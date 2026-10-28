@@ -1,0 +1,167 @@
+provenance:
+  schema_version: 4
+  operator_family: moe_dispatch_combine
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  grouped_routes: Tokens are expanded into expert routes with explicit forward/inverse maps.
+cards:
+- id: moe-route-map-capacity
+  type: constraint
+  axes:
+  - expert_layout
+  - implementation_contract
+  match:
+    operator_families:
+    - moe_dispatch_combine
+    - grouped_gemm_moe
+    - fused_moe_grouped_gemm
+    target_languages:
+    - flydsl
+  question: What is the mapping between token routes and grouped expert rows?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - A route-map kernel assigns rows with per-expert atomic counters.
+  actions:
+  - Zero the expert counters before constructing a fresh map and allocate capacity for the maximum routes received
+    by each expert.
+  - Preserve route = token*topk + choice, grouped row = expert*max_m + slot, and the inverse rows_to_tokens
+    map.
+  - For distributed or masked experts, use the explicit global-to-local map variant and retain the dropped-route
+    convention through the consumer.
+  alternatives:
+  - Use the sorted-token representation with a compatible downstream GEMM.
+  why:
+  - The basic route-map builder atomically reserves an expert-local slot and emits both forward and inverse
+    maps; a separate G2L builder handles local mapping.
+  source_evidence:
+  - aiter_b3ad6c46:src_0a4dbe911d66b11f
+  - aiter_b3ad6c46:src_52948ddec2419f82
+  measurement_evidence: []
+  limitations:
+  - 'The atomic reservation is not a capacity check: overload must be prevented or handled by the caller.'
+  - Atomic slot order need not match original token order.
+  references:
+  - knowledge/operator/moe_dispatch_combine/README.md
+  - knowledge/operator/grouped_gemm_moe/README.md
+  - knowledge/operator/fused_moe_grouped_gemm/README.md
+- id: moe-route-quant-scatter-fusion
+  type: performance_candidate
+  axes:
+  - expert_layout
+  - numerical_contract
+  - data_movement
+  match:
+    operator_families:
+    - moe_dispatch_combine
+    - fused_moe_grouped_gemm
+    target_languages:
+    - flydsl
+  question: What does fusing route mapping, MX quantization and scatter commit the consumer to?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The candidate uses per-1x32 MX activation quantization and expert-grouped storage.
+  actions:
+  - Fuse route assignment, payload quantization and scale placement only when the GEMM accepts exactly that
+    payload/scale layout.
+  - Retain the zero-initialized route counter, per-expert capacity and valid-row metadata.
+  - Keep the scale-preshuffle transform coupled to the grouped row and the consumer's WMMA/MFMA layout.
+  alternatives:
+  - Keep the four stages separate to isolate layout and numerical correctness before fusion.
+  why:
+  - The fused builder replaces separate route-map, quant, token-copy and scale-preshuffle passes, with explicit
+    per-32-element scale handling.
+  source_evidence:
+  - aiter_b3ad6c46:src_2bdcc297cb94f6d6
+  measurement_evidence: []
+  limitations:
+  - This is a source precedent, not a measured reduction in end-to-end latency.
+  - A backend that expects contiguous scales cannot directly consume preshuffled scales.
+  references:
+  - knowledge/operator/moe_dispatch_combine/README.md
+  - knowledge/operator/fused_moe_grouped_gemm/README.md
+- id: moe-weighted-gather-dropped-routes
+  type: semantic
+  axes:
+  - combine
+  - numerical_contract
+  - expert_layout
+  match:
+    operator_families:
+    - moe_dispatch_combine
+    - grouped_gemm_moe
+    - fused_moe_grouped_gemm
+    target_languages:
+    - flydsl
+    - triton
+  question: Where are route weights applied, and how are dropped routes excluded?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - Expert outputs must be combined back into each token's output row.
+  actions:
+  - Apply each route weight exactly once across scatter, expert epilogue and gather/reduce; record whether
+    intermediate rows are already weighted.
+  - Keep a dropped route as invalid and suppress its memory load instead of clamping it to a real expert row
+    and multiplying by zero.
+  - Preserve split-K accumulation and output dtype behavior when changing the combine.
+  alternatives:
+  - Use a separate explicit weighted sum over valid expert outputs.
+  why:
+  - The FlyDSL gather handles DROPPED_ROUTE_ROW with disabled loads, avoiding stale NaN times zero; the Triton
+    scatter-grouped path explicitly preweights rows.
+  source_evidence:
+  - aiter_b3ad6c46:src_e689390c22f73f0d
+  measurement_evidence: []
+  limitations:
+  - A zero weight does not make an invalid or uninitialized read numerically safe.
+  references:
+  - knowledge/operator/moe_dispatch_combine/README.md
+  - knowledge/operator/grouped_gemm_moe/README.md
+  - knowledge/operator/fused_moe_grouped_gemm/README.md
+  solutions:
+  - backend: triton
+    mechanism: _scatter_grouped multiplies rows by Gammas before a subsequent unweighted reduction.
+    source_evidence:
+    - aiter_b3ad6c46:src_8b4846cb32c13ce3
+    - aiter_b3ad6c46:src_330eb5ef722c9789
+- id: moe-communication-arena-lifetime
+  type: constraint
+  axes:
+  - communication
+  - implementation_contract
+  match:
+    operator_families:
+    - moe_dispatch_combine
+    - fused_moe_grouped_gemm
+    target_languages:
+    - flydsl
+  question: Which host and synchronization invariants accompany device-side MoE communication?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The candidate reuses the tensor-parallel MegaMoE device communication design.
+  actions:
+  - Reserve symmetric arena regions in the same order across ranks and keep the mappings alive for all in-flight
+    kernels.
+  - Preserve readiness/epoch and buffer-reuse dependencies along with peer addressing; copying the compute
+    loop alone is insufficient.
+  - Separate TP reductions from EP token routing when defining ownership and output semantics.
+  alternatives:
+  - Use explicit library collectives between compute stages before attempting device-side overlap.
+  why:
+  - The arena implementation maps peer allocations, and the communication helpers poll readiness and use rank-indexed
+    metadata.
+  source_evidence:
+  - aiter_b3ad6c46:src_b3a94e1850387cbe
+  - aiter_b3ad6c46:src_0cb51cc8eaf4375d
+  - aiter_b3ad6c46:src_f80e3738642511c2
+  measurement_evidence: []
+  limitations:
+  - This is a TP communication precedent, not evidence that an arbitrary EP topology is supported.
+  - No multi-GPU performance or deadlock-free execution was measured for this corpus.
+  references:
+  - knowledge/operator/moe_dispatch_combine/README.md
+  - knowledge/operator/fused_moe_grouped_gemm/README.md
+shared_cards: []

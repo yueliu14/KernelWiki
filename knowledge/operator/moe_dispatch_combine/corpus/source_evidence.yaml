@@ -1,0 +1,2208 @@
+schema_version: 2
+operator: moe_dispatch_combine
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  lines: 3200
+  evidence_records: 89
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  lines: 316
+  evidence_records: 13
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  lines: 783
+  evidence_records: 25
+- snapshot: aiter_b3ad6c46
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  lines: 217
+  evidence_records: 13
+missing: []
+source_evidence:
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 100
+  end_line: 103
+  match: 'def _i32_ptr(ptr):'
+  captured:
+  - _i32_ptr
+  arch_scope: ''
+  evidence:
+  - '100: def _i32_ptr(ptr):'
+  - '101:     """View a byte-pointer kernel argument as aligned i32 elements."""'
+  - '102:     ptr_type = fx.PointerType.get(fx.Int32.ir_type, ptr.address_space, 4)'
+  evidence_id: src_8878bd53b95ab9b1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 160
+  end_line: 161
+  match: 'def _arch_has_pk8(arch: str) -> bool:'
+  captured:
+  - _arch_has_pk8
+  arch_scope: ''
+  evidence:
+  - '160: def _arch_has_pk8(arch: str) -> bool:'
+  - '161:     return arch.startswith(_PK8_BF16_ARCHS)'
+  evidence_id: src_7f9537cf8f9e271a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 164
+  end_line: 177
+  match: 'def _cvt_scalef32_pk8_fp4_bf16(src_v8bf16, scale_f32, *, i32_ty):'
+  captured:
+  - _cvt_scalef32_pk8_fp4_bf16
+  arch_scope: ''
+  evidence:
+  - '164: def _cvt_scalef32_pk8_fp4_bf16(src_v8bf16, scale_f32, *, i32_ty):'
+  - '165:     """Native gfx1250 scaled 8x bf16 -> packed fp4 (i32, 8 nibbles).'
+  evidence_id: src_7d6d1c70feecfd66
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 180
+  end_line: 192
+  match: 'def _cvt_scalef32_pk8_fp8_bf16(src_v8bf16, scale_f32, *, v2i32_ty):'
+  captured:
+  - _cvt_scalef32_pk8_fp8_bf16
+  arch_scope: ''
+  evidence:
+  - '180: def _cvt_scalef32_pk8_fp8_bf16(src_v8bf16, scale_f32, *, v2i32_ty):'
+  - '181:     """Native gfx1250 scaled 8x bf16 -> packed fp8 e4m3 (v2i32, 8 bytes).'
+  evidence_id: src_ca9b90bbc0645d70
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 195
+  end_line: 201
+  match: 'def _emit_pk8_lane_amax(bf16x8, c):'
+  captured:
+  - _emit_pk8_lane_amax
+  arch_scope: ''
+  evidence:
+  - '195: def _emit_pk8_lane_amax(bf16x8, c):'
+  - '196:     """max(|x|) over the 8 bf16 this lane owns, as f32."""'
+  - '197:     f32x8 = bf16x8.to(fx.Float32)'
+  evidence_id: src_751a559abac4412c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 204
+  end_line: 205
+  match: 'def _arch_has_native_scaled_cvt(arch: str) -> bool:'
+  captured:
+  - _arch_has_native_scaled_cvt
+  arch_scope: ''
+  evidence:
+  - '204: def _arch_has_native_scaled_cvt(arch: str) -> bool:'
+  - '205:     return arch.startswith(_NATIVE_SCALED_CVT_ARCHS)'
+  evidence_id: src_e46d07d4eeb2cd92
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 208
+  end_line: 301
+  match: 'def _quant_layout(feat_dim: int, quant_mode: str, wmma_rep: int) -> SimpleNamespace:'
+  captured:
+  - _quant_layout
+  arch_scope: ''
+  evidence:
+  - '208: def _quant_layout(feat_dim: int, quant_mode: str, wmma_rep: int) -> SimpleNamespace:'
+  - '209:     """Shared per-block quant + e8m0 scale-preshuffle geometry.'
+  evidence_id: src_831cac604d5242ed
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 304
+  end_line: 545
+  match: 'def _emit_quant_block_loop(c: SimpleNamespace) -> None:'
+  captured:
+  - _emit_quant_block_loop
+  arch_scope: ''
+  evidence:
+  - '304: def _emit_quant_block_loop(c: SimpleNamespace) -> None:'
+  - '305:     """Emit one warp''s per-MX-block quant + e8m0 scale-preshuffle loop.'
+  evidence_id: src_7cf648af09094744
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 548
+  end_line: 584
+  match: 'def _emit_quant_result_stores(c, dst_payload, mx_block, payload_val, e8m0_scale):'
+  captured:
+  - _emit_quant_result_stores
+  arch_scope: ''
+  evidence:
+  - '548: def _emit_quant_result_stores(c, dst_payload, mx_block, payload_val, e8m0_scale):'
+  - '549:     """Write one MX-block result to every destination in ``c.dests``.'
+  evidence_id: src_77661d262ee8c4d9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 587
+  end_line: 597
+  match: 'def _pack_block_group_dword(c, e8m0_scale):'
+  captured:
+  - _pack_block_group_dword
+  arch_scope: ''
+  evidence:
+  - '587: def _pack_block_group_dword(c, e8m0_scale):'
+  - '588:     """The dword of e8m0 bytes for the 4 MX blocks around this lane''s block.'
+  evidence_id: src_1ff64a70a34d8296
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 600
+  end_line: 628
+  match: 'def _emit_interleaved_scale_dwords(c, scale_dword, e8m0_scale):'
+  captured:
+  - _emit_interleaved_scale_dwords
+  arch_scope: ''
+  evidence:
+  - '600: def _emit_interleaved_scale_dwords(c, scale_dword, e8m0_scale):'
+  - '601:     """One dword per 4 MX blocks instead of 4 predicated byte stores.'
+  evidence_id: src_ae217bddb4abc43e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 631
+  end_line: 660
+  match: 'def _emit_compact_scale_dwords(c, scale_dword, e8m0_scale):'
+  captured:
+  - _emit_compact_scale_dwords
+  arch_scope: ''
+  evidence:
+  - '631: def _emit_compact_scale_dwords(c, scale_dword, e8m0_scale):'
+  - '632:     """One row-major e8m0 row per source token, a dword per 4 MX blocks.'
+  evidence_id: src_acaaf01fe0678986
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 663
+  end_line: 682
+  match: 'def _emit_payload_stores(c, dst_payload, payload_val, mx_block):'
+  captured:
+  - _emit_payload_stores
+  arch_scope: ''
+  evidence:
+  - '663: def _emit_payload_stores(c, dst_payload, payload_val, mx_block):'
+  - '664:     """One MX block''s payload bytes to every payload destination.'
+  evidence_id: src_fd056feff23709d9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 685
+  end_line: 695
+  match: 'def _emit_quant_one_k_group(c: SimpleNamespace, mx_group) -> None:'
+  captured:
+  - _emit_quant_one_k_group
+  arch_scope: ''
+  evidence:
+  - '685: def _emit_quant_one_k_group(c: SimpleNamespace, mx_group) -> None:'
+  - '686:     """Emit exactly one K group of MX blocks for one warp.'
+  evidence_id: src_f7b234a42ecdea85
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 698
+  end_line: 789
+  match: 'def _emit_prequant_copy_preshuffle(c: SimpleNamespace) -> None:'
+  captured:
+  - _emit_prequant_copy_preshuffle
+  arch_scope: ''
+  evidence:
+  - '698: def _emit_prequant_copy_preshuffle(c: SimpleNamespace) -> None:'
+  - '699:     """Prequantized full-row path: dwordx4 payload copy + dword-combined e8m0 scatter.'
+  evidence_id: src_0182e4d617481a40
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 792
+  end_line: 1116
+  match: def build_moe_fused_route_quant_scatter_module(
+  captured:
+  - build_moe_fused_route_quant_scatter_module
+  arch_scope: ''
+  evidence:
+  - '792: def build_moe_fused_route_quant_scatter_module('
+  - '793:     model_dim: int,'
+  - '794:     topk: int,'
+  evidence_id: src_2bdcc297cb94f6d6
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1119
+  end_line: 1341
+  match: def build_moe_fused_route_quant_scatter_st_ksplit_module(
+  captured:
+  - build_moe_fused_route_quant_scatter_st_ksplit_module
+  arch_scope: ''
+  evidence:
+  - '1119: def build_moe_fused_route_quant_scatter_st_ksplit_module('
+  - '1120:     model_dim: int,'
+  - '1121:     topk: int,'
+  evidence_id: src_18c45f243be9a51f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1344
+  end_line: 1571
+  match: def build_moe_fused_quant_preshuffle_module(
+  captured:
+  - build_moe_fused_quant_preshuffle_module
+  arch_scope: ''
+  evidence:
+  - '1344: def build_moe_fused_quant_preshuffle_module('
+  - '1345:     feat_dim: int,'
+  - '1346:     wmma_rep: int,'
+  evidence_id: src_840d5ee5e009b278
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1574
+  end_line: 1986
+  match: def build_moe_fused_quant_preshuffle_route_ksplit_module(
+  captured:
+  - build_moe_fused_quant_preshuffle_route_ksplit_module
+  arch_scope: ''
+  evidence:
+  - '1574: def build_moe_fused_quant_preshuffle_route_ksplit_module('
+  - '1575:     feat_dim: int,'
+  - '1576:     wmma_rep: int,'
+  evidence_id: src_704a39260fb4e18d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1989
+  end_line: 2001
+  match: def _token_multidest_scale_base(
+  captured:
+  - _token_multidest_scale_base
+  arch_scope: ''
+  evidence:
+  - '1989: def _token_multidest_scale_base('
+  - '1990:     row, c_rows_per_tile, c_dst_scale_dwords_per_row, c16_i32'
+  - '1991: ):'
+  evidence_id: src_864b2687de1ee234
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2004
+  end_line: 2025
+  match: def token_multidest_ksplit(
+  captured:
+  - token_multidest_ksplit
+  arch_scope: ''
+  evidence:
+  - '2004: def token_multidest_ksplit('
+  - '2005:     feat_dim: int, wmma_rep: int, quant_mode: str, token_num: int'
+  - '2006: ) -> int:'
+  evidence_id: src_fca5ceae38f918b0
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2028
+  end_line: 2044
+  match: def token_multidest_tdm_chunks(
+  captured:
+  - token_multidest_tdm_chunks
+  arch_scope: ''
+  evidence:
+  - '2028: def token_multidest_tdm_chunks('
+  - '2029:     feat_dim: int, wmma_rep: int, quant_mode: str, ksplit: int = 1'
+  - '2030: ) -> int:'
+  evidence_id: src_42b0c256c8093bb9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2047
+  end_line: 2333
+  match: def build_moe_token_multidest_quant_module(
+  captured:
+  - build_moe_token_multidest_quant_module
+  arch_scope: ''
+  evidence:
+  - '2047: def build_moe_token_multidest_quant_module('
+  - '2048:     feat_dim: int,'
+  - '2049:     wmma_rep: int,'
+  evidence_id: src_b64f5a2859c62708
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2336
+  end_line: 2351
+  match: def fused_quant_preshuffle_supported(
+  captured:
+  - fused_quant_preshuffle_supported
+  arch_scope: ''
+  evidence:
+  - '2336: def fused_quant_preshuffle_supported('
+  - '2337:     feat_dim: int, wmma_rep: int, quant_mode: str'
+  - '2338: ) -> bool:'
+  evidence_id: src_7c129b5e86ebd8a7
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2354
+  end_line: 2365
+  match: 'def _fused_preshuffle_k_chunks(L) -> int:'
+  captured:
+  - _fused_preshuffle_k_chunks
+  arch_scope: ''
+  evidence:
+  - '2354: def _fused_preshuffle_k_chunks(L) -> int:'
+  - '2355:     """How many k-slices one scale row-tile needs to fit the phase-2 LDS tile."""'
+  - '2356:     src_dwords = L.mx_blocks_per_row // 4'
+  evidence_id: src_975b29a79050868b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2368
+  end_line: 2643
+  match: def build_moe_token_multidest_compact_quant_module(
+  captured:
+  - build_moe_token_multidest_compact_quant_module
+  arch_scope: ''
+  evidence:
+  - '2368: def build_moe_token_multidest_compact_quant_module('
+  - '2369:     feat_dim: int,'
+  - '2370:     wmma_rep: int,'
+  evidence_id: src_e2b8d0d9d746e8cd
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2646
+  end_line: 3199
+  match: def build_moe_fused_route_psum_quant_scatter_module(
+  captured:
+  - build_moe_fused_route_psum_quant_scatter_module
+  arch_scope: ''
+  evidence:
+  - '2646: def build_moe_fused_route_psum_quant_scatter_module('
+  - '2647:     model_dim: int,'
+  - '2648:     topk: int,'
+  evidence_id: src_d173136a62897cfb
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 375
+  end_line: 378
+  match: 'def _mx_block_of(it):'
+  captured:
+  - _mx_block_of
+  arch_scope: ''
+  evidence:
+  - '373:         )'
+  - '375:     def _mx_block_of(it):'
+  - '376:         return (mx_group_base + fx.Int32(it)) * fx.Int32('
+  - '377:             c.mx_blocks_per_wave_iter'
+  evidence_id: src_b4096ffb78ca7d7f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 389
+  end_line: 408
+  match: 'def _emit_hidden_load(it):'
+  captured:
+  - _emit_hidden_load
+  arch_scope: ''
+  evidence:
+  - '387:     hidden_lds_load = getattr(c, "hidden_lds_load", None)'
+  - '389:     def _emit_hidden_load(it):'
+  - '390:         """This iteration''s 8 bf16 (one aligned dwordx4)."""'
+  - '391:         col_base = ('
+  evidence_id: src_68b6ee8cc64ee8ba
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 573
+  end_line: 577
+  match: 'def _store_lead_scale():'
+  captured:
+  - _store_lead_scale
+  arch_scope: ''
+  evidence:
+  - '571:     # @flyc.jit dispatch (a bare Python ``if`` would eval the dynamic Boolean'
+  - '572:     # as a host bool).'
+  - '573:     def _store_lead_scale():'
+  - '574:         for dst in c.dests:'
+  - '575:             dst_scale_dword = dst.scale_row_dword_base + scale_dword * c.c_wmma_rep * 16'
+  evidence_id: src_fab1a5bdf05946de
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 580
+  end_line: 582
+  match: 'def _dispatch_lead_scale():'
+  captured:
+  - _dispatch_lead_scale
+  arch_scope: ''
+  evidence:
+  - '579:     @flyc.jit'
+  - '580:     def _dispatch_lead_scale():'
+  - '581:         if c.is_block_lead:'
+  - '582:             _store_lead_scale()'
+  evidence_id: src_e5b3d33e5012b15d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 610
+  end_line: 617
+  match: 'def _store_packed():'
+  captured:
+  - _store_packed
+  arch_scope: ''
+  evidence:
+  - '608:     packed = _pack_block_group_dword(c, e8m0_scale)'
+  - '610:     def _store_packed():'
+  - '611:         for dst in c.dests:'
+  - '612:             # buffer_store scales the offset by the stored type, so index dwords.'
+  evidence_id: src_b04ff954c882150b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 624
+  end_line: 626
+  match: 'def _dispatch_packed():'
+  captured:
+  - _dispatch_packed
+  arch_scope: ''
+  evidence:
+  - '623:     @flyc.jit'
+  - '624:     def _dispatch_packed():'
+  - '625:         if group_lead:'
+  - '626:             _store_packed()'
+  evidence_id: src_4d69880a9698df54
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 642
+  end_line: 649
+  match: 'def _store_packed():'
+  captured:
+  - _store_packed
+  arch_scope: ''
+  evidence:
+  - '640:     packed = _pack_block_group_dword(c, e8m0_scale)'
+  - '642:     def _store_packed():'
+  - '643:         for dst in c.dests:'
+  - '644:             # buffer_store scales the offset by the stored type, so index dwords.'
+  evidence_id: src_14687f198694d040
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 656
+  end_line: 658
+  match: 'def _dispatch_packed():'
+  captured:
+  - _dispatch_packed
+  arch_scope: ''
+  evidence:
+  - '655:     @flyc.jit'
+  - '656:     def _dispatch_packed():'
+  - '657:         if group_lead:'
+  - '658:             _store_packed()'
+  evidence_id: src_8f5c7948338776e8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 879
+  end_line: 1070
+  match: def fused_kernel(
+  captured:
+  - fused_kernel
+  arch_scope: ''
+  evidence:
+  - '878:     @flyc.kernel(name=module_name, known_block_size=[BLOCK_THREADS, 1, 1])'
+  - '879:     def fused_kernel('
+  - '880:         topk_ids: fx.Pointer,  # (numel,) int32 (GLOBAL expert ids when use_g2l)'
+  - '881:         counter: fx.Pointer,  # (E,) int32, init 0'
+  evidence_id: src_fa8739fdca0bddb8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1073
+  end_line: 1107
+  match: def launch_fused(
+  captured:
+  - launch_fused
+  arch_scope: ''
+  evidence:
+  - '1072:     @flyc.jit'
+  - '1073:     def launch_fused('
+  - '1074:         topk_ids: fx.Pointer,'
+  - '1075:         counter: fx.Pointer,'
+  evidence_id: src_d439eccc51edeccd
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1180
+  end_line: 1302
+  match: def fused_kernel(
+  captured:
+  - fused_kernel
+  arch_scope: ''
+  evidence:
+  - '1179:     @flyc.kernel(name=module_name, known_block_size=[block_threads, 1, 1])'
+  - '1180:     def fused_kernel('
+  - '1181:         topk_ids: fx.Pointer,  # (topk,) int32'
+  - '1182:         counter: fx.Pointer,  # (E,) int32 out'
+  evidence_id: src_0ff9fd3ee14c316a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1305
+  end_line: 1332
+  match: def launch_fused(
+  captured:
+  - launch_fused
+  arch_scope: ''
+  evidence:
+  - '1304:     @flyc.jit'
+  - '1305:     def launch_fused('
+  - '1306:         topk_ids: fx.Pointer,'
+  - '1307:         counter: fx.Pointer,'
+  evidence_id: src_65d90ede7f2c73d6
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1421
+  end_line: 1537
+  match: def fused_kernel(
+  captured:
+  - fused_kernel
+  arch_scope: ''
+  evidence:
+  - '1420:     @flyc.kernel(name=module_name, known_block_size=[BLOCK_THREADS, 1, 1])'
+  - '1421:     def fused_kernel('
+  - '1422:         grouped_in: fx.Pointer,  # (n_rows*feat_dim,) bf16'
+  - '1423:         grouped_payload: fx.Pointer,  # (n_rows*payload_bytes_per_row,) uint8 out'
+  evidence_id: src_344747edebc05b56
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1540
+  end_line: 1562
+  match: def launch_fused(
+  captured:
+  - launch_fused
+  arch_scope: ''
+  evidence:
+  - '1539:     @flyc.jit'
+  - '1540:     def launch_fused('
+  - '1541:         grouped_in: fx.Pointer,'
+  - '1542:         grouped_payload: fx.Pointer,'
+  evidence_id: src_f43b4776c4bdae06
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1667
+  end_line: 1923
+  match: def fused_kernel(
+  captured:
+  - fused_kernel
+  arch_scope: ''
+  evidence:
+  - '1666:     @flyc.kernel(name=module_name, known_block_size=[BLOCK_THREADS, 1, 1])'
+  - '1667:     def fused_kernel('
+  - '1668:         grouped_in: fx.Pointer,  # flat grouped activations'
+  - '1669:         grouped_payload: fx.Pointer,'
+  evidence_id: src_2efdcc2315c4ae92
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1928
+  end_line: 1977
+  match: def launch_fused(
+  captured:
+  - launch_fused
+  arch_scope: ''
+  evidence:
+  - '1927:     @flyc.jit'
+  - '1928:     def launch_fused('
+  - '1929:         grouped_in: fx.Pointer,'
+  - '1930:         grouped_payload: fx.Pointer,'
+  evidence_id: src_824cb37955b4fab9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2115
+  end_line: 2303
+  match: def token_multidest_kernel(
+  captured:
+  - token_multidest_kernel
+  arch_scope: ''
+  evidence:
+  - '2114:     @flyc.kernel(name=module_name, known_block_size=[BLOCK_THREADS, 1, 1])'
+  - '2115:     def token_multidest_kernel('
+  - '2116:         hidden: fx.Pointer,'
+  - '2117:         grouped_payload: fx.Pointer,'
+  evidence_id: src_8bb51c15c1109e21
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2306
+  end_line: 2325
+  match: def launch_token_multidest(
+  captured:
+  - launch_token_multidest
+  arch_scope: ''
+  evidence:
+  - '2305:     @flyc.jit'
+  - '2306:     def launch_token_multidest('
+  - '2307:         hidden: fx.Pointer,'
+  - '2308:         grouped_payload: fx.Pointer,'
+  evidence_id: src_035ab3c7be57dd74
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2424
+  end_line: 2610
+  match: def compact_quant_kernel(
+  captured:
+  - compact_quant_kernel
+  arch_scope: ''
+  evidence:
+  - '2423:     @flyc.kernel(name=module_name, known_block_size=[BLOCK_THREADS, 1, 1])'
+  - '2424:     def compact_quant_kernel('
+  - '2425:         hidden: fx.Pointer,'
+  - '2426:         grouped_payload: fx.Pointer,'
+  evidence_id: src_78111a1cce941e1f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2613
+  end_line: 2635
+  match: def launch_compact_quant(
+  captured:
+  - launch_compact_quant
+  arch_scope: ''
+  evidence:
+  - '2612:     @flyc.jit'
+  - '2613:     def launch_compact_quant('
+  - '2614:         hidden: fx.Pointer,'
+  - '2615:         grouped_payload: fx.Pointer,'
+  evidence_id: src_1efd2f7122dfe6c9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2756
+  end_line: 3131
+  match: def fused_kernel(
+  captured:
+  - fused_kernel
+  arch_scope: ''
+  evidence:
+  - '2755:     @flyc.kernel(name=module_name, known_block_size=[BLOCK_THREADS, 1, 1])'
+  - '2756:     def fused_kernel('
+  - '2757:         topk_ids: fx.Pointer,  # (numel,) int32'
+  - '2758:         count: fx.Pointer,  # (E,) int32 in/out (init 0) -> masked_m'
+  evidence_id: src_058df0d12391ef33
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 3134
+  end_line: 3190
+  match: def launch_fused(
+  captured:
+  - launch_fused
+  arch_scope: ''
+  evidence:
+  - '3133:     @flyc.jit'
+  - '3134:     def launch_fused('
+  - '3135:         topk_ids: fx.Pointer,'
+  - '3136:         count: fx.Pointer,'
+  evidence_id: src_b1f4e7b43814e04e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 781
+  end_line: 782
+  match: 'def _store_scale_dword(dst_dword_idx=dst_dword_idx, src_dword=src_dword):'
+  captured:
+  - _store_scale_dword
+  arch_scope: ''
+  evidence:
+  - '780:         # Tail-lane guard: n_scale_dwords may not be a wave multiple.'
+  - '781:         def _store_scale_dword(dst_dword_idx=dst_dword_idx, src_dword=src_dword):'
+  - '782:             scale_t_i32[dst_dword_idx] = fx.Int32(src_dword)'
+  evidence_id: src_7cd84da7a5e97ada
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 785
+  end_line: 787
+  match: 'def _dispatch_scale_dword(g=g, _store_scale_dword=_store_scale_dword):'
+  captured:
+  - _dispatch_scale_dword
+  arch_scope: ''
+  evidence:
+  - '784:         @flyc.jit'
+  - '785:         def _dispatch_scale_dword(g=g, _store_scale_dword=_store_scale_dword):'
+  - '786:             if fx.Uint32(g) < fx.Uint32(c_n_scale_dwords):'
+  - '787:                 _store_scale_dword()'
+  evidence_id: src_a20c6251e63c0a9a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2469
+  end_line: 2606
+  match: 'def _quant_token_group(token0):'
+  captured:
+  - _quant_token_group
+  arch_scope: ''
+  evidence:
+  - '2467:             hidden_lds_row_off = warp_in_block * fx.Int32(hidden_chunk_bytes)'
+  - '2469:         def _quant_token_group(token0):'
+  - '2470:             """Quantize one block''s worth of tokens and emit every copy."""'
+  - '2471:             token = token0 + warp_in_block'
+  evidence_id: src_902ca63ff978e8a4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2807
+  end_line: 2814
+  match: 'def _wait_mem():'
+  captured:
+  - _wait_mem
+  arch_scope: ''
+  evidence:
+  - '2806:         # --- cross-block scratch access helpers ---'
+  - '2807:         def _wait_mem():'
+  - '2808:             # Drain outstanding global memory ops (loads + stores) so atomics /'
+  - '2809:             # coherent writes are committed to the L2 coherence point.'
+  evidence_id: src_9c8753b6393b5a45
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2816
+  end_line: 2821
+  match: 'def _elem_ptr(tensor, elem_idx_i32):'
+  captured:
+  - _elem_ptr
+  arch_scope: ''
+  evidence:
+  - '2814:                 rocdl.s_waitcnt(0)'
+  - '2816:         def _elem_ptr(tensor, elem_idx_i32):'
+  - '2817:             # Keep this address calculation: recasting the kernel pointer changes'
+  - '2818:             # the fused route/psum instruction sequence on gfx950.'
+  evidence_id: src_930c67633d70e974
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2823
+  end_line: 2831
+  match: 'def _atomic_add(tensor, elem_idx_i32, addend):'
+  captured:
+  - _atomic_add
+  arch_scope: ''
+  evidence:
+  - '2821:             return fx.inttoptr(ptr_type, addr)'
+  - '2823:         def _atomic_add(tensor, elem_idx_i32, addend):'
+  - '2824:             ptr = _elem_ptr(tensor, elem_idx_i32)'
+  - '2825:             return fx.Uint32('
+  evidence_id: src_9b177c76c3656f88
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 998
+  end_line: 1060
+  match: 'def _emit_row_quant_scatter():'
+  captured:
+  - _emit_row_quant_scatter
+  arch_scope: ''
+  evidence:
+  - '996:                 ptr_buf_tensor(topids_to_rows)[route] = row_out'
+  - '998:             def _emit_row_quant_scatter():'
+  - '999:                 # --- per-row scale-preshuffle geometry (uniform; from the *global*'
+  - '1000:                 #     grouped_row so the same math serves both output layouts). Since'
+  evidence_id: src_2693ee80badd0e68
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1467
+  end_line: 1526
+  match: 'def _emit_row():'
+  captured:
+  - _emit_row
+  arch_scope: ''
+  evidence:
+  - '1465:             slot = row - expert * m  # row within expert'
+  - '1467:             def _emit_row():'
+  - '1468:                 # --- per-row scale-preshuffle geometry (uniform; row pos == slot) ---'
+  - '1469:                 scale_tile = fx.Uint32(slot) // fx.Uint32(c_rows_per_tile)'
+  evidence_id: src_fbcfee698d65ea1e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2165
+  end_line: 2189
+  match: 'def _issue_hidden(chunk):'
+  captured:
+  - _issue_hidden
+  arch_scope: ''
+  evidence:
+  - '2163:             )'
+  - '2165:             def _issue_hidden(chunk):'
+  - '2166:                 shape = (warps_per_block, hidden_chunk_bytes)'
+  - '2167:                 tdm_ops.tensor_load_2d('
+  evidence_id: src_5d3014b505be011d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2193
+  end_line: 2208
+  match: 'def chunk_prefetch(chunk):'
+  captured:
+  - chunk_prefetch
+  arch_scope: ''
+  evidence:
+  - '2191:             is_loader = warp_in_block == fx.Uint32(c0_i32)'
+  - '2193:             def chunk_prefetch(chunk):'
+  - '2194:                 # Prologue lands chunk 0 outright; every chunk then stages the'
+  - '2195:                 # next one and leaves exactly it in flight, so the DMA runs'
+  evidence_id: src_57f45cabbc1aba26
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2534
+  end_line: 2536
+  match: 'def _store_r2t():'
+  captured:
+  - _store_r2t
+  arch_scope: ''
+  evidence:
+  - '2532:             write_r2t = fx.Boolean(valid) & (fx.Uint32(lane) == fx.Uint32(c0_i32))'
+  - '2534:             def _store_r2t():'
+  - '2535:                 for k in range_constexpr(topk):'
+  - '2536:                     r2t_t[rows[k]] = fx.Int32(token_eff)'
+  evidence_id: src_2d9345f9bcb3f8d1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2539
+  end_line: 2541
+  match: 'def _dispatch_r2t():'
+  captured:
+  - _dispatch_r2t
+  arch_scope: ''
+  evidence:
+  - '2538:             @flyc.jit'
+  - '2539:             def _dispatch_r2t():'
+  - '2540:                 if write_r2t:'
+  - '2541:                     _store_r2t()'
+  evidence_id: src_e6bb84e2c20a2e38
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2479
+  end_line: 2503
+  match: 'def _issue_hidden(chunk):'
+  captured:
+  - _issue_hidden
+  arch_scope: ''
+  evidence:
+  - '2477:                 )'
+  - '2479:                 def _issue_hidden(chunk):'
+  - '2480:                     shape = (warps_per_block, hidden_chunk_bytes)'
+  - '2481:                     tdm_ops.tensor_load_2d('
+  evidence_id: src_97340db4491e3b5f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2505
+  end_line: 2517
+  match: 'def chunk_prefetch(chunk):'
+  captured:
+  - chunk_prefetch
+  arch_scope: ''
+  evidence:
+  - '2503:                     )'
+  - '2505:                 def chunk_prefetch(chunk):'
+  - '2506:                     if const_expr(chunk == 0) and is_loader:'
+  - '2507:                         _issue_hidden(0)'
+  evidence_id: src_96df9f488ba5d731
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2186
+  match: num_warps=1
+  captured:
+  - num_warps
+  - '1'
+  arch_scope: ''
+  evidence:
+  - '2184:                         tile_shape=shape,'
+  - '2185:                         elem_bytes=1,'
+  - '2186:                         num_warps=1,'
+  - '2187:                         oob_outer_bound=valid_rows,'
+  - '2188:                     )'
+  evidence_id: src_2c03017913a11494
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2500
+  match: num_warps=1
+  captured:
+  - num_warps
+  - '1'
+  arch_scope: ''
+  evidence:
+  - '2498:                             tile_shape=shape,'
+  - '2499:                             elem_bytes=1,'
+  - '2500:                             num_warps=1,'
+  - '2501:                             oob_outer_bound=valid_rows,'
+  - '2502:                         )'
+  evidence_id: src_59c7e9f3e785b0b7
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 680
+  match: cache_modifier=payload
+  captured:
+  - payload
+  arch_scope: ''
+  evidence:
+  - '678:             rsrc,'
+  - '679:             payload_byte_off,'
+  - '680:             cache_modifier=payload_cache,'
+  - '681:             offset_is_bytes=True,'
+  - '682:         )'
+  evidence_id: src_cbc06c36d1e72598
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 4
+  end_line: 59
+  match: preshuffle (
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '2: # Copyright (C) 2024-2026, Advanced Micro Devices, Inc. All rights reserved.'
+  - '4: """Fused MoE route-map + MX quant + scatter-copy + scale-preshuffle (FlyDSL).'
+  - '6: The grouped a8w4/fp4 MoE stage1 input prep is normally four kernels (see'
+  evidence_id: src_edbdb08de7b78d5a
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 39
+  match: preshuffle (
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '37: (lane_in_block == 0) writes the single e8m0 scale byte.'
+  - '39: Scale preshuffle (per grouped row, mirrors'
+  - '40: ``moe_scatter_copy_preshuffle_scale.py``): for a grouped row at within-expert'
+  - '41: position ``slot`` in expert ``e`` and MX block ``mx_block`` (with'
+  evidence_id: src_7c83510940c8af83
+- snapshot: aiter_b3ad6c46
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2873
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '2871:         gpu.barrier()'
+  - '2872:         _wait_mem()'
+  - '2873:         rocdl.sched_barrier(0)'
+  - '2875:         is_block_leader = tid == c0_i32'
+  evidence_id: src_43bb99aef8139f5e
+- snapshot: aiter_b3ad6c46
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2933
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '2931:         gpu.barrier()'
+  - '2932:         _wait_mem()'
+  - '2933:         rocdl.sched_barrier(0)'
+  - '2935:         # ===================== Phase 3: route + quant + scatter ================='
+  evidence_id: src_84f8471ed4d24fdc
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 237
+  match: .startswith("gfx942")
+  captured:
+  - gfx942
+  arch_scope: gfx942
+  evidence:
+  - '235:     if is_fp8:'
+  - '236:         mx_dtype = ('
+  - '237:             _MxDtype.FP8_E4M3_FNUZ if arch.startswith("gfx942") else _MxDtype.FP8_E4M3'
+  - '238:         )'
+  - '239:         payload_bytes_per_row = feat_dim'
+  evidence_id: src_deb91e424c367d2f
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2749
+  match: .startswith("gfx12")
+  captured:
+  - gfx12
+  arch_scope: ''
+  evidence:
+  - '2747:     # L2-coherent cross-CU producer/consumer pattern on gfx1250 (hand-rolled'
+  - '2748:     # inline-asm coherent global load/store miscompiles here).'
+  - '2749:     _is_gfx12 = str(L.arch).startswith("gfx12")'
+  - '2751:     @fx.struct'
+  evidence_id: src_b15288fe26a4869e
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 150
+  match: _NATIVE_SCALED_CVT_ARCHS = (
+  captured:
+  - _NATIVE_SCALED_CVT_ARCHS
+  arch_scope: ''
+  evidence:
+  - '148: # "Invalid opcode!" assertion at compile time. gfx1250 therefore uses the same'
+  - '149: # portable path as gfx942 (matches ``silu_and_mul_fq``).'
+  - '150: _NATIVE_SCALED_CVT_ARCHS = ("gfx950",)'
+  - '152: # gfx1250 has no 2-element ``v_cvt_scalef32_pk_{fp4,fp8}_f32`` (gfx950-only) but it'
+  evidence_id: src_05b6cdeb62fbfc6e
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 157
+  match: _PK8_BF16_ARCHS = (
+  captured:
+  - _PK8_BF16_ARCHS
+  arch_scope: ''
+  evidence:
+  - '155: # carried in the f32 scale. We emit them via inline asm so they do not depend on'
+  - '156: # the MLIR rocdl op lowering.'
+  - '157: _PK8_BF16_ARCHS = ("gfx1250",)'
+  evidence_id: src_993cb218e089834a
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 848
+  match: raise ValueError("max_m must be positive when expert_row_base is fused
+  captured:
+  - max_m must be positive when expert_row_base is fused
+  arch_scope: ''
+  evidence:
+  - '846:     """'
+  - '847:     if not use_expert_row_base and max_m <= 0:'
+  - '848:         raise ValueError("max_m must be positive when expert_row_base is fused")'
+  - '849:     L = _quant_layout(model_dim, quant_mode, wmma_rep)'
+  - '850:     is_fp8 = L.is_fp8'
+  evidence_id: src_0fd6564af3ab522e
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1139
+  end_line: 1141
+  match: "raise NotImplementedError(\n            \"single-token K-split currently requires power-of-two topk"
+  captured:
+  - single-token K-split currently requires power-of-two topk
+  arch_scope: ''
+  evidence:
+  - '1137:     """'
+  - '1138:     if topk <= 0 or (topk & (topk - 1)) != 0:'
+  - '1139:         raise NotImplementedError('
+  - '1140:             "single-token K-split currently requires power-of-two topk"'
+  - '1141:         )'
+  evidence_id: src_873592fc072e1164
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1143
+  match: raise ValueError("max_m must be positive when expert_row_base is fused
+  captured:
+  - max_m must be positive when expert_row_base is fused
+  arch_scope: ''
+  evidence:
+  - '1141:         )'
+  - '1142:     if not use_expert_row_base and max_m <= 0:'
+  - '1143:         raise ValueError("max_m must be positive when expert_row_base is fused")'
+  - '1145:     L = _quant_layout(model_dim, quant_mode, wmma_rep)'
+  evidence_id: src_0feefae772ca9bed
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2065
+  match: raise NotImplementedError("token multidest quant requires gfx1250 pk8
+  captured:
+  - token multidest quant requires gfx1250 pk8
+  arch_scope: ''
+  evidence:
+  - '2063:     L = _quant_layout(feat_dim, quant_mode, wmma_rep)'
+  - '2064:     if not L.use_pk8:'
+  - '2065:         raise NotImplementedError("token multidest quant requires gfx1250 pk8")'
+  - '2066:     is_fp8 = L.is_fp8'
+  - '2067:     use_native = L.use_native'
+  evidence_id: src_e1cfdc2217dc0a65
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2385
+  match: raise NotImplementedError("token multidest quant requires gfx1250 pk8
+  captured:
+  - token multidest quant requires gfx1250 pk8
+  arch_scope: ''
+  evidence:
+  - '2383:     L = _quant_layout(feat_dim, quant_mode, wmma_rep)'
+  - '2384:     if not L.use_pk8:'
+  - '2385:         raise NotImplementedError("token multidest quant requires gfx1250 pk8")'
+  - '2386:     is_fp8 = L.is_fp8'
+  - '2387:     use_native = L.use_native'
+  evidence_id: src_8aeb1ca00f11da51
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 460
+  match: block_scale_f32 =
+  captured:
+  - block_scale_f32
+  arch_scope: ''
+  evidence:
+  - '458:             # scale 2^(e8m0-127); the HW divides each input by its exponent'
+  - '459:             # and RNE-packs the 8 outputs (fp4: i32 / fp8: v2i32).'
+  - '460:             block_scale_f32 = (e8m0_scale << c.c23_i32).bitcast(fx.Float32)'
+  - '461:             if const_expr(c.is_fp8):'
+  - '462:                 payload_val = _cvt_scalef32_pk8_fp8_bf16('
+  evidence_id: src_849373c307f952df
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 501
+  match: block_scale_f32 =
+  captured:
+  - block_scale_f32
+  arch_scope: ''
+  evidence:
+  - '499:             if const_expr(c.is_fp8):'
+  - '500:                 if const_expr(c.use_native):'
+  - '501:                     block_scale_f32 = (e8m0_scale << c.c23_i32).bitcast(fx.Float32)'
+  - '502:                     packed = rocdl.cvt_scalef32_pk_fp8_f32('
+  - '503:                         i32,'
+  evidence_id: src_e5d6da26e3b6aed8
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 519
+  match: block_scale_f32 =
+  captured:
+  - block_scale_f32
+  arch_scope: ''
+  evidence:
+  - '517:             else:'
+  - '518:                 if const_expr(c.use_native):'
+  - '519:                     block_scale_f32 = (e8m0_scale << c.c23_i32).bitcast(fx.Float32)'
+  - '520:                     packed = rocdl.cvt_scalef32_pk_fp4_f32('
+  - '521:                         i32,'
+  evidence_id: src_5da2310d37b4d77b
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1103
+  match: ".launch(\n            grid=(grid_x, 1, 1)"
+  captured:
+  - grid_x, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1101:             gather_w,'
+  - '1102:             n_buckets,'
+  - '1103:         ).launch('
+  - '1104:             grid=(grid_x, 1, 1),'
+  - '1105:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_f4e04e519017f393
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1328
+  match: ".launch(\n            grid=(grid_x, grid_y, 1)"
+  captured:
+  - grid_x, grid_y, 1
+  arch_scope: ''
+  evidence:
+  - '1326:             expert_row_base,'
+  - '1327:             numel,'
+  - '1328:         ).launch('
+  - '1329:             grid=(grid_x, grid_y, 1),'
+  - '1330:             block=(block_threads, 1, 1),'
+  evidence_id: src_3754128ee344c121
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1558
+  match: ".launch(\n            grid=(grid_x, 1, 1)"
+  captured:
+  - grid_x, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1556:             n_rows,'
+  - '1557:             max_m,'
+  - '1558:         ).launch('
+  - '1559:             grid=(grid_x, 1, 1),'
+  - '1560:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_86279ca57b0ec626
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 1973
+  match: ".launch(\n            grid=(grid_x, grid_y, 1)"
+  captured:
+  - grid_x, grid_y, 1
+  arch_scope: ''
+  evidence:
+  - '1971:             max_tok,'
+  - '1972:             slot_stride,'
+  - '1973:         ).launch('
+  - '1974:             grid=(grid_x, grid_y, 1),'
+  - '1975:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_df8dcf4d08c18001
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2317
+  match: ".launch(\n            grid=(\n                fx.Int64(grid_blocks)"
+  captured:
+  - "\n                fx.Int64(grid_blocks"
+  arch_scope: ''
+  evidence:
+  - '2315:         token_multidest_kernel('
+  - '2316:             hidden, grouped_payload, grouped_scale, topids_to_rows, token_num'
+  - '2317:         ).launch('
+  - '2318:             grid=('
+  - '2319:                 fx.Int64(grid_blocks),'
+  evidence_id: src_ca0b8a936465d384
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 2631
+  match: ".launch(\n            grid=(fx.Int64(grid_blocks)"
+  captured:
+  - fx.Int64(grid_blocks
+  arch_scope: ''
+  evidence:
+  - '2629:             token_num,'
+  - '2630:             grid_blocks,'
+  - '2631:         ).launch('
+  - '2632:             grid=(fx.Int64(grid_blocks), 1, 1),'
+  - '2633:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_03b88e2222141c5d
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  line: 3186
+  match: ".launch(\n            grid=(grid_x, 1, 1)"
+  captured:
+  - grid_x, 1, 1
+  arch_scope: ''
+  evidence:
+  - '3184:             max_tok,'
+  - '3185:             slot_stride,'
+  - '3186:         ).launch('
+  - '3187:             grid=(grid_x, 1, 1),'
+  - '3188:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_9174c12152b65846
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  line: 74
+  end_line: 75
+  match: 'def _lds_li32(ptr, idx):'
+  captured:
+  - _lds_li32
+  arch_scope: ''
+  evidence:
+  - '74: def _lds_li32(ptr, idx):'
+  - '75:     return fx.ptr_load(ptr + fx.Int64(idx))'
+  evidence_id: src_812b52716d493799
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  line: 78
+  end_line: 79
+  match: 'def _lds_si32(ptr, val, idx):'
+  captured:
+  - _lds_si32
+  arch_scope: ''
+  evidence:
+  - '78: def _lds_si32(ptr, val, idx):'
+  - '79:     fx.ptr_store(val, ptr + fx.Int64(idx))'
+  evidence_id: src_aa3b1d58e5bf70bf
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  line: 82
+  end_line: 90
+  match: 'def _unpack_pair_to_f32(raw_dw, out_dtype):'
+  captured:
+  - _unpack_pair_to_f32
+  arch_scope: ''
+  evidence:
+  - '82: def _unpack_pair_to_f32(raw_dw, out_dtype):'
+  - '83:     lo16 = raw_dw & 0xFFFF'
+  - '84:     hi16 = (raw_dw >> 16) & 0xFFFF'
+  evidence_id: src_9701b32ff29909ea
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  line: 93
+  end_line: 97
+  match: 'def _pack_pair_from_f32(acc_lo, acc_hi, out_dtype):'
+  captured:
+  - _pack_pair_from_f32
+  arch_scope: ''
+  evidence:
+  - '93: def _pack_pair_from_f32(acc_lo, acc_hi, out_dtype):'
+  - '94:     odt = fx.BFloat16 if out_dtype == "bf16" else fx.Float16'
+  - '95:     lo_i32 = fx.Uint32(acc_lo.to(odt).bitcast(fx.Uint16))'
+  evidence_id: src_cfd95b216b4993a6
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  line: 100
+  end_line: 315
+  match: def build_moe_gather_reduce_module(
+  captured:
+  - build_moe_gather_reduce_module
+  arch_scope: ''
+  evidence:
+  - '100: def build_moe_gather_reduce_module('
+  - '101:     model_dim: int,'
+  - '102:     topk: int,'
+  evidence_id: src_e689390c22f73f0d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  line: 126
+  end_line: 281
+  match: def moe_gather_reduce_kernel(
+  captured:
+  - moe_gather_reduce_kernel
+  arch_scope: ''
+  evidence:
+  - '125:     @flyc.kernel(name=module_name)'
+  - '126:     def moe_gather_reduce_kernel('
+  - '127:         grouped_out_flat: fx.Pointer,'
+  - '128:         topids_to_rows: fx.Pointer,'
+  evidence_id: src_f5a223928c0a2777
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  line: 284
+  end_line: 307
+  match: def launch_moe_gather_reduce(
+  captured:
+  - launch_moe_gather_reduce
+  arch_scope: ''
+  evidence:
+  - '283:     @flyc.jit'
+  - '284:     def launch_moe_gather_reduce('
+  - '285:         grouped_out_flat: fx.Pointer,'
+  - '286:         topids_to_rows: fx.Pointer,'
+  evidence_id: src_faefec5176f90819
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  line: 192
+  end_line: 195
+  match: 'def _row_weight(k):'
+  captured:
+  - _row_weight
+  arch_scope: ''
+  evidence:
+  - '190:             row_bytes_i32 = fx.Int32(out_dwords * 4)'
+  - '192:             def _row_weight(k):'
+  - '193:                 row_i32 = _lds_li32(rows_lds, k)'
+  - '194:                 w_f32 = _lds_li32(wbits_lds, k).bitcast(fx.Float32)'
+  evidence_id: src_41cad734db058a75
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  line: 203
+  end_line: 212
+  match: 'def _row_rsrc(row_i32, sk):'
+  captured:
+  - _row_rsrc
+  arch_scope: ''
+  evidence:
+  - '201:             # inside one row. The base is loop-invariant, so this costs the'
+  - '202:             # address math once per route, not once per access.'
+  - '203:             def _row_rsrc(row_i32, sk):'
+  - '204:                 mapped = row_i32 >= fx.Int32(0)'
+  - '205:                 row_u64 = fx.Uint64(mapped.select(row_i32, fx.Int32(0)))'
+  evidence_id: src_1b606b8e2fcf3932
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  line: 214
+  end_line: 217
+  match: 'def load_flat(row_i32, sk, dw_off, vec_width):'
+  captured:
+  - load_flat
+  arch_scope: ''
+  evidence:
+  - '212:                 )'
+  - '214:             def load_flat(row_i32, sk, dw_off, vec_width):'
+  - '215:                 return buffer_ops.buffer_load('
+  - '216:                     _row_rsrc(row_i32, sk), dw_off, vec_width=vec_width, dtype=i32'
+  evidence_id: src_16d7306fb23df4ff
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  line: 65
+  match: MAX_GATHER_TOPK = 32
+  captured:
+  - MAX_GATHER_TOPK
+  - '32'
+  arch_scope: ''
+  evidence:
+  - '64: BLOCK_THREADS = 256'
+  - '65: MAX_GATHER_TOPK = 32'
+  evidence_id: src_58c50bc8c94db4b0
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  line: 113
+  match: raise ValueError(f"vec_dwords must be 2, 4, or 8, got {vec_dwords}
+  captured:
+  - vec_dwords must be 2, 4, or 8, got {vec_dwords}
+  arch_scope: ''
+  evidence:
+  - '111:     assert topk <= MAX_GATHER_TOPK'
+  - '112:     if vec_dwords not in (2, 4, 8):'
+  - '113:         raise ValueError(f"vec_dwords must be 2, 4, or 8, got {vec_dwords}")'
+  - '115:     VEC = int(vec_dwords)'
+  evidence_id: src_cb19f3ea8423799c
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  line: 303
+  end_line: 307
+  match: ".launch(\n            grid=(fx.Int64(num_tokens)"
+  captured:
+  - fx.Int64(num_tokens
+  arch_scope: ''
+  evidence:
+  - '301:             num_valid_tokens,'
+  - '302:         )'
+  - '303:         launcher.launch('
+  - '304:             grid=(fx.Int64(num_tokens), n_iters, 1),'
+  - '305:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_75145cce49a8c549
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 64
+  end_line: 67
+  match: 'def _i32_ptr(ptr):'
+  captured:
+  - _i32_ptr
+  arch_scope: ''
+  evidence:
+  - '64: def _i32_ptr(ptr):'
+  - '65:     """View a byte-pointer kernel argument as aligned i32 elements."""'
+  - '66:     ptr_type = fx.PointerType.get(fx.Int32.ir_type, ptr.address_space, 4)'
+  evidence_id: src_e31d7b6d39beff72
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 70
+  end_line: 128
+  match: 'def build_moe_route_maps_module():'
+  captured:
+  - build_moe_route_maps_module
+  arch_scope: ''
+  evidence:
+  - '70: def build_moe_route_maps_module():'
+  - '71:     """JIT launcher: builds topids_to_rows and rows_to_tokens in one pass."""'
+  evidence_id: src_0a4dbe911d66b11f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 131
+  end_line: 178
+  match: 'def build_moe_topids_to_rows_module():'
+  captured:
+  - build_moe_topids_to_rows_module
+  arch_scope: ''
+  evidence:
+  - '131: def build_moe_topids_to_rows_module():'
+  - '132:     """JIT launcher: builds topids_to_rows only (no rows_to_tokens inverse)."""'
+  evidence_id: src_855a83e0d57e2885
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 181
+  end_line: 300
+  match: 'def build_moe_topids_to_rows_g2l_module(weight_dtype="bf16"):'
+  captured:
+  - build_moe_topids_to_rows_g2l_module
+  arch_scope: ''
+  evidence:
+  - '181: def build_moe_topids_to_rows_g2l_module(weight_dtype="bf16"):'
+  - '182:     """topids_to_rows with a fused EP global->local expert remap.'
+  evidence_id: src_52948ddec2419f82
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 303
+  end_line: 598
+  match: 'def build_moe_route_g2l_lds_module(weight_dtype="bf16", direct_mask: bool = False):'
+  captured:
+  - build_moe_route_g2l_lds_module
+  arch_scope: ''
+  evidence:
+  - '303: def build_moe_route_g2l_lds_module(weight_dtype="bf16", direct_mask: bool = False):'
+  - '304:     """Multi-block EP route with a two-level (LDS -> global) atomic reduction.'
+  evidence_id: src_d0ad9d8265c4e799
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 601
+  end_line: 782
+  match: 'def build_moe_route_g2l_fused_module(weight_dtype="bf16"):'
+  captured:
+  - build_moe_route_g2l_fused_module
+  arch_scope: ''
+  evidence:
+  - '601: def build_moe_route_g2l_fused_module(weight_dtype="bf16"):'
+  - '602:     """Single-block fused g2l-LUT build + EP route (contiguous path).'
+  evidence_id: src_c7f9560e2a89ef74
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 74
+  end_line: 99
+  match: def route_maps_kernel(
+  captured:
+  - route_maps_kernel
+  arch_scope: ''
+  evidence:
+  - '73:     @flyc.kernel(name="moe_route_maps")'
+  - '74:     def route_maps_kernel('
+  - '75:         topk_ids: fx.Pointer,  # (numel,) int32'
+  - '76:         atomic_buffer: fx.Pointer,  # (E,) int32, init 0'
+  evidence_id: src_5dc9277bb09ded1c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 102
+  end_line: 120
+  match: def launch_route_maps(
+  captured:
+  - launch_route_maps
+  arch_scope: ''
+  evidence:
+  - '101:     @flyc.jit'
+  - '102:     def launch_route_maps('
+  - '103:         topk_ids: fx.Pointer,'
+  - '104:         atomic_buffer: fx.Pointer,'
+  evidence_id: src_0cbc7186d9598c37
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 135
+  end_line: 153
+  match: def route_kernel(
+  captured:
+  - route_kernel
+  arch_scope: ''
+  evidence:
+  - '134:     @flyc.kernel(name="moe_route")'
+  - '135:     def route_kernel('
+  - '136:         topk_ids: fx.Pointer,'
+  - '137:         atomic_buffer: fx.Pointer,'
+  evidence_id: src_a6ce0866b477913c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 156
+  end_line: 170
+  match: def launch_topids_to_rows(
+  captured:
+  - launch_topids_to_rows
+  arch_scope: ''
+  evidence:
+  - '155:     @flyc.jit'
+  - '156:     def launch_topids_to_rows('
+  - '157:         topk_ids: fx.Pointer,'
+  - '158:         atomic_buffer: fx.Pointer,'
+  evidence_id: src_1b7c0ccc87a75ec4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 199
+  end_line: 259
+  match: def route_kernel(
+  captured:
+  - route_kernel
+  arch_scope: ''
+  evidence:
+  - '198:     @flyc.kernel(name="moe_route_g2l")'
+  - '199:     def route_kernel('
+  - '200:         topk_ids: fx.Pointer,  # (numel,) int32 GLOBAL expert ids'
+  - '201:         g2l_lut: fx.Pointer,  # (E_global,) int32 global->local, sentinel=n_buckets'
+  evidence_id: src_1eab69d842b79279
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 262
+  end_line: 292
+  match: def launch_topids_to_rows_g2l(
+  captured:
+  - launch_topids_to_rows_g2l
+  arch_scope: ''
+  evidence:
+  - '261:     @flyc.jit'
+  - '262:     def launch_topids_to_rows_g2l('
+  - '263:         topk_ids: fx.Pointer,'
+  - '264:         g2l_lut: fx.Pointer,'
+  evidence_id: src_c1c3daf08feec5d9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 332
+  end_line: 470
+  match: def route_kernel(
+  captured:
+  - route_kernel
+  arch_scope: ''
+  evidence:
+  - '330:         known_block_size=[BLOCK_THREADS, 1, 1],'
+  - '331:     )'
+  - '332:     def route_kernel('
+  - '333:         topk_ids: fx.Pointer,  # (numel,) int32 GLOBAL expert ids'
+  - '334:         g2l_lut: fx.Pointer,  # (E_global,) int32 global->local, sentinel=n_buckets'
+  evidence_id: src_138ecf3e7340d7ee
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 472
+  end_line: 509
+  match: def _launch(
+  captured:
+  - _launch
+  arch_scope: ''
+  evidence:
+  - '470:             out_p[route] = row_out'
+  - '472:     def _launch('
+  - '473:         topk_ids,'
+  - '474:         g2l_lut,'
+  evidence_id: src_9781e91aad5c6279
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 623
+  end_line: 741
+  match: def route_fused_kernel(
+  captured:
+  - route_fused_kernel
+  arch_scope: ''
+  evidence:
+  - '621:         known_block_size=[MAX_G2L_EXPERTS, 1, 1],'
+  - '622:     )'
+  - '623:     def route_fused_kernel('
+  - '624:         expert_mask: fx.Pointer,  # (n,) int32 0/1 global expert mask'
+  - '625:         topk_ids: fx.Pointer,  # (numel,) int32 GLOBAL expert ids'
+  evidence_id: src_625224ac09913d1b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 744
+  end_line: 774
+  match: def launch_route_g2l_fused(
+  captured:
+  - launch_route_g2l_fused
+  arch_scope: ''
+  evidence:
+  - '743:     @flyc.jit'
+  - '744:     def launch_route_g2l_fused('
+  - '745:         expert_mask: fx.Pointer,'
+  - '746:         topk_ids: fx.Pointer,'
+  evidence_id: src_e9cd683f1200c975
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 514
+  end_line: 549
+  match: def launch_route_g2l_lds(
+  captured:
+  - launch_route_g2l_lds
+  arch_scope: ''
+  evidence:
+  - '513:         @flyc.jit'
+  - '514:         def launch_route_g2l_lds('
+  - '515:             topk_ids: fx.Pointer,'
+  - '516:             expert_mask: fx.Pointer,'
+  evidence_id: src_fa057fcac04517dc
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 554
+  end_line: 590
+  match: def launch_route_g2l_lds(
+  captured:
+  - launch_route_g2l_lds
+  arch_scope: ''
+  evidence:
+  - '553:         @flyc.jit'
+  - '554:         def launch_route_g2l_lds('
+  - '555:             topk_ids: fx.Pointer,'
+  - '556:             g2l_lut: fx.Pointer,'
+  evidence_id: src_a146029fe6d1515f
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 24
+  match: MAX_G2L_EXPERTS = 512
+  captured:
+  - MAX_G2L_EXPERTS
+  - '512'
+  arch_scope: ''
+  evidence:
+  - '22: # Single-workgroup scan ceiling for the fused g2l+route kernel (matches'
+  - '23: # moe_g2l_lut.MAX_G2L_EXPERTS): E_global must fit one block.'
+  - '24: MAX_G2L_EXPERTS = 512'
+  - '25: # Compile-time LDS bucket capacity for the two-level (LDS-reduce) route kernel.'
+  - '26: # The per-block LDS counter array is sized to this; the dispatcher falls back to'
+  evidence_id: src_d4c2e7f8e49de474
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 28
+  match: MAX_ROUTE_BUCKETS = 512
+  captured:
+  - MAX_ROUTE_BUCKETS
+  - '512'
+  arch_scope: ''
+  evidence:
+  - '26: # The per-block LDS counter array is sized to this; the dispatcher falls back to'
+  - '27: # the plain device-atomic kernel when the local bucket count (E) exceeds it.'
+  - '28: MAX_ROUTE_BUCKETS = 512'
+  - '30: # ``topids_to_rows`` value for an EP route that owns no grouped row (non-local'
+  evidence_id: src_c71b18a575c50f16
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 116
+  end_line: 120
+  match: ".launch(\n            grid=(fx.Int64(grid_blocks)"
+  captured:
+  - fx.Int64(grid_blocks
+  arch_scope: ''
+  evidence:
+  - '114:             topk_ids, atomic_buffer, topids_to_rows, rows_to_tokens, numel, topk, max_m'
+  - '115:         )'
+  - '116:         launch.launch('
+  - '117:             grid=(fx.Int64(grid_blocks), 1, 1),'
+  - '118:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_4ec4177a15847adb
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 166
+  end_line: 170
+  match: ".launch(\n            grid=(fx.Int64(grid_blocks)"
+  captured:
+  - fx.Int64(grid_blocks
+  arch_scope: ''
+  evidence:
+  - '164:     ):'
+  - '165:         launch = route_kernel(topk_ids, atomic_buffer, topids_to_rows, numel, max_m)'
+  - '166:         launch.launch('
+  - '167:             grid=(fx.Int64(grid_blocks), 1, 1),'
+  - '168:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_77a542d012613f71
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 288
+  end_line: 292
+  match: ".launch(\n            grid=(fx.Int64(grid_blocks)"
+  captured:
+  - fx.Int64(grid_blocks
+  arch_scope: ''
+  evidence:
+  - '286:             n_buckets,'
+  - '287:         )'
+  - '288:         launch.launch('
+  - '289:             grid=(fx.Int64(grid_blocks), 1, 1),'
+  - '290:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_f6ea92cb88550141
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 505
+  match: ".launch(\n            grid=(fx.Int64(grid_blocks)"
+  captured:
+  - fx.Int64(grid_blocks
+  arch_scope: ''
+  evidence:
+  - '503:             ep_rowmap,'
+  - '504:             ep_rowmap_cap,'
+  - '505:         ).launch('
+  - '506:             grid=(fx.Int64(grid_blocks), 1, 1),'
+  - '507:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_08c4938c431eaa76
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  line: 770
+  match: ".launch(\n            grid=(1, 1, 1)"
+  captured:
+  - 1, 1, 1
+  arch_scope: ''
+  evidence:
+  - '768:             max_m,'
+  - '769:             E,'
+  - '770:         ).launch('
+  - '771:             grid=(1, 1, 1),'
+  - '772:             block=(MAX_G2L_EXPERTS, 1, 1),'
+  evidence_id: src_46fb295e40cbb0fe
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  line: 23
+  end_line: 82
+  match: def _scatter_grouped(
+  captured:
+  - _scatter_grouped
+  arch_scope: ''
+  evidence:
+  - '22: @triton.jit'
+  - '23: def _scatter_grouped('
+  - '24:     X,'
+  - '25:     stride_xb: tl.uint64,'
+  evidence_id: src_8b4846cb32c13ce3
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  line: 86
+  end_line: 216
+  match: def _reduce_grouped(
+  captured:
+  - _reduce_grouped
+  arch_scope: ''
+  evidence:
+  - '85: @triton.jit(repr=_reduce_grouped_repr)'
+  - '86: def _reduce_grouped('
+  - '87:     X,'
+  - '88:     stride_xb: tl.uint64,'
+  evidence_id: src_330eb5ef722c9789
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  line: 37
+  match: 'BLOCK_N: tl.constexpr,'
+  captured:
+  - BLOCK_N
+  arch_scope: ''
+  evidence:
+  - '35:     N,'
+  - '36:     num_blocks,'
+  - '37:     BLOCK_N: tl.constexpr,'
+  - '38:     EVEN_N: tl.constexpr,'
+  - '39: ):'
+  evidence_id: src_67da600fcb71abf2
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  line: 38
+  match: 'EVEN_N: tl.constexpr,'
+  captured:
+  - EVEN_N
+  arch_scope: ''
+  evidence:
+  - '36:     num_blocks,'
+  - '37:     BLOCK_N: tl.constexpr,'
+  - '38:     EVEN_N: tl.constexpr,'
+  - '39: ):'
+  - '40:     """Route each matmul row to an arbitrary row of `Out` instead of reducing.'
+  evidence_id: src_a00a1541db01c431
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  line: 105
+  match: 'APPLY_SWIGLU: tl.constexpr,'
+  captured:
+  - APPLY_SWIGLU
+  arch_scope: ''
+  evidence:
+  - '103:     N,'
+  - '104:     num_blocks,'
+  - '105:     # fused activation function'
+  - '106:     APPLY_SWIGLU: tl.constexpr,'
+  - '107:     alpha,'
+  evidence_id: src_7a5f2f340df6724b
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  line: 109
+  match: 'ACTIVATION_REDUCTION_N: tl.constexpr,'
+  captured:
+  - ACTIVATION_REDUCTION_N
+  arch_scope: ''
+  evidence:
+  - '107:     alpha,'
+  - '108:     limit,'
+  - '109:     ACTIVATION_REDUCTION_N: tl.constexpr,'
+  - '110:     K: tl.constexpr,'
+  - '111:     HAS_INDX_VALID: tl.constexpr,'
+  evidence_id: src_0012249407814645
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  line: 110
+  match: 'K: tl.constexpr,'
+  captured:
+  - K
+  arch_scope: ''
+  evidence:
+  - '108:     limit,'
+  - '109:     ACTIVATION_REDUCTION_N: tl.constexpr,'
+  - '110:     K: tl.constexpr,'
+  - '111:     HAS_INDX_VALID: tl.constexpr,'
+  - '112:     BLOCK_N: tl.constexpr,'
+  evidence_id: src_3a7e221470bb9a25
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  line: 111
+  match: 'HAS_INDX_VALID: tl.constexpr,'
+  captured:
+  - HAS_INDX_VALID
+  arch_scope: ''
+  evidence:
+  - '109:     ACTIVATION_REDUCTION_N: tl.constexpr,'
+  - '110:     K: tl.constexpr,'
+  - '111:     HAS_INDX_VALID: tl.constexpr,'
+  - '112:     BLOCK_N: tl.constexpr,'
+  - '113:     EVEN_N: tl.constexpr,'
+  evidence_id: src_6bb5b8486fa3b679
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  line: 112
+  match: 'BLOCK_N: tl.constexpr,'
+  captured:
+  - BLOCK_N
+  arch_scope: ''
+  evidence:
+  - '110:     K: tl.constexpr,'
+  - '111:     HAS_INDX_VALID: tl.constexpr,'
+  - '112:     BLOCK_N: tl.constexpr,'
+  - '113:     EVEN_N: tl.constexpr,'
+  - '114:     SWIGLU_ADD_RESIDUAL: tl.constexpr,'
+  evidence_id: src_11224291b1b9db75
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  line: 113
+  match: 'EVEN_N: tl.constexpr,'
+  captured:
+  - EVEN_N
+  arch_scope: ''
+  evidence:
+  - '111:     HAS_INDX_VALID: tl.constexpr,'
+  - '112:     BLOCK_N: tl.constexpr,'
+  - '113:     EVEN_N: tl.constexpr,'
+  - '114:     SWIGLU_ADD_RESIDUAL: tl.constexpr,'
+  - '115:     USE_TDM: tl.constexpr,'
+  evidence_id: src_9a47fa18b9626c94
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  line: 114
+  match: 'SWIGLU_ADD_RESIDUAL: tl.constexpr,'
+  captured:
+  - SWIGLU_ADD_RESIDUAL
+  arch_scope: ''
+  evidence:
+  - '112:     BLOCK_N: tl.constexpr,'
+  - '113:     EVEN_N: tl.constexpr,'
+  - '114:     SWIGLU_ADD_RESIDUAL: tl.constexpr,'
+  - '115:     USE_TDM: tl.constexpr,'
+  - '116:     # Step 9: external residual fold-in. When HAS_EXT_RESIDUAL=True,'
+  evidence_id: src_fea6255417ba77bb
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  line: 115
+  match: 'USE_TDM: tl.constexpr,'
+  captured:
+  - USE_TDM
+  arch_scope: ''
+  evidence:
+  - '113:     EVEN_N: tl.constexpr,'
+  - '114:     SWIGLU_ADD_RESIDUAL: tl.constexpr,'
+  - '115:     USE_TDM: tl.constexpr,'
+  - '116:     # Step 9: external residual fold-in. When HAS_EXT_RESIDUAL=True,'
+  - '117:     # Residual[token, :] is added to `acc` before the writeback.'
+  evidence_id: src_30c70afae6459f76
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  line: 121
+  match: 'HAS_EXT_RESIDUAL: tl.constexpr,'
+  captured:
+  - HAS_EXT_RESIDUAL
+  arch_scope: ''
+  evidence:
+  - '119:     stride_extres_m: tl.uint64,'
+  - '120:     stride_extres_n,'
+  - '121:     HAS_EXT_RESIDUAL: tl.constexpr,'
+  - '122: ):'
+  - '123:     pid = tl.program_id(0)'
+  evidence_id: src_e3feccf91e373c45

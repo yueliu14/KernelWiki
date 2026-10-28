@@ -1,5 +1,8 @@
 # linear_attention_gated_delta
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Recurrent and chunked gated-delta attention, including its causal-conv front end.
 
 5 AITER implementation references; 6 historical experience cards.

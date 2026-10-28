@@ -1,0 +1,1037 @@
+schema_version: 2
+operator: context_parallel_attention
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_b3ad6c46
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  lines: 1725
+  evidence_records: 64
+missing: []
+source_evidence:
+- snapshot: aiter_b3ad6c46
+  category: persistent
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 765
+  match: persistent =
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '763:     const int gqa_ratio = num_heads / num_kv_heads;'
+  - '765:     bool persistent = (num_kv_splits_indptr == nullptr);'
+  - '767:     const HipDeviceGuard device_guard(Q->device_id);'
+  evidence_id: src_32afb48f9703a402
+- snapshot: aiter_b3ad6c46
+  category: persistent
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 855
+  match: persistent_meta_data =
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '853:                         __func__, ": work_indptr and work_info_set data_ptr must not be null");'
+  - '855:             uint64_t* persistent_meta_data = new uint64_t[10];'
+  - '856:             persistent_meta_data[0] = (uint64_t)work_indptr->data_ptr();'
+  - '857:             persistent_meta_data[1] = (uint64_t)work_info_set->data_ptr();'
+  evidence_id: src_2cfd73be1af71e77
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 452
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '450:         const auto& cfg     = it->second;'
+  - '451:         const char* name    = cfg.knl_name.c_str();'
+  - '452:         const char* co_name = cfg.co_name.c_str();'
+  - '453:         impl_ptr ='
+  - '454:             &gfx1250_impl_ptr_map.get_or_create(name, [&]() { return AiterAsmKernel(name, co_name);
+    });'
+  evidence_id: src_2892163abcdb1449
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 454
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '452:         const char* co_name = cfg.co_name.c_str();'
+  - '453:         impl_ptr ='
+  - '454:             &gfx1250_impl_ptr_map.get_or_create(name, [&]() { return AiterAsmKernel(name, co_name);
+    });'
+  - '455:     }'
+  - '456:     else'
+  evidence_id: src_163b049cfd64e894
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 544
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '542:     {'
+  - '543:         const auto& cfg = it->second;'
+  - '544:         std::printf("[aiter][gfx1250][debug] knl_name=%s co_name=%s\n",'
+  - '545:                     cfg.knl_name.c_str(),'
+  - '546:                     cfg.co_name.c_str());'
+  evidence_id: src_19801e3a0c1ad083
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 546
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '544:         std::printf("[aiter][gfx1250][debug] knl_name=%s co_name=%s\n",'
+  - '545:                     cfg.knl_name.c_str(),'
+  - '546:                     cfg.co_name.c_str());'
+  - '547:     }'
+  - '548:     std::printf("[aiter][gfx1250][debug] inputs: arch=%s batch=%d num_heads=%d nhead_kv=%d "'
+  evidence_id: src_ef8cb2cb584546ac
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1119
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '1117:         const auto& cfg     = it->second;'
+  - '1118:         const char* name    = cfg.knl_name.c_str();'
+  - '1119:         const char* co_name = cfg.co_name.c_str();'
+  - '1121:         impl_ptr ='
+  evidence_id: src_983659a2647b1eb3
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1122
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '1121:         impl_ptr ='
+  - '1122:             &impl_ptr_map.get_or_create(name, [&]() { return AiterAsmKernel(name, co_name); });'
+  - '1123:     }'
+  - '1124:     else'
+  evidence_id: src_55368f6895907aec
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1292
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '1290:         const auto& cfg     = it->second;'
+  - '1291:         const char* name    = cfg.knl_name.c_str();'
+  - '1292:         const char* co_name = cfg.co_name.c_str();'
+  - '1294:         impl_ptr ='
+  evidence_id: src_a061591492e4e7eb
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1295
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '1294:         impl_ptr ='
+  - '1295:             &impl_ptr_map.get_or_create(name, [&]() { return AiterAsmKernel(name, co_name); });'
+  - '1296:     }'
+  - '1297:     else'
+  evidence_id: src_78c7c008b953a108
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1403
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '1401:         const auto& cfg     = it->second;'
+  - '1402:         const char* name    = cfg.knl_name.c_str();'
+  - '1403:         const char* co_name = cfg.co_name.c_str();'
+  - '1405:         impl_ptr ='
+  evidence_id: src_1b99cf729a0d1aaa
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1406
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '1405:         impl_ptr ='
+  - '1406:             &impl_ptr_map.get_or_create(name, [&]() { return AiterAsmKernel(name, co_name); });'
+  - '1407:     }'
+  - '1408:     else'
+  evidence_id: src_f5d02634e2976f1a
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1546
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '1544:     static SynchronizedCache<std::string_view, AiterAsmKernel> impl_ptr_map;'
+  - '1545:     const char* name    = cfg->knl_name.c_str();'
+  - '1546:     const char* co_name = cfg->co_name.c_str();'
+  - '1547:     AiterAsmKernel* impl_ptr = &impl_ptr_map.get_or_create(name, [&]() {'
+  - '1548:         return AiterAsmKernel(name, co_name, AiterAsmKernel::SkipGfx1250Gate{});'
+  evidence_id: src_bae40f50738f75e4
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1548
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '1546:     const char* co_name = cfg->co_name.c_str();'
+  - '1547:     AiterAsmKernel* impl_ptr = &impl_ptr_map.get_or_create(name, [&]() {'
+  - '1548:         return AiterAsmKernel(name, co_name, AiterAsmKernel::SkipGfx1250Gate{});'
+  - '1549:     });'
+  evidence_id: src_d54194e7b2389954
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1647
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '1645:             "fp8", "fp8", 128, 0, 0, 0, 1, arch_id, &cfg_mla_asm, 0, 0, 64, 1);'
+  - '1646:         const auto& config = cfg_mla_asm.at(name);'
+  - '1647:         return AiterAsmKernel(config.knl_name.c_str(), config.co_name.c_str());'
+  - '1648:     });'
+  - '1649:     size_t size = sizeof(args);'
+  evidence_id: src_9a8057846dd36c7e
+- snapshot: aiter_b3ad6c46
+  category: asm_launch
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1131
+  match: int gdx = (max_seqlen_q * gqa_ratio + sub_Q - 1) / sub_Q;
+  captured:
+  - (max_seqlen_q * gqa_ratio + sub_Q - 1) / sub_Q
+  arch_scope: ''
+  evidence:
+  - '1130:     int bdx = 256;'
+  - '1131:     int gdx = (max_seqlen_q * gqa_ratio + sub_Q - 1) / sub_Q;'
+  - '1132:     int gdy = batch;'
+  - '1133:     int gdz = kv_split;'
+  evidence_id: src_6531c88c3e5a17a4
+- snapshot: aiter_b3ad6c46
+  category: asm_launch
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1132
+  match: int gdy = batch;
+  captured:
+  - batch
+  arch_scope: ''
+  evidence:
+  - '1130:     int bdx = 256;'
+  - '1131:     int gdx = (max_seqlen_q * gqa_ratio + sub_Q - 1) / sub_Q;'
+  - '1132:     int gdy = batch;'
+  - '1133:     int gdz = kv_split;'
+  evidence_id: src_38325d536b5fdf2f
+- snapshot: aiter_b3ad6c46
+  category: asm_launch
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1133
+  match: int gdz = kv_split;
+  captured:
+  - kv_split
+  arch_scope: ''
+  evidence:
+  - '1131:     int gdx = (max_seqlen_q * gqa_ratio + sub_Q - 1) / sub_Q;'
+  - '1132:     int gdy = batch;'
+  - '1133:     int gdz = kv_split;'
+  - '1135:     if(persistent)'
+  evidence_id: src_ec6554b3cc6ae8b9
+- snapshot: aiter_b3ad6c46
+  category: asm_launch
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1137
+  match: gdx = work_indptr->size(0) - 1;
+  captured:
+  - work_indptr->size(0) - 1
+  arch_scope: ''
+  evidence:
+  - '1135:     if(persistent)'
+  - '1136:     {'
+  - '1137:         gdx = work_indptr->size(0) - 1;'
+  - '1138:         gdy = 1;'
+  - '1139:         gdz = 1;'
+  evidence_id: src_c79e2d15eeaba81d
+- snapshot: aiter_b3ad6c46
+  category: asm_argblock
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 41
+  match: struct __attribute__((packed)) KernelArgs
+  captured:
+  - KernelArgs
+  arch_scope: ''
+  evidence:
+  - '39: #endif'
+  - '41: struct __attribute__((packed)) KernelArgs'
+  - '42: {'
+  - '43:     void* ptr_R;'
+  evidence_id: src_ac89891718cbee9e
+- snapshot: aiter_b3ad6c46
+  category: asm_argblock
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 95
+  match: struct __attribute__((packed)) MlaGfx1250KernelArgs
+  captured:
+  - MlaGfx1250KernelArgs
+  arch_scope: ''
+  evidence:
+  - '93: };'
+  - '95: struct __attribute__((packed)) MlaGfx1250KernelArgs'
+  - '96: {'
+  - '97:     void* ptr_R;'
+  evidence_id: src_0325bd70d374d525
+- snapshot: aiter_b3ad6c46
+  category: asm_argblock
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 136
+  match: struct __attribute__((packed)) MlaGfx1250PackedKernelArgs
+  captured:
+  - MlaGfx1250PackedKernelArgs
+  arch_scope: ''
+  evidence:
+  - '134: };'
+  - '136: struct __attribute__((packed)) MlaGfx1250PackedKernelArgs'
+  - '137: {'
+  - '138:     void* ptr_R;                  // dword 0-1'
+  evidence_id: src_4a59539c96b19821
+- snapshot: aiter_b3ad6c46
+  category: asm_argblock
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1153
+  match: struct __attribute__((packed)) PsKernelArgs
+  captured:
+  - PsKernelArgs
+  arch_scope: ''
+  evidence:
+  - '1151: }'
+  - '1153: struct __attribute__((packed)) PsKernelArgs'
+  - '1154: {'
+  - '1155:     void *ptr_Q;'
+  evidence_id: src_49001692e7ea86f8
+- snapshot: aiter_b3ad6c46
+  category: asm_argblock
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1426
+  match: struct __attribute__((packed)) MlaPs1Fp8KernelArgs
+  captured:
+  - MlaPs1Fp8KernelArgs
+  arch_scope: ''
+  evidence:
+  - '1424: // from FlyDSL (hsa/gfx1250/mla_dsl/mla_dsl.csv). The layout is the code object''s'
+  - '1425: // amdhsa.kernels .args list; the offsets below pin it.'
+  - '1426: struct __attribute__((packed)) MlaPs1Fp8KernelArgs'
+  - '1427: {'
+  - '1428:     void* ptr_r;'
+  evidence_id: src_296b3ced950944f5
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 728
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '726:     aiter_tensor_t* kv_scale,             //   [1] (nullable)'
+  - '727:     aiter_tensor_t* g_kv_indptr,          //   [batch_size+1] GLOBAL kv_indptr for round-robin CP
+    (nullable)'
+  - '728:     int cp_world_size,                    //   round-robin CP world size (1 == disabled)'
+  - '729:     int cp_rank,                          //   round-robin CP rank id'
+  - '730:     aiter_tensor_t* valid_split_count,    //   [batch_size] scratch for packed gfx1250 kernels (nullable)'
+  evidence_id: src_9be3851636eaa5f9
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 736
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '734:     int kv_indptr_is_token_level,          //   QH64 shuffled token indptr and page64 slot IDs'
+  - '735:     hipStream_t stream),'
+  - '736:     (Q, KV, qo_indptr, kv_indptr, kv_page_indices, kv_last_page_lens, num_kv_splits_indptr, work_meta_data,
+    work_indptr, work_info_set, max_seqlen_q, page_size, nhead_kv, softmax_scale, splitData, splitLse, output,
+    lse, q_scale, kv_scale, g_kv_indptr, cp_world_size, cp_rank, valid_split_count, use_valid_split_count_reduce,
+    causal, kv_shuffled, kv_indptr_is_token_level, stream))'
+  - '737: {'
+  - '738:     AITER_CHECK(kv_indptr_is_token_level == 0 || kv_indptr_is_token_level == 1,'
+  evidence_id: src_756f560e76ed2425
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 755
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '753:                         kv_last_page_lens != nullptr && splitData != nullptr && nhead_kv == 1,'
+  - '754:                     __func__, ": kv_shuffled QH64 requires Q and CSR metadata");'
+  - '755:         AITER_CHECK(cp_world_size == 1 && cp_rank == 0 && g_kv_indptr == nullptr,'
+  - '756:                     __func__, ": kv_shuffled QH64 does not support context parallelism");'
+  - '757:     }'
+  evidence_id: src_cfc951315c97cae9
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 830
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '828:     // round-robin context-parallel inputs (no-op when cp_world_size <= 1)'
+  - '829:     args.ptr_GKVTP       = (g_kv_indptr != nullptr) ? g_kv_indptr->data_ptr() : nullptr;'
+  - '830:     args.s_cp_world_size = (cp_world_size > 0) ? (unsigned int)cp_world_size : 1u;'
+  - '831:     args.s_cp_rank       = (cp_rank >= 0) ? (unsigned int)cp_rank : 0u;'
+  - '832:     if (args.ptr_GKVTP != nullptr)'
+  evidence_id: src_c4a0b087d74b3d3f
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 834
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '832:     if (args.ptr_GKVTP != nullptr)'
+  - '833:     {'
+  - '834:         AITER_CHECK(cp_world_size > 0,'
+  - '835:                     __func__, ": cp_world_size must be > 0 when g_kv_indptr is provided");'
+  - '836:         AITER_CHECK(cp_rank >= 0 && cp_rank < cp_world_size,'
+  evidence_id: src_7c1957fba07ae10b
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 835
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '833:     {'
+  - '834:         AITER_CHECK(cp_world_size > 0,'
+  - '835:                     __func__, ": cp_world_size must be > 0 when g_kv_indptr is provided");'
+  - '836:         AITER_CHECK(cp_rank >= 0 && cp_rank < cp_world_size,'
+  - '837:                     __func__, ": cp_rank must be in [0, cp_world_size) when g_kv_indptr is provided");'
+  evidence_id: src_4fe98b8dab18a309
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 836
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '834:         AITER_CHECK(cp_world_size > 0,'
+  - '835:                     __func__, ": cp_world_size must be > 0 when g_kv_indptr is provided");'
+  - '836:         AITER_CHECK(cp_rank >= 0 && cp_rank < cp_world_size,'
+  - '837:                     __func__, ": cp_rank must be in [0, cp_world_size) when g_kv_indptr is provided");'
+  - '838:     }'
+  evidence_id: src_639b46c465722dbe
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 837
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '835:                     __func__, ": cp_world_size must be > 0 when g_kv_indptr is provided");'
+  - '836:         AITER_CHECK(cp_rank >= 0 && cp_rank < cp_world_size,'
+  - '837:                     __func__, ": cp_rank must be in [0, cp_world_size) when g_kv_indptr is provided");'
+  - '838:     }'
+  - '839:     if (persistent)'
+  evidence_id: src_f34a1c2e3912912d
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1446
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '1444:     void* kv_indptr;'
+  - '1445:     void* g_kv_indptr;'
+  - '1446:     int cp_world_size;'
+  - '1447:     int cp_rank;'
+  - '1448: };'
+  evidence_id: src_260e094c5ce83a51
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1474
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '1472:     aiter_tensor_t* kv_indptr,        //   [batch + 1] int32, round-robin CP only (nullable)'
+  - '1473:     aiter_tensor_t* g_kv_indptr,      //   [batch + 1] int32, round-robin CP only (nullable)'
+  - '1474:     int cp_world_size,'
+  - '1475:     int cp_rank,'
+  - '1476:     hipStream_t stream),'
+  evidence_id: src_86f86babebe004c8
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1477
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '1475:     int cp_rank,'
+  - '1476:     hipStream_t stream),'
+  - '1477:     (split_data, split_lse, final_output, final_lse, q, kv_buffer, kv_page_indices, work_indptr,
+    work_info_set, softmax_scale, q_scale, kv_scale, max_seqlen_q, causal, qo_indptr, kv_indptr, g_kv_indptr,
+    cp_world_size, cp_rank, stream))'
+  - '1478: {'
+  - '1479:     const std::string arch_id = get_gpu_arch();'
+  evidence_id: src_d9adb56cb7002674
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1516
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '1514:     const int causal_flag = causal ? 1 : 0;'
+  - '1515:     // Round-robin CP only exists with causal masking, matching the FlyDSL wrapper.'
+  - '1516:     const int cprr = (cp_world_size > 1 && causal_flag) ? 1 : 0;'
+  - '1517:     if(cprr)'
+  - '1518:     {'
+  evidence_id: src_69971ca5d8512777
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1519
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '1517:     if(cprr)'
+  - '1518:     {'
+  - '1519:         AITER_CHECK(0 <= cp_rank && cp_rank < cp_world_size,'
+  - '1520:                     __func__, ": cp_rank must be in [0, cp_world_size)");'
+  - '1521:         require_i32(qo_indptr, "qo_indptr");'
+  evidence_id: src_127e323eca0aef75
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1520
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '1518:     {'
+  - '1519:         AITER_CHECK(0 <= cp_rank && cp_rank < cp_world_size,'
+  - '1520:                     __func__, ": cp_rank must be in [0, cp_world_size)");'
+  - '1521:         require_i32(qo_indptr, "qo_indptr");'
+  - '1522:         require_i32(kv_indptr, "kv_indptr");'
+  evidence_id: src_f4c1e9c8d9876e00
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1569
+  match: cp_world_size
+  captured:
+  - cp_world_size
+  arch_scope: ''
+  evidence:
+  - '1567:     args.kv_indptr        = cprr ? kv_indptr->data_ptr() : nullptr;'
+  - '1568:     args.g_kv_indptr      = cprr ? g_kv_indptr->data_ptr() : nullptr;'
+  - '1569:     args.cp_world_size    = cprr ? cp_world_size : 1;'
+  - '1570:     args.cp_rank          = cprr ? cp_rank : 0;'
+  - '1571:     size_t arg_size       = sizeof(args);'
+  evidence_id: src_9608b5f47fc85caa
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 729
+  match: cp_rank
+  captured:
+  - cp_rank
+  arch_scope: ''
+  evidence:
+  - '727:     aiter_tensor_t* g_kv_indptr,          //   [batch_size+1] GLOBAL kv_indptr for round-robin CP
+    (nullable)'
+  - '728:     int cp_world_size,                    //   round-robin CP world size (1 == disabled)'
+  - '729:     int cp_rank,                          //   round-robin CP rank id'
+  - '730:     aiter_tensor_t* valid_split_count,    //   [batch_size] scratch for packed gfx1250 kernels (nullable)'
+  - '731:     int use_valid_split_count_reduce,     //   enable packed-kernel valid split count writeback/reduce'
+  evidence_id: src_022322fcac496805
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 736
+  match: cp_rank
+  captured:
+  - cp_rank
+  arch_scope: ''
+  evidence:
+  - '734:     int kv_indptr_is_token_level,          //   QH64 shuffled token indptr and page64 slot IDs'
+  - '735:     hipStream_t stream),'
+  - '736:     (Q, KV, qo_indptr, kv_indptr, kv_page_indices, kv_last_page_lens, num_kv_splits_indptr, work_meta_data,
+    work_indptr, work_info_set, max_seqlen_q, page_size, nhead_kv, softmax_scale, splitData, splitLse, output,
+    lse, q_scale, kv_scale, g_kv_indptr, cp_world_size, cp_rank, valid_split_count, use_valid_split_count_reduce,
+    causal, kv_shuffled, kv_indptr_is_token_level, stream))'
+  - '737: {'
+  - '738:     AITER_CHECK(kv_indptr_is_token_level == 0 || kv_indptr_is_token_level == 1,'
+  evidence_id: src_8aca0e87a52f8688
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 755
+  match: cp_rank
+  captured:
+  - cp_rank
+  arch_scope: ''
+  evidence:
+  - '753:                         kv_last_page_lens != nullptr && splitData != nullptr && nhead_kv == 1,'
+  - '754:                     __func__, ": kv_shuffled QH64 requires Q and CSR metadata");'
+  - '755:         AITER_CHECK(cp_world_size == 1 && cp_rank == 0 && g_kv_indptr == nullptr,'
+  - '756:                     __func__, ": kv_shuffled QH64 does not support context parallelism");'
+  - '757:     }'
+  evidence_id: src_d4e1472950418175
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 831
+  match: cp_rank
+  captured:
+  - cp_rank
+  arch_scope: ''
+  evidence:
+  - '829:     args.ptr_GKVTP       = (g_kv_indptr != nullptr) ? g_kv_indptr->data_ptr() : nullptr;'
+  - '830:     args.s_cp_world_size = (cp_world_size > 0) ? (unsigned int)cp_world_size : 1u;'
+  - '831:     args.s_cp_rank       = (cp_rank >= 0) ? (unsigned int)cp_rank : 0u;'
+  - '832:     if (args.ptr_GKVTP != nullptr)'
+  - '833:     {'
+  evidence_id: src_331acb20e2078d4e
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 836
+  match: cp_rank
+  captured:
+  - cp_rank
+  arch_scope: ''
+  evidence:
+  - '834:         AITER_CHECK(cp_world_size > 0,'
+  - '835:                     __func__, ": cp_world_size must be > 0 when g_kv_indptr is provided");'
+  - '836:         AITER_CHECK(cp_rank >= 0 && cp_rank < cp_world_size,'
+  - '837:                     __func__, ": cp_rank must be in [0, cp_world_size) when g_kv_indptr is provided");'
+  - '838:     }'
+  evidence_id: src_96d3ef37cc7abb9a
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 837
+  match: cp_rank
+  captured:
+  - cp_rank
+  arch_scope: ''
+  evidence:
+  - '835:                     __func__, ": cp_world_size must be > 0 when g_kv_indptr is provided");'
+  - '836:         AITER_CHECK(cp_rank >= 0 && cp_rank < cp_world_size,'
+  - '837:                     __func__, ": cp_rank must be in [0, cp_world_size) when g_kv_indptr is provided");'
+  - '838:     }'
+  - '839:     if (persistent)'
+  evidence_id: src_fbf289c757ef0d03
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1447
+  match: cp_rank
+  captured:
+  - cp_rank
+  arch_scope: ''
+  evidence:
+  - '1445:     void* g_kv_indptr;'
+  - '1446:     int cp_world_size;'
+  - '1447:     int cp_rank;'
+  - '1448: };'
+  - '1449: static_assert(offsetof(MlaPs1Fp8KernelArgs, softmax_scale) == 88, "mla_ps1 kernarg layout");'
+  evidence_id: src_a5ee194a307ddc1e
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1451
+  match: cp_rank
+  captured:
+  - cp_rank
+  arch_scope: ''
+  evidence:
+  - '1449: static_assert(offsetof(MlaPs1Fp8KernelArgs, softmax_scale) == 88, "mla_ps1 kernarg layout");'
+  - '1450: static_assert(offsetof(MlaPs1Fp8KernelArgs, qo_indptr) == 104, "mla_ps1 kernarg layout");'
+  - '1451: static_assert(offsetof(MlaPs1Fp8KernelArgs, cp_rank) == 132, "mla_ps1 kernarg layout");'
+  - '1452: static_assert(sizeof(MlaPs1Fp8KernelArgs) == 136, "mla_ps1 kernarg layout");'
+  evidence_id: src_6aa19e22d751568c
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1475
+  match: cp_rank
+  captured:
+  - cp_rank
+  arch_scope: ''
+  evidence:
+  - '1473:     aiter_tensor_t* g_kv_indptr,      //   [batch + 1] int32, round-robin CP only (nullable)'
+  - '1474:     int cp_world_size,'
+  - '1475:     int cp_rank,'
+  - '1476:     hipStream_t stream),'
+  - '1477:     (split_data, split_lse, final_output, final_lse, q, kv_buffer, kv_page_indices, work_indptr,
+    work_info_set, softmax_scale, q_scale, kv_scale, max_seqlen_q, causal, qo_indptr, kv_indptr, g_kv_indptr,
+    cp_world_size, cp_rank, stream))'
+  evidence_id: src_9a121f1f75582fc5
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1477
+  match: cp_rank
+  captured:
+  - cp_rank
+  arch_scope: ''
+  evidence:
+  - '1475:     int cp_rank,'
+  - '1476:     hipStream_t stream),'
+  - '1477:     (split_data, split_lse, final_output, final_lse, q, kv_buffer, kv_page_indices, work_indptr,
+    work_info_set, softmax_scale, q_scale, kv_scale, max_seqlen_q, causal, qo_indptr, kv_indptr, g_kv_indptr,
+    cp_world_size, cp_rank, stream))'
+  - '1478: {'
+  - '1479:     const std::string arch_id = get_gpu_arch();'
+  evidence_id: src_dddb5bde7757e4d6
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1519
+  match: cp_rank
+  captured:
+  - cp_rank
+  arch_scope: ''
+  evidence:
+  - '1517:     if(cprr)'
+  - '1518:     {'
+  - '1519:         AITER_CHECK(0 <= cp_rank && cp_rank < cp_world_size,'
+  - '1520:                     __func__, ": cp_rank must be in [0, cp_world_size)");'
+  - '1521:         require_i32(qo_indptr, "qo_indptr");'
+  evidence_id: src_7ab306ca85a48c6b
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1520
+  match: cp_rank
+  captured:
+  - cp_rank
+  arch_scope: ''
+  evidence:
+  - '1518:     {'
+  - '1519:         AITER_CHECK(0 <= cp_rank && cp_rank < cp_world_size,'
+  - '1520:                     __func__, ": cp_rank must be in [0, cp_world_size)");'
+  - '1521:         require_i32(qo_indptr, "qo_indptr");'
+  - '1522:         require_i32(kv_indptr, "kv_indptr");'
+  evidence_id: src_51a1ab8bd3f64b40
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1570
+  match: cp_rank
+  captured:
+  - cp_rank
+  arch_scope: ''
+  evidence:
+  - '1568:     args.g_kv_indptr      = cprr ? g_kv_indptr->data_ptr() : nullptr;'
+  - '1569:     args.cp_world_size    = cprr ? cp_world_size : 1;'
+  - '1570:     args.cp_rank          = cprr ? cp_rank : 0;'
+  - '1571:     size_t arg_size       = sizeof(args);'
+  evidence_id: src_74e0292f286aa87d
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 727
+  match: g_kv_indptr
+  captured:
+  - g_kv_indptr
+  arch_scope: ''
+  evidence:
+  - '725:     aiter_tensor_t* q_scale,              //   [1] (nullable)'
+  - '726:     aiter_tensor_t* kv_scale,             //   [1] (nullable)'
+  - '727:     aiter_tensor_t* g_kv_indptr,          //   [batch_size+1] GLOBAL kv_indptr for round-robin CP
+    (nullable)'
+  - '728:     int cp_world_size,                    //   round-robin CP world size (1 == disabled)'
+  - '729:     int cp_rank,                          //   round-robin CP rank id'
+  evidence_id: src_826d5014f1109307
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 736
+  match: g_kv_indptr
+  captured:
+  - g_kv_indptr
+  arch_scope: ''
+  evidence:
+  - '734:     int kv_indptr_is_token_level,          //   QH64 shuffled token indptr and page64 slot IDs'
+  - '735:     hipStream_t stream),'
+  - '736:     (Q, KV, qo_indptr, kv_indptr, kv_page_indices, kv_last_page_lens, num_kv_splits_indptr, work_meta_data,
+    work_indptr, work_info_set, max_seqlen_q, page_size, nhead_kv, softmax_scale, splitData, splitLse, output,
+    lse, q_scale, kv_scale, g_kv_indptr, cp_world_size, cp_rank, valid_split_count, use_valid_split_count_reduce,
+    causal, kv_shuffled, kv_indptr_is_token_level, stream))'
+  - '737: {'
+  - '738:     AITER_CHECK(kv_indptr_is_token_level == 0 || kv_indptr_is_token_level == 1,'
+  evidence_id: src_254804d2f101f055
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 755
+  match: g_kv_indptr
+  captured:
+  - g_kv_indptr
+  arch_scope: ''
+  evidence:
+  - '753:                         kv_last_page_lens != nullptr && splitData != nullptr && nhead_kv == 1,'
+  - '754:                     __func__, ": kv_shuffled QH64 requires Q and CSR metadata");'
+  - '755:         AITER_CHECK(cp_world_size == 1 && cp_rank == 0 && g_kv_indptr == nullptr,'
+  - '756:                     __func__, ": kv_shuffled QH64 does not support context parallelism");'
+  - '757:     }'
+  evidence_id: src_269c29e28daa8a9d
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 829
+  match: g_kv_indptr
+  captured:
+  - g_kv_indptr
+  arch_scope: ''
+  evidence:
+  - '828:     // round-robin context-parallel inputs (no-op when cp_world_size <= 1)'
+  - '829:     args.ptr_GKVTP       = (g_kv_indptr != nullptr) ? g_kv_indptr->data_ptr() : nullptr;'
+  - '830:     args.s_cp_world_size = (cp_world_size > 0) ? (unsigned int)cp_world_size : 1u;'
+  - '831:     args.s_cp_rank       = (cp_rank >= 0) ? (unsigned int)cp_rank : 0u;'
+  evidence_id: src_71e496e5bd0067fa
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 835
+  match: g_kv_indptr
+  captured:
+  - g_kv_indptr
+  arch_scope: ''
+  evidence:
+  - '833:     {'
+  - '834:         AITER_CHECK(cp_world_size > 0,'
+  - '835:                     __func__, ": cp_world_size must be > 0 when g_kv_indptr is provided");'
+  - '836:         AITER_CHECK(cp_rank >= 0 && cp_rank < cp_world_size,'
+  - '837:                     __func__, ": cp_rank must be in [0, cp_world_size) when g_kv_indptr is provided");'
+  evidence_id: src_bb161edd438cbe0a
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 837
+  match: g_kv_indptr
+  captured:
+  - g_kv_indptr
+  arch_scope: ''
+  evidence:
+  - '835:                     __func__, ": cp_world_size must be > 0 when g_kv_indptr is provided");'
+  - '836:         AITER_CHECK(cp_rank >= 0 && cp_rank < cp_world_size,'
+  - '837:                     __func__, ": cp_rank must be in [0, cp_world_size) when g_kv_indptr is provided");'
+  - '838:     }'
+  - '839:     if (persistent)'
+  evidence_id: src_9b1562327c603982
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1108
+  match: g_kv_indptr
+  captured:
+  - g_kv_indptr
+  arch_scope: ''
+  evidence:
+  - '1106:     int lse_flag = (lse != nullptr && persistent) ? 1 : 0;'
+  - '1108:     int cprr_flag = (g_kv_indptr != nullptr && g_kv_indptr->data_ptr() != nullptr) ? 1 : 0;'
+  - '1109:     std::string kernelName = get_heuristic_kernel_mla(q_type, kv_type, config_gqa_ratio, ps, prefill,
+    config_causal, config_max_seqlen_q, arch_id, config_map, lse_flag, cprr_flag);'
+  - '1110:     AITER_CHECK(!kernelName.empty(), __func__, ": cannot find suitable kernel");'
+  evidence_id: src_99b6130af18ff933
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1445
+  match: g_kv_indptr
+  captured:
+  - g_kv_indptr
+  arch_scope: ''
+  evidence:
+  - '1443:     void* qo_indptr;'
+  - '1444:     void* kv_indptr;'
+  - '1445:     void* g_kv_indptr;'
+  - '1446:     int cp_world_size;'
+  - '1447:     int cp_rank;'
+  evidence_id: src_7f5667fc236438f6
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1473
+  match: g_kv_indptr
+  captured:
+  - g_kv_indptr
+  arch_scope: ''
+  evidence:
+  - '1471:     aiter_tensor_t* qo_indptr,        //   [batch + 1] int32, round-robin CP only (nullable)'
+  - '1472:     aiter_tensor_t* kv_indptr,        //   [batch + 1] int32, round-robin CP only (nullable)'
+  - '1473:     aiter_tensor_t* g_kv_indptr,      //   [batch + 1] int32, round-robin CP only (nullable)'
+  - '1474:     int cp_world_size,'
+  - '1475:     int cp_rank,'
+  evidence_id: src_00b3b1816fe9a5cf
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1477
+  match: g_kv_indptr
+  captured:
+  - g_kv_indptr
+  arch_scope: ''
+  evidence:
+  - '1475:     int cp_rank,'
+  - '1476:     hipStream_t stream),'
+  - '1477:     (split_data, split_lse, final_output, final_lse, q, kv_buffer, kv_page_indices, work_indptr,
+    work_info_set, softmax_scale, q_scale, kv_scale, max_seqlen_q, causal, qo_indptr, kv_indptr, g_kv_indptr,
+    cp_world_size, cp_rank, stream))'
+  - '1478: {'
+  - '1479:     const std::string arch_id = get_gpu_arch();'
+  evidence_id: src_116f5bde5901caaf
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1523
+  match: g_kv_indptr
+  captured:
+  - g_kv_indptr
+  arch_scope: ''
+  evidence:
+  - '1521:         require_i32(qo_indptr, "qo_indptr");'
+  - '1522:         require_i32(kv_indptr, "kv_indptr");'
+  - '1523:         require_i32(g_kv_indptr, "g_kv_indptr");'
+  - '1524:     }'
+  evidence_id: src_7ee1e81120bbc3a1
+- snapshot: aiter_b3ad6c46
+  category: interface_parameter
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla.cu
+  line: 1568
+  match: g_kv_indptr
+  captured:
+  - g_kv_indptr
+  arch_scope: ''
+  evidence:
+  - '1566:     args.qo_indptr        = cprr ? qo_indptr->data_ptr() : nullptr;'
+  - '1567:     args.kv_indptr        = cprr ? kv_indptr->data_ptr() : nullptr;'
+  - '1568:     args.g_kv_indptr      = cprr ? g_kv_indptr->data_ptr() : nullptr;'
+  - '1569:     args.cp_world_size    = cprr ? cp_world_size : 1;'
+  - '1570:     args.cp_rank          = cprr ? cp_rank : 0;'
+  evidence_id: src_59fadad77271f261

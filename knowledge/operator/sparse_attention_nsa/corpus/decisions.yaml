@@ -1,0 +1,49 @@
+provenance:
+  schema_version: 4
+  operator_family: sparse_attention_nsa
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  paged_kv: The design reads a paged KV cache.
+cards:
+- id: attention-sparse-selected-slots
+  type: constraint
+  axes:
+  - sparse_selection
+  - cache_layout
+  match:
+    operator_families:
+    - sparse_attention_nsa
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+  question: What distinguishes sparse selected-slot attention from dense paged attention?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - An upstream indexer supplies selected KV indices or slots for each query.
+  actions:
+  - Keep the selected-slot representation, valid count and sentinel convention aligned with the cache lookup.
+  - Mask invalid selected entries before loading cache data and before softmax; do not reinterpret sparse-list
+    positions as logical token IDs.
+  - Validate repeated, missing and boundary indices according to the producer contract before tuning gather
+    or LDS staging.
+  alternatives:
+  - Use a reference that gathers the same selected indices and computes attention over that set.
+  why:
+  - The sparse MLA implementations explicitly load selected slots and perform sparse gathers rather than iterating
+    a dense KV range.
+  source_evidence:
+  - aiter_b3ad6c46:src_ed78f2dc4c308f3e
+  measurement_evidence: []
+  limitations:
+  - This card does not establish indexer ranking correctness or a policy for duplicate selections.
+  references:
+  - knowledge/operator/sparse_attention_nsa/README.md
+  solutions:
+  - backend: gluon
+    mechanism: The sparse MLA path isolates slot loading and cache gather helpers before its compute path.
+    source_evidence:
+    - aiter_b3ad6c46:src_2bcb9480481ff798
+    - aiter_b3ad6c46:src_513194697c804a41
+shared_cards: []

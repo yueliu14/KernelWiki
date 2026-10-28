@@ -1,0 +1,2856 @@
+schema_version: 2
+operator: mla_attention
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  lines: 1516
+  evidence_records: 68
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  lines: 490
+  evidence_records: 14
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  lines: 461
+  evidence_records: 23
+- snapshot: aiter_b3ad6c46
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  lines: 763
+  evidence_records: 47
+- snapshot: aiter_b3ad6c46
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  lines: 407
+  evidence_records: 26
+- snapshot: aiter_b3ad6c46
+  language: hip
+  file: csrc/kernels/mla/metadata.cu
+  lines: 279
+  evidence_records: 0
+- snapshot: aiter_b3ad6c46
+  language: hip
+  file: csrc/kernels/mla/opus_mla_decode_fwd.cu
+  lines: 492
+  evidence_records: 2
+- snapshot: aiter_b3ad6c46
+  language: hip
+  file: csrc/kernels/mla/reduce.cu
+  lines: 223
+  evidence_records: 0
+missing: []
+source_evidence:
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 64
+  end_line: 70
+  match: 'def _out_numeric_t(out_dtype: str):'
+  captured:
+  - _out_numeric_t
+  arch_scope: ''
+  evidence:
+  - '64: def _out_numeric_t(out_dtype: str):'
+  - '65:     """Resolve the public FlyDSL numeric output type."""'
+  - '66:     if out_dtype in ("bf16", "bfloat16"):'
+  evidence_id: src_8e2008ea3943e30e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 73
+  end_line: 76
+  match: 'def _vector_elements(value, dtype, width: int):'
+  captured:
+  - _vector_elements
+  arch_scope: ''
+  evidence:
+  - '73: def _vector_elements(value, dtype, width: int):'
+  - '74:     """Expose a raw vector value through FlyDSL''s public vector interface."""'
+  - '75:     vector = fx.Vector(value, shape=width, dtype=dtype)'
+  evidence_id: src_a37ef92a771314ce
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 79
+  end_line: 81
+  match: 'def _make_vector(elements, dtype):'
+  captured:
+  - _make_vector
+  arch_scope: ''
+  evidence:
+  - '79: def _make_vector(elements, dtype):'
+  - '80:     """Build a vector with FlyDSL''s public value-semantics API."""'
+  - '81:     return fx.Vector.from_elements(elements, dtype=dtype)'
+  evidence_id: src_ea82825d8675c3d6
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 84
+  end_line: 87
+  match: 'def _pointer_view(ptr, dtype, shape, stride):'
+  captured:
+  - _pointer_view
+  arch_scope: ''
+  evidence:
+  - '84: def _pointer_view(ptr, dtype, shape, stride):'
+  - '85:     """Build a typed layout view from an opaque pointer-launch ABI argument."""'
+  - '86:     typed_ptr = fx.recast_iter(dtype, ptr)'
+  evidence_id: src_5533bc48af531cf4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 90
+  end_line: 92
+  match: 'def _pointer_buffer_tensor(ptr, dtype, shape, stride):'
+  captured:
+  - _pointer_buffer_tensor
+  arch_scope: ''
+  evidence:
+  - '90: def _pointer_buffer_tensor(ptr, dtype, shape, stride):'
+  - '91:     """Build a public buffer-backed tensor view from a pointer ABI argument."""'
+  - '92:     return fx.rocdl.make_buffer_tensor(_pointer_view(ptr, dtype, shape, stride))'
+  evidence_id: src_d73c37ea22b9c4dd
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 95
+  end_line: 112
+  match: 'def _f32_copy_atom(vec: int):'
+  captured:
+  - _f32_copy_atom
+  arch_scope: ''
+  evidence:
+  - '95: def _f32_copy_atom(vec: int):'
+  - '96:     """Map VEC f32 elements onto the widest legal buffer copy atom.'
+  evidence_id: src_b81b851e81a31d10
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 115
+  end_line: 119
+  match: 'def _chunk_tile_idx(tid, n_chunks, c):'
+  captured:
+  - _chunk_tile_idx
+  arch_scope: ''
+  evidence:
+  - '115: def _chunk_tile_idx(tid, n_chunks, c):'
+  - '116:     """Tile index of chunk ``c`` within the VEC-wide fragment owned by ``tid``."""'
+  - '117:     if fx.const_expr(n_chunks == 1):'
+  evidence_id: src_7ad2eca3f14d9498
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 122
+  end_line: 142
+  match: 'def _load_partial_out(buf, row, head_idx, tid, vec):'
+  captured:
+  - _load_partial_out
+  arch_scope: ''
+  evidence:
+  - '122: def _load_partial_out(buf, row, head_idx, tid, vec):'
+  - '123:     """Read VEC fp32 elements from ``buf[row, head_idx, tid*VEC : +VEC]``.'
+  evidence_id: src_80990f66fd58f9ae
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 145
+  end_line: 162
+  match: 'def _out_copy_atom(vec: int, out_numeric_t):'
+  captured:
+  - _out_copy_atom
+  arch_scope: ''
+  evidence:
+  - '145: def _out_copy_atom(vec: int, out_numeric_t):'
+  - '146:     """Widest legal buffer copy atom for a VEC-element output fragment.'
+  evidence_id: src_8d4255fdfe14896e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 165
+  end_line: 183
+  match: 'def _store_final_out(buf, row, head_idx, tid, elems_f32, vec, out_numeric_t):'
+  captured:
+  - _store_final_out
+  arch_scope: ''
+  evidence:
+  - '165: def _store_final_out(buf, row, head_idx, tid, elems_f32, vec, out_numeric_t):'
+  - '166:     """Write VEC elements to ``buf[row, head_idx, tid*VEC : +VEC]``.'
+  evidence_id: src_0462037f2fa7e64f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 186
+  end_line: 187
+  match: 'def _store_lse(lse, row, head_idx, value):'
+  captured:
+  - _store_lse
+  arch_scope: ''
+  evidence:
+  - '186: def _store_lse(lse, row, head_idx, value):'
+  - '187:     lse[row, head_idx] = value'
+  evidence_id: src_78b57e6afc93026c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 190
+  end_line: 192
+  match: 'def _exp(x):'
+  captured:
+  - _exp
+  arch_scope: ''
+  evidence:
+  - '190: def _exp(x):'
+  - '191:     """exp(x) via the hardware v_exp_f32 (exp2(x*log2e))."""'
+  - '192:     return fx.rocdl.exp2(T.f32, (x * _LOG2E).ir_value())'
+  evidence_id: src_37c779d28b4570e4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 195
+  end_line: 198
+  match: 'def _is_zero_or_nan(value):'
+  captured:
+  - _is_zero_or_nan
+  arch_scope: ''
+  evidence:
+  - '195: def _is_zero_or_nan(value):'
+  - '196:     """Preserve the ordered-zero or unordered-NaN reduction invalidity test."""'
+  - '197:     value = fx.Float32(value)'
+  evidence_id: src_90ee909aa4af902d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 227
+  end_line: 234
+  match: 'def select_tier(num_splits: int) -> Tier:'
+  captured:
+  - select_tier
+  arch_scope: ''
+  evidence:
+  - '227: def select_tier(num_splits: int) -> Tier:'
+  - '228:     if num_splits < MASSIVE_THR:'
+  - '229:         return Tier.SIMPLE'
+  evidence_id: src_4784dd255277cdf6
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 237
+  end_line: 247
+  match: def should_use_persistent_launch(
+  captured:
+  - should_use_persistent_launch
+  arch_scope: ''
+  evidence:
+  - '237: def should_use_persistent_launch('
+  - '238:     *,'
+  - '239:     H: int,'
+  evidence_id: src_3c8575fd72a43ae2
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 251
+  end_line: 908
+  match: def compile_mla_reduce(
+  captured:
+  - compile_mla_reduce
+  arch_scope: ''
+  evidence:
+  - '250: @functools.lru_cache(maxsize=256)'
+  - '251: def compile_mla_reduce('
+  - '252:     *,'
+  - '253:     H: int,'
+  evidence_id: src_ef54c113e3f1fa9c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 917
+  end_line: 1048
+  match: def compile_mla_decode_reduce(
+  captured:
+  - compile_mla_decode_reduce
+  arch_scope: ''
+  evidence:
+  - '916: @functools.lru_cache(maxsize=32)'
+  - '917: def compile_mla_decode_reduce('
+  - '918:     *,'
+  - '919:     H: int,'
+  evidence_id: src_fbe3b9da8ea2b70a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1057
+  end_line: 1089
+  match: def plan_splitk(
+  captured:
+  - plan_splitk
+  arch_scope: ''
+  evidence:
+  - '1057: def plan_splitk('
+  - '1058:     *,'
+  - '1059:     active_tiles,'
+  evidence_id: src_5164542b70ae1d2a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1092
+  end_line: 1101
+  match: 'def derive_actual_max_splits(reduce_indptr) -> int:'
+  captured:
+  - derive_actual_max_splits
+  arch_scope: ''
+  evidence:
+  - '1092: def derive_actual_max_splits(reduce_indptr) -> int:'
+  - '1093:     """Return ``max_t(reduce_indptr[t+1] - reduce_indptr[t])`` from the CSR.'
+  evidence_id: src_725d4ebdfd006f13
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1104
+  end_line: 1163
+  match: def plan_splitk_capture_safe(
+  captured:
+  - plan_splitk_capture_safe
+  arch_scope: ''
+  evidence:
+  - '1104: def plan_splitk_capture_safe('
+  - '1105:     *,'
+  - '1106:     num_final_rows,'
+  evidence_id: src_18dddd6e11b56c3d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1167
+  end_line: 1180
+  match: 'def _get_splitk_scratch(num_slots: int, K: int, Dv: int, device_index: int):'
+  captured:
+  - _get_splitk_scratch
+  arch_scope: ''
+  evidence:
+  - '1166: @functools.lru_cache(maxsize=64)'
+  - '1167: def _get_splitk_scratch(num_slots: int, K: int, Dv: int, device_index: int):'
+  - '1168:     """Pre-allocate (once) the split-K scratch: partial weighted-output'
+  - '1169:     accumulators + (m_j, l_j) per partial. Cached so CUDA-graph replays reuse'
+  evidence_id: src_e9b36d2c7a072f28
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1184
+  end_line: 1515
+  match: def compile_mla_reduce_splitk(
+  captured:
+  - compile_mla_reduce_splitk
+  arch_scope: ''
+  evidence:
+  - '1183: @functools.lru_cache(maxsize=64)'
+  - '1184: def compile_mla_reduce_splitk('
+  - '1185:     *,'
+  - '1186:     H: int,'
+  evidence_id: src_866eed22a9efe9ee
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 325
+  end_line: 852
+  match: def mla_reduce_kernel(
+  captured:
+  - mla_reduce_kernel
+  arch_scope: ''
+  evidence:
+  - '324:     @flyc.kernel(known_block_size=[NUM_THREADS, 1, 1])'
+  - '325:     def mla_reduce_kernel('
+  - '326:         partial_output: fx.Pointer,  # fp32 [row, H, Dv]'
+  - '327:         partial_lse: fx.Pointer,  # fp32 [row, H]'
+  evidence_id: src_8d4b59949eb799aa
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 857
+  end_line: 905
+  match: def launch_mla_reduce(
+  captured:
+  - launch_mla_reduce
+  arch_scope: ''
+  evidence:
+  - '856:     @flyc.jit'
+  - '857:     def launch_mla_reduce('
+  - '858:         partial_output: fx.Pointer,'
+  - '859:         partial_lse: fx.Pointer,'
+  evidence_id: src_8ab27de46923d23b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 946
+  end_line: 1015
+  match: def mla_decode_reduce_kernel(
+  captured:
+  - mla_decode_reduce_kernel
+  arch_scope: ''
+  evidence:
+  - '945:     @flyc.kernel(known_block_size=[num_threads, 1, 1])'
+  - '946:     def mla_decode_reduce_kernel('
+  - '947:         split_data: fx.Pointer,  # fp32 [total_tokens * num_splits, H, Dv]'
+  - '948:         split_lse: fx.Pointer,  # fp32 [total_tokens * num_splits, H]'
+  evidence_id: src_7d2c7f1974fb6a74
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1020
+  end_line: 1045
+  match: def launch_mla_decode_reduce(
+  captured:
+  - launch_mla_decode_reduce
+  arch_scope: ''
+  evidence:
+  - '1019:     @flyc.jit'
+  - '1020:     def launch_mla_decode_reduce('
+  - '1021:         split_data: fx.Pointer,'
+  - '1022:         split_lse: fx.Pointer,'
+  evidence_id: src_4070e75fce461b5a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1212
+  end_line: 1226
+  match: 'def _f32_vec_load(buf, row, tid):'
+  captured:
+  - _f32_vec_load
+  arch_scope: ''
+  evidence:
+  - '1210:     default_stream = fx.Stream(None)'
+  - '1212:     def _f32_vec_load(buf, row, tid):'
+  - '1213:         """Load VEC f32 scratch elements at (row, tid*VEC) via a buffer'
+  - '1214:         tensor layout view + copy atom(s). See ``_f32_copy_atom`` for the'
+  evidence_id: src_6abdc86483667015
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1228
+  end_line: 1238
+  match: 'def _f32_vec_store(buf, row, tid, elems):'
+  captured:
+  - _f32_vec_store
+  arch_scope: ''
+  evidence:
+  - '1226:         return elems'
+  - '1228:     def _f32_vec_store(buf, row, tid, elems):'
+  - '1229:         """Store VEC f32 scratch elements at (row, tid*VEC); see'
+  - '1230:         ``_f32_vec_load``."""'
+  evidence_id: src_0d74cf43889488de
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1241
+  end_line: 1347
+  match: def sk_partial_kernel(
+  captured:
+  - sk_partial_kernel
+  arch_scope: ''
+  evidence:
+  - '1240:     @flyc.kernel(known_block_size=[NUM_THREADS, 1, 1])'
+  - '1241:     def sk_partial_kernel('
+  - '1242:         partial_output: fx.Pointer,  # fp32 [row, H, Dv]'
+  - '1243:         partial_lse: fx.Pointer,  # fp32 [row, H]'
+  evidence_id: src_5be0f9637889a3e9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1350
+  end_line: 1453
+  match: def sk_combine_kernel(
+  captured:
+  - sk_combine_kernel
+  arch_scope: ''
+  evidence:
+  - '1349:     @flyc.kernel(known_block_size=[NUM_THREADS, 1, 1])'
+  - '1350:     def sk_combine_kernel('
+  - '1351:         reduce_indptr: fx.Pointer,  # i32 [tiles + 1]'
+  - '1352:         reduce_final_map: fx.Pointer,  # i32 [tiles, 2] {q_start, q_end}'
+  evidence_id: src_d8b71b68479ede88
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1456
+  end_line: 1480
+  match: def launch_partial(
+  captured:
+  - launch_partial
+  arch_scope: ''
+  evidence:
+  - '1455:     @flyc.jit'
+  - '1456:     def launch_partial('
+  - '1457:         partial_output: fx.Pointer,'
+  - '1458:         partial_lse: fx.Pointer,'
+  evidence_id: src_eb96c6e5be7b136a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1483
+  end_line: 1511
+  match: def launch_combine(
+  captured:
+  - launch_combine
+  arch_scope: ''
+  evidence:
+  - '1482:     @flyc.jit'
+  - '1483:     def launch_combine('
+  - '1484:         reduce_indptr: fx.Pointer,'
+  - '1485:         reduce_final_map: fx.Pointer,'
+  evidence_id: src_d03ee3569e349e66
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 343
+  end_line: 345
+  match: 'def load_o_elems(row_idx, head_idx):'
+  captured:
+  - load_o_elems
+  arch_scope: ''
+  evidence:
+  - '341:         out_numeric_t = _out_numeric_t(out_dtype)'
+  - '343:         def load_o_elems(row_idx, head_idx):'
+  - '344:             """Load VEC fp32 elements as a python list of scalars."""'
+  - '345:             return _load_partial_out(partial_output_buf, row_idx, head_idx, tid, VEC)'
+  evidence_id: src_ef8275710abd0e91
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 347
+  end_line: 351
+  match: 'def store_o_elems(row_idx, head_idx, elems_f32):'
+  captured:
+  - store_o_elems
+  arch_scope: ''
+  evidence:
+  - '345:             return _load_partial_out(partial_output_buf, row_idx, head_idx, tid, VEC)'
+  - '347:         def store_o_elems(row_idx, head_idx, elems_f32):'
+  - '348:             """Cast VEC fp32 scalars to out_t and emit one packed store."""'
+  - '349:             _store_final_out('
+  evidence_id: src_df6a9e64c8bcd798
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 414
+  end_line: 416
+  match: 'def _scalar_indptr(idx):'
+  captured:
+  - _scalar_indptr
+  arch_scope: ''
+  evidence:
+  - '412:         )'
+  - '414:         def _scalar_indptr(idx):'
+  - '415:             """Load a wave-uniform CSR pointer through the scalar memory path."""'
+  - '416:             return fx.Int32(indptr_scalar[idx])'
+  evidence_id: src_36e5276e05f5ce39
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 426
+  end_line: 427
+  match: 'def store_lse_scale(split_idx, value):'
+  captured:
+  - store_lse_scale
+  arch_scope: ''
+  evidence:
+  - '424:             lds_scale = lds.lse_scale'
+  - '426:         def store_lse_scale(split_idx, value):'
+  - '427:             lds_scale[split_idx] = value'
+  evidence_id: src_8ed245a8499d4b1c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 429
+  end_line: 825
+  match: 'def process_work_item(head, block_idx, tile, ntg):'
+  captured:
+  - process_work_item
+  arch_scope: ''
+  evidence:
+  - '427:             lds_scale[split_idx] = value'
+  - '429:         def process_work_item(head, block_idx, tile, ntg):'
+  - '430:             """Reduce one (head, q-pos-group, tile) work item into final_output.'
+  evidence_id: src_190339689c51eafe
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1290
+  end_line: 1292
+  match: 'def store_partial_metadata(ml, row, max_lse, lse_acc):'
+  captured:
+  - store_partial_metadata
+  arch_scope: ''
+  evidence:
+  - '1288:         )'
+  - '1290:         def store_partial_metadata(ml, row, max_lse, lse_acc):'
+  - '1291:             ml[row, 0] = max_lse'
+  - '1292:             ml[row, 1] = lse_acc'
+  evidence_id: src_5e4b61c458a526ea
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 440
+  end_line: 449
+  match: 'def stage_pmap():'
+  captured:
+  - stage_pmap
+  arch_scope: ''
+  evidence:
+  - '438:             n_splits = t1 - t0'
+  - '440:             def stage_pmap():'
+  - '441:                 """Stage reduce_partial_map[t0:t1] to LDS once per work item.'
+  evidence_id: src_b17f89f7df3c5d84
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 481
+  end_line: 495
+  match: 'def row_from_pmap(pmap_i32, local_seq):'
+  captured:
+  - row_from_pmap
+  arch_scope: ''
+  evidence:
+  - '479:             ub_seq = has_work.select(q_end, seq0)'
+  - '481:             def row_from_pmap(pmap_i32, local_seq):'
+  - '482:                 """Bounds-guarded row index from an already-loaded pmap value.'
+  evidence_id: src_561bbc285c2e9697
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 497
+  end_line: 504
+  match: 'def pmap_value(split_i32, direct_pmap: bool = False):'
+  captured:
+  - pmap_value
+  arch_scope: ''
+  evidence:
+  - '495:                 return safe_row_i32, in_bounds'
+  - '497:             def pmap_value(split_i32, direct_pmap: bool = False):'
+  - '498:                 if fx.const_expr(direct_pmap):'
+  - '499:                     # Clamp the absolute pmap load address for masked tail slots.'
+  evidence_id: src_b05b8f7e3abaf6f2
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 506
+  end_line: 508
+  match: 'def gather_row(split_i32, local_seq, direct_pmap: bool = False):'
+  captured:
+  - gather_row
+  arch_scope: ''
+  evidence:
+  - '504:                 return lds_pmap[split_i32]'
+  - '506:             def gather_row(split_i32, local_seq, direct_pmap: bool = False):'
+  - '507:                 pmap = pmap_value(split_i32, direct_pmap)'
+  - '508:                 return row_from_pmap(pmap, local_seq)'
+  evidence_id: src_d575f373e6bb210f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 510
+  end_line: 514
+  match: 'def load_split_o(split_i32, local_seq, direct_pmap: bool = False):'
+  captured:
+  - load_split_o
+  arch_scope: ''
+  evidence:
+  - '508:                 return row_from_pmap(pmap, local_seq)'
+  - '510:             def load_split_o(split_i32, local_seq, direct_pmap: bool = False):'
+  - '511:                 row_idx, in_bounds = gather_row(split_i32, local_seq, direct_pmap)'
+  - '512:                 loaded = load_o_elems(row_idx, head)'
+  evidence_id: src_68e55f9899cf7a8b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 516
+  end_line: 520
+  match: 'def load_split_lse(split_i32, local_seq, direct_pmap: bool = False):'
+  captured:
+  - load_split_lse
+  arch_scope: ''
+  evidence:
+  - '514:                 return [in_bounds.select(v, zero) for v in loaded]'
+  - '516:             def load_split_lse(split_i32, local_seq, direct_pmap: bool = False):'
+  - '517:                 row_idx, in_bounds = gather_row(split_i32, local_seq, direct_pmap)'
+  - '518:                 lse = g_pl[row_idx, head]'
+  evidence_id: src_45d2d7f56cd7c2ad
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 522
+  end_line: 523
+  match: 'def store_result(seq, out_elems):'
+  captured:
+  - store_result
+  arch_scope: ''
+  evidence:
+  - '520:                 return in_bounds.select(lse, neg_inf)'
+  - '522:             def store_result(seq, out_elems):'
+  - '523:                 store_o_elems(seq, head, out_elems)'
+  evidence_id: src_c989fa546e857bf4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 525
+  end_line: 532
+  match: 'def store_lse(seq, max_lse, sum_e):'
+  captured:
+  - store_lse
+  arch_scope: ''
+  evidence:
+  - '523:                 store_o_elems(seq, head, out_elems)'
+  - '525:             def store_lse(seq, max_lse, sum_e):'
+  - '526:                 if fx.const_expr(output_lse):'
+  - '527:                     bad = _is_zero_or_nan(sum_e)'
+  evidence_id: src_60b5d28b7e6f268a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 536
+  end_line: 571
+  match: 'def emit_simple_body(seq_i32, local_seq, direct_pmap: bool = False):'
+  captured:
+  - emit_simple_body
+  arch_scope: ''
+  evidence:
+  - '534:             # Runtime range without carried state lets scheduling overlap the'
+  - '535:             # split-loop VMEM loads with compute.'
+  - '536:             def emit_simple_body(seq_i32, local_seq, direct_pmap: bool = False):'
+  - '537:                 o0 = load_split_o(fx.Int32(0), local_seq, direct_pmap)'
+  - '538:                 lse0 = load_split_lse(fx.Int32(0), local_seq, direct_pmap)'
+  evidence_id: src_bb60800c591fec4d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 573
+  end_line: 764
+  match: def emit_massive_body(
+  captured:
+  - emit_massive_body
+  arch_scope: ''
+  evidence:
+  - '571:                 store_lse(seq_i32, max_lse, sum_e)'
+  - '573:             def emit_massive_body('
+  - '574:                 seq_i32,'
+  - '575:                 local_seq,'
+  evidence_id: src_3c77079ce1cebab8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 766
+  end_line: 807
+  match: 'def dispatch_tier_body(seq_i32, local_seq, direct_pmap: bool = False):'
+  captured:
+  - dispatch_tier_body
+  arch_scope: ''
+  evidence:
+  - '764:                 store_result(seq_i32, out_elems)'
+  - '766:             def dispatch_tier_body(seq_i32, local_seq, direct_pmap: bool = False):'
+  - '767:                 """Block-uniform, side-effect-only runtime tier dispatch."""'
+  - '768:                 if fx.const_expr(is_runtime_tier):'
+  evidence_id: src_513410ae81aca971
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 809
+  end_line: 813
+  match: 'def run_seq_loop(direct_pmap: bool = False):'
+  captured:
+  - run_seq_loop
+  arch_scope: ''
+  evidence:
+  - '807:                     emit_massive_body(seq_i32, local_seq, NLSE, direct_pmap=direct_pmap)'
+  - '809:             def run_seq_loop(direct_pmap: bool = False):'
+  - '810:                 for seq in range(seq0, ub_seq, ntg, init=None):'
+  - '811:                     seq_i32 = fx.Int32(seq)'
+  evidence_id: src_f9c3ddcc1c63740f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 637
+  end_line: 678
+  match: 'def load_os_group(base_i32):'
+  captured:
+  - load_os_group
+  arch_scope: ''
+  evidence:
+  - '635:                 _grp_shift = GRP.bit_length() - 1'
+  - '637:                 def load_os_group(base_i32):'
+  - '638:                     """Gather rows and issue output loads before the scale barrier.'
+  evidence_id: src_1db2276fffa85830
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 680
+  end_line: 697
+  match: 'def load_scales(base_i32, valids):'
+  captured:
+  - load_scales
+  arch_scope: ''
+  evidence:
+  - '678:                     return os_list, valids'
+  - '680:                 def load_scales(base_i32, valids):'
+  - '681:                     """scale phase: wide ds_read_b128 of lds_scale + select-to-0'
+  - '682:                     on invalid splits. This select IS the accumulate''s OOB guard:'
+  evidence_id: src_29665ac3e1d0150e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 699
+  end_line: 704
+  match: 'def load_group(base_i32):'
+  captured:
+  - load_group
+  arch_scope: ''
+  evidence:
+  - '697:                     return scs'
+  - '699:                 def load_group(base_i32):'
+  - '700:                     """Combined pmap+scale load for the steady-state loop (both'
+  - '701:                     LDS regions are valid past the barrier)."""'
+  evidence_id: src_787a26c2dad471b1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 725
+  end_line: 732
+  match: 'def unpack(state):'
+  captured:
+  - unpack
+  arch_scope: ''
+  evidence:
+  - '723:                 _sbase = (GRP + 1) * VEC'
+  - '725:                 def unpack(state):'
+  - '726:                     os_g = ['
+  - '727:                         [state[j * VEC + k] for k in fx.range_constexpr(VEC)]'
+  evidence_id: src_37831093b2cbaaf7
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 734
+  end_line: 742
+  match: 'def accumulate(regs, os_g, sc_g):'
+  captured:
+  - accumulate
+  arch_scope: ''
+  evidence:
+  - '732:                     return os_g, regs, sc_g'
+  - '734:                 def accumulate(regs, os_g, sc_g):'
+  - '735:                     new_regs = list(regs)'
+  - '736:                     for j in fx.range_constexpr(GRP):'
+  evidence_id: src_7560794db9db8f40
+- snapshot: aiter_b3ad6c46
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 34
+  match: persistent=
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '32: Two launch modes (mirrors the HIP kernel):'
+  - '33:   * grid-launch (default): 3-D grid (H, NTG, num_reduce_tile), one block per work item.'
+  - '34:   * persistent (``persistent=True``): 1-D grid of ``num_cu * PS_GRID_MULT`` blocks that'
+  - '35:     grid-stride over the flat work index, matching ``kn_mla_reduce_v1_ps``. This'
+  - '36:     collapses the dispatch when ``num_reduce_tile`` is large but few tiles are'
+  evidence_id: src_21237a8c030ecee5
+- snapshot: aiter_b3ad6c46
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 257
+  match: 'persistent:'
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '255:     out_dtype: str = "bf16",'
+  - '256:     tier: Tier = Tier.SIMPLE,'
+  - '257:     persistent: bool = False,'
+  - '258:     output_lse: bool = False,'
+  - '259:     use_reduce_final_map: bool = True,'
+  evidence_id: src_99f5c74fa2dcfb87
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 220
+  match: LDS_PADDED_SPLITS = (
+  captured:
+  - LDS_PADDED_SPLITS
+  arch_scope: ''
+  evidence:
+  - '218: LDS_MAX_SPLITS = 304  # >= MI300X CU count; compile-time LDS cap'
+  - '219: # Pad LDS tails so masked vector reads stay within one allocation.'
+  - '220: LDS_PADDED_SPLITS = ((LDS_MAX_SPLITS + WARP - 1) // WARP) * WARP'
+  - '221: NLSE_MLDS = (LDS_MAX_SPLITS + WARP - 1) // WARP  # ceil(304/64) = 5'
+  evidence_id: src_0613d51597c9a237
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 221
+  match: NLSE_MLDS = (
+  captured:
+  - NLSE_MLDS
+  arch_scope: ''
+  evidence:
+  - '219: # Pad LDS tails so masked vector reads stay within one allocation.'
+  - '220: LDS_PADDED_SPLITS = ((LDS_MAX_SPLITS + WARP - 1) // WARP) * WARP'
+  - '221: NLSE_MLDS = (LDS_MAX_SPLITS + WARP - 1) // WARP  # ceil(304/64) = 5'
+  - '223: # Production occupancy hint.'
+  evidence_id: src_45ec91b723c2f64a
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 218
+  match: LDS_MAX_SPLITS = 304
+  captured:
+  - LDS_MAX_SPLITS
+  - '304'
+  arch_scope: ''
+  evidence:
+  - '216:     Tier.ALL: None,'
+  - '217: }'
+  - '218: LDS_MAX_SPLITS = 304  # >= MI300X CU count; compile-time LDS cap'
+  - '219: # Pad LDS tails so masked vector reads stay within one allocation.'
+  - '220: LDS_PADDED_SPLITS = ((LDS_MAX_SPLITS + WARP - 1) // WARP) * WARP'
+  evidence_id: src_50694b5e26a9c221
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 211
+  end_line: 217
+  match: _TIER_NLSE = {
+  captured:
+  - _TIER_NLSE
+  arch_scope: ''
+  evidence:
+  - '210: # LSE registers per warp0 lane (None = LDS-backed overflow).'
+  - '211: _TIER_NLSE = {'
+  - '212:     Tier.SIMPLE: 0,'
+  - '213:     Tier.M64: 1,'
+  evidence_id: src_894ffa9165d9b79b
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1041
+  match: ".launch(\n            grid=(H, total_tokens, 1)"
+  captured:
+  - H, total_tokens, 1
+  arch_scope: ''
+  evidence:
+  - '1039:             num_tokens_per_seq,'
+  - '1040:             value_attrs=kernel_value_attrs,'
+  - '1041:         ).launch('
+  - '1042:             grid=(H, total_tokens, 1),'
+  - '1043:             block=(num_threads, 1, 1),'
+  evidence_id: src_415c2b7dce2293cb
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1476
+  match: ".launch(\n            grid=(sk_grid, 1, 1)"
+  captured:
+  - sk_grid, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1474:             num_partial_rows,'
+  - '1475:             value_attrs=kernel_value_attrs,'
+  - '1476:         ).launch('
+  - '1477:             grid=(sk_grid, 1, 1),'
+  - '1478:             block=(NUM_THREADS, 1, 1),'
+  evidence_id: src_f6f4484f4a762c78
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1507
+  match: ".launch(\n            grid=(sk_grid, 1, 1)"
+  captured:
+  - sk_grid, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1505:             num_final_rows,'
+  - '1506:             value_attrs=kernel_value_attrs,'
+  - '1507:         ).launch('
+  - '1508:             grid=(sk_grid, 1, 1),'
+  - '1509:             block=(NUM_THREADS, 1, 1),'
+  evidence_id: src_bd8eb3401736e666
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 250
+  match: '@functools.lru_cache(maxsize=256)
+
+    def compile_mla_reduce'
+  captured:
+  - '256'
+  - compile_mla_reduce
+  arch_scope: ''
+  evidence:
+  - '250: @functools.lru_cache(maxsize=256)'
+  - '251: def compile_mla_reduce('
+  - '252:     *,'
+  evidence_id: src_0bf54744216b7176
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 916
+  match: '@functools.lru_cache(maxsize=32)
+
+    def compile_mla_decode_reduce'
+  captured:
+  - '32'
+  - compile_mla_decode_reduce
+  arch_scope: ''
+  evidence:
+  - '916: @functools.lru_cache(maxsize=32)'
+  - '917: def compile_mla_decode_reduce('
+  - '918:     *,'
+  evidence_id: src_da2092ff9fb6da52
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1166
+  match: '@functools.lru_cache(maxsize=64)
+
+    def _get_splitk_scratch'
+  captured:
+  - '64'
+  - _get_splitk_scratch
+  arch_scope: ''
+  evidence:
+  - '1166: @functools.lru_cache(maxsize=64)'
+  - '1167: def _get_splitk_scratch(num_slots: int, K: int, Dv: int, device_index: int):'
+  - '1168:     """Pre-allocate (once) the split-K scratch: partial weighted-output'
+  evidence_id: src_d5f0435b08e8140c
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mla_reduce.py
+  line: 1183
+  match: '@functools.lru_cache(maxsize=64)
+
+    def compile_mla_reduce_splitk'
+  captured:
+  - '64'
+  - compile_mla_reduce_splitk
+  arch_scope: ''
+  evidence:
+  - '1183: @functools.lru_cache(maxsize=64)'
+  - '1184: def compile_mla_reduce_splitk('
+  - '1185:     *,'
+  evidence_id: src_e7a952b1864a1968
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 23
+  end_line: 25
+  match: 'def _require(condition, message):'
+  captured:
+  - _require
+  arch_scope: ''
+  evidence:
+  - '23: def _require(condition, message):'
+  - '24:     if not condition:'
+  - '25:         raise ValueError(message)'
+  evidence_id: src_a9f1c17303e01f6a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 28
+  end_line: 30
+  match: 'def _require_runtime(condition, message):'
+  captured:
+  - _require_runtime
+  arch_scope: ''
+  evidence:
+  - '28: def _require_runtime(condition, message):'
+  - '29:     if not condition:'
+  - '30:         raise RuntimeError(message)'
+  evidence_id: src_616bb071ca649df1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 33
+  end_line: 45
+  match: 'def _require_layout(name, tensor, dtype, shape=None):'
+  captured:
+  - _require_layout
+  arch_scope: ''
+  evidence:
+  - '33: def _require_layout(name, tensor, dtype, shape=None):'
+  - '34:     """Check the dtype, shape and contiguity a kernel argument must satisfy.'
+  evidence_id: src_3d084b34742690f1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 48
+  end_line: 120
+  match: def _validate_pagesize1_inputs(
+  captured:
+  - _validate_pagesize1_inputs
+  arch_scope: ''
+  evidence:
+  - '48: def _validate_pagesize1_inputs('
+  - '49:     split_data,'
+  - '50:     split_lse,'
+  evidence_id: src_fa79ab179333d89c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 123
+  end_line: 244
+  match: def _run_pagesize1(
+  captured:
+  - _run_pagesize1
+  arch_scope: ''
+  evidence:
+  - '123: def _run_pagesize1('
+  - '124:     launch,'
+  - '125:     qkv_dtype,'
+  evidence_id: src_a77f959e0b31aa4f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 247
+  end_line: 298
+  match: def flydsl_mla_pagesize1_fp8_fp8(
+  captured:
+  - flydsl_mla_pagesize1_fp8_fp8
+  arch_scope: ''
+  evidence:
+  - '247: def flydsl_mla_pagesize1_fp8_fp8('
+  - '248:     split_data,'
+  - '249:     split_lse,'
+  evidence_id: src_9dc42522c038a33e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 301
+  end_line: 351
+  match: def flydsl_mla_pagesize1_bf16_bf16(
+  captured:
+  - flydsl_mla_pagesize1_bf16_bf16
+  arch_scope: ''
+  evidence:
+  - '301: def flydsl_mla_pagesize1_bf16_bf16('
+  - '302:     split_data,'
+  - '303:     split_lse,'
+  evidence_id: src_4e26920bb02db998
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 354
+  end_line: 392
+  match: def _validate_pagesize64_inputs(
+  captured:
+  - _validate_pagesize64_inputs
+  arch_scope: ''
+  evidence:
+  - '354: def _validate_pagesize64_inputs('
+  - '355:     split_data,'
+  - '356:     split_lse,'
+  evidence_id: src_41656e26394762a1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 395
+  end_line: 452
+  match: def flydsl_mla_pagesize64_fp8_fp8(
+  captured:
+  - flydsl_mla_pagesize64_fp8_fp8
+  arch_scope: ''
+  evidence:
+  - '395: def flydsl_mla_pagesize64_fp8_fp8('
+  - '396:     split_data,'
+  - '397:     split_lse,'
+  evidence_id: src_74df558ddd36e15c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 455
+  end_line: 489
+  match: def flydsl_mla_decode_reduce(
+  captured:
+  - flydsl_mla_decode_reduce
+  arch_scope: ''
+  evidence:
+  - '455: def flydsl_mla_decode_reduce('
+  - '456:     split_data,  # fp32 [total_tokens, num_splits, num_heads, v_head_dim]'
+  - '457:     split_lse,  # fp32 [total_tokens, num_splits, num_heads, 1]'
+  evidence_id: src_25ff12c345c3d5aa
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 48
+  end_line: 120
+  match: def _validate_pagesize1_inputs(
+  captured:
+  - _validate_pagesize1_inputs
+  arch_scope: ''
+  evidence:
+  - '48: def _validate_pagesize1_inputs('
+  - '49:     split_data,'
+  - '50:     split_lse,'
+  evidence_id: src_2cfe6bdffe8efee1
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 354
+  end_line: 392
+  match: def _validate_pagesize64_inputs(
+  captured:
+  - _validate_pagesize64_inputs
+  arch_scope: ''
+  evidence:
+  - '354: def _validate_pagesize64_inputs('
+  - '355:     split_data,'
+  - '356:     split_lse,'
+  evidence_id: src_e1e06a3e1dbee78a
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 67
+  match: arch == "gfx1250"
+  captured:
+  - gfx1250
+  arch_scope: gfx1250
+  evidence:
+  - '65:     arch = str(get_rocm_arch() or "").split(":", 1)[0]'
+  - '66:     _require_runtime('
+  - '67:         arch == "gfx1250",'
+  - '68:         f"expected gfx1250, got {arch or ''unknown''}",'
+  - '69:     )'
+  evidence_id: src_4f07dd88c4a4402f
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/mla_kernels.py
+  line: 19
+  match: _PAGESIZE1_NUM_Q_HEADS = (
+  captured:
+  - _PAGESIZE1_NUM_Q_HEADS
+  arch_scope: ''
+  evidence:
+  - '17: ]'
+  - '19: _PAGESIZE1_NUM_Q_HEADS = (16, 32, 64, 96, 128)'
+  - '20: _PAGESIZE1_PACKED_Q_HEADS = 64'
+  evidence_id: src_195f7171b1b62ed1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 52
+  end_line: 59
+  match: 'def _out_dtype_str(dtype: torch.dtype) -> str:'
+  captured:
+  - _out_dtype_str
+  arch_scope: ''
+  evidence:
+  - '52: def _out_dtype_str(dtype: torch.dtype) -> str:'
+  - '53:     if dtype == torch.bfloat16:'
+  - '54:         return "bf16"'
+  evidence_id: src_787d9515207638be
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 62
+  end_line: 72
+  match: 'def _pointer_arg(tensor: torch.Tensor, expected_dtype: torch.dtype):'
+  captured:
+  - _pointer_arg
+  arch_scope: ''
+  evidence:
+  - '62: def _pointer_arg(tensor: torch.Tensor, expected_dtype: torch.dtype):'
+  - '63:     """Pass a role-validated typed pointer through the FlyDSL launcher ABI."""'
+  - '64:     if tensor.dtype != expected_dtype:'
+  evidence_id: src_a8048a92ec114362
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 75
+  end_line: 95
+  match: def _require_tensor(
+  captured:
+  - _require_tensor
+  arch_scope: ''
+  evidence:
+  - '75: def _require_tensor('
+  - '76:     name: str,'
+  - '77:     tensor: torch.Tensor,'
+  evidence_id: src_ce50e829ad3ee439
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 98
+  end_line: 109
+  match: 'def _validate_actual_max_splits(actual_max_splits: int | None) -> None:'
+  captured:
+  - _validate_actual_max_splits
+  arch_scope: ''
+  evidence:
+  - '98: def _validate_actual_max_splits(actual_max_splits: int | None) -> None:'
+  - '99:     if actual_max_splits is None:'
+  - '100:         return'
+  evidence_id: src_6e49a7e29550a915
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 112
+  end_line: 243
+  match: def _validate_mla_reduce_inputs(
+  captured:
+  - _validate_mla_reduce_inputs
+  arch_scope: ''
+  evidence:
+  - '112: def _validate_mla_reduce_inputs('
+  - '113:     partial_output: torch.Tensor,'
+  - '114:     partial_lse: torch.Tensor,'
+  evidence_id: src_a6768ea282169992
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 251
+  end_line: 269
+  match: 'def _resolve_actual_max_splits(reduce_indptr: torch.Tensor) -> int | None:'
+  captured:
+  - _resolve_actual_max_splits
+  arch_scope: ''
+  evidence:
+  - '251: def _resolve_actual_max_splits(reduce_indptr: torch.Tensor) -> int | None:'
+  - '252:     """Resolve ``actual_max_splits`` (true ``max_t(n_splits)``) capture-safely.'
+  evidence_id: src_6273210174229387
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 272
+  end_line: 460
+  match: def flydsl_mla_reduce_v1(
+  captured:
+  - flydsl_mla_reduce_v1
+  arch_scope: ''
+  evidence:
+  - '272: def flydsl_mla_reduce_v1('
+  - '273:     partial_output: torch.Tensor,  # fp32 [rows, H, Dv] contiguous'
+  - '274:     partial_lse: torch.Tensor,  # fp32 [rows, H] contiguous'
+  evidence_id: src_e9be119e9c8bd98b
+- snapshot: aiter_b3ad6c46
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 435
+  match: persistent=
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '433:         out_dtype=out_dtype_str,'
+  - '434:         tier=tier,'
+  - '435:         persistent=use_persistent and not use_adaptive,'
+  - '436:         output_lse=output_lse,'
+  - '437:         use_reduce_final_map=use_reduce_final_map,'
+  evidence_id: src_0ab6455b5ab54616
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 98
+  end_line: 109
+  match: def _validate_actual_max_splits(
+  captured:
+  - _validate_actual_max_splits
+  arch_scope: ''
+  evidence:
+  - '98: def _validate_actual_max_splits(actual_max_splits: int | None) -> None:'
+  - '99:     if actual_max_splits is None:'
+  - '100:         return'
+  evidence_id: src_5172e1c459a0a8f1
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 112
+  end_line: 243
+  match: def _validate_mla_reduce_inputs(
+  captured:
+  - _validate_mla_reduce_inputs
+  arch_scope: ''
+  evidence:
+  - '112: def _validate_mla_reduce_inputs('
+  - '113:     partial_output: torch.Tensor,'
+  - '114:     partial_lse: torch.Tensor,'
+  evidence_id: src_f28ee04bc55087f2
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 43
+  match: _MLA_REDUCE_GFX = (
+  captured:
+  - _MLA_REDUCE_GFX
+  arch_scope: ''
+  evidence:
+  - '43: _MLA_REDUCE_GFX = ("gfx942", "gfx950")'
+  - '44: _POINTER_DSL_DTYPES = {'
+  - '45:     torch.float32: fx.Float32,'
+  evidence_id: src_72dfdf6726f8b033
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 44
+  end_line: 49
+  match: _POINTER_DSL_DTYPES = {
+  captured:
+  - _POINTER_DSL_DTYPES
+  arch_scope: ''
+  evidence:
+  - '43: _MLA_REDUCE_GFX = ("gfx942", "gfx950")'
+  - '44: _POINTER_DSL_DTYPES = {'
+  - '45:     torch.float32: fx.Float32,'
+  - '46:     torch.bfloat16: fx.BFloat16,'
+  evidence_id: src_f461246ecf669657
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 57
+  end_line: 59
+  match: "raise ValueError(\n        f\"flydsl_mla_reduce_v1 only supports bf16/fp16 output, got {dtype!r}"
+  captured:
+  - flydsl_mla_reduce_v1 only supports bf16/fp16 output, got {dtype!r}
+  arch_scope: ''
+  evidence:
+  - '55:     if dtype == torch.float16:'
+  - '56:         return "fp16"'
+  - '57:     raise ValueError('
+  - '58:         f"flydsl_mla_reduce_v1 only supports bf16/fp16 output, got {dtype!r}"'
+  - '59:     )'
+  evidence_id: src_2eaf4d3f00e8d0d7
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 87
+  match: raise ValueError(f"`{name}` must be a CUDA/ROCm tensor, got {tensor.device}
+  captured:
+  - '`{name}` must be a CUDA/ROCm tensor, got {tensor.device}'
+  arch_scope: ''
+  evidence:
+  - '85:         raise TypeError(f"`{name}` must be a torch.Tensor, got {type(tensor)!r}")'
+  - '86:     if tensor.device.type != "cuda":'
+  - '87:         raise ValueError(f"`{name}` must be a CUDA/ROCm tensor, got {tensor.device}")'
+  - '88:     if tensor.device != device:'
+  - '89:         raise ValueError(f"`{name}` must be on {device}, got {tensor.device}")'
+  evidence_id: src_20478697a55601d3
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 89
+  match: raise ValueError(f"`{name}` must be on {device}, got {tensor.device}
+  captured:
+  - '`{name}` must be on {device}, got {tensor.device}'
+  arch_scope: ''
+  evidence:
+  - '87:         raise ValueError(f"`{name}` must be a CUDA/ROCm tensor, got {tensor.device}")'
+  - '88:     if tensor.device != device:'
+  - '89:         raise ValueError(f"`{name}` must be on {device}, got {tensor.device}")'
+  - '90:     if tensor.dtype != dtype:'
+  - '91:         raise TypeError(f"`{name}` must have dtype {dtype}, got {tensor.dtype}")'
+  evidence_id: src_6a5c36d212fa104f
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 93
+  match: raise ValueError(f"`{name}` must be {ndim}D, got shape {tuple(tensor.shape)}
+  captured:
+  - '`{name}` must be {ndim}D, got shape {tuple(tensor.shape)}'
+  arch_scope: ''
+  evidence:
+  - '91:         raise TypeError(f"`{name}` must have dtype {dtype}, got {tensor.dtype}")'
+  - '92:     if tensor.ndim != ndim:'
+  - '93:         raise ValueError(f"`{name}` must be {ndim}D, got shape {tuple(tensor.shape)}")'
+  - '94:     if contiguous and not tensor.is_contiguous():'
+  - '95:         raise ValueError(f"`{name}` must be contiguous")'
+  evidence_id: src_7b01e7fdf09aeacc
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 95
+  match: raise ValueError(f"`{name}` must be contiguous
+  captured:
+  - '`{name}` must be contiguous'
+  arch_scope: ''
+  evidence:
+  - '93:         raise ValueError(f"`{name}` must be {ndim}D, got shape {tuple(tensor.shape)}")'
+  - '94:     if contiguous and not tensor.is_contiguous():'
+  - '95:         raise ValueError(f"`{name}` must be contiguous")'
+  evidence_id: src_ff0e37e71931de40
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 106
+  end_line: 109
+  match: "raise ValueError(\n            f\"`actual_max_splits` must be in [0, {LDS_MAX_SPLITS}],"
+  captured:
+  - '`actual_max_splits` must be in [0, {LDS_MAX_SPLITS}], '
+  arch_scope: ''
+  evidence:
+  - '104:         )'
+  - '105:     if not 0 <= actual_max_splits <= LDS_MAX_SPLITS:'
+  - '106:         raise ValueError('
+  - '107:             f"`actual_max_splits` must be in [0, {LDS_MAX_SPLITS}], "'
+  - '108:             f"got {actual_max_splits}"'
+  evidence_id: src_e669043f21538280
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 130
+  end_line: 132
+  match: "raise ValueError(\n            f\"`final_output` must be a CUDA/ROCm tensor, got {final_output.device}"
+  captured:
+  - '`final_output` must be a CUDA/ROCm tensor, got {final_output.device}'
+  arch_scope: ''
+  evidence:
+  - '128:         )'
+  - '129:     if final_output.device.type != "cuda":'
+  - '130:         raise ValueError('
+  - '131:             f"`final_output` must be a CUDA/ROCm tensor, got {final_output.device}"'
+  - '132:         )'
+  evidence_id: src_4fd48ba1f491bca5
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 139
+  end_line: 141
+  match: "raise ValueError(\n            f\"`final_output` must be 3D [rows, H, Dv], got {tuple(final_output.shape)}"
+  captured:
+  - '`final_output` must be 3D [rows, H, Dv], got {tuple(final_output.shape)}'
+  arch_scope: ''
+  evidence:
+  - '137:         )'
+  - '138:     if final_output.ndim != 3:'
+  - '139:         raise ValueError('
+  - '140:             f"`final_output` must be 3D [rows, H, Dv], got {tuple(final_output.shape)}"'
+  - '141:         )'
+  evidence_id: src_3dfdf3dce051bade
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 225
+  match: raise ValueError(f"`max_seqlen_q` must be positive, got {max_seqlen_q}
+  captured:
+  - '`max_seqlen_q` must be positive, got {max_seqlen_q}'
+  arch_scope: ''
+  evidence:
+  - '223:         raise TypeError(f"`max_seqlen_q` must be an int, got {max_seqlen_q!r}")'
+  - '224:     if max_seqlen_q <= 0:'
+  - '225:         raise ValueError(f"`max_seqlen_q` must be positive, got {max_seqlen_q}")'
+  - '226:     if isinstance(num_kv_splits, bool) or not isinstance(num_kv_splits, int):'
+  - '227:         raise TypeError(f"`num_kv_splits` must be an int, got {num_kv_splits!r}")'
+  evidence_id: src_64f2f14e8a5a2144
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 229
+  end_line: 231
+  match: "raise ValueError(\n            f\"`num_kv_splits` must be in [0, {LDS_MAX_SPLITS}],"
+  captured:
+  - '`num_kv_splits` must be in [0, {LDS_MAX_SPLITS}], '
+  arch_scope: ''
+  evidence:
+  - '227:         raise TypeError(f"`num_kv_splits` must be an int, got {num_kv_splits!r}")'
+  - '228:     if not 0 <= num_kv_splits <= LDS_MAX_SPLITS:'
+  - '229:         raise ValueError('
+  - '230:             f"`num_kv_splits` must be in [0, {LDS_MAX_SPLITS}], " f"got {num_kv_splits}"'
+  - '231:         )'
+  evidence_id: src_18091ee9b8474f06
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  line: 233
+  end_line: 236
+  match: "raise ValueError(\n            f\"`final_output.size(-1)` ({Dv}) must be divisible by NUM_THREADS"
+  captured:
+  - '`final_output.size(-1)` ({Dv}) must be divisible by NUM_THREADS '
+  arch_scope: ''
+  evidence:
+  - '231:         )'
+  - '232:     if Dv % NUM_THREADS != 0:'
+  - '233:         raise ValueError('
+  - '234:             f"`final_output.size(-1)` ({Dv}) must be divisible by NUM_THREADS "'
+  - '235:             f"({NUM_THREADS})"'
+  evidence_id: src_4792fc98ff60484c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 14
+  end_line: 16
+  match: 'def fast_exp(x):'
+  captured:
+  - fast_exp
+  arch_scope: ''
+  evidence:
+  - '13: @triton.jit'
+  - '14: def fast_exp(x):'
+  - '15:     RCP_LN2: tl.constexpr = 1.4426950408889634'
+  - '16:     return tl.math.exp2(x * RCP_LN2)'
+  evidence_id: src_03a88e269e5430b9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 20
+  end_line: 21
+  match: 'def cdiv_fn(x, y):'
+  captured:
+  - cdiv_fn
+  arch_scope: ''
+  evidence:
+  - '19: @triton.jit'
+  - '20: def cdiv_fn(x, y):'
+  - '21:     return (x + y - 1) // y'
+  evidence_id: src_fc8faa583e66b700
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 25
+  end_line: 29
+  match: 'def apply_softcap(S, x):'
+  captured:
+  - apply_softcap
+  arch_scope: ''
+  evidence:
+  - '24: @triton.jit'
+  - '25: def apply_softcap(S, x):'
+  - '26:     Sdiv = S / x'
+  - '27:     p1 = tl.math.exp2(Sdiv)'
+  evidence_id: src_59edd1726c347012
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 33
+  end_line: 52
+  match: def _find_seq_idx(
+  captured:
+  - _find_seq_idx
+  arch_scope: ''
+  evidence:
+  - '32: @triton.jit'
+  - '33: def _find_seq_idx('
+  - '34:     query_start_len_ptr,'
+  - '35:     target_idx,'
+  evidence_id: src_ac80da33639240cc
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 74
+  end_line: 309
+  match: def _mla_prefill_fwd_kernel(
+  captured:
+  - _mla_prefill_fwd_kernel
+  arch_scope: ''
+  evidence:
+  - '73: @triton.jit(repr=_mla_prefill_fwd_kernel_repr)'
+  - '74: def _mla_prefill_fwd_kernel('
+  - '75:     output_ptr,  # [num_tokens, num_query_heads, head_size]'
+  - '76:     query_ptr,  # [num_tokens, num_query_heads, head_size]'
+  evidence_id: src_4beb79e573ff7956
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 336
+  end_line: 653
+  match: def _mla_decode_fwd_kernel(
+  captured:
+  - _mla_decode_fwd_kernel
+  arch_scope: ''
+  evidence:
+  - '335: @triton.jit(repr=_mla_decode_fwd_kernel_repr)'
+  - '336: def _mla_decode_fwd_kernel('
+  - '337:     segm_output_ptr,  # [total_num_tokens, num_query_heads, KV_LORA_RANK + qk_rope_head_dim]'
+  - '338:     segm_max_ptr,  # [total_num_tokens, num_query_heads, num_segments]'
+  evidence_id: src_1e5771093c2f8e5c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 669
+  end_line: 762
+  match: def _mla_decode_fwd_reduce_kernel(
+  captured:
+  - _mla_decode_fwd_reduce_kernel
+  arch_scope: ''
+  evidence:
+  - '668: @triton.jit(repr=_mla_decode_fwd_reduce_kernel_repr)'
+  - '669: def _mla_decode_fwd_reduce_kernel('
+  - '670:     output_ptr,  # [num_tokens, num_query_heads, head_size]'
+  - '671:     segm_output_ptr,'
+  evidence_id: src_a726e480b7d62ccf
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 251
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '249:         seq_mask = seq_offset[None, :] < context_len + query_pos[:, None] + 1'
+  - '251:         S_lora = tl.dot(Q_lora, KV_lora.trans(1, 0).to(Q_lora.dtype))'
+  - '252:         S_rope = tl.dot(Q_rope, K_rope.to(Q_lora.dtype))'
+  - '253:         S = qk_factor * (S_lora + S_rope)'
+  evidence_id: src_51555174173a152b
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 252
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '251:         S_lora = tl.dot(Q_lora, KV_lora.trans(1, 0).to(Q_lora.dtype))'
+  - '252:         S_rope = tl.dot(Q_rope, K_rope.to(Q_lora.dtype))'
+  - '253:         S = qk_factor * (S_lora + S_rope)'
+  evidence_id: src_8545b0e0f8674962
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 284
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '283:         # acc : (BLOCK_M, KV_LORA_RANK)'
+  - '284:         acc += tl.dot(P.to(KV_lora.dtype), KV_lora)'
+  - '285:         seq_offset += TILE_SIZE'
+  evidence_id: src_e4900097e706e0cc
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 588
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '587:         if SHUFFLED_KV_CACHE:'
+  - '588:             S_lora = tl.dot(Q_lora, KV_lora)'
+  - '589:         else:'
+  - '590:             S_lora = tl.dot(Q_lora, KV_lora.permute((1, 0)))'
+  evidence_id: src_ea2df191ed3a648c
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 590
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '588:             S_lora = tl.dot(Q_lora, KV_lora)'
+  - '589:         else:'
+  - '590:             S_lora = tl.dot(Q_lora, KV_lora.permute((1, 0)))'
+  - '591:         S_rope = tl.dot(Q_rope, K_rope)'
+  - '592:         S = qk_factor * (S_lora + S_rope)'
+  evidence_id: src_163d840425993586
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 591
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '589:         else:'
+  - '590:             S_lora = tl.dot(Q_lora, KV_lora.permute((1, 0)))'
+  - '591:         S_rope = tl.dot(Q_rope, K_rope)'
+  - '592:         S = qk_factor * (S_lora + S_rope)'
+  evidence_id: src_d0ba2224a3327ea1
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 622
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '620:         # acc : (BLOCK_M, KV_LORA_RANK)'
+  - '621:         if SHUFFLED_KV_CACHE:'
+  - '622:             acc += tl.dot(P.to(KV_lora.dtype), KV_lora.permute((1, 0)))'
+  - '623:         else:'
+  - '624:             acc += tl.dot(P.to(KV_lora.dtype), KV_lora)'
+  evidence_id: src_be09897d187a1d74
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 624
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '622:             acc += tl.dot(P.to(KV_lora.dtype), KV_lora.permute((1, 0)))'
+  - '623:         else:'
+  - '624:             acc += tl.dot(P.to(KV_lora.dtype), KV_lora)'
+  - '625:         seq_offset += TILE_SIZE'
+  evidence_id: src_206b7b338368f7e6
+- snapshot: aiter_b3ad6c46
+  category: lds_stage
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 222
+  end_line: 285
+  match: num_stages=1
+  captured:
+  - num_stages
+  - '1'
+  arch_scope: ''
+  evidence:
+  - '221:     # iterate through tiles (now limited to the sliding window range)'
+  - '222:     for j in tl.range(tile_start, tile_end, num_stages=1):'
+  - '223:         physical_block_idx = tl.load(block_tables_ptr_shifted + j).to(tl.int64)'
+  evidence_id: src_28c7257df0c80bae
+- snapshot: aiter_b3ad6c46
+  category: lds_stage
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 501
+  match: num_stages=1
+  captured:
+  - num_stages
+  - '1'
+  arch_scope: ''
+  evidence:
+  - '499:         segm_idx * tiles_per_segment,'
+  - '500:         min((segm_idx + 1) * tiles_per_segment, num_tiles),'
+  - '501:         num_stages=1,'
+  - '502:     ):'
+  - '503:         physical_block_idx = tl.load(block_tables_ptr_shifted + j).to(tl.int64)'
+  evidence_id: src_909c9526ef0c0a89
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 37
+  match: 'BLOCK_Q: tl.constexpr,'
+  captured:
+  - BLOCK_Q
+  arch_scope: ''
+  evidence:
+  - '35:     target_idx,'
+  - '36:     num_seqs,'
+  - '37:     BLOCK_Q: tl.constexpr,'
+  - '38:     use_q_block_mode: tl.constexpr,'
+  - '39: ):'
+  evidence_id: src_d91d5a79f5d98213
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 38
+  match: 'use_q_block_mode: tl.constexpr,'
+  captured:
+  - use_q_block_mode
+  arch_scope: ''
+  evidence:
+  - '36:     num_seqs,'
+  - '37:     BLOCK_Q: tl.constexpr,'
+  - '38:     use_q_block_mode: tl.constexpr,'
+  - '39: ):'
+  - '40:     left: tl.int32 = 0'
+  evidence_id: src_0d5348dcb8e741b1
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 80
+  match: 'scale: tl.constexpr,'
+  captured:
+  - scale
+  arch_scope: ''
+  evidence:
+  - '78:     block_tables_ptr,  # [num_seqs, max_num_blocks_per_seq]'
+  - '79:     seq_lens_ptr,  # [num_seqs]'
+  - '80:     scale: tl.constexpr,  # float32'
+  - '81:     q_scale_ptr,  # float32'
+  - '82:     kv_scale_ptr,  # float32'
+  evidence_id: src_4d939f5d633c4c7b
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 84
+  match: 'num_query_heads: tl.constexpr,'
+  captured:
+  - num_query_heads
+  arch_scope: ''
+  evidence:
+  - '82:     kv_scale_ptr,  # float32'
+  - '83:     out_scale_ptr,  # float32'
+  - '84:     num_query_heads: tl.constexpr,  # int'
+  - '85:     num_kv_heads: tl.constexpr,  # int'
+  - '86:     block_tables_stride: tl.int64,  # int'
+  evidence_id: src_0195f504780181c7
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 85
+  match: 'num_kv_heads: tl.constexpr,'
+  captured:
+  - num_kv_heads
+  arch_scope: ''
+  evidence:
+  - '83:     out_scale_ptr,  # float32'
+  - '84:     num_query_heads: tl.constexpr,  # int'
+  - '85:     num_kv_heads: tl.constexpr,  # int'
+  - '86:     block_tables_stride: tl.int64,  # int'
+  - '87:     query_stride_0: tl.int64,  # int'
+  evidence_id: src_b06f812b030bce2b
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 91
+  match: 'KV_LORA_RANK: tl.constexpr,'
+  captured:
+  - KV_LORA_RANK
+  arch_scope: ''
+  evidence:
+  - '89:     output_stride_0: tl.int64,  # int'
+  - '90:     output_stride_1: tl.int64,  # int, should be equal to head_size'
+  - '91:     KV_LORA_RANK: tl.constexpr,  # int'
+  - '92:     QK_ROPE_HEAD_DIM: tl.constexpr,  # int'
+  - '93:     stride_kv_buffer_0: tl.int64,  # int'
+  evidence_id: src_a0cdd1c36fa7b82f
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 92
+  match: 'QK_ROPE_HEAD_DIM: tl.constexpr,'
+  captured:
+  - QK_ROPE_HEAD_DIM
+  arch_scope: ''
+  evidence:
+  - '90:     output_stride_1: tl.int64,  # int, should be equal to head_size'
+  - '91:     KV_LORA_RANK: tl.constexpr,  # int'
+  - '92:     QK_ROPE_HEAD_DIM: tl.constexpr,  # int'
+  - '93:     stride_kv_buffer_0: tl.int64,  # int'
+  - '94:     stride_kv_buffer_1: tl.int64,  # int'
+  evidence_id: src_9dbc87eddb8fb168
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 96
+  match: 'stride_kv_buffer_3: tl.constexpr,'
+  captured:
+  - stride_kv_buffer_3
+  arch_scope: ''
+  evidence:
+  - '94:     stride_kv_buffer_1: tl.int64,  # int'
+  - '95:     stride_kv_buffer_2: tl.int64,  # int'
+  - '96:     stride_kv_buffer_3: tl.constexpr,  # int'
+  - '97:     query_start_len_ptr,  # [num_seqs+1]'
+  - '98:     num_seqs: tl.int32,'
+  evidence_id: src_a76f1f08a194008f
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 99
+  match: 'TILE_SIZE: tl.constexpr,'
+  captured:
+  - TILE_SIZE
+  arch_scope: ''
+  evidence:
+  - '97:     query_start_len_ptr,  # [num_seqs+1]'
+  - '98:     num_seqs: tl.int32,'
+  - '99:     TILE_SIZE: tl.constexpr,  # int'
+  - '100:     BLOCK_Q: tl.constexpr,  # int'
+  - '101:     BLOCK_M: tl.constexpr,  # int'
+  evidence_id: src_2c222b030ef1a619
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 100
+  match: 'BLOCK_Q: tl.constexpr,'
+  captured:
+  - BLOCK_Q
+  arch_scope: ''
+  evidence:
+  - '98:     num_seqs: tl.int32,'
+  - '99:     TILE_SIZE: tl.constexpr,  # int'
+  - '100:     BLOCK_Q: tl.constexpr,  # int'
+  - '101:     BLOCK_M: tl.constexpr,  # int'
+  - '102:     num_warps: tl.constexpr,  # int'
+  evidence_id: src_f16563d81b4ccbd6
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 101
+  match: 'BLOCK_M: tl.constexpr,'
+  captured:
+  - BLOCK_M
+  arch_scope: ''
+  evidence:
+  - '99:     TILE_SIZE: tl.constexpr,  # int'
+  - '100:     BLOCK_Q: tl.constexpr,  # int'
+  - '101:     BLOCK_M: tl.constexpr,  # int'
+  - '102:     num_warps: tl.constexpr,  # int'
+  - '103:     num_stages: tl.constexpr,  # int'
+  evidence_id: src_fb2f630ba086a55c
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 102
+  match: 'num_warps: tl.constexpr,'
+  captured:
+  - num_warps
+  arch_scope: ''
+  evidence:
+  - '100:     BLOCK_Q: tl.constexpr,  # int'
+  - '101:     BLOCK_M: tl.constexpr,  # int'
+  - '102:     num_warps: tl.constexpr,  # int'
+  - '103:     num_stages: tl.constexpr,  # int'
+  - '104:     NUM_HEAD_BLOCKS: tl.constexpr = 1,  # int'
+  evidence_id: src_d58980146a5ae782
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 103
+  match: 'num_stages: tl.constexpr,'
+  captured:
+  - num_stages
+  arch_scope: ''
+  evidence:
+  - '101:     BLOCK_M: tl.constexpr,  # int'
+  - '102:     num_warps: tl.constexpr,  # int'
+  - '103:     num_stages: tl.constexpr,  # int'
+  - '104:     NUM_HEAD_BLOCKS: tl.constexpr = 1,  # int'
+  - '105:     FP8_MIN: tl.constexpr = float8_info.min,'
+  evidence_id: src_1fdf8a9910b695a8
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 348
+  match: 'num_query_heads: tl.constexpr,'
+  captured:
+  - num_query_heads
+  arch_scope: ''
+  evidence:
+  - '346:     q_scale_ptr,  # float32'
+  - '347:     kv_scale_ptr,  # float32'
+  - '348:     num_query_heads: tl.constexpr,  # int'
+  - '349:     num_kv_heads: tl.constexpr,  # int'
+  - '350:     block_tables_stride: tl.int64,  # int'
+  evidence_id: src_c4ab15f67618d2f9
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 349
+  match: 'num_kv_heads: tl.constexpr,'
+  captured:
+  - num_kv_heads
+  arch_scope: ''
+  evidence:
+  - '347:     kv_scale_ptr,  # float32'
+  - '348:     num_query_heads: tl.constexpr,  # int'
+  - '349:     num_kv_heads: tl.constexpr,  # int'
+  - '350:     block_tables_stride: tl.int64,  # int'
+  - '351:     query_stride_0: tl.int64,  # int'
+  evidence_id: src_6268051f47bb60f8
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 355
+  match: 'KV_LORA_RANK: tl.constexpr,'
+  captured:
+  - KV_LORA_RANK
+  arch_scope: ''
+  evidence:
+  - '353:     query_scales_stride_0: tl.int64,  # int'
+  - '354:     query_scales_stride_1: tl.int64,  # int'
+  - '355:     KV_LORA_RANK: tl.constexpr,  # int'
+  - '356:     QK_ROPE_HEAD_DIM: tl.constexpr,  # int'
+  - '357:     stride_kv_buffer_0: tl.int64,  # int'
+  evidence_id: src_17ffc58249ef8d4e
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 356
+  match: 'QK_ROPE_HEAD_DIM: tl.constexpr,'
+  captured:
+  - QK_ROPE_HEAD_DIM
+  arch_scope: ''
+  evidence:
+  - '354:     query_scales_stride_1: tl.int64,  # int'
+  - '355:     KV_LORA_RANK: tl.constexpr,  # int'
+  - '356:     QK_ROPE_HEAD_DIM: tl.constexpr,  # int'
+  - '357:     stride_kv_buffer_0: tl.int64,  # int'
+  - '358:     stride_kv_buffer_1: tl.int64,  # int'
+  evidence_id: src_a189e673ee594cde
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 360
+  match: 'stride_kv_buffer_3: tl.constexpr,'
+  captured:
+  - stride_kv_buffer_3
+  arch_scope: ''
+  evidence:
+  - '358:     stride_kv_buffer_1: tl.int64,  # int'
+  - '359:     stride_kv_buffer_2: tl.int64,  # int'
+  - '360:     stride_kv_buffer_3: tl.constexpr,  # int'
+  - '361:     query_start_len_ptr,  # [num_seqs+1]'
+  - '362:     num_tokens_per_seq: tl.int32,'
+  evidence_id: src_1900edb39d43cd10
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 363
+  match: 'TILE_SIZE: tl.constexpr,'
+  captured:
+  - TILE_SIZE
+  arch_scope: ''
+  evidence:
+  - '361:     query_start_len_ptr,  # [num_seqs+1]'
+  - '362:     num_tokens_per_seq: tl.int32,'
+  - '363:     TILE_SIZE: tl.constexpr,  # int'
+  - '364:     BLOCK_Q: tl.constexpr,  # int'
+  - '365:     BLOCK_M: tl.constexpr,  # int'
+  evidence_id: src_952c289214ddadac
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 364
+  match: 'BLOCK_Q: tl.constexpr,'
+  captured:
+  - BLOCK_Q
+  arch_scope: ''
+  evidence:
+  - '362:     num_tokens_per_seq: tl.int32,'
+  - '363:     TILE_SIZE: tl.constexpr,  # int'
+  - '364:     BLOCK_Q: tl.constexpr,  # int'
+  - '365:     BLOCK_M: tl.constexpr,  # int'
+  - '366:     NUM_SEGMENTS_PER_SEQ: tl.constexpr,  # int'
+  evidence_id: src_e36bcb6b0f734274
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 365
+  match: 'BLOCK_M: tl.constexpr,'
+  captured:
+  - BLOCK_M
+  arch_scope: ''
+  evidence:
+  - '363:     TILE_SIZE: tl.constexpr,  # int'
+  - '364:     BLOCK_Q: tl.constexpr,  # int'
+  - '365:     BLOCK_M: tl.constexpr,  # int'
+  - '366:     NUM_SEGMENTS_PER_SEQ: tl.constexpr,  # int'
+  - '367:     num_warps: tl.constexpr,  # int'
+  evidence_id: src_87b676bdaad2c662
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 366
+  match: 'NUM_SEGMENTS_PER_SEQ: tl.constexpr,'
+  captured:
+  - NUM_SEGMENTS_PER_SEQ
+  arch_scope: ''
+  evidence:
+  - '364:     BLOCK_Q: tl.constexpr,  # int'
+  - '365:     BLOCK_M: tl.constexpr,  # int'
+  - '366:     NUM_SEGMENTS_PER_SEQ: tl.constexpr,  # int'
+  - '367:     num_warps: tl.constexpr,  # int'
+  - '368:     waves_per_eu: tl.constexpr,  # int'
+  evidence_id: src_0cfb4ea56560880f
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 367
+  match: 'num_warps: tl.constexpr,'
+  captured:
+  - num_warps
+  arch_scope: ''
+  evidence:
+  - '365:     BLOCK_M: tl.constexpr,  # int'
+  - '366:     NUM_SEGMENTS_PER_SEQ: tl.constexpr,  # int'
+  - '367:     num_warps: tl.constexpr,  # int'
+  - '368:     waves_per_eu: tl.constexpr,  # int'
+  - '369:     num_stages: tl.constexpr,  # int'
+  evidence_id: src_3d20cd04814d442e
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 368
+  match: 'waves_per_eu: tl.constexpr,'
+  captured:
+  - waves_per_eu
+  arch_scope: ''
+  evidence:
+  - '366:     NUM_SEGMENTS_PER_SEQ: tl.constexpr,  # int'
+  - '367:     num_warps: tl.constexpr,  # int'
+  - '368:     waves_per_eu: tl.constexpr,  # int'
+  - '369:     num_stages: tl.constexpr,  # int'
+  - '370:     NUM_HEAD_BLOCKS: tl.constexpr = 1,  # int'
+  evidence_id: src_903c4bbb1bed0d1d
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 369
+  match: 'num_stages: tl.constexpr,'
+  captured:
+  - num_stages
+  arch_scope: ''
+  evidence:
+  - '367:     num_warps: tl.constexpr,  # int'
+  - '368:     waves_per_eu: tl.constexpr,  # int'
+  - '369:     num_stages: tl.constexpr,  # int'
+  - '370:     NUM_HEAD_BLOCKS: tl.constexpr = 1,  # int'
+  - '371:     ALL_DECODE: tl.constexpr = False,  # bool'
+  evidence_id: src_6fb177438eab71e8
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 678
+  match: 'num_query_heads: tl.constexpr,'
+  captured:
+  - num_query_heads
+  arch_scope: ''
+  evidence:
+  - '676:     out_scale_ptr,  # float32'
+  - '677:     num_seqs,  # int'
+  - '678:     num_query_heads: tl.constexpr,  # int'
+  - '679:     output_stride_0: tl.int64,  # int'
+  - '680:     output_stride_1: tl.int64,  # int, should be equal to head_size'
+  evidence_id: src_28e3a4e95cf3baac
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 684
+  match: 'TILE_SIZE: tl.constexpr,'
+  captured:
+  - TILE_SIZE
+  arch_scope: ''
+  evidence:
+  - '682:     num_tokens_per_seq: tl.int32,'
+  - '683:     total_num_tokens: tl.int32,'
+  - '684:     TILE_SIZE: tl.constexpr,  # int'
+  - '685:     KV_LORA_RANK: tl.constexpr,  # int'
+  - '686:     query_start_len_ptr,  # [num_seqs+1]'
+  evidence_id: src_cc4e4d29514cd864
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 685
+  match: 'KV_LORA_RANK: tl.constexpr,'
+  captured:
+  - KV_LORA_RANK
+  arch_scope: ''
+  evidence:
+  - '683:     total_num_tokens: tl.int32,'
+  - '684:     TILE_SIZE: tl.constexpr,  # int'
+  - '685:     KV_LORA_RANK: tl.constexpr,  # int'
+  - '686:     query_start_len_ptr,  # [num_seqs+1]'
+  - '687:     BLOCK_Q: tl.constexpr,  # int'
+  evidence_id: src_c3515c72633af2d5
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 687
+  match: 'BLOCK_Q: tl.constexpr,'
+  captured:
+  - BLOCK_Q
+  arch_scope: ''
+  evidence:
+  - '685:     KV_LORA_RANK: tl.constexpr,  # int'
+  - '686:     query_start_len_ptr,  # [num_seqs+1]'
+  - '687:     BLOCK_Q: tl.constexpr,  # int'
+  - '688:     NUM_SEGMENTS_PER_SEQ: tl.constexpr,  # int'
+  - '689:     ALL_DECODE: tl.constexpr = False,  # int'
+  evidence_id: src_8d80bde36923c49c
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla.py
+  line: 688
+  match: 'NUM_SEGMENTS_PER_SEQ: tl.constexpr,'
+  captured:
+  - NUM_SEGMENTS_PER_SEQ
+  arch_scope: ''
+  evidence:
+  - '686:     query_start_len_ptr,  # [num_seqs+1]'
+  - '687:     BLOCK_Q: tl.constexpr,  # int'
+  - '688:     NUM_SEGMENTS_PER_SEQ: tl.constexpr,  # int'
+  - '689:     ALL_DECODE: tl.constexpr = False,  # int'
+  - '690:     FP8_MIN: tl.constexpr = float8_info.min,'
+  evidence_id: src_0019fb9f5dbeeaf7
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 58
+  end_line: 325
+  match: def _fwd_grouped_kernel_stage1_rope(
+  captured:
+  - _fwd_grouped_kernel_stage1_rope
+  arch_scope: ''
+  evidence:
+  - '57: @triton.jit(repr=_fwd_grouped_kernel_stage1_rope_repr)'
+  - '58: def _fwd_grouped_kernel_stage1_rope('
+  - '59:     Q,  # Holds [Q_NOPE; Q_PE], b x h x (d+r)'
+  - '60:     K_Buffer,  # Holds [KV; K_PE], b*s x (c+r)'
+  evidence_id: src_90b6591111c7a40b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 341
+  end_line: 400
+  match: def _fwd_kernel_stage2(
+  captured:
+  - _fwd_kernel_stage2
+  arch_scope: ''
+  evidence:
+  - '340: @triton.jit(repr=_fwd_kernel_stage2_repr)'
+  - '341: def _fwd_kernel_stage2('
+  - '342:     Mid_O,'
+  - '343:     O,'
+  evidence_id: src_8eb793a0b42bdbe8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 404
+  end_line: 406
+  match: 'def _get_config():'
+  captured:
+  - _get_config
+  arch_scope: ''
+  evidence:
+  - '403: @functools.lru_cache(maxsize=1024)'
+  - '404: def _get_config():'
+  - '405:     cfg_dir = resolve_config_dir("attention", "MLA_DECODE_ROPE", backend="triton")'
+  - '406:     return load_config_json(f"{cfg_dir}/DEFAULT.json")'
+  evidence_id: src_9e472fabdce31d0f
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 257
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '255:             # (16, 64) x (64, 32)'
+  - '256:             # dot product of rope parts'
+  - '257:             qk = tl.dot(q_pe, k_pe.to(q_pe.dtype))'
+  - '259:             kv = tl.load('
+  evidence_id: src_4660be800507753d
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 267
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '265:             # (16, 512) x (512, 32)'
+  - '266:             # dot product of nope parts'
+  - '267:             qk = tl.dot(q, kv, acc=qk)'
+  - '269:             qk *= sm_scale'
+  evidence_id: src_04cc3d63bcba9c30
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 290
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '288:             acc *= re_scale[:, None]'
+  - '289:             # (16, 32) x (32, 512)'
+  - '290:             acc = tl.dot(p.to(v.dtype), v, acc=acc)'
+  - '292:             e_sum = e_sum * re_scale + tl.sum(p, 1)'
+  evidence_id: src_bbab08d77e19991b
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 79
+  match: 'rotary_dim: tl.constexpr,'
+  captured:
+  - rotary_dim
+  arch_scope: ''
+  evidence:
+  - '77:     stride_cos_sin_cache_s,'
+  - '78:     stride_positions_b,'
+  - '79:     rotary_dim: tl.constexpr,'
+  - '80:     kv_lora_rank: tl.constexpr,'
+  - '81:     qk_rope_head_dim: tl.constexpr,'
+  evidence_id: src_8ceeeaec16246ee2
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 80
+  match: 'kv_lora_rank: tl.constexpr,'
+  captured:
+  - kv_lora_rank
+  arch_scope: ''
+  evidence:
+  - '78:     stride_positions_b,'
+  - '79:     rotary_dim: tl.constexpr,'
+  - '80:     kv_lora_rank: tl.constexpr,'
+  - '81:     qk_rope_head_dim: tl.constexpr,'
+  - '82:     kv_group_num: tl.constexpr,'
+  evidence_id: src_4f401d4c0e6a0e82
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 81
+  match: 'qk_rope_head_dim: tl.constexpr,'
+  captured:
+  - qk_rope_head_dim
+  arch_scope: ''
+  evidence:
+  - '79:     rotary_dim: tl.constexpr,'
+  - '80:     kv_lora_rank: tl.constexpr,'
+  - '81:     qk_rope_head_dim: tl.constexpr,'
+  - '82:     kv_group_num: tl.constexpr,'
+  - '83:     q_head_num: tl.constexpr,'
+  evidence_id: src_ddeb56c5b47a4eda
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 82
+  match: 'kv_group_num: tl.constexpr,'
+  captured:
+  - kv_group_num
+  arch_scope: ''
+  evidence:
+  - '80:     kv_lora_rank: tl.constexpr,'
+  - '81:     qk_rope_head_dim: tl.constexpr,'
+  - '82:     kv_group_num: tl.constexpr,'
+  - '83:     q_head_num: tl.constexpr,'
+  - '84:     batch: tl.constexpr,'
+  evidence_id: src_73d77c0a2f866af0
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 83
+  match: 'q_head_num: tl.constexpr,'
+  captured:
+  - q_head_num
+  arch_scope: ''
+  evidence:
+  - '81:     qk_rope_head_dim: tl.constexpr,'
+  - '82:     kv_group_num: tl.constexpr,'
+  - '83:     q_head_num: tl.constexpr,'
+  - '84:     batch: tl.constexpr,'
+  - '85:     BLOCK_C: tl.constexpr,'
+  evidence_id: src_a33735ad55d42e46
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 84
+  match: 'batch: tl.constexpr,'
+  captured:
+  - batch
+  arch_scope: ''
+  evidence:
+  - '82:     kv_group_num: tl.constexpr,'
+  - '83:     q_head_num: tl.constexpr,'
+  - '84:     batch: tl.constexpr,'
+  - '85:     BLOCK_C: tl.constexpr,'
+  - '86:     BLOCK_R: tl.constexpr,'
+  evidence_id: src_a7b5e6f858e551af
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 85
+  match: 'BLOCK_C: tl.constexpr,'
+  captured:
+  - BLOCK_C
+  arch_scope: ''
+  evidence:
+  - '83:     q_head_num: tl.constexpr,'
+  - '84:     batch: tl.constexpr,'
+  - '85:     BLOCK_C: tl.constexpr,'
+  - '86:     BLOCK_R: tl.constexpr,'
+  - '87:     BLOCK_N: tl.constexpr,'
+  evidence_id: src_3e37d8cba9ace62e
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 86
+  match: 'BLOCK_R: tl.constexpr,'
+  captured:
+  - BLOCK_R
+  arch_scope: ''
+  evidence:
+  - '84:     batch: tl.constexpr,'
+  - '85:     BLOCK_C: tl.constexpr,'
+  - '86:     BLOCK_R: tl.constexpr,'
+  - '87:     BLOCK_N: tl.constexpr,'
+  - '88:     BLOCK_H: tl.constexpr,'
+  evidence_id: src_c55e6969c23e0920
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 87
+  match: 'BLOCK_N: tl.constexpr,'
+  captured:
+  - BLOCK_N
+  arch_scope: ''
+  evidence:
+  - '85:     BLOCK_C: tl.constexpr,'
+  - '86:     BLOCK_R: tl.constexpr,'
+  - '87:     BLOCK_N: tl.constexpr,'
+  - '88:     BLOCK_H: tl.constexpr,'
+  - '89:     NUM_KV_SPLITS: tl.constexpr,'
+  evidence_id: src_f8fc313f2937ed0c
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 88
+  match: 'BLOCK_H: tl.constexpr,'
+  captured:
+  - BLOCK_H
+  arch_scope: ''
+  evidence:
+  - '86:     BLOCK_R: tl.constexpr,'
+  - '87:     BLOCK_N: tl.constexpr,'
+  - '88:     BLOCK_H: tl.constexpr,'
+  - '89:     NUM_KV_SPLITS: tl.constexpr,'
+  - '90:     logit_cap: tl.constexpr,'
+  evidence_id: src_9d4da20327f1076a
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 89
+  match: 'NUM_KV_SPLITS: tl.constexpr,'
+  captured:
+  - NUM_KV_SPLITS
+  arch_scope: ''
+  evidence:
+  - '87:     BLOCK_N: tl.constexpr,'
+  - '88:     BLOCK_H: tl.constexpr,'
+  - '89:     NUM_KV_SPLITS: tl.constexpr,'
+  - '90:     logit_cap: tl.constexpr,'
+  - '91:     USE_ROPE: tl.constexpr,'
+  evidence_id: src_428099c06c0057b9
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 90
+  match: 'logit_cap: tl.constexpr,'
+  captured:
+  - logit_cap
+  arch_scope: ''
+  evidence:
+  - '88:     BLOCK_H: tl.constexpr,'
+  - '89:     NUM_KV_SPLITS: tl.constexpr,'
+  - '90:     logit_cap: tl.constexpr,'
+  - '91:     USE_ROPE: tl.constexpr,'
+  - '92:     IS_NEOX_STYLE: tl.constexpr,'
+  evidence_id: src_cdb060d3f0b3612e
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 91
+  match: 'USE_ROPE: tl.constexpr,'
+  captured:
+  - USE_ROPE
+  arch_scope: ''
+  evidence:
+  - '89:     NUM_KV_SPLITS: tl.constexpr,'
+  - '90:     logit_cap: tl.constexpr,'
+  - '91:     USE_ROPE: tl.constexpr,'
+  - '92:     IS_NEOX_STYLE: tl.constexpr,'
+  - '93: ):'
+  evidence_id: src_c97583e7dac40d97
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 92
+  match: 'IS_NEOX_STYLE: tl.constexpr,'
+  captured:
+  - IS_NEOX_STYLE
+  arch_scope: ''
+  evidence:
+  - '90:     logit_cap: tl.constexpr,'
+  - '91:     USE_ROPE: tl.constexpr,'
+  - '92:     IS_NEOX_STYLE: tl.constexpr,'
+  - '93: ):'
+  - '94:     pid = tl.program_id(0)'
+  evidence_id: src_b33d7445e85cf34e
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 350
+  match: 'NUM_KV_SPLITS: tl.constexpr,'
+  captured:
+  - NUM_KV_SPLITS
+  arch_scope: ''
+  evidence:
+  - '348:     stride_obs,'
+  - '349:     stride_oh,'
+  - '350:     NUM_KV_SPLITS: tl.constexpr,'
+  - '351:     BLOCK_DV: tl.constexpr,'
+  - '352:     Lv: tl.constexpr,'
+  evidence_id: src_2dcd77b04e2e1d9d
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 351
+  match: 'BLOCK_DV: tl.constexpr,'
+  captured:
+  - BLOCK_DV
+  arch_scope: ''
+  evidence:
+  - '349:     stride_oh,'
+  - '350:     NUM_KV_SPLITS: tl.constexpr,'
+  - '351:     BLOCK_DV: tl.constexpr,'
+  - '352:     Lv: tl.constexpr,'
+  - '353:     batch: tl.constexpr,'
+  evidence_id: src_7aaf25e32c5b5ed4
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 352
+  match: 'Lv: tl.constexpr,'
+  captured:
+  - Lv
+  arch_scope: ''
+  evidence:
+  - '350:     NUM_KV_SPLITS: tl.constexpr,'
+  - '351:     BLOCK_DV: tl.constexpr,'
+  - '352:     Lv: tl.constexpr,'
+  - '353:     batch: tl.constexpr,'
+  - '354:     head_num: tl.constexpr,'
+  evidence_id: src_e63d066856aed19d
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 353
+  match: 'batch: tl.constexpr,'
+  captured:
+  - batch
+  arch_scope: ''
+  evidence:
+  - '351:     BLOCK_DV: tl.constexpr,'
+  - '352:     Lv: tl.constexpr,'
+  - '353:     batch: tl.constexpr,'
+  - '354:     head_num: tl.constexpr,'
+  - '355: ):'
+  evidence_id: src_8be6305bc60a888d
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 354
+  match: 'head_num: tl.constexpr,'
+  captured:
+  - head_num
+  arch_scope: ''
+  evidence:
+  - '352:     Lv: tl.constexpr,'
+  - '353:     batch: tl.constexpr,'
+  - '354:     head_num: tl.constexpr,'
+  - '355: ):'
+  - '356:     pid = tl.program_id(0)'
+  evidence_id: src_e148aa4f7a6bcb73
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py
+  line: 403
+  match: '@functools.lru_cache(maxsize=1024)
+
+    def _get_config'
+  captured:
+  - '1024'
+  - _get_config
+  arch_scope: ''
+  evidence:
+  - '403: @functools.lru_cache(maxsize=1024)'
+  - '404: def _get_config():'
+  - '405:     cfg_dir = resolve_config_dir("attention", "MLA_DECODE_ROPE", backend="triton")'
+  evidence_id: src_9236441ea95dc0f7
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: hip
+  file: csrc/kernels/mla/opus_mla_decode_fwd.cu
+  line: 48
+  match: opus_mla_decode_a8w8_32mx4_64nx1.co
+  captured:
+  - opus_mla_decode_a8w8_32mx4_64nx1.co
+  arch_scope: ''
+  evidence:
+  - '46: // score buffers in VGPRs) needs the pin toolchain, and a stock ROCm clang forces every MFMA into'
+  - '47: // AGPR form, which cannot fit. One entry per specialization.'
+  - '48: constexpr const char* kA8W8_32mx4_co = "mla_opus/opus_mla_decode_a8w8_32mx4_64nx1.co";'
+  - '49: // fp8 32mx2 / 32nx2 (mla_decode_a8w8_32mx2_32nx2.hpp): two wave pairs of 32 packed query rows,'
+  - '50: // 32x32x64 for both GEMMs, prebuilt the same way (mla_decode_a8w8_32mx2_32nx2.cu). 64 packed'
+  evidence_id: src_84ab1824162625f2
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: hip
+  file: csrc/kernels/mla/opus_mla_decode_fwd.cu
+  line: 55
+  match: opus_mla_decode_a8w8_32mx2_32nx2.co
+  captured:
+  - opus_mla_decode_a8w8_32mx2_32nx2.co
+  arch_scope: ''
+  evidence:
+  - '53: // exactly the shapes opus_a8w8_route sends here (64 rows or fewer per request, and'
+  - '54: // kPackedQoLenPerWg 64 for nhead 32 x 3).'
+  - '55: constexpr const char* kA8W8_32mx2_co = "mla_opus/opus_mla_decode_a8w8_32mx2_32nx2.co";'
+  - '56: constexpr int kCoBlockSize           = 256;'
+  evidence_id: src_a4c13b4cb7a8cacd

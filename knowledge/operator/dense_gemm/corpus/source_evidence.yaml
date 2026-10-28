@@ -1,0 +1,5264 @@
+schema_version: 2
+operator: dense_gemm
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_a6bb4993
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  lines: 1041
+  evidence_records: 100
+- snapshot: aiter_a6bb4993
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/hgemm_dispatch.py
+  lines: 77
+  evidence_records: 8
+- snapshot: aiter_a6bb4993
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/layout_utils.py
+  lines: 166
+  evidence_records: 0
+- snapshot: aiter_a6bb4993
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  lines: 487
+  evidence_records: 25
+- snapshot: aiter_a6bb4993
+  language: flydsl
+  file: aiter/ops/flydsl/utils.py
+  lines: 71
+  evidence_records: 4
+- snapshot: aiter_a6bb4993
+  language: routing
+  file: aiter/ops/gemm_op_a16w16.py
+  lines: 56
+  evidence_records: 0
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/__init__.py
+  lines: 1
+  evidence_records: 0
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  lines: 269
+  evidence_records: 25
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  lines: 148
+  evidence_records: 13
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  lines: 161
+  evidence_records: 16
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/utils/_triton/pid_preprocessing.py
+  lines: 101
+  evidence_records: 7
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/utils/gemm_config_utils.py
+  lines: 238
+  evidence_records: 2
+- snapshot: aiter_a6bb4993
+  language: routing
+  file: aiter/tuned_gemm.py
+  lines: 576
+  evidence_records: 8
+- snapshot: aiter_a6bb4993
+  language: ck
+  file: csrc/ck_deepgemm/deepgemm.cu
+  lines: 135
+  evidence_records: 0
+- snapshot: aiter_a6bb4993
+  language: ck
+  file: csrc/ck_deepgemm/include/deepgemm_common.cuh
+  lines: 204
+  evidence_records: 0
+- snapshot: aiter_a6bb4993
+  language: hip
+  file: csrc/include/gemm_common.h
+  lines: 14
+  evidence_records: 0
+- snapshot: aiter_a6bb4993
+  language: hip
+  file: csrc/include/gemm_dispatch_utils.h
+  lines: 127
+  evidence_records: 0
+- snapshot: aiter_a6bb4993
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  lines: 3056
+  evidence_records: 15
+- snapshot: aiter_a6bb4993
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  lines: 268
+  evidence_records: 16
+- snapshot: aiter_a6bb4993
+  language: hip
+  file: csrc/py_itfs_cu/gemm_common.cu
+  lines: 42
+  evidence_records: 1
+- snapshot: aiter_a6bb4993
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  lines: 24
+  evidence_records: 22
+- snapshot: aiter_a6bb4993
+  language: asm
+  file: hsa/gfx942/i8gemm/i8gemm_bf16_perTokenI8.csv
+  lines: 11
+  evidence_records: 9
+- snapshot: aiter_a6bb4993
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  lines: 26
+  evidence_records: 24
+- snapshot: aiter_a6bb4993
+  language: asm
+  file: hsa/gfx950/i8gemm/i8gemm_bf16_perTokenI8.csv
+  lines: 10
+  evidence_records: 8
+missing:
+- snapshot: aiter_a6bb4993
+  language: gluon
+  subtree: aiter/ops/triton
+  why: 'declared pattern matched no file: _gluon_kernels/*/gemm/*.py'
+- snapshot: aiter_a6bb4993
+  language: hip
+  subtree: csrc
+  why: 'declared pattern matched no file: opus_gemm/*.cu'
+- snapshot: aiter_a6bb4993
+  language: hip
+  subtree: csrc
+  why: 'declared pattern matched no file: opus_gemm/include/*.cuh'
+- snapshot: aiter_a6bb4993
+  language: hip
+  subtree: csrc
+  why: 'declared pattern matched no file: opus_gemm/include/*.h'
+- snapshot: aiter_a6bb4993
+  language: hip
+  subtree: csrc
+  why: 'declared pattern matched no file: opus_gemm/include/gfx*/opus_gemm_pipeline_*.cuh'
+- snapshot: aiter_a6bb4993
+  language: hip
+  subtree: csrc
+  why: 'declared pattern matched no file: opus_gemm/include/gfx*/opus_gemm_traits_*.cuh'
+- snapshot: aiter_a6bb4993
+  language: hip
+  subtree: csrc
+  why: 'declared pattern matched no file: opus_gemm/codegen/gen_instances_*.py'
+- snapshot: aiter_a6bb4993
+  language: hip
+  subtree: csrc
+  why: 'declared pattern matched no file: opus_gemm/opus_gemm_common.py'
+- snapshot: aiter_a6bb4993
+  language: triton
+  subtree: aiter/ops/triton/_triton_kernels/gemm
+  why: no @triton.autotune in the GEMM family — tuning is shipped as per-shape JSON under aiter/ops/triton/configs/gemm
+    (see evidence/gemm_tuned_configs.yaml, 1304 rows)
+source_evidence:
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/hgemm_dispatch.py
+  line: 26
+  match: 'persistent_n_tiles:'
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '24:     block_n_warps: int = 4,'
+  - '25:     n_tile_repeat: int = 1,'
+  - '26:     persistent_n_tiles: int = 1,'
+  - '27:     waves_per_eu: int = 0,'
+  - '28:     b_to_lds_unroll: int = 0,'
+  evidence_id: src_1ee348744e7c8bbe
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/hgemm_dispatch.py
+  line: 66
+  match: PERSISTENT_N_TILES=
+  captured:
+  - PERSISTENT
+  arch_scope: ''
+  evidence:
+  - '64:             BLOCK_N_WARPS=block_n_warps,'
+  - '65:             N_TILE_REPEAT=n_tile_repeat,'
+  - '66:             PERSISTENT_N_TILES=persistent_n_tiles,'
+  - '67:             WAVES_PER_EU_HINT=waves_per_eu,'
+  - '68:             B_TO_LDS_UNROLL=b_to_lds_unroll,'
+  evidence_id: src_79f134f10862341c
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/hgemm_dispatch.py
+  line: 8
+  match: KERNEL_FAMILY_HGEMM = "hgemm"
+  captured:
+  - KERNEL_FAMILY_HGEMM
+  - hgemm
+  arch_scope: ''
+  evidence:
+  - '6: from .splitk_hgemm import compile_hgemm_kernel'
+  - '8: KERNEL_FAMILY_HGEMM = "hgemm"'
+  - '9: KERNEL_FAMILY_SMALL_M = "small_m"'
+  evidence_id: src_38699a8ce57faf0c
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/hgemm_dispatch.py
+  line: 9
+  match: KERNEL_FAMILY_SMALL_M = "small_m"
+  captured:
+  - KERNEL_FAMILY_SMALL_M
+  - small_m
+  arch_scope: ''
+  evidence:
+  - '8: KERNEL_FAMILY_HGEMM = "hgemm"'
+  - '9: KERNEL_FAMILY_SMALL_M = "small_m"'
+  evidence_id: src_8ffea30406cf0355
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/hgemm_dispatch.py
+  line: 40
+  end_line: 54
+  match: kernel_family in (
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '38:     del pack_n, stages, async_copy, c_to_lds'
+  - '40:     if kernel_family in (None, KERNEL_FAMILY_HGEMM):'
+  - '41:         return compile_hgemm_kernel('
+  - '42:             dtype,'
+  evidence_id: src_a59a70ec93b3ad9b
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/hgemm_dispatch.py
+  line: 56
+  end_line: 71
+  match: kernel_family == KERNEL_FAMILY_SMALL_M
+  captured:
+  - KERNEL_FAMILY_SMALL_M
+  arch_scope: ''
+  evidence:
+  - '54:         )'
+  - '56:     if kernel_family == KERNEL_FAMILY_SMALL_M:'
+  - '57:         return compile_small_m_hgemm_kernel('
+  - '58:             dtype,'
+  evidence_id: src_bca963564a69909c
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/hgemm_dispatch.py
+  line: 30
+  match: 'async_copy:'
+  captured:
+  - async_copy
+  arch_scope: ''
+  evidence:
+  - '28:     b_to_lds_unroll: int = 0,'
+  - '29:     stages: int = 2,'
+  - '30:     async_copy: bool = False,'
+  - '31:     b_to_lds: bool = False,'
+  - '32:     b_preshuffle: bool = True,'
+  evidence_id: src_1b628cfc7dc2b834
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/hgemm_dispatch.py
+  line: 32
+  match: 'b_preshuffle:'
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '30:     async_copy: bool = False,'
+  - '31:     b_to_lds: bool = False,'
+  - '32:     b_preshuffle: bool = True,'
+  - '33:     c_to_lds: bool = False,'
+  - '34:     has_bias: bool = False,'
+  evidence_id: src_93c0f2962c52fdfb
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 15
+  match: c_shuffle_epilog(
+  captured:
+  - c_shuffle
+  arch_scope: ''
+  evidence:
+  - '13:   (e.g. loads scales once, loops over ni, stores).'
+  - '15: - `c_shuffle_epilog(...)` (implementation helper)'
+  - '16:   A LDS CShuffle epilogue skeleton:'
+  - '17:     1) call `write_row_to_lds(...)` for each MFMA output row to populate `lds_out`'
+  evidence_id: src_1786f3708aa447c0
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 85
+  end_line: 416
+  match: c_shuffle_epilog(
+  captured:
+  - c_shuffle
+  arch_scope: ''
+  evidence:
+  - '85: def c_shuffle_epilog('
+  - '86:     *,'
+  - '87:     arith,'
+  evidence_id: src_0a9c121156ff2c92
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 96
+  match: 'cshuffle_nlane:'
+  captured:
+  - cshuffle
+  arch_scope: ''
+  evidence:
+  - '94:     tile_n: int,'
+  - '95:     e_vec: int = 2,'
+  - '96:     cshuffle_nlane: int = 32,'
+  - '97:     block_size: int = 256,'
+  - '98:     m_repeat: int,'
+  evidence_id: src_9b6b06ad99b8daa8
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 133
+  match: cshuffle_nlane (
+  captured:
+  - cshuffle
+  arch_scope: ''
+  evidence:
+  - '131:     if int(block_size) <= 0 or (int(block_size) % int(cshuffle_nlane)) != 0:'
+  - '132:         raise ValueError('
+  - '133:             f"block_size ({block_size}) must be divisible by cshuffle_nlane ({cshuffle_nlane})"'
+  - '134:         )'
+  - '135:     cshuffle_mlane = int(block_size) // int(cshuffle_nlane)'
+  evidence_id: src_2fb71bcbe086edb6
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 135
+  match: cshuffle_mlane =
+  captured:
+  - cshuffle
+  arch_scope: ''
+  evidence:
+  - '133:             f"block_size ({block_size}) must be divisible by cshuffle_nlane ({cshuffle_nlane})"'
+  - '134:         )'
+  - '135:     cshuffle_mlane = int(block_size) // int(cshuffle_nlane)'
+  - '136:     if (int(tile_m) % cshuffle_mlane) != 0:'
+  - '137:         raise ValueError('
+  evidence_id: src_aea04859700a89f8
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 138
+  match: CShuffleMLane (
+  captured:
+  - CShuffle
+  arch_scope: ''
+  evidence:
+  - '136:     if (int(tile_m) % cshuffle_mlane) != 0:'
+  - '137:         raise ValueError('
+  - '138:             f"tile_m must be divisible by CShuffleMLane ({cshuffle_mlane}), got tile_m={tile_m}"'
+  - '139:         )'
+  - '140:     if int(e_vec) <= 0:'
+  evidence_id: src_8455122707c93485
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 160
+  match: CShuffleNLane_s =
+  captured:
+  - CShuffle
+  arch_scope: ''
+  evidence:
+  - '158:         EVec = int(e_vec)'
+  - '160:         CShuffleNLane_s = min(int(cshuffle_nlane), _half_n // EVec)'
+  - '161:         if _half_threads % CShuffleNLane_s != 0:'
+  - '162:             raise ValueError('
+  evidence_id: src_756a8fa4df5e93d9
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 163
+  match: CShuffleNLane_split=
+  captured:
+  - CShuffle
+  arch_scope: ''
+  evidence:
+  - '161:         if _half_threads % CShuffleNLane_s != 0:'
+  - '162:             raise ValueError('
+  - '163:                 f"half_threads={_half_threads} not divisible by CShuffleNLane_split={CShuffleNLane_s}"'
+  - '164:             )'
+  - '165:         CShuffleMLane_s = _half_threads // CShuffleNLane_s'
+  evidence_id: src_3cd0a1fd3262b839
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 165
+  match: CShuffleMLane_s =
+  captured:
+  - CShuffle
+  arch_scope: ''
+  evidence:
+  - '163:                 f"half_threads={_half_threads} not divisible by CShuffleNLane_split={CShuffleNLane_s}"'
+  - '164:             )'
+  - '165:         CShuffleMLane_s = _half_threads // CShuffleNLane_s'
+  - '166:         if int(tile_m) % CShuffleMLane_s != 0:'
+  - '167:             raise ValueError('
+  evidence_id: src_657ddc8907abb6ec
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 168
+  match: CShuffleMLane_split=
+  captured:
+  - CShuffle
+  arch_scope: ''
+  evidence:
+  - '166:         if int(tile_m) % CShuffleMLane_s != 0:'
+  - '167:             raise ValueError('
+  - '168:                 f"tile_m={tile_m} not divisible by CShuffleMLane_split={CShuffleMLane_s}"'
+  - '169:             )'
+  - '170:         m_reps_s = int(tile_m) // CShuffleMLane_s'
+  evidence_id: src_2beb509daf58c03b
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 340
+  match: CShuffleNLane =
+  captured:
+  - CShuffle
+  arch_scope: ''
+  evidence:
+  - '339:     # ---------------- Step 2: shuffle mapping + half2 store/atomic ----------------'
+  - '340:     CShuffleNLane = int(cshuffle_nlane)'
+  - '341:     CShuffleMLane = int(cshuffle_mlane)'
+  - '342:     EVec = int(e_vec)'
+  evidence_id: src_bc9b030728b0fa90
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 341
+  match: CShuffleMLane =
+  captured:
+  - CShuffle
+  arch_scope: ''
+  evidence:
+  - '339:     # ---------------- Step 2: shuffle mapping + half2 store/atomic ----------------'
+  - '340:     CShuffleNLane = int(cshuffle_nlane)'
+  - '341:     CShuffleMLane = int(cshuffle_mlane)'
+  - '342:     EVec = int(e_vec)'
+  evidence_id: src_a08be742b8bb4c8c
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 437
+  match: 'cshuffle_nlane:'
+  captured:
+  - cshuffle
+  arch_scope: ''
+  evidence:
+  - '435:     tile_n: int | None = None,'
+  - '436:     e_vec: int = 2,'
+  - '437:     cshuffle_nlane: int = 32,'
+  - '438:     block_size: int = 256,'
+  - '439:     num_acc_n: int | None = None,'
+  evidence_id: src_a24d83df187dfe80
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 462
+  end_line: 486
+  match: c_shuffle_epilog(
+  captured:
+  - c_shuffle
+  arch_scope: ''
+  evidence:
+  - '460:         )'
+  - '462:     return c_shuffle_epilog('
+  - '463:         arith=arith,'
+  - '464:         vector=vector,'
+  evidence_id: src_76b10d893b2c9185
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 471
+  match: cshuffle_nlane=
+  captured:
+  - cshuffle
+  arch_scope: ''
+  evidence:
+  - '469:         tile_n=int(tile_n),'
+  - '470:         e_vec=int(e_vec),'
+  - '471:         cshuffle_nlane=int(cshuffle_nlane),'
+  - '472:         block_size=int(block_size),'
+  - '473:         m_repeat=m_repeat,'
+  evidence_id: src_c13adc88bb087ffc
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 132
+  end_line: 134
+  match: "raise ValueError(\n            f\"block_size ({block_size}) must be divisible by cshuffle_nlane ({cshuffle_nlane})"
+  captured:
+  - block_size ({block_size}) must be divisible by cshuffle_nlane ({cshuffle_nlane})
+  arch_scope: ''
+  evidence:
+  - '130:     """'
+  - '131:     if int(block_size) <= 0 or (int(block_size) % int(cshuffle_nlane)) != 0:'
+  - '132:         raise ValueError('
+  - '133:             f"block_size ({block_size}) must be divisible by cshuffle_nlane ({cshuffle_nlane})"'
+  - '134:         )'
+  evidence_id: src_d0d34580300e6c02
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 137
+  end_line: 139
+  match: "raise ValueError(\n            f\"tile_m must be divisible by CShuffleMLane ({cshuffle_mlane}), got\
+    \ tile_m={tile_m}"
+  captured:
+  - tile_m must be divisible by CShuffleMLane ({cshuffle_mlane}), got tile_m={tile_m}
+  arch_scope: ''
+  evidence:
+  - '135:     cshuffle_mlane = int(block_size) // int(cshuffle_nlane)'
+  - '136:     if (int(tile_m) % cshuffle_mlane) != 0:'
+  - '137:         raise ValueError('
+  - '138:             f"tile_m must be divisible by CShuffleMLane ({cshuffle_mlane}), got tile_m={tile_m}"'
+  - '139:         )'
+  evidence_id: src_4c3052f8521fc401
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 141
+  match: raise ValueError(f"e_vec must be positive, got {e_vec}
+  captured:
+  - e_vec must be positive, got {e_vec}
+  arch_scope: ''
+  evidence:
+  - '139:         )'
+  - '140:     if int(e_vec) <= 0:'
+  - '141:         raise ValueError(f"e_vec must be positive, got {e_vec}")'
+  - '142:     if (int(tile_n) % (int(cshuffle_nlane) * int(e_vec))) != 0:'
+  - '143:         raise ValueError('
+  evidence_id: src_18f6ce7a12b92c1a
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 143
+  end_line: 145
+  match: "raise ValueError(\n            f\"tile_n must be divisible by (CShuffleNLane*EVec) = {cshuffle_nlane*e_vec},\
+    \ got tile_n={tile_n}"
+  captured:
+  - tile_n must be divisible by (CShuffleNLane*EVec) = {cshuffle_nlane*e_vec}, got tile_n={tile_n}
+  arch_scope: ''
+  evidence:
+  - '141:         raise ValueError(f"e_vec must be positive, got {e_vec}")'
+  - '142:     if (int(tile_n) % (int(cshuffle_nlane) * int(e_vec))) != 0:'
+  - '143:         raise ValueError('
+  - '144:             f"tile_n must be divisible by (CShuffleNLane*EVec) = {cshuffle_nlane*e_vec}, got tile_n={tile_n}"'
+  - '145:         )'
+  evidence_id: src_949b583f0277e194
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 162
+  end_line: 164
+  match: "raise ValueError(\n                f\"half_threads={_half_threads} not divisible by CShuffleNLane_split={CShuffleNLane_s}"
+  captured:
+  - half_threads={_half_threads} not divisible by CShuffleNLane_split={CShuffleNLane_s}
+  arch_scope: ''
+  evidence:
+  - '160:         CShuffleNLane_s = min(int(cshuffle_nlane), _half_n // EVec)'
+  - '161:         if _half_threads % CShuffleNLane_s != 0:'
+  - '162:             raise ValueError('
+  - '163:                 f"half_threads={_half_threads} not divisible by CShuffleNLane_split={CShuffleNLane_s}"'
+  - '164:             )'
+  evidence_id: src_f75ef4cc73b19b18
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 167
+  end_line: 169
+  match: "raise ValueError(\n                f\"tile_m={tile_m} not divisible by CShuffleMLane_split={CShuffleMLane_s}"
+  captured:
+  - tile_m={tile_m} not divisible by CShuffleMLane_split={CShuffleMLane_s}
+  arch_scope: ''
+  evidence:
+  - '165:         CShuffleMLane_s = _half_threads // CShuffleNLane_s'
+  - '166:         if int(tile_m) % CShuffleMLane_s != 0:'
+  - '167:             raise ValueError('
+  - '168:                 f"tile_m={tile_m} not divisible by CShuffleMLane_split={CShuffleMLane_s}"'
+  - '169:             )'
+  evidence_id: src_92750c6817f69077
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 452
+  match: raise ValueError("mfma_epilog(use_cshuffle=False) requires `body_row`.
+  captured:
+  - mfma_epilog(use_cshuffle=False) requires `body_row`.
+  arch_scope: ''
+  evidence:
+  - '450:     if not use_cshuffle:'
+  - '451:         if body_row is None:'
+  - '452:             raise ValueError("mfma_epilog(use_cshuffle=False) requires `body_row`.")'
+  - '453:         return default_epilog('
+  - '454:             arith=arith,'
+  evidence_id: src_f86de945d5202248
+- snapshot: aiter_a6bb4993
+  category: fragment_layout
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 73
+  match: lane_div_16_mul4 = lane_div_16 * 4
+  captured:
+  - lane_div_16_mul4
+  - lane_div_16 * 4
+  arch_scope: ''
+  evidence:
+  - '71:     """'
+  - '72:     bx_m_v = bx_m'
+  - '73:     lane_div_16_mul4 = lane_div_16 * 4'
+  - '74:     ii_idx_list = [fx.Index(ii) for ii in range(4)]'
+  evidence_id: src_5cae13453d752cfb
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 50
+  end_line: 82
+  match: def default_epilog(
+  captured:
+  - default_epilog
+  arch_scope: ''
+  evidence:
+  - '50: def default_epilog('
+  - '51:     *,'
+  - '52:     arith,'
+  evidence_id: src_1743dd27416aa823
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/mfma_epilogues.py
+  line: 419
+  end_line: 486
+  match: def mfma_epilog(
+  captured:
+  - mfma_epilog
+  arch_scope: ''
+  evidence:
+  - '419: def mfma_epilog('
+  - '420:     *,'
+  - '421:     use_cshuffle: bool,'
+  evidence_id: src_410b6fbc54cdbbac
+- snapshot: aiter_a6bb4993
+  category: tile_shape
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 770
+  match: tile_m=16
+  captured:
+  - tile_m
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '768:             raise ValueError("small-M kernel only supports `b_preshuffle=False`")'
+  - '769:         if tile_m != 16:'
+  - '770:             raise ValueError(f"small-M kernel fixes tile_m=16; got tile_m={tile_m}")'
+  - '771:         if block_m_warps != 1:'
+  - '772:             raise ValueError('
+  evidence_id: src_a69a35e050eec095
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 151
+  match: 'persistent_n_tiles:'
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '149:     kernel_family: str = KERNEL_FAMILY_HGEMM,'
+  - '150:     n_tile_repeat: int = 1,'
+  - '151:     persistent_n_tiles: int = 1,'
+  - '152:     waves_per_eu: int = 0,'
+  - '153:     b_to_lds_unroll: int = 0,'
+  evidence_id: src_511298b7db9fe042
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 650
+  match: persistent_n_tiles=
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '648:                 kernel_family=KERNEL_FAMILY_SMALL_M,'
+  - '649:                 n_tile_repeat=config["n_tile_repeat"],'
+  - '650:                 persistent_n_tiles=config["persistent_n_tiles"],'
+  - '651:                 waves_per_eu=config["waves_per_eu"],'
+  - '652:                 b_to_lds_unroll=config["b_to_lds_unroll"],'
+  evidence_id: src_493d4eb71d8e26aa
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 723
+  match: 'persistent_n_tiles:'
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '721:     pack_n: int = 1,'
+  - '722:     n_tile_repeat: int = 1,'
+  - '723:     persistent_n_tiles: int = 1,'
+  - '724:     waves_per_eu: int = 0,'
+  - '725:     b_to_lds_unroll: int = 0,'
+  evidence_id: src_769d8b4482dc49d5
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 795
+  match: persistent_n_tiles=
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '793:         block_n_warps=block_n_warps,'
+  - '794:         n_tile_repeat=n_tile_repeat,'
+  - '795:         persistent_n_tiles=persistent_n_tiles,'
+  - '796:         waves_per_eu=waves_per_eu,'
+  - '797:         b_to_lds_unroll=b_to_lds_unroll,'
+  evidence_id: src_213d894e1581bc1c
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 857
+  match: 'persistent_n_tiles:'
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '855:     block_n_warps: int = 4,'
+  - '856:     n_tile_repeat: int = 1,'
+  - '857:     persistent_n_tiles: int = 1,'
+  - '858:     waves_per_eu: int = 0,'
+  - '859:     b_to_lds_unroll: int = 0,'
+  evidence_id: src_9975807637530ede
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 908
+  match: persistent_n_tiles=
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '906:         pack_n=pack_n,'
+  - '907:         n_tile_repeat=n_tile_repeat,'
+  - '908:         persistent_n_tiles=persistent_n_tiles,'
+  - '909:         waves_per_eu=waves_per_eu,'
+  - '910:         b_to_lds_unroll=b_to_lds_unroll,'
+  evidence_id: src_d5238dba435896fd
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 72
+  match: HGEMM_TILE_N_OPTIONS = (
+  captured:
+  - HGEMM_TILE_N_OPTIONS
+  arch_scope: ''
+  evidence:
+  - '70: # useful during the wider one-off search, instead of maintaining separate'
+  - '71: # search-space modes.'
+  - '72: HGEMM_TILE_N_OPTIONS = (64, 128, 160, 192, 256)'
+  - '73: HGEMM_TILE_K_OPTIONS = (64, 96, 128, 160, 256)'
+  - '74: HGEMM_TILE_M_OPTIONS = (16, 32, 48, 64, 80, 96, 112, 128, 160, 256)'
+  evidence_id: src_62ce0ec6b152ecaa
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 73
+  match: HGEMM_TILE_K_OPTIONS = (
+  captured:
+  - HGEMM_TILE_K_OPTIONS
+  arch_scope: ''
+  evidence:
+  - '71: # search-space modes.'
+  - '72: HGEMM_TILE_N_OPTIONS = (64, 128, 160, 192, 256)'
+  - '73: HGEMM_TILE_K_OPTIONS = (64, 96, 128, 160, 256)'
+  - '74: HGEMM_TILE_M_OPTIONS = (16, 32, 48, 64, 80, 96, 112, 128, 160, 256)'
+  - '75: HGEMM_BASE_SPLIT_K_OPTIONS = (1, 2, 4, 8, 16)'
+  evidence_id: src_3c72689d786ca8be
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 74
+  match: HGEMM_TILE_M_OPTIONS = (
+  captured:
+  - HGEMM_TILE_M_OPTIONS
+  arch_scope: ''
+  evidence:
+  - '72: HGEMM_TILE_N_OPTIONS = (64, 128, 160, 192, 256)'
+  - '73: HGEMM_TILE_K_OPTIONS = (64, 96, 128, 160, 256)'
+  - '74: HGEMM_TILE_M_OPTIONS = (16, 32, 48, 64, 80, 96, 112, 128, 160, 256)'
+  - '75: HGEMM_BASE_SPLIT_K_OPTIONS = (1, 2, 4, 8, 16)'
+  - '76: HGEMM_MAX_SPLIT_K = 32'
+  evidence_id: src_426b8960fb14a04f
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 75
+  match: HGEMM_BASE_SPLIT_K_OPTIONS = (
+  captured:
+  - HGEMM_BASE_SPLIT_K_OPTIONS
+  arch_scope: ''
+  evidence:
+  - '73: HGEMM_TILE_K_OPTIONS = (64, 96, 128, 160, 256)'
+  - '74: HGEMM_TILE_M_OPTIONS = (16, 32, 48, 64, 80, 96, 112, 128, 160, 256)'
+  - '75: HGEMM_BASE_SPLIT_K_OPTIONS = (1, 2, 4, 8, 16)'
+  - '76: HGEMM_MAX_SPLIT_K = 32'
+  - '77: HGEMM_EXTRA_BLOCK_K_LOOPS_MIN = 2'
+  evidence_id: src_fce6be7eb6b247d6
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 79
+  end_line: 105
+  match: KERNEL_CONFIG_VARIANTS = (
+  captured:
+  - KERNEL_CONFIG_VARIANTS
+  arch_scope: ''
+  evidence:
+  - '77: HGEMM_EXTRA_BLOCK_K_LOOPS_MIN = 2'
+  - '78: HGEMM_EXTRA_BLOCK_K_LOOPS_MAX = 8'
+  - '79: KERNEL_CONFIG_VARIANTS = ('
+  - '80:     {'
+  - '81:         "block_m_warps": 1,'
+  evidence_id: src_27d99a67a1d27ccc
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 222
+  end_line: 226
+  match: def _hgemm_tile_m_options(
+  captured:
+  - _hgemm_tile_m_options
+  arch_scope: ''
+  evidence:
+  - '222: def _hgemm_tile_m_options(m: Optional[int]) -> tuple[int, ...]:'
+  - '223:     if m is None:'
+  - '224:         return HGEMM_TILE_M_OPTIONS'
+  evidence_id: src_562e9940a52a202f
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 229
+  end_line: 246
+  match: def _hgemm_split_k_options(
+  captured:
+  - _hgemm_split_k_options
+  arch_scope: ''
+  evidence:
+  - '229: def _hgemm_split_k_options(k: Optional[int], tile_k: int) -> tuple[int, ...]:'
+  - '230:     if k is None:'
+  - '231:         return HGEMM_BASE_SPLIT_K_OPTIONS'
+  evidence_id: src_642476c9b693d5f1
+- snapshot: aiter_a6bb4993
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 37
+  match: SPLIT_K_COUNTER_MAX_LEN = 128
+  captured:
+  - SPLIT_K_COUNTER_MAX_LEN
+  - '128'
+  arch_scope: ''
+  evidence:
+  - '37: SPLIT_K_COUNTER_MAX_LEN = 128'
+  - '38: SPLIT_K_SIGNAL_STATE_COUNT = 3'
+  - '39: FIXED_STAGE = 2'
+  evidence_id: src_7c7ddd401ff4aaeb
+- snapshot: aiter_a6bb4993
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 76
+  match: HGEMM_MAX_SPLIT_K = 32
+  captured:
+  - HGEMM_MAX_SPLIT_K
+  - '32'
+  arch_scope: ''
+  evidence:
+  - '74: HGEMM_TILE_M_OPTIONS = (16, 32, 48, 64, 80, 96, 112, 128, 160, 256)'
+  - '75: HGEMM_BASE_SPLIT_K_OPTIONS = (1, 2, 4, 8, 16)'
+  - '76: HGEMM_MAX_SPLIT_K = 32'
+  - '77: HGEMM_EXTRA_BLOCK_K_LOOPS_MIN = 2'
+  - '78: HGEMM_EXTRA_BLOCK_K_LOOPS_MAX = 8'
+  evidence_id: src_96320a5bab17a8f5
+- snapshot: aiter_a6bb4993
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 77
+  match: HGEMM_EXTRA_BLOCK_K_LOOPS_MIN = 2
+  captured:
+  - HGEMM_EXTRA_BLOCK_K_LOOPS_MIN
+  - '2'
+  arch_scope: ''
+  evidence:
+  - '75: HGEMM_BASE_SPLIT_K_OPTIONS = (1, 2, 4, 8, 16)'
+  - '76: HGEMM_MAX_SPLIT_K = 32'
+  - '77: HGEMM_EXTRA_BLOCK_K_LOOPS_MIN = 2'
+  - '78: HGEMM_EXTRA_BLOCK_K_LOOPS_MAX = 8'
+  - '79: KERNEL_CONFIG_VARIANTS = ('
+  evidence_id: src_c139f07a63569327
+- snapshot: aiter_a6bb4993
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 78
+  match: HGEMM_EXTRA_BLOCK_K_LOOPS_MAX = 8
+  captured:
+  - HGEMM_EXTRA_BLOCK_K_LOOPS_MAX
+  - '8'
+  arch_scope: ''
+  evidence:
+  - '76: HGEMM_MAX_SPLIT_K = 32'
+  - '77: HGEMM_EXTRA_BLOCK_K_LOOPS_MIN = 2'
+  - '78: HGEMM_EXTRA_BLOCK_K_LOOPS_MAX = 8'
+  - '79: KERNEL_CONFIG_VARIANTS = ('
+  - '80:     {'
+  evidence_id: src_539c4b7bf95dca07
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 275
+  end_line: 327
+  match: def _validate_hgemm_inputs(
+  captured:
+  - _validate_hgemm_inputs
+  arch_scope: ''
+  evidence:
+  - '275: def _validate_hgemm_inputs('
+  - '276:     a: torch.Tensor,'
+  - '277:     b: torch.Tensor,'
+  evidence_id: src_e2432aadb1a77cd1
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 330
+  end_line: 456
+  match: def _validate_hgemm_tiling(
+  captured:
+  - _validate_hgemm_tiling
+  arch_scope: ''
+  evidence:
+  - '330: def _validate_hgemm_tiling('
+  - '331:     m: int,'
+  - '332:     n: int,'
+  evidence_id: src_9ae627bec0096537
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 695
+  end_line: 707
+  match: def _check_split_k_counter_capacity(
+  captured:
+  - _check_split_k_counter_capacity
+  arch_scope: ''
+  evidence:
+  - '695: def _check_split_k_counter_capacity('
+  - '696:     m: int, n: int, tile_m: int, tile_n: int, split_k: int'
+  - '697: ) -> None:'
+  evidence_id: src_5c7e74ddb8a071de
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 249
+  end_line: 268
+  match: def _estimate_hgemm_lds_bytes(
+  captured:
+  - _estimate_hgemm_lds_bytes
+  arch_scope: ''
+  evidence:
+  - '249: def _estimate_hgemm_lds_bytes('
+  - '250:     *,'
+  - '251:     dtype: str,'
+  evidence_id: src_d3f3cb90295b0c40
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 42
+  match: KERNEL_FAMILY_HGEMM = "hgemm"
+  captured:
+  - KERNEL_FAMILY_HGEMM
+  - hgemm
+  arch_scope: ''
+  evidence:
+  - '40: FIXED_C_TO_LDS = False'
+  - '41: KERNEL_ASYNC_COPY = get_rocm_arch() != "gfx942"'
+  - '42: KERNEL_FAMILY_HGEMM = "hgemm"'
+  - '43: KERNEL_FAMILY_SMALL_M = "small_m"'
+  - '44: _HGEMM_KERNEL_RE = re.compile('
+  evidence_id: src_85759fc53d71cd7b
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 43
+  match: KERNEL_FAMILY_SMALL_M = "small_m"
+  captured:
+  - KERNEL_FAMILY_SMALL_M
+  - small_m
+  arch_scope: ''
+  evidence:
+  - '41: KERNEL_ASYNC_COPY = get_rocm_arch() != "gfx942"'
+  - '42: KERNEL_FAMILY_HGEMM = "hgemm"'
+  - '43: KERNEL_FAMILY_SMALL_M = "small_m"'
+  - '44: _HGEMM_KERNEL_RE = re.compile('
+  - '45:     r"^flydsl_gemm(?P<stage>\d+)_"'
+  evidence_id: src_604511a2fda23fe8
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 172
+  end_line: 186
+  match: kernel_family == KERNEL_FAMILY_SMALL_M
+  captured:
+  - KERNEL_FAMILY_SMALL_M
+  arch_scope: ''
+  evidence:
+  - '170:         f"_c_to_lds{c_to_lds}"'
+  - '171:     )'
+  - '172:     if kernel_family == KERNEL_FAMILY_SMALL_M:'
+  - '173:         name += "_small_m"'
+  - '174:         if n_tile_repeat > 1:'
+  evidence_id: src_13737e5e8209141f
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 542
+  end_line: 546
+  match: kernel_family == KERNEL_FAMILY_SMALL_M
+  captured:
+  - KERNEL_FAMILY_SMALL_M
+  arch_scope: ''
+  evidence:
+  - '540:         "target_gfx": m.group("target_gfx"),'
+  - '541:     }'
+  - '542:     if kernel_family == KERNEL_FAMILY_SMALL_M:'
+  - '543:         config["n_tile_repeat"] = int(m.group("n_tile_repeat") or 1)'
+  - '544:         config["persistent_n_tiles"] = int(m.group("persistent_n_tiles") or 1)'
+  evidence_id: src_2e94c8ed48d5e1d5
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 744
+  end_line: 780
+  match: kernel_family == KERNEL_FAMILY_HGEMM
+  captured:
+  - KERNEL_FAMILY_HGEMM
+  arch_scope: ''
+  evidence:
+  - '742:         raise ValueError("Current kernel does not support `c_to_lds=True`")'
+  - '744:     if kernel_family == KERNEL_FAMILY_HGEMM:'
+  - '745:         _validate_hgemm_tiling('
+  - '746:             m,'
+  evidence_id: src_78e4e3ef2071e9ae
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 760
+  end_line: 780
+  match: kernel_family == KERNEL_FAMILY_SMALL_M
+  captured:
+  - KERNEL_FAMILY_SMALL_M
+  arch_scope: ''
+  evidence:
+  - '758:             b_to_lds=b_to_lds,'
+  - '759:         )'
+  - '760:     elif kernel_family == KERNEL_FAMILY_SMALL_M:'
+  - '761:         if dtype != "bf16":'
+  - '762:             raise ValueError(f"small-M kernel only supports `bf16`, got {dtype!r}")'
+  evidence_id: src_65e76deb82d6413f
+- snapshot: aiter_a6bb4993
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 41
+  match: get_rocm_arch() != "gfx942"
+  captured:
+  - gfx942
+  arch_scope: ''
+  evidence:
+  - '39: FIXED_STAGE = 2'
+  - '40: FIXED_C_TO_LDS = False'
+  - '41: KERNEL_ASYNC_COPY = get_rocm_arch() != "gfx942"'
+  - '42: KERNEL_FAMILY_HGEMM = "hgemm"'
+  - '43: KERNEL_FAMILY_SMALL_M = "small_m"'
+  evidence_id: src_c4c19187bcb7933c
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 113
+  match: 'async_copy:'
+  captured:
+  - async_copy
+  arch_scope: ''
+  evidence:
+  - '111:     *,'
+  - '112:     stage: int,'
+  - '113:     async_copy: bool,'
+  - '114:     c_to_lds: bool,'
+  - '115: ) -> tuple[int, bool, bool]:'
+  evidence_id: src_eca2908861dcc67b
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 125
+  match: async_copy=
+  captured:
+  - async_copy
+  arch_scope: ''
+  evidence:
+  - '123:         raise ValueError('
+  - '124:             "Current kernel fixes async_copy from the active GPU architecture; "'
+  - '125:             f"got async_copy={async_copy}, expected {KERNEL_ASYNC_COPY}"'
+  - '126:         )'
+  - '127:     if c_to_lds != FIXED_C_TO_LDS:'
+  evidence_id: src_f85f15e0a5b7bed6
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 145
+  match: 'async_copy:'
+  captured:
+  - async_copy
+  arch_scope: ''
+  evidence:
+  - '143:     block_m_warp: int,'
+  - '144:     block_n_warp: int,'
+  - '145:     async_copy: bool,'
+  - '146:     b_to_lds: bool,'
+  - '147:     b_preshuffle: bool,'
+  evidence_id: src_5c4eba380da1b8af
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 157
+  match: async_copy=
+  captured:
+  - async_copy
+  arch_scope: ''
+  evidence:
+  - '155:     stage, async_copy, c_to_lds = _normalize_supported_kernel_metadata('
+  - '156:         stage=stage,'
+  - '157:         async_copy=async_copy,'
+  - '158:         c_to_lds=c_to_lds,'
+  - '159:     )'
+  evidence_id: src_a4ebc9ee47ad9c54
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 727
+  match: 'async_copy:'
+  captured:
+  - async_copy
+  arch_scope: ''
+  evidence:
+  - '725:     b_to_lds_unroll: int = 0,'
+  - '726:     stages: int = FIXED_STAGE,'
+  - '727:     async_copy: bool = False,'
+  - '728:     b_to_lds: bool = False,'
+  - '729:     b_preshuffle: bool = True,'
+  evidence_id: src_5c02ee8bd73cf914
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 799
+  match: async_copy=
+  captured:
+  - async_copy
+  arch_scope: ''
+  evidence:
+  - '797:         b_to_lds_unroll=b_to_lds_unroll,'
+  - '798:         stages=stages,'
+  - '799:         async_copy=async_copy,'
+  - '800:         b_to_lds=b_to_lds,'
+  - '801:         b_preshuffle=b_preshuffle,'
+  evidence_id: src_b5e0900ff0600fc0
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 861
+  match: 'async_copy:'
+  captured:
+  - async_copy
+  arch_scope: ''
+  evidence:
+  - '859:     b_to_lds_unroll: int = 0,'
+  - '860:     stages: int = FIXED_STAGE,'
+  - '861:     async_copy: bool = False,'
+  - '862:     b_to_lds: bool = False,'
+  - '863:     b_preshuffle: bool = True,'
+  evidence_id: src_082a1ccab26022c6
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 912
+  match: async_copy=
+  captured:
+  - async_copy
+  arch_scope: ''
+  evidence:
+  - '910:         b_to_lds_unroll=b_to_lds_unroll,'
+  - '911:         stages=stages,'
+  - '912:         async_copy=async_copy,'
+  - '913:         b_to_lds=b_to_lds,'
+  - '914:         b_preshuffle=b_preshuffle,'
+  evidence_id: src_f4fed6e57ec32661
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 967
+  match: 'use_async_copy:'
+  captured:
+  - use_async_copy
+  arch_scope: ''
+  evidence:
+  - '965:     lds_stage: int = 2,'
+  - '966:     use_cshuffle_epilog: int = 0,'
+  - '967:     use_async_copy: int = 0,'
+  - '968:     waves_per_eu: int = 0,'
+  - '969: ) -> Tensor:'
+  evidence_id: src_c8403ce68d38aabf
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 1018
+  match: use_async_copy=
+  captured:
+  - use_async_copy
+  arch_scope: ''
+  evidence:
+  - '1016:         lds_stage=lds_stage,'
+  - '1017:         use_cshuffle_epilog=bool(use_cshuffle_epilog),'
+  - '1018:         use_async_copy=bool(use_async_copy),'
+  - '1019:         waves_per_eu=wpe,'
+  - '1020:     )'
+  evidence_id: src_c157be8b7289eea3
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 53
+  match: b_preshuffle(
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '51:     r"async_copy(?P<async_copy>True|False)_"'
+  - '52:     r"b_to_lds(?P<b_to_lds>True|False)_"'
+  - '53:     r"b_preshuffle(?P<b_preshuffle>True|False)_"'
+  - '54:     r"c_to_lds(?P<c_to_lds>True|False)"'
+  - '55:     r"(?P<small_m_suffix>"'
+  evidence_id: src_1faf839315efb7e6
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 147
+  match: 'b_preshuffle:'
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '145:     async_copy: bool,'
+  - '146:     b_to_lds: bool,'
+  - '147:     b_preshuffle: bool,'
+  - '148:     c_to_lds: bool,'
+  - '149:     kernel_family: str = KERNEL_FAMILY_HGEMM,'
+  evidence_id: src_51f888cdd29012d2
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 162
+  match: b_preshuffle=
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '160:     if b_preshuffle and b_to_lds:'
+  - '161:         raise ValueError('
+  - '162:             "Current kernel requires b_to_lds=False when b_preshuffle=True"'
+  - '163:         )'
+  - '164:     name = ('
+  evidence_id: src_4c74ced4671a1e5b
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 470
+  match: 'b_preshuffle:'
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '468:     block_n_warps: int,'
+  - '469:     b_to_lds: bool,'
+  - '470:     b_preshuffle: bool,'
+  - '471: ) -> Optional[Dict]:'
+  - '472:     config = {'
+  evidence_id: src_a8da16502505cc86
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 575
+  match: b_preshuffles =
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '573:             "m, n, k must be provided together when requesting shape-aware kernels"'
+  - '574:         )'
+  - '575:     b_preshuffles = [False, True]'
+  - '576:     tile_ms = _hgemm_tile_m_options(m)'
+  - '577:     for tile_m, tile_n, tile_k, b_preshuffle, variant in product('
+  evidence_id: src_6831dfbf55ab6ba3
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 600
+  match: b_preshuffle=
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '598:                 block_n_warps=variant["block_n_warps"],'
+  - '599:                 b_to_lds=variant["b_to_lds"],'
+  - '600:                 b_preshuffle=b_preshuffle,'
+  - '601:             )'
+  - '602:             if config is None:'
+  evidence_id: src_2343e61bdf2598cc
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 729
+  match: 'b_preshuffle:'
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '727:     async_copy: bool = False,'
+  - '728:     b_to_lds: bool = False,'
+  - '729:     b_preshuffle: bool = True,'
+  - '730:     split_k: int = 1,'
+  - '731:     c_to_lds: bool = False,'
+  evidence_id: src_886a3fb0a447c9a7
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 739
+  match: b_preshuffle=
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '737:     if b_preshuffle and b_to_lds:'
+  - '738:         raise ValueError('
+  - '739:             "Current kernel requires b_to_lds=False when b_preshuffle=True"'
+  - '740:         )'
+  - '741:     if c_to_lds:'
+  evidence_id: src_ec3ee11e174e289a
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 767
+  end_line: 768
+  match: 'b_preshuffle:'
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '765:                 f"small-M kernel only supports stage={FIXED_STAGE}; got stage={stages}"'
+  - '766:             )'
+  - '767:         if b_preshuffle:'
+  - '768:             raise ValueError("small-M kernel only supports `b_preshuffle=False`")'
+  - '769:         if tile_m != 16:'
+  evidence_id: src_3ee379ecc88d0ad1
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 768
+  match: b_preshuffle=
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '766:             )'
+  - '767:         if b_preshuffle:'
+  - '768:             raise ValueError("small-M kernel only supports `b_preshuffle=False`")'
+  - '769:         if tile_m != 16:'
+  - '770:             raise ValueError(f"small-M kernel fixes tile_m=16; got tile_m={tile_m}")'
+  evidence_id: src_7b5432b56d9acd63
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 801
+  match: b_preshuffle=
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '799:         async_copy=async_copy,'
+  - '800:         b_to_lds=b_to_lds,'
+  - '801:         b_preshuffle=b_preshuffle,'
+  - '802:         c_to_lds=c_to_lds,'
+  - '803:         has_bias=has_bias,'
+  evidence_id: src_4d7e5f7edc3246c8
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 863
+  match: 'b_preshuffle:'
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '861:     async_copy: bool = False,'
+  - '862:     b_to_lds: bool = False,'
+  - '863:     b_preshuffle: bool = True,'
+  - '864:     auto_shuffle_b: bool = False,'
+  - '865:     c_to_lds: bool = False,'
+  evidence_id: src_2aa8afff0a4748b0
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 883
+  match: shuffle_weight(
+  captured:
+  - shuffle_weight
+  arch_scope: ''
+  evidence:
+  - '881:     if b_preshuffle and not getattr(b, "is_shuffled", False):'
+  - '882:         if auto_shuffle_b:'
+  - '883:             b = shuffle_weight(b, layout=_get_flydsl_shuffle_layout(pack_n))'
+  - '884:         else:'
+  - '885:             raise ValueError('
+  evidence_id: src_e7db1b030bf2e5c6
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 886
+  match: b_preshuffle=
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '884:         else:'
+  - '885:             raise ValueError('
+  - '886:                 "`b_preshuffle=True` expects `b` to be pre-shuffled. "'
+  - '887:                 f"Use `shuffle_weight(b, layout={_get_flydsl_shuffle_layout(pack_n)})` "'
+  - '888:                 "first or pass `auto_shuffle_b=True`."'
+  evidence_id: src_520242be3bd7400e
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 887
+  match: shuffle_weight(
+  captured:
+  - shuffle_weight
+  arch_scope: ''
+  evidence:
+  - '885:             raise ValueError('
+  - '886:                 "`b_preshuffle=True` expects `b` to be pre-shuffled. "'
+  - '887:                 f"Use `shuffle_weight(b, layout={_get_flydsl_shuffle_layout(pack_n)})` "'
+  - '888:                 "first or pass `auto_shuffle_b=True`."'
+  - '889:             )'
+  evidence_id: src_42f6db7e98463208
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 914
+  match: b_preshuffle=
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '912:         async_copy=async_copy,'
+  - '913:         b_to_lds=b_to_lds,'
+  - '914:         b_preshuffle=b_preshuffle,'
+  - '915:         split_k=split_k,'
+  - '916:         c_to_lds=c_to_lds,'
+  evidence_id: src_61497f941a0c2808
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 966
+  match: 'use_cshuffle_epilog:'
+  captured:
+  - use_cshuffle_epilog
+  arch_scope: ''
+  evidence:
+  - '964:     tile_k: int,'
+  - '965:     lds_stage: int = 2,'
+  - '966:     use_cshuffle_epilog: int = 0,'
+  - '967:     use_async_copy: int = 0,'
+  - '968:     waves_per_eu: int = 0,'
+  evidence_id: src_5f2cec9a0c41b122
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 1017
+  match: use_cshuffle_epilog=
+  captured:
+  - use_cshuffle_epilog
+  arch_scope: ''
+  evidence:
+  - '1015:         out_dtype=out_dtype,'
+  - '1016:         lds_stage=lds_stage,'
+  - '1017:         use_cshuffle_epilog=bool(use_cshuffle_epilog),'
+  - '1018:         use_async_copy=bool(use_async_copy),'
+  - '1019:         waves_per_eu=wpe,'
+  evidence_id: src_40a21bcd949fe8bc
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 119
+  end_line: 121
+  match: "raise ValueError(\n            f\"Current kernel only supports stage={FIXED_STAGE}; got stage={stage}"
+  captured:
+  - Current kernel only supports stage={FIXED_STAGE}; got stage={stage}
+  arch_scope: ''
+  evidence:
+  - '117:     # multiple codegen variants to the wrapper layer.'
+  - '118:     if stage != FIXED_STAGE:'
+  - '119:         raise ValueError('
+  - '120:             f"Current kernel only supports stage={FIXED_STAGE}; got stage={stage}"'
+  - '121:         )'
+  evidence_id: src_cbd1aeb93c0eb00c
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 123
+  end_line: 126
+  match: "raise ValueError(\n            \"Current kernel fixes async_copy from the active GPU architecture;"
+  captured:
+  - 'Current kernel fixes async_copy from the active GPU architecture; '
+  arch_scope: ''
+  evidence:
+  - '121:         )'
+  - '122:     if async_copy != KERNEL_ASYNC_COPY:'
+  - '123:         raise ValueError('
+  - '124:             "Current kernel fixes async_copy from the active GPU architecture; "'
+  - '125:             f"got async_copy={async_copy}, expected {KERNEL_ASYNC_COPY}"'
+  evidence_id: src_a0f1066a6a2d6667
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 128
+  end_line: 131
+  match: "raise ValueError(\n            f\"Current kernel only supports c_to_lds={FIXED_C_TO_LDS};"
+  captured:
+  - 'Current kernel only supports c_to_lds={FIXED_C_TO_LDS}; '
+  arch_scope: ''
+  evidence:
+  - '126:         )'
+  - '127:     if c_to_lds != FIXED_C_TO_LDS:'
+  - '128:         raise ValueError('
+  - '129:             f"Current kernel only supports c_to_lds={FIXED_C_TO_LDS}; "'
+  - '130:             f"got c_to_lds={c_to_lds}"'
+  evidence_id: src_d0f75ad1bcdf6730
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 161
+  end_line: 163
+  match: "raise ValueError(\n            \"Current kernel requires b_to_lds=False when b_preshuffle=True"
+  captured:
+  - Current kernel requires b_to_lds=False when b_preshuffle=True
+  arch_scope: ''
+  evidence:
+  - '159:     )'
+  - '160:     if b_preshuffle and b_to_lds:'
+  - '161:         raise ValueError('
+  - '162:             "Current kernel requires b_to_lds=False when b_preshuffle=True"'
+  - '163:         )'
+  evidence_id: src_e248a6669d5daaaf
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 206
+  match: raise ValueError(f"`stream` must be on {device}, got {launch_stream.device}
+  captured:
+  - '`stream` must be on {device}, got {launch_stream.device}'
+  arch_scope: ''
+  evidence:
+  - '204:     )'
+  - '205:     if launch_stream.device != device:'
+  - '206:         raise ValueError(f"`stream` must be on {device}, got {launch_stream.device}")'
+  - '207:     return launch_stream'
+  evidence_id: src_e8786a6677516f6e
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 259
+  match: raise ValueError(f"`dtype` must be
+  captured:
+  - '`dtype` must be '
+  arch_scope: ''
+  evidence:
+  - '257: ) -> int:'
+  - '258:     if dtype not in {"f16", "bf16"}:'
+  - '259:         raise ValueError(f"`dtype` must be ''f16'' or ''bf16'', got {dtype!r}")'
+  - '261:     dtype_bytes = 2'
+  evidence_id: src_0cc665119db142b2
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 286
+  match: raise ValueError("`flydsl_hgemm` only supports CUDA/ROCm tensors
+  captured:
+  - '`flydsl_hgemm` only supports CUDA/ROCm tensors'
+  arch_scope: ''
+  evidence:
+  - '284:         )'
+  - '285:     if a.device.type != "cuda" or b.device.type != "cuda":'
+  - '286:         raise ValueError("`flydsl_hgemm` only supports CUDA/ROCm tensors")'
+  - '287:     if a.device != b.device:'
+  - '288:         raise ValueError('
+  evidence_id: src_c1752b13d6cca5fc
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 288
+  end_line: 290
+  match: "raise ValueError(\n            f\"`a` and `b` must be on the same device, got {a.device=} {b.device=}"
+  captured:
+  - '`a` and `b` must be on the same device, got {a.device=} {b.device=}'
+  arch_scope: ''
+  evidence:
+  - '286:         raise ValueError("`flydsl_hgemm` only supports CUDA/ROCm tensors")'
+  - '287:     if a.device != b.device:'
+  - '288:         raise ValueError('
+  - '289:             f"`a` and `b` must be on the same device, got {a.device=} {b.device=}"'
+  - '290:         )'
+  evidence_id: src_b79ff3412dfe8dfb
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 311
+  match: raise ValueError(f"`out` must be on {a.device}, got {out.device}
+  captured:
+  - '`out` must be on {a.device}, got {out.device}'
+  arch_scope: ''
+  evidence:
+  - '309:             )'
+  - '310:         if out.device != a.device:'
+  - '311:             raise ValueError(f"`out` must be on {a.device}, got {out.device}")'
+  - '312:         if not out.is_contiguous():'
+  - '313:             raise ValueError("`out` must be contiguous")'
+  evidence_id: src_ecf36a5648468c98
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 313
+  match: raise ValueError("`out` must be contiguous
+  captured:
+  - '`out` must be contiguous'
+  arch_scope: ''
+  evidence:
+  - '311:             raise ValueError(f"`out` must be on {a.device}, got {out.device}")'
+  - '312:         if not out.is_contiguous():'
+  - '313:             raise ValueError("`out` must be contiguous")'
+  - '315:     if bias is not None:'
+  evidence_id: src_95505f0d151a92e0
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 317
+  match: raise ValueError(f"`bias` must be 1D, got bias.dim={bias.dim()}
+  captured:
+  - '`bias` must be 1D, got bias.dim={bias.dim()}'
+  arch_scope: ''
+  evidence:
+  - '315:     if bias is not None:'
+  - '316:         if bias.dim() != 1:'
+  - '317:             raise ValueError(f"`bias` must be 1D, got bias.dim={bias.dim()}")'
+  - '318:         if bias.shape != (n,):'
+  - '319:             raise ValueError(f"`bias` must have shape {(n,)}, got {tuple(bias.shape)}")'
+  evidence_id: src_f20517caff2be903
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 325
+  match: raise ValueError(f"`bias` must be on {a.device}, got {bias.device}
+  captured:
+  - '`bias` must be on {a.device}, got {bias.device}'
+  arch_scope: ''
+  evidence:
+  - '323:             )'
+  - '324:         if bias.device != a.device:'
+  - '325:             raise ValueError(f"`bias` must be on {a.device}, got {bias.device}")'
+  - '327:     return m, n, k'
+  evidence_id: src_7a2052551c383ebd
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 349
+  end_line: 351
+  match: "raise ValueError(\n            f\"Tile sizes must be positive, got tile_m={tile_m}, tile_n={tile_n},\
+    \ tile_k={tile_k}"
+  captured:
+  - Tile sizes must be positive, got tile_m={tile_m}, tile_n={tile_n}, tile_k={tile_k}
+  arch_scope: ''
+  evidence:
+  - '348:     if tile_m < 1 or tile_n < 1 or tile_k < 1:'
+  - '349:         raise ValueError('
+  - '350:             f"Tile sizes must be positive, got tile_m={tile_m}, tile_n={tile_n}, tile_k={tile_k}"'
+  - '351:         )'
+  evidence_id: src_3dc0eee4cfb1e955
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 353
+  end_line: 356
+  match: "raise ValueError(\n            \"Warp tiling must be positive, got"
+  captured:
+  - 'Warp tiling must be positive, got '
+  arch_scope: ''
+  evidence:
+  - '351:         )'
+  - '352:     if block_m_warps < 1 or block_n_warps < 1:'
+  - '353:         raise ValueError('
+  - '354:             "Warp tiling must be positive, got "'
+  - '355:             f"block_m_warps={block_m_warps}, block_n_warps={block_n_warps}"'
+  evidence_id: src_9e5684579b7cdff8
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 358
+  end_line: 360
+  match: "raise ValueError(\n            f\"Invalid tile_k={tile_k}; latest kernel requires tile_k >= 32"
+  captured:
+  - Invalid tile_k={tile_k}; latest kernel requires tile_k >= 32
+  arch_scope: ''
+  evidence:
+  - '356:         )'
+  - '357:     if tile_k < 32:'
+  - '358:         raise ValueError('
+  - '359:             f"Invalid tile_k={tile_k}; latest kernel requires tile_k >= 32"'
+  - '360:         )'
+  evidence_id: src_0f8216bb2c53105f
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 362
+  end_line: 364
+  match: "raise ValueError(\n            f\"Invalid tile_k={tile_k}; latest kernel requires tile_k % 32 ==\
+    \ 0"
+  captured:
+  - Invalid tile_k={tile_k}; latest kernel requires tile_k % 32 == 0
+  arch_scope: ''
+  evidence:
+  - '360:         )'
+  - '361:     if tile_k % 32 != 0:'
+  - '362:         raise ValueError('
+  - '363:             f"Invalid tile_k={tile_k}; latest kernel requires tile_k % 32 == 0"'
+  - '364:         )'
+  evidence_id: src_4404f2040e4191a0
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 366
+  match: raise ValueError(f"Invalid split_k={split_k}; split_k must be >= 1
+  captured:
+  - Invalid split_k={split_k}; split_k must be >= 1
+  arch_scope: ''
+  evidence:
+  - '364:         )'
+  - '365:     if split_k < 1:'
+  - '366:         raise ValueError(f"Invalid split_k={split_k}; split_k must be >= 1")'
+  - '367:     if stages != FIXED_STAGE:'
+  - '368:         raise ValueError('
+  evidence_id: src_c064511f4fa9a9e3
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 372
+  end_line: 374
+  match: "raise ValueError(\n            f\"Current kernel only supports `pack_n=1`; got pack_n={pack_n}"
+  captured:
+  - Current kernel only supports `pack_n=1`; got pack_n={pack_n}
+  arch_scope: ''
+  evidence:
+  - '370:         )'
+  - '371:     if pack_n != 1:'
+  - '372:         raise ValueError('
+  - '373:             f"Current kernel only supports `pack_n=1`; got pack_n={pack_n}"'
+  - '374:         )'
+  evidence_id: src_c01de8a05cd112e2
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 380
+  end_line: 383
+  match: "raise ValueError(\n            f\"Invalid tiling: tile_m={tile_m} must be divisible by"
+  captured:
+  - 'Invalid tiling: tile_m={tile_m} must be divisible by '
+  arch_scope: ''
+  evidence:
+  - '379:     if tile_m % (block_m_warps * warp_atom_m) != 0:'
+  - '380:         raise ValueError('
+  - '381:             f"Invalid tiling: tile_m={tile_m} must be divisible by "'
+  - '382:             f"block_m_warps * 16 = {block_m_warps * warp_atom_m}"'
+  evidence_id: src_395e06da016ffcb0
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 385
+  end_line: 388
+  match: "raise ValueError(\n            f\"Invalid tiling: tile_n={tile_n} must be divisible by"
+  captured:
+  - 'Invalid tiling: tile_n={tile_n} must be divisible by '
+  arch_scope: ''
+  evidence:
+  - '383:         )'
+  - '384:     if tile_n % (block_n_warps * warp_atom_n) != 0:'
+  - '385:         raise ValueError('
+  - '386:             f"Invalid tiling: tile_n={tile_n} must be divisible by "'
+  - '387:             f"block_n_warps * 16 = {block_n_warps * warp_atom_n}"'
+  evidence_id: src_5d190a0109bb68d1
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 397
+  end_line: 399
+  match: "raise ValueError(\n            f\"Invalid split-K: K={k} must be divisible by split_k={split_k}"
+  captured:
+  - 'Invalid split-K: K={k} must be divisible by split_k={split_k}'
+  arch_scope: ''
+  evidence:
+  - '396:     if k % split_k != 0:'
+  - '397:         raise ValueError('
+  - '398:             f"Invalid split-K: K={k} must be divisible by split_k={split_k}"'
+  - '399:         )'
+  evidence_id: src_58d4bf39e7ca8f03
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 415
+  end_line: 418
+  match: "raise ValueError(\n            \"Invalid tile combination: tile_m * tile_k must be divisible by"
+  captured:
+  - 'Invalid tile combination: tile_m * tile_k must be divisible by '
+  arch_scope: ''
+  evidence:
+  - '413:     block_mn_size = tile_m * tile_n'
+  - '414:     if block_mk_size % block_vecs != 0:'
+  - '415:         raise ValueError('
+  - '416:             "Invalid tile combination: tile_m * tile_k must be divisible by "'
+  - '417:             f"ldg_vec_size * block_threads = {block_vecs}; got {block_mk_size}"'
+  evidence_id: src_d76e1615be7ab856
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 420
+  end_line: 423
+  match: "raise ValueError(\n            \"Invalid tile combination: tile_n * tile_k must be divisible by"
+  captured:
+  - 'Invalid tile combination: tile_n * tile_k must be divisible by '
+  arch_scope: ''
+  evidence:
+  - '418:         )'
+  - '419:     if block_nk_size % block_vecs != 0:'
+  - '420:         raise ValueError('
+  - '421:             "Invalid tile combination: tile_n * tile_k must be divisible by "'
+  - '422:             f"ldg_vec_size * block_threads = {block_vecs}; got {block_nk_size}"'
+  evidence_id: src_6fa565fcd4cf1d4a
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 425
+  end_line: 428
+  match: "raise ValueError(\n            \"Invalid tile combination: tile_m * tile_n must be divisible by"
+  captured:
+  - 'Invalid tile combination: tile_m * tile_n must be divisible by '
+  arch_scope: ''
+  evidence:
+  - '423:         )'
+  - '424:     if block_mn_size % block_vecs != 0:'
+  - '425:         raise ValueError('
+  - '426:             "Invalid tile combination: tile_m * tile_n must be divisible by "'
+  - '427:             f"ldg_vec_size * block_threads = {block_vecs}; got {block_mn_size}"'
+  evidence_id: src_c1ae1edca69746e5
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 433
+  end_line: 436
+  match: "raise ValueError(\n            \"Invalid tile combination: requires at least one vectorized global\
+    \ load per thread"
+  captured:
+  - 'Invalid tile combination: requires at least one vectorized global load per thread '
+  arch_scope: ''
+  evidence:
+  - '431:     ldg_reg_c_count = block_mn_size // block_vecs'
+  - '432:     if ldg_reg_a_count < 1 or ldg_reg_b_count < 1:'
+  - '433:         raise ValueError('
+  - '434:             "Invalid tile combination: requires at least one vectorized global load per thread "'
+  - '435:             f"(got ldg_reg_a_count={ldg_reg_a_count}, ldg_reg_b_count={ldg_reg_b_count})"'
+  evidence_id: src_7977a72111f49f7c
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 438
+  end_line: 441
+  match: "raise ValueError(\n            \"Invalid tile combination: requires at least one vectorized C load/store\
+    \ per thread"
+  captured:
+  - 'Invalid tile combination: requires at least one vectorized C load/store per thread '
+  arch_scope: ''
+  evidence:
+  - '436:         )'
+  - '437:     if ldg_reg_c_count < 1:'
+  - '438:         raise ValueError('
+  - '439:             "Invalid tile combination: requires at least one vectorized C load/store per thread "'
+  - '440:             f"(got ldg_reg_c_count={ldg_reg_c_count})"'
+  evidence_id: src_597e2491ace2c6e6
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 572
+  end_line: 574
+  match: "raise ValueError(\n            \"m, n, k must be provided together when requesting shape-aware kernels"
+  captured:
+  - m, n, k must be provided together when requesting shape-aware kernels
+  arch_scope: ''
+  evidence:
+  - '570:         dim is not None for dim in (m, n, k)'
+  - '571:     ):'
+  - '572:         raise ValueError('
+  - '573:             "m, n, k must be provided together when requesting shape-aware kernels"'
+  - '574:         )'
+  evidence_id: src_332c487a5b9d81e7
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 704
+  end_line: 707
+  match: "raise ValueError(\n            \"Split-K counter capacity exceeded:"
+  captured:
+  - 'Split-K counter capacity exceeded: '
+  arch_scope: ''
+  evidence:
+  - '702:     required = bm * bn'
+  - '703:     if required > SPLIT_K_COUNTER_MAX_LEN:'
+  - '704:         raise ValueError('
+  - '705:             "Split-K counter capacity exceeded: "'
+  - '706:             f"requires {required} counters, max supported is {SPLIT_K_COUNTER_MAX_LEN}"'
+  evidence_id: src_679a944e53f65823
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 736
+  match: raise ValueError(f"`dtype` must be
+  captured:
+  - '`dtype` must be '
+  arch_scope: ''
+  evidence:
+  - '734: ):'
+  - '735:     if dtype not in {"f16", "bf16"}:'
+  - '736:         raise ValueError(f"`dtype` must be ''f16'' or ''bf16'', got {dtype!r}")'
+  - '737:     if b_preshuffle and b_to_lds:'
+  - '738:         raise ValueError('
+  evidence_id: src_b99443aa253a8819
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 738
+  end_line: 740
+  match: "raise ValueError(\n            \"Current kernel requires b_to_lds=False when b_preshuffle=True"
+  captured:
+  - Current kernel requires b_to_lds=False when b_preshuffle=True
+  arch_scope: ''
+  evidence:
+  - '736:         raise ValueError(f"`dtype` must be ''f16'' or ''bf16'', got {dtype!r}")'
+  - '737:     if b_preshuffle and b_to_lds:'
+  - '738:         raise ValueError('
+  - '739:             "Current kernel requires b_to_lds=False when b_preshuffle=True"'
+  - '740:         )'
+  evidence_id: src_ed18314cce250704
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 762
+  match: raise ValueError(f"small-M kernel only supports `bf16`, got {dtype!r}
+  captured:
+  - small-M kernel only supports `bf16`, got {dtype!r}
+  arch_scope: ''
+  evidence:
+  - '760:     elif kernel_family == KERNEL_FAMILY_SMALL_M:'
+  - '761:         if dtype != "bf16":'
+  - '762:             raise ValueError(f"small-M kernel only supports `bf16`, got {dtype!r}")'
+  - '763:         if stages != FIXED_STAGE:'
+  - '764:             raise ValueError('
+  evidence_id: src_289e494e0a93d0ab
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 764
+  end_line: 766
+  match: "raise ValueError(\n                f\"small-M kernel only supports stage={FIXED_STAGE}; got stage={stages}"
+  captured:
+  - small-M kernel only supports stage={FIXED_STAGE}; got stage={stages}
+  arch_scope: ''
+  evidence:
+  - '762:             raise ValueError(f"small-M kernel only supports `bf16`, got {dtype!r}")'
+  - '763:         if stages != FIXED_STAGE:'
+  - '764:             raise ValueError('
+  - '765:                 f"small-M kernel only supports stage={FIXED_STAGE}; got stage={stages}"'
+  - '766:             )'
+  evidence_id: src_373f78cb592b60d3
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 768
+  match: raise ValueError("small-M kernel only supports `b_preshuffle=False`
+  captured:
+  - small-M kernel only supports `b_preshuffle=False`
+  arch_scope: ''
+  evidence:
+  - '766:             )'
+  - '767:         if b_preshuffle:'
+  - '768:             raise ValueError("small-M kernel only supports `b_preshuffle=False`")'
+  - '769:         if tile_m != 16:'
+  - '770:             raise ValueError(f"small-M kernel fixes tile_m=16; got tile_m={tile_m}")'
+  evidence_id: src_a08737ed38ddab8a
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 770
+  match: raise ValueError(f"small-M kernel fixes tile_m=16; got tile_m={tile_m}
+  captured:
+  - small-M kernel fixes tile_m=16; got tile_m={tile_m}
+  arch_scope: ''
+  evidence:
+  - '768:             raise ValueError("small-M kernel only supports `b_preshuffle=False`")'
+  - '769:         if tile_m != 16:'
+  - '770:             raise ValueError(f"small-M kernel fixes tile_m=16; got tile_m={tile_m}")'
+  - '771:         if block_m_warps != 1:'
+  - '772:             raise ValueError('
+  evidence_id: src_cebaf7af15b42723
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 772
+  end_line: 775
+  match: "raise ValueError(\n                \"small-M kernel fixes block_m_warps=1;"
+  captured:
+  - 'small-M kernel fixes block_m_warps=1; '
+  arch_scope: ''
+  evidence:
+  - '770:             raise ValueError(f"small-M kernel fixes tile_m=16; got tile_m={tile_m}")'
+  - '771:         if block_m_warps != 1:'
+  - '772:             raise ValueError('
+  - '773:                 "small-M kernel fixes block_m_warps=1; "'
+  - '774:                 f"got block_m_warps={block_m_warps}"'
+  evidence_id: src_7f1d29244f024ffc
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 815
+  end_line: 817
+  match: "raise ValueError(\n                \"This launcher was compiled with bias support and requires `bias`."
+  captured:
+  - This launcher was compiled with bias support and requires `bias`.
+  arch_scope: ''
+  evidence:
+  - '813:     ):'
+  - '814:         if has_bias and bias is None:'
+  - '815:             raise ValueError('
+  - '816:                 "This launcher was compiled with bias support and requires `bias`."'
+  - '817:             )'
+  evidence_id: src_48c5b4177ae80c2c
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 37
+  match: SPLIT_K_COUNTER_MAX_LEN =
+  captured:
+  - SPLIT_K_COUNTER_MAX_LEN
+  arch_scope: ''
+  evidence:
+  - '37: SPLIT_K_COUNTER_MAX_LEN = 128'
+  - '38: SPLIT_K_SIGNAL_STATE_COUNT = 3'
+  - '39: FIXED_STAGE = 2'
+  evidence_id: src_355d2350acab709e
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 38
+  match: SPLIT_K_SIGNAL_STATE_COUNT =
+  captured:
+  - SPLIT_K_SIGNAL_STATE_COUNT
+  arch_scope: ''
+  evidence:
+  - '37: SPLIT_K_COUNTER_MAX_LEN = 128'
+  - '38: SPLIT_K_SIGNAL_STATE_COUNT = 3'
+  - '39: FIXED_STAGE = 2'
+  - '40: FIXED_C_TO_LDS = False'
+  evidence_id: src_564badda94311abc
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 66
+  match: 'SPLIT_K_GLOBAL_SEMAPHORE: dict[SplitKStreamKey, torch.Tensor] ='
+  captured:
+  - SPLIT_K_GLOBAL_SEMAPHORE
+  arch_scope: ''
+  evidence:
+  - '65: SplitKStreamKey = tuple[int, int]'
+  - '66: SPLIT_K_GLOBAL_SEMAPHORE: dict[SplitKStreamKey, torch.Tensor] = {}'
+  - '67: SPLIT_K_GLOBAL_SEMAPHORE_STATE: dict[SplitKStreamKey, int] = {}'
+  evidence_id: src_194c17aa69828857
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 67
+  match: 'SPLIT_K_GLOBAL_SEMAPHORE_STATE: dict[SplitKStreamKey, int] ='
+  captured:
+  - SPLIT_K_GLOBAL_SEMAPHORE_STATE
+  arch_scope: ''
+  evidence:
+  - '65: SplitKStreamKey = tuple[int, int]'
+  - '66: SPLIT_K_GLOBAL_SEMAPHORE: dict[SplitKStreamKey, torch.Tensor] = {}'
+  - '67: SPLIT_K_GLOBAL_SEMAPHORE_STATE: dict[SplitKStreamKey, int] = {}'
+  - '69: # Expand the original default HGEMM catalog with the extra cases that proved'
+  evidence_id: src_1a958f82122df673
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 683
+  end_line: 685
+  match: def _get_split_k_signal_state(
+  captured:
+  - _get_split_k_signal_state
+  arch_scope: ''
+  evidence:
+  - '683: def _get_split_k_signal_state(stream: torch.cuda.Stream) -> int:'
+  - '684:     _get_split_k_global_semaphore(stream)'
+  - '685:     return SPLIT_K_GLOBAL_SEMAPHORE_STATE[_stream_cache_key(stream)]'
+  evidence_id: src_94058066019b30f2
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 688
+  end_line: 692
+  match: def _advance_split_k_signal_state(
+  captured:
+  - _advance_split_k_signal_state
+  arch_scope: ''
+  evidence:
+  - '688: def _advance_split_k_signal_state(stream: torch.cuda.Stream) -> None:'
+  - '689:     key = _stream_cache_key(stream)'
+  - '690:     SPLIT_K_GLOBAL_SEMAPHORE_STATE[key] = ('
+  evidence_id: src_86aa6d1400d0f17f
+- snapshot: aiter_a6bb4993
+  category: instance_name
+  language: flydsl
+  file: aiter/ops/flydsl/gemm_kernels.py
+  line: 44
+  end_line: 63
+  match: _HGEMM_KERNEL_RE = re.compile(
+  captured:
+  - _HGEMM_KERNEL_RE
+  arch_scope: ''
+  evidence:
+  - '42: KERNEL_FAMILY_HGEMM = "hgemm"'
+  - '43: KERNEL_FAMILY_SMALL_M = "small_m"'
+  - '44: _HGEMM_KERNEL_RE = re.compile('
+  - '45:     r"^flydsl_gemm(?P<stage>\d+)_"'
+  - '46:     r"a(?P<a_dtype>[a-z0-9]+)_w(?P<w_dtype>[a-z0-9]+)_(?P<out_dtype>[a-z0-9]+)_"'
+  evidence_id: src_1e7dc0218412b0cf
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/utils.py
+  line: 14
+  end_line: 22
+  match: def addressable_lds_bytes_for_gfx(
+  captured:
+  - addressable_lds_bytes_for_gfx
+  arch_scope: ''
+  evidence:
+  - '14: def addressable_lds_bytes_for_gfx(gfx: str) -> int:'
+  - '15:     g = (gfx or "").strip().lower().split(":")[0]'
+  - '16:     if not g.startswith("gfx"):'
+  evidence_id: src_ce6c8804ca232bf6
+- snapshot: aiter_a6bb4993
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/utils.py
+  line: 18
+  end_line: 19
+  match: .startswith("gfx950")
+  captured:
+  - gfx950
+  arch_scope: ''
+  evidence:
+  - '16:     if not g.startswith("gfx"):'
+  - '17:         return _FALLBACK_MAX_LDS_BYTES'
+  - '18:     if g.startswith("gfx950"):'
+  - '19:         return 163840'
+  - '20:     if g.startswith("gfx7") or g.startswith("gfx8"):'
+  evidence_id: src_c694123000988e0b
+- snapshot: aiter_a6bb4993
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/utils.py
+  line: 20
+  end_line: 21
+  match: .startswith("gfx7")
+  captured:
+  - gfx7
+  arch_scope: ''
+  evidence:
+  - '18:     if g.startswith("gfx950"):'
+  - '19:         return 163840'
+  - '20:     if g.startswith("gfx7") or g.startswith("gfx8"):'
+  - '21:         return 32768'
+  - '22:     return 65536'
+  evidence_id: src_efae907f3b7ccf59
+- snapshot: aiter_a6bb4993
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/utils.py
+  line: 20
+  end_line: 21
+  match: .startswith("gfx8")
+  captured:
+  - gfx8
+  arch_scope: ''
+  evidence:
+  - '18:     if g.startswith("gfx950"):'
+  - '19:         return 163840'
+  - '20:     if g.startswith("gfx7") or g.startswith("gfx8"):'
+  - '21:         return 32768'
+  - '22:     return 65536'
+  evidence_id: src_9e29361ce0d15363
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 170
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '168:                     cache_modifier=cache_modifier,'
+  - '169:                 )'
+  - '170:             accumulator += tl.dot(a, b, input_precision="ieee")'
+  - '171:             # Advance the ptrs to the next K block.'
+  - '172:             a_ptrs += BLOCK_SIZE_K * stride_ak'
+  evidence_id: src_cb8f85060eec45f8
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 105
+  match: NUM_XCDS=
+  captured:
+  - NUM_XCDS
+  arch_scope: ''
+  evidence:
+  - '103:     num_pid_m = tl.cdiv(M, BLOCK_SIZE_M)'
+  - '104:     num_pid_n = tl.cdiv(N, BLOCK_SIZE_N)'
+  - '105:     pid_unified = remap_xcd(pid_unified, num_pid_m * num_pid_n * NUM_KSPLIT, NUM_XCDS=8)'
+  - '106:     pid_k = pid_unified % NUM_KSPLIT'
+  - '107:     pid = pid_unified // NUM_KSPLIT'
+  evidence_id: src_334e95f3f9406108
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 81
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '79:     EVEN_K: tl.constexpr,'
+  - '80:     EVEN_MN: tl.constexpr,'
+  - '81:     cache_modifier: tl.constexpr,'
+  - '82:     activation: tl.constexpr,'
+  - '83:     use_activation: tl.constexpr,'
+  evidence_id: src_15cea189ebb33d4c
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 159
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '157:             if EVEN_K:'
+  - '158:                 a = tl.load(a_ptrs)'
+  - '159:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '160:             else:'
+  - '161:                 a = tl.load('
+  evidence_id: src_92959715207084c1
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 168
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '166:                     mask=offs_k[:, None] < k_span - k * BLOCK_SIZE_K,'
+  - '167:                     other=0.0,'
+  - '168:                     cache_modifier=cache_modifier,'
+  - '169:                 )'
+  - '170:             accumulator += tl.dot(a, b, input_precision="ieee")'
+  evidence_id: src_9667faa67584ba59
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 72
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '70:     stride_cm,'
+  - '71:     stride_cn,'
+  - '72:     # Meta-parameters'
+  - '73:     BLOCK_SIZE_M: tl.constexpr,'
+  - '74:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_45e95e07280bb7aa
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 74
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '72:     # Meta-parameters'
+  - '73:     BLOCK_SIZE_M: tl.constexpr,'
+  - '74:     BLOCK_SIZE_N: tl.constexpr,'
+  - '75:     BLOCK_SIZE_K: tl.constexpr,'
+  - '76:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_17b84cf6afa1d326
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 75
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '73:     BLOCK_SIZE_M: tl.constexpr,'
+  - '74:     BLOCK_SIZE_N: tl.constexpr,'
+  - '75:     BLOCK_SIZE_K: tl.constexpr,'
+  - '76:     GROUP_SIZE_M: tl.constexpr,'
+  - '77:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_64dba9756d5b0b27
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 76
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '74:     BLOCK_SIZE_N: tl.constexpr,'
+  - '75:     BLOCK_SIZE_K: tl.constexpr,'
+  - '76:     GROUP_SIZE_M: tl.constexpr,'
+  - '77:     NUM_KSPLIT: tl.constexpr,'
+  - '78:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_de6d336c2ee7601b
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 77
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '75:     BLOCK_SIZE_K: tl.constexpr,'
+  - '76:     GROUP_SIZE_M: tl.constexpr,'
+  - '77:     NUM_KSPLIT: tl.constexpr,'
+  - '78:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '79:     EVEN_K: tl.constexpr,'
+  evidence_id: src_0f50a57ed622a4f4
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 78
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '76:     GROUP_SIZE_M: tl.constexpr,'
+  - '77:     NUM_KSPLIT: tl.constexpr,'
+  - '78:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '79:     EVEN_K: tl.constexpr,'
+  - '80:     EVEN_MN: tl.constexpr,'
+  evidence_id: src_9ded4cca041a3849
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 79
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '77:     NUM_KSPLIT: tl.constexpr,'
+  - '78:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '79:     EVEN_K: tl.constexpr,'
+  - '80:     EVEN_MN: tl.constexpr,'
+  - '81:     cache_modifier: tl.constexpr,'
+  evidence_id: src_fd4106242f7404f7
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 80
+  match: 'EVEN_MN: tl.constexpr,'
+  captured:
+  - EVEN_MN
+  arch_scope: ''
+  evidence:
+  - '78:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '79:     EVEN_K: tl.constexpr,'
+  - '80:     EVEN_MN: tl.constexpr,'
+  - '81:     cache_modifier: tl.constexpr,'
+  - '82:     activation: tl.constexpr,'
+  evidence_id: src_abd4e80f717e9528
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 81
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '79:     EVEN_K: tl.constexpr,'
+  - '80:     EVEN_MN: tl.constexpr,'
+  - '81:     cache_modifier: tl.constexpr,'
+  - '82:     activation: tl.constexpr,'
+  - '83:     use_activation: tl.constexpr,'
+  evidence_id: src_0505cb58690b386c
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 82
+  match: 'activation: tl.constexpr,'
+  captured:
+  - activation
+  arch_scope: ''
+  evidence:
+  - '80:     EVEN_MN: tl.constexpr,'
+  - '81:     cache_modifier: tl.constexpr,'
+  - '82:     activation: tl.constexpr,'
+  - '83:     use_activation: tl.constexpr,'
+  - '84:     ADD_BIAS: tl.constexpr,'
+  evidence_id: src_2af44cb6559a0404
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 83
+  match: 'use_activation: tl.constexpr,'
+  captured:
+  - use_activation
+  arch_scope: ''
+  evidence:
+  - '81:     cache_modifier: tl.constexpr,'
+  - '82:     activation: tl.constexpr,'
+  - '83:     use_activation: tl.constexpr,'
+  - '84:     ADD_BIAS: tl.constexpr,'
+  - '85:     SKIP_REDUCE: tl.constexpr,'
+  evidence_id: src_0638b5932267cb74
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 84
+  match: 'ADD_BIAS: tl.constexpr,'
+  captured:
+  - ADD_BIAS
+  arch_scope: ''
+  evidence:
+  - '82:     activation: tl.constexpr,'
+  - '83:     use_activation: tl.constexpr,'
+  - '84:     ADD_BIAS: tl.constexpr,'
+  - '85:     SKIP_REDUCE: tl.constexpr,'
+  - '86: ):'
+  evidence_id: src_8868bd5fbb97000f
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 85
+  match: 'SKIP_REDUCE: tl.constexpr,'
+  captured:
+  - SKIP_REDUCE
+  arch_scope: ''
+  evidence:
+  - '83:     use_activation: tl.constexpr,'
+  - '84:     ADD_BIAS: tl.constexpr,'
+  - '85:     SKIP_REDUCE: tl.constexpr,'
+  - '86: ):'
+  - '87:     """Kernel for computing the matmul C = A x B.'
+  evidence_id: src_2126bfd49c09ca18
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 207
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '205:     stride_c_out_m,'
+  - '206:     stride_c_out_n,'
+  - '207:     BLOCK_SIZE_M: tl.constexpr,'
+  - '208:     BLOCK_SIZE_N: tl.constexpr,'
+  - '209:     ACTUAL_KSPLIT: tl.constexpr,'
+  evidence_id: src_856d794ebfb34048
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 208
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '206:     stride_c_out_n,'
+  - '207:     BLOCK_SIZE_M: tl.constexpr,'
+  - '208:     BLOCK_SIZE_N: tl.constexpr,'
+  - '209:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '210:     MAX_KSPLIT: tl.constexpr,'
+  evidence_id: src_58bd6e570be45406
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 209
+  match: 'ACTUAL_KSPLIT: tl.constexpr,'
+  captured:
+  - ACTUAL_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '207:     BLOCK_SIZE_M: tl.constexpr,'
+  - '208:     BLOCK_SIZE_N: tl.constexpr,'
+  - '209:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '210:     MAX_KSPLIT: tl.constexpr,'
+  - '211:     activation: tl.constexpr,'
+  evidence_id: src_8f1fdafc50973349
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 210
+  match: 'MAX_KSPLIT: tl.constexpr,'
+  captured:
+  - MAX_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '208:     BLOCK_SIZE_N: tl.constexpr,'
+  - '209:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '210:     MAX_KSPLIT: tl.constexpr,'
+  - '211:     activation: tl.constexpr,'
+  - '212:     use_activation: tl.constexpr,'
+  evidence_id: src_631307eab0126cfe
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 211
+  match: 'activation: tl.constexpr,'
+  captured:
+  - activation
+  arch_scope: ''
+  evidence:
+  - '209:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '210:     MAX_KSPLIT: tl.constexpr,'
+  - '211:     activation: tl.constexpr,'
+  - '212:     use_activation: tl.constexpr,'
+  - '213:     ADD_BIAS: tl.constexpr,'
+  evidence_id: src_bf4e455a969f9196
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 212
+  match: 'use_activation: tl.constexpr,'
+  captured:
+  - use_activation
+  arch_scope: ''
+  evidence:
+  - '210:     MAX_KSPLIT: tl.constexpr,'
+  - '211:     activation: tl.constexpr,'
+  - '212:     use_activation: tl.constexpr,'
+  - '213:     ADD_BIAS: tl.constexpr,'
+  - '214: ):'
+  evidence_id: src_036b71c3d2163f6d
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  line: 213
+  match: 'ADD_BIAS: tl.constexpr,'
+  captured:
+  - ADD_BIAS
+  arch_scope: ''
+  evidence:
+  - '211:     activation: tl.constexpr,'
+  - '212:     use_activation: tl.constexpr,'
+  - '213:     ADD_BIAS: tl.constexpr,'
+  - '214: ):'
+  evidence_id: src_58006451e5e63a38
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  line: 123
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '121:                 )'
+  - '123:             accumulator += tl.dot(a, b, input_precision="ieee")'
+  - '125:             # Advance the ptrs to the next K block.'
+  evidence_id: src_666c4f8159256e97
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  line: 57
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '55:     NUM_KSPLIT: tl.constexpr,'
+  - '56:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '57:     cache_modifier: tl.constexpr,'
+  - '58:     EVEN_K: tl.constexpr,'
+  - '59:     GRID_MN: tl.constexpr,'
+  evidence_id: src_502212cb45947f78
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  line: 114
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '112:             if EVEN_K:'
+  - '113:                 a = tl.load(a_ptrs)'
+  - '114:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '115:             else:'
+  - '116:                 a = tl.load('
+  evidence_id: src_5ff6413c1aeac7e8
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  line: 50
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '48:     stride_cm,'
+  - '49:     stride_cn,'
+  - '50:     # Meta-parameters'
+  - '51:     BLOCK_SIZE_M: tl.constexpr,'
+  - '52:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_6e7846f2d3a5fbf2
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  line: 52
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '50:     # Meta-parameters'
+  - '51:     BLOCK_SIZE_M: tl.constexpr,'
+  - '52:     BLOCK_SIZE_N: tl.constexpr,'
+  - '53:     BLOCK_SIZE_K: tl.constexpr,'
+  - '54:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_eb9af39fb9989707
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  line: 53
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '51:     BLOCK_SIZE_M: tl.constexpr,'
+  - '52:     BLOCK_SIZE_N: tl.constexpr,'
+  - '53:     BLOCK_SIZE_K: tl.constexpr,'
+  - '54:     GROUP_SIZE_M: tl.constexpr,'
+  - '55:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_1fd2e4632c4a7aa9
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  line: 54
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '52:     BLOCK_SIZE_N: tl.constexpr,'
+  - '53:     BLOCK_SIZE_K: tl.constexpr,'
+  - '54:     GROUP_SIZE_M: tl.constexpr,'
+  - '55:     NUM_KSPLIT: tl.constexpr,'
+  - '56:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_a04e2db0c7d81493
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  line: 55
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '53:     BLOCK_SIZE_K: tl.constexpr,'
+  - '54:     GROUP_SIZE_M: tl.constexpr,'
+  - '55:     NUM_KSPLIT: tl.constexpr,'
+  - '56:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '57:     cache_modifier: tl.constexpr,'
+  evidence_id: src_f5043ecafb832fa0
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  line: 56
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '54:     GROUP_SIZE_M: tl.constexpr,'
+  - '55:     NUM_KSPLIT: tl.constexpr,'
+  - '56:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '57:     cache_modifier: tl.constexpr,'
+  - '58:     EVEN_K: tl.constexpr,'
+  evidence_id: src_9ee95b5d364d1124
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  line: 57
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '55:     NUM_KSPLIT: tl.constexpr,'
+  - '56:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '57:     cache_modifier: tl.constexpr,'
+  - '58:     EVEN_K: tl.constexpr,'
+  - '59:     GRID_MN: tl.constexpr,'
+  evidence_id: src_54f8633adb3d6a68
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  line: 58
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '56:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '57:     cache_modifier: tl.constexpr,'
+  - '58:     EVEN_K: tl.constexpr,'
+  - '59:     GRID_MN: tl.constexpr,'
+  - '60: ):'
+  evidence_id: src_65b2d3c83cddad41
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  line: 59
+  match: 'GRID_MN: tl.constexpr,'
+  captured:
+  - GRID_MN
+  arch_scope: ''
+  evidence:
+  - '57:     cache_modifier: tl.constexpr,'
+  - '58:     EVEN_K: tl.constexpr,'
+  - '59:     GRID_MN: tl.constexpr,'
+  - '60: ):'
+  - '61:     """Kernel for computing the matmul C = A x B.'
+  evidence_id: src_a24fc24640dc6043
+- snapshot: aiter_a6bb4993
+  category: atomic_combine
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py
+  line: 139
+  match: tl.atomic_add(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '137:             tl.store(c_ptrs, c, mask=c_mask)'
+  - '138:         else:'
+  - '139:             tl.atomic_add(c_ptrs, c, mask=c_mask, sem="relaxed")'
+  evidence_id: src_9e9cdadae23d0f5f
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 130
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '128:             )'
+  - '130:         acc0 += tl.dot(a, b0, input_precision="ieee")'
+  - '131:         acc1 += tl.dot(a, b1, input_precision="ieee")'
+  evidence_id: src_6a628307effc5032
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 131
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '130:         acc0 += tl.dot(a, b0, input_precision="ieee")'
+  - '131:         acc1 += tl.dot(a, b1, input_precision="ieee")'
+  - '133:         # Advance the ptrs to the next K block.'
+  evidence_id: src_41142fc7c0786092
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 55
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '53:     EVEN_K: tl.constexpr,'
+  - '54:     GRID_MN: tl.constexpr,'
+  - '55:     cache_modifier: tl.constexpr,'
+  - '56:     activation: tl.constexpr,'
+  - '57:     use_activation: tl.constexpr,'
+  evidence_id: src_1567132b507a9c95
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 113
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '111:         if EVEN_K:'
+  - '112:             a = tl.load(a_ptrs)'
+  - '113:             b0 = tl.load(b0_ptrs, cache_modifier=cache_modifier)'
+  - '114:             b1 = tl.load(b1_ptrs, cache_modifier=cache_modifier)'
+  - '115:         else:'
+  evidence_id: src_eca898af467b6c33
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 114
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '112:             a = tl.load(a_ptrs)'
+  - '113:             b0 = tl.load(b0_ptrs, cache_modifier=cache_modifier)'
+  - '114:             b1 = tl.load(b1_ptrs, cache_modifier=cache_modifier)'
+  - '115:         else:'
+  - '116:             a = tl.load(a_ptrs, mask=offs_k[None, :] < K - k * BLOCK_SIZE_K, other=0.0)'
+  evidence_id: src_7b7f0967283bfac0
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 121
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '119:                 mask=offs_k[:, None] < K - k * BLOCK_SIZE_K,'
+  - '120:                 other=0.0,'
+  - '121:                 cache_modifier=cache_modifier,'
+  - '122:             )'
+  - '123:             b1 = tl.load('
+  evidence_id: src_87b27df391a50824
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 127
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '125:                 mask=offs_k[:, None] < K - k * BLOCK_SIZE_K,'
+  - '126:                 other=0.0,'
+  - '127:                 cache_modifier=cache_modifier,'
+  - '128:             )'
+  evidence_id: src_49baa9a1a165dc52
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 48
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '46:     stride_cm,'
+  - '47:     stride_cn,'
+  - '48:     # Meta-parameters'
+  - '49:     BLOCK_SIZE_M: tl.constexpr,'
+  - '50:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_aeb37d7d249efc7d
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 50
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '48:     # Meta-parameters'
+  - '49:     BLOCK_SIZE_M: tl.constexpr,'
+  - '50:     BLOCK_SIZE_N: tl.constexpr,'
+  - '51:     BLOCK_SIZE_K: tl.constexpr,'
+  - '52:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_6513e016fbe67c1a
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 51
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '49:     BLOCK_SIZE_M: tl.constexpr,'
+  - '50:     BLOCK_SIZE_N: tl.constexpr,'
+  - '51:     BLOCK_SIZE_K: tl.constexpr,'
+  - '52:     GROUP_SIZE_M: tl.constexpr,'
+  - '53:     EVEN_K: tl.constexpr,'
+  evidence_id: src_8540fbcbe8e019de
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 52
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '50:     BLOCK_SIZE_N: tl.constexpr,'
+  - '51:     BLOCK_SIZE_K: tl.constexpr,'
+  - '52:     GROUP_SIZE_M: tl.constexpr,'
+  - '53:     EVEN_K: tl.constexpr,'
+  - '54:     GRID_MN: tl.constexpr,'
+  evidence_id: src_2530e1427d0ca570
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 53
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '51:     BLOCK_SIZE_K: tl.constexpr,'
+  - '52:     GROUP_SIZE_M: tl.constexpr,'
+  - '53:     EVEN_K: tl.constexpr,'
+  - '54:     GRID_MN: tl.constexpr,'
+  - '55:     cache_modifier: tl.constexpr,'
+  evidence_id: src_61998cdf9532c394
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 54
+  match: 'GRID_MN: tl.constexpr,'
+  captured:
+  - GRID_MN
+  arch_scope: ''
+  evidence:
+  - '52:     GROUP_SIZE_M: tl.constexpr,'
+  - '53:     EVEN_K: tl.constexpr,'
+  - '54:     GRID_MN: tl.constexpr,'
+  - '55:     cache_modifier: tl.constexpr,'
+  - '56:     activation: tl.constexpr,'
+  evidence_id: src_81033d846f091cac
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 55
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '53:     EVEN_K: tl.constexpr,'
+  - '54:     GRID_MN: tl.constexpr,'
+  - '55:     cache_modifier: tl.constexpr,'
+  - '56:     activation: tl.constexpr,'
+  - '57:     use_activation: tl.constexpr,'
+  evidence_id: src_be7d312d5e198e87
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 56
+  match: 'activation: tl.constexpr,'
+  captured:
+  - activation
+  arch_scope: ''
+  evidence:
+  - '54:     GRID_MN: tl.constexpr,'
+  - '55:     cache_modifier: tl.constexpr,'
+  - '56:     activation: tl.constexpr,'
+  - '57:     use_activation: tl.constexpr,'
+  - '58: ):'
+  evidence_id: src_8dc14233f6bf8725
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py
+  line: 57
+  match: 'use_activation: tl.constexpr,'
+  captured:
+  - use_activation
+  arch_scope: ''
+  evidence:
+  - '55:     cache_modifier: tl.constexpr,'
+  - '56:     activation: tl.constexpr,'
+  - '57:     use_activation: tl.constexpr,'
+  - '58: ):'
+  - '59:     """Kernel for computing the matmul C = A x B.'
+  evidence_id: src_b0146307b4f42ca0
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: triton
+  file: aiter/ops/triton/utils/_triton/pid_preprocessing.py
+  line: 11
+  match: 'NUM_XCDS:'
+  captured:
+  - NUM_XCDS
+  arch_scope: ''
+  evidence:
+  - '9: @triton.jit'
+  - '10: def remap_xcd_chunked('
+  - '11:     pid, GRID_MN, NUM_XCDS: tl.constexpr = 8, CHUNK_SIZE: tl.constexpr = 2'
+  - '12: ):'
+  - '13:     # Compute current XCD and local PID'
+  evidence_id: src_547aba192624b5a0
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: triton
+  file: aiter/ops/triton/utils/_triton/pid_preprocessing.py
+  line: 28
+  end_line: 54
+  match: 'NUM_XCDS:'
+  captured:
+  - NUM_XCDS
+  arch_scope: ''
+  evidence:
+  - '27: @triton.jit'
+  - '28: def remap_xcd(pid, GRID_MN, NUM_XCDS: tl.constexpr = 8):'
+  - '29:     ## pid remapping on xcds'
+  - '30:     # Number of pids per XCD in the new arrangement'
+  evidence_id: src_2d2da169ef7ab903
+- snapshot: aiter_a6bb4993
+  category: grid_mapping
+  language: triton
+  file: aiter/ops/triton/utils/_triton/pid_preprocessing.py
+  line: 10
+  end_line: 24
+  match: def remap_xcd_chunked(
+  captured:
+  - remap_xcd_chunked
+  arch_scope: ''
+  evidence:
+  - '9: @triton.jit'
+  - '10: def remap_xcd_chunked('
+  - '11:     pid, GRID_MN, NUM_XCDS: tl.constexpr = 8, CHUNK_SIZE: tl.constexpr = 2'
+  - '12: ):'
+  evidence_id: src_a0815635126a1ea6
+- snapshot: aiter_a6bb4993
+  category: grid_mapping
+  language: triton
+  file: aiter/ops/triton/utils/_triton/pid_preprocessing.py
+  line: 28
+  end_line: 54
+  match: def remap_xcd(
+  captured:
+  - remap_xcd
+  arch_scope: ''
+  evidence:
+  - '27: @triton.jit'
+  - '28: def remap_xcd(pid, GRID_MN, NUM_XCDS: tl.constexpr = 8):'
+  - '29:     ## pid remapping on xcds'
+  - '30:     # Number of pids per XCD in the new arrangement'
+  evidence_id: src_1b8ded5e4825e5e1
+- snapshot: aiter_a6bb4993
+  category: grid_mapping
+  language: triton
+  file: aiter/ops/triton/utils/_triton/pid_preprocessing.py
+  line: 58
+  end_line: 80
+  match: def pid_grid(
+  captured:
+  - pid_grid
+  arch_scope: ''
+  evidence:
+  - '57: @triton.jit'
+  - '58: def pid_grid(pid: int, num_pid_m: int, num_pid_n: int, GROUP_SIZE_M: tl.constexpr = 1):'
+  - '59:     """'
+  - '60:     Maps 1D pid to 2D grid coords (pid_m, pid_n).'
+  evidence_id: src_d760ac9f0e4bff02
+- snapshot: aiter_a6bb4993
+  category: grid_mapping
+  language: triton
+  file: aiter/ops/triton/utils/_triton/pid_preprocessing.py
+  line: 84
+  end_line: 100
+  match: def pid_grid_3d(
+  captured:
+  - pid_grid_3d
+  arch_scope: ''
+  evidence:
+  - '83: @triton.jit'
+  - '84: def pid_grid_3d(pid: int, num_pid_m: int, num_pid_n: int, num_pid_k):'
+  - '85:     """'
+  - '86:     Maps 1D pid to 3D grid coords (pid_m, pid_n, pid_k).'
+  evidence_id: src_374d2045e949e65b
+- snapshot: aiter_a6bb4993
+  category: grid_mapping
+  language: triton
+  file: aiter/ops/triton/utils/_triton/pid_preprocessing.py
+  line: 31
+  match: pids_per_xcd =
+  captured:
+  - pids_per_xcd
+  arch_scope: ''
+  evidence:
+  - '29:     ## pid remapping on xcds'
+  - '30:     # Number of pids per XCD in the new arrangement'
+  - '31:     pids_per_xcd = (GRID_MN + NUM_XCDS - 1) // NUM_XCDS'
+  - '32:     # When GRID_MN cannot divide NUM_XCDS, some xcds will have'
+  - '33:     # pids_per_xcd pids, the other will have pids_per_xcd - 1 pids.'
+  evidence_id: src_b04ffbdb15587289
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: triton
+  file: aiter/ops/triton/utils/gemm_config_utils.py
+  line: 12
+  match: STANDARD_M_BOUNDS = (
+  captured:
+  - STANDARD_M_BOUNDS
+  arch_scope: ''
+  evidence:
+  - '11: # Standard bounds for M_LEQ_x keys (tuple for hashability with LRU cache)'
+  - '12: STANDARD_M_BOUNDS = (4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192)'
+  - '14: # This flag should be set to True, unless it is being used for debugging'
+  evidence_id: src_556938a6c808ec7d
+- snapshot: aiter_a6bb4993
+  category: config_lookup
+  language: triton
+  file: aiter/ops/triton/utils/gemm_config_utils.py
+  line: 142
+  end_line: 177
+  match: def get_gemm_config(
+  captured:
+  - get_gemm_config
+  arch_scope: ''
+  evidence:
+  - '142: def get_gemm_config('
+  - '143:     config_name: str,'
+  - '144:     M: int,'
+  evidence_id: src_2a228a58ade64092
+- snapshot: aiter_a6bb4993
+  category: dispatch_padding
+  language: hip
+  file: csrc/py_itfs_cu/gemm_common.cu
+  line: 35
+  match: padded_m = 8192
+  captured:
+  - padded_m
+  - '8192'
+  arch_scope: ''
+  evidence:
+  - '33:     } else if (gl == 1) {'
+  - '34:         if (M > 8192 && N > 4096) {'
+  - '35:             padded_m = 8192;'
+  - '36:         } else {'
+  - '37:             padded_m = nextPow2(M);'
+  evidence_id: src_89521c1acfb179e9
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1629
+  match: __builtin_amdgcn_raw_buffer_load_b8  (
+  captured:
+  - load
+  - b8
+  arch_scope: ''
+  evidence:
+  - '1627:     OPUS_D auto _load(int v_os, int s_os = 0, number<aux> = {}) {'
+  - '1628:         using type = vector_type<vec>;'
+  - '1629:         if      constexpr (sizeof(type) == 1)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b8  (cached_rsrc,
+    v_os, s_os, aux)); }'
+  - '1630:         else if constexpr (sizeof(type) == 2)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b16
+    (cached_rsrc, v_os, s_os, aux)); }'
+  - '1631:         else if constexpr (sizeof(type) == 4)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b32
+    (cached_rsrc, v_os, s_os, aux)); }'
+  evidence_id: src_346f7832d20e8b1f
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1630
+  match: __builtin_amdgcn_raw_buffer_load_b16 (
+  captured:
+  - load
+  - b16
+  arch_scope: ''
+  evidence:
+  - '1628:         using type = vector_type<vec>;'
+  - '1629:         if      constexpr (sizeof(type) == 1)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b8  (cached_rsrc,
+    v_os, s_os, aux)); }'
+  - '1630:         else if constexpr (sizeof(type) == 2)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b16
+    (cached_rsrc, v_os, s_os, aux)); }'
+  - '1631:         else if constexpr (sizeof(type) == 4)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b32
+    (cached_rsrc, v_os, s_os, aux)); }'
+  - '1632:         else if constexpr (sizeof(type) == 8)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b64
+    (cached_rsrc, v_os, s_os, aux)); }'
+  evidence_id: src_bc9f33412a26dc2e
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1631
+  match: __builtin_amdgcn_raw_buffer_load_b32 (
+  captured:
+  - load
+  - b32
+  arch_scope: ''
+  evidence:
+  - '1629:         if      constexpr (sizeof(type) == 1)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b8  (cached_rsrc,
+    v_os, s_os, aux)); }'
+  - '1630:         else if constexpr (sizeof(type) == 2)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b16
+    (cached_rsrc, v_os, s_os, aux)); }'
+  - '1631:         else if constexpr (sizeof(type) == 4)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b32
+    (cached_rsrc, v_os, s_os, aux)); }'
+  - '1632:         else if constexpr (sizeof(type) == 8)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b64
+    (cached_rsrc, v_os, s_os, aux)); }'
+  - '1633:         else if constexpr (sizeof(type) == 16) { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b128(cached_rsrc,
+    v_os, s_os, aux)); }'
+  evidence_id: src_5718c1c2541d03c7
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1632
+  match: __builtin_amdgcn_raw_buffer_load_b64 (
+  captured:
+  - load
+  - b64
+  arch_scope: ''
+  evidence:
+  - '1630:         else if constexpr (sizeof(type) == 2)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b16
+    (cached_rsrc, v_os, s_os, aux)); }'
+  - '1631:         else if constexpr (sizeof(type) == 4)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b32
+    (cached_rsrc, v_os, s_os, aux)); }'
+  - '1632:         else if constexpr (sizeof(type) == 8)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b64
+    (cached_rsrc, v_os, s_os, aux)); }'
+  - '1633:         else if constexpr (sizeof(type) == 16) { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b128(cached_rsrc,
+    v_os, s_os, aux)); }'
+  - '1634:     }'
+  evidence_id: src_ed471ee7cb157c0b
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1633
+  match: __builtin_amdgcn_raw_buffer_load_b128(
+  captured:
+  - load
+  - b128
+  arch_scope: ''
+  evidence:
+  - '1631:         else if constexpr (sizeof(type) == 4)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b32
+    (cached_rsrc, v_os, s_os, aux)); }'
+  - '1632:         else if constexpr (sizeof(type) == 8)  { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b64
+    (cached_rsrc, v_os, s_os, aux)); }'
+  - '1633:         else if constexpr (sizeof(type) == 16) { return __builtin_bit_cast(type, __builtin_amdgcn_raw_buffer_load_b128(cached_rsrc,
+    v_os, s_os, aux)); }'
+  - '1634:     }'
+  evidence_id: src_e29f30b4b6f7e736
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1678
+  match: __builtin_amdgcn_raw_buffer_store_b8  (
+  captured:
+  - store
+  - b8
+  arch_scope: ''
+  evidence:
+  - '1676:     OPUS_D void _store(const V& x, int v_os, int s_os = 0, number<aux> = {}) {'
+  - '1677:         static_assert((vec * vector_size) == vector_traits<V>::size(), "vector size need to be same,
+    please check");'
+  - '1678:         if      constexpr (sizeof(vector_type<vec>) == 1)  { __builtin_amdgcn_raw_buffer_store_b8  (__builtin_bit_cast(i8_t,    x),
+    cached_rsrc, v_os, s_os, aux); }'
+  - '1679:         else if constexpr (sizeof(vector_type<vec>) == 2)  { __builtin_amdgcn_raw_buffer_store_b16
+    (__builtin_bit_cast(i16_t,   x), cached_rsrc, v_os, s_os, aux); }'
+  - '1680:         else if constexpr (sizeof(vector_type<vec>) == 4)  { __builtin_amdgcn_raw_buffer_store_b32
+    (__builtin_bit_cast(i32_t,   x), cached_rsrc, v_os, s_os, aux); }'
+  evidence_id: src_c5acc7ebc3d0f314
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1679
+  match: __builtin_amdgcn_raw_buffer_store_b16 (
+  captured:
+  - store
+  - b16
+  arch_scope: ''
+  evidence:
+  - '1677:         static_assert((vec * vector_size) == vector_traits<V>::size(), "vector size need to be same,
+    please check");'
+  - '1678:         if      constexpr (sizeof(vector_type<vec>) == 1)  { __builtin_amdgcn_raw_buffer_store_b8  (__builtin_bit_cast(i8_t,    x),
+    cached_rsrc, v_os, s_os, aux); }'
+  - '1679:         else if constexpr (sizeof(vector_type<vec>) == 2)  { __builtin_amdgcn_raw_buffer_store_b16
+    (__builtin_bit_cast(i16_t,   x), cached_rsrc, v_os, s_os, aux); }'
+  - '1680:         else if constexpr (sizeof(vector_type<vec>) == 4)  { __builtin_amdgcn_raw_buffer_store_b32
+    (__builtin_bit_cast(i32_t,   x), cached_rsrc, v_os, s_os, aux); }'
+  - '1681:         else if constexpr (sizeof(vector_type<vec>) == 8)  { __builtin_amdgcn_raw_buffer_store_b64
+    (__builtin_bit_cast(i32x2_t, x), cached_rsrc, v_os, s_os, aux); }'
+  evidence_id: src_c195604b7c93405d
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1680
+  match: __builtin_amdgcn_raw_buffer_store_b32 (
+  captured:
+  - store
+  - b32
+  arch_scope: ''
+  evidence:
+  - '1678:         if      constexpr (sizeof(vector_type<vec>) == 1)  { __builtin_amdgcn_raw_buffer_store_b8  (__builtin_bit_cast(i8_t,    x),
+    cached_rsrc, v_os, s_os, aux); }'
+  - '1679:         else if constexpr (sizeof(vector_type<vec>) == 2)  { __builtin_amdgcn_raw_buffer_store_b16
+    (__builtin_bit_cast(i16_t,   x), cached_rsrc, v_os, s_os, aux); }'
+  - '1680:         else if constexpr (sizeof(vector_type<vec>) == 4)  { __builtin_amdgcn_raw_buffer_store_b32
+    (__builtin_bit_cast(i32_t,   x), cached_rsrc, v_os, s_os, aux); }'
+  - '1681:         else if constexpr (sizeof(vector_type<vec>) == 8)  { __builtin_amdgcn_raw_buffer_store_b64
+    (__builtin_bit_cast(i32x2_t, x), cached_rsrc, v_os, s_os, aux); }'
+  - '1682:         else if constexpr (sizeof(vector_type<vec>) == 16) { __builtin_amdgcn_raw_buffer_store_b128(__builtin_bit_cast(i32x4_t,
+    x), cached_rsrc, v_os, s_os, aux); }'
+  evidence_id: src_7092b431e932b1d2
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1681
+  match: __builtin_amdgcn_raw_buffer_store_b64 (
+  captured:
+  - store
+  - b64
+  arch_scope: ''
+  evidence:
+  - '1679:         else if constexpr (sizeof(vector_type<vec>) == 2)  { __builtin_amdgcn_raw_buffer_store_b16
+    (__builtin_bit_cast(i16_t,   x), cached_rsrc, v_os, s_os, aux); }'
+  - '1680:         else if constexpr (sizeof(vector_type<vec>) == 4)  { __builtin_amdgcn_raw_buffer_store_b32
+    (__builtin_bit_cast(i32_t,   x), cached_rsrc, v_os, s_os, aux); }'
+  - '1681:         else if constexpr (sizeof(vector_type<vec>) == 8)  { __builtin_amdgcn_raw_buffer_store_b64
+    (__builtin_bit_cast(i32x2_t, x), cached_rsrc, v_os, s_os, aux); }'
+  - '1682:         else if constexpr (sizeof(vector_type<vec>) == 16) { __builtin_amdgcn_raw_buffer_store_b128(__builtin_bit_cast(i32x4_t,
+    x), cached_rsrc, v_os, s_os, aux); }'
+  - '1683:     }'
+  evidence_id: src_0914be88fea3d9ca
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1682
+  match: __builtin_amdgcn_raw_buffer_store_b128(
+  captured:
+  - store
+  - b128
+  arch_scope: ''
+  evidence:
+  - '1680:         else if constexpr (sizeof(vector_type<vec>) == 4)  { __builtin_amdgcn_raw_buffer_store_b32
+    (__builtin_bit_cast(i32_t,   x), cached_rsrc, v_os, s_os, aux); }'
+  - '1681:         else if constexpr (sizeof(vector_type<vec>) == 8)  { __builtin_amdgcn_raw_buffer_store_b64
+    (__builtin_bit_cast(i32x2_t, x), cached_rsrc, v_os, s_os, aux); }'
+  - '1682:         else if constexpr (sizeof(vector_type<vec>) == 16) { __builtin_amdgcn_raw_buffer_store_b128(__builtin_bit_cast(i32x4_t,
+    x), cached_rsrc, v_os, s_os, aux); }'
+  - '1683:     }'
+  evidence_id: src_17b0f5155728ac4f
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1515
+  match: __builtin_amdgcn_s_barrier(
+  captured:
+  - s_barrier
+  arch_scope: ''
+  evidence:
+  - '1513: OPUS_D index_t grid_size_y()  { return __builtin_amdgcn_grid_size_y(); }'
+  - '1514: OPUS_D index_t grid_size_z()  { return __builtin_amdgcn_grid_size_z(); }'
+  - '1515: OPUS_D void    sync_threads() { __builtin_amdgcn_s_barrier(); }'
+  - '1516: #if !defined(HIP_INCLUDE_HIP_AMD_DETAIL_DEVICE_LIBRARY_DECLS_H)'
+  - '1517: extern "C" __device__ int __ockl_wfall_i32(int);'
+  evidence_id: src_c978399c9187052e
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1534
+  match: __builtin_amdgcn_s_barrier(
+  captured:
+  - s_barrier
+  arch_scope: ''
+  evidence:
+  - '1532:     OPUS_D workgroup_barrier(unsigned int* ptr) : base_ptr(ptr) {}'
+  - '1533:     OPUS_D unsigned int ld(unsigned int offset = 0) { return __atomic_load_n(base_ptr + offset,
+    __ATOMIC_RELAXED); }'
+  - '1534:     OPUS_D void wait_eq(unsigned int value, unsigned int offset = 0) { if (__builtin_amdgcn_workitem_id_x()
+    == 0) while (ld(offset) != value) {} __builtin_amdgcn_s_barrier(); }'
+  - '1535:     OPUS_D void wait_lt(unsigned int value, unsigned int offset = 0) { if (__builtin_amdgcn_workitem_id_x()
+    == 0) while (ld(offset) < value) {} __builtin_amdgcn_s_barrier(); }'
+  - '1536:     OPUS_D void inc(unsigned int offset = 0) { __builtin_amdgcn_s_barrier(); if (__builtin_amdgcn_workitem_id_x()
+    == 0) __atomic_fetch_add(base_ptr + offset, 1u, __ATOMIC_RELAXED); }'
+  evidence_id: src_9b4d366c7b5b255e
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1535
+  match: __builtin_amdgcn_s_barrier(
+  captured:
+  - s_barrier
+  arch_scope: ''
+  evidence:
+  - '1533:     OPUS_D unsigned int ld(unsigned int offset = 0) { return __atomic_load_n(base_ptr + offset,
+    __ATOMIC_RELAXED); }'
+  - '1534:     OPUS_D void wait_eq(unsigned int value, unsigned int offset = 0) { if (__builtin_amdgcn_workitem_id_x()
+    == 0) while (ld(offset) != value) {} __builtin_amdgcn_s_barrier(); }'
+  - '1535:     OPUS_D void wait_lt(unsigned int value, unsigned int offset = 0) { if (__builtin_amdgcn_workitem_id_x()
+    == 0) while (ld(offset) < value) {} __builtin_amdgcn_s_barrier(); }'
+  - '1536:     OPUS_D void inc(unsigned int offset = 0) { __builtin_amdgcn_s_barrier(); if (__builtin_amdgcn_workitem_id_x()
+    == 0) __atomic_fetch_add(base_ptr + offset, 1u, __ATOMIC_RELAXED); }'
+  - '1537:     unsigned int* base_ptr;'
+  evidence_id: src_17637218952c3515
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 1536
+  match: __builtin_amdgcn_s_barrier(
+  captured:
+  - s_barrier
+  arch_scope: ''
+  evidence:
+  - '1534:     OPUS_D void wait_eq(unsigned int value, unsigned int offset = 0) { if (__builtin_amdgcn_workitem_id_x()
+    == 0) while (ld(offset) != value) {} __builtin_amdgcn_s_barrier(); }'
+  - '1535:     OPUS_D void wait_lt(unsigned int value, unsigned int offset = 0) { if (__builtin_amdgcn_workitem_id_x()
+    == 0) while (ld(offset) < value) {} __builtin_amdgcn_s_barrier(); }'
+  - '1536:     OPUS_D void inc(unsigned int offset = 0) { __builtin_amdgcn_s_barrier(); if (__builtin_amdgcn_workitem_id_x()
+    == 0) __atomic_fetch_add(base_ptr + offset, 1u, __ATOMIC_RELAXED); }'
+  - '1537:     unsigned int* base_ptr;'
+  - '1538: };'
+  evidence_id: src_be1beb46d4af7b27
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: hip
+  file: csrc/include/opus/opus.hpp
+  line: 2098
+  match: __builtin_amdgcn_s_waitcnt(
+  captured:
+  - s_waitcnt
+  arch_scope: ''
+  evidence:
+  - '2096: template <index_t vmcnt, index_t lgkmcnt, index_t expcnt = 7>'
+  - '2097: OPUS_D void s_waitcnt(number<vmcnt>, number<lgkmcnt>, number<expcnt> = {})'
+  - '2098: {   __builtin_amdgcn_s_waitcnt((((0b110000 & vmcnt) << (14 - 4)) | (0b1111 & vmcnt)) | ((0b111 &
+    expcnt) << 4) | ((0b1111 & lgkmcnt) << 8)); }'
+  - '2100: template <index_t vmcnt>   OPUS_D void s_waitcnt_vmcnt(number<vmcnt>) { s_waitcnt(number<vmcnt>{},
+    number<15>{}); }'
+  evidence_id: src_e431bd364220209b
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 105
+  match: preshuffle=
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '103:                         ", tileN=",'
+  - '104:                         cfg.tileN,'
+  - '105:                         ") or bias/preshuffle setting (preshuffle=",'
+  - '106:                         bpreshuffle,'
+  - '107:                         ", bias=",'
+  evidence_id: src_2616db93f0f6b2b7
+- snapshot: aiter_a6bb4993
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 185
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '183:     const auto& cfg     = it_kl->second;'
+  - '184:     const char* name    = cfg.knl_name.c_str();'
+  - '185:     const char* co_name = cfg.co_name.c_str();'
+  - '186:     SUBM                = cfg.tileM;'
+  - '187:     SUBN                = cfg.tileN;'
+  evidence_id: src_5644e26feb85e947
+- snapshot: aiter_a6bb4993
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 189
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '187:     SUBN                = cfg.tileN;'
+  - '189:     return &impl_ptr_map.get_or_create(name, [&]() { return AiterAsmKernel(name, co_name); });'
+  - '190: }'
+  evidence_id: src_d55ca2e78d9ed061
+- snapshot: aiter_a6bb4993
+  category: asm_launch
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 247
+  match: int gdx = (Ndim + SUBN - 1) / SUBN;
+  captured:
+  - (Ndim + SUBN - 1) / SUBN
+  arch_scope: ''
+  evidence:
+  - '245:     args.splitk              = split;'
+  - '246:     AiterAsmKernel* impl_ptr = get_or_load_kernel(name, config_map, SUBM, SUBN);'
+  - '248:     int gdx = (Ndim + SUBN - 1) / SUBN;'
+  - '249:     int gdy = (Mdim + SUBM - 1) / SUBM;'
+  evidence_id: src_680a902279bf0a09
+- snapshot: aiter_a6bb4993
+  category: asm_launch
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 249
+  match: int gdy = (Mdim + SUBM - 1) / SUBM;
+  captured:
+  - (Mdim + SUBM - 1) / SUBM
+  arch_scope: ''
+  evidence:
+  - '248:     int gdx = (Ndim + SUBN - 1) / SUBN;'
+  - '249:     int gdy = (Mdim + SUBM - 1) / SUBM;'
+  - '250:     int gdz = split;'
+  evidence_id: src_81323f080ddf3954
+- snapshot: aiter_a6bb4993
+  category: asm_launch
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 250
+  match: int gdz = split;
+  captured:
+  - split
+  arch_scope: ''
+  evidence:
+  - '248:     int gdx = (Ndim + SUBN - 1) / SUBN;'
+  - '249:     int gdy = (Mdim + SUBM - 1) / SUBM;'
+  - '250:     int gdz = split;'
+  - '252:     if(split > 1)'
+  evidence_id: src_4044f249c79abf90
+- snapshot: aiter_a6bb4993
+  category: asm_argblock
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 11
+  match: struct __attribute__((packed)) KernelArgs
+  captured:
+  - KernelArgs
+  arch_scope: ''
+  evidence:
+  - '9: #include <hip/hip_runtime.h>'
+  - '11: struct __attribute__((packed)) KernelArgs'
+  - '12: {'
+  - '13:     void* ptr_D;'
+  evidence_id: src_3af5d32be2dfccf0
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 186
+  match: SUBM                = cfg.tileM;
+  captured:
+  - cfg.tileM
+  arch_scope: ''
+  evidence:
+  - '184:     const char* name    = cfg.knl_name.c_str();'
+  - '185:     const char* co_name = cfg.co_name.c_str();'
+  - '186:     SUBM                = cfg.tileM;'
+  - '187:     SUBN                = cfg.tileN;'
+  evidence_id: src_974db2b22cb78ce8
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 187
+  match: SUBN                = cfg.tileN;
+  captured:
+  - cfg.tileN
+  arch_scope: ''
+  evidence:
+  - '185:     const char* co_name = cfg.co_name.c_str();'
+  - '186:     SUBM                = cfg.tileM;'
+  - '187:     SUBN                = cfg.tileN;'
+  - '189:     return &impl_ptr_map.get_or_create(name, [&]() { return AiterAsmKernel(name, co_name); });'
+  evidence_id: src_7d4df85e4aef983b
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 221
+  match: SUBM = 32;
+  captured:
+  - '32'
+  arch_scope: ''
+  evidence:
+  - '219:     int Kdim            = A->size(1);'
+  - '221:     unsigned int SUBM = 32;'
+  - '222:     unsigned int SUBN = 64;'
+  evidence_id: src_890c8cca27fe95ac
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 222
+  match: SUBN = 64;
+  captured:
+  - '64'
+  arch_scope: ''
+  evidence:
+  - '221:     unsigned int SUBM = 32;'
+  - '222:     unsigned int SUBN = 64;'
+  - '224:     KernelArgs args = {};'
+  evidence_id: src_458c16c50840a771
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 115
+  match: cfg.splitK
+  captured:
+  - splitK
+  arch_scope: ''
+  evidence:
+  - '113:                 selectedsplitK = splitk;'
+  - '114:                 selectedsplitK = std::min({selectedsplitK, 16, static_cast<int>(K / cfg.subK)});'
+  - '115:                 AITER_CHECK((selectedsplitK > 1 && cfg.splitK == 1) ||'
+  - '116:                                 (selectedsplitK <= 1 && cfg.splitK == 0),'
+  - '117:                             __func__,'
+  evidence_id: src_05e16505bb238998
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 116
+  match: cfg.splitK
+  captured:
+  - splitK
+  arch_scope: ''
+  evidence:
+  - '114:                 selectedsplitK = std::min({selectedsplitK, 16, static_cast<int>(K / cfg.subK)});'
+  - '115:                 AITER_CHECK((selectedsplitK > 1 && cfg.splitK == 1) ||'
+  - '116:                                 (selectedsplitK <= 1 && cfg.splitK == 0),'
+  - '117:                             __func__,'
+  - '118:                             " The specified splitK ",'
+  evidence_id: src_33ed168f12674807
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 133
+  match: cfg.splitK
+  captured:
+  - splitK
+  arch_scope: ''
+  evidence:
+  - '131:             int split_K = 1;'
+  - '132:             pure_tg_num = ((M + cfg.tileM - 1) / cfg.tileM) * (N / cfg.tileN);'
+  - '133:             if(cfg.splitK == 1 && K / cfg.subK >= 2) // kernel and Kdim support splitk'
+  - '134:             {'
+  - '135:                 AITER_CHECK(cfg.subK > 0,'
+  evidence_id: src_7a432565c23ef5f9
+- snapshot: aiter_a6bb4993
+  category: grid_fill
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 145
+  match: local_round = (tg_num + num_cu - 1) / num_cu
+  captured:
+  - local_round
+  - tg_num
+  - num_cu
+  arch_scope: ''
+  evidence:
+  - '143:             // 2. better or not'
+  - '144:             uint32_t tg_num      = pure_tg_num * split_K;'
+  - '145:             uint32_t local_round = (tg_num + num_cu - 1) / num_cu;'
+  - '146:             float local_compute2mem_effi ='
+  - '147:                 static_cast<float>(cfg.tileM * cfg.tileN) / (cfg.tileM + cfg.tileN);'
+  evidence_id: src_c2ed9024f2039d1f
+- snapshot: aiter_a6bb4993
+  category: grid_fill
+  language: asm
+  file: csrc/py_itfs_cu/asm_gemm_a16w16.cu
+  line: 138
+  match: "max_splitk = std::min(std::min(static_cast<int>(num_cu / pure_tg_num), 16),\n                   \
+    \                       static_cast<int>(K / cfg.subK));"
+  captured:
+  - max_splitk
+  - "std::min(std::min(static_cast<int>(num_cu / pure_tg_num), 16),\n                                     \
+    \     static_cast<int>(K / cfg.subK))"
+  arch_scope: ''
+  evidence:
+  - '136:                     __func__,'
+  - '137:                     " cfg.subK must be greater than 0 to avoid division by zero.");'
+  - '138:                 int max_splitk = std::min(std::min(static_cast<int>(num_cu / pure_tg_num), 16),'
+  - '139:                                           static_cast<int>(K / cfg.subK));'
+  - '140:                 split_K ='
+  evidence_id: src_787ebf8727d0c7e1
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 2
+  match: _ZN5aiter43bf16gemm_fp32bf16_tn_128x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk.co,1,128,64,0,1,0,64,1
+  captured:
+  - tn=1
+  - tile_m=128
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '2: _ZN5aiter43bf16gemm_fp32bf16_tn_128x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk.co,1,128,64,0,1,0,64,1'
+  evidence_id: src_f489a24ab705ccea
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 3
+  match: _ZN5aiter43bf16gemm_fp32bf16_tn_160x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk.co,1,160,64,0,1,0,64,1
+  captured:
+  - tn=1
+  - tile_m=160
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '3: _ZN5aiter43bf16gemm_fp32bf16_tn_160x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk.co,1,160,64,0,1,0,64,1'
+  evidence_id: src_f117496fe7876408
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 4
+  match: _ZN5aiter42bf16gemm_fp32bf16_tn_32x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_32x64_bshuffle_splitk.co,1,32,64,0,1,0,64,1
+  captured:
+  - tn=1
+  - tile_m=32
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '4: _ZN5aiter42bf16gemm_fp32bf16_tn_32x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_32x64_bshuffle_splitk.co,1,32,64,0,1,0,64,1'
+  evidence_id: src_99f06e5230295387
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 5
+  match: _ZN5aiter37bf16gemm_fp32bf16_tn_32x64_pf3_splitkE,bf16gemm_fp32bf16_tn_32x64_pf3_splitk.co,1,32,64,3,0,0,64,1
+  captured:
+  - tn=1
+  - tile_m=32
+  - tile_n=64
+  - prefetch=3
+  - bpreshuffle=0
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '5: _ZN5aiter37bf16gemm_fp32bf16_tn_32x64_pf3_splitkE,bf16gemm_fp32bf16_tn_32x64_pf3_splitk.co,1,32,64,3,0,0,64,1'
+  evidence_id: src_c5fde22d2eac3c08
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 6
+  match: _ZN5aiter42bf16gemm_fp32bf16_tn_48x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_48x64_bshuffle_splitk.co,1,48,64,0,1,0,64,1
+  captured:
+  - tn=1
+  - tile_m=48
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '6: _ZN5aiter42bf16gemm_fp32bf16_tn_48x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_48x64_bshuffle_splitk.co,1,48,64,0,1,0,64,1'
+  evidence_id: src_88511cb62de00bfb
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 7
+  match: _ZN5aiter37bf16gemm_fp32bf16_tn_48x64_pf3_splitkE,bf16gemm_fp32bf16_tn_48x64_pf3_splitk.co,1,48,64,3,0,0,64,1
+  captured:
+  - tn=1
+  - tile_m=48
+  - tile_n=64
+  - prefetch=3
+  - bpreshuffle=0
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '7: _ZN5aiter37bf16gemm_fp32bf16_tn_48x64_pf3_splitkE,bf16gemm_fp32bf16_tn_48x64_pf3_splitk.co,1,48,64,3,0,0,64,1'
+  evidence_id: src_86f6983a5bd21610
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 8
+  match: _ZN5aiter42bf16gemm_fp32bf16_tn_64x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_64x64_bshuffle_splitk.co,1,64,64,0,1,0,64,1
+  captured:
+  - tn=1
+  - tile_m=64
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '8: _ZN5aiter42bf16gemm_fp32bf16_tn_64x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_64x64_bshuffle_splitk.co,1,64,64,0,1,0,64,1'
+  evidence_id: src_2bf2615ceb9e11b1
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 9
+  match: _ZN5aiter37bf16gemm_fp32bf16_tn_64x64_pf3_splitkE,bf16gemm_fp32bf16_tn_64x64_pf3_splitk.co,1,64,64,3,0,0,64,1
+  captured:
+  - tn=1
+  - tile_m=64
+  - tile_n=64
+  - prefetch=3
+  - bpreshuffle=0
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '9: _ZN5aiter37bf16gemm_fp32bf16_tn_64x64_pf3_splitkE,bf16gemm_fp32bf16_tn_64x64_pf3_splitk.co,1,64,64,3,0,0,64,1'
+  evidence_id: src_837b99c6ee5ac9e6
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 10
+  match: _ZN5aiter42bf16gemm_fp32bf16_tn_96x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_96x64_bshuffle_splitk.co,1,96,64,0,1,0,64,1
+  captured:
+  - tn=1
+  - tile_m=96
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '10: _ZN5aiter42bf16gemm_fp32bf16_tn_96x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_96x64_bshuffle_splitk.co,1,96,64,0,1,0,64,1'
+  evidence_id: src_29b693f6e7e3e98b
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 11
+  match: _ZN5aiter37bf16gemm_fp32bf16_tn_96x64_pf3_splitkE,bf16gemm_fp32bf16_tn_96x64_pf3_splitk.co,1,96,64,3,0,0,64,1
+  captured:
+  - tn=1
+  - tile_m=96
+  - tile_n=64
+  - prefetch=3
+  - bpreshuffle=0
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '11: _ZN5aiter37bf16gemm_fp32bf16_tn_96x64_pf3_splitkE,bf16gemm_fp32bf16_tn_96x64_pf3_splitk.co,1,96,64,3,0,0,64,1'
+  evidence_id: src_a6fb8ada0619c9f0
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 12
+  match: _ZN5aiter49bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk_clean.co,1,128,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=128
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '12: _ZN5aiter49bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk_clean.co,1,128,64,0,1,1,64,1'
+  evidence_id: src_8b7a84f993b7dec9
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 13
+  match: _ZN5aiter48bf16gemm_fp32bf16_tn_32x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_32x64_bshuffle_splitk_clean.co,1,32,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=32
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '13: _ZN5aiter48bf16gemm_fp32bf16_tn_32x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_32x64_bshuffle_splitk_clean.co,1,32,64,0,1,1,64,1'
+  evidence_id: src_a8f21f24fba2114f
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 14
+  match: _ZN5aiter48bf16gemm_fp32bf16_tn_48x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_48x64_bshuffle_splitk_clean.co,1,48,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=48
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '14: _ZN5aiter48bf16gemm_fp32bf16_tn_48x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_48x64_bshuffle_splitk_clean.co,1,48,64,0,1,1,64,1'
+  evidence_id: src_d1313b921b8ee08b
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 15
+  match: _ZN5aiter48bf16gemm_fp32bf16_tn_64x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_64x64_bshuffle_splitk_clean.co,1,64,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=64
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '15: _ZN5aiter48bf16gemm_fp32bf16_tn_64x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_64x64_bshuffle_splitk_clean.co,1,64,64,0,1,1,64,1'
+  evidence_id: src_80d586951c80d660
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 16
+  match: _ZN5aiter48bf16gemm_fp32bf16_tn_80x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_80x64_bshuffle_splitk_clean.co,1,80,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=80
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '16: _ZN5aiter48bf16gemm_fp32bf16_tn_80x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_80x64_bshuffle_splitk_clean.co,1,80,64,0,1,1,64,1'
+  evidence_id: src_6ca0537fd6cd1978
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 17
+  match: _ZN5aiter48bf16gemm_fp32bf16_tn_96x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_96x64_bshuffle_splitk_clean.co,1,96,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=96
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '17: _ZN5aiter48bf16gemm_fp32bf16_tn_96x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_96x64_bshuffle_splitk_clean.co,1,96,64,0,1,1,64,1'
+  evidence_id: src_8f8df6ee7efb7c82
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 18
+  match: _ZN5aiter39bf16gemm_fp32bf16_tn_96x64_splitk_cleanE,bf16gemm_fp32bf16_tn_96x64_splitk_clean.co,1,96,64,0,0,1,64,1
+  captured:
+  - tn=1
+  - tile_m=96
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=0
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '18: _ZN5aiter39bf16gemm_fp32bf16_tn_96x64_splitk_cleanE,bf16gemm_fp32bf16_tn_96x64_splitk_clean.co,1,96,64,0,0,1,64,1'
+  evidence_id: src_14f80ee89cfb86ac
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 19
+  match: _ZN5aiter49bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk_clean.co,1,160,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=160
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '19: _ZN5aiter49bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk_clean.co,1,160,64,0,1,1,64,1'
+  evidence_id: src_a08746e8d51c64a4
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 20
+  match: _ZN5aiter39bf16gemm_fp32bf16_tn_32x64_splitk_cleanE,bf16gemm_fp32bf16_tn_32x64_splitk_clean.co,1,32,64,0,0,1,64,1
+  captured:
+  - tn=1
+  - tile_m=32
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=0
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '20: _ZN5aiter39bf16gemm_fp32bf16_tn_32x64_splitk_cleanE,bf16gemm_fp32bf16_tn_32x64_splitk_clean.co,1,32,64,0,0,1,64,1'
+  evidence_id: src_c1a5c947fe3c46a6
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 21
+  match: _ZN5aiter39bf16gemm_fp32bf16_tn_48x64_splitk_cleanE,bf16gemm_fp32bf16_tn_48x64_splitk_clean.co,1,48,64,0,0,1,64,1
+  captured:
+  - tn=1
+  - tile_m=48
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=0
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '21: _ZN5aiter39bf16gemm_fp32bf16_tn_48x64_splitk_cleanE,bf16gemm_fp32bf16_tn_48x64_splitk_clean.co,1,48,64,0,0,1,64,1'
+  evidence_id: src_7ad4d441618deaa9
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 22
+  match: _ZN5aiter39bf16gemm_fp32bf16_tn_64x64_splitk_cleanE,bf16gemm_fp32bf16_tn_64x64_splitk_clean.co,1,64,64,0,0,1,64,1
+  captured:
+  - tn=1
+  - tile_m=64
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=0
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '22: _ZN5aiter39bf16gemm_fp32bf16_tn_64x64_splitk_cleanE,bf16gemm_fp32bf16_tn_64x64_splitk_clean.co,1,64,64,0,0,1,64,1'
+  evidence_id: src_ce3b476f93adb8a9
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 23
+  match: _ZN5aiter39bf16gemm_fp32bf16_tn_80x64_splitk_cleanE,bf16gemm_fp32bf16_tn_80x64_splitk_clean.co,1,80,64,0,0,1,64,1
+  captured:
+  - tn=1
+  - tile_m=80
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=0
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx942
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '23: _ZN5aiter39bf16gemm_fp32bf16_tn_80x64_splitk_cleanE,bf16gemm_fp32bf16_tn_80x64_splitk_clean.co,1,80,64,0,0,1,64,1'
+  evidence_id: src_36b897fbe9709603
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 2
+  match: 112,256,0,1,_ZN5aiter42I8gemm_bf16_perTokenI8_BpreShuffle_112x256E,I8gemm_bf16_perTokenI8_BpreShuffle_112x256.co
+  captured:
+  - tile_m=112
+  - tile_n=256
+  - split_k_capable=0
+  - bpreshuffle=1
+  arch_scope: gfx942
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '2: 112,256,0,1,_ZN5aiter42I8gemm_bf16_perTokenI8_BpreShuffle_112x256E,I8gemm_bf16_perTokenI8_BpreShuffle_112x256.co'
+  evidence_id: src_04535bb7d448e51d
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 3
+  match: 32,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_32x128E,I8gemm_bf16_perTokenI8_BpreShuffle_32x128.co
+  captured:
+  - tile_m=32
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx942
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '3: 32,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_32x128E,I8gemm_bf16_perTokenI8_BpreShuffle_32x128.co'
+  evidence_id: src_8a8e1b431c43ca1c
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 4
+  match: 48,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_48x128E,I8gemm_bf16_perTokenI8_BpreShuffle_48x128.co
+  captured:
+  - tile_m=48
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx942
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '4: 48,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_48x128E,I8gemm_bf16_perTokenI8_BpreShuffle_48x128.co'
+  evidence_id: src_4a10625779e3e502
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 5
+  match: 128,128,1,1,_ZN5aiter42I8gemm_bf16_perTokenI8_BpreShuffle_128x128E,I8gemm_bf16_perTokenI8_BpreShuffle_128x128.co
+  captured:
+  - tile_m=128
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx942
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '5: 128,128,1,1,_ZN5aiter42I8gemm_bf16_perTokenI8_BpreShuffle_128x128E,I8gemm_bf16_perTokenI8_BpreShuffle_128x128.co'
+  evidence_id: src_3b1c5947405c3ef7
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 6
+  match: 160,128,1,1,_ZN5aiter42I8gemm_bf16_perTokenI8_BpreShuffle_160x128E,I8gemm_bf16_perTokenI8_BpreShuffle_160x128.co
+  captured:
+  - tile_m=160
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx942
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '6: 160,128,1,1,_ZN5aiter42I8gemm_bf16_perTokenI8_BpreShuffle_160x128E,I8gemm_bf16_perTokenI8_BpreShuffle_160x128.co'
+  evidence_id: src_87201f99d400d41f
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 7
+  match: 64,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_64x128E,I8gemm_bf16_perTokenI8_BpreShuffle_64x128.co
+  captured:
+  - tile_m=64
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx942
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '7: 64,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_64x128E,I8gemm_bf16_perTokenI8_BpreShuffle_64x128.co'
+  evidence_id: src_b13798126e58eef3
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 8
+  match: 80,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_80x128E,I8gemm_bf16_perTokenI8_BpreShuffle_80x128.co
+  captured:
+  - tile_m=80
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx942
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '8: 80,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_80x128E,I8gemm_bf16_perTokenI8_BpreShuffle_80x128.co'
+  evidence_id: src_e9bf47b974e44f53
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 9
+  match: 96,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_96x128E,I8gemm_bf16_perTokenI8_BpreShuffle_96x128.co
+  captured:
+  - tile_m=96
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx942
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '9: 96,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_96x128E,I8gemm_bf16_perTokenI8_BpreShuffle_96x128.co'
+  evidence_id: src_3ca89354f31b31da
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx942/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 10
+  match: 16,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_16x128E,I8gemm_bf16_perTokenI8_BpreShuffle_16x128.co
+  captured:
+  - tile_m=16
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx942
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '10: 16,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_16x128E,I8gemm_bf16_perTokenI8_BpreShuffle_16x128.co'
+  evidence_id: src_1709d4f3038afac9
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 2
+  match: _ZN5aiter36bf16gemm_bf16_tn_256x256_bpreshuffleE,bf16gemm_bf16_tn_256x256_bpreshuffle.co,1,256,256,0,1,0,64,0
+  captured:
+  - tn=1
+  - tile_m=256
+  - tile_n=256
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=0
+  - sub_k=64
+  - bias=0
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '2: _ZN5aiter36bf16gemm_bf16_tn_256x256_bpreshuffleE,bf16gemm_bf16_tn_256x256_bpreshuffle.co,1,256,256,0,1,0,64,0'
+  evidence_id: src_a1fd64c98e9fb92c
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 3
+  match: _ZN5aiter24bf16gemm_bf16_tn_256x256E,bf16gemm_bf16_tn_256x256.co,1,256,256,0,0,0,64,0
+  captured:
+  - tn=1
+  - tile_m=256
+  - tile_n=256
+  - prefetch=0
+  - bpreshuffle=0
+  - split_k_capable=0
+  - sub_k=64
+  - bias=0
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '3: _ZN5aiter24bf16gemm_bf16_tn_256x256E,bf16gemm_bf16_tn_256x256.co,1,256,256,0,0,0,64,0'
+  evidence_id: src_d3a5f9d10f5d5132
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 4
+  match: _ZN5aiter43bf16gemm_fp32bf16_tn_128x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk.co,1,128,64,0,1,0,64,1
+  captured:
+  - tn=1
+  - tile_m=128
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '4: _ZN5aiter43bf16gemm_fp32bf16_tn_128x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk.co,1,128,64,0,1,0,64,1'
+  evidence_id: src_ccc9e2bcad7b2f6b
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 5
+  match: _ZN5aiter43bf16gemm_fp32bf16_tn_160x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk.co,1,160,64,0,1,0,64,1
+  captured:
+  - tn=1
+  - tile_m=160
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '5: _ZN5aiter43bf16gemm_fp32bf16_tn_160x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk.co,1,160,64,0,1,0,64,1'
+  evidence_id: src_d6ec1c61855545a7
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 6
+  match: _ZN5aiter42bf16gemm_fp32bf16_tn_32x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_32x64_bshuffle_splitk.co,1,32,64,0,1,0,64,1
+  captured:
+  - tn=1
+  - tile_m=32
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '6: _ZN5aiter42bf16gemm_fp32bf16_tn_32x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_32x64_bshuffle_splitk.co,1,32,64,0,1,0,64,1'
+  evidence_id: src_69977da0aa075e6e
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 7
+  match: _ZN5aiter37bf16gemm_fp32bf16_tn_32x64_pf3_splitkE,bf16gemm_fp32bf16_tn_32x64_pf3_splitk.co,1,32,64,3,0,0,64,1
+  captured:
+  - tn=1
+  - tile_m=32
+  - tile_n=64
+  - prefetch=3
+  - bpreshuffle=0
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '7: _ZN5aiter37bf16gemm_fp32bf16_tn_32x64_pf3_splitkE,bf16gemm_fp32bf16_tn_32x64_pf3_splitk.co,1,32,64,3,0,0,64,1'
+  evidence_id: src_f1e48f9dab72a7ad
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 8
+  match: _ZN5aiter42bf16gemm_fp32bf16_tn_48x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_48x64_bshuffle_splitk.co,1,48,64,0,1,0,64,1
+  captured:
+  - tn=1
+  - tile_m=48
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '8: _ZN5aiter42bf16gemm_fp32bf16_tn_48x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_48x64_bshuffle_splitk.co,1,48,64,0,1,0,64,1'
+  evidence_id: src_35197777c584e30b
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 9
+  match: _ZN5aiter37bf16gemm_fp32bf16_tn_48x64_pf3_splitkE,bf16gemm_fp32bf16_tn_48x64_pf3_splitk.co,1,48,64,3,0,0,64,1
+  captured:
+  - tn=1
+  - tile_m=48
+  - tile_n=64
+  - prefetch=3
+  - bpreshuffle=0
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '9: _ZN5aiter37bf16gemm_fp32bf16_tn_48x64_pf3_splitkE,bf16gemm_fp32bf16_tn_48x64_pf3_splitk.co,1,48,64,3,0,0,64,1'
+  evidence_id: src_8e956a43d37bc5ef
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 10
+  match: _ZN5aiter42bf16gemm_fp32bf16_tn_64x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_64x64_bshuffle_splitk.co,1,64,64,0,1,0,64,1
+  captured:
+  - tn=1
+  - tile_m=64
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '10: _ZN5aiter42bf16gemm_fp32bf16_tn_64x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_64x64_bshuffle_splitk.co,1,64,64,0,1,0,64,1'
+  evidence_id: src_fd4245a677d3e350
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 11
+  match: _ZN5aiter37bf16gemm_fp32bf16_tn_64x64_pf3_splitkE,bf16gemm_fp32bf16_tn_64x64_pf3_splitk.co,1,64,64,3,0,0,64,1
+  captured:
+  - tn=1
+  - tile_m=64
+  - tile_n=64
+  - prefetch=3
+  - bpreshuffle=0
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '11: _ZN5aiter37bf16gemm_fp32bf16_tn_64x64_pf3_splitkE,bf16gemm_fp32bf16_tn_64x64_pf3_splitk.co,1,64,64,3,0,0,64,1'
+  evidence_id: src_3d943ee2f91b9a96
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 12
+  match: _ZN5aiter42bf16gemm_fp32bf16_tn_96x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_96x64_bshuffle_splitk.co,1,96,64,0,1,0,64,1
+  captured:
+  - tn=1
+  - tile_m=96
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '12: _ZN5aiter42bf16gemm_fp32bf16_tn_96x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_96x64_bshuffle_splitk.co,1,96,64,0,1,0,64,1'
+  evidence_id: src_055b3f50b3c7f65a
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 13
+  match: _ZN5aiter37bf16gemm_fp32bf16_tn_96x64_pf3_splitkE,bf16gemm_fp32bf16_tn_96x64_pf3_splitk.co,1,96,64,3,0,0,64,1
+  captured:
+  - tn=1
+  - tile_m=96
+  - tile_n=64
+  - prefetch=3
+  - bpreshuffle=0
+  - split_k_capable=0
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '13: _ZN5aiter37bf16gemm_fp32bf16_tn_96x64_pf3_splitkE,bf16gemm_fp32bf16_tn_96x64_pf3_splitk.co,1,96,64,3,0,0,64,1'
+  evidence_id: src_a90be06d3ba04802
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 14
+  match: _ZN5aiter49bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk_clean.co,1,128,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=128
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '14: _ZN5aiter49bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk_clean.co,1,128,64,0,1,1,64,1'
+  evidence_id: src_8f791c76dfc8717d
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 15
+  match: _ZN5aiter48bf16gemm_fp32bf16_tn_32x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_32x64_bshuffle_splitk_clean.co,1,32,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=32
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '15: _ZN5aiter48bf16gemm_fp32bf16_tn_32x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_32x64_bshuffle_splitk_clean.co,1,32,64,0,1,1,64,1'
+  evidence_id: src_d5cc78787d870e04
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 16
+  match: _ZN5aiter48bf16gemm_fp32bf16_tn_48x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_48x64_bshuffle_splitk_clean.co,1,48,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=48
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '16: _ZN5aiter48bf16gemm_fp32bf16_tn_48x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_48x64_bshuffle_splitk_clean.co,1,48,64,0,1,1,64,1'
+  evidence_id: src_65e1a395b5fa2956
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 17
+  match: _ZN5aiter48bf16gemm_fp32bf16_tn_64x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_64x64_bshuffle_splitk_clean.co,1,64,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=64
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '17: _ZN5aiter48bf16gemm_fp32bf16_tn_64x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_64x64_bshuffle_splitk_clean.co,1,64,64,0,1,1,64,1'
+  evidence_id: src_563cf62673de2ef6
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 18
+  match: _ZN5aiter48bf16gemm_fp32bf16_tn_80x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_80x64_bshuffle_splitk_clean.co,1,80,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=80
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '18: _ZN5aiter48bf16gemm_fp32bf16_tn_80x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_80x64_bshuffle_splitk_clean.co,1,80,64,0,1,1,64,1'
+  evidence_id: src_6797f3d2efdc2f73
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 19
+  match: _ZN5aiter48bf16gemm_fp32bf16_tn_96x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_96x64_bshuffle_splitk_clean.co,1,96,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=96
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '19: _ZN5aiter48bf16gemm_fp32bf16_tn_96x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_96x64_bshuffle_splitk_clean.co,1,96,64,0,1,1,64,1'
+  evidence_id: src_103cd842e11a90c7
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 20
+  match: _ZN5aiter39bf16gemm_fp32bf16_tn_96x64_splitk_cleanE,bf16gemm_fp32bf16_tn_96x64_splitk_clean.co,1,96,64,0,0,1,64,1
+  captured:
+  - tn=1
+  - tile_m=96
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=0
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '20: _ZN5aiter39bf16gemm_fp32bf16_tn_96x64_splitk_cleanE,bf16gemm_fp32bf16_tn_96x64_splitk_clean.co,1,96,64,0,0,1,64,1'
+  evidence_id: src_8d7976b8188e9a3a
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 21
+  match: _ZN5aiter49bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk_clean.co,1,160,64,0,1,1,64,1
+  captured:
+  - tn=1
+  - tile_m=160
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=1
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '21: _ZN5aiter49bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk_cleanE,bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk_clean.co,1,160,64,0,1,1,64,1'
+  evidence_id: src_55bcfb1f04fed8c5
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 22
+  match: _ZN5aiter39bf16gemm_fp32bf16_tn_32x64_splitk_cleanE,bf16gemm_fp32bf16_tn_32x64_splitk_clean.co,1,32,64,0,0,1,64,1
+  captured:
+  - tn=1
+  - tile_m=32
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=0
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '22: _ZN5aiter39bf16gemm_fp32bf16_tn_32x64_splitk_cleanE,bf16gemm_fp32bf16_tn_32x64_splitk_clean.co,1,32,64,0,0,1,64,1'
+  evidence_id: src_659c31533c7af04a
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 23
+  match: _ZN5aiter39bf16gemm_fp32bf16_tn_48x64_splitk_cleanE,bf16gemm_fp32bf16_tn_48x64_splitk_clean.co,1,48,64,0,0,1,64,1
+  captured:
+  - tn=1
+  - tile_m=48
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=0
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '23: _ZN5aiter39bf16gemm_fp32bf16_tn_48x64_splitk_cleanE,bf16gemm_fp32bf16_tn_48x64_splitk_clean.co,1,48,64,0,0,1,64,1'
+  evidence_id: src_6db13fda596d5fe5
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 24
+  match: _ZN5aiter39bf16gemm_fp32bf16_tn_64x64_splitk_cleanE,bf16gemm_fp32bf16_tn_64x64_splitk_clean.co,1,64,64,0,0,1,64,1
+  captured:
+  - tn=1
+  - tile_m=64
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=0
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '24: _ZN5aiter39bf16gemm_fp32bf16_tn_64x64_splitk_cleanE,bf16gemm_fp32bf16_tn_64x64_splitk_clean.co,1,64,64,0,0,1,64,1'
+  evidence_id: src_8b2c3fc4811126f1
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/bf16gemm/bf16gemm_fp32bf16.csv
+  line: 25
+  match: _ZN5aiter39bf16gemm_fp32bf16_tn_80x64_splitk_cleanE,bf16gemm_fp32bf16_tn_80x64_splitk_clean.co,1,80,64,0,0,1,64,1
+  captured:
+  - tn=1
+  - tile_m=80
+  - tile_n=64
+  - prefetch=0
+  - bpreshuffle=0
+  - split_k_capable=1
+  - sub_k=64
+  - bias=1
+  arch_scope: gfx950
+  evidence:
+  - '1: knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias'
+  - '25: _ZN5aiter39bf16gemm_fp32bf16_tn_80x64_splitk_cleanE,bf16gemm_fp32bf16_tn_80x64_splitk_clean.co,1,80,64,0,0,1,64,1'
+  evidence_id: src_5b546a41b096e864
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 2
+  match: 16,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_16x128E,I8gemm_bf16_perTokenI8_BpreShuffle_16x128.co
+  captured:
+  - tile_m=16
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx950
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '2: 16,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_16x128E,I8gemm_bf16_perTokenI8_BpreShuffle_16x128.co'
+  evidence_id: src_31a412b93ea1ad16
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 3
+  match: 32,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_32x128E,I8gemm_bf16_perTokenI8_BpreShuffle_32x128.co
+  captured:
+  - tile_m=32
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx950
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '3: 32,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_32x128E,I8gemm_bf16_perTokenI8_BpreShuffle_32x128.co'
+  evidence_id: src_b37f02cf3615a3d7
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 4
+  match: 48,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_48x128E,I8gemm_bf16_perTokenI8_BpreShuffle_48x128.co
+  captured:
+  - tile_m=48
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx950
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '4: 48,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_48x128E,I8gemm_bf16_perTokenI8_BpreShuffle_48x128.co'
+  evidence_id: src_3e3b9c2b0ca6c30e
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 5
+  match: 64,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_64x128E,I8gemm_bf16_perTokenI8_BpreShuffle_64x128.co
+  captured:
+  - tile_m=64
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx950
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '5: 64,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_64x128E,I8gemm_bf16_perTokenI8_BpreShuffle_64x128.co'
+  evidence_id: src_ef004d937d7c388a
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 6
+  match: 80,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_80x128E,I8gemm_bf16_perTokenI8_BpreShuffle_80x128.co
+  captured:
+  - tile_m=80
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx950
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '6: 80,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_80x128E,I8gemm_bf16_perTokenI8_BpreShuffle_80x128.co'
+  evidence_id: src_7a13e6c8f35997b6
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 7
+  match: 96,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_96x128E,I8gemm_bf16_perTokenI8_BpreShuffle_96x128.co
+  captured:
+  - tile_m=96
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx950
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '7: 96,128,1,1,_ZN5aiter41I8gemm_bf16_perTokenI8_BpreShuffle_96x128E,I8gemm_bf16_perTokenI8_BpreShuffle_96x128.co'
+  evidence_id: src_36d23210e5cfb7f3
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 8
+  match: 128,128,1,1,_ZN5aiter42I8gemm_bf16_perTokenI8_BpreShuffle_128x128E,I8gemm_bf16_perTokenI8_BpreShuffle_128x128.co
+  captured:
+  - tile_m=128
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx950
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '8: 128,128,1,1,_ZN5aiter42I8gemm_bf16_perTokenI8_BpreShuffle_128x128E,I8gemm_bf16_perTokenI8_BpreShuffle_128x128.co'
+  evidence_id: src_e150bed2f59fc198
+- snapshot: aiter_a6bb4993
+  category: asm_tile
+  language: asm
+  file: hsa/gfx950/i8gemm/i8gemm_bf16_perTokenI8.csv
+  line: 9
+  match: 160,128,1,1,_ZN5aiter42I8gemm_bf16_perTokenI8_BpreShuffle_160x128E,I8gemm_bf16_perTokenI8_BpreShuffle_160x128.co
+  captured:
+  - tile_m=160
+  - tile_n=128
+  - split_k_capable=1
+  - bpreshuffle=1
+  arch_scope: gfx950
+  evidence:
+  - '1: tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name'
+  - '9: 160,128,1,1,_ZN5aiter42I8gemm_bf16_perTokenI8_BpreShuffle_160x128E,I8gemm_bf16_perTokenI8_BpreShuffle_160x128.co'
+  evidence_id: src_966e720792bbc0b5
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: asm
+  file: aiter/tuned_gemm.py
+  line: 172
+  match: '["libtype"] = "asm"'
+  captured:
+  - asm
+  arch_scope: ''
+  evidence:
+  - '167:                 eval(dtype) == dtypes.bf16'
+  - '168:                 and N % 64 == 0'
+  - '169:                 and K % 64 == 0'
+  - '170:                 and (eval(otype) == dtypes.bf16 or eval(otype) == dtypes.fp32)'
+  - '171:             ):'
+  - '172:                 default_config["libtype"] = "asm"'
+  - '173:                 default_config["solidx"] = 0'
+  evidence_id: src_57c3a751ec4ad78b
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: hip
+  file: aiter/tuned_gemm.py
+  line: 182
+  match: '["libtype"] = "skinny"'
+  captured:
+  - skinny
+  arch_scope: ''
+  evidence:
+  - '177:                 assert ('
+  - '178:                     False'
+  - '179:                 ), f"no solution for {M=} {N=} {K=} {dtype=} {bias=}, {scaleAB=}, {bpreshuffle=}"'
+  - '180:         elif is_skinny_default_shape(M, N, K, dtype, cu_num):'
+  - '181:             # soltype, solution_idx = 3, 2'
+  - '182:             default_config["libtype"] = "skinny"'
+  - '183:             default_config["solidx"] = 2'
+  evidence_id: src_07dceb286dc43c55
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: flydsl
+  file: aiter/tuned_gemm.py
+  line: 133
+  end_line: 141
+  match: libtype"] == "flydsl"
+  captured:
+  - flydsl
+  arch_scope: ''
+  evidence:
+  - '128:                 bpreshuffle,'
+  - '129:             ),'
+  - '130:             None,'
+  - '131:         )'
+  - '132:         if config is not None:'
+  - '133:             if config["libtype"] == "flydsl":'
+  - '134:                 if is_flydsl_available():'
+  evidence_id: src_c9b676e9661f7f1e
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: flydsl
+  file: aiter/tuned_gemm.py
+  line: 282
+  end_line: 297
+  match: libtype"] == "flydsl"
+  captured:
+  - flydsl
+  arch_scope: ''
+  evidence:
+  - '277:         dtype=str(inp_view.dtype),'
+  - '278:         otype=str(otype),'
+  - '279:         scaleAB=scale_a is not None or scale_b is not None,'
+  - '280:         bpreshuffle=bpreshuffle,'
+  - '281:     )'
+  - '282:     if config is not None and config["libtype"] == "flydsl":'
+  - '283:         flydsl_config = ('
+  evidence_id: src_7329476fb825a920
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: asm
+  file: aiter/tuned_gemm.py
+  line: 301
+  end_line: 321
+  match: libtype"] == "asm"
+  captured:
+  - asm
+  arch_scope: ''
+  evidence:
+  - '296:             config=flydsl_config,'
+  - '297:         )'
+  - '299:     gfx = get_gfx()'
+  - '300:     _no_asm = gfx.startswith("gfx12")'
+  - '301:     if config is not None and config["libtype"] == "asm" and not _no_asm:'
+  - '302:         kernelName = config["kernelName"]'
+  evidence_id: src_5b4e23744c1bba47
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: flydsl
+  file: aiter/tuned_gemm.py
+  line: 288
+  end_line: 297
+  match: return flydsl_gemm(
+  captured:
+  - flydsl_gemm
+  arch_scope: ''
+  evidence:
+  - '283:         flydsl_config = ('
+  - '284:             aiter.ops.flydsl.gemm_kernels.get_flydsl_splitk_hgemm_kernel_params('
+  - '285:                 config["kernelName"]'
+  - '286:             )'
+  - '287:         )'
+  - '288:         return flydsl_gemm('
+  - '289:             inp_view,'
+  evidence_id: src_ce738ce3a40661af
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: asm
+  file: aiter/tuned_gemm.py
+  line: 446
+  match: return gemm_a16w16_asm(
+  captured:
+  - gemm_a16w16_asm
+  arch_scope: ''
+  evidence:
+  - '441: ):'
+  - '442:     # just support bf16gemm_outFp32'
+  - '443:     out_asm = torch.empty('
+  - '444:         inp.shape[0], weights.shape[0], dtype=otype, device=inp.device'
+  - '445:     )'
+  - '446:     return gemm_a16w16_asm(inp, weights, out_asm, bias, splitK, KernelName, bpreshuffle)'
+  evidence_id: src_cb5d081e14d7a3a6
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: hip
+  file: aiter/tuned_gemm.py
+  line: 76
+  end_line: 97
+  match: def is_skinny_default_shape(
+  captured:
+  - is_skinny_default_shape
+  arch_scope: ''
+  evidence:
+  - '71:             ]'
+  - '72:         ).to_dict("index")'
+  - '73:     return gemm_dict'
+  - '76: def is_skinny_default_shape('
+  - '77:     M: int,'
+  evidence_id: src_2577a978dcbebafb

@@ -1,0 +1,22 @@
+schema_version: 2
+operator: context_parallel_attention
+sources:
+- snapshot: aiter_b3ad6c46
+  file: csrc/py_itfs_cu/asm_mla.cu
+  language: asm
+  include_symbols: true
+  anchors:
+  - cp_world_size
+  - cp_rank
+  - g_kv_indptr
+validation_sources:
+- snapshot: aiter_b3ad6c46
+  file: op_tests/multigpu_tests/test_msa_block_select_cp.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_mla_persistent_round_robin.py
+coverage_notes:
+- Source observations and conditioned candidates for context parallel attention; source presence is not a measured
+  winner.
+- Native MLA interface and rank-local reference coverage; binary instructions and end-to-end multi-GPU execution
+  are not validated.
+- No new GPU measurements or binary disassembly are included.

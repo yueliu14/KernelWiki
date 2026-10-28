@@ -1,0 +1,50 @@
+provenance:
+  schema_version: 4
+  operator_family: context_parallel_attention
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits: {}
+cards:
+- id: context-parallel-rank-and-layout-gates
+  type: constraint
+  axes:
+  - implementation_contract
+  - attention_semantics
+  match:
+    operator_families:
+    - context_parallel_attention
+    target_languages:
+    - flydsl
+  question: Which context-parallel ownership parameters and layout restrictions does the MLA launcher publish?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected implementation matches the cited path and its input contract.
+  actions:
+  - Pass the global KV prefix sums together with a positive cp_world_size and a rank in [0, world_size).
+  - For the round-robin reference, local KV position j corresponds to global position j*world_size+rank; causal
+    masking must use the global position.
+  - 'Respect the explicit kv_shuffled QH64 restriction: this branch requires cp_world_size=1, cp_rank=0 and
+    no global KV prefix pointer.'
+  - Merge rank-local normalized outputs using their LSE values as described in the linked reference, including
+    empty shards.
+  alternatives:
+  - Keep a simpler implementation with the identical numerical and layout contract for comparison.
+  why:
+  - The cited source declares these operations and checks; the combination is part of its interface.
+  source_evidence:
+  - aiter_b3ad6c46:src_cfc951315c97cae9
+  - aiter_b3ad6c46:src_c4a0b087d74b3d3f
+  - aiter_b3ad6c46:src_639b46c465722dbe
+  - aiter_b3ad6c46:src_d4e1472950418175
+  - aiter_b3ad6c46:src_331acb20e2078d4e
+  - aiter_b3ad6c46:src_96d3ef37cc7abb9a
+  - aiter_b3ad6c46:src_269c29e28daa8a9d
+  - aiter_b3ad6c46:src_71e496e5bd0067fa
+  measurement_evidence: []
+  limitations:
+  - The launcher exposes a binary ABI; this corpus does not infer the binary instructions.
+  - The linked round-robin reference is not a new multi-GPU measurement.
+  references:
+  - knowledge/operator/context_parallel_attention/README.md
+shared_cards:
+- attention-split-kv-merge

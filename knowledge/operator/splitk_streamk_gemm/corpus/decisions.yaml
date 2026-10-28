@@ -1,0 +1,305 @@
+provenance:
+  schema_version: 4
+  operator_family: splitk_streamk_gemm
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  lds_staging: 'The design stages at least one operand tile through LDS: it is stored to LDS and the MFMA fragments
+    are read back from it.'
+  reused_weight: B, the weight, is reused across calls, so a one-time host-side layout transform such as a
+    preshuffle is paid once per weight rather than per call.
+  split_k_hot_loop: The K loop is hand-scheduled with ROCm scheduling directives over LDS-staged operands,
+    as the FlyDSL split-K HGEMM hot loop is.
+cards:
+- id: gemm-split-k-when-grid-underfills
+  type: performance_candidate
+  axes:
+  - work_partition
+  - workgroup_tile
+  - execution_geometry
+  - epilogue
+  - runtime_contract
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - grouped_gemm_moe
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+  question: When does a GEMM case need split-K to fill the machine, and what does choosing it commit the rest
+    of the kernel to?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - a case whose output tile count ceil(M/tile_m)*ceil(N/tile_n) is well below the CU count — 304 on MI300X,
+    256 on MI350X/MI355X — the usual state of decode and skinny-M shapes
+  - 'K is deep enough to split: every split still runs several tile_k iterations (the HGEMM derivation asks
+    for 2 to 8 block-K loops per split for its non-base split factors)'
+  actions:
+  - 'Count output tiles against CUs before tuning anything else in the case. A grid that is a fraction of the
+    CU count leaves the rest of the machine idle, and no schedule or layout change later in the kernel recovers
+    it: this is a partition decision, made before the pipeline work.'
+  - Raise split_k until the workgroup count approaches the CU count, taking values from the kernel's legal
+    set — for the FlyDSL HGEMM, split_k divides K and K/split_k is a multiple of tile_k (flydsl-hgemm-config-space).
+    Past that point a larger split adds combine traffic without adding parallelism.
+  - 'Count rounds, not workgroups: AITER''s ASM launchers score each (tile, split) by ceil(tiles*split / CUs)
+    and keep the fewest rounds, preferring fewer idle CUs in the last round (gemm-asm-tile-inventory-and-selection).
+    One workgroup past a CU multiple costs a whole extra round, so step the split down or the tile up rather
+    than overshoot.'
+  - 'Choose the combine together with the split, because split-K is not a knob on its own: the FlyDSL HGEMM
+    initialises the output from split 0 and atomically adds the others (flydsl-splitk-reduction-contract),
+    Triton writes fp32 partials and runs a separate reduce kernel, ASM multiplies the launch grid by the split.
+    An authored kernel has to pick one and supply its host-side state.'
+  - 'Re-check numerics with the split: a different accumulation order — and, in FlyDSL''s atomic combine, adding
+    partials already rounded to the output dtype — changes the result, so gate against the task''s oracle at
+    its stated tolerance.'
+  - 'Seed from where AITER shipped split-K: FlyDSL bf16 on gfx950 selects split_k > 1 in 83 of 86 rows at M<=16
+    and 38 of 45 at M 17-64, and split_k = 1 in every row above M = 256; Triton''s gfx942 fp8 block-scale configs
+    vary NUM_KSPLIT (1 to 16) only in the buckets up to M<=512 and fix it at 1 from M<=1024 on.'
+  alternatives:
+  - 'Keep split_k = 1 and shrink tile_m / tile_n to raise the tile count: nothing to combine, but less MFMA
+    work per workgroup (background).'
+  - Stream-K or a persistent grid sized to the CU count, which also balances a tile count just off a CU multiple
+    — no FlyDSL precedent in AITER.
+  - split_k = 1 as the control arm.
+  why:
+  - This is the grid-fill rule of the background docs — compute the output tiles and split K when they are
+    far below the CU count. The FlyDSL derivation checks divisibility only, so the occupancy half of the decision
+    is written nowhere in the kernel.
+  - Both backends' shipped selections put split-K where that rule predicts it, in the small-M buckets, and
+    turn it off for large M.
+  source_evidence:
+  - aiter_a6bb4993:src_642476c9b693d5f1
+  - aiter_a6bb4993:src_58d4bf39e7ca8f03
+  - aiter_a6bb4993:src_fce6be7eb6b247d6
+  - aiter_a6bb4993:src_5c7e74ddb8a071de
+  solutions:
+  - backend: triton
+    mechanism: NUM_KSPLIT partitions K inside the kernel and SPLITK_BLOCK_SIZE sizes each partition; a separate
+      reduce kernel sums the fp32 partials. The block-scale kernel carries the same two parameters
+    source_evidence:
+    - aiter_a6bb4993:src_0f50a57ed622a4f4
+    - aiter_a6bb4993:src_8f1fdafc50973349
+    - aiter_a6bb4993:src_4fbd4a0e0992c880
+    - aiter_a6bb4993:src_a6edf5790cd2f1f1
+  - backend: asm
+    mechanism: the launcher scores every (kernel, split) of the architecture by rounds = ceil(tiles*split /
+      CUs), keeps the fewest rounds, and multiplies the launch grid by the split; the bf16 launcher caps split
+      at min(CUs / output tiles, 16, K / sub_k)
+    source_evidence:
+    - aiter_a6bb4993:src_4044f249c79abf90
+    - aiter_a6bb4993:src_b07a8dc43c913b9d
+    - aiter_a6bb4993:src_3528bd18e9f8f895
+    - aiter_a6bb4993:src_787ebf8727d0c7e1
+  - backend: hip
+    mechanism: 'the decode skinny kernels split K across the lanes of a wave instead of across workgroups:
+      weight rows are spread over CUs x YTILE (`mindiv`) and each lane''s partial is reduced with cross-lane
+      shuffles, so nothing is combined in memory'
+    source_evidence:
+    - aiter_a6bb4993:src_4afbdde799d96232
+    - aiter_a6bb4993:src_0b8de37c2b304d4a
+  shipped_evidence:
+  - aiter_a6bb4993:cfg_973fe63f897809df
+  - aiter_a6bb4993:cfg_ac0c03746ab634f6
+  - aiter_a6bb4993:cfg_ae017b25b6473300
+  - aiter_a6bb4993:cfg_d2642e1347a53ea1
+  - aiter_a6bb4993:cfg_c23460f537b313ac
+  - aiter_a6bb4993:cfg_da4a49e152c50056
+  references:
+  - knowledge/operator/splitk_streamk_gemm/tuning.md:16-37
+  - knowledge/general/optimization/wave_and_grid_sizing.md:49-61
+  - knowledge/general/backend/flydsl/knobs.md:52-60
+  - knowledge/general/backend/flydsl/patterns.md:68-76
+  measurement_evidence: []
+  limitations:
+  - Whether split-K pays for a shape is a measurement; the tile count says when it is worth trying, not that
+    it wins.
+  - The CU counts are hardware facts from the background docs, not from this source.
+  - 'A split that fills the grid can still be illegal for its combine: the FlyDSL HGEMM counters allow at most
+    128 output tiles when split_k > 1.'
+- id: flydsl-splitk-hot-loop-schedule-bundle
+  type: performance_candidate
+  axes:
+  - pipeline_schedule
+  - workgroup_tile
+  - execution_geometry
+  - memory_access
+  - compute_instruction
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - grouped_gemm_moe
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+    requires:
+    - split_k_hot_loop
+  question: What explicit instruction-order bundle can seed a hand-scheduled FlyDSL split-K GEMM hot loop?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - operator_family=gemm
+  - target_language=flydsl
+  - the hot loop is hand-scheduled with ROCm scheduling directives (a split-K or tiled K loop with both operands
+    in LDS)
+  actions:
+  - 'Copy the ORDER, not a set of magic numbers: A-fragment ds-reads, then B-fragment ds-reads, then the A
+    and B global loads as vmem, then the MFMA issues, closed by a scheduling barrier.'
+  - Derive each group's count from the loop geometry that produces it — warp K steps times warp M or N steps
+    for the ds-reads, the per-block LDG register counts for the vmem groups, and the full MFMA count for the
+    mfma group — rather than hard-coding the counts observed here.
+  - Move or retune the bundle as a unit against the exact load/MFMA loop, then compare with the unscheduled
+    control.
+  alternatives:
+  - Leave instruction ordering to the compiler; that is the control arm and it is often the right answer.
+  - Use the A8 family's interleaved scheduler instead, which spreads ds-reads and vmem across the MFMAs one
+    at a time rather than emitting the groups back to back — see flydsl-a8-interleaved-schedule.
+  why:
+  - The directives are adjacent inside one scheduler function and describe a single ordering pattern; copying
+    one directive in isolation loses that context.
+  - An earlier version of this card recorded the literal group sizes vmem(2)/dsrd(2)/dsrd(4)/mfma(8). Upstream
+    now emits unit-count directives inside geometry-derived loops, so those numbers described one build of
+    one tile and expired quietly. The order survived the rewrite; the constants did not, which is the reason
+    this card states a rule and not a bundle of integers.
+  source_evidence:
+  - aiter_a6bb4993:src_5da6811a509d9806
+  - aiter_a6bb4993:src_b0da890c19bc671e
+  - aiter_a6bb4993:src_ed1134f4e4cea08c
+  - aiter_a6bb4993:src_86d7e5af1117454e
+  - aiter_a6bb4993:src_0f18d7f50ce33cbb
+  - aiter_a6bb4993:src_dca1b81d9d2b2edf
+  solutions:
+  - backend: ck
+    mechanism: a named loop scheduler (`BlockGemmPipelineScheduler::Intrawave` / `Interwave`) plus a pipeline
+      version chosen per template instance
+    source_evidence:
+    - aiter_a6bb4993:src_75b377d9dfc10083
+    - aiter_a6bb4993:src_bb0d15e277ff0a86
+    - aiter_a6bb4993:src_6a2107cadf863683
+  references:
+  - knowledge/general/optimization/mfma_scheduling.md
+  - knowledge/general/backend/flydsl/authoring_gemm_levers.md:150-165
+  measurement_evidence: []
+  limitations:
+  - Instruction scheduling is the most build-specific thing in this corpus; treat it as a candidate to try
+    late, after tiling and split-K are settled.
+  - Changing tile geometry, LDS stages or access width changes the schedule that must be re-measured.
+- id: flydsl-splitk-reduction-contract
+  type: constraint
+  axes:
+  - epilogue
+  - work_partition
+  - runtime_contract
+  - configuration_constraints
+  match:
+    operator_families:
+    - dense_gemm
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+  question: How does the FlyDSL split-K HGEMM combine partial results, and what does that impose on the launcher?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - split_k > 1 is a candidate, or a split-K kernel is being ported or written
+  actions:
+  - Write the combine in the kernel as the HGEMM does, in three parts. First, only the split with k index 0
+    initialises the output tile — to zero, or to the bias when there is one, so the bias is added exactly once
+    — then writes back L2 and raises the tile's counter to 1 (`zero_c`). Second, every split spins on that
+    counter until it is non-zero before touching the output (`split_k_barrier`). Third, each split rounds its
+    fp32 accumulator to the output dtype and adds it into C with `llvm.AtomicRMWOp(fadd)`, two elements per
+    atomic, at agent scope (the `if const_expr(IS_SPLIT_K):` store block).
+  - The small-M family writes the same combine per N tile (a tile-indexed counter and the same packed fadd),
+    so either kernel is a precedent for an authored split-K.
+  - Keep one global semaphore buffer per stream, sized SPLIT_K_SIGNAL_STATE_COUNT (3) x SPLIT_K_COUNTER_MAX_LEN
+    (128) counters, and pass the current signal state into every launch; split 0 also clears the previous state's
+    counters while the current ones are in use.
+  - Advance the per-stream signal state after a launch only when split_k > 1, cycling modulo 3, so consecutive
+    split-K launches on one stream use different counter slices.
+  - 'Reject configurations whose output-tile count exceeds the counters: with split_k > 1, ceil(M/tile_m)*(N/tile_n)
+    must be at most 128 — for large M this bounds how small tile_m can go while split-K is on.'
+  - 'When porting, keep the combine bookkeeping in the host/launcher contract: a kernel copied without the
+    semaphore allocation and the state rotation does not have the counters its reduction waits on.'
+  alternatives:
+  - split_k=1, which needs none of this.
+  - A two-pass combine — partial buffers plus a reduce kernel — as the Triton GEMM does.
+  why:
+  - The capacity check, the state constants and the rotation helpers are all module-level code in the entry
+    point, so the contract is stated rather than implied.
+  - The kernel half — initialise, wait, atomically add — is three blocks in the kernel body, cited with their
+    extents, so a port can copy the whole mechanism rather than its first line.
+  - 'The capacity bound interacts with the tile search: a split-K candidate that is legal by divisibility can
+    still be rejected by the counter check.'
+  source_evidence:
+  - aiter_a6bb4993:src_1a4b9ad5c5b109de
+  - aiter_a6bb4993:src_ad151ebc96795a5e
+  - aiter_a6bb4993:src_5ad1990942237536
+  - aiter_a6bb4993:src_0294fc9392d3670a
+  - aiter_a6bb4993:src_869d39483177e42c
+  - aiter_a6bb4993:src_284881f3cc4c325a
+  - aiter_a6bb4993:src_39dac9712009eb08
+  - aiter_a6bb4993:src_564badda94311abc
+  - aiter_a6bb4993:src_7c7ddd401ff4aaeb
+  - aiter_a6bb4993:src_194c17aa69828857
+  - aiter_a6bb4993:src_86aa6d1400d0f17f
+  - aiter_a6bb4993:src_94058066019b30f2
+  - aiter_a6bb4993:src_5c7e74ddb8a071de
+  - aiter_a6bb4993:src_679a944e53f65823
+  - aiter_a6bb4993:src_67a72909c71307d1
+  - aiter_a6bb4993:src_217562a4a9b879dc
+  - aiter_a6bb4993:src_636fbc44252bb90e
+  solutions:
+  - backend: triton
+    mechanism: partial buffers per K split plus a reduce kernel (`NUM_KSPLIT`, `ACTUAL_KSPLIT`/`MAX_KSPLIT`),
+      or `tl.atomic_add` into the output in the atomic variant
+    source_evidence:
+    - aiter_a6bb4993:src_0f50a57ed622a4f4
+    - aiter_a6bb4993:src_8f1fdafc50973349
+    - aiter_a6bb4993:src_f5043ecafb832fa0
+    - aiter_a6bb4993:src_9e9cdadae23d0f5f
+  - backend: asm
+    mechanism: the split count is part of the selected object's config and becomes the launch grid's z dimension
+    source_evidence:
+    - aiter_a6bb4993:src_05e16505bb238998
+    - aiter_a6bb4993:src_4044f249c79abf90
+  references:
+  - knowledge/operator/splitk_streamk_gemm/numerics.md
+  - knowledge/operator/splitk_streamk_gemm/backend/flydsl.md:77-85
+  - knowledge/general/backend/flydsl/deep.md:105-114
+  - knowledge/general/backend/flydsl/knobs.md:52-60
+  measurement_evidence: []
+  limitations:
+  - 'The atomic combine adds partials that were already rounded to the output dtype, in whatever order the
+    splits arrive: error grows with split_k and results are not bit-reproducible run to run. Gate against the
+    task''s oracle tolerance, not against a split_k=1 output.'
+  - AITER's own test of this kernel holds most split-K cases to its default gate but relaxes its two M=1 B-in-LDS
+    cases, to 99.0% of elements close with a max |delta| of 8 at split_k 8 and 32 at split_k 16 (flydsl-test-parity-gate);
+    a task oracle stricter than that is a reason to prefer a two-pass or fp32 combine.
+  - The counter capacity is a property of the current kernel; an authored split-K with a different combine
+    has its own bound.
+  - Whether split-K pays for a shape is a measurement; this card only states what a legal split-K launch requires.
+shared_cards:
+- flydsl-async-copy-by-family
+- flydsl-gfx942-path-gates
+- flydsl-half-mfma-call-forms
+- flydsl-hgemm-config-space
+- flydsl-hgemm-tiling-validity
+- flydsl-host-launch-contract
+- flydsl-lds-pipeline-depth
+- flydsl-mfma-fragment-lane-layout
+- flydsl-preshuffle-b-layout-contract
+- flydsl-test-parity-gate
+- flydsl-xor16-lds-layout-consistency
+- gemm-asm-tile-inventory-and-selection
+- gemm-shape-regime-routing
+- gemm-streamed-operand-cache-policy
+- gemm-workgroup-xcd-mapping

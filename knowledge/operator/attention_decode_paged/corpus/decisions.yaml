@@ -1,0 +1,55 @@
+provenance:
+  schema_version: 4
+  operator_family: attention_decode_paged
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  paged_kv: The design reads a paged KV cache.
+cards:
+- id: attention-paged-kv-addressing
+  type: constraint
+  axes:
+  - cache_layout
+  - implementation_contract
+  match:
+    operator_families:
+    - attention_decode_paged
+    - mla_attention
+    - chunked_prefill
+    target_languages:
+    - triton
+    - flydsl
+    - gluon
+    requires:
+    - paged_kv
+  question: What must remain consistent when loading a paged KV cache?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - KV positions are logical sequence positions mapped through a per-request page table.
+  actions:
+  - Resolve each logical token through its block-table entry and its offset within the page; preserve the independent
+    K/V cache strides.
+  - 'Distinguish a compute tile from a cache page: the general path may need multiple page-table lookups, while
+    TILE_SIZE == BLOCK_SIZE enables a specialized path.'
+  - Validate ragged sequence lengths, nontrivial block-table strides and the final partial page against the
+    actual cache producer.
+  alternatives:
+  - Use the general paged load path before specializing page-aligned tiles.
+  why:
+  - The unified Triton kernel has distinct TILE_SIZE == BLOCK_SIZE and general page-lookup paths, with explicit
+    K and V strides.
+  source_evidence:
+  - aiter_b3ad6c46:src_49cb5bdc816cb102
+  measurement_evidence: []
+  limitations:
+  - A page-size constant is not evidence that all cache layouts use the same physical order.
+  - Source availability does not establish support for every dtype or head dimension.
+  references:
+  - knowledge/operator/attention_decode_paged/README.md
+  - knowledge/operator/mla_attention/README.md
+  - knowledge/operator/chunked_prefill/README.md
+shared_cards:
+- attention-gqa-head-mapping
+- attention-mla-reduce-abi
+- attention-query-kv-tile-pipeline
+- attention-split-kv-merge

@@ -1,0 +1,1365 @@
+schema_version: 2
+operator: moe_routing_topk
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/herd_topk.py
+  lines: 267
+  evidence_records: 6
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/herd_topk.py
+  lines: 150
+  evidence_records: 4
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  lines: 2055
+  evidence_records: 58
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/moe_sorting.py
+  lines: 65
+  evidence_records: 1
+- snapshot: aiter_b3ad6c46
+  language: hip
+  file: csrc/kernels/moe_align_block_size_kernels.cu
+  lines: 162
+  evidence_records: 1
+- snapshot: aiter_b3ad6c46
+  language: hip
+  file: csrc/kernels/topk_gating_kernels.cu
+  lines: 153
+  evidence_records: 0
+- snapshot: aiter_b3ad6c46
+  language: hip
+  file: csrc/kernels/topk_softmax_kernels.cu
+  lines: 1588
+  evidence_records: 8
+- snapshot: aiter_b3ad6c46
+  language: hip
+  file: csrc/py_itfs_cu/moe_sorting_opus_kernels.cu
+  lines: 554
+  evidence_records: 6
+missing: []
+source_evidence:
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/herd_topk.py
+  line: 22
+  end_line: 53
+  match: def _run_sigmoid_candidate(
+  captured:
+  - _run_sigmoid_candidate
+  arch_scope: ''
+  evidence:
+  - '22: def _run_sigmoid_candidate('
+  - '23:     packed_gating: torch.Tensor,'
+  - '24:     correction_bias: torch.Tensor,'
+  evidence_id: src_e44ab8682ed6c7b2
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/herd_topk.py
+  line: 56
+  end_line: 88
+  match: def _run_finalize(
+  captured:
+  - _run_finalize
+  arch_scope: ''
+  evidence:
+  - '56: def _run_finalize('
+  - '57:     candidate_ids: torch.Tensor,'
+  - '58:     candidate_values: torch.Tensor,'
+  evidence_id: src_6aed3c9825dd64f4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/herd_topk.py
+  line: 91
+  end_line: 104
+  match: 'def _profile(score_func: str, experts: int, topk: int) -> str | None:'
+  captured:
+  - _profile
+  arch_scope: ''
+  evidence:
+  - '91: def _profile(score_func: str, experts: int, topk: int) -> str | None:'
+  - '92:     if (score_func, experts, topk) == ('
+  - '93:         "sigmoid",'
+  evidence_id: src_07127917d294dfe9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/herd_topk.py
+  line: 107
+  end_line: 149
+  match: def _unsupported_reason(
+  captured:
+  - _unsupported_reason
+  arch_scope: ''
+  evidence:
+  - '107: def _unsupported_reason('
+  - '108:     topk_weights: torch.Tensor,'
+  - '109:     topk_ids: torch.Tensor,'
+  evidence_id: src_938ee9ec013bdbd5
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/herd_topk.py
+  line: 152
+  end_line: 168
+  match: def herd_topk_gating_supported(
+  captured:
+  - herd_topk_gating_supported
+  arch_scope: ''
+  evidence:
+  - '152: def herd_topk_gating_supported('
+  - '153:     topk_weights: torch.Tensor,'
+  - '154:     topk_ids: torch.Tensor,'
+  evidence_id: src_9d848814d316020e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/herd_topk.py
+  line: 171
+  end_line: 266
+  match: def herd_topk_gating(
+  captured:
+  - herd_topk_gating
+  arch_scope: ''
+  evidence:
+  - '171: def herd_topk_gating('
+  - '172:     topk_weights: torch.Tensor,'
+  - '173:     topk_ids: torch.Tensor,'
+  evidence_id: src_353602ffdde67db6
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/herd_topk.py
+  line: 19
+  end_line: 149
+  match: def build_herd_finalize_module(
+  captured:
+  - build_herd_finalize_module
+  arch_scope: ''
+  evidence:
+  - '18: @cache'
+  - '19: def build_herd_finalize_module('
+  - '20:     topk: int,'
+  - '21:     num_experts: int,'
+  evidence_id: src_08eb061c309e546c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/herd_topk.py
+  line: 50
+  end_line: 120
+  match: def finalize_kernel(
+  captured:
+  - finalize_kernel
+  arch_scope: ''
+  evidence:
+  - '48:         known_block_size=[block_threads, 1, 1],'
+  - '49:     )'
+  - '50:     def finalize_kernel('
+  - '51:         candidate_ids: fx.Tensor,'
+  - '52:         candidate_values: fx.Tensor,'
+  evidence_id: src_12136f00afc258a8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/herd_topk.py
+  line: 123
+  end_line: 147
+  match: def launch_finalize(
+  captured:
+  - launch_finalize
+  arch_scope: ''
+  evidence:
+  - '122:     @flyc.jit'
+  - '123:     def launch_finalize('
+  - '124:         candidate_ids: fx.Tensor,'
+  - '125:         candidate_values: fx.Tensor,'
+  evidence_id: src_e4eddddaf7674def
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/herd_topk.py
+  line: 143
+  match: ".launch(\n            grid=(1, 1, 1)"
+  captured:
+  - 1, 1, 1
+  arch_scope: ''
+  evidence:
+  - '141:             rows,'
+  - '142:             routed_scaling_factor,'
+  - '143:         ).launch('
+  - '144:             grid=(1, 1, 1),'
+  - '145:             block=(block_threads, 1, 1),'
+  evidence_id: src_9a5b85819c163b56
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 55
+  end_line: 57
+  match: 'def _unwrap_val(v):'
+  captured:
+  - _unwrap_val
+  arch_scope: ''
+  evidence:
+  - '55: def _unwrap_val(v):'
+  - '56:     """Unwrap DSL value to raw MLIR ir.Value."""'
+  - '57:     return v.ir_value() if hasattr(v, "ir_value") else v'
+  evidence_id: src_7b5eb16a80f84fa8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 60
+  end_line: 93
+  match: 'def _dpp_intra_wave_prefix_sum(val, lane, WARP_SIZE):'
+  captured:
+  - _dpp_intra_wave_prefix_sum
+  arch_scope: ''
+  evidence:
+  - '60: def _dpp_intra_wave_prefix_sum(val, lane, WARP_SIZE):'
+  - '61:     """inclusive prefix sum within a single wave using DPP.'
+  evidence_id: src_c57dac26449fe22b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 97
+  end_line: 112
+  match: 'def _allwave_inclusive_prefix_sum(val, lane, wave, scratch_mr, NUM_WAVES, WARP_SIZE):'
+  captured:
+  - _allwave_inclusive_prefix_sum
+  arch_scope: ''
+  evidence:
+  - '96: @flyc.jit'
+  - '97: def _allwave_inclusive_prefix_sum(val, lane, wave, scratch_mr, NUM_WAVES, WARP_SIZE):'
+  - '98:     """DPP intra-wave prefix sum + cross-wave LDS accumulation.'
+  evidence_id: src_4979d5daca83ed65
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 116
+  end_line: 126
+  match: 'def _zero_moe_buf_grid_stride(moe_buf_it, gid_v4, stride_v4, total_v4, oob_idx):'
+  captured:
+  - _zero_moe_buf_grid_stride
+  arch_scope: ''
+  evidence:
+  - '115: @flyc.jit'
+  - '116: def _zero_moe_buf_grid_stride(moe_buf_it, gid_v4, stride_v4, total_v4, oob_idx):'
+  - '117:     """Grid-stride loop zeroing moe_buf via vectorized (4xi32) stores."""'
+  - '118:     c_one = fx.Int32(1)'
+  evidence_id: src_88b34396e35aad7b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 129
+  end_line: 141
+  match: 'def _extend_prefix_sum_serial(mr, start_block, E, load_fn, store_fn):'
+  captured:
+  - _extend_prefix_sum_serial
+  arch_scope: ''
+  evidence:
+  - '129: def _extend_prefix_sum_serial(mr, start_block, E, load_fn, store_fn):'
+  - '130:     """Thread-0 serial extension of prefix sum for experts >= start_block.'
+  evidence_id: src_91d9b944647683e9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 145
+  end_line: 149
+  match: 'def _write_expert_id_blocks(sorted_e_it, local_eid, blk_start, n_blks):'
+  captured:
+  - _write_expert_id_blocks
+  arch_scope: ''
+  evidence:
+  - '144: @flyc.jit'
+  - '145: def _write_expert_id_blocks(sorted_e_it, local_eid, blk_start, n_blks):'
+  - '146:     """Write local_eid to sorted_expert_ids[blk_start .. blk_start+n_blks)."""'
+  - '147:     for _jb in range(fx.Int32(0), n_blks, fx.Int32(1)):'
+  evidence_id: src_813a1fbae51448b9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 153
+  end_line: 164
+  match: def _fill_sentinel_slots(
+  captured:
+  - _fill_sentinel_slots
+  arch_scope: ''
+  evidence:
+  - '152: @flyc.jit'
+  - '153: def _fill_sentinel_slots('
+  - '154:     sorted_ids_it, sorted_w_it, start, count, sentinel, block_size, tid, oob_idx'
+  - '155: ):'
+  evidence_id: src_2dd6e2d5481889d9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 170
+  end_line: 172
+  match: 'def _lds_load_raw(raw_ptr, idx):'
+  captured:
+  - _lds_load_raw
+  arch_scope: ''
+  evidence:
+  - '168: # LDS helpers for multiphase kernels (module-level, used inside @flyc.kernel)'
+  - '169: # ---------------------------------------------------------------------------'
+  - '170: def _lds_load_raw(raw_ptr, idx):'
+  - '171:     """Load i32 from an LDS pointer at i32 element offset `idx`."""'
+  - '172:     return fx.ptr_load(raw_ptr + fx.Int64(idx))'
+  evidence_id: src_d2e75ad92f7d95a9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 175
+  end_line: 177
+  match: 'def _lds_store_raw(raw_ptr, val, idx):'
+  captured:
+  - _lds_store_raw
+  arch_scope: ''
+  evidence:
+  - '175: def _lds_store_raw(raw_ptr, val, idx):'
+  - '176:     """Store i32 to an LDS pointer at i32 element offset `idx`."""'
+  - '177:     fx.ptr_store(val, raw_ptr + fx.Int64(idx))'
+  evidence_id: src_ad581adeea7b347f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 187
+  end_line: 189
+  match: 'def _buf_iter(tensor):'
+  captured:
+  - _buf_iter
+  arch_scope: ''
+  evidence:
+  - '185: # Offsets are in ELEMENTS of the buffer''s dtype.'
+  - '186: # ---------------------------------------------------------------------------'
+  - '187: def _buf_iter(tensor):'
+  - '188:     """OOB-checked V# iterator over a global tensor."""'
+  - '189:     return fx.get_iter(fx.rocdl.make_buffer_tensor(tensor, max_size=True))'
+  evidence_id: src_eaad561b9bbd9ff2
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 192
+  end_line: 203
+  match: 'def _i8_global_ptr(tensor):'
+  captured:
+  - _i8_global_ptr
+  arch_scope: ''
+  evidence:
+  - '192: def _i8_global_ptr(tensor):'
+  - '193:     """Raw i8 global pointer to `tensor` for byte-addressed stores.'
+  evidence_id: src_b19e8baf11998343
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 206
+  end_line: 208
+  match: 'def _gld(it, idx):'
+  captured:
+  - _gld
+  arch_scope: ''
+  evidence:
+  - '206: def _gld(it, idx):'
+  - '207:     """Scalar load at i32 element offset `idx` (OOB -> 0)."""'
+  - '208:     return fx.ptr_load(it + fx.Int64(idx))'
+  evidence_id: src_0829f38a016c31fe
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 211
+  end_line: 213
+  match: 'def _gst(it, val, idx):'
+  captured:
+  - _gst
+  arch_scope: ''
+  evidence:
+  - '211: def _gst(it, val, idx):'
+  - '212:     """Scalar store at i32 element offset `idx` (OOB dropped)."""'
+  - '213:     fx.ptr_store(val, it + fx.Int64(idx))'
+  evidence_id: src_a6a7e4a59d79cfe3
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 224
+  end_line: 778
+  match: def _compile_moe_sorting_oneshot(
+  captured:
+  - _compile_moe_sorting_oneshot
+  arch_scope: ''
+  evidence:
+  - '222: # ---------------------------------------------------------------------------'
+  - '223: @functools.lru_cache(maxsize=256)'
+  - '224: def _compile_moe_sorting_oneshot('
+  - '225:     *,'
+  - '226:     num_experts: int,'
+  evidence_id: src_ad0757611a58a3ca
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 785
+  end_line: 793
+  match: 'def _p23_block_size(num_experts: int, tokens: int) -> int:'
+  captured:
+  - _p23_block_size
+  arch_scope: ''
+  evidence:
+  - '783: # ---------------------------------------------------------------------------'
+  - '784: @functools.lru_cache(maxsize=64)'
+  - '785: def _p23_block_size(num_experts: int, tokens: int) -> int:'
+  - '786:     """Runtime P23 block size: balance E>256 prefix path vs large-T mesh scan."""'
+  - '787:     if num_experts <= 256:'
+  evidence_id: src_77813ff655e57bd8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 797
+  end_line: 1768
+  match: def _compile_moe_sorting_multiphase(
+  captured:
+  - _compile_moe_sorting_multiphase
+  arch_scope: ''
+  evidence:
+  - '796: @functools.lru_cache(maxsize=256)'
+  - '797: def _compile_moe_sorting_multiphase('
+  - '798:     *,'
+  - '799:     num_experts: int,'
+  evidence_id: src_16bc8b203184a19b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1774
+  end_line: 1798
+  match: 'def _compute_sub_tokens(num_experts, arch=None):'
+  captured:
+  - _compute_sub_tokens
+  arch_scope: ''
+  evidence:
+  - '1772: # ---------------------------------------------------------------------------'
+  - '1773: @functools.lru_cache(maxsize=64)'
+  - '1774: def _compute_sub_tokens(num_experts, arch=None):'
+  - '1775:     """Compute the LDS-capacity threshold (sub_tokens) for oneshot vs multiphase decision.'
+  evidence_id: src_3ef9ad474c12e8d4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1801
+  end_line: 1811
+  match: 'def moe_sorting_get_workspace_size(M, num_experts, topk, unit_size=UNIT_SIZE):'
+  captured:
+  - moe_sorting_get_workspace_size
+  arch_scope: ''
+  evidence:
+  - '1801: def moe_sorting_get_workspace_size(M, num_experts, topk, unit_size=UNIT_SIZE):'
+  - '1802:     """Return workspace size (in i32 elements) needed for the multiphase path.'
+  - '1803:     Returns 0 if the oneshot path will be used."""'
+  evidence_id: src_e5ea78501a299de9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1814
+  end_line: 1845
+  match: def compile_moe_sorting(
+  captured:
+  - compile_moe_sorting
+  arch_scope: ''
+  evidence:
+  - '1814: def compile_moe_sorting('
+  - '1815:     *,'
+  - '1816:     num_experts,'
+  evidence_id: src_5d813b782da0feae
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1848
+  end_line: 2054
+  match: def moe_sorting_flydsl(
+  captured:
+  - moe_sorting_flydsl
+  arch_scope: ''
+  evidence:
+  - '1848: def moe_sorting_flydsl('
+  - '1849:     topk_ids,'
+  - '1850:     topk_weights,'
+  evidence_id: src_dca12676a48f85ea
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 299
+  end_line: 738
+  match: def moe_sorting_oneshot_kernel(
+  captured:
+  - moe_sorting_oneshot_kernel
+  arch_scope: ''
+  evidence:
+  - '298:     @flyc.kernel(known_block_size=[ONESHOT_BLOCK, 1, 1])'
+  - '299:     def moe_sorting_oneshot_kernel('
+  - '300:         topk_ids_tensor: fx.Tensor,'
+  - '301:         topk_weights_tensor: fx.Tensor,'
+  evidence_id: src_9e694e030e9b8db3
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 743
+  end_line: 776
+  match: def launch_moe_sorting_oneshot(
+  captured:
+  - launch_moe_sorting_oneshot
+  arch_scope: ''
+  evidence:
+  - '742:     @flyc.jit'
+  - '743:     def launch_moe_sorting_oneshot('
+  - '744:         topk_ids_tensor: fx.Tensor,'
+  - '745:         topk_weights_tensor: fx.Tensor,'
+  evidence_id: src_15f1ebafcbce9442
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 832
+  end_line: 844
+  match: 'def _extend_local_idx_for_extra_experts(cumsum_mr, mask_it, K4_BLOCK, E, has_mask):'
+  captured:
+  - _extend_local_idx_for_extra_experts
+  arch_scope: ''
+  evidence:
+  - '831:     @flyc.jit'
+  - '832:     def _extend_local_idx_for_extra_experts(cumsum_mr, mask_it, K4_BLOCK, E, has_mask):'
+  - '833:         """Thread-0: write local expert indices for experts >= K4_BLOCK to cumsum_mr."""'
+  - '834:         if has_mask:'
+  evidence_id: src_6c04296195407133
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 847
+  end_line: 965
+  match: def _p23_scatter_mesh(
+  captured:
+  - _p23_scatter_mesh
+  arch_scope: ''
+  evidence:
+  - '846:     @flyc.jit'
+  - '847:     def _p23_scatter_mesh('
+  - '848:         tid,'
+  - '849:         scatter_mr,'
+  evidence_id: src_8054f71d49873f79
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 973
+  end_line: 983
+  match: def clear_workspace_kernel(
+  captured:
+  - clear_workspace_kernel
+  arch_scope: ''
+  evidence:
+  - '972:     @flyc.kernel(known_block_size=[K1_BLOCK, 1, 1])'
+  - '973:     def clear_workspace_kernel('
+  - '974:         workspace: fx.Tensor,'
+  - '975:         i32_total_elems: fx.Int32,'
+  evidence_id: src_3e28d9f2b6a7b27e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 986
+  end_line: 994
+  match: def launch_clear_ws(
+  captured:
+  - launch_clear_ws
+  arch_scope: ''
+  evidence:
+  - '985:     @flyc.jit'
+  - '986:     def launch_clear_ws('
+  - '987:         workspace: fx.Tensor,'
+  - '988:         i32_total_elems: fx.Int32,'
+  evidence_id: src_b5c03777fa02ce19
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1003
+  end_line: 1038
+  match: def p0_scatter_kernel(
+  captured:
+  - p0_scatter_kernel
+  arch_scope: ''
+  evidence:
+  - '1002:     @flyc.kernel'
+  - '1003:     def p0_scatter_kernel('
+  - '1004:         topk_ids: fx.Tensor,'
+  - '1005:         workspace: fx.Tensor,'
+  evidence_id: src_601a3f3ed6be7715
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1041
+  end_line: 1060
+  match: def launch_p0(
+  captured:
+  - launch_p0
+  arch_scope: ''
+  evidence:
+  - '1040:     @flyc.jit'
+  - '1041:     def launch_p0('
+  - '1042:         topk_ids: fx.Tensor,'
+  - '1043:         workspace: fx.Tensor,'
+  evidence_id: src_8bb5cca8ebf3eeaa
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1078
+  end_line: 1179
+  match: def p1_count_kernel(
+  captured:
+  - p1_count_kernel
+  arch_scope: ''
+  evidence:
+  - '1077:     @flyc.kernel'
+  - '1078:     def p1_count_kernel('
+  - '1079:         workspace: fx.Tensor,'
+  - '1080:         expert_mask_tensor: fx.Tensor,'
+  evidence_id: src_b1bc3df603031613
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1182
+  end_line: 1200
+  match: def launch_p1(
+  captured:
+  - launch_p1
+  arch_scope: ''
+  evidence:
+  - '1181:     @flyc.jit'
+  - '1182:     def launch_p1('
+  - '1183:         workspace: fx.Tensor,'
+  - '1184:         expert_mask_tensor: fx.Tensor,'
+  evidence_id: src_b3bd0b3c6eae5a0d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1221
+  end_line: 1372
+  match: def p0v2_kernel(
+  captured:
+  - p0v2_kernel
+  arch_scope: ''
+  evidence:
+  - '1220:     @flyc.kernel(known_block_size=[P0V2_BLOCK, 1, 1])'
+  - '1221:     def p0v2_kernel('
+  - '1222:         topk_ids: fx.Tensor,'
+  - '1223:         workspace: fx.Tensor,'
+  evidence_id: src_1dae7aa004cc752e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1375
+  end_line: 1395
+  match: def launch_p0v2(
+  captured:
+  - launch_p0v2
+  arch_scope: ''
+  evidence:
+  - '1374:     @flyc.jit'
+  - '1375:     def launch_p0v2('
+  - '1376:         topk_ids: fx.Tensor,'
+  - '1377:         workspace: fx.Tensor,'
+  evidence_id: src_09ebc1e447a44ab0
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1414
+  end_line: 1610
+  match: def p23_kernel(
+  captured:
+  - p23_kernel
+  arch_scope: ''
+  evidence:
+  - '1413:     @flyc.kernel(known_block_size=[K4_BLOCK, 1, 1])'
+  - '1414:     def p23_kernel('
+  - '1415:         workspace: fx.Tensor,'
+  - '1416:         topk_weights_tensor: fx.Tensor,'
+  evidence_id: src_fe877bb4d46e62b3
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1613
+  end_line: 1646
+  match: def launch_p23(
+  captured:
+  - launch_p23
+  arch_scope: ''
+  evidence:
+  - '1612:     @flyc.jit'
+  - '1613:     def launch_p23('
+  - '1614:         workspace: fx.Tensor,'
+  - '1615:         topk_weights_tensor: fx.Tensor,'
+  evidence_id: src_d435af40a4f8a901
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1649
+  end_line: 1694
+  match: def launch_p0v2_p23(
+  captured:
+  - launch_p0v2_p23
+  arch_scope: ''
+  evidence:
+  - '1648:     @flyc.jit'
+  - '1649:     def launch_p0v2_p23('
+  - '1650:         topk_ids: fx.Tensor,'
+  - '1651:         workspace: fx.Tensor,'
+  evidence_id: src_464aae48bc5189d1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1697
+  end_line: 1758
+  match: def launch_4k_fused(
+  captured:
+  - launch_4k_fused
+  arch_scope: ''
+  evidence:
+  - '1696:     @flyc.jit'
+  - '1697:     def launch_4k_fused('
+  - '1698:         topk_ids: fx.Tensor,'
+  - '1699:         workspace: fx.Tensor,'
+  evidence_id: src_3b561c43a6b951ae
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 265
+  end_line: 270
+  match: in ("gfx942"
+  captured:
+  - gfx942
+  arch_scope: gfx942
+  evidence:
+  - '263:     # LDS sizing: sub_tokens rows for the token×expert histogram'
+  - '264:     # Match CK''s sizing: total LDS / occupancy / smem_cols, rounded to 8'
+  - '265:     if arch in ("gfx942",) or str(arch).startswith("gfx94"):'
+  - '266:         lds_capacity_bytes = 65536'
+  - '267:     elif str(arch).startswith("gfx95"):'
+  evidence_id: src_375a1cbaf9ea08ba
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1784
+  end_line: 1789
+  match: in ("gfx942"
+  captured:
+  - gfx942
+  arch_scope: gfx942
+  evidence:
+  - '1782:     E = num_experts'
+  - '1783:     smem_cols = E + 1'
+  - '1784:     if arch in ("gfx942",) or str(arch).startswith("gfx94"):'
+  - '1785:         lds_capacity_bytes = 65536'
+  - '1786:     elif str(arch).startswith("gfx95"):'
+  evidence_id: src_9e6c38332b066904
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 265
+  end_line: 270
+  match: .startswith("gfx94")
+  captured:
+  - gfx94
+  arch_scope: gfx942
+  evidence:
+  - '263:     # LDS sizing: sub_tokens rows for the token×expert histogram'
+  - '264:     # Match CK''s sizing: total LDS / occupancy / smem_cols, rounded to 8'
+  - '265:     if arch in ("gfx942",) or str(arch).startswith("gfx94"):'
+  - '266:         lds_capacity_bytes = 65536'
+  - '267:     elif str(arch).startswith("gfx95"):'
+  evidence_id: src_d1dd7a03effe8944
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 267
+  end_line: 270
+  match: .startswith("gfx95")
+  captured:
+  - gfx95
+  arch_scope: gfx942
+  evidence:
+  - '265:     if arch in ("gfx942",) or str(arch).startswith("gfx94"):'
+  - '266:         lds_capacity_bytes = 65536'
+  - '267:     elif str(arch).startswith("gfx95"):'
+  - '268:         lds_capacity_bytes = 163840'
+  - '269:     else:'
+  evidence_id: src_f51f71fa7f1c041a
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1784
+  end_line: 1789
+  match: .startswith("gfx94")
+  captured:
+  - gfx94
+  arch_scope: gfx942
+  evidence:
+  - '1782:     E = num_experts'
+  - '1783:     smem_cols = E + 1'
+  - '1784:     if arch in ("gfx942",) or str(arch).startswith("gfx94"):'
+  - '1785:         lds_capacity_bytes = 65536'
+  - '1786:     elif str(arch).startswith("gfx95"):'
+  evidence_id: src_03607c45537213a4
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1786
+  end_line: 1789
+  match: .startswith("gfx95")
+  captured:
+  - gfx95
+  arch_scope: gfx942
+  evidence:
+  - '1784:     if arch in ("gfx942",) or str(arch).startswith("gfx94"):'
+  - '1785:         lds_capacity_bytes = 65536'
+  - '1786:     elif str(arch).startswith("gfx95"):'
+  - '1787:         lds_capacity_bytes = 163840'
+  - '1788:     else:'
+  evidence_id: src_5a8cb1f0ed00fe55
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 772
+  end_line: 776
+  match: ".launch(\n            grid=(n_grid_blocks, 1, 1)"
+  captured:
+  - n_grid_blocks, 1, 1
+  arch_scope: ''
+  evidence:
+  - '770:             i32_moe_buf_elems,'
+  - '771:         )'
+  - '772:         launcher.launch('
+  - '773:             grid=(n_grid_blocks, 1, 1),'
+  - '774:             block=(ONESHOT_BLOCK, 1, 1),'
+  evidence_id: src_62f1c33debda3eed
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 994
+  match: .launch(grid=(n_grid, 1, 1)
+  captured:
+  - n_grid, 1, 1
+  arch_scope: ''
+  evidence:
+  - '992:         stream = stream if stream is not None else fx.Stream(None)'
+  - '993:         launcher = clear_workspace_kernel(workspace, i32_total_elems)'
+  - '994:         launcher.launch(grid=(n_grid, 1, 1), block=(K1_BLOCK, 1, 1), stream=stream)'
+  - '996:     # --- K2: P0 scatter kernel -----------------------------------------------'
+  evidence_id: src_edad5995e481a7a8
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1060
+  match: .launch(grid=(n_grid, 1, 1)
+  captured:
+  - n_grid, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1058:             i32_niters,'
+  - '1059:         )'
+  - '1060:         launcher.launch(grid=(n_grid, 1, 1), block=(K2_BLOCK, 1, 1), stream=stream)'
+  - '1062:     # --- K3: P1 count kernel -------------------------------------------------'
+  evidence_id: src_43cbe27bd46342e8
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1200
+  match: .launch(grid=(E, 1, 1)
+  captured:
+  - E, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1198:             i32_mesh_size,'
+  - '1199:         )'
+  - '1200:         launcher.launch(grid=(E, 1, 1), block=(K3_BLOCK, 1, 1), stream=stream)'
+  - '1202:     # --- P0_v2: Fused clear+scatter+count kernel (for T <= 2048) --------------'
+  evidence_id: src_c1f0e046c5841729
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1395
+  match: .launch(grid=(E, 1, 1)
+  captured:
+  - E, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1393:             i32_mesh_size,'
+  - '1394:         )'
+  - '1395:         launcher.launch(grid=(E, 1, 1), block=(P0V2_BLOCK, 1, 1), stream=stream)'
+  - '1397:     # --- K4: P23 prefix-sum + scatter + moe_buf zeroing ---------------------'
+  evidence_id: src_b1d4338caf797a44
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1646
+  match: .launch(grid=(n_grid, 1, 1)
+  captured:
+  - n_grid, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1644:             i32_moe_buf_elems,'
+  - '1645:         )'
+  - '1646:         launcher.launch(grid=(n_grid, 1, 1), block=(K4_BLOCK, 1, 1), stream=stream)'
+  - '1648:     @flyc.jit'
+  evidence_id: src_0c9fd4d6996e3893
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1677
+  match: .launch(grid=(E, 1, 1)
+  captured:
+  - E, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1675:             i32_mesh_size,'
+  - '1676:         )'
+  - '1677:         l1.launch(grid=(E, 1, 1), block=(P0V2_BLOCK, 1, 1), stream=stream)'
+  - '1679:         l2 = p23_kernel('
+  evidence_id: src_c69bc701a3d11ba5
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1694
+  match: .launch(grid=(n_grid_p23, 1, 1)
+  captured:
+  - n_grid_p23, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1692:             i32_moe_buf_elems,'
+  - '1693:         )'
+  - '1694:         l2.launch(grid=(n_grid_p23, 1, 1), block=(K4_BLOCK, 1, 1), stream=stream)'
+  - '1696:     @flyc.jit'
+  evidence_id: src_0f720b7cd7d8f1ff
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1721
+  match: .launch(grid=(n_grid_k1, 1, 1)
+  captured:
+  - n_grid_k1, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1719:         stream = stream if stream is not None else fx.Stream(None)'
+  - '1720:         l1 = clear_workspace_kernel(workspace, i32_ws_total)'
+  - '1721:         l1.launch(grid=(n_grid_k1, 1, 1), block=(K1_BLOCK, 1, 1), stream=stream)'
+  - '1723:         l2 = p0_scatter_kernel('
+  evidence_id: src_4ee57ea5b65bc0ab
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1731
+  match: .launch(grid=(n_grid_k2, 1, 1)
+  captured:
+  - n_grid_k2, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1729:             i32_p0_niters,'
+  - '1730:         )'
+  - '1731:         l2.launch(grid=(n_grid_k2, 1, 1), block=(K2_BLOCK, 1, 1), stream=stream)'
+  - '1733:         l3 = p1_count_kernel('
+  evidence_id: src_f9386a176c6470b1
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1741
+  match: .launch(grid=(E, 1, 1)
+  captured:
+  - E, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1739:             i32_mesh_size,'
+  - '1740:         )'
+  - '1741:         l3.launch(grid=(E, 1, 1), block=(K3_BLOCK, 1, 1), stream=stream)'
+  - '1743:         l4 = p23_kernel('
+  evidence_id: src_4927442f1d194426
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1758
+  match: .launch(grid=(n_grid_p23, 1, 1)
+  captured:
+  - n_grid_p23, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1756:             i32_moe_buf_elems,'
+  - '1757:         )'
+  - '1758:         l4.launch(grid=(n_grid_p23, 1, 1), block=(K4_BLOCK, 1, 1), stream=stream)'
+  - '1760:     return ('
+  evidence_id: src_d191786d13cb5db5
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 223
+  match: '@functools.lru_cache(maxsize=256)
+
+    def _compile_moe_sorting_oneshot'
+  captured:
+  - '256'
+  - _compile_moe_sorting_oneshot
+  arch_scope: ''
+  evidence:
+  - '221: # FlyDSL GPU kernel — oneshot path (single kernel, all phases in LDS)'
+  - '222: # ---------------------------------------------------------------------------'
+  - '223: @functools.lru_cache(maxsize=256)'
+  - '224: def _compile_moe_sorting_oneshot('
+  - '225:     *,'
+  evidence_id: src_e098ef36a5c40d45
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 784
+  match: '@functools.lru_cache(maxsize=64)
+
+    def _p23_block_size'
+  captured:
+  - '64'
+  - _p23_block_size
+  arch_scope: ''
+  evidence:
+  - '782: # FlyDSL GPU kernels — multiphase path (2 or 4 kernels, large T via HBM workspace)'
+  - '783: # ---------------------------------------------------------------------------'
+  - '784: @functools.lru_cache(maxsize=64)'
+  - '785: def _p23_block_size(num_experts: int, tokens: int) -> int:'
+  - '786:     """Runtime P23 block size: balance E>256 prefix path vs large-T mesh scan."""'
+  evidence_id: src_249e8d699180c5d7
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 796
+  match: '@functools.lru_cache(maxsize=256)
+
+    def _compile_moe_sorting_multiphase'
+  captured:
+  - '256'
+  - _compile_moe_sorting_multiphase
+  arch_scope: ''
+  evidence:
+  - '796: @functools.lru_cache(maxsize=256)'
+  - '797: def _compile_moe_sorting_multiphase('
+  - '798:     *,'
+  evidence_id: src_e5b7dc6af63b51b5
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  line: 1773
+  match: '@functools.lru_cache(maxsize=64)
+
+    def _compute_sub_tokens'
+  captured:
+  - '64'
+  - _compute_sub_tokens
+  arch_scope: ''
+  evidence:
+  - '1771: # Host-side entry point'
+  - '1772: # ---------------------------------------------------------------------------'
+  - '1773: @functools.lru_cache(maxsize=64)'
+  - '1774: def _compute_sub_tokens(num_experts, arch=None):'
+  - '1775:     """Compute the LDS-capacity threshold (sub_tokens) for oneshot vs multiphase decision.'
+  evidence_id: src_914dd518fb02be1e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/moe_sorting.py
+  line: 19
+  end_line: 64
+  match: def flydsl_moe_sorting_fwd(
+  captured:
+  - flydsl_moe_sorting_fwd
+  arch_scope: ''
+  evidence:
+  - '19: def flydsl_moe_sorting_fwd('
+  - '20:     topk_ids,'
+  - '21:     topk_weights,'
+  evidence_id: src_ac3c69d9503ae1e9
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/moe_align_block_size_kernels.cu
+  line: 47
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '45:     const size_t start_idx         = threadIdx.x * tokens_per_thread;'
+  - '47:     extern __shared__ int32_t shared_mem[];'
+  - '49:     // Optimized shared memory layout using only O(num_experts):'
+  evidence_id: src_ad65f32a0eb52f52
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/topk_softmax_kernels.cu
+  line: 73
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '71:                     const int input_row_stride)'
+  - '72: {'
+  - '73:     __shared__ float normalizing_factor;'
+  - '74:     __shared__ float float_max;'
+  evidence_id: src_3a885d221440baac
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/topk_softmax_kernels.cu
+  line: 74
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '72: {'
+  - '73:     __shared__ float normalizing_factor;'
+  - '74:     __shared__ float float_max;'
+  - '76:     // `input` is the caller''s gating tensor, whose rows may be strided; `output` is the'
+  evidence_id: src_3828294d1c593a54
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/topk_softmax_kernels.cu
+  line: 870
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '868:         NUM_SHARED_EXPERTS * GATE_LDS_CAP * static_cast<int>(sizeof(DTYPE)) <= 65536;'
+  - '869:     static constexpr int GATE_LDS_SLOTS = GATE_LDS_FITS ? NUM_SHARED_EXPERTS * GATE_LDS_CAP : 1;'
+  - '870:     __shared__ __attribute__((aligned(64))) DTYPE s_gate[GATE_LDS_SLOTS];'
+  - '871:     bool use_lds_gate = false;'
+  - '872:     if constexpr(NUM_SHARED_EXPERTS > 0 && SCORING_FUNC != SharedExpertScoringFunc::NONE &&'
+  evidence_id: src_397b092bd5c8ad63
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: hip
+  file: csrc/kernels/topk_softmax_kernels.cu
+  line: 66
+  match: __launch_bounds__(TPB)
+  captured:
+  - TPB
+  arch_scope: ''
+  evidence:
+  - '64: // in the softmax kernel when we extend this module to support expert-choice routing.'
+  - '65: template <typename DTYPE, int TPB>'
+  - '66: __launch_bounds__(TPB) __global__'
+  - '67:     void moeSoftmax(const DTYPE* input,'
+  - '68:                     const bool* finished,'
+  evidence_id: src_f944117ff3b30994
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: hip
+  file: csrc/kernels/topk_softmax_kernels.cu
+  line: 129
+  match: __launch_bounds__(TPB)
+  captured:
+  - TPB
+  arch_scope: ''
+  evidence:
+  - '128: template <int TPB>'
+  - '129: __launch_bounds__(TPB) __global__ void moeTopK(const float* inputs_after_softmax,'
+  - '130:                                                const bool* finished,'
+  - '131:                                                float* output,'
+  evidence_id: src_4e1aa5ae71011dba
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: hip
+  file: csrc/kernels/topk_softmax_kernels.cu
+  line: 238
+  match: __launch_bounds__(WARPS_PER_CTA * opus::get_warp_size()
+  captured:
+  - WARPS_PER_CTA * opus::get_warp_size(
+  arch_scope: ''
+  evidence:
+  - '236:           int NUM_SHARED_EXPERTS = 0,'
+  - '237:           SharedExpertScoringFunc SCORING_FUNC = SharedExpertScoringFunc::NONE>'
+  - '238: __launch_bounds__(WARPS_PER_CTA * opus::get_warp_size()) __global__'
+  - '239:     void topkGatingSoftmax(const DTYPE* input,'
+  - '240:                            const bool* finished,'
+  evidence_id: src_f32f09f89cf9ee07
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: hip
+  file: csrc/kernels/topk_softmax_kernels.cu
+  line: 640
+  match: __launch_bounds__(TPB)
+  captured:
+  - TPB
+  arch_scope: ''
+  evidence:
+  - '638: // Kernel to apply sigmoid scoring to shared experts'
+  - '639: template <typename DTYPE, int TPB>'
+  - '640: __launch_bounds__(TPB) __global__'
+  - '641:     void applySharedExpertSigmoid(const DTYPE* shared_gating_input,'
+  - '642:                                   float* shared_weights,'
+  evidence_id: src_144fd9e8f121932d
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: hip
+  file: csrc/kernels/topk_softmax_kernels.cu
+  line: 785
+  match: __launch_bounds__(WARPS_PER_CTA * opus::get_warp_size()
+  captured:
+  - WARPS_PER_CTA * opus::get_warp_size(
+  arch_scope: ''
+  evidence:
+  - '783:           int NUM_SHARED_EXPERTS = 0,'
+  - '784:           SharedExpertScoringFunc SCORING_FUNC = SharedExpertScoringFunc::NONE>'
+  - '785: __launch_bounds__(WARPS_PER_CTA * opus::get_warp_size()) __global__'
+  - '786:     void topkGatingSoftmaxFusedGate(const DTYPE* input,'
+  - '787:                            const bool* finished,'
+  evidence_id: src_931527dde204f460
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/py_itfs_cu/moe_sorting_opus_kernels.cu
+  line: 170
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '168:     // (E=385) is covered by the running prefix of the last full wave.'
+  - '169:     constexpr int kFullExpertWaves = NumExperts / 64;'
+  - '170:     __shared__ int expert_counts[NumExperts];'
+  - '171:     __shared__ int expert_offsets[NumExperts + 1];'
+  - '172:     __shared__ int expert_cursors[NumExperts];'
+  evidence_id: src_8a9247c3eeb063e8
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/py_itfs_cu/moe_sorting_opus_kernels.cu
+  line: 171
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '169:     constexpr int kFullExpertWaves = NumExperts / 64;'
+  - '170:     __shared__ int expert_counts[NumExperts];'
+  - '171:     __shared__ int expert_offsets[NumExperts + 1];'
+  - '172:     __shared__ int expert_cursors[NumExperts];'
+  - '173:     __shared__ int wave_totals[16];'
+  evidence_id: src_f94bb12b407e5c46
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/py_itfs_cu/moe_sorting_opus_kernels.cu
+  line: 172
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '170:     __shared__ int expert_counts[NumExperts];'
+  - '171:     __shared__ int expert_offsets[NumExperts + 1];'
+  - '172:     __shared__ int expert_cursors[NumExperts];'
+  - '173:     __shared__ int wave_totals[16];'
+  evidence_id: src_44da49602ca5f531
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/py_itfs_cu/moe_sorting_opus_kernels.cu
+  line: 173
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '171:     __shared__ int expert_offsets[NumExperts + 1];'
+  - '172:     __shared__ int expert_cursors[NumExperts];'
+  - '173:     __shared__ int wave_totals[16];'
+  - '175:     const int tid = threadIdx.x;'
+  evidence_id: src_35e6ed85da01e8bc
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: hip
+  file: csrc/py_itfs_cu/moe_sorting_opus_kernels.cu
+  line: 266
+  match: groups_per_token =
+  captured:
+  - groups_per_token
+  arch_scope: ''
+  evidence:
+  - '264: {'
+  - '265:     using bf16x2_t = __bf16 __attribute__((ext_vector_type(2)));'
+  - '266:     constexpr int groups_per_token = kHiddenSize / 32;'
+  - '267:     constexpr int groups_per_wave = 16;'
+  - '268:     constexpr int groups_per_cta = (kThreads / 64) * groups_per_wave;'
+  evidence_id: src_4c5f7e713465a3ff
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: hip
+  file: csrc/py_itfs_cu/moe_sorting_opus_kernels.cu
+  line: 339
+  match: __launch_bounds__(kThreads)
+  captured:
+  - kThreads
+  arch_scope: ''
+  evidence:
+  - '338: template <int NumExperts, int TopK>'
+  - '339: __global__ void __launch_bounds__(kThreads) moe_sort_quant_kernel('
+  - '340:     const hip_bfloat16* hidden_states,'
+  - '341:     const int32_t* topk_ids,'
+  evidence_id: src_bad34d9b2f34b444

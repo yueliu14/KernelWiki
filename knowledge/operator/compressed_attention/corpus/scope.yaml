@@ -1,0 +1,18 @@
+schema_version: 2
+operator: compressed_attention
+sources:
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  language: flydsl
+  include_symbols: true
+validation_sources:
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_flydsl_compress_attn.py
+coverage_notes:
+- Source observations and conditioned candidates for compressed attention; source presence is not a measured
+  winner.
+- No new GPU measurements or binary disassembly are included.

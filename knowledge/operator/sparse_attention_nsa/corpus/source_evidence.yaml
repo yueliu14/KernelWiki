@@ -1,0 +1,1318 @@
+schema_version: 2
+operator: sparse_attention_nsa
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_b3ad6c46
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  lines: 2938
+  evidence_records: 59
+- snapshot: aiter_b3ad6c46
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  lines: 271
+  evidence_records: 19
+- snapshot: aiter_b3ad6c46
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla_sparse_prefill.cu
+  lines: 261
+  evidence_records: 4
+missing: []
+source_evidence:
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 8
+  end_line: 9
+  match: 'def cdiv_fn(x, y):'
+  captured:
+  - cdiv_fn
+  arch_scope: ''
+  evidence:
+  - '7: @triton.jit'
+  - '8: def cdiv_fn(x, y):'
+  - '9:     return (x + y - 1) // y'
+  evidence_id: src_28dd127d81d35f01
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 13
+  end_line: 17
+  match: 'def apply_softcap(S, x):'
+  captured:
+  - apply_softcap
+  arch_scope: ''
+  evidence:
+  - '12: @triton.jit'
+  - '13: def apply_softcap(S, x):'
+  - '14:     Sdiv = S / x'
+  - '15:     p1 = tl.exp(Sdiv)'
+  evidence_id: src_2fd79f0812586853
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 21
+  end_line: 40
+  match: def find_seq_idx(
+  captured:
+  - find_seq_idx
+  arch_scope: ''
+  evidence:
+  - '20: @triton.jit'
+  - '21: def find_seq_idx('
+  - '22:     query_start_len_ptr,'
+  - '23:     target_idx,'
+  evidence_id: src_5c6fca0f7efcb8a9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 60
+  end_line: 270
+  match: def _kernel_unified_attention_sparse_mla_2d(
+  captured:
+  - _kernel_unified_attention_sparse_mla_2d
+  arch_scope: ''
+  evidence:
+  - '59: @triton.jit(repr=_kernel_unified_attention_sparse_mla_2d_repr)'
+  - '60: def _kernel_unified_attention_sparse_mla_2d('
+  - '61:     output_ptr,  # [num_tokens, num_query_heads, KV_LORA_RANK]'
+  - '62:     query_ptr,  # [num_tokens, num_query_heads, KV_LORA_RANK]'
+  evidence_id: src_ed78f2dc4c308f3e
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 206
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '204:             cache_modifier=KV_cache_modifier,'
+  - '205:         )'
+  - '206:         S += scale * tl.dot(Q_rope, K_rope)'
+  - '207:         # K_lora: (KV_LORA_RANK, TILE_SIZE)'
+  - '208:         k_lora_ptrs = ('
+  evidence_id: src_2bbbfad2a6bcaffb
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 222
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '220:         )'
+  - '222:         S += scale * tl.dot(Q_lora, K_lora)'
+  - '224:         S = tl.where('
+  evidence_id: src_e0771855a9197cce
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 255
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '253:         )'
+  - '255:         acc = tl.dot(P.to(V_lora.dtype), V_lora, acc=acc)'
+  - '257:     # epilogue'
+  evidence_id: src_8541f36db9ec46d6
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 25
+  match: 'BLOCK_Q: tl.constexpr,'
+  captured:
+  - BLOCK_Q
+  arch_scope: ''
+  evidence:
+  - '23:     target_idx,'
+  - '24:     num_seqs,'
+  - '25:     BLOCK_Q: tl.constexpr,'
+  - '26:     use_q_block_mode: tl.constexpr,'
+  - '27: ):'
+  evidence_id: src_97ab18da0aaa1941
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 26
+  match: 'use_q_block_mode: tl.constexpr,'
+  captured:
+  - use_q_block_mode
+  arch_scope: ''
+  evidence:
+  - '24:     num_seqs,'
+  - '25:     BLOCK_Q: tl.constexpr,'
+  - '26:     use_q_block_mode: tl.constexpr,'
+  - '27: ):'
+  - '28:     left: tl.int32 = 0'
+  evidence_id: src_69af567076d0bbae
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 69
+  match: 'num_query_heads: tl.constexpr,'
+  captured:
+  - num_query_heads
+  arch_scope: ''
+  evidence:
+  - '67:     seq_lens_ptr,  # [num_seqs]'
+  - '68:     scale,  # float32'
+  - '69:     num_query_heads: tl.constexpr,  # int'
+  - '70:     num_queries_per_kv: tl.constexpr,  # int'
+  - '71:     block_table_stride: tl.int64,  # int'
+  evidence_id: src_162ed9e404d68d32
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 70
+  match: 'num_queries_per_kv: tl.constexpr,'
+  captured:
+  - num_queries_per_kv
+  arch_scope: ''
+  evidence:
+  - '68:     scale,  # float32'
+  - '69:     num_query_heads: tl.constexpr,  # int'
+  - '70:     num_queries_per_kv: tl.constexpr,  # int'
+  - '71:     block_table_stride: tl.int64,  # int'
+  - '72:     query_stride_0: tl.int64,  # int'
+  evidence_id: src_e4d0aa83b6ca1a41
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 76
+  match: 'BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '74:     output_stride_0: tl.int64,  # int'
+  - '75:     output_stride_1: tl.int64,  # int'
+  - '76:     BLOCK_SIZE: tl.constexpr,  # int'
+  - '77:     stride_k_cache_0: tl.int64,  # int'
+  - '78:     stride_k_cache_1: tl.int64,  # int'
+  evidence_id: src_ddf1f65174155aac
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 80
+  match: 'stride_k_cache_3: tl.constexpr,'
+  captured:
+  - stride_k_cache_3
+  arch_scope: ''
+  evidence:
+  - '78:     stride_k_cache_1: tl.int64,  # int'
+  - '79:     stride_k_cache_2: tl.int64,  # int'
+  - '80:     stride_k_cache_3: tl.constexpr,  # int'
+  - '81:     stride_v_cache_0: tl.int64,  # int'
+  - '82:     stride_v_cache_1: tl.int64,  # int'
+  evidence_id: src_2c8f74a9ff98fae3
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 84
+  match: 'stride_v_cache_3: tl.constexpr,'
+  captured:
+  - stride_v_cache_3
+  arch_scope: ''
+  evidence:
+  - '82:     stride_v_cache_1: tl.int64,  # int'
+  - '83:     stride_v_cache_2: tl.int64,  # int'
+  - '84:     stride_v_cache_3: tl.constexpr,  # int'
+  - '85:     topk_count: tl.constexpr,'
+  - '86:     query_start_len_ptr,  # [num_seqs+1]'
+  evidence_id: src_8ae81e4ddbb15475
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 85
+  match: 'topk_count: tl.constexpr,'
+  captured:
+  - topk_count
+  arch_scope: ''
+  evidence:
+  - '83:     stride_v_cache_2: tl.int64,  # int'
+  - '84:     stride_v_cache_3: tl.constexpr,  # int'
+  - '85:     topk_count: tl.constexpr,'
+  - '86:     query_start_len_ptr,  # [num_seqs+1]'
+  - '87:     num_seqs: tl.int32,'
+  evidence_id: src_d24522036303188d
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 88
+  match: 'BLOCK_M: tl.constexpr,'
+  captured:
+  - BLOCK_M
+  arch_scope: ''
+  evidence:
+  - '86:     query_start_len_ptr,  # [num_seqs+1]'
+  - '87:     num_seqs: tl.int32,'
+  - '88:     BLOCK_M: tl.constexpr,  # int'
+  - '89:     ROPE_RANK: tl.constexpr,'
+  - '90:     KV_LORA_RANK: tl.constexpr,'
+  evidence_id: src_2d43e9a406c735b6
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 89
+  match: 'ROPE_RANK: tl.constexpr,'
+  captured:
+  - ROPE_RANK
+  arch_scope: ''
+  evidence:
+  - '87:     num_seqs: tl.int32,'
+  - '88:     BLOCK_M: tl.constexpr,  # int'
+  - '89:     ROPE_RANK: tl.constexpr,'
+  - '90:     KV_LORA_RANK: tl.constexpr,'
+  - '91:     TILE_SIZE: tl.constexpr,'
+  evidence_id: src_ab25ae0aea10e82e
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 90
+  match: 'KV_LORA_RANK: tl.constexpr,'
+  captured:
+  - KV_LORA_RANK
+  arch_scope: ''
+  evidence:
+  - '88:     BLOCK_M: tl.constexpr,  # int'
+  - '89:     ROPE_RANK: tl.constexpr,'
+  - '90:     KV_LORA_RANK: tl.constexpr,'
+  - '91:     TILE_SIZE: tl.constexpr,'
+  - '92:     ALL_DECODE: tl.constexpr = False,'
+  evidence_id: src_428f3fd3a986d42e
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py
+  line: 91
+  match: 'TILE_SIZE: tl.constexpr,'
+  captured:
+  - TILE_SIZE
+  arch_scope: ''
+  evidence:
+  - '89:     ROPE_RANK: tl.constexpr,'
+  - '90:     KV_LORA_RANK: tl.constexpr,'
+  - '91:     TILE_SIZE: tl.constexpr,'
+  - '92:     ALL_DECODE: tl.constexpr = False,'
+  - '93: ):'
+  evidence_id: src_7b00639a1085fd41
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 66
+  end_line: 67
+  match: 'def _max2(a, b):'
+  captured:
+  - _max2
+  arch_scope: ''
+  evidence:
+  - '65: @gluon.jit'
+  - '66: def _max2(a, b):'
+  - '67:     return gl.maximum(a, b, propagate_nan=_MAX_PROP_NAN)'
+  evidence_id: src_d246292a30a67ec6
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 71
+  end_line: 72
+  match: 'def _rmax(x, axis):'
+  captured:
+  - _rmax
+  arch_scope: ''
+  evidence:
+  - '70: @gluon.jit'
+  - '71: def _rmax(x, axis):'
+  - '72:     return gl.reduce(x, axis, _max2)'
+  evidence_id: src_7075dabff20e2d61
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 76
+  end_line: 88
+  match: 'def _row_partials_layout(lin, n_warps):'
+  captured:
+  - _row_partials_layout
+  arch_scope: ''
+  evidence:
+  - '75: @gluon.constexpr_function'
+  - '76: def _row_partials_layout(lin, n_warps):'
+  - '77:     """Layout that reads per-warp row partials back from LDS."""'
+  - '78:     reg = [[0, 1 << i] for i in range(n_warps.bit_length() - 1)]'
+  evidence_id: src_279dd06a3fbd257a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 92
+  end_line: 121
+  match: 'def _row_reduce_lds(cfg, x, red_smem, IS_MAX: gl.constexpr):'
+  captured:
+  - _row_reduce_lds
+  arch_scope: ''
+  evidence:
+  - '91: @gluon.jit'
+  - '92: def _row_reduce_lds(cfg, x, red_smem, IS_MAX: gl.constexpr):'
+  - '93:     """Row max or sum across the key warps through red_smem: one barrier,'
+  - '94:     and gl.reduce''s summation order."""'
+  evidence_id: src_b4ca5990b0d7f436
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 125
+  end_line: 152
+  match: def _cache_load(
+  captured:
+  - _cache_load
+  arch_scope: ''
+  evidence:
+  - '124: @gluon.jit'
+  - '125: def _cache_load('
+  - '126:     ptr,'
+  - '127:     row,'
+  evidence_id: src_a8732aa076646f70
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 156
+  end_line: 157
+  match: 'def _fp8_to_f32(x_u8):'
+  captured:
+  - _fp8_to_f32
+  arch_scope: ''
+  evidence:
+  - '155: @gluon.jit'
+  - '156: def _fp8_to_f32(x_u8):'
+  - '157:     return x_u8.to(gl.float8e4nv, bitcast=True).to(gl.float32)'
+  evidence_id: src_bae5e0fce2475a22
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 161
+  end_line: 163
+  match: 'def _fp8_to_bf16(x_u8):'
+  captured:
+  - _fp8_to_bf16
+  arch_scope: ''
+  evidence:
+  - '160: @gluon.jit'
+  - '161: def _fp8_to_bf16(x_u8):'
+  - '162:     # Exact: fp8''s 3 mantissa bits fit bf16''s 8.'
+  - '163:     return x_u8.to(gl.float8e4nv, bitcast=True).to(gl.bfloat16)'
+  evidence_id: src_c45e9bfe34b0ba84
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 167
+  end_line: 223
+  match: def _scale_load(
+  captured:
+  - _scale_load
+  arch_scope: ''
+  evidence:
+  - '166: @gluon.jit'
+  - '167: def _scale_load('
+  - '168:     ptr,'
+  - '169:     row,'
+  evidence_id: src_a6dea1eca824a271
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 227
+  end_line: 233
+  match: 'def _widen_scales(sc, gather_l: gl.constexpr, NG: gl.constexpr, W_FULL: gl.constexpr):'
+  captured:
+  - _widen_scales
+  arch_scope: ''
+  evidence:
+  - '226: @gluon.jit'
+  - '227: def _widen_scales(sc, gather_l: gl.constexpr, NG: gl.constexpr, W_FULL: gl.constexpr):'
+  - '228:     """Broadcast [BLOCK_K, NG] group scales to [BLOCK_K, W_FULL] in gather_l'
+  - '229:     (a register rename)."""'
+  evidence_id: src_69566efcfbb06fa8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 237
+  end_line: 246
+  match: 'def _split2(x):'
+  captured:
+  - _split2
+  arch_scope: ''
+  evidence:
+  - '236: @gluon.jit'
+  - '237: def _split2(x):'
+  - '238:     """Register split along dim 1: [A, B] -> two [A, B//2] in the input''s own'
+  - '239:     layout. Free only while the column direction is a per-lane register repeat;'
+  evidence_id: src_8e598d3cfb469e7a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 250
+  end_line: 258
+  match: 'def _split2_dim0(x):'
+  captured:
+  - _split2_dim0
+  arch_scope: ''
+  evidence:
+  - '249: @gluon.jit'
+  - '250: def _split2_dim0(x):'
+  - '251:     """Dim-0 counterpart of _split2, for the row-wide gather layout where the'
+  - '252:     per-lane register repeats live on dim 0."""'
+  evidence_id: src_4845ecaa52ca3b65
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 262
+  end_line: 267
+  match: 'def _split_ax(x, AXIS: gl.constexpr):'
+  captured:
+  - _split_ax
+  arch_scope: ''
+  evidence:
+  - '261: @gluon.jit'
+  - '262: def _split_ax(x, AXIS: gl.constexpr):'
+  - '263:     if AXIS == 1:'
+  - '264:         a, b = _split2(x)'
+  evidence_id: src_671dc633f424a13d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 271
+  end_line: 298
+  match: 'def _scaled_upcast_asm(x16, e_u8, W8: gl.constexpr, out_l: gl.constexpr):'
+  captured:
+  - _scaled_upcast_asm
+  arch_scope: ''
+  evidence:
+  - '270: @gluon.jit'
+  - '271: def _scaled_upcast_asm(x16, e_u8, W8: gl.constexpr, out_l: gl.constexpr):'
+  - '272:     """[BLOCK_K, W8/2] int16 (4 packed fp8) + raw E8M0 byte -> [BLOCK_K, W8] bf16.'
+  evidence_id: src_9005d76585756563
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 714
+  end_line: 751
+  match: 'def _deq_store(x_u8, sc, kv_smem, off, cfg, fmt, AXIS: gl.constexpr):'
+  captured:
+  - _deq_store
+  arch_scope: ''
+  evidence:
+  - '713: @gluon.jit'
+  - '714: def _deq_store(x_u8, sc, kv_smem, off, cfg, fmt, AXIS: gl.constexpr):'
+  - '715:     """Dequant one fp8 slab into kv_smem[:, off:off+W]. Dequant stays in f32'
+  - '716:     (gfx950 has no bf16 multiply). sc: raw UE8M0 byte (dsv4), f32 scale'
+  evidence_id: src_0eb2b8b252b58204
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 755
+  end_line: 800
+  match: 'def _deq_store_tile(x_u8, sc, kv_smem, cfg, fmt):'
+  captured:
+  - _deq_store_tile
+  arch_scope: ''
+  evidence:
+  - '754: @gluon.jit'
+  - '755: def _deq_store_tile(x_u8, sc, kv_smem, cfg, fmt):'
+  - '756:     """Dequant a gathered fp8 tile into kv_smem in NOPE_CHUNK-sized pieces'
+  - '757:     along CHUNK_AXIS (0 = rows, 1 = columns). The f32 expansion is 4x the fp8'
+  evidence_id: src_312fca27a555ef00
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 804
+  end_line: 808
+  match: 'def _read_slots_at(cfg, base, off):'
+  captured:
+  - _read_slots_at
+  arch_scope: ''
+  evidence:
+  - '803: @gluon.jit'
+  - '804: def _read_slots_at(cfg, base, off):'
+  - '805:     """Slot ids base[off], base = indices_ptr + the segment''s start."""'
+  - '806:     if cfg.IDX_BUFFER_LOAD:'
+  evidence_id: src_6ca605fa4ac02aeb
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 812
+  end_line: 813
+  match: 'def _read_slots(cfg, seg, off):'
+  captured:
+  - _read_slots
+  arch_scope: ''
+  evidence:
+  - '811: @gluon.jit'
+  - '812: def _read_slots(cfg, seg, off):'
+  - '813:     return _read_slots_at(cfg, seg.indices_ptr + seg.seg_start, off)'
+  evidence_id: src_2bcb9480481ff798
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 817
+  end_line: 820
+  match: 'def _split_slot(cfg, slot, BLOCK_SIZE: gl.constexpr):'
+  captured:
+  - _split_slot
+  arch_scope: ''
+  evidence:
+  - '816: @gluon.jit'
+  - '817: def _split_slot(cfg, slot, BLOCK_SIZE: gl.constexpr):'
+  - '818:     if cfg.SLOT_U32:'
+  - '819:         slot = slot.to(gl.uint32)'
+  evidence_id: src_0e5f34ca8cf794f5
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 824
+  end_line: 874
+  match: def _slots(
+  captured:
+  - _slots
+  arch_scope: ''
+  evidence:
+  - '823: @gluon.jit'
+  - '824: def _slots('
+  - '825:     cfg,'
+  - '826:     seg,'
+  evidence_id: src_fe7422153439dd0e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 878
+  end_line: 887
+  match: 'def _first_valid_slot(cfg, seg, target, k, hi):'
+  captured:
+  - _first_valid_slot
+  arch_scope: ''
+  evidence:
+  - '877: @gluon.jit'
+  - '878: def _first_valid_slot(cfg, seg, target, k, hi):'
+  - '879:     """While target < 0, read the slot ids from k on a tile at a time: the'
+  - '880:     largest id of the first tile holding a valid one, or -1."""'
+  evidence_id: src_e5723c7d650e848b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 891
+  end_line: 903
+  match: 'def _with_target(seg, target):'
+  captured:
+  - _with_target
+  arch_scope: ''
+  evidence:
+  - '890: @gluon.jit'
+  - '891: def _with_target(seg, target):'
+  - '892:     """seg with the slot its -1 sentinels gather."""'
+  - '893:     return Seg('
+  evidence_id: src_366b9de6b74b5287
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 907
+  end_line: 941
+  match: 'def _qk_scores(cfg, q_dot, q_rope_dot, kv_smem, rope_smem):'
+  captured:
+  - _qk_scores
+  arch_scope: ''
+  evidence:
+  - '906: @gluon.jit'
+  - '907: def _qk_scores(cfg, q_dot, q_rope_dot, kv_smem, rope_smem):'
+  - '908:     """QK scores for one tile; ROPE_SEPARATE chains a second MFMA over the rope'
+  - '909:     buffer (MFMA accumulates natively, so KV_DIM + ROPE_DIM is two dots)."""'
+  evidence_id: src_a20638c51686486f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 945
+  end_line: 956
+  match: 'def _tile_rows(cfg, seg, k_start, seg_hi, k_rng, ROPE: gl.constexpr):'
+  captured:
+  - _tile_rows
+  arch_scope: ''
+  evidence:
+  - '944: @gluon.jit'
+  - '945: def _tile_rows(cfg, seg, k_start, seg_hi, k_rng, ROPE: gl.constexpr):'
+  - '946:     """Per-token row offsets for one tile, in k_rng''s layout. Clamped like UNI_TILE'
+  - '947:     (the score mask kills the duplicate), so an over-fetched tile is addressable."""'
+  evidence_id: src_ba5387d3114a8e0f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 960
+  end_line: 975
+  match: def _copy_lds_buffer(
+  captured:
+  - _copy_lds_buffer
+  arch_scope: ''
+  evidence:
+  - '959: @gluon.jit'
+  - '960: def _copy_lds_buffer('
+  - '961:     seg, dst, row, col, USE_BUFFER_LOAD: gl.constexpr, CACHE: gl.constexpr'
+  - '962: ):'
+  evidence_id: src_2bdfaef77b3f6564
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 979
+  end_line: 988
+  match: 'def _copy_tile(cfg, seg, kv_smem, rope_smem, row_l, row_r, offs_l, offs_r):'
+  captured:
+  - _copy_tile
+  arch_scope: ''
+  evidence:
+  - '978: @gluon.jit'
+  - '979: def _copy_tile(cfg, seg, kv_smem, rope_smem, row_l, row_r, offs_l, offs_r):'
+  - '980:     """One commit group = one tile (both buffers), so wait_group counts tiles."""'
+  - '981:     _copy_lds_buffer('
+  evidence_id: src_6f2b84f44bba75e2
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 992
+  end_line: 1050
+  match: def _async_segment(
+  captured:
+  - _async_segment
+  arch_scope: ''
+  evidence:
+  - '991: @gluon.jit'
+  - '992: def _async_segment('
+  - '993:     cfg,'
+  - '994:     seg,'
+  evidence_id: src_feb7167776956f1e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 1060
+  end_line: 1189
+  match: def _gather_full(
+  captured:
+  - _gather_full
+  arch_scope: ''
+  evidence:
+  - '1059: @gluon.jit'
+  - '1060: def _gather_full('
+  - '1061:     cfg,'
+  - '1062:     seg,'
+  evidence_id: src_f1ef5f7bd96ad620
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 1193
+  end_line: 1213
+  match: 'def _stage(cfg, seg, x_u8, sc, k_rope, kv_smem, rope_smem):'
+  captured:
+  - _stage
+  arch_scope: ''
+  evidence:
+  - '1192: @gluon.jit'
+  - '1193: def _stage(cfg, seg, x_u8, sc, k_rope, kv_smem, rope_smem):'
+  - '1194:     """Write one prefetched tile into the LDS buffer(s). The KV buffer is always the'
+  - '1195:     full KV_DIM-wide dequant: "fp8_dsv4_mla" gathers KV_DIM bytes too, the last 64 being'
+  evidence_id: src_ff5a50e559209ae8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 1218
+  end_line: 1256
+  match: def _qkpv(
+  captured:
+  - _qkpv
+  arch_scope: ''
+  evidence:
+  - '1217: @gluon.jit'
+  - '1218: def _qkpv('
+  - '1219:     cfg,'
+  - '1220:     seg,'
+  evidence_id: src_09406d91eeac6043
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 1260
+  end_line: 1350
+  match: def _qkpv_lds(
+  captured:
+  - _qkpv_lds
+  arch_scope: ''
+  evidence:
+  - '1259: @gluon.jit'
+  - '1260: def _qkpv_lds('
+  - '1261:     cfg,'
+  - '1262:     seg,'
+  evidence_id: src_8e1bf03be87eb482
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 1360
+  end_line: 1530
+  match: def _decode_tile(
+  captured:
+  - _decode_tile
+  arch_scope: ''
+  evidence:
+  - '1359: @gluon.jit'
+  - '1360: def _decode_tile('
+  - '1361:     cfg,'
+  - '1362:     seg,'
+  evidence_id: src_c9f40dbfd6f12c2e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 1534
+  end_line: 1689
+  match: def _staged_segment(
+  captured:
+  - _staged_segment
+  arch_scope: ''
+  evidence:
+  - '1533: @gluon.jit'
+  - '1534: def _staged_segment('
+  - '1535:     cfg,'
+  - '1536:     seg,'
+  evidence_id: src_2583d684af6c54d8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 1696
+  end_line: 1707
+  match: 'def _dsv4_slot_ids(cfg, base, k_start, seg_hi, k_rng_slot, k_rng_rope, k_rng_col):'
+  captured:
+  - _dsv4_slot_ids
+  arch_scope: ''
+  evidence:
+  - '1695: @gluon.jit'
+  - '1696: def _dsv4_slot_ids(cfg, base, k_start, seg_hi, k_rng_slot, k_rng_rope, k_rng_col):'
+  - '1697:     """Slot ids of one tile in every layout it uses, in one round trip.'
+  evidence_id: src_0a9dad4a3139f064
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 1711
+  end_line: 1716
+  match: 'def _split_slot_pow2(cfg, slot, SHIFT: gl.constexpr):'
+  captured:
+  - _split_slot_pow2
+  arch_scope: ''
+  evidence:
+  - '1710: @gluon.jit'
+  - '1711: def _split_slot_pow2(cfg, slot, SHIFT: gl.constexpr):'
+  - '1712:     """_split_slot by shifts; slots are non-negative here."""'
+  - '1713:     if cfg.SLOT_U32:'
+  evidence_id: src_c1d007b879e48e79
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 1720
+  end_line: 1820
+  match: def _dsv4_gather(
+  captured:
+  - _dsv4_gather
+  arch_scope: ''
+  evidence:
+  - '1719: @gluon.jit'
+  - '1720: def _dsv4_gather('
+  - '1721:     cfg,'
+  - '1722:     seg,'
+  evidence_id: src_bbaeb244f6adbac4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 1824
+  end_line: 1833
+  match: 'def _dsv4_scales(cfg, seg, sc):'
+  captured:
+  - _dsv4_scales
+  arch_scope: ''
+  evidence:
+  - '1823: @gluon.jit'
+  - '1824: def _dsv4_scales(cfg, seg, sc):'
+  - '1825:     """A _dsv4_gather tile''s exponents as u8 in gather_l: [BLOCK_K, NG] dwords or'
+  - '1826:     bytes are unpacked and widened; the buffer-load gather is already wide."""'
+  evidence_id: src_309b654b788a0c02
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 1837
+  end_line: 1958
+  match: def _dsv4_segment(
+  captured:
+  - _dsv4_segment
+  arch_scope: ''
+  evidence:
+  - '1836: @gluon.jit'
+  - '1837: def _dsv4_segment('
+  - '1838:     cfg,'
+  - '1839:     seg,'
+  evidence_id: src_cdc2aaac72b6bf2b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 1962
+  end_line: 2034
+  match: def _segment(
+  captured:
+  - _segment
+  arch_scope: ''
+  evidence:
+  - '1961: @gluon.jit'
+  - '1962: def _segment('
+  - '1963:     cfg,'
+  - '1964:     seg,'
+  evidence_id: src_da8d28a0c0715b18
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 2038
+  end_line: 2053
+  match: 'def _inv_rope(x, cs_row, ROPE_DIM: gl.constexpr):'
+  captured:
+  - _inv_rope
+  arch_scope: ''
+  evidence:
+  - '2037: @gluon.jit'
+  - '2038: def _inv_rope(x, cs_row, ROPE_DIM: gl.constexpr):'
+  - '2039:     """Inverse GPT-J RoPE on the trailing ROPE_DIM lanes of x [M, D] f32, with'
+  - '2040:     the row''s cos | sin at cs_row: even * cos + odd * sin, odd * cos - even * sin.'
+  evidence_id: src_d16cb95a0566e060
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 2057
+  end_line: 2076
+  match: 'def _mxfp8(x, scale_ptr, h0, num_heads):'
+  captured:
+  - _mxfp8
+  arch_scope: ''
+  evidence:
+  - '2056: @gluon.jit'
+  - '2057: def _mxfp8(x, scale_ptr, h0, num_heads):'
+  - '2058:     """MXFP8 of x [M, D] f32, heads h0 onwards of one row: one E8M0 byte per 32'
+  - '2059:     lanes, stored to scale_ptr [H, D // 32]. Returns the values to store as e4m3."""'
+  evidence_id: src_22c11d33bf579a23
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 2080
+  end_line: 2120
+  match: def _epilogue_store(
+  captured:
+  - _epilogue_store
+  arch_scope: ''
+  evidence:
+  - '2079: @gluon.jit'
+  - '2080: def _epilogue_store('
+  - '2081:     x,'
+  - '2082:     out_ptr,'
+  evidence_id: src_a67b10f40b1ebb35
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 2124
+  end_line: 2148
+  match: 'def _xcd_work(GRID_ORDER: gl.constexpr, NUM_XCDS: gl.constexpr, SPLIT_K: gl.constexpr):'
+  captured:
+  - _xcd_work
+  arch_scope: ''
+  evidence:
+  - '2123: @gluon.jit'
+  - '2124: def _xcd_work(GRID_ORDER: gl.constexpr, NUM_XCDS: gl.constexpr, SPLIT_K: gl.constexpr):'
+  - '2125:     """(query, split, head block) of this program, remapped with remap_xcd so'
+  - '2126:     the programs that read the same KV rows share an XCD and its L2."""'
+  evidence_id: src_7534f03af498116b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 2163
+  end_line: 2784
+  match: def _sparse_mla(
+  captured:
+  - _sparse_mla
+  arch_scope: ''
+  evidence:
+  - '2161:     do_not_specialize=["pm_stride0", "num_splits", "main_num_splits"],'
+  - '2162: )'
+  - '2163: def _sparse_mla('
+  - '2164:     # Shapes below: C = queries, H = num_heads, S = HEAD_SIZE (the V width),'
+  - '2165:     # R = ROPE_DIM, nnz = total gathered tokens in a segment''s index list.'
+  evidence_id: src_513194697c804a41
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 2788
+  end_line: 2789
+  match: 'def _next_pow2(n):'
+  captured:
+  - _next_pow2
+  arch_scope: ''
+  evidence:
+  - '2787: @gluon.constexpr_function'
+  - '2788: def _next_pow2(n):'
+  - '2789:     return 1 << (n - 1).bit_length()'
+  evidence_id: src_9073021a58413346
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 2799
+  end_line: 2937
+  match: def _sparse_mla_reduce(
+  captured:
+  - _sparse_mla_reduce
+  arch_scope: ''
+  evidence:
+  - '2798: @gluon.jit(repr=_sparse_mla_reduce_repr)'
+  - '2799: def _sparse_mla_reduce('
+  - '2800:     part_m_ptr,'
+  - '2801:     part_l_ptr,'
+  evidence_id: src_10f61265c0657288
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 365
+  end_line: 563
+  match: def __init__(
+  captured:
+  - __init__
+  arch_scope: ''
+  evidence:
+  - '364:     @gluon.constexpr_function'
+  - '365:     def __init__('
+  - '366:         self,'
+  - '367:         BLOCK_M,'
+  evidence_id: src_3bdb96bcaca87a88
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 596
+  end_line: 662
+  match: def __init__(
+  captured:
+  - __init__
+  arch_scope: ''
+  evidence:
+  - '595:     @gluon.constexpr_function'
+  - '596:     def __init__('
+  - '597:         self,'
+  - '598:         cfg,'
+  evidence_id: src_591159f2cd1d0e4d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 690
+  end_line: 710
+  match: def __init__(
+  captured:
+  - __init__
+  arch_scope: ''
+  evidence:
+  - '689:     @gluon.constexpr_function'
+  - '690:     def __init__('
+  - '691:         self,'
+  - '692:         fmt,'
+  evidence_id: src_e40861cc4d404470
+- snapshot: aiter_b3ad6c46
+  category: mfma_shape
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 422
+  match: MFMA_K = 32
+  captured:
+  - '32'
+  arch_scope: ''
+  evidence:
+  - '420:         self.ROPE_VEC = gl.constexpr(ROPE_VEC)'
+  - '421:         # bf16 dots on 16x16x32 (gfx950''s full rate) on the dsv4 and STAGED_K32 walks.'
+  - '422:         MFMA_K = 32 if FP8_MFMA or DSV4_WALK or STAGED_K32 else 16'
+  - '423:         self.MFMA_K = gl.constexpr(MFMA_K)'
+  evidence_id: src_eac7481f97dd35c0
+- snapshot: aiter_b3ad6c46
+  category: mfma_shape
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 431
+  match: instr_shape=[16, 16, MFMA_K]
+  captured:
+  - 16, 16, MFMA_K
+  arch_scope: ''
+  evidence:
+  - '429:             gl.amd.AMDMFMALayout('
+  - '430:                 version=4,'
+  - '431:                 instr_shape=[16, 16, MFMA_K],'
+  - '432:                 transposed=True,'
+  - '433:                 warps_per_cta=[M_WARPS, NUM_WARPS // M_WARPS],'
+  evidence_id: src_0003e0779b32d058
+- snapshot: aiter_b3ad6c46
+  category: mfma_shape
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 439
+  match: instr_shape=[16, 16, MFMA_K]
+  captured:
+  - 16, 16, MFMA_K
+  arch_scope: ''
+  evidence:
+  - '437:             gl.amd.AMDMFMALayout('
+  - '438:                 version=4,'
+  - '439:                 instr_shape=[16, 16, MFMA_K],'
+  - '440:                 transposed=True,'
+  - '441:                 warps_per_cta=[M_WARPS, NUM_WARPS // M_WARPS],'
+  evidence_id: src_86504487c0bae825
+- snapshot: aiter_b3ad6c46
+  category: persistent
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 2124
+  end_line: 2148
+  match: 'NUM_XCDS:'
+  captured:
+  - NUM_XCDS
+  arch_scope: ''
+  evidence:
+  - '2123: @gluon.jit'
+  - '2124: def _xcd_work(GRID_ORDER: gl.constexpr, NUM_XCDS: gl.constexpr, SPLIT_K: gl.constexpr):'
+  - '2125:     """(query, split, head block) of this program, remapped with remap_xcd so'
+  - '2126:     the programs that read the same KV rows share an XCD and its L2."""'
+  evidence_id: src_03a4dd868417b589
+- snapshot: aiter_b3ad6c46
+  category: lds_pad
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 382
+  match: PAD_INTERVAL=1024
+  captured:
+  - PAD_INTERVAL
+  - '1024'
+  arch_scope: ''
+  evidence:
+  - '380:         ASYNC_LDS=False,'
+  - '381:         RELAXED_LOAD=True,'
+  - '382:         PAD_INTERVAL=1024,'
+  - '383:         SLOT_U32=False,'
+  - '384:         KV_LDS_PAD=0,'
+  evidence_id: src_e05b98f3643bbfb1
+- snapshot: aiter_b3ad6c46
+  category: lds_pad
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 384
+  match: KV_LDS_PAD=0
+  captured:
+  - KV_LDS_PAD
+  - '0'
+  arch_scope: ''
+  evidence:
+  - '382:         PAD_INTERVAL=1024,'
+  - '383:         SLOT_U32=False,'
+  - '384:         KV_LDS_PAD=0,'
+  - '385:         UNPEEL=False,'
+  - '386:         DSV4_WALK=False,'
+  evidence_id: src_1a901311e57101fb
+- snapshot: aiter_b3ad6c46
+  category: lds_pad
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 406
+  match: LDS_PAD = 16
+  captured:
+  - LDS_PAD
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '404:         self.GSPT = gl.constexpr(GSPT)'
+  - '405:         self.SCL_DWORD = gl.constexpr(SCL_DWORD)'
+  - '406:         LDS_PAD = 16 if FP8_MFMA else 8'
+  - '407:         self.LDS_PAD = gl.constexpr(LDS_PAD)'
+  - '408:         self.UNI_TILE = gl.constexpr(UNI_TILE)'
+  evidence_id: src_17d717f61d97e306
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 808
+  match: cache_modifier=cfg
+  captured:
+  - cfg
+  arch_scope: ''
+  evidence:
+  - '806:     if cfg.IDX_BUFFER_LOAD:'
+  - '807:         return gl.amd.cdna4.buffer_load(ptr=base, offsets=off, cache=cfg.IDX_CACHE)'
+  - '808:     return gl.load(base + off, cache_modifier=cfg.IDX_CACHE)'
+  evidence_id: src_16c393a70fd0c352
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 857
+  match: cache_modifier=cfg
+  captured:
+  - cfg
+  arch_scope: ''
+  evidence:
+  - '855:                 mask=in_range,'
+  - '856:                 other=-1,'
+  - '857:                 cache_modifier=cfg.IDX_CACHE,'
+  - '858:             )'
+  - '859:         valid = in_range & (slot >= 0) & (slot < num_rows)'
+  evidence_id: src_4de42206c7d7f074
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 1767
+  match: cache_modifier=cfg
+  captured:
+  - cfg
+  arch_scope: ''
+  evidence:
+  - '1765:         sc = gl.load('
+  - '1766:             p32 + ((rows[:, None] + (cols & -4)[None, :]) >> 2),'
+  - '1767:             cache_modifier=cfg.GATHER_CACHE,'
+  - '1768:         )'
+  - '1769:     elif fmt.NARROW_SCALE and not fmt.USE_BUFFER_LOAD:'
+  evidence_id: src_84c71b2b1f816235
+- snapshot: aiter_b3ad6c46
+  category: lds_swizzle
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py
+  line: 2560
+  match: gl.SwizzledSharedLayout(
+  captured:
+  - SwizzledSharedLayout
+  arch_scope: ''
+  evidence:
+  - '2558:             gl.float32,'
+  - '2559:             [2 * BLOCK_M, cfg.N_WARPS],'
+  - '2560:             gl.SwizzledSharedLayout(vec=1, per_phase=1, max_phase=1, order=[1, 0]),'
+  - '2561:         )'
+  - '2562:     else:'
+  evidence_id: src_70f5449cbf1e9e7a
+- snapshot: aiter_b3ad6c46
+  category: lds_pad
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla_sparse_prefill.cu
+  line: 190
+  match: _tail_pad           = 0
+  captured:
+  - _tail_pad
+  - '0'
+  arch_scope: ''
+  evidence:
+  - '188:     args.kv_indices_extend   = kv_indices_extend->data_ptr();'
+  - '189:     args.softmax_scale       = softmax_scale;'
+  - '190:     args._tail_pad           = 0;'
+  - '192:     CFG* config_map = &cfg_mla_v4_asm;'
+  evidence_id: src_570ff7d3c03810ae
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla_sparse_prefill.cu
+  line: 226
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '224:         const auto& cfg     = it->second;'
+  - '225:         const char* name    = cfg.knl_name.c_str();'
+  - '226:         const char* co_name = cfg.co_name.c_str();'
+  - '227:         impl_ptr ='
+  - '228:             &impl_ptr_map.get_or_create(name, [&]() { return AiterAsmKernel(name, co_name); });'
+  evidence_id: src_3954acacf420cc18
+- snapshot: aiter_b3ad6c46
+  category: asm_object
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla_sparse_prefill.cu
+  line: 228
+  match: co_name
+  captured:
+  - co_name
+  arch_scope: ''
+  evidence:
+  - '226:         const char* co_name = cfg.co_name.c_str();'
+  - '227:         impl_ptr ='
+  - '228:             &impl_ptr_map.get_or_create(name, [&]() { return AiterAsmKernel(name, co_name); });'
+  - '229:     }'
+  evidence_id: src_3142eadfd8bf6cec
+- snapshot: aiter_b3ad6c46
+  category: asm_argblock
+  language: asm
+  file: csrc/py_itfs_cu/asm_mla_sparse_prefill.cu
+  line: 19
+  match: struct __attribute__((packed)) MlaSparsePrefillKargs
+  captured:
+  - MlaSparsePrefillKargs
+  arch_scope: ''
+  evidence:
+  - '17: namespace {'
+  - '19: struct __attribute__((packed)) MlaSparsePrefillKargs'
+  - '20: {'
+  - '21:     const void* q_nope;            // 0x00  [T, H, 512] fp8   (448 data + 14 e8m0 scales + pad)'
+  evidence_id: src_a170e5137d58946d

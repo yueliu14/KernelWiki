@@ -1,5 +1,8 @@
 # attention_decode_paged
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Decode attention over paged KV caches, split/reduce and mixed precision.
 
 5 AITER implementation references; 35 historical experience cards.

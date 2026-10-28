@@ -1,0 +1,176 @@
+provenance:
+  schema_version: 4
+  operator_family: gemm_epilogue_fused
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  lds_staging: 'The design stages at least one operand tile through LDS: it is stored to LDS and the MFMA fragments
+    are read back from it.'
+  reused_weight: B, the weight, is reused across calls, so a one-time host-side layout transform such as a
+    preshuffle is paid once per weight rather than per call.
+  split_k_hot_loop: The K loop is hand-scheduled with ROCm scheduling directives over LDS-staged operands,
+    as the FlyDSL split-K HGEMM hot loop is.
+cards:
+- id: flydsl-cshuffle-epilogue
+  type: performance_candidate
+  axes:
+  - epilogue
+  - configuration_constraints
+  - workgroup_tile
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - grouped_gemm_moe
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+  question: When can a FlyDSL GEMM route its accumulators through an LDS CShuffle epilogue, and what does it
+    cost?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - the output store path (layout, vector width, atomics) is being chosen
+  actions:
+  - Treat the epilogue as a choice between the row epilogue, which stores straight from the MFMA accumulator
+    layout, and the LDS CShuffle epilogue, which writes the tile row-major into LDS, barriers, re-reads it
+    with threads remapped to (MLane, NLane) = (8, 32) and emits vectorised half2 stores or atomics.
+  - 'Check legality first: block_size must divide by cshuffle_nlane (32), tile_m by CShuffleMLane (256/32 =
+    8 for the 256-thread A8 block), and tile_n by cshuffle_nlane*e_vec (64 by default).'
+  - 'Price the LDS: the staging buffer is 2*tile_m*tile_n bytes and shares the A ping/pong space in the family''s
+    estimate; when it overflows, the helper can split the buffer between two wave groups.'
+  - 'Use its `store_pair` hook for split-K or atomic accumulation: the same shuffled layout feeds either a
+    store or an atomic.'
+  - 'Keep both arms: in AITER''s gfx950 fp8 selections CShuffle on and off both occur in every M bucket (22
+    of 72 rows on at M<=16, 32 of 50 at M 1025-4096).'
+  - In the split-K HGEMM the equivalent (`c_to_lds`) is fixed off and rejected if requested.
+  alternatives:
+  - Direct row store from the MFMA layout — the default and the control arm.
+  why:
+  - The helper states its legality as raises and its data flow in its docstring, so the contract is readable
+    rather than reverse-engineered.
+  - The epilogue is the only place the corpus has no other card for, and it is where store coalescing and split-K
+    accumulation are decided.
+  source_evidence:
+  - aiter_a6bb4993:src_1786f3708aa447c0
+  - aiter_a6bb4993:src_0a9c121156ff2c92
+  - aiter_a6bb4993:src_d0d34580300e6c02
+  - aiter_a6bb4993:src_4c3052f8521fc401
+  - aiter_a6bb4993:src_949b583f0277e194
+  - aiter_a6bb4993:src_756a8fa4df5e93d9
+  - aiter_a6bb4993:src_c701f7377a04c988
+  - aiter_a6bb4993:src_f83d827dcfa59956
+  - aiter_a6bb4993:src_d0f75ad1bcdf6730
+  solutions:
+  - backend: ck
+    mechanism: the CShuffle epilogue is part of the device-op template (`CShuffleDataType`, `*_Xdl_CShuffle*`
+      instances)
+    source_evidence:
+    - aiter_a6bb4993:src_5ebdfc64c47345bb
+    - aiter_a6bb4993:src_7e81eb9b49b377d5
+    - aiter_a6bb4993:src_780fadebcc954d06
+  shipped_evidence:
+  - aiter_a6bb4993:cfg_909edfc582fce0bd
+  - aiter_a6bb4993:cfg_496162f129968cb9
+  references:
+  - knowledge/operator/gemm_epilogue_fused/backend/flydsl.md:20-26
+  - knowledge/general/backend/flydsl/authoring_gemm_levers.md:167-180
+  measurement_evidence: []
+  limitations:
+  - Legality is the helper's; the LDS cost interacts with the A staging budget, so re-run the LDS estimate
+    for the combined configuration.
+  - Selection shares are where AITER chose each arm, not how much either arm helped.
+- id: gemm-gated-feed-forward-atomic-output
+  type: constraint
+  axes:
+  - epilogue
+  - runtime_contract
+  match:
+    operator_families:
+    - gemm_epilogue_fused
+    target_languages:
+    - triton
+  question: What does the fused gated feed-forward body require of its output buffer?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected implementation matches the cited path and its input contract.
+  actions:
+  - Apply the chosen activation to the gate accumulator before multiplying the up accumulator, then cast that
+    intermediate to the down-weight element type.
+  - 'Preserve the paired gate/up tile interpretation: each output half uses BLOCK_SIZE_N/2 columns.'
+  - Initialize the output for the atomic accumulation contract and include that initialization when comparing
+    this fused path with separate GEMMs.
+  alternatives:
+  - Keep a simpler implementation with the identical numerical and layout contract for comparison.
+  why:
+  - The cited source declares these operations and checks; the combination is part of its interface.
+  source_evidence:
+  - aiter_b3ad6c46:src_cf2b5852b341da65
+  measurement_evidence: []
+  limitations:
+  - Atomic accumulation order can change numerical error; validate the whole gated feed-forward output.
+  - This is an atomic-add body, not an overwrite of a fresh output by every program.
+  references:
+  - knowledge/operator/gemm_epilogue_fused/README.md
+- id: gemm-blockscale-fused-affine-split
+  type: semantic
+  axes:
+  - epilogue
+  - work_partition
+  match:
+    operator_families:
+    - gemm_epilogue_fused
+    target_languages:
+    - triton
+  question: Where does an affine epilogue belong when the GEMM is split over K?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected implementation matches the cited path and its input contract.
+  actions:
+  - Keep FUSE_TYPE=0 (a*GEMM+b) distinct from the alternate form (b*a+GEMM), including scalar versus strided
+    tensor operands.
+  - For NUM_KSPLIT=1 the main kernel applies the epilogue; for split execution the reduce kernel sums partials
+    before applying it once.
+  - Do not apply the additive term independently to every partial, which would multiply that term by the number
+    of splits.
+  alternatives:
+  - Keep a simpler implementation with the identical numerical and layout contract for comparison.
+  why:
+  - The cited source declares these operations and checks; the combination is part of its interface.
+  source_evidence:
+  - aiter_b3ad6c46:src_cba1ac61dda37c05
+  - aiter_b3ad6c46:src_e91a864245298df4
+  measurement_evidence: []
+  limitations:
+  - This is an implementation precedent, not a measured performance preference on a new workload.
+  references:
+  - knowledge/operator/gemm_epilogue_fused/README.md
+shared_cards:
+- flydsl-a8-data-movement-helpers
+- flydsl-a8-interleaved-schedule
+- flydsl-a8-legality
+- flydsl-a8-mfma-selection
+- flydsl-a8-preshuffle-config-space
+- flydsl-a8-scale-granularity-contract
+- flydsl-async-copy-by-family
+- flydsl-gfx942-path-gates
+- flydsl-half-mfma-call-forms
+- flydsl-hgemm-config-space
+- flydsl-hgemm-tiling-validity
+- flydsl-host-launch-contract
+- flydsl-lds-pipeline-depth
+- flydsl-mfma-fragment-lane-layout
+- flydsl-preshuffle-b-layout-contract
+- flydsl-splitk-hot-loop-schedule-bundle
+- flydsl-splitk-reduction-contract
+- flydsl-test-parity-gate
+- flydsl-xor16-lds-layout-consistency
+- gemm-blockscale-k-loop-scale-application
+- gemm-blockscale-shipped-bucket-structure
+- gemm-default-backend-routing
+- gemm-shape-regime-routing
+- gemm-split-k-when-grid-underfills
+- gemm-streamed-operand-cache-policy
+- gemm-workgroup-xcd-mapping

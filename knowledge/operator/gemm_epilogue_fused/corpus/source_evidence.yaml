@@ -1,0 +1,4849 @@
+schema_version: 2
+operator: gemm_epilogue_fused
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/__init__.py
+  lines: 1
+  evidence_records: 0
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  lines: 396
+  evidence_records: 29
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  lines: 350
+  evidence_records: 33
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  lines: 639
+  evidence_records: 38
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  lines: 833
+  evidence_records: 58
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  lines: 623
+  evidence_records: 55
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  lines: 697
+  evidence_records: 35
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  language: triton
+  lines: 219
+  evidence_records: 20
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  language: triton
+  lines: 356
+  evidence_records: 36
+missing: []
+source_evidence:
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 177
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '176:                 accumulator_fp8 += ('
+  - '177:                     tl.dot(a, b, input_precision="ieee")'
+  - '178:                     * a_scale[:, None]'
+  - '179:                     * b_scale[None, :]'
+  evidence_id: src_7ff2abcf833502d1
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 239
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '237:                     )'
+  - '239:                 accumulator_bf16 += tl.dot(a, b, input_precision="ieee")'
+  - '241:                 a_ptrs += BLOCK_SIZE_K * stride_a_bf16_k'
+  evidence_id: src_e93ee1fd14893910
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 71
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '69:     GRID_MN_BF16: tl.constexpr,'
+  - '70:     SKIP_REDUCE: tl.constexpr,'
+  - '71:     cache_modifier: tl.constexpr,'
+  - '72: ):'
+  evidence_id: src_f09647766308d6ed
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 159
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '157:                 if EVEN_K:'
+  - '158:                     a = tl.load(a_fp8_ptrs)'
+  - '159:                     b = tl.load(b_fp8_ptrs, cache_modifier=cache_modifier)'
+  - '160:                 else:'
+  - '161:                     a = tl.load('
+  evidence_id: src_ec149f4c00076214
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 170
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '168:                         mask=offs_k[:, None] < K - k * BLOCK_SIZE_K,'
+  - '169:                         other=0.0,'
+  - '170:                         cache_modifier=cache_modifier,'
+  - '171:                     )'
+  evidence_id: src_f6f476d3f180461f
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 227
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '225:                 if EVEN_K:'
+  - '226:                     a = tl.load(a_ptrs)'
+  - '227:                     b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '228:                 else:'
+  - '229:                     a = tl.load('
+  evidence_id: src_c3a3b44893ecf25f
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 236
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '234:                         mask=offs_k[:, None] < K - k * BLOCK_SIZE_K,'
+  - '235:                         other=0.0,'
+  - '236:                         cache_modifier=cache_modifier,'
+  - '237:                     )'
+  evidence_id: src_3d2428dae40390bc
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 56
+  match: 'GROUP_K: tl.constexpr,'
+  captured:
+  - GROUP_K
+  arch_scope: ''
+  evidence:
+  - '54:     stride_c_bf16_m,'
+  - '55:     stride_c_bf16_n,'
+  - '56:     # Meta-parameters'
+  - '57:     GROUP_K: tl.constexpr,'
+  - '58:     GROUP_N: tl.constexpr,'
+  evidence_id: src_755776823ad15042
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 58
+  match: 'GROUP_N: tl.constexpr,'
+  captured:
+  - GROUP_N
+  arch_scope: ''
+  evidence:
+  - '56:     # Meta-parameters'
+  - '57:     GROUP_K: tl.constexpr,'
+  - '58:     GROUP_N: tl.constexpr,'
+  - '59:     BLOCK_SIZE_M: tl.constexpr,'
+  - '60:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_05fb5221f55ecefc
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 59
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '57:     GROUP_K: tl.constexpr,'
+  - '58:     GROUP_N: tl.constexpr,'
+  - '59:     BLOCK_SIZE_M: tl.constexpr,'
+  - '60:     BLOCK_SIZE_N: tl.constexpr,'
+  - '61:     BLOCK_SIZE_K: tl.constexpr,'
+  evidence_id: src_18afeba2b3d03e68
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 60
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '58:     GROUP_N: tl.constexpr,'
+  - '59:     BLOCK_SIZE_M: tl.constexpr,'
+  - '60:     BLOCK_SIZE_N: tl.constexpr,'
+  - '61:     BLOCK_SIZE_K: tl.constexpr,'
+  - '62:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_b05c251a3f42ea20
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 61
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '59:     BLOCK_SIZE_M: tl.constexpr,'
+  - '60:     BLOCK_SIZE_N: tl.constexpr,'
+  - '61:     BLOCK_SIZE_K: tl.constexpr,'
+  - '62:     GROUP_SIZE_M: tl.constexpr,'
+  - '63:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_706105fd538b23a8
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 62
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '60:     BLOCK_SIZE_N: tl.constexpr,'
+  - '61:     BLOCK_SIZE_K: tl.constexpr,'
+  - '62:     GROUP_SIZE_M: tl.constexpr,'
+  - '63:     NUM_KSPLIT: tl.constexpr,'
+  - '64:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_a2465c7a264b9671
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 63
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '61:     BLOCK_SIZE_K: tl.constexpr,'
+  - '62:     GROUP_SIZE_M: tl.constexpr,'
+  - '63:     NUM_KSPLIT: tl.constexpr,'
+  - '64:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '65:     ADD_BIAS_FP8: tl.constexpr,'
+  evidence_id: src_f7fffa7dcfb1ad31
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 64
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '62:     GROUP_SIZE_M: tl.constexpr,'
+  - '63:     NUM_KSPLIT: tl.constexpr,'
+  - '64:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '65:     ADD_BIAS_FP8: tl.constexpr,'
+  - '66:     ADD_BIAS_BF16: tl.constexpr,'
+  evidence_id: src_eea9f220fad0746c
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 65
+  match: 'ADD_BIAS_FP8: tl.constexpr,'
+  captured:
+  - ADD_BIAS_FP8
+  arch_scope: ''
+  evidence:
+  - '63:     NUM_KSPLIT: tl.constexpr,'
+  - '64:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '65:     ADD_BIAS_FP8: tl.constexpr,'
+  - '66:     ADD_BIAS_BF16: tl.constexpr,'
+  - '67:     EVEN_K: tl.constexpr,'
+  evidence_id: src_a8382a66d8326561
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 66
+  match: 'ADD_BIAS_BF16: tl.constexpr,'
+  captured:
+  - ADD_BIAS_BF16
+  arch_scope: ''
+  evidence:
+  - '64:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '65:     ADD_BIAS_FP8: tl.constexpr,'
+  - '66:     ADD_BIAS_BF16: tl.constexpr,'
+  - '67:     EVEN_K: tl.constexpr,'
+  - '68:     GRID_MN_FP8: tl.constexpr,'
+  evidence_id: src_8688984368e3ebdd
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 67
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '65:     ADD_BIAS_FP8: tl.constexpr,'
+  - '66:     ADD_BIAS_BF16: tl.constexpr,'
+  - '67:     EVEN_K: tl.constexpr,'
+  - '68:     GRID_MN_FP8: tl.constexpr,'
+  - '69:     GRID_MN_BF16: tl.constexpr,'
+  evidence_id: src_0f6aff9a1ff5536d
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 68
+  match: 'GRID_MN_FP8: tl.constexpr,'
+  captured:
+  - GRID_MN_FP8
+  arch_scope: ''
+  evidence:
+  - '66:     ADD_BIAS_BF16: tl.constexpr,'
+  - '67:     EVEN_K: tl.constexpr,'
+  - '68:     GRID_MN_FP8: tl.constexpr,'
+  - '69:     GRID_MN_BF16: tl.constexpr,'
+  - '70:     SKIP_REDUCE: tl.constexpr,'
+  evidence_id: src_e38f13e6ebab09d2
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 69
+  match: 'GRID_MN_BF16: tl.constexpr,'
+  captured:
+  - GRID_MN_BF16
+  arch_scope: ''
+  evidence:
+  - '67:     EVEN_K: tl.constexpr,'
+  - '68:     GRID_MN_FP8: tl.constexpr,'
+  - '69:     GRID_MN_BF16: tl.constexpr,'
+  - '70:     SKIP_REDUCE: tl.constexpr,'
+  - '71:     cache_modifier: tl.constexpr,'
+  evidence_id: src_a524171726cc74b7
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 70
+  match: 'SKIP_REDUCE: tl.constexpr,'
+  captured:
+  - SKIP_REDUCE
+  arch_scope: ''
+  evidence:
+  - '68:     GRID_MN_FP8: tl.constexpr,'
+  - '69:     GRID_MN_BF16: tl.constexpr,'
+  - '70:     SKIP_REDUCE: tl.constexpr,'
+  - '71:     cache_modifier: tl.constexpr,'
+  - '72: ):'
+  evidence_id: src_b24aba8b34933bda
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 71
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '69:     GRID_MN_BF16: tl.constexpr,'
+  - '70:     SKIP_REDUCE: tl.constexpr,'
+  - '71:     cache_modifier: tl.constexpr,'
+  - '72: ):'
+  evidence_id: src_86090326176e1ec0
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 284
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '282:     stride_c_bf16_out_m,'
+  - '283:     stride_c_bf16_out_n,'
+  - '284:     BLOCK_SIZE_M: tl.constexpr,'
+  - '285:     BLOCK_SIZE_N: tl.constexpr,'
+  - '286:     ACTUAL_KSPLIT: tl.constexpr,'
+  evidence_id: src_a4c8c121190006c1
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 285
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '283:     stride_c_bf16_out_n,'
+  - '284:     BLOCK_SIZE_M: tl.constexpr,'
+  - '285:     BLOCK_SIZE_N: tl.constexpr,'
+  - '286:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '287:     MAX_KSPLIT: tl.constexpr,'
+  evidence_id: src_ef0c745eefd77652
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 286
+  match: 'ACTUAL_KSPLIT: tl.constexpr,'
+  captured:
+  - ACTUAL_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '284:     BLOCK_SIZE_M: tl.constexpr,'
+  - '285:     BLOCK_SIZE_N: tl.constexpr,'
+  - '286:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '287:     MAX_KSPLIT: tl.constexpr,'
+  - '288:     ADD_BIAS_FP8: tl.constexpr,'
+  evidence_id: src_bb85d7e1222d02f2
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 287
+  match: 'MAX_KSPLIT: tl.constexpr,'
+  captured:
+  - MAX_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '285:     BLOCK_SIZE_N: tl.constexpr,'
+  - '286:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '287:     MAX_KSPLIT: tl.constexpr,'
+  - '288:     ADD_BIAS_FP8: tl.constexpr,'
+  - '289:     ADD_BIAS_BF16: tl.constexpr,'
+  evidence_id: src_8eeb87e19e26ba00
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 288
+  match: 'ADD_BIAS_FP8: tl.constexpr,'
+  captured:
+  - ADD_BIAS_FP8
+  arch_scope: ''
+  evidence:
+  - '286:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '287:     MAX_KSPLIT: tl.constexpr,'
+  - '288:     ADD_BIAS_FP8: tl.constexpr,'
+  - '289:     ADD_BIAS_BF16: tl.constexpr,'
+  - '290: ):'
+  evidence_id: src_2d673f8278b666ac
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 289
+  match: 'ADD_BIAS_BF16: tl.constexpr,'
+  captured:
+  - ADD_BIAS_BF16
+  arch_scope: ''
+  evidence:
+  - '287:     MAX_KSPLIT: tl.constexpr,'
+  - '288:     ADD_BIAS_FP8: tl.constexpr,'
+  - '289:     ADD_BIAS_BF16: tl.constexpr,'
+  - '290: ):'
+  evidence_id: src_5249c49f3cb12cf4
+- snapshot: aiter_a6bb4993
+  category: scale_in_k_loop
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  line: 176
+  end_line: 180
+  match: "accumulator_fp8 += (\n                    tl.dot(a, b, input_precision=\"ieee\")\n              \
+    \      * a_scale[:, None]"
+  captured:
+  - accumulator_fp8
+  - a_scale
+  arch_scope: ''
+  evidence:
+  - '174:                 b_scale = tl.load(b_scale_ptrs)'
+  - '176:                 accumulator_fp8 += ('
+  - '177:                     tl.dot(a, b, input_precision="ieee")'
+  - '178:                     * a_scale[:, None]'
+  evidence_id: src_cb04a173a4f1bbdf
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 183
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '181:             # Perform dot operation and apply scale'
+  - '182:             accumulator += ('
+  - '183:                 tl.dot(a, b, input_precision="ieee")'
+  - '184:                 * a_scale[:, None]'
+  - '185:                 * b_scale[None, :]'
+  evidence_id: src_0de1e4941612b4d7
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 80
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '78:     waves_per_eu: tl.constexpr,'
+  - '79:     matrix_instr_nonkdim: tl.constexpr,'
+  - '80:     cache_modifier: tl.constexpr,'
+  - '81: ):'
+  - '82:     """'
+  evidence_id: src_bd6c19046735d5d5
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 166
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '164:             if EVEN_K:'
+  - '165:                 a = tl.load(a_ptrs)'
+  - '166:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '167:             else:'
+  - '168:                 a = tl.load('
+  evidence_id: src_9ffc75a371cb25ed
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 175
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '173:                     mask=offs_k[:, None] < K - k * BLOCK_SIZE_K,'
+  - '174:                     other=0,'
+  - '175:                     cache_modifier=cache_modifier,'
+  - '176:                 )'
+  evidence_id: src_a9f3c2dd70a3e4b2
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 61
+  match: 'GROUP_K: tl.constexpr,'
+  captured:
+  - GROUP_K
+  arch_scope: ''
+  evidence:
+  - '59:     stride_cbm,'
+  - '60:     stride_cbn,'
+  - '61:     # Meta-parameters'
+  - '62:     GROUP_K: tl.constexpr,'
+  - '63:     GROUP_N: tl.constexpr,'
+  evidence_id: src_bb20c50dbe53e328
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 63
+  match: 'GROUP_N: tl.constexpr,'
+  captured:
+  - GROUP_N
+  arch_scope: ''
+  evidence:
+  - '61:     # Meta-parameters'
+  - '62:     GROUP_K: tl.constexpr,'
+  - '63:     GROUP_N: tl.constexpr,'
+  - '64:     BLOCK_SIZE_M: tl.constexpr,'
+  - '65:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_983494b69b6c6ca5
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 64
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '62:     GROUP_K: tl.constexpr,'
+  - '63:     GROUP_N: tl.constexpr,'
+  - '64:     BLOCK_SIZE_M: tl.constexpr,'
+  - '65:     BLOCK_SIZE_N: tl.constexpr,'
+  - '66:     BLOCK_SIZE_K: tl.constexpr,'
+  evidence_id: src_396fdbd14a5fb393
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 65
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '63:     GROUP_N: tl.constexpr,'
+  - '64:     BLOCK_SIZE_M: tl.constexpr,'
+  - '65:     BLOCK_SIZE_N: tl.constexpr,'
+  - '66:     BLOCK_SIZE_K: tl.constexpr,'
+  - '67:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_14dcb61f5f86ccf1
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 66
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '64:     BLOCK_SIZE_M: tl.constexpr,'
+  - '65:     BLOCK_SIZE_N: tl.constexpr,'
+  - '66:     BLOCK_SIZE_K: tl.constexpr,'
+  - '67:     GROUP_SIZE_M: tl.constexpr,'
+  - '68:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_c86c98bde7ae816c
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 67
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '65:     BLOCK_SIZE_N: tl.constexpr,'
+  - '66:     BLOCK_SIZE_K: tl.constexpr,'
+  - '67:     GROUP_SIZE_M: tl.constexpr,'
+  - '68:     NUM_KSPLIT: tl.constexpr,'
+  - '69:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_170364964aee137b
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 68
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '66:     BLOCK_SIZE_K: tl.constexpr,'
+  - '67:     GROUP_SIZE_M: tl.constexpr,'
+  - '68:     NUM_KSPLIT: tl.constexpr,'
+  - '69:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '70:     EVEN_K: tl.constexpr,'
+  evidence_id: src_9553b4bad355e9ef
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 69
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '67:     GROUP_SIZE_M: tl.constexpr,'
+  - '68:     NUM_KSPLIT: tl.constexpr,'
+  - '69:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '70:     EVEN_K: tl.constexpr,'
+  - '71:     IS_A_SCALAR: tl.constexpr,'
+  evidence_id: src_e4cbd4393f7bdbfb
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 70
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '68:     NUM_KSPLIT: tl.constexpr,'
+  - '69:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '70:     EVEN_K: tl.constexpr,'
+  - '71:     IS_A_SCALAR: tl.constexpr,'
+  - '72:     IS_B_SCALAR: tl.constexpr,'
+  evidence_id: src_0258c5e62f1ae493
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 71
+  match: 'IS_A_SCALAR: tl.constexpr,'
+  captured:
+  - IS_A_SCALAR
+  arch_scope: ''
+  evidence:
+  - '69:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '70:     EVEN_K: tl.constexpr,'
+  - '71:     IS_A_SCALAR: tl.constexpr,'
+  - '72:     IS_B_SCALAR: tl.constexpr,'
+  - '73:     IS_A_TENSOR: tl.constexpr,'
+  evidence_id: src_20d9ed507cf33104
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 72
+  match: 'IS_B_SCALAR: tl.constexpr,'
+  captured:
+  - IS_B_SCALAR
+  arch_scope: ''
+  evidence:
+  - '70:     EVEN_K: tl.constexpr,'
+  - '71:     IS_A_SCALAR: tl.constexpr,'
+  - '72:     IS_B_SCALAR: tl.constexpr,'
+  - '73:     IS_A_TENSOR: tl.constexpr,'
+  - '74:     IS_B_TENSOR: tl.constexpr,'
+  evidence_id: src_4af763380b4e4607
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 73
+  match: 'IS_A_TENSOR: tl.constexpr,'
+  captured:
+  - IS_A_TENSOR
+  arch_scope: ''
+  evidence:
+  - '71:     IS_A_SCALAR: tl.constexpr,'
+  - '72:     IS_B_SCALAR: tl.constexpr,'
+  - '73:     IS_A_TENSOR: tl.constexpr,'
+  - '74:     IS_B_TENSOR: tl.constexpr,'
+  - '75:     FUSE_TYPE: tl.constexpr,'
+  evidence_id: src_85bb194dfc92e6d7
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 74
+  match: 'IS_B_TENSOR: tl.constexpr,'
+  captured:
+  - IS_B_TENSOR
+  arch_scope: ''
+  evidence:
+  - '72:     IS_B_SCALAR: tl.constexpr,'
+  - '73:     IS_A_TENSOR: tl.constexpr,'
+  - '74:     IS_B_TENSOR: tl.constexpr,'
+  - '75:     FUSE_TYPE: tl.constexpr,'
+  - '76:     num_warps: tl.constexpr,'
+  evidence_id: src_edde905e7e7864a9
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 75
+  match: 'FUSE_TYPE: tl.constexpr,'
+  captured:
+  - FUSE_TYPE
+  arch_scope: ''
+  evidence:
+  - '73:     IS_A_TENSOR: tl.constexpr,'
+  - '74:     IS_B_TENSOR: tl.constexpr,'
+  - '75:     FUSE_TYPE: tl.constexpr,'
+  - '76:     num_warps: tl.constexpr,'
+  - '77:     num_stages: tl.constexpr,'
+  evidence_id: src_bc248ea24f612098
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 76
+  match: 'num_warps: tl.constexpr,'
+  captured:
+  - num_warps
+  arch_scope: ''
+  evidence:
+  - '74:     IS_B_TENSOR: tl.constexpr,'
+  - '75:     FUSE_TYPE: tl.constexpr,'
+  - '76:     num_warps: tl.constexpr,'
+  - '77:     num_stages: tl.constexpr,'
+  - '78:     waves_per_eu: tl.constexpr,'
+  evidence_id: src_912fdf8a57ccecd4
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 77
+  match: 'num_stages: tl.constexpr,'
+  captured:
+  - num_stages
+  arch_scope: ''
+  evidence:
+  - '75:     FUSE_TYPE: tl.constexpr,'
+  - '76:     num_warps: tl.constexpr,'
+  - '77:     num_stages: tl.constexpr,'
+  - '78:     waves_per_eu: tl.constexpr,'
+  - '79:     matrix_instr_nonkdim: tl.constexpr,'
+  evidence_id: src_13ef893220d07ef6
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 78
+  match: 'waves_per_eu: tl.constexpr,'
+  captured:
+  - waves_per_eu
+  arch_scope: ''
+  evidence:
+  - '76:     num_warps: tl.constexpr,'
+  - '77:     num_stages: tl.constexpr,'
+  - '78:     waves_per_eu: tl.constexpr,'
+  - '79:     matrix_instr_nonkdim: tl.constexpr,'
+  - '80:     cache_modifier: tl.constexpr,'
+  evidence_id: src_135d585edd0d2e97
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 79
+  match: 'matrix_instr_nonkdim: tl.constexpr,'
+  captured:
+  - matrix_instr_nonkdim
+  arch_scope: ''
+  evidence:
+  - '77:     num_stages: tl.constexpr,'
+  - '78:     waves_per_eu: tl.constexpr,'
+  - '79:     matrix_instr_nonkdim: tl.constexpr,'
+  - '80:     cache_modifier: tl.constexpr,'
+  - '81: ):'
+  evidence_id: src_f74b102f896d8709
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 80
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '78:     waves_per_eu: tl.constexpr,'
+  - '79:     matrix_instr_nonkdim: tl.constexpr,'
+  - '80:     cache_modifier: tl.constexpr,'
+  - '81: ):'
+  - '82:     """'
+  evidence_id: src_43a43f3b2665b1d3
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 275
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '273:     stride_cbm,'
+  - '274:     stride_cbn,'
+  - '275:     BLOCK_SIZE_M: tl.constexpr,'
+  - '276:     BLOCK_SIZE_N: tl.constexpr,'
+  - '277:     ACTUAL_KSPLIT: tl.constexpr,'
+  evidence_id: src_711b63b706ea814d
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 276
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '274:     stride_cbn,'
+  - '275:     BLOCK_SIZE_M: tl.constexpr,'
+  - '276:     BLOCK_SIZE_N: tl.constexpr,'
+  - '277:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '278:     MAX_KSPLIT: tl.constexpr,'
+  evidence_id: src_352e64cabe076993
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 277
+  match: 'ACTUAL_KSPLIT: tl.constexpr,'
+  captured:
+  - ACTUAL_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '275:     BLOCK_SIZE_M: tl.constexpr,'
+  - '276:     BLOCK_SIZE_N: tl.constexpr,'
+  - '277:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '278:     MAX_KSPLIT: tl.constexpr,'
+  - '279:     IS_A_SCALAR: tl.constexpr,'
+  evidence_id: src_4f1c2e7d9e5c9cec
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 278
+  match: 'MAX_KSPLIT: tl.constexpr,'
+  captured:
+  - MAX_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '276:     BLOCK_SIZE_N: tl.constexpr,'
+  - '277:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '278:     MAX_KSPLIT: tl.constexpr,'
+  - '279:     IS_A_SCALAR: tl.constexpr,'
+  - '280:     IS_B_SCALAR: tl.constexpr,'
+  evidence_id: src_946c41858eee5e48
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 279
+  match: 'IS_A_SCALAR: tl.constexpr,'
+  captured:
+  - IS_A_SCALAR
+  arch_scope: ''
+  evidence:
+  - '277:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '278:     MAX_KSPLIT: tl.constexpr,'
+  - '279:     IS_A_SCALAR: tl.constexpr,'
+  - '280:     IS_B_SCALAR: tl.constexpr,'
+  - '281:     IS_A_TENSOR: tl.constexpr,'
+  evidence_id: src_511e0b31b338953d
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 280
+  match: 'IS_B_SCALAR: tl.constexpr,'
+  captured:
+  - IS_B_SCALAR
+  arch_scope: ''
+  evidence:
+  - '278:     MAX_KSPLIT: tl.constexpr,'
+  - '279:     IS_A_SCALAR: tl.constexpr,'
+  - '280:     IS_B_SCALAR: tl.constexpr,'
+  - '281:     IS_A_TENSOR: tl.constexpr,'
+  - '282:     IS_B_TENSOR: tl.constexpr,'
+  evidence_id: src_5c7c55a9f3a6727b
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 281
+  match: 'IS_A_TENSOR: tl.constexpr,'
+  captured:
+  - IS_A_TENSOR
+  arch_scope: ''
+  evidence:
+  - '279:     IS_A_SCALAR: tl.constexpr,'
+  - '280:     IS_B_SCALAR: tl.constexpr,'
+  - '281:     IS_A_TENSOR: tl.constexpr,'
+  - '282:     IS_B_TENSOR: tl.constexpr,'
+  - '283:     FUSE_TYPE: tl.constexpr,'
+  evidence_id: src_a714081b4a2a77fa
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 282
+  match: 'IS_B_TENSOR: tl.constexpr,'
+  captured:
+  - IS_B_TENSOR
+  arch_scope: ''
+  evidence:
+  - '280:     IS_B_SCALAR: tl.constexpr,'
+  - '281:     IS_A_TENSOR: tl.constexpr,'
+  - '282:     IS_B_TENSOR: tl.constexpr,'
+  - '283:     FUSE_TYPE: tl.constexpr,'
+  - '284: ):'
+  evidence_id: src_fd2fc193bf04da80
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 283
+  match: 'FUSE_TYPE: tl.constexpr,'
+  captured:
+  - FUSE_TYPE
+  arch_scope: ''
+  evidence:
+  - '281:     IS_A_TENSOR: tl.constexpr,'
+  - '282:     IS_B_TENSOR: tl.constexpr,'
+  - '283:     FUSE_TYPE: tl.constexpr,'
+  - '284: ):'
+  evidence_id: src_391ebd1e9f43e8ea
+- snapshot: aiter_a6bb4993
+  category: scale_in_k_loop
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 182
+  end_line: 186
+  match: "accumulator += (\n                tl.dot(a, b, input_precision=\"ieee\")\n                * a_scale[:,\
+    \ None]"
+  captured:
+  - accumulator
+  - a_scale
+  arch_scope: ''
+  evidence:
+  - '181:             # Perform dot operation and apply scale'
+  - '182:             accumulator += ('
+  - '183:                 tl.dot(a, b, input_precision="ieee")'
+  - '184:                 * a_scale[:, None]'
+  evidence_id: src_5136b15e0c6f76e7
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 160
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '158:             # Perform dot operation and apply scale'
+  - '159:             accumulator += ('
+  - '160:                 tl.dot(a, b, input_precision="ieee")'
+  - '161:                 * a_scale[:, None]'
+  - '162:                 * b_scale[None, :]'
+  evidence_id: src_515ce50c3c991cd5
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 417
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '415:             # Perform dot operation and apply scale'
+  - '416:             accumulator += ('
+  - '417:                 tl.dot(a, b, input_precision="ieee")'
+  - '418:                 * a_scale[:, None]'
+  - '419:                 * b_scale[None, :]'
+  evidence_id: src_485a28da3cf11076
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 69
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '67:     EVEN_K: tl.constexpr,'
+  - '68:     GRID_MN: tl.constexpr,'
+  - '69:     cache_modifier: tl.constexpr,'
+  - '70: ):'
+  - '71:     tl.assume(stride_a_m > 0)'
+  evidence_id: src_bbab6129dc57a7e3
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 146
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '144:             if EVEN_K:'
+  - '145:                 a = tl.load(a_ptrs)'
+  - '146:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '147:             else:'
+  - '148:                 a = tl.load('
+  evidence_id: src_bd2f48f043076b7d
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 308
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '306:     EVEN_K: tl.constexpr,'
+  - '307:     GRID_MN: tl.constexpr,'
+  - '308:     cache_modifier: tl.constexpr,'
+  - '309: ):'
+  - '310:     tl.assume(stride_a_m > 0)'
+  evidence_id: src_dc84b392ccf51886
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 389
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '387:             if EVEN_K:'
+  - '388:                 a = tl.load(a_ptrs)'
+  - '389:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '390:             else:'
+  - '391:                 a = tl.load('
+  evidence_id: src_5787c6c050a7eb54
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 57
+  match: 'GROUP_K: tl.constexpr,'
+  captured:
+  - GROUP_K
+  arch_scope: ''
+  evidence:
+  - '55:     stride_bscale_k,'
+  - '56:     stride_bscale_n,'
+  - '57:     # Meta-parameters'
+  - '58:     GROUP_K: tl.constexpr,'
+  - '59:     GROUP_N: tl.constexpr,'
+  evidence_id: src_f98fff4f57b2fa76
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 59
+  match: 'GROUP_N: tl.constexpr,'
+  captured:
+  - GROUP_N
+  arch_scope: ''
+  evidence:
+  - '57:     # Meta-parameters'
+  - '58:     GROUP_K: tl.constexpr,'
+  - '59:     GROUP_N: tl.constexpr,'
+  - '60:     BLOCK_SIZE_M: tl.constexpr,'
+  - '61:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_79a893dfa41e9417
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 60
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '58:     GROUP_K: tl.constexpr,'
+  - '59:     GROUP_N: tl.constexpr,'
+  - '60:     BLOCK_SIZE_M: tl.constexpr,'
+  - '61:     BLOCK_SIZE_N: tl.constexpr,'
+  - '62:     BLOCK_SIZE_K: tl.constexpr,'
+  evidence_id: src_bc4f45ce7a613f75
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 61
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '59:     GROUP_N: tl.constexpr,'
+  - '60:     BLOCK_SIZE_M: tl.constexpr,'
+  - '61:     BLOCK_SIZE_N: tl.constexpr,'
+  - '62:     BLOCK_SIZE_K: tl.constexpr,'
+  - '63:     BLOCK_SIZE_S3: tl.constexpr,'
+  evidence_id: src_3c0002d84a595f3f
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 62
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '60:     BLOCK_SIZE_M: tl.constexpr,'
+  - '61:     BLOCK_SIZE_N: tl.constexpr,'
+  - '62:     BLOCK_SIZE_K: tl.constexpr,'
+  - '63:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '64:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_3304a1e23ec43214
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 63
+  match: 'BLOCK_SIZE_S3: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_S3
+  arch_scope: ''
+  evidence:
+  - '61:     BLOCK_SIZE_N: tl.constexpr,'
+  - '62:     BLOCK_SIZE_K: tl.constexpr,'
+  - '63:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '64:     GROUP_SIZE_M: tl.constexpr,'
+  - '65:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_4f5cdbc5904cb281
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 64
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '62:     BLOCK_SIZE_K: tl.constexpr,'
+  - '63:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '64:     GROUP_SIZE_M: tl.constexpr,'
+  - '65:     NUM_KSPLIT: tl.constexpr,'
+  - '66:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_d3ae8752c6522b85
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 65
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '63:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '64:     GROUP_SIZE_M: tl.constexpr,'
+  - '65:     NUM_KSPLIT: tl.constexpr,'
+  - '66:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '67:     EVEN_K: tl.constexpr,'
+  evidence_id: src_b344d0fe623a2cf6
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 66
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '64:     GROUP_SIZE_M: tl.constexpr,'
+  - '65:     NUM_KSPLIT: tl.constexpr,'
+  - '66:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '67:     EVEN_K: tl.constexpr,'
+  - '68:     GRID_MN: tl.constexpr,'
+  evidence_id: src_4eb6124fe875d783
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 67
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '65:     NUM_KSPLIT: tl.constexpr,'
+  - '66:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '67:     EVEN_K: tl.constexpr,'
+  - '68:     GRID_MN: tl.constexpr,'
+  - '69:     cache_modifier: tl.constexpr,'
+  evidence_id: src_e69012a03f0f68b6
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 68
+  match: 'GRID_MN: tl.constexpr,'
+  captured:
+  - GRID_MN
+  arch_scope: ''
+  evidence:
+  - '66:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '67:     EVEN_K: tl.constexpr,'
+  - '68:     GRID_MN: tl.constexpr,'
+  - '69:     cache_modifier: tl.constexpr,'
+  - '70: ):'
+  evidence_id: src_ff8852ea4003b0a0
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 69
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '67:     EVEN_K: tl.constexpr,'
+  - '68:     GRID_MN: tl.constexpr,'
+  - '69:     cache_modifier: tl.constexpr,'
+  - '70: ):'
+  - '71:     tl.assume(stride_a_m > 0)'
+  evidence_id: src_3d4a06323b92c98c
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 296
+  match: 'GROUP_K: tl.constexpr,'
+  captured:
+  - GROUP_K
+  arch_scope: ''
+  evidence:
+  - '294:     stride_bscale_k,'
+  - '295:     stride_bscale_n,'
+  - '296:     # Meta-parameters'
+  - '297:     GROUP_K: tl.constexpr,'
+  - '298:     GROUP_N: tl.constexpr,'
+  evidence_id: src_f4c77a2a8f71c357
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 298
+  match: 'GROUP_N: tl.constexpr,'
+  captured:
+  - GROUP_N
+  arch_scope: ''
+  evidence:
+  - '296:     # Meta-parameters'
+  - '297:     GROUP_K: tl.constexpr,'
+  - '298:     GROUP_N: tl.constexpr,'
+  - '299:     BLOCK_SIZE_M: tl.constexpr,'
+  - '300:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_7da16ba6134cf4e0
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 299
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '297:     GROUP_K: tl.constexpr,'
+  - '298:     GROUP_N: tl.constexpr,'
+  - '299:     BLOCK_SIZE_M: tl.constexpr,'
+  - '300:     BLOCK_SIZE_N: tl.constexpr,'
+  - '301:     BLOCK_SIZE_K: tl.constexpr,'
+  evidence_id: src_071e70dd2ee2e3d6
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 300
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '298:     GROUP_N: tl.constexpr,'
+  - '299:     BLOCK_SIZE_M: tl.constexpr,'
+  - '300:     BLOCK_SIZE_N: tl.constexpr,'
+  - '301:     BLOCK_SIZE_K: tl.constexpr,'
+  - '302:     BLOCK_SIZE_S3: tl.constexpr,'
+  evidence_id: src_613752a3d7144479
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 301
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '299:     BLOCK_SIZE_M: tl.constexpr,'
+  - '300:     BLOCK_SIZE_N: tl.constexpr,'
+  - '301:     BLOCK_SIZE_K: tl.constexpr,'
+  - '302:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '303:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_1b6035e81d6b6635
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 302
+  match: 'BLOCK_SIZE_S3: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_S3
+  arch_scope: ''
+  evidence:
+  - '300:     BLOCK_SIZE_N: tl.constexpr,'
+  - '301:     BLOCK_SIZE_K: tl.constexpr,'
+  - '302:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '303:     GROUP_SIZE_M: tl.constexpr,'
+  - '304:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_dd976d7f30883e83
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 303
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '301:     BLOCK_SIZE_K: tl.constexpr,'
+  - '302:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '303:     GROUP_SIZE_M: tl.constexpr,'
+  - '304:     NUM_KSPLIT: tl.constexpr,'
+  - '305:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_1b666e6a898761b6
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 304
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '302:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '303:     GROUP_SIZE_M: tl.constexpr,'
+  - '304:     NUM_KSPLIT: tl.constexpr,'
+  - '305:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '306:     EVEN_K: tl.constexpr,'
+  evidence_id: src_b9be2b77411786c0
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 305
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '303:     GROUP_SIZE_M: tl.constexpr,'
+  - '304:     NUM_KSPLIT: tl.constexpr,'
+  - '305:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '306:     EVEN_K: tl.constexpr,'
+  - '307:     GRID_MN: tl.constexpr,'
+  evidence_id: src_906fedcfff105cef
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 306
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '304:     NUM_KSPLIT: tl.constexpr,'
+  - '305:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '306:     EVEN_K: tl.constexpr,'
+  - '307:     GRID_MN: tl.constexpr,'
+  - '308:     cache_modifier: tl.constexpr,'
+  evidence_id: src_c8b6019e8bc62ad8
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 307
+  match: 'GRID_MN: tl.constexpr,'
+  captured:
+  - GRID_MN
+  arch_scope: ''
+  evidence:
+  - '305:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '306:     EVEN_K: tl.constexpr,'
+  - '307:     GRID_MN: tl.constexpr,'
+  - '308:     cache_modifier: tl.constexpr,'
+  - '309: ):'
+  evidence_id: src_ee34edabe3dc6da5
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 308
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '306:     EVEN_K: tl.constexpr,'
+  - '307:     GRID_MN: tl.constexpr,'
+  - '308:     cache_modifier: tl.constexpr,'
+  - '309: ):'
+  - '310:     tl.assume(stride_a_m > 0)'
+  evidence_id: src_fa615beec8af3822
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 531
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '529:     stride_y_d,'
+  - '530:     stride_y_s,'
+  - '531:     BLOCK_SIZE_M: tl.constexpr,'
+  - '532:     BLOCK_SIZE_N: tl.constexpr,'
+  - '533:     BLOCK_SIZE_S3: tl.constexpr,'
+  evidence_id: src_da46e38a6f9c5bb3
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 532
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '530:     stride_y_s,'
+  - '531:     BLOCK_SIZE_M: tl.constexpr,'
+  - '532:     BLOCK_SIZE_N: tl.constexpr,'
+  - '533:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '534:     ACTUAL_KSPLIT: tl.constexpr,'
+  evidence_id: src_7ee65620de1df2cb
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 533
+  match: 'BLOCK_SIZE_S3: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_S3
+  arch_scope: ''
+  evidence:
+  - '531:     BLOCK_SIZE_M: tl.constexpr,'
+  - '532:     BLOCK_SIZE_N: tl.constexpr,'
+  - '533:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '534:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '535:     MAX_KSPLIT: tl.constexpr,'
+  evidence_id: src_e5da99462054f915
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 534
+  match: 'ACTUAL_KSPLIT: tl.constexpr,'
+  captured:
+  - ACTUAL_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '532:     BLOCK_SIZE_N: tl.constexpr,'
+  - '533:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '534:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '535:     MAX_KSPLIT: tl.constexpr,'
+  - '536: ):'
+  evidence_id: src_42c8ec6d157f7179
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 535
+  match: 'MAX_KSPLIT: tl.constexpr,'
+  captured:
+  - MAX_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '533:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '534:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '535:     MAX_KSPLIT: tl.constexpr,'
+  - '536: ):'
+  - '537:     tl.assume(stride_c_k > 0)'
+  evidence_id: src_f64a941d8e33ef43
+- snapshot: aiter_a6bb4993
+  category: scale_in_k_loop
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 159
+  end_line: 163
+  match: "accumulator += (\n                tl.dot(a, b, input_precision=\"ieee\")\n                * a_scale[:,\
+    \ None]"
+  captured:
+  - accumulator
+  - a_scale
+  arch_scope: ''
+  evidence:
+  - '158:             # Perform dot operation and apply scale'
+  - '159:             accumulator += ('
+  - '160:                 tl.dot(a, b, input_precision="ieee")'
+  - '161:                 * a_scale[:, None]'
+  evidence_id: src_a27a42fc4bcf85dc
+- snapshot: aiter_a6bb4993
+  category: scale_in_k_loop
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 416
+  end_line: 420
+  match: "accumulator += (\n                tl.dot(a, b, input_precision=\"ieee\")\n                * a_scale[:,\
+    \ None]"
+  captured:
+  - accumulator
+  - a_scale
+  arch_scope: ''
+  evidence:
+  - '415:             # Perform dot operation and apply scale'
+  - '416:             accumulator += ('
+  - '417:                 tl.dot(a, b, input_precision="ieee")'
+  - '418:                 * a_scale[:, None]'
+  evidence_id: src_5c899543b2ddf4c8
+- snapshot: aiter_a6bb4993
+  category: jit_cache
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  line: 628
+  match: '@functools.lru_cache(maxsize=1024)
+
+    def _get_config'
+  captured:
+  - '1024'
+  - _get_config
+  arch_scope: ''
+  evidence:
+  - '628: @functools.lru_cache(maxsize=1024)'
+  - '629: def _get_config('
+  - '630:     M: int,'
+  evidence_id: src_a438c4568128f669
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 208
+  match: tl.dot_scaled(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '206:                     )'
+  - '208:                 accumulator_fp4 += tl.dot_scaled(a, a_scale, "e2m1", b, b_scale, "e2m1")'
+  - '210:                 a_fp4_ptrs += (BLOCK_SIZE_K // 2) * stride_a_fp4_k'
+  evidence_id: src_983afff0d24d7263
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 285
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '283:                     )'
+  - '285:                 accumulator_bf16 += tl.dot(a, b, input_precision="ieee")'
+  - '287:                 a_ptrs += BLOCK_SIZE_K * stride_a_bf16_k'
+  evidence_id: src_51496c94627f8f65
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 575
+  match: tl.dot_scaled(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '573:                 )'
+  - '575:                 accumulator_fp4 += tl.dot_scaled(a, a_scale, "e2m1", b, b_scale, "e2m1")'
+  - '577:                 a_fp4_ptrs += (BLOCK_SIZE_K // 2) * stride_a_fp4_k'
+  evidence_id: src_42b1d4a8f60ddf7d
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 655
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '653:                     )'
+  - '655:                 accumulator_bf16 += tl.dot(a, b, input_precision="ieee")'
+  - '657:                 a_ptrs += BLOCK_SIZE_K * stride_a_bf16_k'
+  evidence_id: src_d8c6e61846b67454
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 118
+  match: NUM_XCDS=
+  captured:
+  - NUM_XCDS
+  arch_scope: ''
+  evidence:
+  - '117:     pid_unified = tl.program_id(axis=0)'
+  - '118:     pid_unified = remap_xcd(pid_unified, GRID_MN * NUM_KSPLIT, NUM_XCDS=8)'
+  - '120:     pid_k = pid_unified % NUM_KSPLIT'
+  evidence_id: src_13f39bad50748bf2
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 416
+  match: NUM_XCDS=
+  captured:
+  - NUM_XCDS
+  arch_scope: ''
+  evidence:
+  - '415:     pid_unified = tl.program_id(axis=0)'
+  - '416:     pid_unified = remap_xcd(pid_unified, GRID_MN * NUM_KSPLIT, NUM_XCDS=8)'
+  - '418:     pid_k = pid_unified % NUM_KSPLIT'
+  evidence_id: src_970cb20303f9b143
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 92
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '90:     GRID_MN_BF16: tl.constexpr,'
+  - '91:     SKIP_REDUCE: tl.constexpr,'
+  - '92:     cache_modifier: tl.constexpr,'
+  - '93: ):'
+  evidence_id: src_0dce051d0826a1a0
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 190
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '188:             for k in range(pid_k * num_k_iter, (pid_k + 1) * num_k_iter):'
+  - '189:                 a_scale = tl.load(a_fp4_scale_ptrs)'
+  - '190:                 b_scale = tl.load(b_fp4_scale_ptrs, cache_modifier=cache_modifier)'
+  - '192:                 if EVEN_K:'
+  evidence_id: src_7eeb95375599e588
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 194
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '192:                 if EVEN_K:'
+  - '193:                     a = tl.load(a_fp4_ptrs)'
+  - '194:                     b = tl.load(b_fp4_ptrs, cache_modifier=cache_modifier)'
+  - '195:                 else:'
+  - '196:                     a = tl.load('
+  evidence_id: src_f6d576cca18d9abb
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 205
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '203:                         mask=offs_k_fp4[:, None] < K - k * (BLOCK_SIZE_K // 2),'
+  - '204:                         other=0.0,'
+  - '205:                         cache_modifier=cache_modifier,'
+  - '206:                     )'
+  evidence_id: src_c3a6f88176068b45
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 271
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '269:                 if EVEN_K:'
+  - '270:                     a = tl.load(a_ptrs)'
+  - '271:                     b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '272:                 else:'
+  - '273:                     a = tl.load('
+  evidence_id: src_ff8906e4345a5afd
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 282
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '280:                         mask=offs_k_bf16[:, None] < K - k * BLOCK_SIZE_K,'
+  - '281:                         other=0.0,'
+  - '282:                         cache_modifier=cache_modifier,'
+  - '283:                     )'
+  evidence_id: src_84f07d3de145cd69
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 390
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '388:     GRID_MN_BF16: tl.constexpr,'
+  - '389:     SKIP_REDUCE: tl.constexpr,'
+  - '390:     cache_modifier: tl.constexpr,'
+  - '391: ):'
+  evidence_id: src_3f92c51e87bce7d7
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 531
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '530:                 b_scale = ('
+  - '531:                     tl.load(b_fp4_scale_ptrs, cache_modifier=cache_modifier)'
+  - '532:                     .reshape('
+  - '533:                         BLOCK_SIZE_N // 32,'
+  evidence_id: src_bd7e6cb855a0f81f
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 547
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '545:                 if EVEN_K:'
+  - '546:                     a = tl.load(a_fp4_ptrs)'
+  - '547:                     b = tl.load(b_fp4_ptrs, cache_modifier=cache_modifier)'
+  - '548:                 # else:'
+  - '549:                 #     a = tl.load('
+  evidence_id: src_9bb2ae44c674f7c7
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 602
+  match: cache_modifier=".wt
+  captured:
+  - .wt
+  arch_scope: ''
+  evidence:
+  - '600:             )'
+  - '601:             c_fp4_mask = (offs_cm[:, None] < M) & (offs_c_fp4_n[None, :] < N_fp4)'
+  - '602:             tl.store(c_fp4_ptrs, c_fp4, mask=c_fp4_mask, cache_modifier=".wt")'
+  - '603:         else:'
+  - '604:             pid_n -= num_pid_n_fp4'
+  evidence_id: src_1f8060866f973374
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 641
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '639:                 if EVEN_K:'
+  - '640:                     a = tl.load(a_ptrs)'
+  - '641:                     b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '642:                 else:'
+  - '643:                     a = tl.load('
+  evidence_id: src_925aa6564912b32d
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 652
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '650:                         mask=offs_k_bf16[:, None] < K - k * BLOCK_SIZE_K,'
+  - '651:                         other=0.0,'
+  - '652:                         cache_modifier=cache_modifier,'
+  - '653:                     )'
+  evidence_id: src_fe6944d659ca22ae
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 75
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '73:     stride_c_bf16_m,'
+  - '74:     stride_c_bf16_n,'
+  - '75:     # Meta-parameters'
+  - '76:     BLOCK_SIZE_M: tl.constexpr,'
+  - '77:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_9ca0ea6b4b7d64fd
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 77
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '75:     # Meta-parameters'
+  - '76:     BLOCK_SIZE_M: tl.constexpr,'
+  - '77:     BLOCK_SIZE_N: tl.constexpr,'
+  - '78:     BLOCK_SIZE_K: tl.constexpr,'
+  - '79:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_752dec70cea99961
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 78
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '76:     BLOCK_SIZE_M: tl.constexpr,'
+  - '77:     BLOCK_SIZE_N: tl.constexpr,'
+  - '78:     BLOCK_SIZE_K: tl.constexpr,'
+  - '79:     GROUP_SIZE_M: tl.constexpr,'
+  - '80:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_602d84e9451439f9
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 79
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '77:     BLOCK_SIZE_N: tl.constexpr,'
+  - '78:     BLOCK_SIZE_K: tl.constexpr,'
+  - '79:     GROUP_SIZE_M: tl.constexpr,'
+  - '80:     NUM_KSPLIT: tl.constexpr,'
+  - '81:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_5b5d2e62fda37619
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 80
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '78:     BLOCK_SIZE_K: tl.constexpr,'
+  - '79:     GROUP_SIZE_M: tl.constexpr,'
+  - '80:     NUM_KSPLIT: tl.constexpr,'
+  - '81:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '82:     ADD_BIAS_FP4: tl.constexpr,'
+  evidence_id: src_f5779eb9a2eda09e
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 81
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '79:     GROUP_SIZE_M: tl.constexpr,'
+  - '80:     NUM_KSPLIT: tl.constexpr,'
+  - '81:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '82:     ADD_BIAS_FP4: tl.constexpr,'
+  - '83:     ADD_BIAS_BF16: tl.constexpr,'
+  evidence_id: src_0237e843e5104e84
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 82
+  match: 'ADD_BIAS_FP4: tl.constexpr,'
+  captured:
+  - ADD_BIAS_FP4
+  arch_scope: ''
+  evidence:
+  - '80:     NUM_KSPLIT: tl.constexpr,'
+  - '81:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '82:     ADD_BIAS_FP4: tl.constexpr,'
+  - '83:     ADD_BIAS_BF16: tl.constexpr,'
+  - '84:     EVEN_K: tl.constexpr,'
+  evidence_id: src_8e0fb52a44af1a26
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 83
+  match: 'ADD_BIAS_BF16: tl.constexpr,'
+  captured:
+  - ADD_BIAS_BF16
+  arch_scope: ''
+  evidence:
+  - '81:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '82:     ADD_BIAS_FP4: tl.constexpr,'
+  - '83:     ADD_BIAS_BF16: tl.constexpr,'
+  - '84:     EVEN_K: tl.constexpr,'
+  - '85:     num_warps: tl.constexpr,'
+  evidence_id: src_1b267b13f226070a
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 84
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '82:     ADD_BIAS_FP4: tl.constexpr,'
+  - '83:     ADD_BIAS_BF16: tl.constexpr,'
+  - '84:     EVEN_K: tl.constexpr,'
+  - '85:     num_warps: tl.constexpr,'
+  - '86:     num_stages: tl.constexpr,'
+  evidence_id: src_132c6dd0d68c2b5e
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 85
+  match: 'num_warps: tl.constexpr,'
+  captured:
+  - num_warps
+  arch_scope: ''
+  evidence:
+  - '83:     ADD_BIAS_BF16: tl.constexpr,'
+  - '84:     EVEN_K: tl.constexpr,'
+  - '85:     num_warps: tl.constexpr,'
+  - '86:     num_stages: tl.constexpr,'
+  - '87:     waves_per_eu: tl.constexpr,'
+  evidence_id: src_9ebe842efdff0b7f
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 86
+  match: 'num_stages: tl.constexpr,'
+  captured:
+  - num_stages
+  arch_scope: ''
+  evidence:
+  - '84:     EVEN_K: tl.constexpr,'
+  - '85:     num_warps: tl.constexpr,'
+  - '86:     num_stages: tl.constexpr,'
+  - '87:     waves_per_eu: tl.constexpr,'
+  - '88:     matrix_instr_nonkdim: tl.constexpr,'
+  evidence_id: src_35742e351fb99abc
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 87
+  match: 'waves_per_eu: tl.constexpr,'
+  captured:
+  - waves_per_eu
+  arch_scope: ''
+  evidence:
+  - '85:     num_warps: tl.constexpr,'
+  - '86:     num_stages: tl.constexpr,'
+  - '87:     waves_per_eu: tl.constexpr,'
+  - '88:     matrix_instr_nonkdim: tl.constexpr,'
+  - '89:     GRID_MN_FP4: tl.constexpr,'
+  evidence_id: src_f37806a50887f718
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 88
+  match: 'matrix_instr_nonkdim: tl.constexpr,'
+  captured:
+  - matrix_instr_nonkdim
+  arch_scope: ''
+  evidence:
+  - '86:     num_stages: tl.constexpr,'
+  - '87:     waves_per_eu: tl.constexpr,'
+  - '88:     matrix_instr_nonkdim: tl.constexpr,'
+  - '89:     GRID_MN_FP4: tl.constexpr,'
+  - '90:     GRID_MN_BF16: tl.constexpr,'
+  evidence_id: src_37c7bed57d637d04
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 89
+  match: 'GRID_MN_FP4: tl.constexpr,'
+  captured:
+  - GRID_MN_FP4
+  arch_scope: ''
+  evidence:
+  - '87:     waves_per_eu: tl.constexpr,'
+  - '88:     matrix_instr_nonkdim: tl.constexpr,'
+  - '89:     GRID_MN_FP4: tl.constexpr,'
+  - '90:     GRID_MN_BF16: tl.constexpr,'
+  - '91:     SKIP_REDUCE: tl.constexpr,'
+  evidence_id: src_f58108dc10981787
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 90
+  match: 'GRID_MN_BF16: tl.constexpr,'
+  captured:
+  - GRID_MN_BF16
+  arch_scope: ''
+  evidence:
+  - '88:     matrix_instr_nonkdim: tl.constexpr,'
+  - '89:     GRID_MN_FP4: tl.constexpr,'
+  - '90:     GRID_MN_BF16: tl.constexpr,'
+  - '91:     SKIP_REDUCE: tl.constexpr,'
+  - '92:     cache_modifier: tl.constexpr,'
+  evidence_id: src_87124aeb8f41fdba
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 91
+  match: 'SKIP_REDUCE: tl.constexpr,'
+  captured:
+  - SKIP_REDUCE
+  arch_scope: ''
+  evidence:
+  - '89:     GRID_MN_FP4: tl.constexpr,'
+  - '90:     GRID_MN_BF16: tl.constexpr,'
+  - '91:     SKIP_REDUCE: tl.constexpr,'
+  - '92:     cache_modifier: tl.constexpr,'
+  - '93: ):'
+  evidence_id: src_15241207dad8a433
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 92
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '90:     GRID_MN_BF16: tl.constexpr,'
+  - '91:     SKIP_REDUCE: tl.constexpr,'
+  - '92:     cache_modifier: tl.constexpr,'
+  - '93: ):'
+  evidence_id: src_02be259b7048a1db
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 373
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '371:     stride_c_bf16_m,'
+  - '372:     stride_c_bf16_n,'
+  - '373:     # Meta-parameters'
+  - '374:     BLOCK_SIZE_M: tl.constexpr,'
+  - '375:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_9b0305c79791c8bc
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 375
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '373:     # Meta-parameters'
+  - '374:     BLOCK_SIZE_M: tl.constexpr,'
+  - '375:     BLOCK_SIZE_N: tl.constexpr,'
+  - '376:     BLOCK_SIZE_K: tl.constexpr,'
+  - '377:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_1b3ed9e9d8116c65
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 376
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '374:     BLOCK_SIZE_M: tl.constexpr,'
+  - '375:     BLOCK_SIZE_N: tl.constexpr,'
+  - '376:     BLOCK_SIZE_K: tl.constexpr,'
+  - '377:     GROUP_SIZE_M: tl.constexpr,'
+  - '378:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_bfa90838eceede0c
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 377
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '375:     BLOCK_SIZE_N: tl.constexpr,'
+  - '376:     BLOCK_SIZE_K: tl.constexpr,'
+  - '377:     GROUP_SIZE_M: tl.constexpr,'
+  - '378:     NUM_KSPLIT: tl.constexpr,'
+  - '379:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_2694e5e5940aa08f
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 378
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '376:     BLOCK_SIZE_K: tl.constexpr,'
+  - '377:     GROUP_SIZE_M: tl.constexpr,'
+  - '378:     NUM_KSPLIT: tl.constexpr,'
+  - '379:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '380:     ADD_BIAS_FP4: tl.constexpr,'
+  evidence_id: src_3eed146917ea9e05
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 379
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '377:     GROUP_SIZE_M: tl.constexpr,'
+  - '378:     NUM_KSPLIT: tl.constexpr,'
+  - '379:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '380:     ADD_BIAS_FP4: tl.constexpr,'
+  - '381:     ADD_BIAS_BF16: tl.constexpr,'
+  evidence_id: src_3addaa60aa973d28
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 380
+  match: 'ADD_BIAS_FP4: tl.constexpr,'
+  captured:
+  - ADD_BIAS_FP4
+  arch_scope: ''
+  evidence:
+  - '378:     NUM_KSPLIT: tl.constexpr,'
+  - '379:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '380:     ADD_BIAS_FP4: tl.constexpr,'
+  - '381:     ADD_BIAS_BF16: tl.constexpr,'
+  - '382:     EVEN_K: tl.constexpr,'
+  evidence_id: src_e88941d997089167
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 381
+  match: 'ADD_BIAS_BF16: tl.constexpr,'
+  captured:
+  - ADD_BIAS_BF16
+  arch_scope: ''
+  evidence:
+  - '379:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '380:     ADD_BIAS_FP4: tl.constexpr,'
+  - '381:     ADD_BIAS_BF16: tl.constexpr,'
+  - '382:     EVEN_K: tl.constexpr,'
+  - '383:     num_warps: tl.constexpr,'
+  evidence_id: src_6de152877236ffed
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 382
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '380:     ADD_BIAS_FP4: tl.constexpr,'
+  - '381:     ADD_BIAS_BF16: tl.constexpr,'
+  - '382:     EVEN_K: tl.constexpr,'
+  - '383:     num_warps: tl.constexpr,'
+  - '384:     num_stages: tl.constexpr,'
+  evidence_id: src_5bbc15043c6f4553
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 383
+  match: 'num_warps: tl.constexpr,'
+  captured:
+  - num_warps
+  arch_scope: ''
+  evidence:
+  - '381:     ADD_BIAS_BF16: tl.constexpr,'
+  - '382:     EVEN_K: tl.constexpr,'
+  - '383:     num_warps: tl.constexpr,'
+  - '384:     num_stages: tl.constexpr,'
+  - '385:     waves_per_eu: tl.constexpr,'
+  evidence_id: src_29610988a3e238a7
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 384
+  match: 'num_stages: tl.constexpr,'
+  captured:
+  - num_stages
+  arch_scope: ''
+  evidence:
+  - '382:     EVEN_K: tl.constexpr,'
+  - '383:     num_warps: tl.constexpr,'
+  - '384:     num_stages: tl.constexpr,'
+  - '385:     waves_per_eu: tl.constexpr,'
+  - '386:     matrix_instr_nonkdim: tl.constexpr,'
+  evidence_id: src_fa78c64a350d4655
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 385
+  match: 'waves_per_eu: tl.constexpr,'
+  captured:
+  - waves_per_eu
+  arch_scope: ''
+  evidence:
+  - '383:     num_warps: tl.constexpr,'
+  - '384:     num_stages: tl.constexpr,'
+  - '385:     waves_per_eu: tl.constexpr,'
+  - '386:     matrix_instr_nonkdim: tl.constexpr,'
+  - '387:     GRID_MN_FP4: tl.constexpr,'
+  evidence_id: src_26db2a51f66db56d
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 386
+  match: 'matrix_instr_nonkdim: tl.constexpr,'
+  captured:
+  - matrix_instr_nonkdim
+  arch_scope: ''
+  evidence:
+  - '384:     num_stages: tl.constexpr,'
+  - '385:     waves_per_eu: tl.constexpr,'
+  - '386:     matrix_instr_nonkdim: tl.constexpr,'
+  - '387:     GRID_MN_FP4: tl.constexpr,'
+  - '388:     GRID_MN_BF16: tl.constexpr,'
+  evidence_id: src_62a019022d524bd8
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 387
+  match: 'GRID_MN_FP4: tl.constexpr,'
+  captured:
+  - GRID_MN_FP4
+  arch_scope: ''
+  evidence:
+  - '385:     waves_per_eu: tl.constexpr,'
+  - '386:     matrix_instr_nonkdim: tl.constexpr,'
+  - '387:     GRID_MN_FP4: tl.constexpr,'
+  - '388:     GRID_MN_BF16: tl.constexpr,'
+  - '389:     SKIP_REDUCE: tl.constexpr,'
+  evidence_id: src_8a62eda0a6306e35
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 388
+  match: 'GRID_MN_BF16: tl.constexpr,'
+  captured:
+  - GRID_MN_BF16
+  arch_scope: ''
+  evidence:
+  - '386:     matrix_instr_nonkdim: tl.constexpr,'
+  - '387:     GRID_MN_FP4: tl.constexpr,'
+  - '388:     GRID_MN_BF16: tl.constexpr,'
+  - '389:     SKIP_REDUCE: tl.constexpr,'
+  - '390:     cache_modifier: tl.constexpr,'
+  evidence_id: src_82b4a31d8d8c8808
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 389
+  match: 'SKIP_REDUCE: tl.constexpr,'
+  captured:
+  - SKIP_REDUCE
+  arch_scope: ''
+  evidence:
+  - '387:     GRID_MN_FP4: tl.constexpr,'
+  - '388:     GRID_MN_BF16: tl.constexpr,'
+  - '389:     SKIP_REDUCE: tl.constexpr,'
+  - '390:     cache_modifier: tl.constexpr,'
+  - '391: ):'
+  evidence_id: src_880f89bf7354c9ea
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 390
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '388:     GRID_MN_BF16: tl.constexpr,'
+  - '389:     SKIP_REDUCE: tl.constexpr,'
+  - '390:     cache_modifier: tl.constexpr,'
+  - '391: ):'
+  evidence_id: src_25516f5a695123f6
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 714
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '712:     stride_c_bf16_out_m,'
+  - '713:     stride_c_bf16_out_n,'
+  - '714:     BLOCK_SIZE_M: tl.constexpr,'
+  - '715:     BLOCK_SIZE_N: tl.constexpr,'
+  - '716:     ACTUAL_KSPLIT: tl.constexpr,'
+  evidence_id: src_9ec895188ffb8937
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 715
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '713:     stride_c_bf16_out_n,'
+  - '714:     BLOCK_SIZE_M: tl.constexpr,'
+  - '715:     BLOCK_SIZE_N: tl.constexpr,'
+  - '716:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '717:     MAX_KSPLIT: tl.constexpr,'
+  evidence_id: src_6f4496b409ea1f0c
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 716
+  match: 'ACTUAL_KSPLIT: tl.constexpr,'
+  captured:
+  - ACTUAL_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '714:     BLOCK_SIZE_M: tl.constexpr,'
+  - '715:     BLOCK_SIZE_N: tl.constexpr,'
+  - '716:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '717:     MAX_KSPLIT: tl.constexpr,'
+  - '718:     ADD_BIAS_FP4: tl.constexpr,'
+  evidence_id: src_91d6d5cf95c4cc0f
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 717
+  match: 'MAX_KSPLIT: tl.constexpr,'
+  captured:
+  - MAX_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '715:     BLOCK_SIZE_N: tl.constexpr,'
+  - '716:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '717:     MAX_KSPLIT: tl.constexpr,'
+  - '718:     ADD_BIAS_FP4: tl.constexpr,'
+  - '719:     ADD_BIAS_BF16: tl.constexpr,'
+  evidence_id: src_d2db45ce817f4972
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 718
+  match: 'ADD_BIAS_FP4: tl.constexpr,'
+  captured:
+  - ADD_BIAS_FP4
+  arch_scope: ''
+  evidence:
+  - '716:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '717:     MAX_KSPLIT: tl.constexpr,'
+  - '718:     ADD_BIAS_FP4: tl.constexpr,'
+  - '719:     ADD_BIAS_BF16: tl.constexpr,'
+  - '720: ):'
+  evidence_id: src_d2805c4c351c7209
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  line: 719
+  match: 'ADD_BIAS_BF16: tl.constexpr,'
+  captured:
+  - ADD_BIAS_BF16
+  arch_scope: ''
+  evidence:
+  - '717:     MAX_KSPLIT: tl.constexpr,'
+  - '718:     ADD_BIAS_FP4: tl.constexpr,'
+  - '719:     ADD_BIAS_BF16: tl.constexpr,'
+  - '720: ):'
+  evidence_id: src_c98ca6f5bc3f55aa
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 174
+  end_line: 176
+  match: tl.dot_scaled(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '172:                 )'
+  - '174:             accumulator = tl.dot_scaled('
+  - '175:                 a, a_scales, "e2m1", b, b_scales, "e2m1", accumulator'
+  - '176:             )'
+  evidence_id: src_27b40aac644830f2
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 452
+  match: tl.dot_scaled(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '450:             )'
+  - '452:             accumulator += tl.dot_scaled(a, a_scales, "e2m1", b, b_scales, "e2m1")'
+  - '454:             # Advance the ptrs to the next K block.'
+  evidence_id: src_a3871685f5a70702
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 106
+  match: NUM_XCDS=
+  captured:
+  - NUM_XCDS
+  arch_scope: ''
+  evidence:
+  - '104:     pid_unified = tl.program_id(axis=0)'
+  - '105:     # remap so that XCDs get continous chunks of pids (of CHUNK_SIZE).'
+  - '106:     pid_unified = remap_xcd(pid_unified, GRID_MN * NUM_KSPLIT, NUM_XCDS=8)'
+  - '108:     pid_k = pid_unified % NUM_KSPLIT'
+  evidence_id: src_b21abc8e0ae27e61
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 326
+  match: NUM_XCDS=
+  captured:
+  - NUM_XCDS
+  arch_scope: ''
+  evidence:
+  - '324:     # This is done in a grouped ordering to promote L2 data reuse.'
+  - '325:     pid_unified = tl.program_id(axis=0)'
+  - '326:     pid_unified = remap_xcd(pid_unified, GRID_MN * NUM_KSPLIT, NUM_XCDS=8)'
+  - '327:     pid_k = pid_unified % NUM_KSPLIT'
+  - '328:     pid = pid_unified // NUM_KSPLIT'
+  evidence_id: src_0ceb52a2e1eda432
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 79
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '77:     waves_per_eu: tl.constexpr,'
+  - '78:     matrix_instr_nonkdim: tl.constexpr,'
+  - '79:     cache_modifier: tl.constexpr,'
+  - '80: ):'
+  - '81:     """'
+  evidence_id: src_b0fc62d6c859ef98
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 156
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '154:         for k in range(pid_k * num_k_iter, (pid_k + 1) * num_k_iter):'
+  - '155:             a_scales = tl.load(a_scale_ptrs)'
+  - '156:             b_scales = tl.load(b_scale_ptrs, cache_modifier=cache_modifier)'
+  - '158:             # Load the next block of A and B, generate a mask by checking the K dimension.'
+  evidence_id: src_20fdd0ded0790150
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 162
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '160:             if EVEN_K:'
+  - '161:                 a = tl.load(a_ptrs)'
+  - '162:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '163:             else:'
+  - '164:                 a = tl.load('
+  evidence_id: src_0139d75d77d689da
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 171
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '169:                     mask=offs_k[:, None] < K - k * (BLOCK_SIZE_K // 2),'
+  - '170:                     other=0,'
+  - '171:                     cache_modifier=cache_modifier,'
+  - '172:                 )'
+  evidence_id: src_9ea183d3743a44b5
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 300
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '298:     waves_per_eu: tl.constexpr,'
+  - '299:     matrix_instr_nonkdim: tl.constexpr,'
+  - '300:     cache_modifier: tl.constexpr,'
+  - '301: ):'
+  - '302:     """'
+  evidence_id: src_e1c7a2c450c81840
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 418
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '417:             b_scales = ('
+  - '418:                 tl.load(b_scale_ptrs, cache_modifier=cache_modifier)'
+  - '419:                 .reshape('
+  - '420:                     BLOCK_SIZE_N // 32,'
+  evidence_id: src_8e86ce6fa2138f21
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 436
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '434:             if EVEN_K:'
+  - '435:                 a = tl.load(a_ptrs)'
+  - '436:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '438:             b = ('
+  evidence_id: src_78b0764b6315244d
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 508
+  match: cache_modifier=".wt
+  captured:
+  - .wt
+  arch_scope: ''
+  evidence:
+  - '506:             + pid_k * stride_ck'
+  - '507:         )'
+  - '508:         tl.store(c_ptrs, c, mask=c_mask, cache_modifier=".wt")'
+  evidence_id: src_fa78f47ddfd1903e
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 62
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '60:     stride_cbm,'
+  - '61:     stride_cbn,'
+  - '62:     # Meta-parameters'
+  - '63:     BLOCK_SIZE_M: tl.constexpr,'
+  - '64:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_938fb066ce8f33b4
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 64
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '62:     # Meta-parameters'
+  - '63:     BLOCK_SIZE_M: tl.constexpr,'
+  - '64:     BLOCK_SIZE_N: tl.constexpr,'
+  - '65:     BLOCK_SIZE_K: tl.constexpr,'
+  - '66:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_1051f59767086e0f
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 65
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '63:     BLOCK_SIZE_M: tl.constexpr,'
+  - '64:     BLOCK_SIZE_N: tl.constexpr,'
+  - '65:     BLOCK_SIZE_K: tl.constexpr,'
+  - '66:     GROUP_SIZE_M: tl.constexpr,'
+  - '67:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_392574587b9f15b3
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 66
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '64:     BLOCK_SIZE_N: tl.constexpr,'
+  - '65:     BLOCK_SIZE_K: tl.constexpr,'
+  - '66:     GROUP_SIZE_M: tl.constexpr,'
+  - '67:     NUM_KSPLIT: tl.constexpr,'
+  - '68:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_4990a5c6dfe55506
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 67
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '65:     BLOCK_SIZE_K: tl.constexpr,'
+  - '66:     GROUP_SIZE_M: tl.constexpr,'
+  - '67:     NUM_KSPLIT: tl.constexpr,'
+  - '68:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '69:     EVEN_K: tl.constexpr,'
+  evidence_id: src_d90d777ef1b9fa63
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 68
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '66:     GROUP_SIZE_M: tl.constexpr,'
+  - '67:     NUM_KSPLIT: tl.constexpr,'
+  - '68:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '69:     EVEN_K: tl.constexpr,'
+  - '70:     IS_A_SCALAR: tl.constexpr,'
+  evidence_id: src_9e42e4b5fbc51ad9
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 69
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '67:     NUM_KSPLIT: tl.constexpr,'
+  - '68:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '69:     EVEN_K: tl.constexpr,'
+  - '70:     IS_A_SCALAR: tl.constexpr,'
+  - '71:     IS_B_SCALAR: tl.constexpr,'
+  evidence_id: src_c3dbf64a4bac3cb6
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 70
+  match: 'IS_A_SCALAR: tl.constexpr,'
+  captured:
+  - IS_A_SCALAR
+  arch_scope: ''
+  evidence:
+  - '68:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '69:     EVEN_K: tl.constexpr,'
+  - '70:     IS_A_SCALAR: tl.constexpr,'
+  - '71:     IS_B_SCALAR: tl.constexpr,'
+  - '72:     IS_A_TENSOR: tl.constexpr,'
+  evidence_id: src_8df3981659c4a251
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 71
+  match: 'IS_B_SCALAR: tl.constexpr,'
+  captured:
+  - IS_B_SCALAR
+  arch_scope: ''
+  evidence:
+  - '69:     EVEN_K: tl.constexpr,'
+  - '70:     IS_A_SCALAR: tl.constexpr,'
+  - '71:     IS_B_SCALAR: tl.constexpr,'
+  - '72:     IS_A_TENSOR: tl.constexpr,'
+  - '73:     IS_B_TENSOR: tl.constexpr,'
+  evidence_id: src_ee3edb3008c1dab8
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 72
+  match: 'IS_A_TENSOR: tl.constexpr,'
+  captured:
+  - IS_A_TENSOR
+  arch_scope: ''
+  evidence:
+  - '70:     IS_A_SCALAR: tl.constexpr,'
+  - '71:     IS_B_SCALAR: tl.constexpr,'
+  - '72:     IS_A_TENSOR: tl.constexpr,'
+  - '73:     IS_B_TENSOR: tl.constexpr,'
+  - '74:     FUSE_TYPE: tl.constexpr,'
+  evidence_id: src_4828b00acb349c76
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 73
+  match: 'IS_B_TENSOR: tl.constexpr,'
+  captured:
+  - IS_B_TENSOR
+  arch_scope: ''
+  evidence:
+  - '71:     IS_B_SCALAR: tl.constexpr,'
+  - '72:     IS_A_TENSOR: tl.constexpr,'
+  - '73:     IS_B_TENSOR: tl.constexpr,'
+  - '74:     FUSE_TYPE: tl.constexpr,'
+  - '75:     num_warps: tl.constexpr,'
+  evidence_id: src_7e9e28c3b00eb2bd
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 74
+  match: 'FUSE_TYPE: tl.constexpr,'
+  captured:
+  - FUSE_TYPE
+  arch_scope: ''
+  evidence:
+  - '72:     IS_A_TENSOR: tl.constexpr,'
+  - '73:     IS_B_TENSOR: tl.constexpr,'
+  - '74:     FUSE_TYPE: tl.constexpr,'
+  - '75:     num_warps: tl.constexpr,'
+  - '76:     num_stages: tl.constexpr,'
+  evidence_id: src_4a8c2698b74264dd
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 75
+  match: 'num_warps: tl.constexpr,'
+  captured:
+  - num_warps
+  arch_scope: ''
+  evidence:
+  - '73:     IS_B_TENSOR: tl.constexpr,'
+  - '74:     FUSE_TYPE: tl.constexpr,'
+  - '75:     num_warps: tl.constexpr,'
+  - '76:     num_stages: tl.constexpr,'
+  - '77:     waves_per_eu: tl.constexpr,'
+  evidence_id: src_ef73b3f5d16ca436
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 76
+  match: 'num_stages: tl.constexpr,'
+  captured:
+  - num_stages
+  arch_scope: ''
+  evidence:
+  - '74:     FUSE_TYPE: tl.constexpr,'
+  - '75:     num_warps: tl.constexpr,'
+  - '76:     num_stages: tl.constexpr,'
+  - '77:     waves_per_eu: tl.constexpr,'
+  - '78:     matrix_instr_nonkdim: tl.constexpr,'
+  evidence_id: src_3bbd64e5eb1d7a69
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 77
+  match: 'waves_per_eu: tl.constexpr,'
+  captured:
+  - waves_per_eu
+  arch_scope: ''
+  evidence:
+  - '75:     num_warps: tl.constexpr,'
+  - '76:     num_stages: tl.constexpr,'
+  - '77:     waves_per_eu: tl.constexpr,'
+  - '78:     matrix_instr_nonkdim: tl.constexpr,'
+  - '79:     cache_modifier: tl.constexpr,'
+  evidence_id: src_ee665dc81974e7b9
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 78
+  match: 'matrix_instr_nonkdim: tl.constexpr,'
+  captured:
+  - matrix_instr_nonkdim
+  arch_scope: ''
+  evidence:
+  - '76:     num_stages: tl.constexpr,'
+  - '77:     waves_per_eu: tl.constexpr,'
+  - '78:     matrix_instr_nonkdim: tl.constexpr,'
+  - '79:     cache_modifier: tl.constexpr,'
+  - '80: ):'
+  evidence_id: src_193f2f6cc466bc03
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 79
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '77:     waves_per_eu: tl.constexpr,'
+  - '78:     matrix_instr_nonkdim: tl.constexpr,'
+  - '79:     cache_modifier: tl.constexpr,'
+  - '80: ):'
+  - '81:     """'
+  evidence_id: src_f969917bb080798d
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 283
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '281:     stride_cbm,'
+  - '282:     stride_cbn,'
+  - '283:     # Meta-parameters'
+  - '284:     BLOCK_SIZE_M: tl.constexpr,'
+  - '285:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_27b24645624aab19
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 285
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '283:     # Meta-parameters'
+  - '284:     BLOCK_SIZE_M: tl.constexpr,'
+  - '285:     BLOCK_SIZE_N: tl.constexpr,'
+  - '286:     BLOCK_SIZE_K: tl.constexpr,'
+  - '287:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_882079c066edeb1e
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 286
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '284:     BLOCK_SIZE_M: tl.constexpr,'
+  - '285:     BLOCK_SIZE_N: tl.constexpr,'
+  - '286:     BLOCK_SIZE_K: tl.constexpr,'
+  - '287:     GROUP_SIZE_M: tl.constexpr,'
+  - '288:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_1f0db037a71655aa
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 287
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '285:     BLOCK_SIZE_N: tl.constexpr,'
+  - '286:     BLOCK_SIZE_K: tl.constexpr,'
+  - '287:     GROUP_SIZE_M: tl.constexpr,'
+  - '288:     NUM_KSPLIT: tl.constexpr,'
+  - '289:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_f87ddf3dd90b1685
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 288
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '286:     BLOCK_SIZE_K: tl.constexpr,'
+  - '287:     GROUP_SIZE_M: tl.constexpr,'
+  - '288:     NUM_KSPLIT: tl.constexpr,'
+  - '289:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '290:     EVEN_K: tl.constexpr,'
+  evidence_id: src_dcc0e8df60b663fc
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 289
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '287:     GROUP_SIZE_M: tl.constexpr,'
+  - '288:     NUM_KSPLIT: tl.constexpr,'
+  - '289:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '290:     EVEN_K: tl.constexpr,'
+  - '291:     IS_A_SCALAR: tl.constexpr,'
+  evidence_id: src_4a29182c50a6528a
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 290
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '288:     NUM_KSPLIT: tl.constexpr,'
+  - '289:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '290:     EVEN_K: tl.constexpr,'
+  - '291:     IS_A_SCALAR: tl.constexpr,'
+  - '292:     IS_B_SCALAR: tl.constexpr,'
+  evidence_id: src_22119ca9dfaedc8c
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 291
+  match: 'IS_A_SCALAR: tl.constexpr,'
+  captured:
+  - IS_A_SCALAR
+  arch_scope: ''
+  evidence:
+  - '289:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '290:     EVEN_K: tl.constexpr,'
+  - '291:     IS_A_SCALAR: tl.constexpr,'
+  - '292:     IS_B_SCALAR: tl.constexpr,'
+  - '293:     IS_A_TENSOR: tl.constexpr,'
+  evidence_id: src_e7f524e3370bfef4
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 292
+  match: 'IS_B_SCALAR: tl.constexpr,'
+  captured:
+  - IS_B_SCALAR
+  arch_scope: ''
+  evidence:
+  - '290:     EVEN_K: tl.constexpr,'
+  - '291:     IS_A_SCALAR: tl.constexpr,'
+  - '292:     IS_B_SCALAR: tl.constexpr,'
+  - '293:     IS_A_TENSOR: tl.constexpr,'
+  - '294:     IS_B_TENSOR: tl.constexpr,'
+  evidence_id: src_c1b6b733a102c1f5
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 293
+  match: 'IS_A_TENSOR: tl.constexpr,'
+  captured:
+  - IS_A_TENSOR
+  arch_scope: ''
+  evidence:
+  - '291:     IS_A_SCALAR: tl.constexpr,'
+  - '292:     IS_B_SCALAR: tl.constexpr,'
+  - '293:     IS_A_TENSOR: tl.constexpr,'
+  - '294:     IS_B_TENSOR: tl.constexpr,'
+  - '295:     FUSE_TYPE: tl.constexpr,'
+  evidence_id: src_0817d75870e70119
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 294
+  match: 'IS_B_TENSOR: tl.constexpr,'
+  captured:
+  - IS_B_TENSOR
+  arch_scope: ''
+  evidence:
+  - '292:     IS_B_SCALAR: tl.constexpr,'
+  - '293:     IS_A_TENSOR: tl.constexpr,'
+  - '294:     IS_B_TENSOR: tl.constexpr,'
+  - '295:     FUSE_TYPE: tl.constexpr,'
+  - '296:     num_warps: tl.constexpr,'
+  evidence_id: src_fc95ad6d8eadcb67
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 295
+  match: 'FUSE_TYPE: tl.constexpr,'
+  captured:
+  - FUSE_TYPE
+  arch_scope: ''
+  evidence:
+  - '293:     IS_A_TENSOR: tl.constexpr,'
+  - '294:     IS_B_TENSOR: tl.constexpr,'
+  - '295:     FUSE_TYPE: tl.constexpr,'
+  - '296:     num_warps: tl.constexpr,'
+  - '297:     num_stages: tl.constexpr,'
+  evidence_id: src_aab41826f120ca63
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 296
+  match: 'num_warps: tl.constexpr,'
+  captured:
+  - num_warps
+  arch_scope: ''
+  evidence:
+  - '294:     IS_B_TENSOR: tl.constexpr,'
+  - '295:     FUSE_TYPE: tl.constexpr,'
+  - '296:     num_warps: tl.constexpr,'
+  - '297:     num_stages: tl.constexpr,'
+  - '298:     waves_per_eu: tl.constexpr,'
+  evidence_id: src_ed9cf7cf81820457
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 297
+  match: 'num_stages: tl.constexpr,'
+  captured:
+  - num_stages
+  arch_scope: ''
+  evidence:
+  - '295:     FUSE_TYPE: tl.constexpr,'
+  - '296:     num_warps: tl.constexpr,'
+  - '297:     num_stages: tl.constexpr,'
+  - '298:     waves_per_eu: tl.constexpr,'
+  - '299:     matrix_instr_nonkdim: tl.constexpr,'
+  evidence_id: src_f2602a4d0e00a777
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 298
+  match: 'waves_per_eu: tl.constexpr,'
+  captured:
+  - waves_per_eu
+  arch_scope: ''
+  evidence:
+  - '296:     num_warps: tl.constexpr,'
+  - '297:     num_stages: tl.constexpr,'
+  - '298:     waves_per_eu: tl.constexpr,'
+  - '299:     matrix_instr_nonkdim: tl.constexpr,'
+  - '300:     cache_modifier: tl.constexpr,'
+  evidence_id: src_de49c416a09911f5
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 299
+  match: 'matrix_instr_nonkdim: tl.constexpr,'
+  captured:
+  - matrix_instr_nonkdim
+  arch_scope: ''
+  evidence:
+  - '297:     num_stages: tl.constexpr,'
+  - '298:     waves_per_eu: tl.constexpr,'
+  - '299:     matrix_instr_nonkdim: tl.constexpr,'
+  - '300:     cache_modifier: tl.constexpr,'
+  - '301: ):'
+  evidence_id: src_c095a61bdad7fe5a
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 300
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '298:     waves_per_eu: tl.constexpr,'
+  - '299:     matrix_instr_nonkdim: tl.constexpr,'
+  - '300:     cache_modifier: tl.constexpr,'
+  - '301: ):'
+  - '302:     """'
+  evidence_id: src_0bef07a281aefb5c
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 540
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '538:     stride_cbm,'
+  - '539:     stride_cbn,'
+  - '540:     BLOCK_SIZE_M: tl.constexpr,'
+  - '541:     BLOCK_SIZE_N: tl.constexpr,'
+  - '542:     ACTUAL_KSPLIT: tl.constexpr,'
+  evidence_id: src_8e758e5211210767
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 541
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '539:     stride_cbn,'
+  - '540:     BLOCK_SIZE_M: tl.constexpr,'
+  - '541:     BLOCK_SIZE_N: tl.constexpr,'
+  - '542:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '543:     MAX_KSPLIT: tl.constexpr,'
+  evidence_id: src_05459de970c610f4
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 542
+  match: 'ACTUAL_KSPLIT: tl.constexpr,'
+  captured:
+  - ACTUAL_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '540:     BLOCK_SIZE_M: tl.constexpr,'
+  - '541:     BLOCK_SIZE_N: tl.constexpr,'
+  - '542:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '543:     MAX_KSPLIT: tl.constexpr,'
+  - '544:     IS_A_SCALAR: tl.constexpr,'
+  evidence_id: src_d2a822d839f7bff3
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 543
+  match: 'MAX_KSPLIT: tl.constexpr,'
+  captured:
+  - MAX_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '541:     BLOCK_SIZE_N: tl.constexpr,'
+  - '542:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '543:     MAX_KSPLIT: tl.constexpr,'
+  - '544:     IS_A_SCALAR: tl.constexpr,'
+  - '545:     IS_B_SCALAR: tl.constexpr,'
+  evidence_id: src_ab10878db5e8f7bb
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 544
+  match: 'IS_A_SCALAR: tl.constexpr,'
+  captured:
+  - IS_A_SCALAR
+  arch_scope: ''
+  evidence:
+  - '542:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '543:     MAX_KSPLIT: tl.constexpr,'
+  - '544:     IS_A_SCALAR: tl.constexpr,'
+  - '545:     IS_B_SCALAR: tl.constexpr,'
+  - '546:     IS_A_TENSOR: tl.constexpr,'
+  evidence_id: src_24f5dc6f7d8d60c3
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 545
+  match: 'IS_B_SCALAR: tl.constexpr,'
+  captured:
+  - IS_B_SCALAR
+  arch_scope: ''
+  evidence:
+  - '543:     MAX_KSPLIT: tl.constexpr,'
+  - '544:     IS_A_SCALAR: tl.constexpr,'
+  - '545:     IS_B_SCALAR: tl.constexpr,'
+  - '546:     IS_A_TENSOR: tl.constexpr,'
+  - '547:     IS_B_TENSOR: tl.constexpr,'
+  evidence_id: src_de3608b56a5add89
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 546
+  match: 'IS_A_TENSOR: tl.constexpr,'
+  captured:
+  - IS_A_TENSOR
+  arch_scope: ''
+  evidence:
+  - '544:     IS_A_SCALAR: tl.constexpr,'
+  - '545:     IS_B_SCALAR: tl.constexpr,'
+  - '546:     IS_A_TENSOR: tl.constexpr,'
+  - '547:     IS_B_TENSOR: tl.constexpr,'
+  - '548:     FUSE_TYPE: tl.constexpr,'
+  evidence_id: src_843984f44bb23631
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 547
+  match: 'IS_B_TENSOR: tl.constexpr,'
+  captured:
+  - IS_B_TENSOR
+  arch_scope: ''
+  evidence:
+  - '545:     IS_B_SCALAR: tl.constexpr,'
+  - '546:     IS_A_TENSOR: tl.constexpr,'
+  - '547:     IS_B_TENSOR: tl.constexpr,'
+  - '548:     FUSE_TYPE: tl.constexpr,'
+  - '549: ):'
+  evidence_id: src_516b2c93d9c0311b
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  line: 548
+  match: 'FUSE_TYPE: tl.constexpr,'
+  captured:
+  - FUSE_TYPE
+  arch_scope: ''
+  evidence:
+  - '546:     IS_A_TENSOR: tl.constexpr,'
+  - '547:     IS_B_TENSOR: tl.constexpr,'
+  - '548:     FUSE_TYPE: tl.constexpr,'
+  - '549: ):'
+  evidence_id: src_04e4c07ddaad7496
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 180
+  end_line: 182
+  match: tl.dot_scaled(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '179:             # Perform dot operation and apply scales'
+  - '180:             accumulator = tl.dot_scaled('
+  - '181:                 a, a_scales, "e2m1", b, b_scales, "e2m1", accumulator'
+  - '182:             )'
+  evidence_id: src_f962aa5947e324e6
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 492
+  match: tl.dot_scaled(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '490:             )'
+  - '492:             accumulator += tl.dot_scaled(a, a_scales, "e2m1", b, b_scales, "e2m1")'
+  - '494:             # Advance the ptrs to the next K block.'
+  evidence_id: src_695aa1f6646a00bb
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 104
+  match: NUM_XCDS=
+  captured:
+  - NUM_XCDS
+  arch_scope: ''
+  evidence:
+  - '102:     pid_unified = tl.program_id(axis=0)'
+  - '103:     # remap so that XCDs get continous chunks of pids (of CHUNK_SIZE).'
+  - '104:     pid_unified = remap_xcd(pid_unified, GRID_MN * NUM_KSPLIT, NUM_XCDS=8)'
+  - '106:     pid_k = pid_unified % NUM_KSPLIT'
+  evidence_id: src_582e477fd8b9fb54
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 364
+  match: NUM_XCDS=
+  captured:
+  - NUM_XCDS
+  arch_scope: ''
+  evidence:
+  - '362:     pid_unified = tl.program_id(axis=0)'
+  - '363:     # remap so that XCDs get continous chunks of pids (of CHUNK_SIZE).'
+  - '364:     pid_unified = remap_xcd(pid_unified, GRID_MN * NUM_KSPLIT, NUM_XCDS=8)'
+  - '366:     pid_k = pid_unified % NUM_KSPLIT'
+  evidence_id: src_e0a19084ce054725
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 80
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '78:     EVEN_K: tl.constexpr,'
+  - '79:     GRID_MN: tl.constexpr,'
+  - '80:     cache_modifier: tl.constexpr,'
+  - '81: ):'
+  - '82:     tl.assume(stride_a_m > 0)'
+  evidence_id: src_692cb88fcfa2dadf
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 160
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '158:         for k in range(pid_k * num_k_iter, (pid_k + 1) * num_k_iter):'
+  - '159:             a_scales = tl.load(a_scales_ptrs)'
+  - '160:             b_scales = tl.load(b_scales_ptrs, cache_modifier=cache_modifier)'
+  - '162:             # Load the next block of A and B, generate a mask by checking the K dimension.'
+  evidence_id: src_7d27a52455adae1a
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 166
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '164:             if EVEN_K:'
+  - '165:                 a = tl.load(a_ptrs)'
+  - '166:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '167:             else:'
+  - '168:                 a = tl.load('
+  evidence_id: src_94cd632fdb70a08c
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 340
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '338:     EVEN_K: tl.constexpr,'
+  - '339:     GRID_MN: tl.constexpr,'
+  - '340:     cache_modifier: tl.constexpr,'
+  - '341: ):'
+  - '342:     tl.assume(stride_a_m > 0)'
+  evidence_id: src_2182fcdd7ef7e63f
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 458
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '457:             b_scales = ('
+  - '458:                 tl.load(b_scale_ptrs, cache_modifier=cache_modifier)'
+  - '459:                 .reshape('
+  - '460:                     BLOCK_SIZE_N // 32,'
+  evidence_id: src_4d9e69b73a1a9c77
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 476
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '474:             if EVEN_K:'
+  - '475:                 a = tl.load(a_ptrs)'
+  - '476:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '478:             b = ('
+  evidence_id: src_f11debfaef5fa5c7
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 70
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '68:     stride_bscales_k,'
+  - '69:     stride_bscales_n,'
+  - '70:     # Meta-parameters'
+  - '71:     BLOCK_SIZE_M: tl.constexpr,'
+  - '72:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_ff4452c97849907a
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 72
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '70:     # Meta-parameters'
+  - '71:     BLOCK_SIZE_M: tl.constexpr,'
+  - '72:     BLOCK_SIZE_N: tl.constexpr,'
+  - '73:     BLOCK_SIZE_K: tl.constexpr,'
+  - '74:     BLOCK_SIZE_S3: tl.constexpr,'
+  evidence_id: src_d3b51bfe5f75008f
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 73
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '71:     BLOCK_SIZE_M: tl.constexpr,'
+  - '72:     BLOCK_SIZE_N: tl.constexpr,'
+  - '73:     BLOCK_SIZE_K: tl.constexpr,'
+  - '74:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '75:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_a397b117dd22d7e5
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 74
+  match: 'BLOCK_SIZE_S3: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_S3
+  arch_scope: ''
+  evidence:
+  - '72:     BLOCK_SIZE_N: tl.constexpr,'
+  - '73:     BLOCK_SIZE_K: tl.constexpr,'
+  - '74:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '75:     GROUP_SIZE_M: tl.constexpr,'
+  - '76:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_baa6dae779bfb49c
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 75
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '73:     BLOCK_SIZE_K: tl.constexpr,'
+  - '74:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '75:     GROUP_SIZE_M: tl.constexpr,'
+  - '76:     NUM_KSPLIT: tl.constexpr,'
+  - '77:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_24202e26e2d50b60
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 76
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '74:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '75:     GROUP_SIZE_M: tl.constexpr,'
+  - '76:     NUM_KSPLIT: tl.constexpr,'
+  - '77:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '78:     EVEN_K: tl.constexpr,'
+  evidence_id: src_21cae073fa9f14f8
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 77
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '75:     GROUP_SIZE_M: tl.constexpr,'
+  - '76:     NUM_KSPLIT: tl.constexpr,'
+  - '77:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '78:     EVEN_K: tl.constexpr,'
+  - '79:     GRID_MN: tl.constexpr,'
+  evidence_id: src_d088322000258b16
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 78
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '76:     NUM_KSPLIT: tl.constexpr,'
+  - '77:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '78:     EVEN_K: tl.constexpr,'
+  - '79:     GRID_MN: tl.constexpr,'
+  - '80:     cache_modifier: tl.constexpr,'
+  evidence_id: src_85e961855ea717af
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 79
+  match: 'GRID_MN: tl.constexpr,'
+  captured:
+  - GRID_MN
+  arch_scope: ''
+  evidence:
+  - '77:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '78:     EVEN_K: tl.constexpr,'
+  - '79:     GRID_MN: tl.constexpr,'
+  - '80:     cache_modifier: tl.constexpr,'
+  - '81: ):'
+  evidence_id: src_220e0a48eba39fe9
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 80
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '78:     EVEN_K: tl.constexpr,'
+  - '79:     GRID_MN: tl.constexpr,'
+  - '80:     cache_modifier: tl.constexpr,'
+  - '81: ):'
+  - '82:     tl.assume(stride_a_m > 0)'
+  evidence_id: src_db17cf285d816788
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 330
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '328:     stride_bscales_n,'
+  - '329:     stride_bscales_k,'
+  - '330:     # Meta-parameters'
+  - '331:     BLOCK_SIZE_M: tl.constexpr,'
+  - '332:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_c73fdd03db61af6c
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 332
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '330:     # Meta-parameters'
+  - '331:     BLOCK_SIZE_M: tl.constexpr,'
+  - '332:     BLOCK_SIZE_N: tl.constexpr,'
+  - '333:     BLOCK_SIZE_K: tl.constexpr,'
+  - '334:     BLOCK_SIZE_S3: tl.constexpr,'
+  evidence_id: src_f536ff49c447ecbd
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 333
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '331:     BLOCK_SIZE_M: tl.constexpr,'
+  - '332:     BLOCK_SIZE_N: tl.constexpr,'
+  - '333:     BLOCK_SIZE_K: tl.constexpr,'
+  - '334:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '335:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_6e4ae0aa7f6a343d
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 334
+  match: 'BLOCK_SIZE_S3: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_S3
+  arch_scope: ''
+  evidence:
+  - '332:     BLOCK_SIZE_N: tl.constexpr,'
+  - '333:     BLOCK_SIZE_K: tl.constexpr,'
+  - '334:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '335:     GROUP_SIZE_M: tl.constexpr,'
+  - '336:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_d9d9433f9d2bc65b
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 335
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '333:     BLOCK_SIZE_K: tl.constexpr,'
+  - '334:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '335:     GROUP_SIZE_M: tl.constexpr,'
+  - '336:     NUM_KSPLIT: tl.constexpr,'
+  - '337:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_48db71a4f39e188a
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 336
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '334:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '335:     GROUP_SIZE_M: tl.constexpr,'
+  - '336:     NUM_KSPLIT: tl.constexpr,'
+  - '337:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '338:     EVEN_K: tl.constexpr,'
+  evidence_id: src_b55e9638e12bae85
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 337
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '335:     GROUP_SIZE_M: tl.constexpr,'
+  - '336:     NUM_KSPLIT: tl.constexpr,'
+  - '337:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '338:     EVEN_K: tl.constexpr,'
+  - '339:     GRID_MN: tl.constexpr,'
+  evidence_id: src_73abf958175b7740
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 338
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '336:     NUM_KSPLIT: tl.constexpr,'
+  - '337:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '338:     EVEN_K: tl.constexpr,'
+  - '339:     GRID_MN: tl.constexpr,'
+  - '340:     cache_modifier: tl.constexpr,'
+  evidence_id: src_3725fb754d69ea8f
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 339
+  match: 'GRID_MN: tl.constexpr,'
+  captured:
+  - GRID_MN
+  arch_scope: ''
+  evidence:
+  - '337:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '338:     EVEN_K: tl.constexpr,'
+  - '339:     GRID_MN: tl.constexpr,'
+  - '340:     cache_modifier: tl.constexpr,'
+  - '341: ):'
+  evidence_id: src_d7a84578ab120f2a
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 340
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '338:     EVEN_K: tl.constexpr,'
+  - '339:     GRID_MN: tl.constexpr,'
+  - '340:     cache_modifier: tl.constexpr,'
+  - '341: ):'
+  - '342:     tl.assume(stride_a_m > 0)'
+  evidence_id: src_bd01d37a0f955137
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 602
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '600:     stride_y_d,'
+  - '601:     stride_y_s,'
+  - '602:     BLOCK_SIZE_M: tl.constexpr,'
+  - '603:     BLOCK_SIZE_N: tl.constexpr,'
+  - '604:     BLOCK_SIZE_S3: tl.constexpr,'
+  evidence_id: src_899032db9d93581b
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 603
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '601:     stride_y_s,'
+  - '602:     BLOCK_SIZE_M: tl.constexpr,'
+  - '603:     BLOCK_SIZE_N: tl.constexpr,'
+  - '604:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '605:     ACTUAL_KSPLIT: tl.constexpr,'
+  evidence_id: src_2306852d192edc7f
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 604
+  match: 'BLOCK_SIZE_S3: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_S3
+  arch_scope: ''
+  evidence:
+  - '602:     BLOCK_SIZE_M: tl.constexpr,'
+  - '603:     BLOCK_SIZE_N: tl.constexpr,'
+  - '604:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '605:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '606:     MAX_KSPLIT: tl.constexpr,'
+  evidence_id: src_dc572f91fa16aefe
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 605
+  match: 'ACTUAL_KSPLIT: tl.constexpr,'
+  captured:
+  - ACTUAL_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '603:     BLOCK_SIZE_N: tl.constexpr,'
+  - '604:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '605:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '606:     MAX_KSPLIT: tl.constexpr,'
+  - '607: ):'
+  evidence_id: src_abbf7ba20c00e14e
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  line: 606
+  match: 'MAX_KSPLIT: tl.constexpr,'
+  captured:
+  - MAX_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '604:     BLOCK_SIZE_S3: tl.constexpr,'
+  - '605:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '606:     MAX_KSPLIT: tl.constexpr,'
+  - '607: ):'
+  - '608:     tl.assume(stride_c_k > 0)'
+  evidence_id: src_d437e443beba07c8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 37
+  end_line: 210
+  match: def _ff_a16w16_fused_gated(
+  captured:
+  - _ff_a16w16_fused_gated
+  arch_scope: ''
+  evidence:
+  - '35: )'
+  - '36: @triton.jit(repr=_ff_a16w16_fused_gated_repr)'
+  - '37: def _ff_a16w16_fused_gated('
+  - '38:     x_ptr,'
+  - '39:     w1_ptr,'
+  evidence_id: src_cf2b5852b341da65
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 213
+  end_line: 218
+  match: def _get_config(
+  captured:
+  - _get_config
+  arch_scope: ''
+  evidence:
+  - '213: def _get_config('
+  - '214:     M: int,'
+  - '215:     N: int,'
+  evidence_id: src_4a7499338dfe4b41
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 154
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '152:             )'
+  - '154:         acc0 = tl.dot(x, w1n0, acc=acc0)'
+  - '155:         acc1 = tl.dot(x, w1n1, acc=acc1)'
+  evidence_id: src_d50c148950c0953a
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 155
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '154:         acc0 = tl.dot(x, w1n0, acc=acc0)'
+  - '155:         acc1 = tl.dot(x, w1n1, acc=acc1)'
+  - '157:         # Advance the ptrs to the next K block.'
+  evidence_id: src_017c4c08231beb2d
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 195
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '193:                 other=0.0,'
+  - '194:             )'
+  - '195:         partial_sum_y = tl.dot(acc_gated, w2)'
+  - '196:         # tl.device_print("w2:", w2)'
+  - '197:         # tl.device_print("partial y:", partial_sum_y)'
+  evidence_id: src_1cc1ed7b9204b759
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 60
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '58:     EVEN_K: tl.constexpr,'
+  - '59:     GRID_MN: tl.constexpr,'
+  - '60:     cache_modifier: tl.constexpr,'
+  - '61:     activation: tl.constexpr,'
+  - '62:     use_activation: tl.constexpr,'
+  evidence_id: src_a7f03e6d4533c0f9
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 126
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '124:                 w1n0_ptrs,'
+  - '125:                 mask=offs_w1n0[None, :] < (N // 2),'
+  - '126:                 cache_modifier=cache_modifier,'
+  - '127:             )'
+  - '128:             w1n1 = tl.load('
+  evidence_id: src_2b31e3a0c1429aa3
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 131
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '129:                 w1n1_ptrs,'
+  - '130:                 mask=offs_w1n1[None, :] < N,'
+  - '131:                 cache_modifier=cache_modifier,'
+  - '132:             )'
+  - '133:         else:'
+  evidence_id: src_fe3e30bb9307e722
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 144
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '142:                 & (offs_w1n0[None, :] < (N // 2)),'
+  - '143:                 other=0.0,'
+  - '144:                 cache_modifier=cache_modifier,'
+  - '145:             )'
+  - '146:             w1n1 = tl.load('
+  evidence_id: src_778fa13d8d2436e1
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 151
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '149:                 & (offs_w1n1[None, :] < N),'
+  - '150:                 other=0.0,'
+  - '151:                 cache_modifier=cache_modifier,'
+  - '152:             )'
+  evidence_id: src_d5addc44715cc010
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 53
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '51:     stride_ym,'
+  - '52:     stride_yk,'
+  - '53:     # Meta-parameters'
+  - '54:     BLOCK_SIZE_M: tl.constexpr,'
+  - '55:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_01b211b1d6cd9115
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 55
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '53:     # Meta-parameters'
+  - '54:     BLOCK_SIZE_M: tl.constexpr,'
+  - '55:     BLOCK_SIZE_N: tl.constexpr,'
+  - '56:     BLOCK_SIZE_K: tl.constexpr,'
+  - '57:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_3016eb8c69ec993b
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 56
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '54:     BLOCK_SIZE_M: tl.constexpr,'
+  - '55:     BLOCK_SIZE_N: tl.constexpr,'
+  - '56:     BLOCK_SIZE_K: tl.constexpr,'
+  - '57:     GROUP_SIZE_M: tl.constexpr,'
+  - '58:     EVEN_K: tl.constexpr,'
+  evidence_id: src_9a950abdaa0c8e92
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 57
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '55:     BLOCK_SIZE_N: tl.constexpr,'
+  - '56:     BLOCK_SIZE_K: tl.constexpr,'
+  - '57:     GROUP_SIZE_M: tl.constexpr,'
+  - '58:     EVEN_K: tl.constexpr,'
+  - '59:     GRID_MN: tl.constexpr,'
+  evidence_id: src_735f735728f2dc1b
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 58
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '56:     BLOCK_SIZE_K: tl.constexpr,'
+  - '57:     GROUP_SIZE_M: tl.constexpr,'
+  - '58:     EVEN_K: tl.constexpr,'
+  - '59:     GRID_MN: tl.constexpr,'
+  - '60:     cache_modifier: tl.constexpr,'
+  evidence_id: src_edf563203ca6307f
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 59
+  match: 'GRID_MN: tl.constexpr,'
+  captured:
+  - GRID_MN
+  arch_scope: ''
+  evidence:
+  - '57:     GROUP_SIZE_M: tl.constexpr,'
+  - '58:     EVEN_K: tl.constexpr,'
+  - '59:     GRID_MN: tl.constexpr,'
+  - '60:     cache_modifier: tl.constexpr,'
+  - '61:     activation: tl.constexpr,'
+  evidence_id: src_46b4096d3cd07f52
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 60
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '58:     EVEN_K: tl.constexpr,'
+  - '59:     GRID_MN: tl.constexpr,'
+  - '60:     cache_modifier: tl.constexpr,'
+  - '61:     activation: tl.constexpr,'
+  - '62:     use_activation: tl.constexpr,'
+  evidence_id: src_249def59e2e3b86f
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 61
+  match: 'activation: tl.constexpr,'
+  captured:
+  - activation
+  arch_scope: ''
+  evidence:
+  - '59:     GRID_MN: tl.constexpr,'
+  - '60:     cache_modifier: tl.constexpr,'
+  - '61:     activation: tl.constexpr,'
+  - '62:     use_activation: tl.constexpr,'
+  - '63: ):'
+  evidence_id: src_c54925513bd52141
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 62
+  match: 'use_activation: tl.constexpr,'
+  captured:
+  - use_activation
+  arch_scope: ''
+  evidence:
+  - '60:     cache_modifier: tl.constexpr,'
+  - '61:     activation: tl.constexpr,'
+  - '62:     use_activation: tl.constexpr,'
+  - '63: ):'
+  - '64:     """Kernel for computing the matmul C = A x B.'
+  evidence_id: src_95e70e6214cf858e
+- snapshot: aiter_b3ad6c46
+  category: atomic_combine
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  line: 201
+  match: tl.atomic_add(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '199:             (offs_k[None, :] + BLOCK_SIZE_K * k_cyclic_offset) < K'
+  - '200:         )'
+  - '201:         tl.atomic_add(y_ptrs, partial_sum_y, mask=y_mask, sem="relaxed", scope="gpu")'
+  - '202:         # tl.store(y_ptrs, partial_sum_y, mask=y_mask)'
+  - '203:         k_cyclic_offset += 1'
+  evidence_id: src_ecc0d24dc1776eaf
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 37
+  end_line: 240
+  match: def _fused_gemm_a8w8_blockscale_mul_add_kernel(
+  captured:
+  - _fused_gemm_a8w8_blockscale_mul_add_kernel
+  arch_scope: ''
+  evidence:
+  - '35: )'
+  - '36: @triton.jit(repr=_fused_gemm_a8w8_blockscale_mul_add_repr)'
+  - '37: def _fused_gemm_a8w8_blockscale_mul_add_kernel('
+  - '38:     a_ptr,'
+  - '39:     b_ptr,'
+  evidence_id: src_cba1ac61dda37c05
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 256
+  end_line: 337
+  match: def _fused_gemm_a8w8_blockscale_mul_add_reduce_kernel(
+  captured:
+  - _fused_gemm_a8w8_blockscale_mul_add_reduce_kernel
+  arch_scope: ''
+  evidence:
+  - '254: @triton.heuristics({})  # dummy heuristics to invoke kernel re-naming'
+  - '255: @triton.jit(repr=_fused_gemm_a8w8_blockscale_mul_add_reduce_repr)'
+  - '256: def _fused_gemm_a8w8_blockscale_mul_add_reduce_kernel('
+  - '257:     c_in_ptr,'
+  - '258:     c_out_ptr,'
+  evidence_id: src_e91a864245298df4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 340
+  end_line: 355
+  match: def _get_config(
+  captured:
+  - _get_config
+  arch_scope: ''
+  evidence:
+  - '340: def _get_config('
+  - '341:     M: int,'
+  - '342:     N: int,'
+  evidence_id: src_ed50d387e3d45fc3
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 183
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '182:             # Perform dot operation and apply scale'
+  - '183:             accumulator += tl.dot(a, b) * a_scale[:, None] * b_scale[None, :]'
+  - '185:             # Advance the ptrs to the next K block.'
+  evidence_id: src_d7e874731daad53b
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 82
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '80:     waves_per_eu: tl.constexpr,'
+  - '81:     matrix_instr_nonkdim: tl.constexpr,'
+  - '82:     cache_modifier: tl.constexpr,'
+  - '83: ):'
+  - '84:     """'
+  evidence_id: src_ce4d025575b5dad2
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 167
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '165:             if EVEN_K:'
+  - '166:                 a = tl.load(a_ptrs)'
+  - '167:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '168:             else:'
+  - '169:                 a = tl.load('
+  evidence_id: src_860d7e0bcb5ccc80
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 176
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '174:                     mask=offs_k[:, None] < K - k * BLOCK_SIZE_K,'
+  - '175:                     other=0,'
+  - '176:                     cache_modifier=cache_modifier,'
+  - '177:                 )'
+  evidence_id: src_551a8e938fbf9834
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 63
+  match: 'GROUP_K: tl.constexpr,'
+  captured:
+  - GROUP_K
+  arch_scope: ''
+  evidence:
+  - '61:     stride_cbm,'
+  - '62:     stride_cbn,'
+  - '63:     # Meta-parameters'
+  - '64:     GROUP_K: tl.constexpr,'
+  - '65:     GROUP_N: tl.constexpr,'
+  evidence_id: src_2ce15d76c8ece707
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 65
+  match: 'GROUP_N: tl.constexpr,'
+  captured:
+  - GROUP_N
+  arch_scope: ''
+  evidence:
+  - '63:     # Meta-parameters'
+  - '64:     GROUP_K: tl.constexpr,'
+  - '65:     GROUP_N: tl.constexpr,'
+  - '66:     BLOCK_SIZE_M: tl.constexpr,'
+  - '67:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_9b308e6b627419a3
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 66
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '64:     GROUP_K: tl.constexpr,'
+  - '65:     GROUP_N: tl.constexpr,'
+  - '66:     BLOCK_SIZE_M: tl.constexpr,'
+  - '67:     BLOCK_SIZE_N: tl.constexpr,'
+  - '68:     BLOCK_SIZE_K: tl.constexpr,'
+  evidence_id: src_bba496bce94a2b31
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 67
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '65:     GROUP_N: tl.constexpr,'
+  - '66:     BLOCK_SIZE_M: tl.constexpr,'
+  - '67:     BLOCK_SIZE_N: tl.constexpr,'
+  - '68:     BLOCK_SIZE_K: tl.constexpr,'
+  - '69:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_64a91dca65b0558c
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 68
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '66:     BLOCK_SIZE_M: tl.constexpr,'
+  - '67:     BLOCK_SIZE_N: tl.constexpr,'
+  - '68:     BLOCK_SIZE_K: tl.constexpr,'
+  - '69:     GROUP_SIZE_M: tl.constexpr,'
+  - '70:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_4bc8ef44b21c7458
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 69
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '67:     BLOCK_SIZE_N: tl.constexpr,'
+  - '68:     BLOCK_SIZE_K: tl.constexpr,'
+  - '69:     GROUP_SIZE_M: tl.constexpr,'
+  - '70:     NUM_KSPLIT: tl.constexpr,'
+  - '71:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_6ecf1204cf907690
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 70
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '68:     BLOCK_SIZE_K: tl.constexpr,'
+  - '69:     GROUP_SIZE_M: tl.constexpr,'
+  - '70:     NUM_KSPLIT: tl.constexpr,'
+  - '71:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '72:     EVEN_K: tl.constexpr,'
+  evidence_id: src_420c4823e2951142
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 71
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '69:     GROUP_SIZE_M: tl.constexpr,'
+  - '70:     NUM_KSPLIT: tl.constexpr,'
+  - '71:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '72:     EVEN_K: tl.constexpr,'
+  - '73:     IS_A_SCALAR: tl.constexpr,'
+  evidence_id: src_504df9a1ff0d3e47
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 72
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '70:     NUM_KSPLIT: tl.constexpr,'
+  - '71:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '72:     EVEN_K: tl.constexpr,'
+  - '73:     IS_A_SCALAR: tl.constexpr,'
+  - '74:     IS_B_SCALAR: tl.constexpr,'
+  evidence_id: src_baaeeba92dc4fa52
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 73
+  match: 'IS_A_SCALAR: tl.constexpr,'
+  captured:
+  - IS_A_SCALAR
+  arch_scope: ''
+  evidence:
+  - '71:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '72:     EVEN_K: tl.constexpr,'
+  - '73:     IS_A_SCALAR: tl.constexpr,'
+  - '74:     IS_B_SCALAR: tl.constexpr,'
+  - '75:     IS_A_TENSOR: tl.constexpr,'
+  evidence_id: src_cfdfb5b99ee8f826
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 74
+  match: 'IS_B_SCALAR: tl.constexpr,'
+  captured:
+  - IS_B_SCALAR
+  arch_scope: ''
+  evidence:
+  - '72:     EVEN_K: tl.constexpr,'
+  - '73:     IS_A_SCALAR: tl.constexpr,'
+  - '74:     IS_B_SCALAR: tl.constexpr,'
+  - '75:     IS_A_TENSOR: tl.constexpr,'
+  - '76:     IS_B_TENSOR: tl.constexpr,'
+  evidence_id: src_e1ba5f463926b40f
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 75
+  match: 'IS_A_TENSOR: tl.constexpr,'
+  captured:
+  - IS_A_TENSOR
+  arch_scope: ''
+  evidence:
+  - '73:     IS_A_SCALAR: tl.constexpr,'
+  - '74:     IS_B_SCALAR: tl.constexpr,'
+  - '75:     IS_A_TENSOR: tl.constexpr,'
+  - '76:     IS_B_TENSOR: tl.constexpr,'
+  - '77:     FUSE_TYPE: tl.constexpr,'
+  evidence_id: src_48c6f6f9bc02ffd9
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 76
+  match: 'IS_B_TENSOR: tl.constexpr,'
+  captured:
+  - IS_B_TENSOR
+  arch_scope: ''
+  evidence:
+  - '74:     IS_B_SCALAR: tl.constexpr,'
+  - '75:     IS_A_TENSOR: tl.constexpr,'
+  - '76:     IS_B_TENSOR: tl.constexpr,'
+  - '77:     FUSE_TYPE: tl.constexpr,'
+  - '78:     num_warps: tl.constexpr,'
+  evidence_id: src_4a4607d59ddb388a
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 77
+  match: 'FUSE_TYPE: tl.constexpr,'
+  captured:
+  - FUSE_TYPE
+  arch_scope: ''
+  evidence:
+  - '75:     IS_A_TENSOR: tl.constexpr,'
+  - '76:     IS_B_TENSOR: tl.constexpr,'
+  - '77:     FUSE_TYPE: tl.constexpr,'
+  - '78:     num_warps: tl.constexpr,'
+  - '79:     num_stages: tl.constexpr,'
+  evidence_id: src_3f8661d101dfa9a4
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 78
+  match: 'num_warps: tl.constexpr,'
+  captured:
+  - num_warps
+  arch_scope: ''
+  evidence:
+  - '76:     IS_B_TENSOR: tl.constexpr,'
+  - '77:     FUSE_TYPE: tl.constexpr,'
+  - '78:     num_warps: tl.constexpr,'
+  - '79:     num_stages: tl.constexpr,'
+  - '80:     waves_per_eu: tl.constexpr,'
+  evidence_id: src_790aaf75c3e72f02
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 79
+  match: 'num_stages: tl.constexpr,'
+  captured:
+  - num_stages
+  arch_scope: ''
+  evidence:
+  - '77:     FUSE_TYPE: tl.constexpr,'
+  - '78:     num_warps: tl.constexpr,'
+  - '79:     num_stages: tl.constexpr,'
+  - '80:     waves_per_eu: tl.constexpr,'
+  - '81:     matrix_instr_nonkdim: tl.constexpr,'
+  evidence_id: src_996db5ab65075cd2
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 80
+  match: 'waves_per_eu: tl.constexpr,'
+  captured:
+  - waves_per_eu
+  arch_scope: ''
+  evidence:
+  - '78:     num_warps: tl.constexpr,'
+  - '79:     num_stages: tl.constexpr,'
+  - '80:     waves_per_eu: tl.constexpr,'
+  - '81:     matrix_instr_nonkdim: tl.constexpr,'
+  - '82:     cache_modifier: tl.constexpr,'
+  evidence_id: src_437e997517542e63
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 81
+  match: 'matrix_instr_nonkdim: tl.constexpr,'
+  captured:
+  - matrix_instr_nonkdim
+  arch_scope: ''
+  evidence:
+  - '79:     num_stages: tl.constexpr,'
+  - '80:     waves_per_eu: tl.constexpr,'
+  - '81:     matrix_instr_nonkdim: tl.constexpr,'
+  - '82:     cache_modifier: tl.constexpr,'
+  - '83: ):'
+  evidence_id: src_13fa69021a1bb0b1
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 82
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '80:     waves_per_eu: tl.constexpr,'
+  - '81:     matrix_instr_nonkdim: tl.constexpr,'
+  - '82:     cache_modifier: tl.constexpr,'
+  - '83: ):'
+  - '84:     """'
+  evidence_id: src_c425fc4a898f77ef
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 272
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '270:     stride_cbm,'
+  - '271:     stride_cbn,'
+  - '272:     BLOCK_SIZE_M: tl.constexpr,'
+  - '273:     BLOCK_SIZE_N: tl.constexpr,'
+  - '274:     ACTUAL_KSPLIT: tl.constexpr,'
+  evidence_id: src_4677af2d1cae32a8
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 273
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '271:     stride_cbn,'
+  - '272:     BLOCK_SIZE_M: tl.constexpr,'
+  - '273:     BLOCK_SIZE_N: tl.constexpr,'
+  - '274:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '275:     MAX_KSPLIT: tl.constexpr,'
+  evidence_id: src_c42a4ec7e8cde0c9
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 274
+  match: 'ACTUAL_KSPLIT: tl.constexpr,'
+  captured:
+  - ACTUAL_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '272:     BLOCK_SIZE_M: tl.constexpr,'
+  - '273:     BLOCK_SIZE_N: tl.constexpr,'
+  - '274:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '275:     MAX_KSPLIT: tl.constexpr,'
+  - '276:     IS_A_SCALAR: tl.constexpr,'
+  evidence_id: src_2bf5130ed6eb7188
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 275
+  match: 'MAX_KSPLIT: tl.constexpr,'
+  captured:
+  - MAX_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '273:     BLOCK_SIZE_N: tl.constexpr,'
+  - '274:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '275:     MAX_KSPLIT: tl.constexpr,'
+  - '276:     IS_A_SCALAR: tl.constexpr,'
+  - '277:     IS_B_SCALAR: tl.constexpr,'
+  evidence_id: src_fae364258fc88436
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 276
+  match: 'IS_A_SCALAR: tl.constexpr,'
+  captured:
+  - IS_A_SCALAR
+  arch_scope: ''
+  evidence:
+  - '274:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '275:     MAX_KSPLIT: tl.constexpr,'
+  - '276:     IS_A_SCALAR: tl.constexpr,'
+  - '277:     IS_B_SCALAR: tl.constexpr,'
+  - '278:     IS_A_TENSOR: tl.constexpr,'
+  evidence_id: src_4da1e6e554d475cc
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 277
+  match: 'IS_B_SCALAR: tl.constexpr,'
+  captured:
+  - IS_B_SCALAR
+  arch_scope: ''
+  evidence:
+  - '275:     MAX_KSPLIT: tl.constexpr,'
+  - '276:     IS_A_SCALAR: tl.constexpr,'
+  - '277:     IS_B_SCALAR: tl.constexpr,'
+  - '278:     IS_A_TENSOR: tl.constexpr,'
+  - '279:     IS_B_TENSOR: tl.constexpr,'
+  evidence_id: src_f6d94ab000410d93
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 278
+  match: 'IS_A_TENSOR: tl.constexpr,'
+  captured:
+  - IS_A_TENSOR
+  arch_scope: ''
+  evidence:
+  - '276:     IS_A_SCALAR: tl.constexpr,'
+  - '277:     IS_B_SCALAR: tl.constexpr,'
+  - '278:     IS_A_TENSOR: tl.constexpr,'
+  - '279:     IS_B_TENSOR: tl.constexpr,'
+  - '280:     FUSE_TYPE: tl.constexpr,'
+  evidence_id: src_a46d84fca943d1e8
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 279
+  match: 'IS_B_TENSOR: tl.constexpr,'
+  captured:
+  - IS_B_TENSOR
+  arch_scope: ''
+  evidence:
+  - '277:     IS_B_SCALAR: tl.constexpr,'
+  - '278:     IS_A_TENSOR: tl.constexpr,'
+  - '279:     IS_B_TENSOR: tl.constexpr,'
+  - '280:     FUSE_TYPE: tl.constexpr,'
+  - '281: ):'
+  evidence_id: src_043918fd1acd8326
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 280
+  match: 'FUSE_TYPE: tl.constexpr,'
+  captured:
+  - FUSE_TYPE
+  arch_scope: ''
+  evidence:
+  - '278:     IS_A_TENSOR: tl.constexpr,'
+  - '279:     IS_B_TENSOR: tl.constexpr,'
+  - '280:     FUSE_TYPE: tl.constexpr,'
+  - '281: ):'
+  evidence_id: src_ee10ab5b929a658c
+- snapshot: aiter_b3ad6c46
+  category: scale_in_k_loop
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  line: 183
+  match: accumulator += tl.dot(a, b) * a_scale[:, None]
+  captured:
+  - accumulator
+  - a_scale
+  arch_scope: ''
+  evidence:
+  - '182:             # Perform dot operation and apply scale'
+  - '183:             accumulator += tl.dot(a, b) * a_scale[:, None] * b_scale[None, :]'
+  - '185:             # Advance the ptrs to the next K block.'
+  evidence_id: src_e60c05201a31695e

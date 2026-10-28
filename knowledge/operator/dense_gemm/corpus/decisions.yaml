@@ -1,0 +1,1167 @@
+provenance:
+  schema_version: 4
+  operator_family: dense_gemm
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  lds_staging: 'The design stages at least one operand tile through LDS: it is stored to LDS and the MFMA fragments
+    are read back from it.'
+  reused_weight: B, the weight, is reused across calls, so a one-time host-side layout transform such as a
+    preshuffle is paid once per weight rather than per call.
+  split_k_hot_loop: The K loop is hand-scheduled with ROCm scheduling directives over LDS-staged operands,
+    as the FlyDSL split-K HGEMM hot loop is.
+cards:
+- id: flydsl-gfx942-path-gates
+  type: constraint
+  axes:
+  - architecture_capability
+  - compute_instruction
+  - memory_access
+  - implementation_variant
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - grouped_gemm_moe
+    - batched_gemm
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+    gfx:
+    - gfx942
+  question: Which FlyDSL GEMM paths does gfx942 (MI300X) actually give you, and which does it silently switch
+    or refuse?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - operator_family=gemm
+  - target_language=flydsl
+  - target architecture is gfx942 — read this before costing any other card on this page
+  actions:
+  - Read the architecture gates before the tuning tables. Whether a path exists on your box outranks every
+    fact about how to tune it, and several gates in this library key on gfx942 alone.
+  - Do not fund async copy for the split-K HGEMM family on gfx942. That family computes its async-copy flag
+    as `architecture is not gfx942`, rejects any request that disagrees, and its kernel hard-codes async off
+    on this branch — there is no knob to flip. This does NOT carry over to the A8 (fp8/int8) preshuffle family,
+    which keeps `use_async_copy` as a real knob on gfx942 with a 4-byte A copy instead of 16 — see flydsl-async-copy-by-family.
+  - Do not fund the small-M kernel family on gfx942. Its compile entry point raises, and its config registry
+    returns nothing. Port the design if you want it; you cannot call it.
+  - Expect the HGEMM to use the m16n16k16 fragment with 4-byte DMA and two MFMA steps per warp-K, not the m16n16k32
+    / 16-byte / one-step bundle the other architectures get. The choice is made for you by one architecture
+    test — see flydsl-half-mfma-call-forms.
+  - Expect the A8 family on gfx942 to take its hand-written gfx942 schedule branch, K=32 fp8 MFMAs instead
+    of the K=128 scaled MFMA, and tile_k=64 tiles that the gfx950 catalog omits — see flydsl-a8-mfma-selection
+    and flydsl-a8-interleaved-schedule.
+  - 'Expect no shipped FlyDSL seed: every gfx942 fp8 row in AITER''s tuned databases went to CK or ASM. Budget
+    a FlyDSL kernel on this box as authoring work, not as a lookup — see gemm-shape-regime-routing.'
+  - 'On gfx950 these gates open: the wider fragment, the 16-byte DMA, async copy and the small-M family are
+    all in play. Other architectures are not excluded by these gates, but AITER ships no FlyDSL configuration
+    for them.'
+  alternatives:
+  - On gfx942, spend the search on what remains genuinely open — the tile geometry, split_k, B staging and
+    the epilogue — rather than on the gated paths.
+  - If a gated path is the real ceiling for your shape, vendor and port it deliberately as a structural change,
+    and budget it as one.
+  why:
+  - 'Six gfx942 tests exist in the FlyDSL GEMM sources and they do different things: one switches the HGEMM
+    fragment/DMA/MFMA bundle, one fixes HGEMM async copy library-wide, two shut the small-M family, one narrows
+    the A8 async A-copy width and one selects the A8 gfx942 schedule.'
+  - This is the cheapest knowledge on the page. A gate costs nothing to check and a whole round to discover,
+    and none of it is visible from the tuning tables, which record what was selected on the architectures where
+    the path was open.
+  source_evidence:
+  - aiter_a6bb4993:src_c4c19187bcb7933c
+  - aiter_a6bb4993:src_a0f1066a6a2d6667
+  - aiter_a6bb4993:src_e689c0cbe1b4f8e8
+  - aiter_a6bb4993:src_7eee3f6769348b4c
+  - aiter_a6bb4993:src_e04716b6d760605b
+  - aiter_a6bb4993:src_42146c2d073d655e
+  - aiter_a6bb4993:src_fbe3baca81526883
+  shipped_evidence:
+  - aiter_a6bb4993:sel_5aecc3631bf688e9
+  - aiter_a6bb4993:sel_438e88e4bc86460c
+  - aiter_a6bb4993:sel_f1384cc1069c9823
+  references:
+  - knowledge/general/hardware/cdna3_mi300/memory_hierarchy.md
+  - knowledge/general/backend/flydsl/knobs.md:71-75
+  - knowledge/general/backend/flydsl/kernel_families.md:19-32
+  measurement_evidence: []
+  limitations:
+  - These are the gates that name an architecture literally. A path can also be effectively closed by something
+    this card does not see — a missing dtype, an LDS budget, a compiler version.
+  - 'Gates are per family: a gate in one family''s source says nothing about another family''s, which is exactly
+    how the async-copy statement used to be over-read.'
+  - Gates move between releases. Every citation carries its file and line; re-read them against the checkout
+    you are building on before trusting the list.
+  - That a path is open says nothing about whether it is fast.
+- id: flydsl-hgemm-tiling-validity
+  type: constraint
+  axes:
+  - configuration_constraints
+  - workgroup_tile
+  - pipeline_schedule
+  - execution_geometry
+  match:
+    operator_families:
+    - dense_gemm
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+    dtypes:
+    - f16
+    - bf16
+  question: Which FlyDSL HGEMM configurations will fail to build at all, before any of them can be slow?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - operator_family=gemm
+  - target_language=flydsl
+  - candidate configurations are being generated automatically or swept
+  actions:
+  - 'Filter candidates before compiling them: N must satisfy N >= tile_n and N % tile_n == 0, and K/split_k
+    must satisfy K/split_k >= tile_k and (K/split_k) % tile_k == 0.'
+  - Require tile_k >= 32 and tile_k % 32 == 0, tile_m % (block_m_warps*16) == 0 and tile_n % (block_n_warps*16)
+    == 0.
+  - Require each of tile_m*tile_k, tile_n*tile_k and tile_m*tile_n to be divisible by 8*64*block_m_warps*block_n_warps,
+    the per-block vectorised load width.
+  - 'Estimate LDS as a_lds = max(stages*tile_m*tile_k*2, tile_m*tile_n*2) when B is not staged through LDS;
+    when it is, the estimate is not a_lds plus something, it becomes align_up(a_lds,16) + stages*tile_n*tile_k*2.
+    Drop candidates over the block budget, which the library takes from `addressable_lds_bytes_for_gfx`: 163840
+    bytes on gfx950 and 65536 on the other CDNA targets.'
+  - 'Do not spend a round on stages, pack_n or c_to_lds in the generic family: the kernel compiles a fixed
+    2-stage pipeline, pack_n=1 and c_to_lds off, and rejects anything else. They read like tuning knobs in
+    the signature and are not.'
+  - Do not combine b_preshuffle=True with b_to_lds=True; the kernel rejects it.
+  - Check the split-K reduction counter capacity separately — see flydsl-splitk-reduction-contract.
+  alternatives:
+  - Let the compiler reject the configuration and catch the exception — acceptable only when the search is
+    small, since each rejection still costs a compile.
+  why:
+  - AITER performs all of these checks in host code before the kernel is built, so they are the stated contract
+    rather than an inference from a crash.
+  - An optimizer that cannot separate 'illegal' from 'slow' spends its budget re-discovering the first, and
+    a budgeted search has few rounds to spend.
+  source_evidence:
+  - aiter_a6bb4993:src_9ae627bec0096537
+  - aiter_a6bb4993:src_d3f3cb90295b0c40
+  - aiter_a6bb4993:src_5c7e74ddb8a071de
+  - aiter_a6bb4993:src_7c7ddd401ff4aaeb
+  - aiter_a6bb4993:src_c139f07a63569327
+  - aiter_a6bb4993:src_539c4b7bf95dca07
+  - aiter_a6bb4993:src_0f8216bb2c53105f
+  - aiter_a6bb4993:src_4404f2040e4191a0
+  - aiter_a6bb4993:src_d76e1615be7ab856
+  - aiter_a6bb4993:src_cbd1aeb93c0eb00c
+  - aiter_a6bb4993:src_c01de8a05cd112e2
+  - aiter_a6bb4993:src_d0f75ad1bcdf6730
+  - aiter_a6bb4993:src_e248a6669d5daaaf
+  - aiter_a6bb4993:src_ce6c8804ca232bf6
+  - aiter_a6bb4993:src_c694123000988e0b
+  references:
+  - knowledge/general/backend/flydsl/authoring_optimization.md:75-93
+  - knowledge/general/backend/flydsl/knobs.md:20-40
+  - knowledge/general/backend/flydsl/patterns.md:21-39
+  measurement_evidence: []
+  limitations:
+  - The LDS formula is the library's own estimate for this kernel shape; a rewritten staging scheme changes
+    it and the estimate stops applying.
+  - Passing every check means the configuration builds, not that it is fast, and not that it is correct in
+    a modified kernel.
+- id: flydsl-half-mfma-call-forms
+  type: performance_candidate
+  axes:
+  - compute_instruction
+  - architecture_capability
+  match:
+    operator_families:
+    - dense_gemm
+    - grouped_gemm_moe
+    - batched_gemm
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+    dtypes:
+    - f16
+    - bf16
+  question: Which legal MFMA call forms can seed a FlyDSL f16/bf16 GEMM?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - operator_family=gemm
+  - target_language=flydsl
+  - input_dtype in {f16,bf16}
+  actions:
+  - For an m16n16k16 candidate, pair bf16 with mfma_f32_16x16x16bf16_1k and f16 with mfma_f32_16x16x16f16.
+  - 'Check the target architecture before treating the K shape as a free axis: the shipped split-K kernel does
+    not let you pick it. On gfx942 it selects m16n16k16 with 4-byte DMA and two MFMA steps per warp-K; on every
+    other architecture it selects m16n16k32 with 16-byte DMA and one. Benchmarking the K=32 form on gfx942
+    means rewriting that branch, not passing a flag.'
+  - Also benchmark the m16n16k32 bf16/f16 forms where the architecture branch does select them and the fragment
+    shape and register budget allow.
+  - 'Keep 16x16 fragments as the default shape and reach for 32x32 only when the tile needs it: a 16x16 accumulator
+    block costs 4 VGPRs per lane, a 32x32 block 16, at the same nominal rate (background).'
+  alternatives:
+  - Use the m16n16k16 form when the larger-K fragment does not fit the surrounding tile or register budget.
+  - Let a higher-level backend select the instruction when direct MFMA control is not required.
+  why:
+  - AITER's FlyDSL split-K GEMM implements both K=16 and K=32 classes and branches explicitly on bf16 versus
+    f16.
+  - 'The two classes are not offered side by side at runtime: one architecture test picks the WMMA implementation,
+    the DMA width and the MFMA-per-warp-K count together, as one bundle.'
+  - This establishes legal implementation precedents; it does not establish which form is faster for a new
+    shape.
+  source_evidence:
+  - aiter_a6bb4993:src_24517333d1cd6722
+  - aiter_a6bb4993:src_0ed3b5780c589479
+  - aiter_a6bb4993:src_387e95ce58e0449b
+  - aiter_a6bb4993:src_79cfb57473ed817f
+  - aiter_a6bb4993:src_e689c0cbe1b4f8e8
+  solutions:
+  - backend: triton
+    mechanism: '`tl.dot` over the tile; the compiler picks the MFMA, steered by `matrix_instr_nonkdim` in the
+      shipped config'
+    source_evidence:
+    - aiter_a6bb4993:src_cb8f85060eec45f8
+  - backend: gluon
+    mechanism: an explicit MFMA layout with `instr_shape` (e.g. [16, 16, 32] or [32, 32, 16]) chosen per kernel
+    source_evidence:
+    - aiter_a6bb4993:src_cf70b9a5bae73954
+    - aiter_a6bb4993:src_422867b3bf9dfa13
+  - backend: ck
+    mechanism: an XDL device-op template; the MFMA shape is a positional template argument the corpus does
+      not decode
+    source_evidence:
+    - aiter_a6bb4993:src_780fadebcc954d06
+  references:
+  - knowledge/general/hardware/shared/matrix_core_mfma_smfmac.md
+  - knowledge/general/hardware/cdna4_mi350/matrix_core_blockscale.md
+  - knowledge/general/backend/flydsl/authoring_tile_programming.md:201-277
+  - knowledge/general/backend/flydsl/authoring_tile_programming.md:503-518
+  measurement_evidence: []
+  limitations:
+  - No latency or occupancy comparison is attached; treat both K shapes as candidates and re-measure.
+  - API spelling is version-sensitive; consult languages/flydsl/version_map.md before copying.
+- id: flydsl-async-copy-by-family
+  type: performance_candidate
+  axes:
+  - memory_access
+  - architecture_capability
+  - pipeline_schedule
+  - implementation_variant
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - grouped_gemm_moe
+    - batched_gemm
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+    requires:
+    - lds_staging
+  question: Is global-to-LDS async copy a knob, a fixed fact, or unavailable — per FlyDSL kernel family and
+    architecture?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - an operand tile is staged through LDS
+  actions:
+  - 'Split-K HGEMM: not a knob. The flag is computed from the architecture (off on gfx942, on elsewhere) and
+    a request that disagrees raises. Every FlyDSL bf16 selection AITER ships for gfx950 has async_copy on.'
+  - 'A8 preshuffle (fp8/int8): a real knob on both architectures. The A tile is copied 4 bytes per lane on
+    gfx942 and 16 bytes elsewhere, and the tuner sweeps async on and off in both catalogs.'
+  - 'Search it per M bucket rather than fixing it: in AITER''s gfx950 fp8 selections, async copy is on in 17
+    of 72 rows at M<=16 but in 39 of 50 at M 1025-4096 and 65 of 77 above 4096.'
+  - 'When async copy is on, drop the ds_write group from any hand schedule: A lands in LDS without passing
+    through VGPRs.'
+  - 'For an authored kernel, size the copy to the hardware: direct global-to-LDS moves up to 32 bits per lane
+    on CDNA3 and up to 128 bits on CDNA4 (background), which is why the gfx942 A8 path copies 4 bytes.'
+  alternatives:
+  - Synchronous global-to-register-to-LDS staging, which is the gfx942 HGEMM path and the async=0 arm of the
+    A8 sweep.
+  why:
+  - The same word — async copy — names an architecture fact in one family and a searched knob in the other;
+    reading one family's gate as the other's rule removes a live candidate.
+  - The copy width is written in the A8 compile entry point, and the sweep values are module constants in its
+    tune catalog.
+  source_evidence:
+  - aiter_a6bb4993:src_c4c19187bcb7933c
+  - aiter_a6bb4993:src_a0f1066a6a2d6667
+  - aiter_a6bb4993:src_8f59fe9a6d65aaf3
+  - aiter_a6bb4993:src_14bff946c5d70663
+  - aiter_a6bb4993:src_42146c2d073d655e
+  - aiter_a6bb4993:src_623470961bcb8c24
+  - aiter_a6bb4993:src_6dd333649bf42b12
+  shipped_evidence:
+  - aiter_a6bb4993:cfg_909edfc582fce0bd
+  - aiter_a6bb4993:cfg_496162f129968cb9
+  - aiter_a6bb4993:cfg_9636311ea3a3ce0d
+  - aiter_a6bb4993:cfg_973fe63f897809df
+  references:
+  - knowledge/general/hardware/cdna3_mi300/memory_hierarchy.md
+  - knowledge/general/hardware/cdna4_mi350/memory.md:51-55
+  - knowledge/general/backend/flydsl/deep.md:65-73
+  - knowledge/general/backend/flydsl/knobs.md:71-75
+  - knowledge/general/backend/flydsl/authoring_gemm_levers.md:119-131
+  - knowledge/general/backend/flydsl/authoring_tile_programming.md:396-426
+  measurement_evidence: []
+  limitations:
+  - Selection shares show where AITER's tuner chose async copy, not by how much it helped.
+  - The HGEMM rule is tied to the current kernel; an authored HGEMM can stage however the hardware allows.
+- id: gemm-workgroup-xcd-mapping
+  type: performance_candidate
+  axes:
+  - work_partition
+  - memory_access
+  - execution_geometry
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - grouped_gemm_moe
+    - batched_gemm
+    - splitk_streamk_gemm
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+  question: How should a FlyDSL GEMM map workgroup IDs onto output tiles and XCDs, and where does AITER already
+    do it?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - 'a multi-XCD part (MI300X / MI355X: 8 XCDs, each with its own L2)'
+  - the grid launches enough workgroups that their placement across XCDs matters
+  actions:
+  - 'Know the starting point: no workgroup remap was found in the dense FlyDSL HGEMM or A8 sources scanned
+    here (only the grouped-GEMM kernel has one), so consecutive workgroups follow the hardware''s round-robin
+    across XCDs and neighbours that share an A or B panel land on different L2s (background).'
+  - 'Port the remap as a block-id permutation in the kernel prologue, the way the FlyDSL grouped-GEMM kernel
+    does behind `xcd_swizzle`: with 8 XCDs, wgid = (linear_id % 8) * (num_wgs / 8) + linear_id / 8, then rasterise
+    M in groups of `xcd_swizzle` rows before decoding the (m, n) tile.'
+  - 'Or follow Triton''s shared helpers: `remap_xcd` / `remap_xcd_chunked` regroup program IDs per XCD, then
+    `pid_grid(..., GROUP_SIZE_M)` walks M in groups so consecutive programs reuse one B panel.'
+  - Keep the unmapped kernel as the control arm (`xcd_swizzle=0` is the grouped kernel's default), gate the
+    remap by grid size, and prove every tile is still visited exactly once when the grid is not a multiple
+    of the XCD count.
+  alternatives:
+  - No remap — the default dispatch order.
+  - Grouped-M rasterisation alone (`GROUP_SIZE_M`) without an XCD remap.
+  why:
+  - Two implementations in AITER already solve this and state the formula in source; the dense FlyDSL kernels
+    are the ones that do not.
+  - Whether it pays depends on how much panel reuse crosses XCDs for the shape, which is why it is a candidate
+    with a control arm and not a default.
+  source_evidence:
+  - aiter_a6bb4993:src_69a5695f3c33fd50
+  - aiter_a6bb4993:src_3a83a99245462451
+  - aiter_a6bb4993:src_923af36a5869aea6
+  solutions:
+  - backend: triton
+    mechanism: '`remap_xcd` / `remap_xcd_chunked` plus `pid_grid` with `GROUP_SIZE_M` in the shared pid helper,
+      called from the GEMM kernels with `NUM_XCDS`'
+    source_evidence:
+    - aiter_a6bb4993:src_1b8ded5e4825e5e1
+    - aiter_a6bb4993:src_a0815635126a1ea6
+    - aiter_a6bb4993:src_d760ac9f0e4bff02
+    - aiter_a6bb4993:src_334e95f3f9406108
+    - aiter_a6bb4993:src_de6d336c2ee7601b
+  references:
+  - knowledge/general/optimization/xcd_l2_locality.md:36-49
+  - knowledge/general/hardware/shared/l2_xcd_swizzle.md
+  measurement_evidence: []
+  limitations:
+  - The grouped kernel's tile decode after the remap is MoE-specific; the remap ports, the decode has to be
+    rewritten for a dense grid.
+  - Measured effects of XCD remapping live in learned cards and expert skills behind their switches; this card
+    carries none.
+- id: flydsl-hgemm-config-space
+  type: performance_candidate
+  axes:
+  - workgroup_tile
+  - work_partition
+  - execution_geometry
+  - tunable_surface
+  match:
+    operator_families:
+    - dense_gemm
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+    dtypes:
+    - f16
+    - bf16
+  question: Which tile, warp and split-K values will the FlyDSL HGEMM family actually accept, and how does
+    a shape narrow them?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - operator_family=gemm
+  - target_language=flydsl
+  - a configuration is being chosen or searched for a known M, N, K
+  actions:
+  - Search tile_m within (16, 32, 48, 64, 80, 96, 112, 128, 160, 256), tile_n within (64, 128, 160, 192, 256)
+    and tile_k within (64, 96, 128, 160, 256) rather than treating the 128x128x64 default as the space.
+  - 'Search the warp layout and B staging as one knob: the registry enumerates exactly five (block_m_warps,
+    block_n_warps, b_to_lds) variants — (1,2,F), (1,4,F), (2,2,F), (1,4,T), (2,2,T).'
+  - 'Cap tile_m at max(96, align_up(2*M, 16)): a tile_m far above M pays for rows that do not exist, and the
+    shipped derivation refuses those candidates outright.'
+  - Take split_k from 1..32, keeping only values that divide K and leave K/split_k divisible by tile_k; every
+    candidate must clear that filter, including 1, 2, 4, 8 and 16. Those five need nothing further; any other
+    divisor also has to leave between 2 and 8 block-K loops per split.
+  - 'Whether split_k > 1 is worth generating at all is the grid-fill decision in gemm-split-k-when-grid-underfills:
+    the derivation here checks divisibility, never occupancy.'
+  - 'Seed from what AITER shipped for your bucket before sweeping (FlyDSL tuned-DB table below): on gfx950
+    bf16 every shipped FlyDSL selection used either (2,2,b_to_lds=True) or (1,4,b_to_lds=False); the M<=64
+    buckets are dominated by tile_m=32 with split_k 4-16; every bucket above M=256 uses split_k=1, and M 257-1024
+    favours the non-power-of-two tile_m=96.'
+  alternatives:
+  - Keep the library default 128x128x64 with split_k=1 as the control arm to measure against.
+  - Fix the tile and search only split_k when N or K constrain the tiling to one legal shape.
+  why:
+  - AITER states the space as module-level option tuples and two derivation helpers, not as one default; the
+    default is one point inside it.
+  - The derivations encode the shape-dependence directly — tile_m is bounded by M, and split_k by the divisibility
+    of K — so the narrowing rule is readable rather than guessed.
+  - This card says which candidates are legal and worth generating. It does not say which one wins; that is
+    what the benchmark is for.
+  source_evidence:
+  - aiter_a6bb4993:src_426b8960fb14a04f
+  - aiter_a6bb4993:src_62ce0ec6b152ecaa
+  - aiter_a6bb4993:src_3c72689d786ca8be
+  - aiter_a6bb4993:src_fce6be7eb6b247d6
+  - aiter_a6bb4993:src_96320a5bab17a8f5
+  - aiter_a6bb4993:src_562e9940a52a202f
+  - aiter_a6bb4993:src_642476c9b693d5f1
+  - aiter_a6bb4993:src_27d99a67a1d27ccc
+  shipped_evidence:
+  - aiter_a6bb4993:cfg_973fe63f897809df
+  - aiter_a6bb4993:cfg_ac0c03746ab634f6
+  - aiter_a6bb4993:cfg_147eed9b10acbc4e
+  - aiter_a6bb4993:cfg_ae017b25b6473300
+  references:
+  - knowledge/operator/splitk_streamk_gemm/tuning.md:16-19
+  - knowledge/general/backend/flydsl/knobs.md:42-50
+  - knowledge/general/backend/flydsl/authoring_gemm_levers.md:103-117
+  - knowledge/general/optimization/occupancy_and_registers.md:54-67
+  measurement_evidence: []
+  limitations:
+  - These are the values the library is willing to compile, not values anybody measured as best; every candidate
+    still has to be timed on the target box.
+  - Shipped selections come from AITER's tuner on its own box and competing set; they seed a search, they do
+    not end one.
+  - The option tuples are the generic HGEMM family's. The small-M family has its own, wider, N space — see
+    flydsl-small-m-hgemm-family.
+  - A candidate that is inside the space can still be rejected at compile time by the tiling and LDS rules
+    — see flydsl-hgemm-tiling-validity.
+- id: flydsl-xor16-lds-layout-consistency
+  type: performance_candidate
+  axes:
+  - operand_layout
+  - configuration_constraints
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - grouped_gemm_moe
+    - batched_gemm
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+    requires:
+    - lds_staging
+  question: How should a FlyDSL GEMM apply an XOR16 LDS layout without making stores and loads disagree?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - operator_family=gemm
+  - target_language=flydsl
+  - an operand is staged through LDS (in the A8 family only A is; B is read preshuffled from global memory)
+  - XOR16 is included as a bank-conflict candidate
+  actions:
+  - Define the byte-column transform once as col_in_bytes XOR ((row modulo k_blocks16) times 16).
+  - 'Apply the identical transform at every site: the global-to-LDS store and the LDS-to-fragment load, for
+    each operand that goes through LDS.'
+  - 'Re-derive the swizzle period per architecture: gfx942 LDS has 32 banks in 64 KiB, gfx950 has 64 banks
+    in 160 KiB, so a stride that fully aliases on one may only partially conflict on the other (background).'
+  alternatives:
+  - Keep the unswizzled layout as the control arm.
+  - Pad the LDS row instead of swizzling when LDS headroom allows — the FlyDSL grouped-GEMM kernels pad K by
+    8 elements unless they use the 128-bit LDS layout.
+  - Benchmark a different padding or swizzle scheme when the tile geometry changes.
+  why:
+  - The AITER implementation calls one helper at every write and read site; copying only one side changes addressing
+    semantics rather than performance.
+  - The cited sites are A store, A fragment load, B store and B fragment load — the set that has to move together.
+  source_evidence:
+  - aiter_a6bb4993:src_2e329cfe46a52fb9
+  - aiter_a6bb4993:src_d1f233838e74f022
+  - aiter_a6bb4993:src_6f222b94149ab249
+  - aiter_a6bb4993:src_d2c808ad3cd9ce7c
+  - aiter_a6bb4993:src_0438c6e24a955ea2
+  - aiter_a6bb4993:src_03338c20f236373f
+  solutions:
+  - backend: gluon
+    mechanism: '`gl.SwizzledSharedLayout(...)` declared per staged operand (and per block-scale buffer); the
+      compiler applies the same permutation at store and load'
+    source_evidence:
+    - aiter_a6bb4993:src_99b2357d48e96781
+    - aiter_a6bb4993:src_4e349fde44ffedd3
+    - aiter_a6bb4993:src_0526e1f18b1c8460
+  references:
+  - knowledge/general/backend/flydsl/authoring_optimization.md:75-93
+  - knowledge/general/hardware/shared/memory_model_lds_bank.md
+  - knowledge/general/optimization/lds_and_bank_conflicts.md
+  - knowledge/general/backend/flydsl/authoring_gemm_levers.md:133-148
+  measurement_evidence: []
+  limitations:
+  - The citations prove address consistency, not that XOR16 reduces bank conflicts on every tile.
+  - Retain the unswizzled implementation and choose by target-box measurement.
+- id: flydsl-preshuffle-b-layout-contract
+  type: performance_candidate
+  axes:
+  - operand_layout
+  - runtime_contract
+  - implementation_variant
+  - configuration_constraints
+  match:
+    operator_families:
+    - dense_gemm
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+    requires:
+    - reused_weight
+  question: What does enabling B preshuffle on a FlyDSL HGEMM actually require?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - operator_family=gemm
+  - target_language=flydsl
+  - B preshuffle is being considered as a candidate
+  - 'the regime of B is known or can be read from the caller: a weight reused across calls, or per-call data'
+  actions:
+  - 'Put the preshuffled B path on the candidate list on the generic family instead of deferring it: b_preshuffle
+    is the default of the public entry point (flydsl_hgemm) and of the internal compile helper.'
+  - 'Do not read that default as the deployment state: AITER''s tuned database keys on `bpreshuffle`, and every
+    FlyDSL bf16 selection it ships for gfx950 has b_preshuffle=False — those deployments pass unshuffled weights.
+    Which layout you may assume is set by the caller''s weight contract, not by the entry-point default.'
+  - 'Treat b_preshuffle as a change of B''s storage layout, not as a boolean tuning flag: the kernel expects
+    B already permuted into the family''s shuffle layout, and the host side must either shuffle it or be told
+    it is pre-shuffled.'
+  - Do not decline preshuffle on the grounds that no offline shuffle is available. The library performs the
+    permutation itself with shuffle_weight(b, layout=_get_flydsl_shuffle_layout(pack_n)), exposes auto_shuffle_b
+    to apply it at call time, and skips it when the tensor already carries the is_shuffled marker — the shuffle,
+    the layout selector and the once-per-tensor skip are all readable from the entry point, so a copy of the
+    kernel that cannot import them can still reimplement the same three pieces.
+  - 'Hoist the permutation out of the measured region rather than counting it against the win: key a cached
+    shuffled copy on the identity of the source tensor so it is paid once per distinct B and reused by every
+    later launch. is_shuffled is that idea in the library; a cache that also detects in-place mutation of the
+    source is the same idea made safe.'
+  - Scope the work item to the host layer before assigning it. The permutation happens on the host side of
+    the entry point, before the launcher is called — it is not reachable from the kernel body. A direction
+    that hands an engineer only the kernel source will come back 'not attempted, the host file is outside my
+    lane', which is a decomposition failure and not a finding about preshuffle. The owner of this direction
+    needs the configuration/launch module and permission to add a host-side module beside it.
+  - 'Make the cache invalidation-safe or do not cache: a freed tensor''s address can be handed to a later allocation,
+    so identity alone can alias two different matrices. Pair the address with something that changes when the
+    contents do, and treat a mismatch as a re-shuffle rather than a stale hit.'
+  - 'Settle the accounting question first, then act on the answer instead of parking the lever because the
+    question exists. Read the benchmark loop: if it builds one B and calls the kernel repeatedly against it,
+    with warmup iterations before the timed ones, then a once-per-tensor shuffle lands in warmup by construction
+    and the steady-state cost is the honest number for that workload. Cache it, and write one line in the report
+    saying B is treated as a reused operand and the permutation is amortised — a declared accounting choice
+    is a complete answer, whereas deferring the lever leaves the fastest available configuration untested and
+    reports nothing.'
+  - 'Where B is genuinely per-call data the same reading gives the opposite instruction: do not cache, charge
+    the shuffle to every launch, and expect the unshuffled path to win. The rule is that the regime decides,
+    and the regime is readable from the caller.'
+  - Keep b_to_lds=false whenever b_preshuffle=true; the current kernel rejects the combination.
+  - Keep b_preshuffle=false on the small-M family, which rejects it outright.
+  - Retune the tile shortlist on the preshuffled tree rather than carrying over the configuration that won
+    without it; the two paths feed the MFMA differently and their best tiles need not agree.
+  - 'The A8 (fp8/int8) family has no such choice: it always consumes B preshuffled, so its host side must supply
+    the shuffled weight (and the matching scale layout) — see flydsl-a8-preshuffle-config-space.'
+  alternatives:
+  - Use the unshuffled B path as the correctness and performance control.
+  - Shuffle B once at load time outside the timed region when the deployment allows it, and measure both accounting
+    rules explicitly.
+  - If B genuinely changes every call, the amortisation argument does not apply and the unshuffled path is
+    the right answer — say which of the two regimes you are in before choosing.
+  why:
+  - The generic HGEMM path supports preshuffled B and its dispatch default is even b_preshuffle=true, so this
+    is a supported layout rather than a forbidden one — but the guard rails around it are all layout guard
+    rails.
+  - 'The two rejections in the source are specific and different in kind: an unsupported combination (with
+    b_to_lds) and an unsupported family (small-M). Neither is a statement about speed.'
+  - The reason to name the amortisation machinery explicitly is that the layout requirement reads like a blocker
+    and is not one. An author who stops at 'the kernel wants B permuted' concludes the harness cannot supply
+    it; the entry point shows the library supplying it three different ways in the same nine lines.
+  source_evidence:
+  - aiter_a6bb4993:src_93c0f2962c52fdfb
+  - aiter_a6bb4993:src_4c74ced4671a1e5b
+  - aiter_a6bb4993:src_3ee379ecc88d0ad1
+  - aiter_a6bb4993:src_7b5432b56d9acd63
+  - aiter_a6bb4993:src_520242be3bd7400e
+  - aiter_a6bb4993:src_e7db1b030bf2e5c6
+  - aiter_a6bb4993:src_886a3fb0a447c9a7
+  - aiter_a6bb4993:src_2aa8afff0a4748b0
+  - aiter_a6bb4993:src_e248a6669d5daaaf
+  solutions:
+  - backend: asm
+    mechanism: the bf16 assembly GEMM takes a `preshuffle` flag in its launcher and selects a preshuffled object
+    source_evidence:
+    - aiter_a6bb4993:src_2616db93f0f6b2b7
+  - backend: ck
+    mechanism: separate B-preshuffle device-op templates (`*_BPreshuffle`) with their own tuned databases
+    source_evidence:
+    - aiter_a6bb4993:src_24c2dc21486cdfe7
+    - aiter_a6bb4993:src_6352032268991afb
+  shipped_evidence:
+  - aiter_a6bb4993:cfg_973fe63f897809df
+  - aiter_a6bb4993:cfg_147eed9b10acbc4e
+  references:
+  - knowledge/general/backend/flydsl/knobs.md:62-69
+  - knowledge/general/backend/flydsl/patterns.md:55-66
+  measurement_evidence: []
+  limitations:
+  - A shipped default is a precedent, not a benchmark. That the library chose b_preshuffle=true says the path
+    is first class and worth trying early; it does not say it wins on your shape, and the unshuffled control
+    still has to be run.
+  - The amortisation only holds where one B is reused across launches. Under an accounting rule that charges
+    the first shuffle to a single call, the path can lose; state which rule you are reporting.
+  - A benchmark that reuses one pre-shuffled B across iterations measures the steady state, not the first call;
+    state which one you are reporting.
+  - The card is grounded in the vendored library's contract. A kernel copy that has been edited may have moved
+    these checks.
+- id: gemm-shape-regime-routing
+  type: performance_candidate
+  axes:
+  - implementation_variant
+  - workgroup_tile
+  - work_partition
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - grouped_gemm_moe
+    - batched_gemm
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+  question: For each shape bucket, which backend did AITER's own tuner ship, and what does that imply for a
+    FlyDSL kernel?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - a workload with one or more (M, N, K) cases, with gfx and dtype known
+  actions:
+  - Look up each case's bucket in the backend-selection table below before choosing directions. It says which
+    implementation AITER shipped for comparable shapes on that gfx and CU count — what a FlyDSL kernel competes
+    with in production, even when the task's frozen baseline is Triton.
+  - 'gfx950 bf16: FlyDSL was selected for 86 of 165 rows at M<=16 and 52 of 174 at M 65-256, but for only 7
+    of 186 rows above M=1024, where ASM took 164. Large-M bf16 is where FlyDSL has no shipped precedent: plan
+    structural work (wave schedule, tile, workgroup mapping), not a config lookup.'
+  - 'gfx950 fp8 per-token with preshuffled B: FlyDSL was selected in every bucket, most often at the extremes
+    (72 of 111 rows at M<=16, 77 of 133 above M=4096) — seed from the FlyDSL A8 groups.'
+  - 'fp8 128x128 block scale on either architecture, and every gfx942 fp8 database: no FlyDSL row exists —
+    CK, CK-Tile and ASM own them. A FlyDSL kernel there is authored from the A8 precedents plus a block-scale
+    K loop, with no shipped FlyDSL seed (see flydsl-a8-scale-granularity-contract and gemm-blockscale-k-loop-scale-application);
+    which configuration the Triton baseline actually runs per case — often one fallback tile for every M —
+    is gemm-blockscale-shipped-bucket-structure.'
+  - Route small-M bf16 on gfx950 through both the generic HGEMM (what AITER shipped) and the small-M family
+    (flydsl-small-m-hgemm-family); route quantized operands to the A8 family.
+  - 'Treat buckets as separate problems: when a workload spans buckets (decode plus prefill), expect different
+    winners per case and keep a per-case dispatch rather than one global configuration.'
+  - 'For a case no database row covers, read AITER''s default route instead (gemm-default-backend-routing):
+    the HIP skinny kernels for small-M bf16/fp16, hipblaslt (gfx942) or ASM (elsewhere) for B-preshuffled bf16,
+    CK for fp8 — that is what a FlyDSL kernel competes with there.'
+  alternatives:
+  - Ignore the shipped selection and search blind — the control arm, and the only option for a bucket the database
+    does not cover.
+  why:
+  - The tuned databases are the only place AITER records which implementation it chose for which shape regime.
+  - A frozen Triton baseline says nothing about where FlyDSL already wins in production and where it never
+    has; this table does.
+  source_evidence:
+  - aiter_a6bb4993:src_38699a8ce57faf0c
+  - aiter_a6bb4993:src_bca963564a69909c
+  - aiter_a6bb4993:src_b446c07f43b11542
+  - aiter_a6bb4993:src_f854f40de1f28585
+  shipped_evidence:
+  - aiter_a6bb4993:sel_81411b8982b03045
+  - aiter_a6bb4993:sel_4ff2330404509760
+  - aiter_a6bb4993:sel_0bf8dd0fd028cea8
+  - aiter_a6bb4993:sel_c472ec443f7b30a0
+  - aiter_a6bb4993:sel_7c8d8e410633ad1e
+  - aiter_a6bb4993:sel_1b5489e6d41507a3
+  - aiter_a6bb4993:sel_8b543c4558078855
+  - aiter_a6bb4993:sel_438e88e4bc86460c
+  references:
+  - knowledge/operator/dense_gemm/tuning.md
+  - knowledge/operator/splitk_streamk_gemm/tuning.md:16-19
+  - knowledge/general/backend/flydsl/patterns.md:41-53
+  measurement_evidence: []
+  limitations:
+  - 'Counts are rows, not unique shapes: a shape shipped in two model databases counts twice.'
+  - The tuner's box, competing set and toolchain are not recorded; a selection says where AITER chose a backend,
+    never by how much.
+  - The table reflects AITER at the pinned commit; re-extract after an AITER bump.
+- id: gemm-default-backend-routing
+  type: performance_candidate
+  axes:
+  - implementation_variant
+  - runtime_contract
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+  question: Which backend does AITER's own dispatch pick when no tuned row exists, and how does that differ
+    between gfx942 and gfx950?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - a case whose production path, or whose frozen baseline, is AITER's dispatch rather than a fixed kernel
+  actions:
+  - 'bf16/fp16 (`tuned_gemm.get_GEMM_A16W16_config`): a tuned row wins first, and a `flydsl` row is served
+    only when `is_flydsl_available()` and its kernel name parses — otherwise the row is dropped. With no row:
+    gfx12 goes to torch; a B-preshuffled request goes to hipblaslt on gfx942 and, elsewhere, to ASM when the
+    input is bf16, the output bf16 or fp32, and N and K are multiples of 64 (it asserts otherwise); an unshuffled
+    request goes to the HIP skinny kernels when `is_skinny_default_shape` holds, else to torch.'
+  - 'The skinny route owns bf16/fp16 decode by default: K % 8 == 0 and M = 1 with N <= 2*CU and K <= 9216,
+    M <= 4 with N <= CU and K <= 9216, M <= 8 with N <= CU and K <= 5120, or M <= 16 with N <= CU and K <=
+    256 (gemm-skinny-decode-wave-split).'
+  - 'fp8 128x128 block scale (`gemm_op_a8w8.gemm_a8w8_blockscale`): a B-preshuffled call goes to ASM only on
+    gfx950 with m >= 16, k >= 512 and bf16 output, and asserts otherwise; an unshuffled call goes to CK or
+    CK-Tile by tuned row, CK by default. The B-preshuffled block-scale entry (`gemm_a8w8_blockscale_bpreshuffle`)
+    picks CK-Tile, CK or ASM by tuned row — that is where gfx942 reaches its ASM block-scale kernels.'
+  - 'fp8 per-token with preshuffled B (`gemm_a8w8_bpreshuffle`, fp8 weights only at the pinned commit): CK,
+    CK-Tile or FlyDSL by tuned row (`gemm_a8w8_bpreshuffle_flydsl`, only when FlyDSL is available), CK with
+    no row.'
+  - Read these as what a FlyDSL kernel competes with for a case AITER never tuned; where it did tune, the backend-selection
+    table (gemm-shape-regime-routing) says what it picked.
+  alternatives:
+  - Ignore AITER's dispatch and compare only against the task's frozen baseline — the control arm.
+  why:
+  - 'The default route is code, not a table: it is what production runs for every shape the tuned databases
+    do not cover, and it differs by architecture.'
+  - It names FlyDSL as a routed backend for bf16 and for per-token fp8, and never for block scale.
+  source_evidence:
+  - aiter_a6bb4993:src_2577a978dcbebafb
+  - aiter_a6bb4993:src_c9b676e9661f7f1e
+  - aiter_a6bb4993:src_57c3a751ec4ad78b
+  - aiter_a6bb4993:src_07dceb286dc43c55
+  - aiter_a6bb4993:src_44e19b6d045bd0ec
+  - aiter_a6bb4993:src_9dd4c645f2e22c23
+  - aiter_a6bb4993:src_ae977d7a08feed5e
+  - aiter_a6bb4993:src_08f91e081b402af2
+  - aiter_a6bb4993:src_f4e4d3f780fda60a
+  - aiter_a6bb4993:src_24f53ab3d301476f
+  - aiter_a6bb4993:src_bcbb91da2b9d2eb8
+  - aiter_a6bb4993:src_df8a47f1c59069da
+  references:
+  - knowledge/general/backend/flydsl/patterns.md:41-53
+  - knowledge/operator/skinny_gemv_decode/tuning.md:16-33
+  measurement_evidence: []
+  limitations:
+  - The routing conditions are AITER's at the pinned commit; its dispatch changes between releases, so re-read
+    `tuned_gemm.py` and `ops/gemm_op_a8w8.py` after an AITER bump.
+  - A route says which backend runs, not how fast it is; hipblaslt and torch routes are libraries this corpus
+    does not index.
+- id: gemm-asm-tile-inventory-and-selection
+  type: performance_candidate
+  axes:
+  - workgroup_tile
+  - work_partition
+  - execution_geometry
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    target_languages:
+    - flydsl
+  question: Which tiles and split-K capabilities does AITER's hand-written ASM ship per architecture, and how
+    does its launcher choose among them for a shape?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - a tile and split are being chosen per case, and the vendor's own choices for the same dtype and architecture
+    are worth knowing
+  actions:
+  - 'Read the per-architecture inventory as the vendor''s tile set: fp8 128x128 block scale is the same six
+    kernels on gfx942 and gfx950 — tile_n = 128, tile_m in 32, 48, 64, 80, 96, 128, all split-K capable and
+    B-preshuffled. bf16 is 22 kernels on gfx942 (tile_n = 64, tile_m 32 to 160, 12 split-K capable) and 24
+    on gfx950 (adding two 256x256 kernels). fp4 exists only on gfx950 (35 kernels, 2 split-K capable).'
+  - 'Choose tile and split the way the launcher does, per case rather than once: for every kernel of the architecture
+    (the block-scale launcher also requires tile_n to divide N), and every split from 1 to 16 it supports,
+    count the rounds `ceil(ceil(M/tile_m) * ceil(N/tile_n) * split / num_cu)`; keep the fewest rounds, and
+    among equal rounds the one with fewer idle CUs in the last round or the larger `tile_m * tile_n / (tile_m
+    + tile_n)`.'
+  - The bf16 launcher also caps the split at `min(num_cu / output_tiles, 16, K / sub_k)` — split only up to
+    what fills the machine.
+  - 'Under block scale keep tile_n a search axis, with 128 as ASM''s point: every block-scale ASM kernel uses
+    tile_n = 128 on both architectures (one N tile, one W scale per K block), while Triton''s gfx942 block-scale
+    configs fix GROUP_N = 128 but ship BLOCK_SIZE_N 16 or 64 at M <= 8 and mostly 128 at M 1025-2048 (gemm-blockscale-k-loop-scale-application).'
+  alternatives:
+  - A single fixed tile for every case — the control arm, and what an untuned Triton baseline does.
+  why:
+  - The inventories state what exists per architecture; the launchers state the rule that picks from it. Both
+    are the vendor's grid-fill heuristic written as code, and `num_cu` is read at run time, so the same rule
+    serves the 304-CU MI300X and the 256-CU MI355X.
+  source_evidence:
+  - aiter_a6bb4993:src_3528bd18e9f8f895
+  - aiter_a6bb4993:src_c2ed9024f2039d1f
+  - aiter_a6bb4993:src_787ebf8727d0c7e1
+  - aiter_a6bb4993:src_0558cdca6ff86ab9
+  - aiter_a6bb4993:src_fa4eb9ba8bba7192
+  - aiter_a6bb4993:src_3865c44e30f36de9
+  - aiter_a6bb4993:src_fcf5d73d12271d55
+  - aiter_a6bb4993:src_c792a003b578b049
+  - aiter_a6bb4993:src_acee84984c040f98
+  - aiter_a6bb4993:src_fe82852692f7eaca
+  - aiter_a6bb4993:src_8475d71b5a90595e
+  - aiter_a6bb4993:src_8866d3dbeb612f3a
+  - aiter_a6bb4993:src_a4937eaa160077d1
+  shipped_evidence:
+  - aiter_a6bb4993:cfg_d2642e1347a53ea1
+  - aiter_a6bb4993:cfg_1311810498769365
+  references:
+  - knowledge/general/optimization/wave_and_grid_sizing.md:49-61
+  - knowledge/operator/splitk_streamk_gemm/tuning.md:16-37
+  measurement_evidence: []
+  limitations:
+  - The inventory lists what AITER ships, not which kernel wins a shape; the launcher's rule is a heuristic,
+    and the task's benchmark decides.
+  - 'ASM tiles are binaries: the tile shapes transfer as intent; the MFMA schedule inside them is not visible.'
+- id: flydsl-mfma-fragment-lane-layout
+  type: semantic
+  axes:
+  - operand_layout
+  - epilogue
+  - compute_instruction
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - grouped_gemm_moe
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+  question: Which lane holds which row and column of a 16x16 MFMA fragment in AITER's FlyDSL kernels, and what
+    does that fix for loads, in-register scaling and stores?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - a kernel loads MFMA fragments, scales an accumulator per row or per column, or writes it back
+  actions:
+  - 'Load fragments by lane: in the HGEMM, lane l reads A row `l % 16` at K offset `(l // 16) * frag_values
+    * mfma_steps` (`ldmatrix_a_m_idx`, `ldmatrix_a_k_vec_idx`), and B mirrors it along N (`ldmatrix_b_n_idx`,
+    `ldmatrix_b_k_vec_idx`).'
+  - 'Read the accumulator as lane l holding four consecutive rows starting at `(l // 16) * 4`, in column `l
+    % 16`: the row epilogue''s row offset is `lane_div_16 * 4 + ii` for ii in 0..3, the HGEMM store uses `stmatrix_c_m_vec_idx
+    = w_tid // WMMA_N * WMMA_C_FRAG_VALUES` and `stmatrix_c_n_idx = w_tid % WMMA_N`, and the A8 kernels name
+    the same 4x16 lane grid `make_layout((4, 16), (16, 1))`.'
+  - 'Scale in registers with that mapping: a lane multiplies its four rows by their row scales and its one
+    column by that column''s scale — the in-loop block-scale multiply (gemm-blockscale-k-loop-scale-application)
+    and a per-token epilogue both need it.'
+  - 'Derive loads, scales and stores from one mapping: a transposed reading on any side permutes the output
+    without failing to compile.'
+  alternatives:
+  - Stage the accumulator through LDS with a C-shuffle epilogue (flydsl-cshuffle-epilogue) and index it row-major
+    there, paying LDS for a simpler mapping.
+  why:
+  - Every FlyDSL GEMM in AITER writes this mapping as index arithmetic, so it can be read off the source instead
+    of being rediscovered by debugging a permuted result.
+  source_evidence:
+  - aiter_a6bb4993:src_f01ef3793a7bd87c
+  - aiter_a6bb4993:src_7e41979f22eae1f9
+  - aiter_a6bb4993:src_44f9bf23c53fc7bc
+  - aiter_a6bb4993:src_8ba4dcf6e9d68f6e
+  - aiter_a6bb4993:src_91899d8d1f4341f6
+  - aiter_a6bb4993:src_074f27a8a5c89fcf
+  - aiter_a6bb4993:src_5cae13453d752cfb
+  - aiter_a6bb4993:src_1743dd27416aa823
+  - aiter_a6bb4993:src_29a6126027710513
+  references:
+  - knowledge/general/backend/flydsl/authoring_attention_levers.md:49-62
+  - knowledge/general/backend/flydsl/authoring_tile_programming.md:201-277
+  measurement_evidence: []
+  limitations:
+  - The mapping is for the 16x16 MFMA atom these kernels use; a 32x32 instruction has a different lane layout.
+  - K per lane depends on the instruction (four bf16 or eight fp8 elements per lane for the 16x16 forms), which
+    the frag-value constants carry.
+- id: flydsl-host-launch-contract
+  type: constraint
+  axes:
+  - runtime_contract
+  - work_partition
+  - implementation_variant
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - grouped_gemm_moe
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+  question: What does the host side of a FlyDSL GEMM have to provide in AITER — compile cache, launch grid,
+    per-stream state and kernel name?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - a FlyDSL kernel is being launched, cached or registered for dispatch
+  actions:
+  - 'Compile once per configuration and cache it: AITER''s HGEMM, small-M, A8 preshuffle and 2-stage MoE compilers
+    are `@functools.lru_cache(maxsize=1024)` (the mixed-precision MoE ones unbounded), keyed on the full configuration,
+    so every new tile or split is a new compile — warm up before timing.'
+  - 'Make the launch grid match what the kernel reads: the HGEMM and small-M launch `grid=(bm, bn, SPLIT_K)`
+    — block x is the M tile, y the N tile, z the K split — while the A8 GEMM launches `(gx, gy, 1)`. A kernel
+    that reads `block_idx.z` as its split needs the host to launch that z.'
+  - 'Supply split-K''s per-stream state: the counter buffer and the current signal state go into every split-K
+    launch and the state advances after it (flydsl-splitk-reduction-contract).'
+  - 'Name the kernel in the registry''s grammar: tuned rows encode every knob in the kernel name matched by
+    `_HGEMM_KERNEL_RE`, and `tuned_gemm` drops a `flydsl` row whose name does not parse.'
+  - Check every FlyDSL symbol against the installed version before copying code across versions (version_map);
+    a module that moved fails at import, not at compile.
+  alternatives:
+  - Call the library entry points (`flydsl_hgemm`, `flydsl_preshuffle_gemm_a8`), which own this contract, instead
+    of launching an authored kernel directly.
+  why:
+  - Each of these is a failure that surfaces only at run time — a recompile per call, a grid that leaves splits
+    unlaunched, counters that were never allocated, a tuned row silently dropped.
+  source_evidence:
+  - aiter_a6bb4993:src_4d28023c79d1fe52
+  - aiter_a6bb4993:src_1e5ae08be5adf756
+  - aiter_a6bb4993:src_ca495db46be070cd
+  - aiter_a6bb4993:src_ada62c940d6fc161
+  - aiter_a6bb4993:src_821a059af3542249
+  - aiter_a6bb4993:src_569b9cec48bd2103
+  - aiter_a6bb4993:src_328a63de09b9204a
+  - aiter_a6bb4993:src_1e7dc0218412b0cf
+  - aiter_a6bb4993:src_c9b676e9661f7f1e
+  - aiter_a6bb4993:src_86aa6d1400d0f17f
+  - aiter_a6bb4993:src_194c17aa69828857
+  references:
+  - knowledge/general/backend/flydsl/deep.md:116-122
+  - knowledge/general/backend/flydsl/version_map.md:279-316
+  - knowledge/general/backend/flydsl/patterns.md:104-108
+  measurement_evidence: []
+  limitations:
+  - This is AITER's host contract at the pinned commit; an authored kernel launched outside AITER's wrappers
+    must provide the same pieces itself.
+- id: flydsl-test-parity-gate
+  type: constraint
+  axes:
+  - validation_contract
+  - work_partition
+  - epilogue
+  match:
+    operator_families:
+    - dense_gemm
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+  question: Which parity does AITER's own FlyDSL GEMM test demand, where does it relax it, and what does that
+    say about validating an authored kernel?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - a FlyDSL GEMM — especially a split-K one — is being validated against a reference
+  actions:
+  - 'Gate against an fp32 reference first: AITER''s split-K HGEMM test compares with `torch.isclose` at atol
+    = rtol = 1e-2 and requires 99.9% of elements close.'
+  - 'Relax only where the implementation had to: AITER''s split-K precision cases at split_k 8 (M=104, K=7168)
+    and split_k 4 (M=1, K=512) hold the default gate; only its two M=1 `b_to_lds` cases are relaxed, to 99.0%
+    of elements with max |delta| <= 32 at split_k 16 (K=7168) and <= 8 at split_k 8 (K=1536). The drift comes
+    from the atomic combine of partials already rounded to bf16 (flydsl-splitk-reduction-contract).'
+  - Let the task's oracle and tolerance decide acceptance (the workflow's verify step); use AITER's gate to
+    judge a failure — drift within it is the known cost of split-K, drift beyond it points at a bug.
+  alternatives:
+  - Split-K with an fp32 workspace and a separate reduce pass (the Triton pattern), which keeps the combine
+    in fp32 at the cost of a second kernel.
+  why:
+  - The relaxed cases are the implementation stating where its numerics drift; without them a correct split-K
+    kernel reads as broken, or a broken one as merely imprecise.
+  source_evidence:
+  - aiter_a6bb4993:src_9d1d40ad1d82f015
+  - aiter_a6bb4993:src_f0baf9a97c14b111
+  - aiter_a6bb4993:src_1183d7ed5d869e8a
+  - aiter_a6bb4993:src_217562a4a9b879dc
+  - aiter_a6bb4993:src_636fbc44252bb90e
+  - aiter_a6bb4993:src_972b88aa5143a3f7
+  - aiter_a6bb4993:src_f30b29895e6d16b2
+  - aiter_a6bb4993:src_724636e4ecf6c5f6
+  - aiter_a6bb4993:src_dcea4e10d8996a4e
+  references:
+  - knowledge/operator/splitk_streamk_gemm/backend/flydsl.md:77-85
+  - knowledge/operator/dense_gemm/numerics.md:59-63
+  measurement_evidence: []
+  limitations:
+  - These are AITER's regression cases for its own kernel; an authored kernel is judged by the task's oracle,
+    not by this test.
+- id: gemm-streamed-operand-cache-policy
+  type: performance_candidate
+  axes:
+  - memory_access
+  - tunable_surface
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - grouped_gemm_moe
+    - batched_gemm
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+  question: Which operand loads and output stores should carry a streaming (non-temporal) cache policy, and
+    which should keep the default?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - one operand is read once per call while the other is reused across tiles — typically the weight B at decode,
+    where every workgroup streams its own slice of W while the few rows of A are shared — or an output is written
+    once and not read back by this kernel
+  actions:
+  - 'Make the cache policy a per-operand knob on the global loads, not a kernel-wide switch: FlyDSL''s `buffer_ops.buffer_load`
+    takes `cache_modifier`, and AITER''s FlyDSL MoE GEMM exposes it for its B loads only, as `b_nt` (default
+    0 in one of its kernels and 2 in the other), while its other loads pass `cache_modifier=0`.'
+  - Search the streamed operand's load policy — the default against the streaming setting — and leave the reused
+    operand's loads at the default.
+  - 'Store a write-once output non-temporally when nothing re-reads it soon: the FlyDSL MoE kernel writes its
+    output with `llvm.StoreOp(..., nontemporal=True)`.'
+  alternatives:
+  - The default cache policy everywhere — the control arm.
+  why:
+  - 'AITER''s Triton a16w16 GEMM makes the same choice per operand: `cache_modifier` is a kernel parameter
+    applied to the B loads only, never to A. Of the 306 shipped Triton GEMM config groups, 88 set it, and 87
+    of those choose `.cg`.'
+  - A line fetched once and never re-read only displaces lines that would have been reused; the reused operand
+    is the one worth keeping resident.
+  source_evidence:
+  - aiter_a6bb4993:src_6a42df54a6f6b458
+  - aiter_a6bb4993:src_e93e7dd39f7adedc
+  - aiter_a6bb4993:src_106bcf16a01dfc38
+  - aiter_a6bb4993:src_e59fe6013e3decd4
+  solutions:
+  - backend: triton
+    mechanism: '`cache_modifier: tl.constexpr` on the a16w16 kernels, passed to `tl.load(b_ptrs, cache_modifier=...)`
+      for B and never for A; the value is carried per bucket in the shipped configs'
+    source_evidence:
+    - aiter_a6bb4993:src_15cea189ebb33d4c
+    - aiter_a6bb4993:src_92959715207084c1
+    - aiter_a6bb4993:src_9667faa67584ba59
+  references:
+  - knowledge/general/hardware/shared/hbm_infinity_fabric.md:73-73
+  - knowledge/general/hardware/cdna3_mi300/memory_hierarchy.md:48-48
+  measurement_evidence: []
+  limitations:
+  - The spelling differs per backend — a Triton modifier string, a FlyDSL integer `cache_modifier`, an LLVM
+    `nontemporal` store flag — and the corpus does not map one onto another; read what the target API accepts.
+  - 'Whether streaming helps depends on the reuse the benchmark reproduces: a timing loop that re-reads the
+    same weight from a warm cache measures a different reuse than serving, where each layer reads its own weight.'
+- id: flydsl-lds-pipeline-depth
+  type: performance_candidate
+  axes:
+  - pipeline_schedule
+  - configuration_constraints
+  - workgroup_tile
+  match:
+    operator_families:
+    - dense_gemm
+    - scaled_quant_gemm
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    - gemm_epilogue_fused
+    target_languages:
+    - flydsl
+    requires:
+    - lds_staging
+  question: How many LDS stages should the K loop keep in flight, and what does each one cost?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - the design stages operand tiles through LDS (trait lds_staging)
+  actions:
+  - 'Treat the stage count as a knob that competes with the tile for LDS: the split-K HGEMM allocates `STAGES
+    * BLOCK_M * BLOCK_K` elements for A and `STAGES * BLOCK_N * BLOCK_K` for B, so every extra stage costs
+    one more A tile and one more B tile.'
+  - Start from AITER's two stages — `STAGES = 2` in the split-K and small-M HGEMMs, `lds_stage=2` as the preshuffle
+    GEMM's default — and try a deeper ring only where the tile is small enough for the LDS budget and the tiling
+    validator to accept it.
+  - Keep the stage count in the kernel name, as AITER does (`_S{STAGES}`, `_lds{lds_stage}`), so two builds
+    that differ only in depth never share a compiled-kernel cache entry.
+  alternatives:
+  - 'More workgroups per CU instead of more stages: the same LDS spent on occupancy hides latency across workgroups
+    rather than within one.'
+  why:
+  - A stage is how far the loader runs ahead of the MFMAs, and it is bought with LDS that the tile, occupancy
+    and any LDS-staged epilogue also want.
+  - 'AITER fixes two stages in the HGEMMs and exposes the depth only on the preshuffle GEMM, where it also
+    restricts it (FP4 with tile_k=128 supports only lds_stage=2): the depth is a design axis, not a constant.'
+  source_evidence:
+  - aiter_a6bb4993:src_dbdbdbf21af30e3c
+  - aiter_a6bb4993:src_8a036c537a13ff24
+  - aiter_a6bb4993:src_1a80adca750d9118
+  references:
+  - knowledge/general/optimization/lds_and_bank_conflicts.md:56-60
+  - knowledge/general/optimization/lds_and_bank_conflicts.md:95-97
+  - knowledge/operator/skinny_gemv_decode/backend/flydsl.md:59-59
+  measurement_evidence: []
+  limitations:
+  - The HGEMM families hard-code two stages; a different depth there means changing the kernel source, not
+    passing a parameter.
+  - 'Deeper is not monotonically better: once global latency is hidden, further stages only take LDS away from
+    occupancy.'
+shared_cards:
+- flydsl-a8-data-movement-helpers
+- flydsl-a8-interleaved-schedule
+- flydsl-a8-legality
+- flydsl-a8-mfma-selection
+- flydsl-a8-preshuffle-config-space
+- flydsl-a8-scale-granularity-contract
+- flydsl-cshuffle-epilogue
+- flydsl-small-m-hgemm-family
+- flydsl-splitk-hot-loop-schedule-bundle
+- flydsl-splitk-reduction-contract
+- gemm-blockscale-k-loop-scale-application
+- gemm-blockscale-shipped-bucket-structure
+- gemm-skinny-decode-wave-split
+- gemm-split-k-when-grid-underfills

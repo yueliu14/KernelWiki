@@ -1,0 +1,1318 @@
+schema_version: 2
+operator: compressed_attention
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  lines: 2712
+  evidence_records: 68
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  lines: 291
+  evidence_records: 14
+missing: []
+source_evidence:
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 125
+  end_line: 141
+  match: 'def _load_f32_vec(buf, off_elems_i32, vec_width):'
+  captured:
+  - _load_f32_vec
+  arch_scope: ''
+  evidence:
+  - '125: def _load_f32_vec(buf, off_elems_i32, vec_width):'
+  - '126:     """Load vec_width fp32 from byte-aligned stream -> list of vec_width fp32 scalars.'
+  evidence_id: src_4d591760ff609f3d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 144
+  end_line: 165
+  match: 'def _load_bf16_vec_then_f32(buf, off_elems_i32, vec_width):'
+  captured:
+  - _load_bf16_vec_then_f32
+  arch_scope: ''
+  evidence:
+  - '144: def _load_bf16_vec_then_f32(buf, off_elems_i32, vec_width):'
+  - '145:     """Load vec_width bf16 from byte-aligned dword stream -> fp32 vec_width scalars.'
+  evidence_id: src_83ed6d5b40633fd7
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 168
+  end_line: 1235
+  match: def _build_kernel(
+  captured:
+  - _build_kernel
+  arch_scope: ''
+  evidence:
+  - '168: def _build_kernel('
+  - '169:     *,'
+  - '170:     head_dim: int,'
+  evidence_id: src_24c98837f9940bb0
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1261
+  end_line: 2090
+  match: def _build_kernel_ksplit(
+  captured:
+  - _build_kernel_ksplit
+  arch_scope: ''
+  evidence:
+  - '1261: def _build_kernel_ksplit('
+  - '1262:     *,'
+  - '1263:     head_dim: int,'
+  evidence_id: src_b2441ce4b6a083d9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2105
+  end_line: 2131
+  match: 'def hca_per_n_config(plan_capacity: int) -> tuple[int, int]:'
+  captured:
+  - hca_per_n_config
+  arch_scope: ''
+  evidence:
+  - '2105: def hca_per_n_config(plan_capacity: int) -> tuple[int, int]:'
+  - '2106:     """Return ``(slice_size, k_split_num_waves)`` for ``flydsl_hca_compress_attn``'
+  - '2107:     tuned for V4-Pro HCA Main (D=512, ratio=128, overlap=False) on MI355X.'
+  evidence_id: src_3f2f65411ba04f64
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2135
+  end_line: 2170
+  match: def compile_flydsl_fused_compress_attn(
+  captured:
+  - compile_flydsl_fused_compress_attn
+  arch_scope: ''
+  evidence:
+  - '2134: @lru_cache(maxsize=32)'
+  - '2135: def compile_flydsl_fused_compress_attn('
+  - '2136:     *,'
+  - '2137:     head_dim: int,'
+  evidence_id: src_04849078697998c8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2173
+  end_line: 2196
+  match: 'def csa_ksplit_num_waves(plan_capacity: int) -> int:'
+  captured:
+  - csa_ksplit_num_waves
+  arch_scope: ''
+  evidence:
+  - '2173: def csa_ksplit_num_waves(plan_capacity: int) -> int:'
+  - '2174:     """Auto-pick ``k_split_num_waves`` for the CSA Main BF16 path'
+  - '2175:     (D=512, RD=64, ratio=4, overlap, K=8) and the CSA Indexer FP8 path'
+  evidence_id: src_05320cf693858099
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2200
+  end_line: 2233
+  match: def compile_flydsl_fused_compress_attn_ksplit(
+  captured:
+  - compile_flydsl_fused_compress_attn_ksplit
+  arch_scope: ''
+  evidence:
+  - '2199: @lru_cache(maxsize=32)'
+  - '2200: def compile_flydsl_fused_compress_attn_ksplit('
+  - '2201:     *,'
+  - '2202:     head_dim: int,'
+  evidence_id: src_71480fce8eadf604
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2236
+  end_line: 2711
+  match: def flydsl_fused_compress_attn(
+  captured:
+  - flydsl_fused_compress_attn
+  arch_scope: ''
+  evidence:
+  - '2236: def flydsl_fused_compress_attn('
+  - '2237:     *,'
+  - '2238:     kv_in: torch.Tensor,  # [num_q_tokens, DIM_FULL] bf16'
+  evidence_id: src_a64c7fb9fcd7a4bf
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 304
+  end_line: 1167
+  match: def kernel(
+  captured:
+  - kernel
+  arch_scope: ''
+  evidence:
+  - '303:     @flyc.kernel(name=_kname)'
+  - '304:     def kernel('
+  - '305:         kv_in: fx.Tensor,  # [num_q_tokens, DIM_FULL] bf16, strided'
+  - '306:         kv_in_row_stride: Int32,  # bf16-elements'
+  evidence_id: src_3b002f840effcc7d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1170
+  end_line: 1233
+  match: def launch_fused_compress_attn(
+  captured:
+  - launch_fused_compress_attn
+  arch_scope: ''
+  evidence:
+  - '1169:     @flyc.jit'
+  - '1170:     def launch_fused_compress_attn('
+  - '1171:         kv_in: fx.Tensor,'
+  - '1172:         kv_in_row_stride: fx.Int32,'
+  evidence_id: src_7af63aa37d437ee8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1385
+  end_line: 2022
+  match: def kernel(
+  captured:
+  - kernel
+  arch_scope: ''
+  evidence:
+  - '1384:     @flyc.kernel(name=_kname, known_block_size=[BLOCK_TH, 1, 1])'
+  - '1385:     def kernel('
+  - '1386:         kv_in: fx.Tensor,'
+  - '1387:         kv_in_row_stride: Int32,'
+  evidence_id: src_d375e8da70a8b459
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2025
+  end_line: 2088
+  match: def launch_fused_compress_attn_ksplit(
+  captured:
+  - launch_fused_compress_attn_ksplit
+  arch_scope: ''
+  evidence:
+  - '2024:     @flyc.jit'
+  - '2025:     def launch_fused_compress_attn_ksplit('
+  - '2026:         kv_in: fx.Tensor,'
+  - '2027:         kv_in_row_stride: fx.Int32,'
+  evidence_id: src_c74af9266f7eddd6
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 366
+  end_line: 1163
+  match: 'def _body():'
+  captured:
+  - _body
+  arch_scope: ''
+  evidence:
+  - '364:         # under a runtime `if`: the rewriter sees an opaque call (no state to'
+  - '365:         # thread) and lowers it to scf.if, guarding every store inside.'
+  - '366:         def _body():'
+  - '367:             # ---- Step 3: per-seq state slot ----'
+  - '368:             slot_map_buf = ptr_buf_tensor(fx.get_iter(state_slot_mapping), fx.Int32)'
+  evidence_id: src_2a896753c6f05449
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1442
+  end_line: 2019
+  match: 'def _body():'
+  captured:
+  - _body
+  arch_scope: ''
+  evidence:
+  - '1440:         # Sentinel-skip: whole body runs only for position >= 0, as a closure'
+  - '1441:         # under a runtime `if` (see the CSA kernel above for the rationale).'
+  - '1442:         def _body():'
+  - '1443:             slot_map_buf = ptr_buf_tensor(fx.get_iter(state_slot_mapping), fx.Int32)'
+  - '1444:             slot = fx.add_offset(fx.get_iter(slot_map_buf), batch_id).load(i32)'
+  evidence_id: src_e8cdc585154f4e4a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 382
+  end_line: 441
+  match: def _online_softmax_update(
+  captured:
+  - _online_softmax_update
+  arch_scope: ''
+  evidence:
+  - '380:             init_state = list(init_m) + list(init_kv) + list(init_w)'
+  - '382:             def _online_softmax_update('
+  - '383:                 m_lane,'
+  - '384:                 kv_lane,'
+  evidence_id: src_9650a688334d028a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 467
+  end_line: 479
+  match: 'def _col_off_for_k(k_static_val):'
+  captured:
+  - _col_off_for_k
+  arch_scope: ''
+  evidence:
+  - '465:             ape_buf = ptr_buf_tensor(fx.get_iter(ape), fx.Float32)'
+  - '467:             def _col_off_for_k(k_static_val):'
+  - '468:                 """Compute col_off ? {0, D} for OVERLAP (==head_dim when k >= RATIO),'
+  - '469:                 or constant 0 for HCA (no overlap).'
+  evidence_id: src_e72ba02e4e039a7b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 530
+  end_line: 536
+  match: 'def _phase2_offsets(k_i32):'
+  captured:
+  - _phase2_offsets
+  arch_scope: ''
+  evidence:
+  - '528:             #     configs.'
+  - '530:             def _phase2_offsets(k_i32):'
+  - '531:                 """Compute (col_off, in_row, ape_row) for Phase 2 iter k."""'
+  - '532:                 k = fx.Int32(k_i32)'
+  evidence_id: src_9c62291501f16a4f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 538
+  end_line: 553
+  match: 'def _phase2_issue_loads(k_i32):'
+  captured:
+  - _phase2_issue_loads
+  arch_scope: ''
+  evidence:
+  - '536:                 return col_off, in_row, ape_row'
+  - '538:             def _phase2_issue_loads(k_i32):'
+  - '539:                 """Issue kv_in / score_in / ape loads for Phase 2 iter k.'
+  evidence_id: src_c3a9f4ad799bbd83
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1466
+  end_line: 1469
+  match: 'def _col_off_for_k(k_i32):'
+  captured:
+  - _col_off_for_k
+  arch_scope: ''
+  evidence:
+  - '1464:             ape_buf = ptr_buf_tensor(fx.get_iter(ape), fx.Float32)'
+  - '1466:             def _col_off_for_k(k_i32):'
+  - '1467:                 if const_expr(not overlap):'
+  - '1468:                     return fx.Int32(0)'
+  evidence_id: src_5f65e7df2dc59a66
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1471
+  end_line: 1510
+  match: 'def _softmax_step(m_lane, kv_lane, w_lane, score_lane, kv_v_lane):'
+  captured:
+  - _softmax_step
+  arch_scope: ''
+  evidence:
+  - '1469:                 return (fx.Int32(k_i32) >= ratio).select(fx.Int32(D), fx.Int32(0))'
+  - '1471:             def _softmax_step(m_lane, kv_lane, w_lane, score_lane, kv_v_lane):'
+  - '1472:                 """Padding-aware per-lane online-softmax update. Phase 2 scores'
+  - '1473:                 are finite, so the is-pad branch is dead code there (compiler'
+  evidence_id: src_829b8f80e871e500
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1512
+  end_line: 1526
+  match: 'def _phase1_loads(k_i32):'
+  captured:
+  - _phase1_loads
+  arch_scope: ''
+  evidence:
+  - '1510:                 return new_m, new_kv, new_w'
+  - '1512:             def _phase1_loads(k_i32):'
+  - '1513:                 s = position - (K - 1) + fx.Int32(k_i32)'
+  - '1514:                 is_pad = s < fx.Int32(0)'
+  evidence_id: src_c56d2afefb54b1d4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1528
+  end_line: 1541
+  match: 'def _phase2_loads(k_i32):'
+  captured:
+  - _phase2_loads
+  arch_scope: ''
+  evidence:
+  - '1526:                 return kv_v, sc_pad'
+  - '1528:             def _phase2_loads(k_i32):'
+  - '1529:                 col_off = _col_off_for_k(k_i32)'
+  - '1530:                 k = fx.Int32(k_i32)'
+  evidence_id: src_b2f6e97348e72a35
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1596
+  end_line: 2016
+  match: 'def _wave0():'
+  captured:
+  - _wave0
+  arch_scope: ''
+  evidence:
+  - '1595:             # ---- wave 0: cross-wave reduce + norm + rope + scatter ----'
+  - '1596:             def _wave0():'
+  - '1597:                 comp_lane = []'
+  - '1598:                 for i in range_constexpr(VEC):'
+  evidence_id: src_238d8e98a85cc987
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2317
+  end_line: 2347
+  match: get_gfx() == "gfx1250"
+  captured:
+  - gfx1250
+  arch_scope: ''
+  evidence:
+  - '2315:     from aiter.jit.utils.chip_info import get_gfx as _get_gfx'
+  - '2317:     if _get_gfx() == "gfx1250":'
+  - '2318:         from .fused_compress_attn_gfx1250 import flydsl_fused_compress_attn_gfx1250'
+  evidence_id: src_d192c622397bec04
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 178
+  match: 'preshuffle:'
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '176:     has_block_table: bool,'
+  - '177:     use_ue8m0: bool,'
+  - '178:     preshuffle: bool,'
+  - '179:     rms_weight_is_bf16: bool,'
+  - '180:     rms_eps: float,'
+  evidence_id: src_9203d08b7bd1490a
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 207
+  match: 'preshuffle:'
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '205:       - use_ue8m0: only for fp8 (round scale to power-of-2); the FP4 path'
+  - '206:         always uses the MX RoundUp e8m0 scale regardless.'
+  - '207:       - preshuffle: only when quant (MFMA 16x16 tile / FP4 KV tile layout)'
+  - '208:       - enable_prefetch_input: True → Phase 2 carries k+1 loads through'
+  - '209:         scf.for iter-args so the buffer_load issue overlaps current iter''s'
+  evidence_id: src_f2abe92bbf2182d1
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 238
+  match: preshuffle=
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '236:     log2_rts = int(math.log2(RTS)) if nm_asm else 0'
+  - '237:     if nm_asm:'
+  - '238:         assert quant and not preshuffle, "nm_asm: requires quant=True, preshuffle=False"'
+  - '239:         assert ('
+  - '240:             NOPE % GROUP_SIZE_Q == 0 and GROUP_SIZE_Q % VEC == 0'
+  evidence_id: src_24ca8e52f7f0cdab
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 248
+  end_line: 250
+  match: 'preshuffle:'
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '246:     assert RD > 0 and RD % 2 == 0 and RD % VEC == 0'
+  - '247:     assert state_size >= K, f"state_size={state_size} < K={K}"'
+  - '248:     if quant and preshuffle:'
+  - '249:         assert D % _PRESHUFFLE_TILE == 0'
+  - '250:         assert k_per_block % _PRESHUFFLE_TILE == 0'
+  evidence_id: src_f3e65b4bab787a42
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 265
+  end_line: 266
+  match: 'preshuffle:'
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '263:             _FP4_GROUP_SIZE % VEC == 0'
+  - '264:         ), f"FP4 group {_FP4_GROUP_SIZE} must be a multiple of VEC={VEC}"'
+  - '265:         if preshuffle:'
+  - '266:             assert k_per_block % _PRESHUFFLE_TILE == 0'
+  evidence_id: src_9e14d70dd01295f9
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 287
+  end_line: 288
+  match: 'preshuffle:'
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '285:             elif use_ue8m0:'
+  - '286:                 _name_parts.append("ue8m0")'
+  - '287:             if preshuffle:'
+  - '288:                 _name_parts.append("psh")'
+  - '289:     else:'
+  evidence_id: src_5c02188b7ffcd67d
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1271
+  match: 'preshuffle:'
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '1269:     k_split_num_waves: int,'
+  - '1270:     use_ue8m0: bool,'
+  - '1271:     preshuffle: bool,'
+  - '1272:     rms_weight_is_bf16: bool,'
+  - '1273:     rms_eps: float,'
+  evidence_id: src_ab0429d05a5c14a0
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1336
+  end_line: 1337
+  match: 'preshuffle:'
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '1334:             _FP4_GROUP_SIZE % VEC == 0'
+  - '1335:         ), f"FP4 group {_FP4_GROUP_SIZE} must be a multiple of VEC={VEC}"'
+  - '1336:         if preshuffle:'
+  - '1337:             assert k_per_block % _PRESHUFFLE_TILE == 0'
+  - '1338:     elif quant and preshuffle:'
+  evidence_id: src_294edfffebe4318b
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1338
+  end_line: 1340
+  match: 'preshuffle:'
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '1336:         if preshuffle:'
+  - '1337:             assert k_per_block % _PRESHUFFLE_TILE == 0'
+  - '1338:     elif quant and preshuffle:'
+  - '1339:         assert D % _PRESHUFFLE_TILE == 0'
+  - '1340:         assert k_per_block % _PRESHUFFLE_TILE == 0'
+  evidence_id: src_1296bd6d7e6b028f
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1342
+  match: preshuffle=
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '1340:         assert k_per_block % _PRESHUFFLE_TILE == 0'
+  - '1341:     if nm_asm:'
+  - '1342:         assert quant and not preshuffle, "nm_asm: requires quant=True, preshuffle=False"'
+  - '1343:         assert ('
+  - '1344:             NOPE % GROUP_SIZE_Q == 0 and GROUP_SIZE_Q % VEC == 0'
+  evidence_id: src_7b2b634b38389190
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1374
+  end_line: 1375
+  match: 'preshuffle:'
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '1372:         elif use_ue8m0:'
+  - '1373:             _name_parts.append("ue8m0")'
+  - '1374:         if preshuffle:'
+  - '1375:             _name_parts.append("psh")'
+  - '1376:     if rms_weight_is_bf16:'
+  evidence_id: src_4cf41092f551f026
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2145
+  match: 'preshuffle:'
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '2143:     has_block_table: bool,'
+  - '2144:     use_ue8m0: bool,'
+  - '2145:     preshuffle: bool,'
+  - '2146:     rms_weight_is_bf16: bool,'
+  - '2147:     rms_eps: float,'
+  evidence_id: src_be8636387ce36097
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2162
+  match: preshuffle=
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '2160:         has_block_table=has_block_table,'
+  - '2161:         use_ue8m0=use_ue8m0,'
+  - '2162:         preshuffle=preshuffle,'
+  - '2163:         rms_weight_is_bf16=rms_weight_is_bf16,'
+  - '2164:         rms_eps=rms_eps,'
+  evidence_id: src_9fe1f517b9b57fb3
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2210
+  match: 'preshuffle:'
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '2208:     k_split_num_waves: int,'
+  - '2209:     use_ue8m0: bool,'
+  - '2210:     preshuffle: bool,'
+  - '2211:     rms_weight_is_bf16: bool,'
+  - '2212:     rms_eps: float,'
+  evidence_id: src_4873071c9b1d3a82
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2226
+  match: preshuffle=
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '2224:         k_split_num_waves=k_split_num_waves,'
+  - '2225:         use_ue8m0=use_ue8m0,'
+  - '2226:         preshuffle=preshuffle,'
+  - '2227:         rms_weight_is_bf16=rms_weight_is_bf16,'
+  - '2228:         rms_eps=rms_eps,'
+  evidence_id: src_8b73a12e9d5125d4
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2259
+  match: 'preshuffle:'
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '2257:     cache_scale: torch.Tensor | None = None,  # fp32 [NB, k_per_block]'
+  - '2258:     use_ue8m0: bool = True,'
+  - '2259:     preshuffle: bool = True,'
+  - '2260:     # Master quant selector; overrides the legacy `quant` bool. Accepts:'
+  - '2261:     #   "none" | "fp8"/"per_row_fp8" (indexer) | "group_fp8" (CSA/HCA Main'
+  evidence_id: src_4d2d626db18d8ef3
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2280
+  match: "preshuffle\n        ("
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '2278:       - ``"none"`` → BF16 paged write (CSA / HCA Main).'
+  - '2279:       - ``"fp8"``  → FP8 e4m3 per-row e8m0 scale + MFMA 16x16 preshuffle.'
+  - '2280:       - ``"fp4"``  → FP4 (E2M1) per-group(32) e8m0 scale + FP4 KV preshuffle'
+  - '2281:         (``kv_cache`` uint8 [NB, k_tiles, 4, k_per_block, 16];'
+  - '2282:         ``cache_scale`` uint8 [NB, k_tiles, 4, k_per_block]).'
+  evidence_id: src_28030d7b6f8ffadc
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2342
+  match: preshuffle=
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '2340:             cache_scale=cache_scale,'
+  - '2341:             use_ue8m0=use_ue8m0,'
+  - '2342:             preshuffle=preshuffle,'
+  - '2343:             k_split_num_waves=k_split_num_waves,'
+  - '2344:             quant_mode=_mode,'
+  evidence_id: src_404a184e80037b11
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2357
+  match: preshuffle =
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '2355:     nm_asm = _mode == "group_fp8"'
+  - '2356:     if nm_asm:'
+  - '2357:         preshuffle = False'
+  - '2359:     dim_full = (2 if overlap else 1) * head_dim'
+  evidence_id: src_1b4ab3dd12523b20
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2444
+  end_line: 2452
+  match: 'preshuffle:'
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '2442:                     "fp8 quant requires fp32 [NB, k_per_block] cache_scale"'
+  - '2443:                 )'
+  - '2444:             if preshuffle:'
+  - '2445:                 if head_dim % _PRESHUFFLE_TILE != 0:'
+  - '2446:                     raise ValueError('
+  evidence_id: src_550342d888903a87
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2619
+  match: preshuffle=
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '2617:             k_split_num_waves=int(k_split_num_waves),'
+  - '2618:             use_ue8m0=use_ue8m0,'
+  - '2619:             preshuffle=preshuffle,'
+  - '2620:             rms_weight_is_bf16=_rms_weight_is_bf16,'
+  - '2621:             rms_eps=float(rms_eps),'
+  evidence_id: src_be3f98f621a1faa6
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2670
+  match: preshuffle=
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '2668:         has_block_table=has_bt,'
+  - '2669:         use_ue8m0=use_ue8m0,'
+  - '2670:         preshuffle=preshuffle,'
+  - '2671:         rms_weight_is_bf16=_rms_weight_is_bf16,'
+  - '2672:         rms_eps=float(rms_eps),'
+  evidence_id: src_5c7a4719c8c3f580
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2098
+  end_line: 2102
+  match: _DEFAULT_COMPILE_HINTS = {
+  captured:
+  - _DEFAULT_COMPILE_HINTS
+  arch_scope: ''
+  evidence:
+  - '2098: _DEFAULT_COMPILE_HINTS = {'
+  - '2099:     "waves_per_eu": 8,'
+  - '2100:     "fast_fp_math": True,'
+  evidence_id: src_70b7ff3bcc70273b
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 254
+  match: raise ValueError("quant=True requires has_block_table=True
+  captured:
+  - quant=True requires has_block_table=True
+  arch_scope: ''
+  evidence:
+  - '252:         # quant=True with no scatter is meaningless (the scale write is what'
+  - '253:         # the FP8 cache reader consumes). Reject early.'
+  - '254:         raise ValueError("quant=True requires has_block_table=True")'
+  - '255:     if quant_fp4:'
+  - '256:         # FP4 KV preshuffle: k_tile = 128 elems → 4 groups of 32; data tile is'
+  evidence_id: src_d724fcabd456157a
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2306
+  end_line: 2308
+  match: "raise ValueError(\n            f\"quant_mode must be none|fp8|per_row_fp8|group_fp8|fp4, got {_mode!r}"
+  captured:
+  - quant_mode must be none|fp8|per_row_fp8|group_fp8|fp4, got {_mode!r}
+  arch_scope: ''
+  evidence:
+  - '2304:         _mode = "per_row_fp8"  # back-compat alias'
+  - '2305:     if _mode not in ("none", "per_row_fp8", "group_fp8", "fp4"):'
+  - '2306:         raise ValueError('
+  - '2307:             f"quant_mode must be none|fp8|per_row_fp8|group_fp8|fp4, got {_mode!r}"'
+  - '2308:         )'
+  evidence_id: src_039df5f2f2f209f8
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2369
+  match: raise ValueError("kv_in/score_in inner stride must be 1
+  captured:
+  - kv_in/score_in inner stride must be 1
+  arch_scope: ''
+  evidence:
+  - '2367:         )'
+  - '2368:     if kv_in.stride(-1) != 1 or score_in.stride(-1) != 1:'
+  - '2369:         raise ValueError("kv_in/score_in inner stride must be 1")'
+  - '2370:     if kv_in.stride(0) % 2 != 0 or score_in.stride(0) % 2 != 0:'
+  - '2371:         raise ValueError('
+  evidence_id: src_5f22d4e89db042da
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2371
+  end_line: 2373
+  match: "raise ValueError(\n            \"kv_in/score_in row strides (bf16 elem) must be even for dword bitcast"
+  captured:
+  - kv_in/score_in row strides (bf16 elem) must be even for dword bitcast
+  arch_scope: ''
+  evidence:
+  - '2369:         raise ValueError("kv_in/score_in inner stride must be 1")'
+  - '2370:     if kv_in.stride(0) % 2 != 0 or score_in.stride(0) % 2 != 0:'
+  - '2371:         raise ValueError('
+  - '2372:             "kv_in/score_in row strides (bf16 elem) must be even for dword bitcast"'
+  - '2373:         )'
+  evidence_id: src_adca07a14a579b8a
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2391
+  match: raise ValueError("kv_state/score_state inner stride must be 1
+  captured:
+  - kv_state/score_state inner stride must be 1
+  arch_scope: ''
+  evidence:
+  - '2389:     # `col_off + lane`.'
+  - '2390:     if kv_state.stride(-1) != 1 or score_state.stride(-1) != 1:'
+  - '2391:         raise ValueError("kv_state/score_state inner stride must be 1")'
+  - '2392:     if ape.shape != (ratio, dim_full) or ape.dtype != torch.float32:'
+  - '2393:         raise ValueError('
+  evidence_id: src_aaca6a2d39c42874
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2407
+  match: raise ValueError("state_slot_mapping must be 1D int32
+  captured:
+  - state_slot_mapping must be 1D int32
+  arch_scope: ''
+  evidence:
+  - '2405:         )'
+  - '2406:     if state_slot_mapping.dim() != 1 or state_slot_mapping.dtype != torch.int32:'
+  - '2407:         raise ValueError("state_slot_mapping must be 1D int32")'
+  - '2408:     if cos_cache.shape[-1] != rope_head_dim // 2:'
+  - '2409:         raise ValueError('
+  evidence_id: src_46978970adc506f1
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2415
+  match: raise ValueError("cos/sin must be contiguous
+  captured:
+  - cos/sin must be contiguous
+  arch_scope: ''
+  evidence:
+  - '2413:         raise ValueError("cos/sin shape mismatch")'
+  - '2414:     if not (cos_cache.is_contiguous() and sin_cache.is_contiguous()):'
+  - '2415:         raise ValueError("cos/sin must be contiguous")'
+  - '2417:     has_bt = block_tables is not None and kv_cache is not None'
+  evidence_id: src_f0cd39fdc19aa6e3
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2422
+  match: raise ValueError(f"kv_cache must be 3D, got {kv_cache.shape}
+  captured:
+  - kv_cache must be 3D, got {kv_cache.shape}
+  arch_scope: ''
+  evidence:
+  - '2420:         # is 5D [NB, k_tiles, 4, k_per_block, 16] uint8.'
+  - '2421:         if not _fp4 and kv_cache.dim() != 3:'
+  - '2422:             raise ValueError(f"kv_cache must be 3D, got {kv_cache.shape}")'
+  - '2423:         if block_tables.dim() != 2 or block_tables.dtype != torch.int32:'
+  - '2424:             raise ValueError("block_tables must be 2D int32")'
+  evidence_id: src_eb5ad3a32741b57e
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2424
+  match: raise ValueError("block_tables must be 2D int32
+  captured:
+  - block_tables must be 2D int32
+  arch_scope: ''
+  evidence:
+  - '2422:             raise ValueError(f"kv_cache must be 3D, got {kv_cache.shape}")'
+  - '2423:         if block_tables.dim() != 2 or block_tables.dtype != torch.int32:'
+  - '2424:             raise ValueError("block_tables must be 2D int32")'
+  - '2425:         if not block_tables.is_contiguous():'
+  - '2426:             raise ValueError("block_tables must be contiguous")'
+  evidence_id: src_8b433d66518fba7a
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2426
+  match: raise ValueError("block_tables must be contiguous
+  captured:
+  - block_tables must be contiguous
+  arch_scope: ''
+  evidence:
+  - '2424:             raise ValueError("block_tables must be 2D int32")'
+  - '2425:         if not block_tables.is_contiguous():'
+  - '2426:             raise ValueError("block_tables must be contiguous")'
+  - '2427:     if _quant:'
+  - '2428:         if not has_bt:'
+  evidence_id: src_bf782ae156370d85
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2429
+  match: raise ValueError("quant requires block_tables
+  captured:
+  - quant requires block_tables
+  arch_scope: ''
+  evidence:
+  - '2427:     if _quant:'
+  - '2428:         if not has_bt:'
+  - '2429:             raise ValueError("quant requires block_tables")'
+  - '2430:         if not _fp4:'
+  - '2431:             # FP8 path (per_row_fp8, or group_fp8/nm_asm which carries its own'
+  evidence_id: src_3763fcda7373a186
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2441
+  end_line: 2443
+  match: "raise ValueError(\n                    \"fp8 quant requires fp32 [NB, k_per_block] cache_scale"
+  captured:
+  - fp8 quant requires fp32 [NB, k_per_block] cache_scale
+  arch_scope: ''
+  evidence:
+  - '2439:                 or cache_scale.shape[0] != kv_cache.shape[0]'
+  - '2440:             ):'
+  - '2441:                 raise ValueError('
+  - '2442:                     "fp8 quant requires fp32 [NB, k_per_block] cache_scale"'
+  - '2443:                 )'
+  evidence_id: src_39ce003144278712
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2446
+  end_line: 2448
+  match: "raise ValueError(\n                        f\"preshuffle requires head_dim%16==0, got {head_dim}"
+  captured:
+  - preshuffle requires head_dim%16==0, got {head_dim}
+  arch_scope: ''
+  evidence:
+  - '2444:             if preshuffle:'
+  - '2445:                 if head_dim % _PRESHUFFLE_TILE != 0:'
+  - '2446:                     raise ValueError('
+  - '2447:                         f"preshuffle requires head_dim%16==0, got {head_dim}"'
+  - '2448:                     )'
+  evidence_id: src_fcf2024b4022bd47
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2450
+  end_line: 2452
+  match: "raise ValueError(\n                        f\"preshuffle requires k_per_block%16==0, got {k_per_block}"
+  captured:
+  - preshuffle requires k_per_block%16==0, got {k_per_block}
+  arch_scope: ''
+  evidence:
+  - '2448:                     )'
+  - '2449:                 if k_per_block % _PRESHUFFLE_TILE != 0:'
+  - '2450:                     raise ValueError('
+  - '2451:                         f"preshuffle requires k_per_block%16==0, got {k_per_block}"'
+  - '2452:                     )'
+  evidence_id: src_a9e3d7fea97d933d
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2460
+  match: raise ValueError("fp4 quant requires uint8 e8m0 cache_scale
+  captured:
+  - fp4 quant requires uint8 e8m0 cache_scale
+  arch_scope: ''
+  evidence:
+  - '2458:                 )'
+  - '2459:             if cache_scale is None or cache_scale.dtype != torch.uint8:'
+  - '2460:                 raise ValueError("fp4 quant requires uint8 e8m0 cache_scale")'
+  - '2461:             if cache_scale.shape[0] != kv_cache.shape[0]:'
+  - '2462:                 raise ValueError("fp4 cache_scale NB must match kv_cache NB")'
+  evidence_id: src_65c46436bce21a87
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2464
+  match: raise ValueError(f"fp4 requires head_dim%128==0, got {head_dim}
+  captured:
+  - fp4 requires head_dim%128==0, got {head_dim}
+  arch_scope: ''
+  evidence:
+  - '2462:                 raise ValueError("fp4 cache_scale NB must match kv_cache NB")'
+  - '2463:             if head_dim % _FP4_K_TILE != 0:'
+  - '2464:                 raise ValueError(f"fp4 requires head_dim%128==0, got {head_dim}")'
+  - '2465:             if head_dim % _FP4_GROUP_SIZE != 0:'
+  - '2466:                 raise ValueError(f"fp4 requires head_dim%32==0, got {head_dim}")'
+  evidence_id: src_606a2e6d1edf9278
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2466
+  match: raise ValueError(f"fp4 requires head_dim%32==0, got {head_dim}
+  captured:
+  - fp4 requires head_dim%32==0, got {head_dim}
+  arch_scope: ''
+  evidence:
+  - '2464:                 raise ValueError(f"fp4 requires head_dim%128==0, got {head_dim}")'
+  - '2465:             if head_dim % _FP4_GROUP_SIZE != 0:'
+  - '2466:                 raise ValueError(f"fp4 requires head_dim%32==0, got {head_dim}")'
+  - '2467:             if preshuffle and k_per_block % _PRESHUFFLE_TILE != 0:'
+  - '2468:                 raise ValueError('
+  evidence_id: src_2d74cc8ade6db836
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2468
+  end_line: 2470
+  match: "raise ValueError(\n                    f\"fp4 preshuffle requires k_per_block%16==0, got {k_per_block}"
+  captured:
+  - fp4 preshuffle requires k_per_block%16==0, got {k_per_block}
+  arch_scope: ''
+  evidence:
+  - '2466:                 raise ValueError(f"fp4 requires head_dim%32==0, got {head_dim}")'
+  - '2467:             if preshuffle and k_per_block % _PRESHUFFLE_TILE != 0:'
+  - '2468:                 raise ValueError('
+  - '2469:                     f"fp4 preshuffle requires k_per_block%16==0, got {k_per_block}"'
+  - '2470:                 )'
+  evidence_id: src_17a65d4b76442318
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 1229
+  end_line: 1233
+  match: ".launch(\n            grid=(idx_p, 1, 1)"
+  captured:
+  - idx_p, 1, 1
+  arch_scope: ''
+  evidence:
+  - '1227:             block_table_seq_stride,'
+  - '1228:         )'
+  - '1229:         k.launch('
+  - '1230:             grid=(idx_p, 1, 1),'
+  - '1231:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_a08679ae02284821
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn.py
+  line: 2084
+  end_line: 2088
+  match: ".launch(\n            grid=(idx_p, 1, 1)"
+  captured:
+  - idx_p, 1, 1
+  arch_scope: ''
+  evidence:
+  - '2082:             block_table_seq_stride,'
+  - '2083:         )'
+  - '2084:         k.launch('
+  - '2085:             grid=(idx_p, 1, 1),'
+  - '2086:             block=(BLOCK_TH, 1, 1),'
+  evidence_id: src_a6483e78b9023103
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 39
+  end_line: 51
+  match: 'def _ptr_at_byte_off(tensor, base_i64):'
+  captured:
+  - _ptr_at_byte_off
+  arch_scope: ''
+  evidence:
+  - '39: def _ptr_at_byte_off(tensor, base_i64):'
+  - '40:     """Global byte pointer at ``tensor``''s base + ``base_i64`` (64-bit byte offset).'
+  evidence_id: src_d7ccf25867d02b10
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 55
+  end_line: 61
+  match: 'def _fp8_const():'
+  captured:
+  - _fp8_const
+  arch_scope: ''
+  evidence:
+  - '54: @lru_cache(maxsize=1)'
+  - '55: def _fp8_const():'
+  - '56:     """Resolve lazily: setup.py imports kernels before module_aiter_core is built."""'
+  - '57:     from aiter.utility import dtypes as aiter_dtypes'
+  evidence_id: src_2eb61a2dfbcec76b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 64
+  end_line: 66
+  match: 'def _fexp_f32(x, c_log2e):'
+  captured:
+  - _fexp_f32
+  arch_scope: ''
+  evidence:
+  - '64: def _fexp_f32(x, c_log2e):'
+  - '65:     """exp(x) while preserving the operands'' arithmetic and fastmath semantics."""'
+  - '66:     return fx.rocdl.exp2(T.f32, _to_raw(x * c_log2e))'
+  evidence_id: src_025da5cb83850eee
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 69
+  end_line: 76
+  match: 'def _wave_reduce_add(x, log2_wave, wave_size):'
+  captured:
+  - _wave_reduce_add
+  arch_scope: ''
+  evidence:
+  - '69: def _wave_reduce_add(x, log2_wave, wave_size):'
+  - '70:     """Butterfly sum for typed fp32 operands."""'
+  - '71:     w = fx.Float32(x)'
+  evidence_id: src_ec2a58a48b5fcaf1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 79
+  end_line: 86
+  match: 'def _wave_reduce_max(x, log2_wave, wave_size):'
+  captured:
+  - _wave_reduce_max
+  arch_scope: ''
+  evidence:
+  - '79: def _wave_reduce_max(x, log2_wave, wave_size):'
+  - '80:     """Butterfly maximum for typed fp32 operands."""'
+  - '81:     w = fx.Float32(x)'
+  evidence_id: src_a1dd63ca17272ce9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 89
+  end_line: 93
+  match: 'def _split_state(state, vec_width):'
+  captured:
+  - _split_state
+  arch_scope: ''
+  evidence:
+  - '89: def _split_state(state, vec_width):'
+  - '90:     m_lane = list(state[:vec_width])'
+  - '91:     kv_lane = list(state[vec_width : 2 * vec_width])'
+  evidence_id: src_7ebb96abe363b243
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 97
+  end_line: 100
+  match: 'def group_fp8_mx_dtype():'
+  captured:
+  - group_fp8_mx_dtype
+  arch_scope: ''
+  evidence:
+  - '96: @lru_cache(maxsize=1)'
+  - '97: def group_fp8_mx_dtype():'
+  - '98:     """e4m3fnuz on gfx942 (MI300), OCP e4m3fn on gfx950+/gfx1250. Matches the C++'
+  - '99:     kHwFp8E4m3Dtype selection so the e8m0 scale + fp8 bytes align across kernels."""'
+  evidence_id: src_d3790a3cee53c7a4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 103
+  end_line: 119
+  match: 'def state_slot_byte_offset(slot, slot_stride_f32_elems):'
+  captured:
+  - state_slot_byte_offset
+  arch_scope: ''
+  evidence:
+  - '103: def state_slot_byte_offset(slot, slot_stride_f32_elems):'
+  - '104:     """`slot * slot_stride` in bytes, computed in 64 bits.'
+  evidence_id: src_61a4064ac1de54b4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 122
+  end_line: 151
+  match: 'def block_base_bytes_i64(physical_block, block_stride, elem_bytes: int = 1):'
+  captured:
+  - block_base_bytes_i64
+  arch_scope: ''
+  evidence:
+  - '122: def block_base_bytes_i64(physical_block, block_stride, elem_bytes: int = 1):'
+  - '123:     """Byte offset of one physical block, computed in 64 bits.'
+  evidence_id: src_ba088773dbbf1f89
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 154
+  end_line: 170
+  match: 'def _global_ptr(base_i64, byte_off, elem_ir_type, align):'
+  captured:
+  - _global_ptr
+  arch_scope: ''
+  evidence:
+  - '154: def _global_ptr(base_i64, byte_off, elem_ir_type, align):'
+  - '155:     """Direct global pointer at ``base_i64 + byte_off``, element type ``elem_ir_type``.'
+  evidence_id: src_620273e79f377d7c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 173
+  end_line: 290
+  match: def emit_group_fp8_nm_asm_scatter(
+  captured:
+  - emit_group_fp8_nm_asm_scatter
+  arch_scope: ''
+  evidence:
+  - '173: def emit_group_fp8_nm_asm_scatter('
+  - '174:     *,'
+  - '175:     normed_lane,  # list[VEC] f32: post-norm nope values (this lane''s slice)'
+  evidence_id: src_2b9c24b600c0b9d0
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 229
+  end_line: 262
+  match: 'def _nope_lanes():'
+  captured:
+  - _nope_lanes
+  arch_scope: ''
+  evidence:
+  - '227:     # imported emitter''s own source (skill Sec.5).'
+  - '228:     @flyc.jit'
+  - '229:     def _nope_lanes():'
+  - '230:         if lane < fx.Int32(ROPE_THREAD_LO):'
+  - '231:             safe = []'
+  evidence_id: src_0582f3b4f039d638
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 268
+  end_line: 288
+  match: 'def _rope_lanes():'
+  captured:
+  - _rope_lanes
+  arch_scope: ''
+  evidence:
+  - '266:     # -- rope lanes: rotated bf16 -> separate k_rope_buff --'
+  - '267:     @flyc.jit'
+  - '268:     def _rope_lanes():'
+  - '269:         if is_rope_t:'
+  - '270:             rope_rel = lane - fx.Int32(ROPE_THREAD_LO)'
+  evidence_id: src_e48ecfac8ecc3903
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/fused_compress_attn_common.py
+  line: 100
+  match: get_rocm_arch() == "gfx942"
+  captured:
+  - gfx942
+  arch_scope: gfx942
+  evidence:
+  - '98:     """e4m3fnuz on gfx942 (MI300), OCP e4m3fn on gfx950+/gfx1250. Matches the C++'
+  - '99:     kHwFp8E4m3Dtype selection so the e8m0 scale + fp8 bytes align across kernels."""'
+  - '100:     return _MxD.FP8_E4M3_FNUZ if get_rocm_arch() == "gfx942" else _MxD.FP8_E4M3'
+  evidence_id: src_dac83afd7d567c79

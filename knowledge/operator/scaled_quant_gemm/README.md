@@ -1,5 +1,8 @@
 # scaled_quant_gemm
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 FP8, INT8, FP4 and microscaled projections, including packing and scale contracts.
 
 8 AITER implementation references; 13 historical experience cards.
