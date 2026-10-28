@@ -1,5 +1,8 @@
 # moe_routing_topk
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Expert selection, routing weights, token sorting and alignment for MoE GEMMs.
 
 5 AITER implementation references; 4 historical experience cards.

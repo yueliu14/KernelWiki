@@ -1,5 +1,8 @@
 # compressed_attention
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Compression stages and fused attention over compressed representations.
 
 1 AITER implementation references; 0 historical experience cards.

@@ -1,158 +1,151 @@
-schema_version: 1
-
-# The authoring languages a corpus record may be keyed on.  This list lives HERE, with the
-# data, and not in the consumer's card tooling, because it is the join key between a corpus
-# record and a learned card: a corpus keyed on its own private language names cannot be
-# joined to a card, which is the entire point of putting `language:` on a card.
-#
-# Direction of the contract: this file DECLARES, a consumer CONFORMS.  GEAK's
-# `kernel_workflow/scripts/kb.py` holds `AUTHORING_LANGUAGES`, and its own test asserts that
-# constant equals this list for whatever knowledge dir it is pointed at.  So the vocabulary
-# has one home and two enforced readers, instead of two copies that drift.
-#
-# Library/auto backends (`aiter`, `hipblaslt`, ...) are NOT languages: a record whose finding
-# is "call this library" is not a record about how a kernel was written.
+schema_version: 2
+description: Operator-local corpus; paths are repository-relative. Source/config references are snapshot-qualified.
 authoring_languages:
-  - triton
-  - flydsl
-  - hip
-  - ck
-  - asm
-  - tilelang
-  - gluon
-  - rocwmma
-  - hipkittens
-  - mojo
-  - cutlass_port
-
-# One discovery surface for every operator/pattern corpus.  Source evidence,
-# curated decisions, generated human pages and optional benchmark adapters stay
-# separate artifacts; the catalog only says which files belong to one family.
-#
-# Every operator has one discovery owner. Grouped expert GEMM belongs to MoE,
-# where routing, intermediate layouts and combine are part of its contract;
-# the historical GEMM cards remain available as linked compute precedents.
-# A family pin describes its extracted snapshot, not a claim that every backend
-# is present or supported on every GPU. See each family's coverage_notes.
+- triton
+- flydsl
+- hip
+- ck
+- asm
+- tilelang
+- gluon
+- rocwmma
+- hipkittens
+- mojo
+- cutlass_port
+snapshots:
+  aiter_a6bb4993:
+    repository: https://github.com/ROCm/aiter.git
+    commit: a6bb499375849eec45d68c5ccaebc8865fd422c0
+  aiter_b3ad6c46:
+    repository: https://github.com/ROCm/aiter.git
+    commit: b3ad6c461703110dc36286265c16e453ef0e2dd2
 families:
-  - id: gemm
-    title: GEMM and projection fusions
-    patterns:
-      - gemm
-      - dense_gemm
-      - scaled_quant_gemm
-      - batched_gemm
-      - splitk_streamk_gemm
-      - skinny_gemv_decode
-      - gemm_epilogue_fused
-    source_evidence: evidence/gemm_source.yaml
-    tuned_evidence: evidence/gemm_tuned_configs.yaml
-    tuned_db_evidence: evidence/gemm_csv_tuned_configs.yaml
-    performance_axes: performance_axes/gemm.yaml
-    # The two modules a consumer is allowed to load out of this repo, named here so it
-    # resolves them through the catalog rather than importing them as siblings. Both are
-    # pure functions over text -- `source_extractor.scan_file` turns a source file into
-    # records, `performance_normalizer.model_summary`/`.normalize_implementation` put
-    # performance claims in comparable units. A consumer that reached past the catalog for
-    # them would be depending on this repo's directory layout instead of its interface.
-    performance_normalizer: _normalize_performance_decisions.py
-    source_extractor: _extract_impl_facts.py
-    # WHICH aiter files this family's evidence is read from. Data, not code: `_extract_impl_facts.py`
-    # holds the rules (what a tiling or an arch gate looks like) and is shared by every family, so
-    # adding an operator is adding a scope file and this line -- never an edit to the extractor.
-    source_scope: scopes/gemm.yaml
-    decisions: decisions/gemm.yaml
-    source_document: gemm_source_evidence.md
-    decision_document: gemm_decisions.md
-    seed_documents:
-      - gemm_triton_seeds.md
-    # No `benchmark_manifest`: how to RUN a benchmark is the consumer's business and its
-    # manifest lives with the consumer. Declaring it here would make this catalog name a path
-    # that does not exist in this repo, which is exactly the kind of claim the gates exist to
-    # refuse.
-  - id: attention
-    title: Attention, KV caches and preparation fusions
-    patterns:
-      - attention_prefill_fmha
-      - attention_decode_paged
-      - mla_attention
-      - gqa_mqa_attention
-      - sparse_attention_nsa
-      - compressed_attention
-      - linear_attention_gated_delta
-      - chunked_prefill
-      - sliding_window_attention
-      - context_parallel_attention
-      - qk_norm_rope_cache
-    source_scope: scopes/attention.yaml
-    source_extractor: _extract_impl_facts.py
-    source_evidence: evidence/attention_source.yaml
-    performance_axes: performance_axes/attention.yaml
-    performance_normalizer: _normalize_performance_decisions.py
-    decisions: decisions/attention.yaml
-    source_document: attention_source_evidence.md
-    decision_document: attention_decisions.md
-    coverage_notes:
-      - Forward inference precedents only; explicit backward/training sources are excluded.
-      - Context-parallel coverage concerns partial-result normalization; cross-rank transport is not extracted.
-      - Gated-delta and compression have distinct semantics; softmax cards do not apply to them by default.
-      - Native OPUS source is classified as HIP/C++; ASM records describe launch contracts, not disassembled instructions.
-      - Tuned attention databases and new GPU measurements are not included.
-    validation_sources:
-      - op_tests/test_mla.py
-      - op_tests/test_flydsl_mla_reduce.py
-      - op_tests/test_flydsl_compress_attn.py
-      - op_tests/test_flydsl_linear_attention.py
-      - op_tests/test_flydsl_qk_norm_rope_quant.py
-  - id: moe
-    title: MoE routing, expert GEMMs and combine
-    patterns:
-      - grouped_gemm_moe
-      - fused_moe_grouped_gemm
-      - moe_routing_topk
-      - moe_dispatch_combine
-      - shared_expert_fusion
-    source_scope: scopes/moe.yaml
-    source_extractor: _extract_impl_facts.py
-    source_evidence: evidence/moe_source.yaml
-    performance_axes: performance_axes/moe.yaml
-    performance_normalizer: _normalize_performance_decisions.py
-    decisions: decisions/moe.yaml
-    source_document: moe_source_evidence.md
-    decision_document: moe_decisions.md
-    coverage_notes:
-      - Covers routing profiles, sorted/grouped row contracts, two-stage expert compute, shared partials and communication lifetimes.
-      - Historical GEMM tile/MFMA precedents remain in gemm_decisions.md; their older source pin is retained.
-      - TP device-communication precedents do not establish arbitrary EP topology support.
-      - No CK expert-template expansion, tuned MoE database extraction or multi-GPU validation is claimed.
-      - Native OPUS source is classified as HIP/C++; binary internals remain uninspected.
-    validation_sources:
-      - op_tests/test_moe_2stage.py
-      - op_tests/test_moe_sorting.py
-      - op_tests/test_moe_local_expert_ids.py
-      - op_tests/test_moe_dp_share_expert.py
-      - op_tests/test_moe_topk_gating.py
-  - id: indexer
-    title: Attention index scoring and selection
-    patterns:
-      - attention_indexer
-    source_scope: scopes/indexer.yaml
-    source_extractor: _extract_impl_facts.py
-    source_evidence: evidence/indexer_source.yaml
-    performance_axes: performance_axes/indexer.yaml
-    performance_normalizer: _normalize_performance_decisions.py
-    decisions: decisions/indexer.yaml
-    source_document: indexer_source_evidence.md
-    decision_document: indexer_decisions.md
-    coverage_notes:
-      - Separates DeepSeek weighted-ReLU MQA logits from MiniMax page-max scores and from the subsequent top-k operation.
-      - Includes contiguous FP8, paged MXFP4, row selection and DCP merge precedents; these are different layout and numerical contracts.
-      - Kernel and wrapper presence does not certify runtime dispatch, stable tie ordering or performance.
-      - Native OPUS source is classified as HIP/C++; ASM evidence is limited to host launchers.
-      - No tuned indexer database or GPU benchmark result is published here.
-    validation_sources:
-      - op_tests/test_flydsl_fp8_mqa_logits.py
-      - op_tests/test_flydsl_pa_mqa_logits_fp4.py
-      - op_tests/test_flydsl_minimax_m3_index_score.py
-      - op_tests/test_topk_per_row_stable.py
-      - op_tests/test_flydsl_dcp_topk_merge.py
+- id: gemm
+  title: GEMM and projection fusions
+  operators:
+  - batched_gemm
+  - dense_gemm
+  - gemm_epilogue_fused
+  - scaled_quant_gemm
+  - skinny_gemv_decode
+  - splitk_streamk_gemm
+- id: attention
+  title: Attention, KV caches and preparation fusions
+  operators:
+  - attention_decode_paged
+  - attention_prefill_fmha
+  - chunked_prefill
+  - compressed_attention
+  - context_parallel_attention
+  - gqa_mqa_attention
+  - linear_attention_gated_delta
+  - mla_attention
+  - qk_norm_rope_cache
+  - sliding_window_attention
+  - sparse_attention_nsa
+- id: moe
+  title: MoE routing, expert GEMMs and combine
+  operators:
+  - fused_moe_grouped_gemm
+  - grouped_gemm_moe
+  - moe_dispatch_combine
+  - moe_routing_topk
+  - shared_expert_fusion
+- id: indexer
+  title: Attention index scoring and selection
+  operators:
+  - attention_indexer
+operators:
+- id: attention_decode_paged
+  family: attention
+  directory: knowledge/operator/attention_decode_paged/corpus
+  aliases: []
+- id: attention_indexer
+  family: indexer
+  directory: knowledge/operator/attention_indexer/corpus
+  aliases: []
+- id: attention_prefill_fmha
+  family: attention
+  directory: knowledge/operator/attention_prefill_fmha/corpus
+  aliases: []
+- id: batched_gemm
+  family: gemm
+  directory: knowledge/operator/batched_gemm/corpus
+  aliases: []
+- id: chunked_prefill
+  family: attention
+  directory: knowledge/operator/chunked_prefill/corpus
+  aliases: []
+- id: compressed_attention
+  family: attention
+  directory: knowledge/operator/compressed_attention/corpus
+  aliases: []
+- id: context_parallel_attention
+  family: attention
+  directory: knowledge/operator/context_parallel_attention/corpus
+  aliases: []
+- id: dense_gemm
+  family: gemm
+  directory: knowledge/operator/dense_gemm/corpus
+  aliases:
+  - gemm
+- id: fused_moe_grouped_gemm
+  family: moe
+  directory: knowledge/operator/fused_moe_grouped_gemm/corpus
+  aliases: []
+- id: gemm_epilogue_fused
+  family: gemm
+  directory: knowledge/operator/gemm_epilogue_fused/corpus
+  aliases: []
+- id: gqa_mqa_attention
+  family: attention
+  directory: knowledge/operator/gqa_mqa_attention/corpus
+  aliases: []
+- id: grouped_gemm_moe
+  family: moe
+  directory: knowledge/operator/grouped_gemm_moe/corpus
+  aliases: []
+- id: linear_attention_gated_delta
+  family: attention
+  directory: knowledge/operator/linear_attention_gated_delta/corpus
+  aliases: []
+- id: mla_attention
+  family: attention
+  directory: knowledge/operator/mla_attention/corpus
+  aliases: []
+- id: moe_dispatch_combine
+  family: moe
+  directory: knowledge/operator/moe_dispatch_combine/corpus
+  aliases: []
+- id: moe_routing_topk
+  family: moe
+  directory: knowledge/operator/moe_routing_topk/corpus
+  aliases: []
+- id: qk_norm_rope_cache
+  family: attention
+  directory: knowledge/operator/qk_norm_rope_cache/corpus
+  aliases: []
+- id: scaled_quant_gemm
+  family: gemm
+  directory: knowledge/operator/scaled_quant_gemm/corpus
+  aliases: []
+- id: shared_expert_fusion
+  family: moe
+  directory: knowledge/operator/shared_expert_fusion/corpus
+  aliases: []
+- id: skinny_gemv_decode
+  family: gemm
+  directory: knowledge/operator/skinny_gemv_decode/corpus
+  aliases: []
+- id: sliding_window_attention
+  family: attention
+  directory: knowledge/operator/sliding_window_attention/corpus
+  aliases: []
+- id: sparse_attention_nsa
+  family: attention
+  directory: knowledge/operator/sparse_attention_nsa/corpus
+  aliases: []
+- id: splitk_streamk_gemm
+  family: gemm
+  directory: knowledge/operator/splitk_streamk_gemm/corpus
+  aliases: []

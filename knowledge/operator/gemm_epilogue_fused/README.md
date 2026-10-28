@@ -1,5 +1,8 @@
 # gemm_epilogue_fused
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 GEMM with activation, residual, normalization/quantization and communication boundaries.
 
 2 AITER implementation references; 3 historical experience cards.

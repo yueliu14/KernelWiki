@@ -1,5 +1,8 @@
 # gqa_mqa_attention
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Grouped-query and multi-query head sharing.
 
 1 AITER implementation references; 5 historical experience cards.

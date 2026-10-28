@@ -1,0 +1,756 @@
+schema_version: 2
+operator: scaled_quant_gemm
+records:
+- snapshot: aiter_a6bb4993
+  kind: flydsl
+  config_id: cfg_909edfc582fce0bd
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  family: a8_preshuffle
+  dtype: af8_wf8_b16
+  m_bucket: M<=16
+  shape_configs: 72
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+  same_across_configs:
+    scheduler: default
+  varies_by_shape:
+    lds_stage: '2: 36, 1: 36'
+    tile: '16x64x512: 61, 16x64x256: 7, 16x256x512: 4'
+    use_async_copy: '0: 55, 1: 17'
+    use_cshuffle_epilog: '0: 50, 1: 22'
+    waves_per_eu: '0: 18, 2: 15, 1: 15, 3: 14, 4: 10'
+- snapshot: aiter_a6bb4993
+  kind: flydsl
+  config_id: cfg_2f03fe974e5d2b5c
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  family: a8_preshuffle
+  dtype: af8_wf8_b16
+  m_bucket: M17-64
+  shape_configs: 42
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+  same_across_configs:
+    scheduler: default
+  varies_by_shape:
+    lds_stage: '2: 23, 1: 19'
+    tile: '32x64x512: 14, 16x64x512: 8, 32x64x256: 6, 64x64x256: 3, 32x64x128: 2, 16x64x256: 2, 64x256x128:
+      2, 64x128x256: 1, 32x128x256: 1, 32x256x128: 1, 32x128x128: 1, 64x256x256: 1'
+    use_async_copy: '0: 30, 1: 12'
+    use_cshuffle_epilog: '0: 28, 1: 14'
+    waves_per_eu: '1: 12, 4: 9, 3: 8, 0: 7, 2: 6'
+- snapshot: aiter_a6bb4993
+  kind: flydsl
+  config_id: cfg_382465b289aad520
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  family: a8_preshuffle
+  dtype: af8_wf8_b16
+  m_bucket: M65-256
+  shape_configs: 34
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+  same_across_configs:
+    scheduler: default
+  varies_by_shape:
+    lds_stage: '2: 19, 1: 15'
+    tile: '64x64x256: 12, 128x64x256: 5, 128x128x256: 3, 128x256x128: 3, 32x64x512: 3, 64x128x256: 2, 32x128x128:
+      1, 64x128x128: 1, 32x64x256: 1, 32x128x256: 1, 256x128x128: 1, 48x64x256: 1'
+    use_async_copy: '0: 19, 1: 15'
+    use_cshuffle_epilog: '0: 22, 1: 12'
+    waves_per_eu: '4: 8, 1: 8, 3: 6, 2: 6, 0: 6'
+- snapshot: aiter_a6bb4993
+  kind: flydsl
+  config_id: cfg_8245d4268291ab55
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  family: a8_preshuffle
+  dtype: af8_wf8_b16
+  m_bucket: M257-1024
+  shape_configs: 28
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+  same_across_configs:
+    scheduler: default
+  varies_by_shape:
+    lds_stage: '2: 23, 1: 5'
+    tile: '128x128x256: 7, 128x128x128: 4, 256x128x128: 4, 16x64x512: 3, 128x64x256: 2, 32x64x512: 1, 64x64x128:
+      1, 64x128x128: 1, 64x128x256: 1, 64x256x128: 1, 128x256x128: 1, 64x192x256: 1, 128x192x128: 1'
+    use_async_copy: '1: 18, 0: 10'
+    use_cshuffle_epilog: '0: 20, 1: 8'
+    waves_per_eu: '2: 12, 1: 7, 3: 4, 0: 4, 4: 1'
+- snapshot: aiter_a6bb4993
+  kind: flydsl
+  config_id: cfg_496162f129968cb9
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  family: a8_preshuffle
+  dtype: af8_wf8_b16
+  m_bucket: M1025-4096
+  shape_configs: 50
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+  same_across_configs:
+    scheduler: default
+  varies_by_shape:
+    lds_stage: '2: 35, 1: 15'
+    tile: '128x256x128: 23, 256x128x128: 8, 128x128x256: 6, 128x192x128: 5, 128x128x128: 5, 64x64x256: 1, 64x128x256:
+      1, 32x64x512: 1'
+    use_async_copy: '1: 39, 0: 11'
+    use_cshuffle_epilog: '1: 32, 0: 18'
+    waves_per_eu: '2: 29, 1: 9, 0: 7, 3: 5'
+- snapshot: aiter_a6bb4993
+  kind: flydsl
+  config_id: cfg_9636311ea3a3ce0d
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  family: a8_preshuffle
+  dtype: af8_wf8_b16
+  m_bucket: M>4096
+  shape_configs: 77
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+  same_across_configs:
+    scheduler: default
+  varies_by_shape:
+    lds_stage: '2: 59, 1: 18'
+    tile: '128x256x128: 39, 256x128x128: 26, 128x128x256: 4, 128x192x128: 4, 64x128x256: 2, 64x192x256: 1,
+      256x256x128: 1'
+    use_async_copy: '1: 65, 0: 12'
+    use_cshuffle_epilog: '0: 41, 1: 36'
+    waves_per_eu: '2: 52, 0: 12, 1: 10, 4: 2, 3: 1'
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_f7e394faa23e37e6
+  gfx: gfx942
+  cu_num: 80
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  m_bucket: M<=16
+  rows: 18
+  selected_backend_rows:
+    asm: 2
+    ck: 16
+  source_files:
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_dsv3.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_abae8b787c473637
+  gfx: gfx942
+  cu_num: 80
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  m_bucket: M17-64
+  rows: 29
+  selected_backend_rows:
+    asm: 21
+    ck: 8
+  source_files:
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_dsv3.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_989b9db8a18a0bb0
+  gfx: gfx942
+  cu_num: 80
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  m_bucket: M65-256
+  rows: 110
+  selected_backend_rows:
+    asm: 79
+    ck: 31
+  source_files:
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_dsv3.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_a216d21d97247805
+  gfx: gfx942
+  cu_num: 80
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  m_bucket: M257-1024
+  rows: 218
+  selected_backend_rows:
+    asm: 146
+    ck: 72
+  source_files:
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_dsv3.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_6d485fcb23ffd0fe
+  gfx: gfx942
+  cu_num: 80
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  m_bucket: M1025-4096
+  rows: 155
+  selected_backend_rows:
+    asm: 84
+    ck: 71
+  source_files:
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_dsv3.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_f1384cc1069c9823
+  gfx: gfx942
+  cu_num: 80
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  m_bucket: M>4096
+  rows: 38
+  selected_backend_rows:
+    asm: 32
+    ck: 6
+  source_files:
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_dsv3.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_5aecc3631bf688e9
+  gfx: gfx942
+  cu_num: 80
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M<=16
+  rows: 204
+  selected_backend_rows:
+    ck: 204
+  source_files:
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_5d90eccfeec27af1
+  gfx: gfx942
+  cu_num: 80
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M17-64
+  rows: 95
+  selected_backend_rows:
+    asm: 1
+    ck: 94
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_def10f3ed4823c11
+  gfx: gfx942
+  cu_num: 80
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M65-256
+  rows: 279
+  selected_backend_rows:
+    asm: 18
+    ck: 260
+    cktile: 1
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_3316f2390f8a8002
+  gfx: gfx942
+  cu_num: 80
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M257-1024
+  rows: 365
+  selected_backend_rows:
+    asm: 9
+    ck: 356
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_bb0d68aae12eba45
+  gfx: gfx942
+  cu_num: 80
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M1025-4096
+  rows: 102
+  selected_backend_rows:
+    asm: 4
+    ck: 98
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_438e88e4bc86460c
+  gfx: gfx942
+  cu_num: 80
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M>4096
+  rows: 395
+  selected_backend_rows:
+    asm: 4
+    ck: 391
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_5cf769a02e468084
+  gfx: gfx942
+  cu_num: 304
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M17-64
+  rows: 2
+  selected_backend_rows:
+    asm: 2
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_9609d454b46e0fab
+  gfx: gfx942
+  cu_num: 304
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M65-256
+  rows: 4
+  selected_backend_rows:
+    asm: 4
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_20bfb36c5f1ee347
+  gfx: gfx942
+  cu_num: 304
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M257-1024
+  rows: 4
+  selected_backend_rows:
+    asm: 4
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_6bb0baf26eda8568
+  gfx: gfx942
+  cu_num: 304
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M1025-4096
+  rows: 4
+  selected_backend_rows:
+    asm: 4
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_4914d4c661ff1e2a
+  gfx: gfx942
+  cu_num: 304
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M>4096
+  rows: 18
+  selected_backend_rows:
+    asm: 18
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_b7d6386940696a48
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  m_bucket: M<=16
+  rows: 241
+  selected_backend_rows:
+    asm: 6
+    ck: 223
+    cktile: 12
+  source_files:
+  - aiter/configs/a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_dsv3.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3.5_397b.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3_235b.csv
+  - aiter/configs/model_configs/glm5_a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_bdf0a0ce3c910fc6
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  m_bucket: M17-64
+  rows: 139
+  selected_backend_rows:
+    asm: 15
+    ck: 120
+    cktile: 4
+  source_files:
+  - aiter/configs/a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_dsv3.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3.5_397b.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3_235b.csv
+  - aiter/configs/model_configs/glm5_a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_bc5f94a60e7ac2a4
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  m_bucket: M65-256
+  rows: 243
+  selected_backend_rows:
+    asm: 54
+    ck: 185
+    cktile: 4
+  source_files:
+  - aiter/configs/a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_dsv3.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3.5_397b.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3_235b.csv
+  - aiter/configs/model_configs/glm5_a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_9f87c053af503719
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  m_bucket: M257-1024
+  rows: 386
+  selected_backend_rows:
+    asm: 109
+    ck: 266
+    cktile: 11
+  source_files:
+  - aiter/configs/a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_dsv3.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3.5_397b.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3_235b.csv
+  - aiter/configs/model_configs/glm5_a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_a91bc7afb96c3708
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  m_bucket: M1025-4096
+  rows: 306
+  selected_backend_rows:
+    asm: 20
+    ck: 264
+    cktile: 22
+  source_files:
+  - aiter/configs/a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_dsv3.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3.5_397b.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3_235b.csv
+  - aiter/configs/model_configs/glm5_a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_b6b0e3ba26774e37
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  m_bucket: M>4096
+  rows: 183
+  selected_backend_rows:
+    asm: 3
+    ck: 140
+    cktile: 40
+  source_files:
+  - aiter/configs/a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_dsv3.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3.5_397b.csv
+  - aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3_235b.csv
+  - aiter/configs/model_configs/glm5_a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_4b9bcc0f7ab9c1d0
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_blockscale_tuned_gemm
+  m_bucket: M<=16
+  rows: 193
+  selected_backend_rows:
+    ck: 190
+    cktile: 3
+  source_files:
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_ds_v3.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_235b.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_5_397b_a13b.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_2f4edda53f68e173
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_blockscale_tuned_gemm
+  m_bucket: M17-64
+  rows: 95
+  selected_backend_rows:
+    ck: 93
+    cktile: 2
+  source_files:
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_ds_v3.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_235b.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_5_397b_a13b.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_a0e632e90c21cdfc
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_blockscale_tuned_gemm
+  m_bucket: M65-256
+  rows: 203
+  selected_backend_rows:
+    ck: 200
+    cktile: 3
+  source_files:
+  - aiter/configs/a8w8_blockscale_tuned_gemm.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_ds_v3.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_235b.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_5_397b_a13b.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_ee2dd068224e320e
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_blockscale_tuned_gemm
+  m_bucket: M257-1024
+  rows: 323
+  selected_backend_rows:
+    ck: 296
+    cktile: 27
+  source_files:
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_ds_v3.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_235b.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_5_397b_a13b.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_b9a37194ba7c274a
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_blockscale_tuned_gemm
+  m_bucket: M1025-4096
+  rows: 114
+  selected_backend_rows:
+    ck: 80
+    cktile: 34
+  source_files:
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_ds_v3.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_235b.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_5_397b_a13b.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_8b543c4558078855
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_blockscale_tuned_gemm
+  m_bucket: M>4096
+  rows: 325
+  selected_backend_rows:
+    ck: 178
+    cktile: 147
+  source_files:
+  - aiter/configs/a8w8_blockscale_tuned_gemm.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_ds_v3.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_235b.csv
+  - aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_5_397b_a13b.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_7c8d8e410633ad1e
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M<=16
+  rows: 111
+  selected_backend_rows:
+    ck: 37
+    cktile: 2
+    flydsl: 72
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_da4768bfb4a81119
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M17-64
+  rows: 88
+  selected_backend_rows:
+    ck: 34
+    cktile: 12
+    flydsl: 42
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_75a6d5abfd89238c
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M65-256
+  rows: 98
+  selected_backend_rows:
+    ck: 44
+    cktile: 20
+    flydsl: 34
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_a7859ab04377ab13
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M257-1024
+  rows: 91
+  selected_backend_rows:
+    ck: 38
+    cktile: 25
+    flydsl: 28
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_3b5495db028ae505
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M1025-4096
+  rows: 91
+  selected_backend_rows:
+    ck: 15
+    cktile: 26
+    flydsl: 50
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+- snapshot: aiter_a6bb4993
+  kind: selection
+  selection_id: sel_1b5489e6d41507a3
+  gfx: gfx950
+  cu_num: 256
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  m_bucket: M>4096
+  rows: 133
+  selected_backend_rows:
+    ck: 20
+    cktile: 36
+    flydsl: 77
+  source_files:
+  - aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  - aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+inventory:
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/a4w4_blockscale_tuned_gemm.csv
+  db_kind: a4w4_blockscale_tuned_gemm
+  rows: 1470
+  backend_column: false
+  gfx:
+  - gfx950
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  rows: 58
+  backend_column: true
+  gfx:
+  - gfx950
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/a8w8_blockscale_tuned_gemm.csv
+  db_kind: a8w8_blockscale_tuned_gemm
+  rows: 5
+  backend_column: true
+  gfx:
+  - gfx950
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/a8w8_bpreshuffle_tuned_gemm.csv
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  rows: 550
+  backend_column: true
+  gfx:
+  - gfx942
+  - gfx950
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/a8w8_tuned_batched_gemm.csv
+  db_kind: a8w8_tuned_batched_gemm
+  rows: 26
+  backend_column: false
+  gfx:
+  - gfx942
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/a8w8_tuned_gemm.csv
+  db_kind: a8w8_tuned_gemm
+  rows: 582
+  backend_column: false
+  gfx:
+  - gfx942
+  - gfx950
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_dsv3.csv
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  rows: 1288
+  backend_column: true
+  gfx:
+  - gfx942
+  - gfx950
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3.5_397b.csv
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  rows: 553
+  backend_column: true
+  gfx:
+  - gfx950
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/model_configs/a8w8_blockscale_bpreshuffle_tuned_gemm_qwen3_235b.csv
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  rows: 87
+  backend_column: true
+  gfx:
+  - gfx950
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_ds_v3.csv
+  db_kind: a8w8_blockscale_tuned_gemm
+  rows: 1020
+  backend_column: true
+  gfx:
+  - gfx950
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_235b.csv
+  db_kind: a8w8_blockscale_tuned_gemm
+  rows: 128
+  backend_column: true
+  gfx:
+  - gfx950
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/model_configs/a8w8_blockscale_tuned_gemm_qwen3_5_397b_a13b.csv
+  db_kind: a8w8_blockscale_tuned_gemm
+  rows: 100
+  backend_column: true
+  gfx:
+  - gfx950
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/model_configs/dsv3_a4w4_blockscale_tuned_gemm.csv
+  db_kind: a4w4_blockscale_tuned_gemm
+  rows: 30
+  backend_column: false
+  gfx:
+  - gfx950
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/model_configs/dsv3_a8w8_bpreshuffle_tuned_gemm.csv
+  db_kind: a8w8_bpreshuffle_tuned_gemm
+  rows: 1534
+  backend_column: true
+  gfx:
+  - gfx942
+  - gfx950
+- snapshot: aiter_a6bb4993
+  file: aiter/configs/model_configs/glm5_a8w8_blockscale_bpreshuffle_tuned_gemm.csv
+  db_kind: a8w8_blockscale_bpreshuffle_tuned_gemm
+  rows: 80
+  backend_column: true
+  gfx:
+  - gfx950
+missing: []

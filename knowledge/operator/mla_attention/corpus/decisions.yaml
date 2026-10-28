@@ -1,0 +1,96 @@
+provenance:
+  schema_version: 4
+  operator_family: mla_attention
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  paged_kv: The design reads a paged KV cache.
+cards:
+- id: attention-split-kv-merge
+  type: performance_candidate
+  axes:
+  - kv_partition
+  - attention_semantics
+  - numerical_contract
+  match:
+    operator_families:
+    - attention_decode_paged
+    - mla_attention
+    - context_parallel_attention
+    target_languages:
+    - triton
+    - flydsl
+    - gluon
+  question: When splitting KV work, what information must the merge preserve?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - A long KV sequence leaves too few independent query/head workgroups, or partial attention outputs already
+    exist.
+  actions:
+  - Try multiple KV partitions together with an explicit partial-output and normalization-statistics layout.
+  - Merge partials using their maxima and exponential sums, or the equivalent LSE representation; never take
+    an unweighted average of already-normalized partial outputs.
+  - Include the merge and scratch traffic when assessing a split count, and mask unused partitions.
+  alternatives:
+  - Keep an unsplit path for short contexts or sufficiently large query batches.
+  why:
+  - The Triton MLA reduce kernel rescales segment sums and outputs by exp2(segment_max - overall_max), then
+    divides by the combined exponential sum.
+  source_evidence:
+  - aiter_b3ad6c46:src_a726e480b7d62ccf
+  measurement_evidence: []
+  limitations:
+  - The source demonstrates local segment merging, not an implementation of cross-rank transport; context-parallel
+    ownership and communication require separate evidence.
+  - The cited raw-max/exp-sum representation cannot be mixed directly with another backend's LSE ABI.
+  references:
+  - knowledge/operator/attention_decode_paged/README.md
+  - knowledge/operator/mla_attention/README.md
+  - knowledge/operator/context_parallel_attention/README.md
+  solutions:
+  - backend: flydsl
+    mechanism: The FlyDSL reducer consumes partial outputs, partial LSE and explicit partial/final maps; its
+      host validator defines a separate ABI.
+    source_evidence:
+    - aiter_b3ad6c46:src_a6768ea282169992
+- id: attention-mla-reduce-abi
+  type: constraint
+  axes:
+  - implementation_contract
+  - kv_partition
+  match:
+    operator_families:
+    - mla_attention
+    - attention_decode_paged
+    target_languages:
+    - flydsl
+  question: Which tensor and mapping invariants does the FlyDSL MLA reducer require?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected path calls flydsl_mla_reduce_v1 with mapped partial outputs.
+  actions:
+  - Use FP32 partial_output [rows,H,Dv] and partial_lse [rows,H], int32 mapping/indptr arrays, and a common
+    GPU device.
+  - Provide a 3D BF16/FP16 final output with packed last dimension and matching H/Dv; validate optional final
+    LSE and final-map tensors too.
+  - Pass only valid split counts and map bounds, and preserve the difference between allocated maximum splits
+    and actual splits.
+  alternatives:
+  - Convert layouts explicitly at the boundary, accounting for their cost, or select a reducer that natively
+    accepts the producer layout.
+  why:
+  - The host validator checks dtype, rank, strides, shape relationships and split metadata before raw pointers
+    reach the kernel.
+  source_evidence:
+  - aiter_b3ad6c46:src_a6768ea282169992
+  - aiter_b3ad6c46:src_6e49a7e29550a915
+  measurement_evidence: []
+  limitations:
+  - These are the cited reducer's requirements, not a universal MLA ABI.
+  - A dtype-correct mapping can still point at the wrong sequence; validate mapping contents.
+  references:
+  - knowledge/operator/mla_attention/README.md
+  - knowledge/operator/attention_decode_paged/README.md
+shared_cards:
+- attention-paged-kv-addressing

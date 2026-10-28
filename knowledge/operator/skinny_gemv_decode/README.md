@@ -1,5 +1,8 @@
 # skinny_gemv_decode
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Small-M decode projections and GEMV-like regimes.
 
 1 AITER implementation references; 0 historical experience cards.

@@ -2,15 +2,13 @@ name: corpus checks
 
 # The gates live in the repo that holds the data they check.
 #
-# `corpus/` is machine-readable knowledge: evidence extracted from upstream
-# source with file:line provenance, curated decision cards grounded in that evidence, and
-# human-readable pages RENDERED from both. Nothing here is hand-edited, so the only thing
-# worth gating is whether the committed artifacts still match their inputs -- which is a
-# property of this repo alone and needs no consumer checkout to verify.
+# Each knowledge/operator/<operator>/corpus/ contains source observations, curated
+# cards and generated reading pages. Validate their schemas, ownership, references and
+# generated artifacts without a consumer checkout.
 #
-# The extraction step (`_extract_impl_facts.py`) is deliberately NOT run here: it reads an
-# upstream AITER checkout pinned by `evidence/gemm_source.yaml`'s `provenance.aiter_commit`,
-# which is a multi-GB clone. The round trip is run by hand when the pin moves.
+# Source extraction and citation audits read AITER git objects pinned by corpus/catalog.yaml.
+# Run tools/corpus/extract.py --check and validate.py --verify-source when refreshing sources;
+# this offline job does not fetch the upstream repository or execute GPU tests.
 
 on:
   push:
@@ -33,13 +31,9 @@ jobs:
       - name: rendered pages match their inputs
         run: |
           set -e
-          python3 corpus/_build_corpus.py --check
+          python3 tools/corpus/build.py --check
 
       # Schema, provenance, citation grounding, and the no-performance-number rule on source
-      # evidence. `_render_decisions.py --check` already refuses a card citing a file that is
-      # not in this repo, so the grounding pages must stay checked in alongside the cards.
-      - name: corpus self-consistency
-        run: python3 -m pytest corpus -q
-
+      # evidence. Tests also check shared links and reproducible extraction from pinned git objects.
       - name: repo tests
-        run: python3 -m pytest tests kernelwiki/_store/tests -q
+        run: python3 -m pytest -q

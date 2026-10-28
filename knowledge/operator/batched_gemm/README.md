@@ -1,5 +1,8 @@
 # batched_gemm
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Batched matrix products and head-wise projection variants.
 
 6 AITER implementation references; 0 historical experience cards.

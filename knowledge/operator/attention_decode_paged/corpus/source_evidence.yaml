@@ -1,0 +1,2154 @@
+schema_version: 2
+operator: attention_decode_paged
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  lines: 584
+  evidence_records: 19
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  lines: 307
+  evidence_records: 23
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  lines: 513
+  evidence_records: 30
+- snapshot: aiter_b3ad6c46
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  lines: 1129
+  evidence_records: 62
+missing: []
+source_evidence:
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 85
+  end_line: 395
+  match: def compile_pa_decode_tile(
+  captured:
+  - compile_pa_decode_tile
+  arch_scope: ''
+  evidence:
+  - '85: def compile_pa_decode_tile('
+  - '86:     *,'
+  - '87:     architecture: str | None = None,'
+  evidence_id: src_3841faec6e46e213
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 398
+  end_line: 583
+  match: def compile_gfx1250_pa_decode(
+  captured:
+  - compile_gfx1250_pa_decode
+  arch_scope: ''
+  evidence:
+  - '398: def compile_gfx1250_pa_decode('
+  - '399:     *,'
+  - '400:     head_dim,'
+  evidence_id: src_563ec8bc6edfc770
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 222
+  end_line: 268
+  match: def _pa_decode_tile_task(
+  captured:
+  - _pa_decode_tile_task
+  arch_scope: ''
+  evidence:
+  - '221:     @flyc.jit'
+  - '222:     def _pa_decode_tile_task('
+  - '223:         # Packed partials: [KV heads, capacity, query rows].'
+  - '224:         pmax_ptr: fx.Pointer,  # Natural-log row max.'
+  evidence_id: src_7098bd2bd8b3195b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 271
+  end_line: 329
+  match: def pa_decode_tile_kernel(
+  captured:
+  - pa_decode_tile_kernel
+  arch_scope: ''
+  evidence:
+  - '270:     @flyc.kernel(known_block_size=(traits.BLOCK_THREADS, 1, 1))'
+  - '271:     def pa_decode_tile_kernel('
+  - '272:         pmax_ptr: fx.Pointer,'
+  - '273:         psum_ptr: fx.Pointer,'
+  evidence_id: src_70f6dd1a0bea6c18
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 332
+  end_line: 389
+  match: def pa_decode_tile_launch(
+  captured:
+  - pa_decode_tile_launch
+  arch_scope: ''
+  evidence:
+  - '331:     @flyc.jit'
+  - '332:     def pa_decode_tile_launch('
+  - '333:         pmax: fx.Pointer,'
+  - '334:         psum: fx.Pointer,'
+  evidence_id: src_826a57e2770fb62b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 446
+  end_line: 530
+  match: def kernel(
+  captured:
+  - kernel
+  arch_scope: ''
+  evidence:
+  - '445:     @flyc.kernel(known_block_size=(128, 1, 1))'
+  - '446:     def kernel('
+  - '447:         pmax: fx.Pointer,'
+  - '448:         psum: fx.Pointer,'
+  evidence_id: src_cb860d8528673157
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 533
+  end_line: 580
+  match: def launch(
+  captured:
+  - launch
+  arch_scope: ''
+  evidence:
+  - '532:     @flyc.jit'
+  - '533:     def launch('
+  - '534:         pmax: fx.Pointer,'
+  - '535:         psum: fx.Pointer,'
+  evidence_id: src_7eff6d360e373c49
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 289
+  end_line: 310
+  match: 'def _run_task(seq, start, end, context):'
+  captured:
+  - _run_task
+  arch_scope: ''
+  evidence:
+  - '287:         num_sequences: fx.Int32,'
+  - '288:     ):'
+  - '289:         def _run_task(seq, start, end, context):'
+  - '290:             _pa_decode_tile_task('
+  - '291:                 pmax_ptr,'
+  evidence_id: src_2eebaa87e0e08fce
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 182
+  end_line: 183
+  match: in ("gfx942"
+  captured:
+  - gfx942
+  arch_scope: ''
+  evidence:
+  - '180:             query_splits=query_splits,'
+  - '181:         )'
+  - '182:     if architecture not in ("gfx942", "gfx950"):'
+  - '183:         raise NotImplementedError(f"PA decode does not support {architecture}")'
+  - '184:     if direct_output:'
+  evidence_id: src_118e990823222db2
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 81
+  match: _PA_DECODE_TILE_CACHE = {
+  captured:
+  - _PA_DECODE_TILE_CACHE
+  arch_scope: ''
+  evidence:
+  - '80: # Key by selected specialization, not batch/head/CU scheduling inputs.'
+  - '81: _PA_DECODE_TILE_CACHE = {}'
+  - '82: _GFX1250_PA_DECODE_CACHE = {}'
+  evidence_id: src_91c85926b197cd9e
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 82
+  match: _GFX1250_PA_DECODE_CACHE = {
+  captured:
+  - _GFX1250_PA_DECODE_CACHE
+  arch_scope: ''
+  evidence:
+  - '80: # Key by selected specialization, not batch/head/CU scheduling inputs.'
+  - '81: _PA_DECODE_TILE_CACHE = {}'
+  - '82: _GFX1250_PA_DECODE_CACHE = {}'
+  evidence_id: src_b2de42815ad8a133
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 153
+  match: raise ValueError("direct_output requires a one-partition plan
+  captured:
+  - direct_output requires a one-partition plan
+  arch_scope: ''
+  evidence:
+  - '151:     if architecture == "gfx1250":'
+  - '152:         if direct_output and num_partitions != 1:'
+  - '153:             raise ValueError("direct_output requires a one-partition plan")'
+  - '154:         if query_splits is None:'
+  - '155:             # Split the measured spilling BF16 specialization into one Q tile'
+  evidence_id: src_68e47c0812ddbaba
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 185
+  match: raise NotImplementedError("direct_output requires gfx1250
+  captured:
+  - direct_output requires gfx1250
+  arch_scope: ''
+  evidence:
+  - '183:         raise NotImplementedError(f"PA decode does not support {architecture}")'
+  - '184:     if direct_output:'
+  - '185:         raise NotImplementedError("direct_output requires gfx1250")'
+  - '186:     schedule = PaDecodeSchedule.select('
+  - '187:         head_dim=head_dim,'
+  evidence_id: src_12754f8ffc2dc4ef
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 414
+  match: raise ValueError("query_splits must be 1, 2, or 4 and divide query_length
+  captured:
+  - query_splits must be 1, 2, or 4 and divide query_length
+  arch_scope: ''
+  evidence:
+  - '412: ):'
+  - '413:     if query_splits not in (1, 2, 4) or query_length % query_splits:'
+  - '414:         raise ValueError("query_splits must be 1, 2, or 4 and divide query_length")'
+  - '415:     t = Gfx1250Traits('
+  - '416:         head_dim,'
+  evidence_id: src_50163131bbc26e51
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 434
+  end_line: 436
+  match: "raise NotImplementedError(\n            \"gfx1250 PA decode query/KV tiles exceed LDS capacity"
+  captured:
+  - gfx1250 PA decode query/KV tiles exceed LDS capacity
+  arch_scope: ''
+  evidence:
+  - '432:         raise ValueError("BF16 PA decode does not use quantization scales")'
+  - '433:     if t.total_bytes > 327680:'
+  - '434:         raise NotImplementedError('
+  - '435:             "gfx1250 PA decode query/KV tiles exceed LDS capacity"'
+  - '436:         )'
+  evidence_id: src_13540fc60afa0e9f
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 174
+  match: per_token_kv=
+  captured:
+  - per_token_kv
+  arch_scope: ''
+  evidence:
+  - '172:             softmax_scale=softmax_scale,'
+  - '173:             query_dtype=query_dtype,'
+  - '174:             per_token_kv=per_token_kv,'
+  - '175:             query_length=query_length,'
+  - '176:             trans_v=trans_v,'
+  evidence_id: src_4a52e3fe5c5098cb
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 197
+  match: per_token_kv=
+  captured:
+  - per_token_kv
+  arch_scope: ''
+  evidence:
+  - '195:         query_dtype=query_dtype,'
+  - '196:         kv_dtype=kv_dtype,'
+  - '197:         per_token_kv=per_token_kv,'
+  - '198:         query_length=query_length,'
+  - '199:         trans_v=trans_v,'
+  evidence_id: src_7c779afb7ebf98e8
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 373
+  match: ".launch(\n                grid=(\n                    (\n                        num_seqs,\n    \
+    \                    num_kv_heads * traits.query_splits,\n                        work_capacity // num_seqs,\n\
+    \                    )"
+  captured:
+  - "\n                    (\n                        num_seqs,\n                        num_kv_heads * traits.query_splits,\n\
+    \                        work_capacity // num_seqs,\n                    "
+  arch_scope: ''
+  evidence:
+  - '371:                 work_info,'
+  - '372:                 num_seqs,'
+  - '373:             ).launch('
+  - '374:                 grid=('
+  - '375:                     ('
+  evidence_id: src_087674aa07d017f7
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  line: 572
+  match: ".launch(\n            grid=(\n                sequences if t.direct_output else capacity,\n     \
+    \           kv_heads * t.query_splits,\n                1,\n            )"
+  captured:
+  - "\n                sequences if t.direct_output else capacity,\n                kv_heads * t.query_splits,\n\
+    \                1,\n            "
+  arch_scope: ''
+  evidence:
+  - '570:             work,'
+  - '571:             sequences,'
+  - '572:         ).launch('
+  - '573:             grid=('
+  - '574:                 sequences if t.direct_output else capacity,'
+  evidence_id: src_506b5887667b71c5
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 21
+  end_line: 145
+  match: 'def compile_pa_decode_plan(batch, capacity, max_parts, sliding_window, query_length):'
+  captured:
+  - compile_pa_decode_plan
+  arch_scope: ''
+  evidence:
+  - '20: @cache'
+  - '21: def compile_pa_decode_plan(batch, capacity, max_parts, sliding_window, query_length):'
+  - '22:     """Allocate packed tasks with one block-wide scan, without GPU readback."""'
+  - '23:     threads = max(64, min(1024, 1 << (capacity - 1).bit_length()))'
+  evidence_id: src_92a87452217cdd66
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 196
+  end_line: 306
+  match: def plan_pa_decode(
+  captured:
+  - plan_pa_decode
+  arch_scope: ''
+  evidence:
+  - '196: def plan_pa_decode('
+  - '197:     context_lengths: torch.Tensor,'
+  - '198:     num_kv_heads: int,'
+  evidence_id: src_72cfa22d018bf760
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 34
+  end_line: 132
+  match: def pa_decode_plan_kernel(
+  captured:
+  - pa_decode_plan_kernel
+  arch_scope: ''
+  evidence:
+  - '33:     @flyc.kernel(known_block_size=[threads, 1, 1])'
+  - '34:     def pa_decode_plan_kernel('
+  - '35:         lengths_ptr: fx.Pointer,'
+  - '36:         work_ptr: fx.Pointer,'
+  evidence_id: src_3afeddc8b55de554
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 135
+  end_line: 143
+  match: def launch(
+  captured:
+  - launch
+  arch_scope: ''
+  evidence:
+  - '134:     @flyc.jit'
+  - '135:     def launch('
+  - '136:         lengths: fx.Pointer,'
+  - '137:         work: fx.Pointer,'
+  evidence_id: src_cc8a16aafee238e8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 166
+  end_line: 167
+  match: 'def capacity(self) -> int:'
+  captured:
+  - capacity
+  arch_scope: ''
+  evidence:
+  - '165:     @property'
+  - '166:     def capacity(self) -> int:'
+  - '167:         return self.work_info.shape[0]'
+  evidence_id: src_62857ad021a44283
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 169
+  end_line: 193
+  match: 'def validate(self, batch_size: int, num_kv_heads: int, device: torch.device):'
+  captured:
+  - validate
+  arch_scope: ''
+  evidence:
+  - '167:         return self.work_info.shape[0]'
+  - '169:     def validate(self, batch_size: int, num_kv_heads: int, device: torch.device):'
+  - '170:         if type(self.max_batch_size) is not int or self.max_batch_size < 1:'
+  - '171:             raise ValueError("plan max_batch_size must be a positive int")'
+  evidence_id: src_a0dd120aaa6e890c
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 15
+  match: DEFAULT_MAX_BATCH_SIZE = 4096
+  captured:
+  - DEFAULT_MAX_BATCH_SIZE
+  - '4096'
+  arch_scope: ''
+  evidence:
+  - '13: from .tensor_shim import _run_compiled, ptr_arg, ptr_buf_tensor'
+  - '15: DEFAULT_MAX_BATCH_SIZE = 4096'
+  - '16: # Two warp scans and one reduction use at most 512 bytes at 1024 wave32 threads.'
+  - '17: _PLAN_SCAN_LDS_BYTES = 512'
+  evidence_id: src_23676dbb06719167
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 169
+  end_line: 193
+  match: def validate(
+  captured:
+  - validate
+  arch_scope: ''
+  evidence:
+  - '167:         return self.work_info.shape[0]'
+  - '169:     def validate(self, batch_size: int, num_kv_heads: int, device: torch.device):'
+  - '170:         if type(self.max_batch_size) is not int or self.max_batch_size < 1:'
+  - '171:             raise ValueError("plan max_batch_size must be a positive int")'
+  evidence_id: src_5f5c74d3423ead39
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 171
+  match: raise ValueError("plan max_batch_size must be a positive int
+  captured:
+  - plan max_batch_size must be a positive int
+  arch_scope: ''
+  evidence:
+  - '169:     def validate(self, batch_size: int, num_kv_heads: int, device: torch.device):'
+  - '170:         if type(self.max_batch_size) is not int or self.max_batch_size < 1:'
+  - '171:             raise ValueError("plan max_batch_size must be a positive int")'
+  - '172:         if not 1 <= batch_size <= self.max_batch_size:'
+  - '173:             raise ValueError(f"plan supports batches in [1, {self.max_batch_size}]")'
+  evidence_id: src_cf8980ffcdf20de8
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 180
+  match: raise ValueError(f"plan max_partitions must be in [1, {num_compute_units}]
+  captured:
+  - plan max_partitions must be in [1, {num_compute_units}]
+  arch_scope: ''
+  evidence:
+  - '178:         ).multi_processor_count'
+  - '179:         if not 1 <= self.max_partitions <= num_compute_units:'
+  - '180:             raise ValueError(f"plan max_partitions must be in [1, {num_compute_units}]")'
+  - '181:         if self.sliding_window < 0 or self.query_length < 1:'
+  - '182:             raise ValueError("invalid plan sliding_window or query_length")'
+  evidence_id: src_445dd67e82739310
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 188
+  match: raise ValueError("plan capacity must be in [batch, batch * max_partitions]
+  captured:
+  - plan capacity must be in [batch, batch * max_partitions]
+  arch_scope: ''
+  evidence:
+  - '186:             raise ValueError("work_info must have shape [capacity, 4]")'
+  - '187:         if not batch_size <= self.capacity <= batch_size * self.max_partitions:'
+  - '188:             raise ValueError("plan capacity must be in [batch, batch * max_partitions]")'
+  - '189:         for tensor in (self.work_info, self.reduce_info):'
+  - '190:             if tensor.device != device or tensor.dtype != torch.int32:'
+  evidence_id: src_b7f453af62d55f30
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 191
+  match: raise ValueError("plan metadata must be int32 on the query device
+  captured:
+  - plan metadata must be int32 on the query device
+  arch_scope: ''
+  evidence:
+  - '189:         for tensor in (self.work_info, self.reduce_info):'
+  - '190:             if tensor.device != device or tensor.dtype != torch.int32:'
+  - '191:                 raise ValueError("plan metadata must be int32 on the query device")'
+  - '192:             if not tensor.is_contiguous():'
+  - '193:                 raise ValueError("plan metadata must be contiguous")'
+  evidence_id: src_6e56b47ff000f493
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 193
+  match: raise ValueError("plan metadata must be contiguous
+  captured:
+  - plan metadata must be contiguous
+  arch_scope: ''
+  evidence:
+  - '191:                 raise ValueError("plan metadata must be int32 on the query device")'
+  - '192:             if not tensor.is_contiguous():'
+  - '193:                 raise ValueError("plan metadata must be contiguous")'
+  evidence_id: src_b233c83171edcfa3
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 225
+  match: raise ValueError("sliding_window must be -1, 0, or positive
+  captured:
+  - sliding_window must be -1, 0, or positive
+  arch_scope: ''
+  evidence:
+  - '223:         raise TypeError("sliding_window must be an int")'
+  - '224:     if sliding_window < -1:'
+  - '225:         raise ValueError("sliding_window must be -1, 0, or positive")'
+  - '226:     sliding_window = max(sliding_window, 0)'
+  - '227:     if not isinstance(query_length, int):'
+  evidence_id: src_d48bbb094a4fb3d9
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 230
+  match: raise ValueError("query_length must be positive
+  captured:
+  - query_length must be positive
+  arch_scope: ''
+  evidence:
+  - '228:         raise TypeError("query_length must be an int")'
+  - '229:     if query_length < 1:'
+  - '230:         raise ValueError("query_length must be positive")'
+  - '231:     if context_lengths.device.type != "cuda" or context_lengths.dtype != torch.int32:'
+  - '232:         raise ValueError("context_lengths must be a CUDA int32 tensor")'
+  evidence_id: src_d375fa1c51ab2939
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 232
+  match: raise ValueError("context_lengths must be a CUDA int32 tensor
+  captured:
+  - context_lengths must be a CUDA int32 tensor
+  arch_scope: ''
+  evidence:
+  - '230:         raise ValueError("query_length must be positive")'
+  - '231:     if context_lengths.device.type != "cuda" or context_lengths.dtype != torch.int32:'
+  - '232:         raise ValueError("context_lengths must be a CUDA int32 tensor")'
+  - '233:     if context_lengths.ndim != 1 or not context_lengths.is_contiguous():'
+  - '234:         raise ValueError("context_lengths must be a contiguous vector")'
+  evidence_id: src_f43a76b4e09ff4a5
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 234
+  match: raise ValueError("context_lengths must be a contiguous vector
+  captured:
+  - context_lengths must be a contiguous vector
+  arch_scope: ''
+  evidence:
+  - '232:         raise ValueError("context_lengths must be a CUDA int32 tensor")'
+  - '233:     if context_lengths.ndim != 1 or not context_lengths.is_contiguous():'
+  - '234:         raise ValueError("context_lengths must be a contiguous vector")'
+  - '235:     if max_batch_size is None:'
+  - '236:         max_batch_size = DEFAULT_MAX_BATCH_SIZE if plan is None else plan.max_batch_size'
+  evidence_id: src_7f017dc17e4e4928
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 240
+  match: raise ValueError("max_batch_size must be positive
+  captured:
+  - max_batch_size must be positive
+  arch_scope: ''
+  evidence:
+  - '238:         raise TypeError("max_batch_size must be an int")'
+  - '239:     if max_batch_size < 1:'
+  - '240:         raise ValueError("max_batch_size must be positive")'
+  - '241:     batch = context_lengths.numel()'
+  - '242:     if batch < 1 or batch > max_batch_size:'
+  evidence_id: src_e64e69f7bcc0e802
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 245
+  match: raise ValueError("num_kv_heads must be positive
+  captured:
+  - num_kv_heads must be positive
+  arch_scope: ''
+  evidence:
+  - '243:         raise ValueError(f"plan supports batches in [1, {max_batch_size}]")'
+  - '244:     if num_kv_heads < 1:'
+  - '245:         raise ValueError("num_kv_heads must be positive")'
+  - '246:     dev = context_lengths.device'
+  - '247:     properties = torch.cuda.get_device_properties(dev)'
+  evidence_id: src_9fadefcba32477d8
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 251
+  end_line: 255
+  match: "raise ValueError(\n            f\"batch={batch} exceeds planner LDS capacity: requires up to"
+  captured:
+  - 'batch={batch} exceeds planner LDS capacity: requires up to '
+  arch_scope: ''
+  evidence:
+  - '249:     task_end_bytes = (batch * 4 + 15) // 16 * 16'
+  - '250:     if task_end_bytes + _PLAN_SCAN_LDS_BYTES > properties.shared_memory_per_block:'
+  - '251:         raise ValueError('
+  - '252:             f"batch={batch} exceeds planner LDS capacity: requires up to "'
+  - '253:             f"{task_end_bytes + _PLAN_SCAN_LDS_BYTES} bytes, device supports "'
+  evidence_id: src_54ceb81b513c8c2e
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 259
+  match: raise ValueError(f"max_partitions must be in [1, {num_compute_units}]
+  captured:
+  - max_partitions must be in [1, {num_compute_units}]
+  arch_scope: ''
+  evidence:
+  - '257:         max_partitions = num_compute_units if plan is None else plan.max_partitions'
+  - '258:     if not 1 <= max_partitions <= num_compute_units:'
+  - '259:         raise ValueError(f"max_partitions must be in [1, {num_compute_units}]")'
+  - '260:     if plan is None:'
+  - '261:         if workgroup_budget is None:'
+  evidence_id: src_9f689b2e2f180f57
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 264
+  match: raise ValueError("workgroup_budget must be positive
+  captured:
+  - workgroup_budget must be positive
+  arch_scope: ''
+  evidence:
+  - '262:             workgroup_budget = 2 * num_compute_units'
+  - '263:         if workgroup_budget < 1:'
+  - '264:             raise ValueError("workgroup_budget must be positive")'
+  - '265:         capacity = min('
+  - '266:             batch * max_partitions,'
+  evidence_id: src_1a540ea366620e3c
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  line: 141
+  end_line: 143
+  match: ".launch(\n            grid=(1, 1, 1)"
+  captured:
+  - 1, 1, 1
+  arch_scope: ''
+  evidence:
+  - '139:         stream: fx.Stream,'
+  - '140:     ):'
+  - '141:         pa_decode_plan_kernel(lengths, work, reduce_info).launch('
+  - '142:             grid=(1, 1, 1), block=(threads, 1, 1), stream=stream'
+  - '143:         )'
+  evidence_id: src_c18632438f8631d8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 30
+  end_line: 32
+  match: 'def _shuffle_offsets(parts):'
+  captured:
+  - _shuffle_offsets
+  arch_scope: ''
+  evidence:
+  - '30: def _shuffle_offsets(parts):'
+  - '31:     width = 1 if parts == 1 else 1 << (parts - 1).bit_length()'
+  - '32:     return tuple(o for o in (32, 16, 8, 4, 2, 1) if o < width)'
+  evidence_id: src_4410667b77bd3545
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 35
+  end_line: 37
+  match: 'def _fast_div(value, magic):'
+  captured:
+  - _fast_div
+  arch_scope: ''
+  evidence:
+  - '35: def _fast_div(value, magic):'
+  - '36:     """floor(value / d) for magic = ceil(2**30 / d), exact while value * d <= 2**30."""'
+  - '37:     return fx.Int32((fx.Int64(value) * fx.Int64(magic)) >> 30)'
+  evidence_id: src_ca486cf3436102f4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 41
+  end_line: 512
+  match: def compile_pa_decode_ps_reduce(
+  captured:
+  - compile_pa_decode_ps_reduce
+  arch_scope: ''
+  evidence:
+  - '40: @lru_cache(maxsize=256)'
+  - '41: def compile_pa_decode_ps_reduce('
+  - '42:     *,'
+  - '43:     architecture: str | None = None,'
+  evidence_id: src_8a2e7e1166ad0025
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 149
+  end_line: 450
+  match: def pa_decode_ps_reduce_kernel(
+  captured:
+  - pa_decode_ps_reduce_kernel
+  arch_scope: ''
+  evidence:
+  - '148:     @flyc.kernel(known_block_size=block)'
+  - '149:     def pa_decode_ps_reduce_kernel('
+  - '150:         output_ptr: fx.Pointer,'
+  - '151:         exp_sums_ptr: fx.Pointer,'
+  evidence_id: src_84f6f88bfa5e4f6d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 453
+  end_line: 507
+  match: def launch_pa_decode_ps_reduce_kernel(
+  captured:
+  - launch_pa_decode_ps_reduce_kernel
+  arch_scope: ''
+  evidence:
+  - '452:     @flyc.jit'
+  - '453:     def launch_pa_decode_ps_reduce_kernel('
+  - '454:         output: fx.Pointer,'
+  - '455:         exp_sums: fx.Pointer,'
+  evidence_id: src_8378bbbbd47a0f65
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 243
+  end_line: 246
+  match: 'def _zero():'
+  captured:
+  - _zero
+  arch_scope: ''
+  evidence:
+  - '241:         )'
+  - '243:         def _zero():'
+  - '244:             if fx.const_expr(pairs):'
+  - '245:                 return fx.full(2, 0.0, fx.Float32)'
+  evidence_id: src_fc473e2f17a39d06
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 248
+  end_line: 256
+  match: 'def _load_logits(part, unit):'
+  captured:
+  - _load_logits
+  arch_scope: ''
+  evidence:
+  - '246:             return zero_f'
+  - '248:         def _load_logits(part, unit):'
+  - '249:             return buf_copy_load('
+  - '250:                 logits_buffer,'
+  evidence_id: src_83fa028d331f56f4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 258
+  end_line: 261
+  match: 'def _to_f32(value):'
+  captured:
+  - _to_f32
+  arch_scope: ''
+  evidence:
+  - '256:             )'
+  - '258:         def _to_f32(value):'
+  - '259:             if fx.const_expr(pairs):'
+  - '260:                 return value.to(fx.Float32)'
+  evidence_id: src_c6a9e33d7b924788
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 263
+  end_line: 270
+  match: 'def _store(acc, unit):'
+  captured:
+  - _store
+  arch_scope: ''
+  evidence:
+  - '261:             return fx.Float32(value)'
+  - '263:         def _store(acc, unit):'
+  - '264:             # Output rows need only element alignment, so pairs store scalars.'
+  - '265:             offset = output_base + unit * fx.Int32(elems)'
+  evidence_id: src_87d5a6d3ff4ce78f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 272
+  end_line: 284
+  match: 'def _lane_stats(chunk):'
+  captured:
+  - _lane_stats
+  arch_scope: ''
+  evidence:
+  - '270:                 output[offset] = acc.to(output_dtype)'
+  - '272:         def _lane_stats(chunk):'
+  - '273:             # Lane l owns partition l + wave * chunk; part_count <= NP.'
+  - '274:             part = lane + fx.Int32(chunk * wave)'
+  evidence_id: src_8b51a3603b8ba141
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 286
+  end_line: 319
+  match: 'def _softmax_weights(sums, maxes, offsets):'
+  captured:
+  - _softmax_weights
+  arch_scope: ''
+  evidence:
+  - '284:             return part_sum, part_max'
+  - '286:         def _softmax_weights(sums, maxes, offsets):'
+  - '287:             lane_max = maxes[0]'
+  - '288:             for part_max in maxes[1:]:'
+  evidence_id: src_24afef28710af3fd
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 321
+  end_line: 340
+  match: 'def _reduce_register(rung, unit):'
+  captured:
+  - _reduce_register
+  arch_scope: ''
+  evidence:
+  - '319:             return [value * inv_exp_sum for value in scaled]'
+  - '321:         def _reduce_register(rung, unit):'
+  - '322:             part_sum, part_max = _lane_stats(0)'
+  - '323:             order = range(rung)'
+  evidence_id: src_8495bccb709b0e6a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 342
+  end_line: 353
+  match: 'def _top_first(rungs, reduce, unit, scale=1):'
+  captured:
+  - _top_first
+  arch_scope: ''
+  evidence:
+  - '340:             return acc'
+  - '342:         def _top_first(rungs, reduce, unit, scale=1):'
+  - '343:             # CTA-uniform count: the largest rung is the first test and the'
+  - '344:             # smallest the fall-through. Branches carry the same acc type.'
+  evidence_id: src_506bc3a08073ea4e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 355
+  end_line: 364
+  match: 'def _bottom_first(rungs, reduce, unit):'
+  captured:
+  - _bottom_first
+  arch_scope: ''
+  evidence:
+  - '353:             return acc'
+  - '355:         def _bottom_first(rungs, reduce, unit):'
+  - '356:             acc = _zero()'
+  - '357:             if fx.const_expr(len(rungs) == 1):'
+  evidence_id: src_7cfaea3370045982
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 384
+  end_line: 440
+  match: 'def _reduce_lds():'
+  captured:
+  - _reduce_lds
+  arch_scope: ''
+  evidence:
+  - '382:             unit = urem_const(worker, group_waves) * c_wave + lane'
+  - '384:             def _reduce_lds():'
+  - '385:                 # Every thread reaches each barrier; the count is CTA-uniform.'
+  - '386:                 storage = fx.SharedAllocator().allocate(SharedStorage).peek()'
+  evidence_id: src_29a998c9a49744ae
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 404
+  end_line: 416
+  match: 'def _group_sum(rung, unit):'
+  captured:
+  - _group_sum
+  arch_scope: ''
+  evidence:
+  - '402:                 fx.gpu.barrier()'
+  - '404:                 def _group_sum(rung, unit):'
+  - '405:                     # Inactive slots have zero weight and load zero past the'
+  - '406:                     # sequence bound, so they add exactly +0.'
+  evidence_id: src_3f7b031b7ac1ddae
+- snapshot: aiter_b3ad6c46
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 53
+  match: 'num_xcds:'
+  captured:
+  - num_xcds
+  arch_scope: ''
+  evidence:
+  - '51:     pairs: bool = False,'
+  - '52:     parallel_groups: int = 1,'
+  - '53:     num_xcds: int = 0,'
+  - '54: ):'
+  - '55:     """Build PA decode''s partitioned-softmax reducer.'
+  evidence_id: src_6c1dedf1183cc4bb
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 27
+  match: MAX_CTA_WAVES = 16
+  captured:
+  - MAX_CTA_WAVES
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '25: REGISTER_PARTITIONS = 64'
+  - '26: DUAL_REGISTER_PARTITIONS = 32'
+  - '27: MAX_CTA_WAVES = 16'
+  evidence_id: src_1467c105fbab4b06
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 79
+  end_line: 80
+  match: in ("gfx942"
+  captured:
+  - gfx942
+  arch_scope: ''
+  evidence:
+  - '77:     """'
+  - '78:     architecture = (architecture or get_gfx_runtime()).split(":", 1)[0]'
+  - '79:     if architecture not in ("gfx942", "gfx950", "gfx1250"):'
+  - '80:         raise NotImplementedError(f"PA decode reducer does not support {architecture}")'
+  - '81:     wave = 32 if architecture == "gfx1250" else WAVE'
+  evidence_id: src_448c0a5877cd1475
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 16
+  end_line: 20
+  match: _DTYPE_MAP = {
+  captured:
+  - _DTYPE_MAP
+  arch_scope: ''
+  evidence:
+  - '14: from .utils import rcp_f32, udiv_const, urem_const'
+  - '16: _DTYPE_MAP = {'
+  - '17:     "f32": fx.Float32,'
+  - '18:     "f16": fx.Float16,'
+  evidence_id: src_f7b766161794e811
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 86
+  end_line: 88
+  match: "raise ValueError(\n            f\"max_context_partition_num must be positive, got {partitions}"
+  captured:
+  - max_context_partition_num must be positive, got {partitions}
+  arch_scope: ''
+  evidence:
+  - '84:     partitions = max_context_partition_num'
+  - '85:     if partitions < 1:'
+  - '86:         raise ValueError('
+  - '87:             f"max_context_partition_num must be positive, got {partitions}"'
+  - '88:         )'
+  evidence_id: src_ecdb5988109c20c3
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 90
+  end_line: 92
+  match: "raise ValueError(\n            f\"head_size must be a multiple of 64 in [64, 1024], got {head_size}"
+  captured:
+  - head_size must be a multiple of 64 in [64, 1024], got {head_size}
+  arch_scope: ''
+  evidence:
+  - '88:         )'
+  - '89:     if head_size <= 0 or head_size > 1024 or head_size % 64:'
+  - '90:         raise ValueError('
+  - '91:             f"head_size must be a multiple of 64 in [64, 1024], got {head_size}"'
+  - '92:         )'
+  evidence_id: src_a7cc64f6b1e568ec
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 97
+  match: raise ValueError(f"query_group_size must be positive, got {query_group_size}
+  captured:
+  - query_group_size must be positive, got {query_group_size}
+  arch_scope: ''
+  evidence:
+  - '95:             raise ValueError(f"Unsupported FlyDSL dtype: {dtype_str!r}")'
+  - '96:     if query_group_size <= 0:'
+  - '97:         raise ValueError(f"query_group_size must be positive, got {query_group_size}")'
+  - '98:     if pairs and (head_size % 128 or logits_dtype_str not in ("bf16", "f16")):'
+  - '99:         raise ValueError("pairs requires D % 128 == 0 and bf16/f16 logits")'
+  evidence_id: src_786eb2056f732131
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 99
+  match: raise ValueError("pairs requires D % 128 == 0 and bf16/f16 logits
+  captured:
+  - pairs requires D % 128 == 0 and bf16/f16 logits
+  arch_scope: ''
+  evidence:
+  - '97:         raise ValueError(f"query_group_size must be positive, got {query_group_size}")'
+  - '98:     if pairs and (head_size % 128 or logits_dtype_str not in ("bf16", "f16")):'
+  - '99:         raise ValueError("pairs requires D % 128 == 0 and bf16/f16 logits")'
+  - '100:     elems = 2 if pairs else 1'
+  - '101:     group_waves = head_size // elems // wave'
+  evidence_id: src_1d7bd53b73155fa7
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 105
+  match: raise ValueError(f"parallel_groups must be a power of two, got {groups}
+  captured:
+  - parallel_groups must be a power of two, got {groups}
+  arch_scope: ''
+  evidence:
+  - '103:     groups = parallel_groups'
+  - '104:     if groups < 1 or groups & (groups - 1):'
+  - '105:         raise ValueError(f"parallel_groups must be a power of two, got {groups}")'
+  - '106:     if groups > 1 and not dual:'
+  - '107:         raise ValueError(f"parallel_groups > 1 requires NP > {register_partitions}")'
+  evidence_id: src_9f8a0c8c37bbd42b
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 107
+  match: raise ValueError(f"parallel_groups > 1 requires NP > {register_partitions}
+  captured:
+  - parallel_groups > 1 requires NP > {register_partitions}
+  arch_scope: ''
+  evidence:
+  - '105:         raise ValueError(f"parallel_groups must be a power of two, got {groups}")'
+  - '106:     if groups > 1 and not dual:'
+  - '107:         raise ValueError(f"parallel_groups > 1 requires NP > {register_partitions}")'
+  - '108:     if groups * group_waves > max_cta_waves:'
+  - '109:         raise ValueError(f"{groups} groups of {group_waves} waves exceed the CTA")'
+  evidence_id: src_420977bf5adbfa94
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 109
+  match: raise ValueError(f"{groups} groups of {group_waves} waves exceed the CTA
+  captured:
+  - '{groups} groups of {group_waves} waves exceed the CTA'
+  arch_scope: ''
+  evidence:
+  - '107:         raise ValueError(f"parallel_groups > 1 requires NP > {register_partitions}")'
+  - '108:     if groups * group_waves > max_cta_waves:'
+  - '109:         raise ValueError(f"{groups} groups of {group_waves} waves exceed the CTA")'
+  - '110:     if num_xcds < 0:'
+  - '111:         raise ValueError(f"num_xcds must be nonnegative, got {num_xcds}")'
+  evidence_id: src_cc015d909b3a2574
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 111
+  match: raise ValueError(f"num_xcds must be nonnegative, got {num_xcds}
+  captured:
+  - num_xcds must be nonnegative, got {num_xcds}
+  arch_scope: ''
+  evidence:
+  - '109:         raise ValueError(f"{groups} groups of {group_waves} waves exceed the CTA")'
+  - '110:     if num_xcds < 0:'
+  - '111:         raise ValueError(f"num_xcds must be nonnegative, got {num_xcds}")'
+  - '113:     output_dtype = _DTYPE_MAP[output_dtype_str]'
+  evidence_id: src_d0cb3cd8847c6267
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 177
+  match: per_xcd =
+  captured:
+  - per_xcd
+  arch_scope: ''
+  evidence:
+  - '175:             linear = fx.block_idx.x'
+  - '176:             xcd = urem_const(linear, num_xcds)'
+  - '177:             per_xcd = udiv_const(num_ctas, num_xcds)'
+  - '178:             extra = urem_const(num_ctas, num_xcds)'
+  - '179:             logical = ('
+  evidence_id: src_8ed144bb0380d9e3
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  line: 499
+  match: ".launch(\n            grid=(\n                (num_ctas, 1, 1)"
+  captured:
+  - "\n                (num_ctas, 1, 1"
+  arch_scope: ''
+  evidence:
+  - '497:             rows_magic,'
+  - '498:             seq_magic,'
+  - '499:         ).launch('
+  - '500:             grid=('
+  - '501:                 (num_ctas, 1, 1)'
+  evidence_id: src_d3aea23e21ad8630
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 14
+  end_line: 16
+  match: 'def fast_exp(x):'
+  captured:
+  - fast_exp
+  arch_scope: ''
+  evidence:
+  - '13: @triton.jit'
+  - '14: def fast_exp(x):'
+  - '15:     RCP_LN2: tl.constexpr = 1.4426950408889634'
+  - '16:     return tl.math.exp2(x * RCP_LN2)'
+  evidence_id: src_e8976a862f3b3145
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 20
+  end_line: 21
+  match: 'def cdiv_fn(x, y):'
+  captured:
+  - cdiv_fn
+  arch_scope: ''
+  evidence:
+  - '19: @triton.jit'
+  - '20: def cdiv_fn(x, y):'
+  - '21:     return (x + y - 1) // y'
+  evidence_id: src_867d7599d70a24b2
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 25
+  end_line: 29
+  match: 'def apply_softcap(S, x):'
+  captured:
+  - apply_softcap
+  arch_scope: ''
+  evidence:
+  - '24: @triton.jit'
+  - '25: def apply_softcap(S, x):'
+  - '26:     Sdiv = S / x'
+  - '27:     p1 = tl.math.exp2(Sdiv)'
+  evidence_id: src_3ec60c848b3c182d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 33
+  end_line: 52
+  match: def find_seq_idx(
+  captured:
+  - find_seq_idx
+  arch_scope: ''
+  evidence:
+  - '32: @triton.jit'
+  - '33: def find_seq_idx('
+  - '34:     query_start_len_ptr,'
+  - '35:     target_idx,'
+  evidence_id: src_9b31d3b8f3db1b18
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 82
+  end_line: 553
+  match: def kernel_unified_attention_2d(
+  captured:
+  - kernel_unified_attention_2d
+  arch_scope: ''
+  evidence:
+  - '81: @triton.jit(repr=_kernel_unified_attention_2d_repr)'
+  - '82: def kernel_unified_attention_2d('
+  - '83:     output_ptr,  # [num_tokens, num_query_heads, head_size]'
+  - '84:     query_ptr,  # [num_tokens, num_query_heads, head_size]'
+  evidence_id: src_49cb5bdc816cb102
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 578
+  end_line: 969
+  match: def kernel_unified_attention_3d(
+  captured:
+  - kernel_unified_attention_3d
+  arch_scope: ''
+  evidence:
+  - '577: @triton.jit(repr=kernel_unified_attention_3d_repr)'
+  - '578: def kernel_unified_attention_3d('
+  - '579:     segm_output_ptr,'
+  - '580:     # [num_tokens, num_query_heads, num_segments, head_size]'
+  evidence_id: src_abec3e580f50bd65
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 985
+  end_line: 1128
+  match: def reduce_segments(
+  captured:
+  - reduce_segments
+  arch_scope: ''
+  evidence:
+  - '984: @triton.jit(repr=_reduce_segments_repr)'
+  - '985: def reduce_segments('
+  - '986:     output_ptr,  # [num_tokens, num_query_heads, head_size]'
+  - '987:     segm_output_ptr,'
+  evidence_id: src_1935242b8a5056fd
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 346
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '344:             V = V_load.to(Q.dtype)'
+  - '346:             S = qk_scale * tl.dot(Q, K)'
+  - '348:             if USE_SOFTCAP:'
+  evidence_id: src_046b3b892b2fbfc2
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 372
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '370:             L = L * alpha + l_j'
+  - '371:             M = m_j'
+  - '372:             acc = tl.dot(P.to(V.dtype), V, acc=acc)'
+  - '374:         masked_tile_start = unmasked_tile_end'
+  evidence_id: src_409a534e291ce6f9
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 467
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '465:         # S : (BLOCK_M, TILE_SIZE)'
+  - '466:         # qk_scale = scale * RCP_LN2 (log_2 e) so that we can use exp2 later'
+  - '467:         S = qk_scale * tl.dot(Q, K)'
+  - '469:         if USE_SOFTCAP:'
+  evidence_id: src_185adcc86bc20415
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 528
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '527:         # acc : (BLOCK_M, HEAD_SIZE_PADDED)'
+  - '528:         acc = tl.dot(P.to(V.dtype), V, acc=acc)'
+  - '530:     # epilogue'
+  evidence_id: src_de0e0c23ab6abc6d
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 883
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '881:         # S : (BLOCK_M, TILE_SIZE)'
+  - '882:         # qk_scale = scale * RCP_LN2 (log_2 e) so that we can use exp2 later'
+  - '883:         S = qk_scale * tl.dot(Q, K)'
+  - '885:         if USE_SOFTCAP:'
+  evidence_id: src_362c9696425d714b
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 943
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '942:         # acc : (BLOCK_M, HEAD_SIZE_PADDED)'
+  - '943:         acc = tl.dot(P.to(V.dtype), V, acc=acc)'
+  - '945:     acc = acc * out_factor'
+  evidence_id: src_1c9c1f72440654cc
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 37
+  match: 'BLOCK_Q: tl.constexpr,'
+  captured:
+  - BLOCK_Q
+  arch_scope: ''
+  evidence:
+  - '35:     target_idx,'
+  - '36:     num_seqs,'
+  - '37:     BLOCK_Q: tl.constexpr,'
+  - '38:     use_q_block_mode: tl.constexpr,'
+  - '39: ):'
+  evidence_id: src_ad0f95b25f494a94
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 38
+  match: 'use_q_block_mode: tl.constexpr,'
+  captured:
+  - use_q_block_mode
+  arch_scope: ''
+  evidence:
+  - '36:     num_seqs,'
+  - '37:     BLOCK_Q: tl.constexpr,'
+  - '38:     use_q_block_mode: tl.constexpr,'
+  - '39: ):'
+  - '40:     left: tl.int32 = 0'
+  evidence_id: src_8ff0ac89259243cb
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 92
+  match: 'scale: tl.constexpr,'
+  captured:
+  - scale
+  arch_scope: ''
+  evidence:
+  - '90:     alibi_slopes_ptr,  # [num_query_heads]'
+  - '91:     qq_bias_ptr,  # [num_query_tokens, num_query_tokens]'
+  - '92:     scale: tl.constexpr,  # float32'
+  - '93:     q_descale_ptr,  # float32'
+  - '94:     k_descale_ptr,  # float32'
+  evidence_id: src_6f7a598fb67ff830
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 98
+  match: 'num_query_heads: tl.constexpr,'
+  captured:
+  - num_query_heads
+  arch_scope: ''
+  evidence:
+  - '96:     out_scale_ptr,  # float32'
+  - '97:     softcap,  # float32'
+  - '98:     num_query_heads: tl.constexpr,  # int'
+  - '99:     num_queries_per_kv: tl.constexpr,  # int'
+  - '100:     block_table_stride: tl.int64,  # int'
+  evidence_id: src_4395238d1c56ba3a
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 99
+  match: 'num_queries_per_kv: tl.constexpr,'
+  captured:
+  - num_queries_per_kv
+  arch_scope: ''
+  evidence:
+  - '97:     softcap,  # float32'
+  - '98:     num_query_heads: tl.constexpr,  # int'
+  - '99:     num_queries_per_kv: tl.constexpr,  # int'
+  - '100:     block_table_stride: tl.int64,  # int'
+  - '101:     query_stride_0: tl.int64,  # int'
+  evidence_id: src_c196ccf618371bde
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 106
+  match: 'BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '104:     output_stride_1: tl.int64,  # int, should be equal to head_size'
+  - '105:     qq_bias_stride_0: tl.int64,  # int'
+  - '106:     BLOCK_SIZE: tl.constexpr,  # int'
+  - '107:     TILE_SIZE: tl.constexpr,  # int must be power of 2'
+  - '108:     HEAD_SIZE: tl.constexpr,  # int'
+  evidence_id: src_f51cb40a2e58f3b4
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 107
+  match: 'TILE_SIZE: tl.constexpr,'
+  captured:
+  - TILE_SIZE
+  arch_scope: ''
+  evidence:
+  - '105:     qq_bias_stride_0: tl.int64,  # int'
+  - '106:     BLOCK_SIZE: tl.constexpr,  # int'
+  - '107:     TILE_SIZE: tl.constexpr,  # int must be power of 2'
+  - '108:     HEAD_SIZE: tl.constexpr,  # int'
+  - '109:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  evidence_id: src_e245de91bba35f15
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 108
+  match: 'HEAD_SIZE: tl.constexpr,'
+  captured:
+  - HEAD_SIZE
+  arch_scope: ''
+  evidence:
+  - '106:     BLOCK_SIZE: tl.constexpr,  # int'
+  - '107:     TILE_SIZE: tl.constexpr,  # int must be power of 2'
+  - '108:     HEAD_SIZE: tl.constexpr,  # int'
+  - '109:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '110:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  evidence_id: src_46653bde5a6fef18
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 109
+  match: 'HEAD_SIZE_PADDED: tl.constexpr,'
+  captured:
+  - HEAD_SIZE_PADDED
+  arch_scope: ''
+  evidence:
+  - '107:     TILE_SIZE: tl.constexpr,  # int must be power of 2'
+  - '108:     HEAD_SIZE: tl.constexpr,  # int'
+  - '109:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '110:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  - '111:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  evidence_id: src_5db1812afb0d38df
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 110
+  match: 'V_HEAD_SIZE: tl.constexpr,'
+  captured:
+  - V_HEAD_SIZE
+  arch_scope: ''
+  evidence:
+  - '108:     HEAD_SIZE: tl.constexpr,  # int'
+  - '109:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '110:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  - '111:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '112:     USE_ALIBI_SLOPES: tl.constexpr,  # bool'
+  evidence_id: src_967a7e395603ad2e
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 111
+  match: 'V_HEAD_SIZE_PADDED: tl.constexpr,'
+  captured:
+  - V_HEAD_SIZE_PADDED
+  arch_scope: ''
+  evidence:
+  - '109:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '110:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  - '111:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '112:     USE_ALIBI_SLOPES: tl.constexpr,  # bool'
+  - '113:     USE_QQ_BIAS: tl.constexpr,  # bool'
+  evidence_id: src_9d5f8cf02b36cccd
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 112
+  match: 'USE_ALIBI_SLOPES: tl.constexpr,'
+  captured:
+  - USE_ALIBI_SLOPES
+  arch_scope: ''
+  evidence:
+  - '110:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  - '111:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '112:     USE_ALIBI_SLOPES: tl.constexpr,  # bool'
+  - '113:     USE_QQ_BIAS: tl.constexpr,  # bool'
+  - '114:     USE_SOFTCAP: tl.constexpr,  # bool'
+  evidence_id: src_334ddce3da2cd5ca
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 113
+  match: 'USE_QQ_BIAS: tl.constexpr,'
+  captured:
+  - USE_QQ_BIAS
+  arch_scope: ''
+  evidence:
+  - '111:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '112:     USE_ALIBI_SLOPES: tl.constexpr,  # bool'
+  - '113:     USE_QQ_BIAS: tl.constexpr,  # bool'
+  - '114:     USE_SOFTCAP: tl.constexpr,  # bool'
+  - '115:     USE_SINKS: tl.constexpr,  # bool'
+  evidence_id: src_b55bd2b34676bb91
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 114
+  match: 'USE_SOFTCAP: tl.constexpr,'
+  captured:
+  - USE_SOFTCAP
+  arch_scope: ''
+  evidence:
+  - '112:     USE_ALIBI_SLOPES: tl.constexpr,  # bool'
+  - '113:     USE_QQ_BIAS: tl.constexpr,  # bool'
+  - '114:     USE_SOFTCAP: tl.constexpr,  # bool'
+  - '115:     USE_SINKS: tl.constexpr,  # bool'
+  - '116:     SLIDING_WINDOW: tl.constexpr,  # int'
+  evidence_id: src_0a17e92c05b9f598
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 115
+  match: 'USE_SINKS: tl.constexpr,'
+  captured:
+  - USE_SINKS
+  arch_scope: ''
+  evidence:
+  - '113:     USE_QQ_BIAS: tl.constexpr,  # bool'
+  - '114:     USE_SOFTCAP: tl.constexpr,  # bool'
+  - '115:     USE_SINKS: tl.constexpr,  # bool'
+  - '116:     SLIDING_WINDOW: tl.constexpr,  # int'
+  - '117:     stride_k_cache_0: tl.int64,  # int'
+  evidence_id: src_88f3cff6b2330101
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 116
+  match: 'SLIDING_WINDOW: tl.constexpr,'
+  captured:
+  - SLIDING_WINDOW
+  arch_scope: ''
+  evidence:
+  - '114:     USE_SOFTCAP: tl.constexpr,  # bool'
+  - '115:     USE_SINKS: tl.constexpr,  # bool'
+  - '116:     SLIDING_WINDOW: tl.constexpr,  # int'
+  - '117:     stride_k_cache_0: tl.int64,  # int'
+  - '118:     stride_k_cache_1: tl.int64,  # int'
+  evidence_id: src_1c39d6c43ab83bdf
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 120
+  match: 'stride_k_cache_3: tl.constexpr,'
+  captured:
+  - stride_k_cache_3
+  arch_scope: ''
+  evidence:
+  - '118:     stride_k_cache_1: tl.int64,  # int'
+  - '119:     stride_k_cache_2: tl.int64,  # int'
+  - '120:     stride_k_cache_3: tl.constexpr,  # int'
+  - '121:     stride_v_cache_0: tl.int64,  # int'
+  - '122:     stride_v_cache_1: tl.int64,  # int'
+  evidence_id: src_82968a9fbd10a95e
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 124
+  match: 'stride_v_cache_3: tl.constexpr,'
+  captured:
+  - stride_v_cache_3
+  arch_scope: ''
+  evidence:
+  - '122:     stride_v_cache_1: tl.int64,  # int'
+  - '123:     stride_v_cache_2: tl.int64,  # int'
+  - '124:     stride_v_cache_3: tl.constexpr,  # int'
+  - '125:     query_start_len_ptr,  # [num_seqs+1]'
+  - '126:     BLOCK_Q: tl.constexpr,  # int'
+  evidence_id: src_a2cc2d3e0f43aace
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 126
+  match: 'BLOCK_Q: tl.constexpr,'
+  captured:
+  - BLOCK_Q
+  arch_scope: ''
+  evidence:
+  - '124:     stride_v_cache_3: tl.constexpr,  # int'
+  - '125:     query_start_len_ptr,  # [num_seqs+1]'
+  - '126:     BLOCK_Q: tl.constexpr,  # int'
+  - '127:     num_seqs: tl.int32,'
+  - '128:     BLOCK_M: tl.constexpr,  # int'
+  evidence_id: src_2ab2b02ed8f86297
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 128
+  match: 'BLOCK_M: tl.constexpr,'
+  captured:
+  - BLOCK_M
+  arch_scope: ''
+  evidence:
+  - '126:     BLOCK_Q: tl.constexpr,  # int'
+  - '127:     num_seqs: tl.int32,'
+  - '128:     BLOCK_M: tl.constexpr,  # int'
+  - '129:     FP8_MIN: tl.constexpr = float8_info.min,'
+  - '130:     FP8_MAX: tl.constexpr = float8_info.max,'
+  evidence_id: src_0b90b7ebfc31e94d
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 597
+  match: 'num_query_heads: tl.constexpr,'
+  captured:
+  - num_query_heads
+  arch_scope: ''
+  evidence:
+  - '595:     out_scale_ptr,  # float32'
+  - '596:     softcap,  # float32'
+  - '597:     num_query_heads: tl.constexpr,  # int'
+  - '598:     num_queries_per_kv: tl.constexpr,  # int'
+  - '599:     block_table_stride: tl.int64,  # int'
+  evidence_id: src_3d267216b7122e90
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 598
+  match: 'num_queries_per_kv: tl.constexpr,'
+  captured:
+  - num_queries_per_kv
+  arch_scope: ''
+  evidence:
+  - '596:     softcap,  # float32'
+  - '597:     num_query_heads: tl.constexpr,  # int'
+  - '598:     num_queries_per_kv: tl.constexpr,  # int'
+  - '599:     block_table_stride: tl.int64,  # int'
+  - '600:     query_stride_0: tl.int64,  # int'
+  evidence_id: src_30bd7e138c77e359
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 603
+  match: 'BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '601:     query_stride_1: tl.int64,  # int, should be equal to head_size'
+  - '602:     qq_bias_stride_0: tl.int64,  # int'
+  - '603:     BLOCK_SIZE: tl.constexpr,  # int'
+  - '604:     TILE_SIZE: tl.constexpr,  # int, must be power of 2'
+  - '605:     HEAD_SIZE: tl.constexpr,  # int'
+  evidence_id: src_17c8c74f825a81b8
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 604
+  match: 'TILE_SIZE: tl.constexpr,'
+  captured:
+  - TILE_SIZE
+  arch_scope: ''
+  evidence:
+  - '602:     qq_bias_stride_0: tl.int64,  # int'
+  - '603:     BLOCK_SIZE: tl.constexpr,  # int'
+  - '604:     TILE_SIZE: tl.constexpr,  # int, must be power of 2'
+  - '605:     HEAD_SIZE: tl.constexpr,  # int'
+  - '606:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  evidence_id: src_ae752519686d73c9
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 605
+  match: 'HEAD_SIZE: tl.constexpr,'
+  captured:
+  - HEAD_SIZE
+  arch_scope: ''
+  evidence:
+  - '603:     BLOCK_SIZE: tl.constexpr,  # int'
+  - '604:     TILE_SIZE: tl.constexpr,  # int, must be power of 2'
+  - '605:     HEAD_SIZE: tl.constexpr,  # int'
+  - '606:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '607:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  evidence_id: src_5ebd4880225a0e2d
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 606
+  match: 'HEAD_SIZE_PADDED: tl.constexpr,'
+  captured:
+  - HEAD_SIZE_PADDED
+  arch_scope: ''
+  evidence:
+  - '604:     TILE_SIZE: tl.constexpr,  # int, must be power of 2'
+  - '605:     HEAD_SIZE: tl.constexpr,  # int'
+  - '606:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '607:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  - '608:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  evidence_id: src_000edabf08401e48
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 607
+  match: 'V_HEAD_SIZE: tl.constexpr,'
+  captured:
+  - V_HEAD_SIZE
+  arch_scope: ''
+  evidence:
+  - '605:     HEAD_SIZE: tl.constexpr,  # int'
+  - '606:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '607:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  - '608:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '609:     USE_ALIBI_SLOPES: tl.constexpr,  # bool'
+  evidence_id: src_c43fbb5fd12dfd49
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 608
+  match: 'V_HEAD_SIZE_PADDED: tl.constexpr,'
+  captured:
+  - V_HEAD_SIZE_PADDED
+  arch_scope: ''
+  evidence:
+  - '606:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '607:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  - '608:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '609:     USE_ALIBI_SLOPES: tl.constexpr,  # bool'
+  - '610:     USE_QQ_BIAS: tl.constexpr,  # bool'
+  evidence_id: src_2dd3d1e3e7b29a79
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 609
+  match: 'USE_ALIBI_SLOPES: tl.constexpr,'
+  captured:
+  - USE_ALIBI_SLOPES
+  arch_scope: ''
+  evidence:
+  - '607:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  - '608:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '609:     USE_ALIBI_SLOPES: tl.constexpr,  # bool'
+  - '610:     USE_QQ_BIAS: tl.constexpr,  # bool'
+  - '611:     USE_SOFTCAP: tl.constexpr,  # bool'
+  evidence_id: src_6c8b06a713207434
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 610
+  match: 'USE_QQ_BIAS: tl.constexpr,'
+  captured:
+  - USE_QQ_BIAS
+  arch_scope: ''
+  evidence:
+  - '608:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '609:     USE_ALIBI_SLOPES: tl.constexpr,  # bool'
+  - '610:     USE_QQ_BIAS: tl.constexpr,  # bool'
+  - '611:     USE_SOFTCAP: tl.constexpr,  # bool'
+  - '612:     USE_SINKS: tl.constexpr,  # bool'
+  evidence_id: src_f72641129bb26ced
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 611
+  match: 'USE_SOFTCAP: tl.constexpr,'
+  captured:
+  - USE_SOFTCAP
+  arch_scope: ''
+  evidence:
+  - '609:     USE_ALIBI_SLOPES: tl.constexpr,  # bool'
+  - '610:     USE_QQ_BIAS: tl.constexpr,  # bool'
+  - '611:     USE_SOFTCAP: tl.constexpr,  # bool'
+  - '612:     USE_SINKS: tl.constexpr,  # bool'
+  - '613:     SLIDING_WINDOW: tl.constexpr,  # int'
+  evidence_id: src_3e32eb361efa683e
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 612
+  match: 'USE_SINKS: tl.constexpr,'
+  captured:
+  - USE_SINKS
+  arch_scope: ''
+  evidence:
+  - '610:     USE_QQ_BIAS: tl.constexpr,  # bool'
+  - '611:     USE_SOFTCAP: tl.constexpr,  # bool'
+  - '612:     USE_SINKS: tl.constexpr,  # bool'
+  - '613:     SLIDING_WINDOW: tl.constexpr,  # int'
+  - '614:     stride_k_cache_0: tl.int64,  # int'
+  evidence_id: src_634c44371b70c6ae
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 613
+  match: 'SLIDING_WINDOW: tl.constexpr,'
+  captured:
+  - SLIDING_WINDOW
+  arch_scope: ''
+  evidence:
+  - '611:     USE_SOFTCAP: tl.constexpr,  # bool'
+  - '612:     USE_SINKS: tl.constexpr,  # bool'
+  - '613:     SLIDING_WINDOW: tl.constexpr,  # int'
+  - '614:     stride_k_cache_0: tl.int64,  # int'
+  - '615:     stride_k_cache_1: tl.int64,  # int'
+  evidence_id: src_fdb51fbd3f224b73
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 617
+  match: 'stride_k_cache_3: tl.constexpr,'
+  captured:
+  - stride_k_cache_3
+  arch_scope: ''
+  evidence:
+  - '615:     stride_k_cache_1: tl.int64,  # int'
+  - '616:     stride_k_cache_2: tl.int64,  # int'
+  - '617:     stride_k_cache_3: tl.constexpr,  # int'
+  - '618:     stride_v_cache_0: tl.int64,  # int'
+  - '619:     stride_v_cache_1: tl.int64,  # int'
+  evidence_id: src_d3fd9149efa0dce3
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 621
+  match: 'stride_v_cache_3: tl.constexpr,'
+  captured:
+  - stride_v_cache_3
+  arch_scope: ''
+  evidence:
+  - '619:     stride_v_cache_1: tl.int64,  # int'
+  - '620:     stride_v_cache_2: tl.int64,  # int'
+  - '621:     stride_v_cache_3: tl.constexpr,  # int'
+  - '622:     query_start_len_ptr,  # [num_seqs+1]'
+  - '623:     BLOCK_Q: tl.constexpr,  # int'
+  evidence_id: src_8f9af8b5e60c4dd8
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 623
+  match: 'BLOCK_Q: tl.constexpr,'
+  captured:
+  - BLOCK_Q
+  arch_scope: ''
+  evidence:
+  - '621:     stride_v_cache_3: tl.constexpr,  # int'
+  - '622:     query_start_len_ptr,  # [num_seqs+1]'
+  - '623:     BLOCK_Q: tl.constexpr,  # int'
+  - '624:     num_seqs: tl.int32,'
+  - '625:     BLOCK_M: tl.constexpr,  # int'
+  evidence_id: src_1d7e5dcf05b52cc8
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 625
+  match: 'BLOCK_M: tl.constexpr,'
+  captured:
+  - BLOCK_M
+  arch_scope: ''
+  evidence:
+  - '623:     BLOCK_Q: tl.constexpr,  # int'
+  - '624:     num_seqs: tl.int32,'
+  - '625:     BLOCK_M: tl.constexpr,  # int'
+  - '626:     num_warps: tl.constexpr,  # int'
+  - '627:     waves_per_eu: tl.constexpr,  # int'
+  evidence_id: src_80ce76b148f69778
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 626
+  match: 'num_warps: tl.constexpr,'
+  captured:
+  - num_warps
+  arch_scope: ''
+  evidence:
+  - '624:     num_seqs: tl.int32,'
+  - '625:     BLOCK_M: tl.constexpr,  # int'
+  - '626:     num_warps: tl.constexpr,  # int'
+  - '627:     waves_per_eu: tl.constexpr,  # int'
+  - '628:     num_stages: tl.constexpr,  # int'
+  evidence_id: src_1eea820e28eb1140
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 627
+  match: 'waves_per_eu: tl.constexpr,'
+  captured:
+  - waves_per_eu
+  arch_scope: ''
+  evidence:
+  - '625:     BLOCK_M: tl.constexpr,  # int'
+  - '626:     num_warps: tl.constexpr,  # int'
+  - '627:     waves_per_eu: tl.constexpr,  # int'
+  - '628:     num_stages: tl.constexpr,  # int'
+  - '629:     NUM_SEGMENTS_PER_SEQ: tl.constexpr,  # int'
+  evidence_id: src_ac70eef7fd0c0254
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 628
+  match: 'num_stages: tl.constexpr,'
+  captured:
+  - num_stages
+  arch_scope: ''
+  evidence:
+  - '626:     num_warps: tl.constexpr,  # int'
+  - '627:     waves_per_eu: tl.constexpr,  # int'
+  - '628:     num_stages: tl.constexpr,  # int'
+  - '629:     NUM_SEGMENTS_PER_SEQ: tl.constexpr,  # int'
+  - '630:     ALL_DECODE: tl.constexpr = False,  # bool'
+  evidence_id: src_90272a138e3b7635
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 629
+  match: 'NUM_SEGMENTS_PER_SEQ: tl.constexpr,'
+  captured:
+  - NUM_SEGMENTS_PER_SEQ
+  arch_scope: ''
+  evidence:
+  - '627:     waves_per_eu: tl.constexpr,  # int'
+  - '628:     num_stages: tl.constexpr,  # int'
+  - '629:     NUM_SEGMENTS_PER_SEQ: tl.constexpr,  # int'
+  - '630:     ALL_DECODE: tl.constexpr = False,  # bool'
+  - '631:     SHUFFLED_KV_CACHE: tl.constexpr = False,  # bool'
+  evidence_id: src_85b8c6fb28a88bc6
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 993
+  match: 'num_query_heads: tl.constexpr,'
+  captured:
+  - num_query_heads
+  arch_scope: ''
+  evidence:
+  - '991:     seq_lens_ptr,  # [num_seqs]'
+  - '992:     num_seqs,  # int'
+  - '993:     num_query_heads: tl.constexpr,  # int'
+  - '994:     out_scale_ptr,  # float32'
+  - '995:     output_stride_0: tl.int64,  # int'
+  evidence_id: src_307e80b8210f58c9
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 998
+  match: 'TILE_SIZE: tl.constexpr,'
+  captured:
+  - TILE_SIZE
+  arch_scope: ''
+  evidence:
+  - '996:     output_stride_1: tl.int64,  # int, should be equal to head_size'
+  - '997:     block_table_stride: tl.int64,  # int'
+  - '998:     TILE_SIZE: tl.constexpr,  # int'
+  - '999:     HEAD_SIZE: tl.constexpr,  # int, must be power of 2'
+  - '1000:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  evidence_id: src_660a5f9051067900
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 999
+  match: 'HEAD_SIZE: tl.constexpr,'
+  captured:
+  - HEAD_SIZE
+  arch_scope: ''
+  evidence:
+  - '997:     block_table_stride: tl.int64,  # int'
+  - '998:     TILE_SIZE: tl.constexpr,  # int'
+  - '999:     HEAD_SIZE: tl.constexpr,  # int, must be power of 2'
+  - '1000:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '1001:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  evidence_id: src_8629a1be600e86a8
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 1000
+  match: 'HEAD_SIZE_PADDED: tl.constexpr,'
+  captured:
+  - HEAD_SIZE_PADDED
+  arch_scope: ''
+  evidence:
+  - '998:     TILE_SIZE: tl.constexpr,  # int'
+  - '999:     HEAD_SIZE: tl.constexpr,  # int, must be power of 2'
+  - '1000:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '1001:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  - '1002:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  evidence_id: src_d0f60c13be5ec875
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 1001
+  match: 'V_HEAD_SIZE: tl.constexpr,'
+  captured:
+  - V_HEAD_SIZE
+  arch_scope: ''
+  evidence:
+  - '999:     HEAD_SIZE: tl.constexpr,  # int, must be power of 2'
+  - '1000:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '1001:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  - '1002:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '1003:     query_start_len_ptr,  # [num_seqs+1]'
+  evidence_id: src_31c0f2ea20897b20
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 1002
+  match: 'V_HEAD_SIZE_PADDED: tl.constexpr,'
+  captured:
+  - V_HEAD_SIZE_PADDED
+  arch_scope: ''
+  evidence:
+  - '1000:     HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '1001:     V_HEAD_SIZE: tl.constexpr,  # int, value head size (may differ from HEAD_SIZE)'
+  - '1002:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '1003:     query_start_len_ptr,  # [num_seqs+1]'
+  - '1004:     BLOCK_Q: tl.constexpr,  # int'
+  evidence_id: src_cc759568843e9ec6
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 1004
+  match: 'BLOCK_Q: tl.constexpr,'
+  captured:
+  - BLOCK_Q
+  arch_scope: ''
+  evidence:
+  - '1002:     V_HEAD_SIZE_PADDED: tl.constexpr,  # int, must be power of 2'
+  - '1003:     query_start_len_ptr,  # [num_seqs+1]'
+  - '1004:     BLOCK_Q: tl.constexpr,  # int'
+  - '1005:     NUM_SEGMENTS_PER_SEQ: tl.constexpr,  # int'
+  - '1006:     FP8_MIN: tl.constexpr = float8_info.min,'
+  evidence_id: src_6ade6b98fd0fce4e
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  line: 1005
+  match: 'NUM_SEGMENTS_PER_SEQ: tl.constexpr,'
+  captured:
+  - NUM_SEGMENTS_PER_SEQ
+  arch_scope: ''
+  evidence:
+  - '1003:     query_start_len_ptr,  # [num_seqs+1]'
+  - '1004:     BLOCK_Q: tl.constexpr,  # int'
+  - '1005:     NUM_SEGMENTS_PER_SEQ: tl.constexpr,  # int'
+  - '1006:     FP8_MIN: tl.constexpr = float8_info.min,'
+  - '1007:     FP8_MAX: tl.constexpr = float8_info.max,'
+  evidence_id: src_8890c89b896a6ebb

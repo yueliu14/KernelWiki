@@ -1,0 +1,1066 @@
+schema_version: 2
+operator: attention_prefill_fmha
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  lines: 639
+  evidence_records: 41
+- snapshot: aiter_b3ad6c46
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  lines: 1149
+  evidence_records: 14
+- snapshot: aiter_b3ad6c46
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/prefill_attention.py
+  lines: 177
+  evidence_records: 9
+missing: []
+source_evidence:
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 56
+  end_line: 58
+  match: 'def _is_valid_softmax_scale(softmax_scale: float | None) -> bool:'
+  captured:
+  - _is_valid_softmax_scale
+  arch_scope: ''
+  evidence:
+  - '56: def _is_valid_softmax_scale(softmax_scale: float | None) -> bool:'
+  - '57:     """Accept the default scale or a positive, finite custom scale."""'
+  - '58:     return softmax_scale is None or (math.isfinite(softmax_scale) and softmax_scale > 0)'
+  evidence_id: src_f8f8423666634e80
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 61
+  end_line: 62
+  match: 'def _fp8_rescale_threshold(seqlen_kv: int) -> float:'
+  captured:
+  - _fp8_rescale_threshold
+  arch_scope: ''
+  evidence:
+  - '61: def _fp8_rescale_threshold(seqlen_kv: int) -> float:'
+  - '62:     return 6.0 if seqlen_kv <= _FP8_LONG_SEQ else 4.0'
+  evidence_id: src_7662dde03fe9a014
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 69
+  end_line: 73
+  match: 'def _gpu_arch_cached(index: int | None) -> str:'
+  captured:
+  - _gpu_arch_cached
+  arch_scope: ''
+  evidence:
+  - '67: # entirely host-bound, so memoise them.'
+  - '68: @functools.lru_cache(maxsize=16)'
+  - '69: def _gpu_arch_cached(index: int | None) -> str:'
+  - '70:     try:'
+  - '71:         return torch.cuda.get_device_properties(index).gcnArchName.split(":")[0]'
+  evidence_id: src_d828ac9b80e077c4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 77
+  end_line: 81
+  match: 'def _num_cu_cached(index: int | None) -> int:'
+  captured:
+  - _num_cu_cached
+  arch_scope: ''
+  evidence:
+  - '76: @functools.lru_cache(maxsize=16)'
+  - '77: def _num_cu_cached(index: int | None) -> int:'
+  - '78:     try:'
+  - '79:         return int(torch.cuda.get_device_properties(index).multi_processor_count)'
+  evidence_id: src_403737d436d23232
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 84
+  end_line: 85
+  match: 'def _gpu_arch(device: torch.device) -> str:'
+  captured:
+  - _gpu_arch
+  arch_scope: ''
+  evidence:
+  - '84: def _gpu_arch(device: torch.device) -> str:'
+  - '85:     return _gpu_arch_cached(device.index)'
+  evidence_id: src_c514bf0bb201476b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 88
+  end_line: 89
+  match: 'def _num_cu(device: torch.device) -> int:'
+  captured:
+  - _num_cu
+  arch_scope: ''
+  evidence:
+  - '88: def _num_cu(device: torch.device) -> int:'
+  - '89:     return _num_cu_cached(device.index)'
+  evidence_id: src_8cb1f8edb95e3465
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 93
+  end_line: 117
+  match: def _fp8_config_reason(
+  captured:
+  - _fp8_config_reason
+  arch_scope: ''
+  evidence:
+  - '92: @functools.lru_cache(maxsize=128)'
+  - '93: def _fp8_config_reason('
+  - '94:     num_heads: int, num_kv_heads: int, head_dim: int, head_dim_v: int'
+  - '95: ) -> str | None:'
+  evidence_id: src_5dbe887a9a8f7650
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 120
+  end_line: 148
+  match: def flydsl_flash_attn_fp8_supported(
+  captured:
+  - flydsl_flash_attn_fp8_supported
+  arch_scope: ''
+  evidence:
+  - '120: def flydsl_flash_attn_fp8_supported('
+  - '121:     device: torch.device,'
+  - '122:     num_heads: int,'
+  evidence_id: src_5cd118fef64b8218
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 152
+  end_line: 161
+  match: def _fp8_auto_block_m(
+  captured:
+  - _fp8_auto_block_m
+  arch_scope: ''
+  evidence:
+  - '151: @functools.lru_cache(maxsize=256)'
+  - '152: def _fp8_auto_block_m('
+  - '153:     batch: int, num_heads: int, seqlen_q: int, seqlen_kv: int, num_cu: int'
+  - '154: ) -> int:'
+  evidence_id: src_d8060642095560e1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 165
+  end_line: 171
+  match: def _fp8_batch_interleave_group(
+  captured:
+  - _fp8_batch_interleave_group
+  arch_scope: ''
+  evidence:
+  - '164: @functools.lru_cache(maxsize=256)'
+  - '165: def _fp8_batch_interleave_group('
+  - '166:     batch: int, causal: bool, cross: bool, num_kv_splits: int'
+  - '167: ) -> int:'
+  evidence_id: src_cb7ad13811af2593
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 175
+  end_line: 223
+  match: def _fp8_auto_kv_splits(
+  captured:
+  - _fp8_auto_kv_splits
+  arch_scope: ''
+  evidence:
+  - '174: @functools.lru_cache(maxsize=512)'
+  - '175: def _fp8_auto_kv_splits('
+  - '176:     batch: int,'
+  - '177:     num_heads: int,'
+  evidence_id: src_abec9918b1b8cafc
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 227
+  end_line: 267
+  match: def _build_fp8(
+  captured:
+  - _build_fp8
+  arch_scope: ''
+  evidence:
+  - '226: @functools.lru_cache(maxsize=128)'
+  - '227: def _build_fp8('
+  - '228:     num_heads: int,'
+  - '229:     num_kv_heads: int,'
+  evidence_id: src_a4593ab451ff2a44
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 270
+  end_line: 638
+  match: def flydsl_flash_attn_fp8_func(
+  captured:
+  - flydsl_flash_attn_fp8_func
+  arch_scope: ''
+  evidence:
+  - '270: def flydsl_flash_attn_fp8_func('
+  - '271:     q: torch.Tensor,'
+  - '272:     k: torch.Tensor,'
+  evidence_id: src_bd2e46ad49f7eb24
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 211
+  end_line: 213
+  match: 'def makespan(splits: int) -> float:'
+  captured:
+  - makespan
+  arch_scope: ''
+  evidence:
+  - '209:         return 2'
+  - '211:     def makespan(splits: int) -> float:'
+  - '212:         n = wgs * splits'
+  - '213:         return (-(-n // num_cu)) * (_FP8_AUTOSPLIT_FIXED_TILES + -(-kv_tiles // splits))'
+  evidence_id: src_2631471c3ea05d7f
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 544
+  end_line: 547
+  match: .startswith("gfx950")
+  captured:
+  - gfx950
+  arch_scope: gfx950
+  evidence:
+  - '542:         )'
+  - '543:         _arch = _gpu_arch(q.device)'
+  - '544:         if not _arch.startswith("gfx950"):'
+  - '545:             raise ValueError('
+  - '546:                 f"flydsl_flash_attn_fp8_func: fp8 requires gfx950, got ''{_arch or ''unknown''}''"'
+  evidence_id: src_3744dd799cc5da45
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 333
+  match: 'raise ValueError("flydsl_flash_attn_fp8_func: q/k/v must be CUDA tensors'
+  captured:
+  - 'flydsl_flash_attn_fp8_func: q/k/v must be CUDA tensors'
+  arch_scope: ''
+  evidence:
+  - '331:     """'
+  - '332:     if not (q.is_cuda and k.is_cuda and v.is_cuda):'
+  - '333:         raise ValueError("flydsl_flash_attn_fp8_func: q/k/v must be CUDA tensors")'
+  - '334:     if not (q.device == k.device == v.device):'
+  - '335:         raise ValueError('
+  evidence_id: src_eaabce65c3ebb3df
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 345
+  end_line: 347
+  match: "raise ValueError(\n            f\"flydsl_flash_attn_fp8_func: q/k/v must be float8_e4m3fn, got {q.dtype!r}"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: q/k/v must be float8_e4m3fn, got {q.dtype!r}'
+  arch_scope: ''
+  evidence:
+  - '343:         )'
+  - '344:     if q.dtype != torch.float8_e4m3fn:'
+  - '345:         raise ValueError('
+  - '346:             f"flydsl_flash_attn_fp8_func: q/k/v must be float8_e4m3fn, got {q.dtype!r}"'
+  - '347:         )'
+  evidence_id: src_ef9e4bffbc50cde0
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 411
+  end_line: 413
+  match: "raise ValueError(\n            \"flydsl_flash_attn_fp8_func: fp8 requires q_descale, k_descale, and\
+    \ v_descale"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: fp8 requires q_descale, k_descale, and v_descale'
+  arch_scope: ''
+  evidence:
+  - '410:     if any(x is None for x in (q_descale, k_descale, v_descale)):'
+  - '411:         raise ValueError('
+  - '412:             "flydsl_flash_attn_fp8_func: fp8 requires q_descale, k_descale, and v_descale"'
+  - '413:         )'
+  evidence_id: src_0e0b6bfbdf8f1890
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 420
+  end_line: 422
+  match: "raise ValueError(\n                f\"flydsl_flash_attn_fp8_func: {name} must be a CUDA tensor"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: {name} must be a CUDA tensor'
+  arch_scope: ''
+  evidence:
+  - '418:     ):'
+  - '419:         if not scale.is_cuda:'
+  - '420:             raise ValueError('
+  - '421:                 f"flydsl_flash_attn_fp8_func: {name} must be a CUDA tensor"'
+  - '422:             )'
+  evidence_id: src_010474eaf47dce9f
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 424
+  end_line: 426
+  match: "raise ValueError(\n                f\"flydsl_flash_attn_fp8_func: {name} must be on {q.device}, got\
+    \ {scale.device}"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: {name} must be on {q.device}, got {scale.device}'
+  arch_scope: ''
+  evidence:
+  - '422:             )'
+  - '423:         if scale.device != q.device:'
+  - '424:             raise ValueError('
+  - '425:                 f"flydsl_flash_attn_fp8_func: {name} must be on {q.device}, got {scale.device}"'
+  - '426:             )'
+  evidence_id: src_fea36185b6e45100
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 428
+  end_line: 430
+  match: "raise ValueError(\n                f\"flydsl_flash_attn_fp8_func: {name} must be a shape-[1] float32\
+    \ tensor"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: {name} must be a shape-[1] float32 tensor'
+  arch_scope: ''
+  evidence:
+  - '426:             )'
+  - '427:         if scale.dtype != torch.float32 or scale.numel() != 1:'
+  - '428:             raise ValueError('
+  - '429:                 f"flydsl_flash_attn_fp8_func: {name} must be a shape-[1] float32 tensor"'
+  - '430:             )'
+  evidence_id: src_83247e3aab1e6a1a
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 444
+  end_line: 446
+  match: "raise ValueError(\n                f\"flydsl_flash_attn_fp8_func: varlen q must be 3D [total,H,D],\
+    \ got {q.dim()}D"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: varlen q must be 3D [total,H,D], got {q.dim()}D'
+  arch_scope: ''
+  evidence:
+  - '442:     if varlen:'
+  - '443:         if q.dim() != 3:'
+  - '444:             raise ValueError('
+  - '445:                 f"flydsl_flash_attn_fp8_func: varlen q must be 3D [total,H,D], got {q.dim()}D"'
+  - '446:             )'
+  evidence_id: src_713f41c708eb5ebf
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 467
+  end_line: 469
+  match: "raise ValueError(\n                f\"flydsl_flash_attn_fp8_func: dense q must be 4D [B,Sq,H,D],\
+    \ got {q.dim()}D"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: dense q must be 4D [B,Sq,H,D], got {q.dim()}D'
+  arch_scope: ''
+  evidence:
+  - '465:     else:'
+  - '466:         if q.dim() != 4:'
+  - '467:             raise ValueError('
+  - '468:                 f"flydsl_flash_attn_fp8_func: dense q must be 4D [B,Sq,H,D], got {q.dim()}D"'
+  - '469:             )'
+  evidence_id: src_c23ff1ebf819a41b
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 478
+  end_line: 481
+  match: "raise ValueError(\n            f\"flydsl_flash_attn_fp8_func: num_heads ({H}) must be divisible by"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: num_heads ({H}) must be divisible by '
+  arch_scope: ''
+  evidence:
+  - '476:         num_kv_heads = Hkv'
+  - '477:     if H % num_kv_heads != 0:'
+  - '478:         raise ValueError('
+  - '479:             f"flydsl_flash_attn_fp8_func: num_heads ({H}) must be divisible by "'
+  - '480:             f"num_kv_heads ({num_kv_heads})"'
+  evidence_id: src_b065bad38f27d481
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 483
+  end_line: 485
+  match: "raise ValueError(\n            f\"flydsl_flash_attn_fp8_func: head_dim ({D}) must be >= 64 and a\
+    \ multiple of 32"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: head_dim ({D}) must be >= 64 and a multiple of 32'
+  arch_scope: ''
+  evidence:
+  - '481:         )'
+  - '482:     if D < 64 or D % 32 != 0:'
+  - '483:         raise ValueError('
+  - '484:             f"flydsl_flash_attn_fp8_func: head_dim ({D}) must be >= 64 and a multiple of 32"'
+  - '485:         )'
+  evidence_id: src_bad63446c1fff213
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 490
+  end_line: 492
+  match: "raise ValueError(\n            \"flydsl_flash_attn_fp8_func: softmax_scale must be positive and finite"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: softmax_scale must be positive and finite'
+  arch_scope: ''
+  evidence:
+  - '488:         softmax_scale = D**-0.5'
+  - '489:     if not _is_valid_softmax_scale(softmax_scale):'
+  - '490:         raise ValueError('
+  - '491:             "flydsl_flash_attn_fp8_func: softmax_scale must be positive and finite"'
+  - '492:         )'
+  evidence_id: src_a7ab4c1638b15cf2
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 524
+  end_line: 528
+  match: "raise ValueError(\n                \"flydsl_flash_attn_fp8_func: split-K requires seq_len>=384"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: split-K requires seq_len>=384 '
+  arch_scope: ''
+  evidence:
+  - '522:     if splitk:'
+  - '523:         if not splitk_supported:'
+  - '524:             raise ValueError('
+  - '525:                 "flydsl_flash_attn_fp8_func: split-K requires seq_len>=384 "'
+  - '526:                 f"or noncausal cross-sequence attention, got seq_len={Sq}, "'
+  evidence_id: src_2a2602980e5a7425
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 545
+  end_line: 547
+  match: "raise ValueError(\n                f\"flydsl_flash_attn_fp8_func: fp8 requires gfx950, got"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: fp8 requires gfx950, got '
+  arch_scope: gfx950
+  evidence:
+  - '543:         _arch = _gpu_arch(q.device)'
+  - '544:         if not _arch.startswith("gfx950"):'
+  - '545:             raise ValueError('
+  - '546:                 f"flydsl_flash_attn_fp8_func: fp8 requires gfx950, got ''{_arch or ''unknown''}''"'
+  - '547:             )'
+  evidence_id: src_3b9b006ce6059245
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 573
+  end_line: 575
+  match: "raise ValueError(\n                f\"flydsl_flash_attn_fp8_func: out must be {_out_shape}, got {tuple(out.shape)}"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: out must be {_out_shape}, got {tuple(out.shape)}'
+  arch_scope: gfx950
+  evidence:
+  - '571:             out = torch.empty(_out_shape, dtype=torch.bfloat16, device=q.device)'
+  - '572:         elif tuple(out.shape) != _out_shape:'
+  - '573:             raise ValueError('
+  - '574:                 f"flydsl_flash_attn_fp8_func: out must be {_out_shape}, got {tuple(out.shape)}"'
+  - '575:             )'
+  evidence_id: src_a27b650abe80e6fc
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 577
+  end_line: 579
+  match: "raise ValueError(\n                f\"flydsl_flash_attn_fp8_func: fp8 output must be bf16, got {out.dtype}"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: fp8 output must be bf16, got {out.dtype}'
+  arch_scope: gfx950
+  evidence:
+  - '575:             )'
+  - '576:         elif out.dtype != torch.bfloat16:'
+  - '577:             raise ValueError('
+  - '578:                 f"flydsl_flash_attn_fp8_func: fp8 output must be bf16, got {out.dtype}"'
+  - '579:             )'
+  evidence_id: src_4a6a374f11000e38
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 581
+  end_line: 584
+  match: "raise ValueError(\n                \"flydsl_flash_attn_fp8_func: out must be contiguous, got strides"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: out must be contiguous, got strides '
+  arch_scope: gfx950
+  evidence:
+  - '579:             )'
+  - '580:         elif not out.is_contiguous():'
+  - '581:             raise ValueError('
+  - '582:                 "flydsl_flash_attn_fp8_func: out must be contiguous, got strides "'
+  - '583:                 f"{tuple(out.stride())} for shape {tuple(out.shape)}"'
+  evidence_id: src_6a6d5718e623d843
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 592
+  end_line: 594
+  match: "raise ValueError(\n                    f\"flydsl_flash_attn_fp8_func: lse must be {_lse_shape}, got\
+    \ {tuple(lse.shape)}"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: lse must be {_lse_shape}, got {tuple(lse.shape)}'
+  arch_scope: ''
+  evidence:
+  - '590:                 lse = torch.empty(_lse_shape, dtype=torch.float32, device=q.device)'
+  - '591:             elif tuple(lse.shape) != _lse_shape:'
+  - '592:                 raise ValueError('
+  - '593:                     f"flydsl_flash_attn_fp8_func: lse must be {_lse_shape}, got {tuple(lse.shape)}"'
+  - '594:                 )'
+  evidence_id: src_913ce0b3f5a94551
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 596
+  end_line: 598
+  match: "raise ValueError(\n                    f\"flydsl_flash_attn_fp8_func: lse must be float32, got {lse.dtype}"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: lse must be float32, got {lse.dtype}'
+  arch_scope: ''
+  evidence:
+  - '594:                 )'
+  - '595:             elif lse.dtype != torch.float32:'
+  - '596:                 raise ValueError('
+  - '597:                     f"flydsl_flash_attn_fp8_func: lse must be float32, got {lse.dtype}"'
+  - '598:                 )'
+  evidence_id: src_4ebd9210f9b50c87
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 600
+  end_line: 603
+  match: "raise ValueError(\n                    \"flydsl_flash_attn_fp8_func: lse must be contiguous, got\
+    \ strides"
+  captured:
+  - 'flydsl_flash_attn_fp8_func: lse must be contiguous, got strides '
+  arch_scope: ''
+  evidence:
+  - '598:                 )'
+  - '599:             elif not lse.is_contiguous():'
+  - '600:                 raise ValueError('
+  - '601:                     "flydsl_flash_attn_fp8_func: lse must be contiguous, got strides "'
+  - '602:                     f"{tuple(lse.stride())} for shape {tuple(lse.shape)}"'
+  evidence_id: src_bd7c0e3aa6d8ba9b
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 68
+  match: '@functools.lru_cache(maxsize=16)
+
+    def _gpu_arch_cached'
+  captured:
+  - '16'
+  - _gpu_arch_cached
+  arch_scope: ''
+  evidence:
+  - '66: # index resp. a handful of ints, but they run on every call; small shapes are'
+  - '67: # entirely host-bound, so memoise them.'
+  - '68: @functools.lru_cache(maxsize=16)'
+  - '69: def _gpu_arch_cached(index: int | None) -> str:'
+  - '70:     try:'
+  evidence_id: src_fdf4a026a3ce05c6
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 76
+  match: '@functools.lru_cache(maxsize=16)
+
+    def _num_cu_cached'
+  captured:
+  - '16'
+  - _num_cu_cached
+  arch_scope: ''
+  evidence:
+  - '76: @functools.lru_cache(maxsize=16)'
+  - '77: def _num_cu_cached(index: int | None) -> int:'
+  - '78:     try:'
+  evidence_id: src_e0ec315266e5a34a
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 92
+  match: '@functools.lru_cache(maxsize=128)
+
+    def _fp8_config_reason'
+  captured:
+  - '128'
+  - _fp8_config_reason
+  arch_scope: ''
+  evidence:
+  - '92: @functools.lru_cache(maxsize=128)'
+  - '93: def _fp8_config_reason('
+  - '94:     num_heads: int, num_kv_heads: int, head_dim: int, head_dim_v: int'
+  evidence_id: src_ee3768d46cb54830
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 151
+  match: '@functools.lru_cache(maxsize=256)
+
+    def _fp8_auto_block_m'
+  captured:
+  - '256'
+  - _fp8_auto_block_m
+  arch_scope: ''
+  evidence:
+  - '151: @functools.lru_cache(maxsize=256)'
+  - '152: def _fp8_auto_block_m('
+  - '153:     batch: int, num_heads: int, seqlen_q: int, seqlen_kv: int, num_cu: int'
+  evidence_id: src_6cbccf8fc5be5051
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 164
+  match: '@functools.lru_cache(maxsize=256)
+
+    def _fp8_batch_interleave_group'
+  captured:
+  - '256'
+  - _fp8_batch_interleave_group
+  arch_scope: ''
+  evidence:
+  - '164: @functools.lru_cache(maxsize=256)'
+  - '165: def _fp8_batch_interleave_group('
+  - '166:     batch: int, causal: bool, cross: bool, num_kv_splits: int'
+  evidence_id: src_fd640695ad23d660
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 174
+  match: '@functools.lru_cache(maxsize=512)
+
+    def _fp8_auto_kv_splits'
+  captured:
+  - '512'
+  - _fp8_auto_kv_splits
+  arch_scope: ''
+  evidence:
+  - '174: @functools.lru_cache(maxsize=512)'
+  - '175: def _fp8_auto_kv_splits('
+  - '176:     batch: int,'
+  evidence_id: src_eac28771ade22c02
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/flash_attn_func_fp8_gfx950.py
+  line: 226
+  match: '@functools.lru_cache(maxsize=128)
+
+    def _build_fp8'
+  captured:
+  - '128'
+  - _build_fp8
+  arch_scope: ''
+  evidence:
+  - '226: @functools.lru_cache(maxsize=128)'
+  - '227: def _build_fp8('
+  - '228:     num_heads: int,'
+  evidence_id: src_77fb38b1b198d6bc
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/prefill_attention.py
+  line: 44
+  end_line: 176
+  match: def _fwd_kernel(
+  captured:
+  - _fwd_kernel
+  arch_scope: ''
+  evidence:
+  - '43: @triton.jit(repr=_fwd_kernel_repr)'
+  - '44: def _fwd_kernel('
+  - '45:     Q,'
+  - '46:     K,'
+  evidence_id: src_a3adfa0056dbdf43
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/prefill_attention.py
+  line: 124
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '123:         qk = tl.zeros([BLOCK_M, BLOCK_N], dtype=tl.float32)'
+  - '124:         qk = tl.dot(q, k, acc=qk)'
+  - '125:         qk *= sm_scale'
+  evidence_id: src_69913b7083c18349
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/prefill_attention.py
+  line: 163
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '162:         p = p.to(v.dtype)'
+  - '163:         acc = tl.dot(p, v, acc=acc)'
+  - '164:         # update m_i and l_i'
+  - '165:         l_i = l_i_new'
+  evidence_id: src_01b91e33db77bd1f
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/prefill_attention.py
+  line: 60
+  match: 'kv_group_num: tl.constexpr,'
+  captured:
+  - kv_group_num
+  arch_scope: ''
+  evidence:
+  - '58:     stride_obs,'
+  - '59:     stride_oh,'
+  - '60:     kv_group_num: tl.constexpr,'
+  - '61:     BLOCK_M: tl.constexpr,'
+  - '62:     BLOCK_DMODEL: tl.constexpr,'
+  evidence_id: src_44fa180ef2b46ef9
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/prefill_attention.py
+  line: 61
+  match: 'BLOCK_M: tl.constexpr,'
+  captured:
+  - BLOCK_M
+  arch_scope: ''
+  evidence:
+  - '59:     stride_oh,'
+  - '60:     kv_group_num: tl.constexpr,'
+  - '61:     BLOCK_M: tl.constexpr,'
+  - '62:     BLOCK_DMODEL: tl.constexpr,'
+  - '63:     BLOCK_N: tl.constexpr,'
+  evidence_id: src_9d42975902d849b1
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/prefill_attention.py
+  line: 62
+  match: 'BLOCK_DMODEL: tl.constexpr,'
+  captured:
+  - BLOCK_DMODEL
+  arch_scope: ''
+  evidence:
+  - '60:     kv_group_num: tl.constexpr,'
+  - '61:     BLOCK_M: tl.constexpr,'
+  - '62:     BLOCK_DMODEL: tl.constexpr,'
+  - '63:     BLOCK_N: tl.constexpr,'
+  - '64:     IS_CAUSAL: tl.constexpr,'
+  evidence_id: src_88b99869d7cbcfae
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/prefill_attention.py
+  line: 63
+  match: 'BLOCK_N: tl.constexpr,'
+  captured:
+  - BLOCK_N
+  arch_scope: ''
+  evidence:
+  - '61:     BLOCK_M: tl.constexpr,'
+  - '62:     BLOCK_DMODEL: tl.constexpr,'
+  - '63:     BLOCK_N: tl.constexpr,'
+  - '64:     IS_CAUSAL: tl.constexpr,'
+  - '65:     Lk: tl.constexpr,'
+  evidence_id: src_633c9d201ef63a15
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/prefill_attention.py
+  line: 64
+  match: 'IS_CAUSAL: tl.constexpr,'
+  captured:
+  - IS_CAUSAL
+  arch_scope: ''
+  evidence:
+  - '62:     BLOCK_DMODEL: tl.constexpr,'
+  - '63:     BLOCK_N: tl.constexpr,'
+  - '64:     IS_CAUSAL: tl.constexpr,'
+  - '65:     Lk: tl.constexpr,'
+  - '66: ):'
+  evidence_id: src_71c9a155d477a06b
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/prefill_attention.py
+  line: 65
+  match: 'Lk: tl.constexpr,'
+  captured:
+  - Lk
+  arch_scope: ''
+  evidence:
+  - '63:     BLOCK_N: tl.constexpr,'
+  - '64:     IS_CAUSAL: tl.constexpr,'
+  - '65:     Lk: tl.constexpr,'
+  - '66: ):'
+  - '67:     cur_batch = tl.program_id(0)'
+  evidence_id: src_f671359a42e293e9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 42
+  end_line: 58
+  match: def _make_kv_shared_layouts(
+  captured:
+  - _make_kv_shared_layouts
+  arch_scope: ''
+  evidence:
+  - '41: @gluon.constexpr_function'
+  - '42: def _make_kv_shared_layouts('
+  - '43:     head_dim_pow2, elem_bytes, k_width=8, non_k_dim=16, banks=64'
+  - '44: ):'
+  evidence_id: src_10f5273a8f2a8245
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 62
+  end_line: 77
+  match: 'def _make_load_layout(block_dmodel, load_vec, num_warps, transposed, lanes=64):'
+  captured:
+  - _make_load_layout
+  arch_scope: ''
+  evidence:
+  - '61: @gluon.constexpr_function'
+  - '62: def _make_load_layout(block_dmodel, load_vec, num_warps, transposed, lanes=64):'
+  - '63:     """Blocked layout for one tile load."""'
+  - '64:     warp_elems = lanes * load_vec'
+  evidence_id: src_e48412dbea6afab4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 81
+  end_line: 98
+  match: def _buffer_load_2d(
+  captured:
+  - _buffer_load_2d
+  arch_scope: ''
+  evidence:
+  - '80: @gluon.jit'
+  - '81: def _buffer_load_2d('
+  - '82:     base, offsets, offset_first, offset_second, boundary_first, boundary_second'
+  - '83: ):'
+  evidence_id: src_56e1e9889539f5ec
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 102
+  end_line: 142
+  match: def _load_k(
+  captured:
+  - _load_k
+  arch_scope: ''
+  evidence:
+  - '101: @gluon.jit'
+  - '102: def _load_k('
+  - '103:     k_base,'
+  - '104:     k_offsets,'
+  evidence_id: src_cc25eac3f3aaf5dd
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 146
+  end_line: 169
+  match: def _load_v(
+  captured:
+  - _load_v
+  arch_scope: ''
+  evidence:
+  - '145: @gluon.jit'
+  - '146: def _load_v('
+  - '147:     v_base,'
+  - '148:     v_offsets,'
+  evidence_id: src_aba788abdbbe4b1b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 173
+  end_line: 176
+  match: 'def _store_k_smem(smemK, smemKpe, k_tile, k_pe_tile, HAS_PE: gl.constexpr):'
+  captured:
+  - _store_k_smem
+  arch_scope: ''
+  evidence:
+  - '172: @gluon.jit'
+  - '173: def _store_k_smem(smemK, smemKpe, k_tile, k_pe_tile, HAS_PE: gl.constexpr):'
+  - '174:     smemK.store(k_tile)'
+  - '175:     if HAS_PE:'
+  evidence_id: src_3b5f66a11f308644
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 180
+  end_line: 185
+  match: 'def _load_k_smem(smemK, smemKpe, dotK: gl.constexpr, HAS_PE: gl.constexpr):'
+  captured:
+  - _load_k_smem
+  arch_scope: ''
+  evidence:
+  - '179: @gluon.jit'
+  - '180: def _load_k_smem(smemK, smemKpe, dotK: gl.constexpr, HAS_PE: gl.constexpr):'
+  - '181:     k = smemK.load(dotK)'
+  - '182:     if HAS_PE:'
+  evidence_id: src_72d9c6339b2fe0da
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 189
+  end_line: 243
+  match: def _attn_qk(
+  captured:
+  - _attn_qk
+  arch_scope: ''
+  evidence:
+  - '188: @gluon.jit'
+  - '189: def _attn_qk('
+  - '190:     q,'
+  - '191:     k,'
+  evidence_id: src_41b24e1d348220fd
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 247
+  end_line: 305
+  match: def _attn_softmax_pv(
+  captured:
+  - _attn_softmax_pv
+  arch_scope: ''
+  evidence:
+  - '246: @gluon.jit'
+  - '247: def _attn_softmax_pv('
+  - '248:     acc,'
+  - '249:     l_i,'
+  evidence_id: src_cfddabcea1608ec9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 309
+  end_line: 455
+  match: def _attn_fwd_inner(
+  captured:
+  - _attn_fwd_inner
+  arch_scope: ''
+  evidence:
+  - '308: @gluon.jit'
+  - '309: def _attn_fwd_inner('
+  - '310:     acc,'
+  - '311:     l_i,'
+  evidence_id: src_34fb1245882837f4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 480
+  end_line: 1135
+  match: def _attn_fwd(
+  captured:
+  - _attn_fwd
+  arch_scope: ''
+  evidence:
+  - '479: @gluon.jit(repr=_attn_fwd_repr)'
+  - '480: def _attn_fwd('
+  - '481:     q_ptr,'
+  - '482:     k_ptr,'
+  evidence_id: src_c261b9972eed0fa0
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 1138
+  end_line: 1148
+  match: 'def _get_config(is_fp8: bool, has_pe: bool = False):'
+  captured:
+  - _get_config
+  arch_scope: ''
+  evidence:
+  - '1138: def _get_config(is_fp8: bool, has_pe: bool = False):'
+  - '1139:     arch = arch_info.get_arch()'
+  - '1140:     fpath = f"{AITER_TRITON_CONFIGS_PATH}/{arch}/gluon/attention/mha/mha.json"'
+  evidence_id: src_4ef6d40cf812fcce
+- snapshot: aiter_b3ad6c46
+  category: lds_swizzle
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 56
+  match: gl.SwizzledSharedLayout(
+  captured:
+  - SwizzledSharedLayout
+  arch_scope: ''
+  evidence:
+  - '54:         bank_line_elems // swizzle_vec,'
+  - '55:     )'
+  - '56:     k_shared = gl.SwizzledSharedLayout(swizzle_vec, per_phase, max_phase, order=[0, 1])'
+  - '57:     v_shared = gl.SwizzledSharedLayout(swizzle_vec, per_phase, max_phase, order=[1, 0])'
+  - '58:     return k_shared, v_shared'
+  evidence_id: src_f3523e4b9543b571
+- snapshot: aiter_b3ad6c46
+  category: lds_swizzle
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/mha.py
+  line: 57
+  match: gl.SwizzledSharedLayout(
+  captured:
+  - SwizzledSharedLayout
+  arch_scope: ''
+  evidence:
+  - '55:     )'
+  - '56:     k_shared = gl.SwizzledSharedLayout(swizzle_vec, per_phase, max_phase, order=[0, 1])'
+  - '57:     v_shared = gl.SwizzledSharedLayout(swizzle_vec, per_phase, max_phase, order=[1, 0])'
+  - '58:     return k_shared, v_shared'
+  evidence_id: src_d5395a448bb3c67d

@@ -1,5 +1,8 @@
 # chunked_prefill
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Prompt chunks attending to cached prefixes.
 
 1 AITER implementation references; 0 historical experience cards.

@@ -1,0 +1,44 @@
+provenance:
+  schema_version: 4
+  operator_family: compressed_attention
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  paged_kv: The design reads a paged KV cache.
+cards:
+- id: attention-compression-cache-contract
+  type: constraint
+  axes:
+  - compression
+  - cache_layout
+  - numerical_contract
+  match:
+    operator_families:
+    - compressed_attention
+    target_languages:
+    - flydsl
+  question: Which compression-window and quantized-cache contracts must travel together?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The chosen source path is the fused compression/cache preparation kernel, not ordinary dense attention.
+  actions:
+  - 'Preserve the overlap setting: the builder uses K = 2*ratio for overlap and K = ratio without overlap,
+    with a state-size requirement.'
+  - 'Select the cache output format explicitly: per-row FP8, grouped FP8 and FP4 have different scales and
+    layouts.'
+  - Enforce the builder's vector-width, rotary-dimension, state-size and FP4 alignment checks before tuning
+    its pipeline.
+  alternatives:
+  - Keep compression and quantized cache packing separate until both intermediate outputs agree with the reference.
+  why:
+  - The builder couples compression geometry, online rescaling, quantization and cache scatter in one implementation.
+  source_evidence:
+  - aiter_b3ad6c46:src_24c98837f9940bb0
+  measurement_evidence: []
+  limitations:
+  - This source is a compression/preparation stage; it is not proof of a complete compressed-attention serving
+    path.
+  - FP4 and FP8 scale contracts are not interchangeable.
+  references:
+  - knowledge/operator/compressed_attention/README.md
+shared_cards: []

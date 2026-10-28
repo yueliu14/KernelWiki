@@ -1,0 +1,1228 @@
+schema_version: 2
+operator: splitk_streamk_gemm
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_a6bb4993
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  lines: 934
+  evidence_records: 63
+- snapshot: aiter_a6bb4993
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  lines: 292
+  evidence_records: 13
+missing: []
+source_evidence:
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 56
+  end_line: 58
+  match: rocdl.mfma_f32_16x16x16bf16_1k(
+  captured:
+  - mfma_f32_16x16x16bf16_1k
+  arch_scope: ''
+  evidence:
+  - '54:             a_frag_vi16 = vector.bitcast(T.vec(self.WMMA_A_FRAG_VALUES, T.i16), a_frag)'
+  - '55:             b_frag_vi16 = vector.bitcast(T.vec(self.WMMA_B_FRAG_VALUES, T.i16), b_frag)'
+  - '56:             return rocdl.mfma_f32_16x16x16bf16_1k('
+  - '57:                 T.f32x4, [a_frag_vi16, b_frag_vi16, c_frag, 0, 0, 0]'
+  - '58:             )'
+  evidence_id: src_24517333d1cd6722
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 59
+  end_line: 61
+  match: rocdl.mfma_f32_16x16x16f16(
+  captured:
+  - mfma_f32_16x16x16f16
+  arch_scope: ''
+  evidence:
+  - '57:                 T.f32x4, [a_frag_vi16, b_frag_vi16, c_frag, 0, 0, 0]'
+  - '58:             )'
+  - '59:         return rocdl.mfma_f32_16x16x16f16('
+  - '60:             T.vec(self.WMMA_C_FRAG_VALUES, T.f32), [a_frag, b_frag, c_frag, 0, 0, 0]'
+  - '61:         )'
+  evidence_id: src_0ed3b5780c589479
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 77
+  end_line: 79
+  match: rocdl.mfma_f32_16x16x32_bf16(
+  captured:
+  - mfma_f32_16x16x32_bf16
+  arch_scope: ''
+  evidence:
+  - '75:     def __call__(self, a_frag, b_frag, c_frag):'
+  - '76:         if self.dtype == "bf16":'
+  - '77:             return rocdl.mfma_f32_16x16x32_bf16('
+  - '78:                 T.vec(self.WMMA_C_FRAG_VALUES, T.f32), [a_frag, b_frag, c_frag, 0, 0, 0]'
+  - '79:             )'
+  evidence_id: src_387e95ce58e0449b
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 80
+  end_line: 82
+  match: rocdl.mfma_f32_16x16x32_f16(
+  captured:
+  - mfma_f32_16x16x32_f16
+  arch_scope: ''
+  evidence:
+  - '78:                 T.vec(self.WMMA_C_FRAG_VALUES, T.f32), [a_frag, b_frag, c_frag, 0, 0, 0]'
+  - '79:             )'
+  - '80:         return rocdl.mfma_f32_16x16x32_f16('
+  - '81:             T.vec(self.WMMA_C_FRAG_VALUES, T.f32), [a_frag, b_frag, c_frag, 0, 0, 0]'
+  - '82:         )'
+  evidence_id: src_79cfb57473ed817f
+- snapshot: aiter_a6bb4993
+  category: mfma_shape
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 42
+  match: WMMA_M = 16
+  captured:
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '41: class WmmaHalf_m16n16k16(WmmaHalfBase):'
+  - '42:     WMMA_M = 16'
+  - '43:     WMMA_N = 16'
+  - '44:     WMMA_K = 16'
+  evidence_id: src_31876969bf8ecf17
+- snapshot: aiter_a6bb4993
+  category: mfma_shape
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 43
+  match: WMMA_N = 16
+  captured:
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '41: class WmmaHalf_m16n16k16(WmmaHalfBase):'
+  - '42:     WMMA_M = 16'
+  - '43:     WMMA_N = 16'
+  - '44:     WMMA_K = 16'
+  - '45:     WMMA_A_FRAG_VALUES = 4'
+  evidence_id: src_9790559824dc89a2
+- snapshot: aiter_a6bb4993
+  category: mfma_shape
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 44
+  match: WMMA_K = 16
+  captured:
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '42:     WMMA_M = 16'
+  - '43:     WMMA_N = 16'
+  - '44:     WMMA_K = 16'
+  - '45:     WMMA_A_FRAG_VALUES = 4'
+  - '46:     WMMA_B_FRAG_VALUES = 4'
+  evidence_id: src_6b168310db260660
+- snapshot: aiter_a6bb4993
+  category: mfma_shape
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 65
+  match: WMMA_M = 16
+  captured:
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '64: class WmmaHalf_m16n16k32(WmmaHalfBase):'
+  - '65:     WMMA_M = 16'
+  - '66:     WMMA_N = 16'
+  - '67:     WMMA_K = 32'
+  evidence_id: src_8ee8f15251a9a000
+- snapshot: aiter_a6bb4993
+  category: mfma_shape
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 66
+  match: WMMA_N = 16
+  captured:
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '64: class WmmaHalf_m16n16k32(WmmaHalfBase):'
+  - '65:     WMMA_M = 16'
+  - '66:     WMMA_N = 16'
+  - '67:     WMMA_K = 32'
+  - '68:     WMMA_A_FRAG_VALUES = 8'
+  evidence_id: src_066c741da8b8107b
+- snapshot: aiter_a6bb4993
+  category: mfma_shape
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 67
+  match: WMMA_K = 32
+  captured:
+  - '32'
+  arch_scope: ''
+  evidence:
+  - '65:     WMMA_M = 16'
+  - '66:     WMMA_N = 16'
+  - '67:     WMMA_K = 32'
+  - '68:     WMMA_A_FRAG_VALUES = 8'
+  - '69:     WMMA_B_FRAG_VALUES = 8'
+  evidence_id: src_ec432cec141eab67
+- snapshot: aiter_a6bb4993
+  category: waves
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 139
+  match: WARP_SIZE = 64
+  captured:
+  - WARP_SIZE
+  - '64'
+  arch_scope: gfx942
+  evidence:
+  - '137:         ASYNC_COPY = True'
+  - '139:     WARP_SIZE = 64'
+  - '140:     DTYPE_BYTES = 2'
+  - '141:     LDG_VEC_SIZE = 8'
+  evidence_id: src_fdef5d4771689903
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 117
+  match: IS_SPLIT_K =
+  captured:
+  - IS_SPLIT_K
+  arch_scope: ''
+  evidence:
+  - '115:     HAS_BIAS: bool = False,'
+  - '116: ):'
+  - '117:     IS_SPLIT_K = SPLIT_K > 1'
+  - '118:     BLOCK_K = TILE_K'
+  - '119:     assert (k % SPLIT_K == 0) and (k // SPLIT_K >= 1)'
+  evidence_id: src_b9b52836a1da4a49
+- snapshot: aiter_a6bb4993
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 23
+  match: SPLIT_K_COUNTER_MAX_LEN = 128
+  captured:
+  - SPLIT_K_COUNTER_MAX_LEN
+  - '128'
+  arch_scope: ''
+  evidence:
+  - '21: from ..utils import get_shared_memory_per_block'
+  - '23: SPLIT_K_COUNTER_MAX_LEN = 128'
+  - '24: SPLIT_K_SIGNAL_STATE_COUNT = 3'
+  evidence_id: src_5876c1cb8be66e43
+- snapshot: aiter_a6bb4993
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 128
+  end_line: 137
+  match: GPU_ARCH == "gfx942"
+  captured:
+  - gfx942
+  arch_scope: gfx942
+  evidence:
+  - '127:     GPU_ARCH = get_rocm_arch()'
+  - '128:     if GPU_ARCH == "gfx942":'
+  - '129:         WMMA_IMPL = WmmaHalf_m16n16k16(dtype)'
+  - '130:         DMA_BYTES = 4'
+  evidence_id: src_e689c0cbe1b4f8e8
+- snapshot: aiter_a6bb4993
+  category: lds_stage
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 142
+  match: STAGES = 2
+  captured:
+  - STAGES
+  - '2'
+  arch_scope: gfx942
+  evidence:
+  - '140:     DTYPE_BYTES = 2'
+  - '141:     LDG_VEC_SIZE = 8'
+  - '142:     STAGES = 2'
+  - '144:     WMMA_M = WMMA_IMPL.WMMA_M'
+  evidence_id: src_dbdbdbf21af30e3c
+- snapshot: aiter_a6bb4993
+  category: lds_swizzle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 27
+  end_line: 28
+  match: def swizzle_xor16(
+  captured:
+  - swizzle_xor16
+  arch_scope: ''
+  evidence:
+  - '27: def swizzle_xor16(row, col_in_bytes, k_blocks16):'
+  - '28:     return col_in_bytes ^ ((row % k_blocks16) * 16)'
+  evidence_id: src_2e329cfe46a52fb9
+- snapshot: aiter_a6bb4993
+  category: lds_swizzle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 27
+  end_line: 28
+  match: swizzle_xor16
+  captured:
+  - swizzle_xor16
+  arch_scope: ''
+  evidence:
+  - '27: def swizzle_xor16(row, col_in_bytes, k_blocks16):'
+  - '28:     return col_in_bytes ^ ((row % k_blocks16) * 16)'
+  evidence_id: src_5f392410068ae1c3
+- snapshot: aiter_a6bb4993
+  category: lds_swizzle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 455
+  end_line: 457
+  match: swizzle_xor16
+  captured:
+  - swizzle_xor16
+  arch_scope: ''
+  evidence:
+  - '453:                 m_local_idx = global_tid // LDG_A_X_THREADS'
+  - '454:                 k_local_idx = global_tid % LDG_A_X_THREADS * LDG_VEC_SIZE'
+  - '455:                 col_in_bytes = swizzle_xor16('
+  - '456:                     m_local_idx, k_local_idx * DTYPE_BYTES, k_blocks16'
+  - '457:                 )'
+  evidence_id: src_d1f233838e74f022
+- snapshot: aiter_a6bb4993
+  category: lds_swizzle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 485
+  end_line: 487
+  match: swizzle_xor16
+  captured:
+  - swizzle_xor16
+  arch_scope: ''
+  evidence:
+  - '483:                 m_local_idx = global_tid // LDG_A_X_THREADS_AS'
+  - '484:                 k_local_idx = global_tid % LDG_A_X_THREADS_AS * LDG_ASYNC_VEC_SIZE'
+  - '485:                 col_in_bytes = swizzle_xor16('
+  - '486:                     m_local_idx, k_local_idx * DTYPE_BYTES, k_blocks16'
+  - '487:                 )'
+  evidence_id: src_a0bc14b5075901f7
+- snapshot: aiter_a6bb4993
+  category: lds_swizzle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 530
+  match: swizzle_xor16
+  captured:
+  - swizzle_xor16
+  arch_scope: ''
+  evidence:
+  - '528:                         warp_atom_k_idx + ldmatrix_a_k_vec_idx'
+  - '529:                     ) * DTYPE_BYTES'
+  - '530:                     col_in_bytes = swizzle_xor16(row, col_in_bytes, k_blocks16)'
+  - '531:                     a_frags[kk * WARP_M_STEPS + ii] = as_.vec_load('
+  - '532:                         (s, row, col_in_bytes // DTYPE_BYTES),'
+  evidence_id: src_6f222b94149ab249
+- snapshot: aiter_a6bb4993
+  category: lds_swizzle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 625
+  end_line: 627
+  match: swizzle_xor16
+  captured:
+  - swizzle_xor16
+  arch_scope: ''
+  evidence:
+  - '623:                     n_local_idx = global_tid // LDG_B_X_THREADS_AS'
+  - '624:                     k_local_idx = global_tid % LDG_B_X_THREADS_AS * LDG_ASYNC_VEC_SIZE'
+  - '625:                     col_in_bytes = swizzle_xor16('
+  - '626:                         n_local_idx, k_local_idx * DTYPE_BYTES, k_blocks16'
+  - '627:                     )'
+  evidence_id: src_d2c808ad3cd9ce7c
+- snapshot: aiter_a6bb4993
+  category: lds_swizzle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 675
+  match: swizzle_xor16
+  captured:
+  - swizzle_xor16
+  arch_scope: ''
+  evidence:
+  - '673:                             warp_atom_k_idx + ldmatrix_b_k_vec_idx'
+  - '674:                         ) * DTYPE_BYTES'
+  - '675:                         col_in_bytes = swizzle_xor16(row, col_in_bytes, k_blocks16)'
+  - '676:                         b_frags[kk * WARP_N_STEPS + ii] = bs_s.vec_load('
+  - '677:                             (s, row, col_in_bytes // DTYPE_BYTES),'
+  evidence_id: src_0438c6e24a955ea2
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 132
+  match: ASYNC_COPY =
+  captured:
+  - ASYNC_COPY
+  arch_scope: gfx942
+  evidence:
+  - '130:         DMA_BYTES = 4'
+  - '131:         MFMA_PER_WARP_K = 2'
+  - '132:         ASYNC_COPY = False'
+  - '133:     else:'
+  - '134:         WMMA_IMPL = WmmaHalf_m16n16k32(dtype)'
+  evidence_id: src_8f59fe9a6d65aaf3
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 137
+  match: ASYNC_COPY =
+  captured:
+  - ASYNC_COPY
+  arch_scope: gfx942
+  evidence:
+  - '135:         DMA_BYTES = 16'
+  - '136:         MFMA_PER_WARP_K = 1'
+  - '137:         ASYNC_COPY = True'
+  - '139:     WARP_SIZE = 64'
+  evidence_id: src_0f3d7f24923f1bc6
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 130
+  match: DMA_BYTES = 4
+  captured:
+  - DMA_BYTES
+  - '4'
+  arch_scope: gfx942
+  evidence:
+  - '128:     if GPU_ARCH == "gfx942":'
+  - '129:         WMMA_IMPL = WmmaHalf_m16n16k16(dtype)'
+  - '130:         DMA_BYTES = 4'
+  - '131:         MFMA_PER_WARP_K = 2'
+  - '132:         ASYNC_COPY = False'
+  evidence_id: src_08dc0d0909566fd7
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 135
+  match: DMA_BYTES = 16
+  captured:
+  - DMA_BYTES
+  - '16'
+  arch_scope: gfx942
+  evidence:
+  - '133:     else:'
+  - '134:         WMMA_IMPL = WmmaHalf_m16n16k32(dtype)'
+  - '135:         DMA_BYTES = 16'
+  - '136:         MFMA_PER_WARP_K = 1'
+  - '137:         ASYNC_COPY = True'
+  evidence_id: src_7bc158d48a36bfca
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 140
+  match: DTYPE_BYTES = 2
+  captured:
+  - DTYPE_BYTES
+  - '2'
+  arch_scope: gfx942
+  evidence:
+  - '139:     WARP_SIZE = 64'
+  - '140:     DTYPE_BYTES = 2'
+  - '141:     LDG_VEC_SIZE = 8'
+  - '142:     STAGES = 2'
+  evidence_id: src_c3a611645fc2a1c3
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 141
+  match: LDG_VEC_SIZE = 8
+  captured:
+  - LDG_VEC_SIZE
+  - '8'
+  arch_scope: gfx942
+  evidence:
+  - '139:     WARP_SIZE = 64'
+  - '140:     DTYPE_BYTES = 2'
+  - '141:     LDG_VEC_SIZE = 8'
+  - '142:     STAGES = 2'
+  evidence_id: src_5935d3305750c5f0
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 323
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '321:                         scf.YieldOp([])'
+  - '322:                 scf.YieldOp([])'
+  - '323:             rocdl.sched_barrier(0)'
+  - '324:             gpu.barrier()'
+  evidence_id: src_e7a68de63948b12e
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 366
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '364:                     scf.YieldOp([])'
+  - '365:                 scf.YieldOp([])'
+  - '366:             rocdl.sched_barrier(0)'
+  - '367:             gpu.barrier()'
+  evidence_id: src_dbc6beb1ebc75dcd
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 390
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '388:                     scf.YieldOp([])'
+  - '389:                 scf.YieldOp([])'
+  - '390:             rocdl.sched_barrier(0)'
+  - '391:             gpu.barrier()'
+  evidence_id: src_c481394b755422a6
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 688
+  match: rocdl.sched_dsrd(
+  captured:
+  - sched_dsrd
+  arch_scope: ''
+  evidence:
+  - '686:             def hot_loop_scheduler():'
+  - '687:                 for _ in range_constexpr(WARP_K_STEPS * WARP_M_STEPS):'
+  - '688:                     rocdl.sched_dsrd(1)'
+  - '689:                 for _ in range_constexpr(WARP_K_STEPS * WARP_N_STEPS):'
+  - '690:                     rocdl.sched_dsrd(1)'
+  evidence_id: src_5da6811a509d9806
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 690
+  match: rocdl.sched_dsrd(
+  captured:
+  - sched_dsrd
+  arch_scope: ''
+  evidence:
+  - '688:                     rocdl.sched_dsrd(1)'
+  - '689:                 for _ in range_constexpr(WARP_K_STEPS * WARP_N_STEPS):'
+  - '690:                     rocdl.sched_dsrd(1)'
+  - '691:                 for _ in range_constexpr('
+  - '692:                     LDG_REG_A_COUNT_AS if const_expr(ASYNC_COPY) else LDG_REG_A_COUNT'
+  evidence_id: src_b0da890c19bc671e
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 694
+  match: rocdl.sched_vmem(
+  captured:
+  - sched_vmem
+  arch_scope: ''
+  evidence:
+  - '692:                     LDG_REG_A_COUNT_AS if const_expr(ASYNC_COPY) else LDG_REG_A_COUNT'
+  - '693:                 ):'
+  - '694:                     rocdl.sched_vmem(1)'
+  - '695:                 for _ in range_constexpr('
+  - '696:                     LDG_REG_B_COUNT_AS if const_expr(ASYNC_COPY) else LDG_REG_B_COUNT'
+  evidence_id: src_ed1134f4e4cea08c
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 698
+  match: rocdl.sched_vmem(
+  captured:
+  - sched_vmem
+  arch_scope: ''
+  evidence:
+  - '696:                     LDG_REG_B_COUNT_AS if const_expr(ASYNC_COPY) else LDG_REG_B_COUNT'
+  - '697:                 ):'
+  - '698:                     rocdl.sched_vmem(1)'
+  - '699:                 for _ in range_constexpr('
+  - '700:                     WARP_K_STEPS * WARP_M_STEPS * WARP_N_STEPS * MFMA_PER_WARP_K'
+  evidence_id: src_86d7e5af1117454e
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 702
+  match: rocdl.sched_mfma(
+  captured:
+  - sched_mfma
+  arch_scope: ''
+  evidence:
+  - '700:                     WARP_K_STEPS * WARP_M_STEPS * WARP_N_STEPS * MFMA_PER_WARP_K'
+  - '701:                 ):'
+  - '702:                     rocdl.sched_mfma(1)'
+  - '703:                 rocdl.sched_barrier(0)'
+  evidence_id: src_0f18d7f50ce33cbb
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 703
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '701:                 ):'
+  - '702:                     rocdl.sched_mfma(1)'
+  - '703:                 rocdl.sched_barrier(0)'
+  - '705:             UNROLL = 8'
+  evidence_id: src_dca1b81d9d2b2edf
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 753
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '751:             a_frags = lds_matrix_a(0)'
+  - '752:             b_frags = ldg_matrix_b(ks_begin)'
+  - '753:             rocdl.sched_barrier(0)'
+  - '755:             def hot_loop_scheduler():'
+  evidence_id: src_59e3448ceb8df5b8
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 768
+  match: rocdl.sched_vmem(
+  captured:
+  - sched_vmem
+  arch_scope: ''
+  evidence:
+  - '766:                     avg_mfma_count = (mfma_total + ldg_total - 1) // ldg_total'
+  - '767:                     for _ in range_constexpr(ldg_total):'
+  - '768:                         rocdl.sched_vmem(ldg_.consume(1))'
+  - '769:                         rocdl.sched_mfma(mfma_.consume(avg_mfma_count))'
+  - '770:                 else:'
+  evidence_id: src_0d4fc63bfc744687
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 769
+  match: rocdl.sched_mfma(
+  captured:
+  - sched_mfma
+  arch_scope: ''
+  evidence:
+  - '767:                     for _ in range_constexpr(ldg_total):'
+  - '768:                         rocdl.sched_vmem(ldg_.consume(1))'
+  - '769:                         rocdl.sched_mfma(mfma_.consume(avg_mfma_count))'
+  - '770:                 else:'
+  - '771:                     ldg_sts_total = ldg_total + ldg_reg_a_count_'
+  evidence_id: src_73013b6a4cb30a28
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 774
+  match: rocdl.sched_vmem(
+  captured:
+  - sched_vmem
+  arch_scope: ''
+  evidence:
+  - '772:                     avg_mfma_count = (mfma_total + ldg_sts_total - 1) // ldg_sts_total'
+  - '773:                     for _ in range_constexpr(ldg_total):'
+  - '774:                         rocdl.sched_vmem(ldg_.consume(1))'
+  - '775:                         rocdl.sched_mfma(mfma_.consume(avg_mfma_count))'
+  - '776:                     for _ in range_constexpr(ldg_reg_a_count_):'
+  evidence_id: src_98806d8a9c7375c6
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 775
+  match: rocdl.sched_mfma(
+  captured:
+  - sched_mfma
+  arch_scope: ''
+  evidence:
+  - '773:                     for _ in range_constexpr(ldg_total):'
+  - '774:                         rocdl.sched_vmem(ldg_.consume(1))'
+  - '775:                         rocdl.sched_mfma(mfma_.consume(avg_mfma_count))'
+  - '776:                     for _ in range_constexpr(ldg_reg_a_count_):'
+  - '777:                         rocdl.sched_dswr(1)'
+  evidence_id: src_c6763cf12ad488c9
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 777
+  match: rocdl.sched_dswr(
+  captured:
+  - sched_dswr
+  arch_scope: ''
+  evidence:
+  - '775:                         rocdl.sched_mfma(mfma_.consume(avg_mfma_count))'
+  - '776:                     for _ in range_constexpr(ldg_reg_a_count_):'
+  - '777:                         rocdl.sched_dswr(1)'
+  - '778:                         rocdl.sched_mfma(mfma_.consume(avg_mfma_count))'
+  - '779:                 rocdl.sched_barrier(0)'
+  evidence_id: src_e7aa46e98f65ce51
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 778
+  match: rocdl.sched_mfma(
+  captured:
+  - sched_mfma
+  arch_scope: ''
+  evidence:
+  - '776:                     for _ in range_constexpr(ldg_reg_a_count_):'
+  - '777:                         rocdl.sched_dswr(1)'
+  - '778:                         rocdl.sched_mfma(mfma_.consume(avg_mfma_count))'
+  - '779:                 rocdl.sched_barrier(0)'
+  evidence_id: src_87c2fdf5145d3d3d
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 779
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '777:                         rocdl.sched_dswr(1)'
+  - '778:                         rocdl.sched_mfma(mfma_.consume(avg_mfma_count))'
+  - '779:                 rocdl.sched_barrier(0)'
+  - '781:             init_state = ('
+  evidence_id: src_db647c99b1795531
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 804
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '802:                 a_frags_next = lds_matrix_a(next_stage)'
+  - '803:                 k_offset = k_offset + fx.Int32(BLOCK_K)'
+  - '804:                 rocdl.sched_barrier(0)'
+  - '805:                 results = ('
+  - '806:                     yield [k_offset, next_stage] + c_frags + a_frags_next + b_frags_next'
+  evidence_id: src_80808a5197c8e6dc
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 206
+  end_line: 211
+  match: "raise RuntimeError(\n            f\"{KERNEL_NAME} requires {SMEM_USE} bytes LDS,"
+  captured:
+  - '{KERNEL_NAME} requires {SMEM_USE} bytes LDS, '
+  arch_scope: ''
+  evidence:
+  - '204:     smem_limit = get_shared_memory_per_block(fallback_gfx=GPU_ARCH)'
+  - '205:     if SMEM_USE > smem_limit:'
+  - '206:         raise RuntimeError('
+  - '207:             f"{KERNEL_NAME} requires {SMEM_USE} bytes LDS, "'
+  - '208:             f"but device limit is {smem_limit} bytes "'
+  evidence_id: src_7c071910c9e0ca7e
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 610
+  end_line: 612
+  match: "raise NotImplementedError(\n                                f\"MFMA_PER_WARP_K={MFMA_PER_WARP_K}\
+    \ not supported"
+  captured:
+  - MFMA_PER_WARP_K={MFMA_PER_WARP_K} not supported
+  arch_scope: ''
+  evidence:
+  - '608:                             )'
+  - '609:                         else:'
+  - '610:                             raise NotImplementedError('
+  - '611:                                 f"MFMA_PER_WARP_K={MFMA_PER_WARP_K} not supported"'
+  - '612:                             )'
+  evidence_id: src_4081e9d359fdc4c9
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 23
+  match: SPLIT_K_COUNTER_MAX_LEN =
+  captured:
+  - SPLIT_K_COUNTER_MAX_LEN
+  arch_scope: ''
+  evidence:
+  - '21: from ..utils import get_shared_memory_per_block'
+  - '23: SPLIT_K_COUNTER_MAX_LEN = 128'
+  - '24: SPLIT_K_SIGNAL_STATE_COUNT = 3'
+  evidence_id: src_1e029a07ace5e667
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 24
+  match: SPLIT_K_SIGNAL_STATE_COUNT =
+  captured:
+  - SPLIT_K_SIGNAL_STATE_COUNT
+  arch_scope: ''
+  evidence:
+  - '23: SPLIT_K_COUNTER_MAX_LEN = 128'
+  - '24: SPLIT_K_SIGNAL_STATE_COUNT = 3'
+  evidence_id: src_67a72909c71307d1
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 296
+  end_line: 391
+  match: def zero_c(
+  captured:
+  - zero_c
+  arch_scope: ''
+  evidence:
+  - '294:         c_frags = [acc_init] * C_FRAGS_LEN'
+  - '296:         def zero_c(bias_g, c_g, counter_tensor, counter_g):'
+  - '297:             cond_ks0 = arith.cmpi(arith.CmpIPredicate.eq, ks_idx, fx.Index(0))'
+  - '298:             cond_ks0_if = scf.IfOp(cond_ks0, results_=[], has_else=False)'
+  evidence_id: src_1a4b9ad5c5b109de
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 393
+  end_line: 432
+  match: def split_k_barrier(
+  captured:
+  - split_k_barrier
+  arch_scope: ''
+  evidence:
+  - '391:             gpu.barrier()'
+  - '393:         def split_k_barrier(counter_tensor):'
+  - '394:             init_cur = arith.constant(0, type=T.i32)'
+  - '395:             w = scf.WhileOp([T.i32], [init_cur])'
+  evidence_id: src_ad151ebc96795a5e
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 615
+  end_line: 616
+  match: 'if const_expr(IS_SPLIT_K):'
+  captured:
+  - IS_SPLIT_K
+  arch_scope: ''
+  evidence:
+  - '613:             return c_frags_new'
+  - '615:         if const_expr(IS_SPLIT_K):'
+  - '616:             zero_c(BIAS_, C_, COUNTER, COUNTER_)'
+  evidence_id: src_5ad1990942237536
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 830
+  end_line: 905
+  match: 'if const_expr(IS_SPLIT_K):'
+  captured:
+  - IS_SPLIT_K
+  arch_scope: ''
+  evidence:
+  - '828:                     cs_[lds_m_idx, lds_n_idx] = val.truncf(dtype_)'
+  - '830:         if const_expr(IS_SPLIT_K):'
+  - '831:             split_k_barrier(COUNTER)'
+  - '832:             out_raw = fly_values(C)[0]'
+  evidence_id: src_0294fc9392d3670a
+- snapshot: aiter_a6bb4993
+  category: atomic_combine
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 875
+  end_line: 882
+  match: "llvm.AtomicRMWOp(\n                            llvm.AtomicBinOp.fadd"
+  captured:
+  - fadd
+  arch_scope: ''
+  evidence:
+  - '873:                         )'
+  - '874:                         pair_v = pair._value if hasattr(pair, "_value") else pair'
+  - '875:                         llvm.AtomicRMWOp('
+  - '876:                             llvm.AtomicBinOp.fadd,'
+  - '877:                             pair_ptr_v,'
+  evidence_id: src_869d39483177e42c
+- snapshot: aiter_a6bb4993
+  category: fragment_layout
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 288
+  match: ldmatrix_a_m_idx = w_tid % WMMA_M
+  captured:
+  - ldmatrix_a_m_idx
+  - w_tid % WMMA_M
+  arch_scope: ''
+  evidence:
+  - '286:         warp_m_idx = wid // BLOCK_N_WARPS * WARP_M'
+  - '287:         warp_n_idx = wid % BLOCK_N_WARPS * WARP_N'
+  - '288:         ldmatrix_a_m_idx = w_tid % WMMA_M'
+  - '289:         ldmatrix_a_k_vec_idx = w_tid // WMMA_M * WMMA_A_FRAG_VALUES * MFMA_PER_WARP_K'
+  - '290:         ldmatrix_b_n_idx = w_tid % WMMA_N'
+  evidence_id: src_f01ef3793a7bd87c
+- snapshot: aiter_a6bb4993
+  category: fragment_layout
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 289
+  match: ldmatrix_a_k_vec_idx = w_tid // WMMA_M * WMMA_A_FRAG_VALUES * MFMA_PER_WARP_K
+  captured:
+  - ldmatrix_a_k_vec_idx
+  - w_tid // WMMA_M * WMMA_A_FRAG_VALUES * MFMA_PER_WARP_K
+  arch_scope: ''
+  evidence:
+  - '287:         warp_n_idx = wid % BLOCK_N_WARPS * WARP_N'
+  - '288:         ldmatrix_a_m_idx = w_tid % WMMA_M'
+  - '289:         ldmatrix_a_k_vec_idx = w_tid // WMMA_M * WMMA_A_FRAG_VALUES * MFMA_PER_WARP_K'
+  - '290:         ldmatrix_b_n_idx = w_tid % WMMA_N'
+  - '291:         ldmatrix_b_k_vec_idx = w_tid // WMMA_N * WMMA_B_FRAG_VALUES * MFMA_PER_WARP_K'
+  evidence_id: src_7e41979f22eae1f9
+- snapshot: aiter_a6bb4993
+  category: fragment_layout
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 290
+  match: ldmatrix_b_n_idx = w_tid % WMMA_N
+  captured:
+  - ldmatrix_b_n_idx
+  - w_tid % WMMA_N
+  arch_scope: ''
+  evidence:
+  - '288:         ldmatrix_a_m_idx = w_tid % WMMA_M'
+  - '289:         ldmatrix_a_k_vec_idx = w_tid // WMMA_M * WMMA_A_FRAG_VALUES * MFMA_PER_WARP_K'
+  - '290:         ldmatrix_b_n_idx = w_tid % WMMA_N'
+  - '291:         ldmatrix_b_k_vec_idx = w_tid // WMMA_N * WMMA_B_FRAG_VALUES * MFMA_PER_WARP_K'
+  - '292:         A_FRAGS_LEN = WARP_K_STEPS * WARP_M_STEPS'
+  evidence_id: src_44f9bf23c53fc7bc
+- snapshot: aiter_a6bb4993
+  category: fragment_layout
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 291
+  match: ldmatrix_b_k_vec_idx = w_tid // WMMA_N * WMMA_B_FRAG_VALUES * MFMA_PER_WARP_K
+  captured:
+  - ldmatrix_b_k_vec_idx
+  - w_tid // WMMA_N * WMMA_B_FRAG_VALUES * MFMA_PER_WARP_K
+  arch_scope: ''
+  evidence:
+  - '289:         ldmatrix_a_k_vec_idx = w_tid // WMMA_M * WMMA_A_FRAG_VALUES * MFMA_PER_WARP_K'
+  - '290:         ldmatrix_b_n_idx = w_tid % WMMA_N'
+  - '291:         ldmatrix_b_k_vec_idx = w_tid // WMMA_N * WMMA_B_FRAG_VALUES * MFMA_PER_WARP_K'
+  - '292:         A_FRAGS_LEN = WARP_K_STEPS * WARP_M_STEPS'
+  - '293:         C_FRAGS_LEN = WARP_M_STEPS * WARP_N_STEPS'
+  evidence_id: src_8ba4dcf6e9d68f6e
+- snapshot: aiter_a6bb4993
+  category: fragment_layout
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 813
+  match: stmatrix_c_m_vec_idx = w_tid // WMMA_N * WMMA_C_FRAG_VALUES
+  captured:
+  - stmatrix_c_m_vec_idx
+  - w_tid // WMMA_N * WMMA_C_FRAG_VALUES
+  arch_scope: ''
+  evidence:
+  - '811:             c_frags = block_mma_sync(a_frags, b_frags, c_frags)'
+  - '813:         stmatrix_c_m_vec_idx = w_tid // WMMA_N * WMMA_C_FRAG_VALUES'
+  - '814:         stmatrix_c_n_idx = w_tid % WMMA_N'
+  - '815:         gpu.barrier()'
+  evidence_id: src_91899d8d1f4341f6
+- snapshot: aiter_a6bb4993
+  category: fragment_layout
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 814
+  match: stmatrix_c_n_idx = w_tid % WMMA_N
+  captured:
+  - stmatrix_c_n_idx
+  - w_tid % WMMA_N
+  arch_scope: ''
+  evidence:
+  - '813:         stmatrix_c_m_vec_idx = w_tid // WMMA_N * WMMA_C_FRAG_VALUES'
+  - '814:         stmatrix_c_n_idx = w_tid % WMMA_N'
+  - '815:         gpu.barrier()'
+  - '816:         for ii in range_constexpr(WARP_M_STEPS):'
+  evidence_id: src_074f27a8a5c89fcf
+- snapshot: aiter_a6bb4993
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 927
+  end_line: 931
+  match: ".launch(\n            grid=(bm, bn, SPLIT_K)"
+  captured:
+  - bm, bn, SPLIT_K
+  arch_scope: ''
+  evidence:
+  - '925:         bn = n // BLOCK_N'
+  - '926:         hgemm_kernel._func.__name__ = KERNEL_NAME'
+  - '927:         hgemm_kernel(C, A, B, BIAS, m, COUNTER, signal_state).launch('
+  - '928:             grid=(bm, bn, SPLIT_K),'
+  - '929:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_821a059af3542249
+- snapshot: aiter_a6bb4993
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  line: 102
+  match: '@functools.lru_cache(maxsize=1024)
+
+    def compile_hgemm_kernel'
+  captured:
+  - '1024'
+  - compile_hgemm_kernel
+  arch_scope: ''
+  evidence:
+  - '102: @functools.lru_cache(maxsize=1024)'
+  - '103: def compile_hgemm_kernel('
+  - '104:     dtype: str,'
+  evidence_id: src_4d28023c79d1fe52
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  line: 46
+  end_line: 105
+  match: SPLITK_PRECISION_CASES = [
+  captured:
+  - SPLITK_PRECISION_CASES
+  arch_scope: ''
+  evidence:
+  - '44: DEFAULT_INPUT_SEED = 20260401'
+  - '46: SPLITK_PRECISION_CASES = ['
+  - '47:     {'
+  - '48:         "name": "splitk8_tile32_m104_n384_k7168",'
+  evidence_id: src_dcea4e10d8996a4e
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  line: 129
+  end_line: 154
+  match: def _check_output(
+  captured:
+  - _check_output
+  arch_scope: ''
+  evidence:
+  - '129: def _check_output('
+  - '130:     ref: torch.Tensor,'
+  - '131:     out: torch.Tensor,'
+  evidence_id: src_724636e4ecf6c5f6
+- snapshot: aiter_a6bb4993
+  category: async_copy
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  line: 243
+  match: async_copy=
+  captured:
+  - async_copy
+  arch_scope: ''
+  evidence:
+  - '242:     with pytest.raises(ValueError, match="async_copy"):'
+  - '243:         flydsl_kernel_name(**_make_kernel_name_kwargs(async_copy=not KERNEL_ASYNC_COPY))'
+  - '245:     with pytest.raises(ValueError, match="c_to_lds"):'
+  evidence_id: src_23b50401ccf2a58f
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  line: 178
+  match: shuffle_weight(
+  captured:
+  - shuffle_weight
+  arch_scope: ''
+  evidence:
+  - '176:     ref = run_torch_acc(a, b, dtype=torch_dtype)'
+  - '177:     b_shuf = ('
+  - '178:         shuffle_weight(b, layout=(16 * case["pack_n"], 16))'
+  - '179:         if case["b_preshuffle"]'
+  - '180:         else b'
+  evidence_id: src_5be3642792e15485
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  line: 194
+  match: b_preshuffle=
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '192:         block_n_warps=case.get("block_n_warps", 4),'
+  - '193:         b_to_lds=case.get("b_to_lds", False),'
+  - '194:         b_preshuffle=case["b_preshuffle"],'
+  - '195:     )'
+  - '196:     torch.cuda.synchronize()'
+  evidence_id: src_4243ff7ee617a850
+- snapshot: aiter_a6bb4993
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  line: 249
+  match: b_preshuffle=
+  captured:
+  - b_preshuffle
+  arch_scope: ''
+  evidence:
+  - '248:     with pytest.raises(ValueError, match="b_to_lds=False"):'
+  - '249:         flydsl_kernel_name(**_make_kernel_name_kwargs(b_to_lds=True, b_preshuffle=True))'
+  evidence_id: src_a471b2a3e7386e92
+- snapshot: aiter_a6bb4993
+  category: parity_tolerance
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  line: 41
+  match: DEFAULT_ATOL = 1e-2
+  captured:
+  - DEFAULT_ATOL
+  - 1e-2
+  arch_scope: ''
+  evidence:
+  - '39: torch.set_default_device("cuda")'
+  - '41: DEFAULT_ATOL = 1e-2'
+  - '42: DEFAULT_RTOL = 1e-2'
+  - '43: DEFAULT_PASS_PCT = 99.9'
+  evidence_id: src_9d1d40ad1d82f015
+- snapshot: aiter_a6bb4993
+  category: parity_tolerance
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  line: 42
+  match: DEFAULT_RTOL = 1e-2
+  captured:
+  - DEFAULT_RTOL
+  - 1e-2
+  arch_scope: ''
+  evidence:
+  - '41: DEFAULT_ATOL = 1e-2'
+  - '42: DEFAULT_RTOL = 1e-2'
+  - '43: DEFAULT_PASS_PCT = 99.9'
+  - '44: DEFAULT_INPUT_SEED = 20260401'
+  evidence_id: src_f0baf9a97c14b111
+- snapshot: aiter_a6bb4993
+  category: parity_tolerance
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  line: 43
+  match: DEFAULT_PASS_PCT = 99.9
+  captured:
+  - DEFAULT_PASS_PCT
+  - '99.9'
+  arch_scope: ''
+  evidence:
+  - '41: DEFAULT_ATOL = 1e-2'
+  - '42: DEFAULT_RTOL = 1e-2'
+  - '43: DEFAULT_PASS_PCT = 99.9'
+  - '44: DEFAULT_INPUT_SEED = 20260401'
+  evidence_id: src_1183d7ed5d869e8a
+- snapshot: aiter_a6bb4993
+  category: parity_tolerance
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  line: 85
+  match: '"pass_pct": 99.0'
+  captured:
+  - pass_pct
+  - '99.0'
+  arch_scope: ''
+  evidence:
+  - '83:         "b_to_lds": True,'
+  - '84:         "b_preshuffle": False,'
+  - '85:         "pass_pct": 99.0,'
+  - '86:         "max_delta_limit": 32.0,'
+  - '87:     },'
+  evidence_id: src_217562a4a9b879dc
+- snapshot: aiter_a6bb4993
+  category: parity_tolerance
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  line: 86
+  match: '"max_delta_limit": 32.0'
+  captured:
+  - max_delta_limit
+  - '32.0'
+  arch_scope: ''
+  evidence:
+  - '84:         "b_preshuffle": False,'
+  - '85:         "pass_pct": 99.0,'
+  - '86:         "max_delta_limit": 32.0,'
+  - '87:     },'
+  - '88:     {'
+  evidence_id: src_636fbc44252bb90e
+- snapshot: aiter_a6bb4993
+  category: parity_tolerance
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  line: 102
+  match: '"pass_pct": 99.0'
+  captured:
+  - pass_pct
+  - '99.0'
+  arch_scope: ''
+  evidence:
+  - '100:         "b_to_lds": True,'
+  - '101:         "b_preshuffle": False,'
+  - '102:         "pass_pct": 99.0,'
+  - '103:         "max_delta_limit": 8.0,'
+  - '104:     },'
+  evidence_id: src_972b88aa5143a3f7
+- snapshot: aiter_a6bb4993
+  category: parity_tolerance
+  language: flydsl
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  line: 103
+  match: '"max_delta_limit": 8.0'
+  captured:
+  - max_delta_limit
+  - '8.0'
+  arch_scope: ''
+  evidence:
+  - '101:         "b_preshuffle": False,'
+  - '102:         "pass_pct": 99.0,'
+  - '103:         "max_delta_limit": 8.0,'
+  - '104:     },'
+  - '105: ]'
+  evidence_id: src_f30b29895e6d16b2

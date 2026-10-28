@@ -1,5 +1,8 @@
 # moe_dispatch_combine
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Expert-parallel dispatch, gather, reduction and combine.
 
 3 AITER implementation references; 0 historical experience cards.
