@@ -2,6 +2,8 @@
 
 The operator collection focuses on the main LLM inference workloads: GEMM, MoE, attention and attention indexers, including their variants and fusions. Start with a workload family, then follow its backend implementations and run-derived lessons.
 
+For execution chains spanning these operators, see [workload knowledge](../workload/README.md), including [Muse Spark fusion boundaries](../workload/muse_spark/README.md). Operator pages describe individual implementations; workload pages connect their inputs, outputs, dispatch and serving behavior.
+
 Standalone normalization, activation, softmax, positional encoding, quantization, sampling, copy/transpose, scans and generic collectives are outside this operator index. Their relevant contracts belong with the main kernel that consumes them. MoE routing/dispatch and Q/K preparation fusions remain because they define the corresponding workload.
 
 AITER is the primary implementation source. Provider pages describe dispatch; backend pages cover Triton, Gluon, FlyDSL, HIP, CK, ASM or OPUS where an applicable source reference exists. A source reference is not a measured winner. Historical GEAK notes may cite excluded operators through pinned archived documents.
