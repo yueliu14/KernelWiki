@@ -2,6 +2,7 @@
 semantic_chain: projection_norm_residual
 model: Muse-Spark-Open-816B-A42B-Quark-MXFP4
 phase: decode_target_verify
+topics: [fusion, dataflow, dispatch]
 evidence: source_inspection_and_local_reports
 source_set: ../../_sources/muse_spark_c8.yaml
 ---
@@ -35,4 +36,4 @@ The standalone wrapper accepts `0 < M <= 64`, input width 4096 and output width 
 
 The case establishes implementation structure from the pinned local source. It does not establish a speedup over unfused code. The extraction report's correctness checks use the frozen installed implementation with seeded inputs; no new correctness or performance run was performed here. Preserve the [shared coverage and attribution limits](../../_sources/muse_spark_c8.md#evidence-boundaries) when using this case.
 
-For a new comparison, follow the [case template](../../_templates/fusion_case.md) and [measurement guidance](../../fusion_patterns.md#measure-the-chain-and-its-workload-contribution).
+For a new comparison, follow the [workload case template](../../_templates/workload_case.md) and [measurement guidance](../../fusion_patterns.md#measure-the-chain-and-its-workload-contribution).

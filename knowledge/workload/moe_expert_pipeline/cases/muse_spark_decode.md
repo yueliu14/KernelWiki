@@ -2,6 +2,7 @@
 semantic_chain: moe_expert_pipeline
 model: Muse-Spark-Open-816B-A42B-Quark-MXFP4
 phase: decode_target_verify
+topics: [fusion, dataflow, dispatch]
 evidence: source_inspection_and_local_reports
 source_set: ../../_sources/muse_spark_c8.yaml
 ---
@@ -9,6 +10,8 @@ source_set: ../../_sources/muse_spark_c8.yaml
 # Muse Spark compact MXFP4 MoE
 
 This case instantiates the [moe_expert_pipeline semantic chain](../README.md) in the [Muse Spark c8 source snapshot](../../_sources/muse_spark_c8.md). Source IDs refer to the [shared source ledger](../../_sources/muse_spark_c8.yaml). Semantic diagrams are not measured unfused baselines; launch counts describe the inspected source path.
+
+For the same implementation's token reuse, memory lifetimes, scheduling and communication boundary, see the [non-fusion dataflow case](muse_spark_decode_dataflow.md).
 
 **Evidence:** `moe_source`, `moe_metadata`, `c8_report`.
 
@@ -34,4 +37,4 @@ The source predicate requires `M` to be a multiple of eight with `0 < M <= 512`,
 
 The case establishes implementation structure from the pinned local source. It does not establish a speedup over unfused code. The extraction report's correctness checks use the frozen installed implementation with seeded inputs; no new correctness or performance run was performed here. Preserve the [shared coverage and attribution limits](../../_sources/muse_spark_c8.md#evidence-boundaries) when using this case.
 
-For a new comparison, follow the [case template](../../_templates/fusion_case.md) and [measurement guidance](../../fusion_patterns.md#measure-the-chain-and-its-workload-contribution).
+For a new comparison, follow the [workload case template](../../_templates/workload_case.md) and [measurement guidance](../../fusion_patterns.md#measure-the-chain-and-its-workload-contribution).

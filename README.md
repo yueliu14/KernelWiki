@@ -1,12 +1,12 @@
 # KernelWiki
 
-An **operator- and workload-level GPU kernel knowledge base for LLM inference**, focused on **GEMM, MoE, attention and attention indexers**, including their variants and fusions. It documents backend implementations, multi-kernel execution chains, applicability, performance evidence and optimization experience to help developers and GEAK write, select and improve kernels.
+An **operator- and workload-level GPU kernel knowledge base for LLM inference**, focused on **GEMM, MoE, attention and attention indexers**, including their variants and fusions. It documents backend implementations, multi-operator dataflow, scheduling, dispatch, memory, communication and performance evidence to help developers and GEAK write, select and improve kernels and execution paths.
 
 ## Content
 
 | Content | Start here | Purpose |
 | --- | --- | --- |
-| Written knowledge | [Operators](knowledge/operator/README.md) · [Workloads](knowledge/workload/README.md) · [General](knowledge/general/README.md) | Implementation details, cross-kernel fusion, source entry points, performance and applicability, tuning methods and lessons from previous runs |
+| Written knowledge | [Operators](knowledge/operator/README.md) · [Workloads](knowledge/workload/README.md) · [General](knowledge/general/README.md) | Implementations, multi-operator execution contracts and optimization, source entry points, applicability and evidence |
 | Kernel implementations | [Source collection](kernels/README.md) · [Put, search and fetch API](kernelwiki/README.md) | Reuse complete source bundles with entry points, dependencies, correctness checks and benchmarks |
 | Machine-queryable corpus | [GEMM corpus](corpus/README.md) | Source-cited evidence records and tuning decisions a program can query; the written pages here are generated from them |
 
@@ -20,12 +20,17 @@ knowledge/
   workload/
     README.md
     fusion_patterns.md
+    _templates/workload_case.md
     _templates/fusion_case.md
     _sources/<source_set>.md
     _sources/<source_set>.yaml
     <semantic_chain>/
       README.md
-      cases/<model_or_stack>_<regime>.md
+      dataflow.md
+      scheduling.md
+      dispatch.md
+      measurement.md
+      cases/<case>.md
   general/
     profile_bottleneck/
     optimization/
@@ -57,7 +62,7 @@ corpus/
 - [Dense GEMM](knowledge/operator/dense_gemm/README.md) · [Quantized GEMM](knowledge/operator/scaled_quant_gemm/README.md) · [Grouped GEMM / MoE](knowledge/operator/grouped_gemm_moe/README.md)
 - [MLA](knowledge/operator/mla_attention/README.md) · [Paged decode attention](knowledge/operator/attention_decode_paged/README.md) · [Attention indexer](knowledge/operator/attention_indexer/README.md)
 - [GEMM fusions](knowledge/operator/gemm_epilogue_fused/README.md) · [Fused MoE](knowledge/operator/fused_moe_grouped_gemm/README.md) · [Q/K preparation fusions](knowledge/operator/qk_norm_rope_cache/README.md)
-- [Workload semantic chains](knowledge/workload/README.md) · [Fusion patterns](knowledge/workload/fusion_patterns.md) · [QKV preparation chain](knowledge/workload/qkv_projection_norm_rope_cache/README.md) · [MoE expert pipeline](knowledge/workload/moe_expert_pipeline/README.md)
+- [Workload semantic chains](knowledge/workload/README.md) · [MoE dataflow example](knowledge/workload/moe_expert_pipeline/cases/muse_spark_decode_dataflow.md) · [Fusion patterns](knowledge/workload/fusion_patterns.md) · [QKV preparation chain](knowledge/workload/qkv_projection_norm_rope_cache/README.md)
 - [Bottleneck analysis](knowledge/general/profile_bottleneck/README.md) · [Optimization methods](knowledge/general/optimization/README.md) · [Writing knowledge and recording evidence](knowledge/README.md)
 
 ## Operator scope and evidence

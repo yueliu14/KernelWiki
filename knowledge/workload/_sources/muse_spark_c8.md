@@ -16,6 +16,7 @@ The source snapshot is the `muse-spark-open-1020` image with digest `sha256:7343
 | Router, pooler and top-k | [Muse Spark decode](../router_pooler_topk/cases/muse_spark_decode.md) |
 | Projection, normalization and residual update | [Muse Spark decode](../projection_norm_residual/cases/muse_spark_decode.md) |
 | MoE expert pipeline | [Muse Spark decode](../moe_expert_pipeline/cases/muse_spark_decode.md) |
+| MoE dataflow, memory and execution contracts | [Muse Spark token reuse](../moe_expert_pipeline/cases/muse_spark_decode_dataflow.md) |
 | Retained split/merge and adjacent kernels | [Fusion boundary examples](../fusion_patterns.md#source-example-split-kv-and-adjacent-kernels) |
 
 ## Evidence boundaries
@@ -28,4 +29,4 @@ The separate `muse_spark_opt_1021` handoff uses image digest `sha256:72065dfc0b8
 
 `_dense_partial` is shared by the QKV, router and unpool call sites. Attribute time using the caller/branch before summing workload savings; a kernel-name total cannot be independently charged to all three. The same rule applies to companion epilogues and partial/reduce pairs selected as a group.
 
-Related: [workload index](../README.md), [fusion patterns](../fusion_patterns.md), [case template](../_templates/fusion_case.md).
+Related: [workload index](../README.md), [fusion patterns](../fusion_patterns.md), [workload case template](../_templates/workload_case.md).
