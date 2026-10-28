@@ -1,7 +1,7 @@
 # Kernel knowledge
 
 - [Operators](operator/README.md): GEMM, MoE, attention and indexer implementations, variants, fusions and lessons for LLM inference.
-- [Workloads](workload/README.md): model or serving execution chains spanning multiple kernels, fusion boundaries, dispatch conditions and workload-level evidence.
+- [Workloads](workload/README.md): semantic execution chains spanning multiple operators, with fusion boundaries, dispatch conditions and model/stack-specific evidence.
 - [General knowledge](general/README.md): profiling, optimization, backend programming, hardware and reusable recipes.
 - [Kernel source collection](../kernels/README.md): complete implementations with entry points, dependencies, tests and benchmarks.
 
@@ -19,7 +19,7 @@ Keep independently measured results, upstream-reported results and source-only o
 
 Keep new operator entries within GEMM, MoE, attention or attention indexers and their variants/fusions. Document small supporting operations with the main workload: packing and quantization with GEMM, routing and dispatch with MoE, cache writes and positional encoding with attention, and causal state mixing with gated-delta attention. Do not add separate collections for generic small operators, vision convolutions or training-only kernels.
 
-Put operator-specific implementation knowledge under `operator/<op>/backend/`; put transferable run-derived lessons under that operator's `learned_knowledge/`. Put model- or serving-specific execution chains under `workload/<workload>/`, with links to the participating operators. Record actual kernel boundaries, intermediate tensors, dispatch conditions and evidence using the [workload case template](workload/_templates/fusion_case.md). A joint benchmark or adjacent launches alone do not establish fusion. Put methods that apply across operators under `general/`; the workload [fusion pattern index](workload/fusion_patterns.md) connects those methods to concrete chains. Add a local navigation link and cite the relevant source or measurement. AITER implementation links should include a commit.
+Put operator-specific implementation knowledge under `operator/<op>/backend/`; put transferable run-derived lessons under that operator's `learned_knowledge/`. Organize multi-operator execution chains under `workload/<semantic_chain>/`, with a model-independent contract and links to the participating operators. Store model/stack-specific implementations under that chain's `cases/`, with model and phase in the case metadata; shared source context belongs in `workload/_sources/`. Record actual kernel boundaries, intermediate tensors, dispatch conditions and evidence using the [workload case template](workload/_templates/fusion_case.md). A joint benchmark or adjacent launches alone do not establish fusion. Put methods that apply across operators under `general/`; the workload [fusion pattern index](workload/fusion_patterns.md) connects those methods to concrete chains. Add a local navigation link and cite the relevant source or measurement. AITER implementation links should include a commit.
 
 Store reusable code as a complete source bundle under `kernels/<operator>/<backend>/<implementation>/`. Link its implementation ID from the corresponding knowledge page. Include the exact source digest with measured results; historical patch references remain historical evidence, not the current storage format. All repository documentation and comments use English.
 

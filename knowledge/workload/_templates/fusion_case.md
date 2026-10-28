@@ -1,6 +1,16 @@
-# <Workload>: <execution chain>
+# <Semantic chain>: <model or stack> <regime>
 
-Replace the placeholders and remove guidance that does not apply. Link the completed case from its workload README.
+Save as `<semantic_chain>/cases/<model_or_stack>_<regime>.md`. Replace the placeholders and remove guidance that does not apply. Link the completed case from its semantic-chain README. Keep reusable contracts in that README and model-specific details here.
+
+Add front matter to the completed case:
+
+```yaml
+semantic_chain: <parent directory name>
+model: <model name>
+phase: <prefill, decode, decode_target_verify, or both>
+evidence: <source_inspection, source_inspection_and_local_reports, reported_measurement, reproduced_measurement, or hypothesis>
+source_set: ../../_sources/<source_set>.yaml
+```
 
 ## Context and evidence
 

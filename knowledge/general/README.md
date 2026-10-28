@@ -2,7 +2,7 @@
 
 Methods and reference material shared across operators. Start with the [GEMM, MoE, attention and indexer collection](../operator/README.md) when optimizing an LLM inference workload. Imported library and taxonomy documents can describe a broader historical ecosystem; they do not define the active operator scope.
 
-Model-specific multi-kernel execution chains and fusion cases live in [workload knowledge](../workload/README.md). Historical run reports remain in [case studies](case_studies/README.md).
+Multi-operator execution chains live in [workload knowledge](../workload/README.md), organized by semantic composition with model-specific implementation cases. Historical run reports remain in [case studies](case_studies/README.md).
 
 - [backend](backend/README.md)
 - [case_studies](case_studies/README.md)
