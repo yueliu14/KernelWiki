@@ -7,6 +7,7 @@ An **operator-centered GPU kernel knowledge base for LLM inference**, focused on
 | Content | Start here | Purpose |
 | --- | --- | --- |
 | Written knowledge | [Operators](knowledge/operator/README.md) · [General](knowledge/general/README.md) | Implementation details, source entry points, performance and applicability, tuning methods and lessons from previous runs |
+| Structured corpus | [Family catalog](corpus/catalog.yaml) · [Corpus guide](corpus/README.md) | Pinned source observations and conditioned development cards for GEMM, attention, MoE and indexers |
 | Kernel implementations | [Source collection](kernels/README.md) · [Put, search and fetch API](kernelwiki/README.md) | Reuse complete source bundles with entry points, dependencies, correctness checks and benchmarks |
 | Machine-queryable corpus | [GEMM corpus](corpus/README.md) | Source-cited evidence records and tuning decisions a program can query; the written pages here are generated from them |
 
@@ -51,6 +52,14 @@ corpus/
 - [Bottleneck analysis](knowledge/general/profile_bottleneck/README.md) · [Optimization methods](knowledge/general/optimization/README.md) · [Writing knowledge and recording evidence](knowledge/README.md)
 
 ## Operator scope and evidence
+
+For source-grounded implementation decisions, start with the [GEMM](corpus/gemm_decisions.md),
+[attention](corpus/attention_decisions.md), [MoE](corpus/moe_decisions.md) or
+[indexer](corpus/indexer_decisions.md) corpus. The four catalog families give all 23 operator
+directories one discovery owner; this is not a claim of complete implementation coverage.
+The new attention/MoE/indexer evidence uses AITER `b3ad6c461703`; the existing GEMM evidence keeps
+its `a6bb49937584` snapshot and stable references. Every page distinguishes source precedents,
+constraints and unmeasured candidates. See each family's coverage limits and pinned upstream tests.
 
 - **23 operator directories**, grouped by GEMM, MoE, attention and indexer workloads, with **92 AITER backend/provider reference pages**, **13 implementation-note pages** and **122 operator experience cards**.
 - Standalone small operators, spatial convolutions, training losses, recommendation attention and general solvers are excluded from the operator collection. Quantization, activation, cache layout, normalization and communication are documented where they affect a main kernel or fusion. MoE routing/dispatch and Q/K preparation fusions remain part of those workloads.

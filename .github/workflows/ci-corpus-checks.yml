@@ -33,8 +33,7 @@ jobs:
       - name: rendered pages match their inputs
         run: |
           set -e
-          python3 corpus/_render_facts.py --check
-          python3 corpus/_render_decisions.py --check
+          python3 corpus/_build_corpus.py --check
 
       # Schema, provenance, citation grounding, and the no-performance-number rule on source
       # evidence. `_render_decisions.py --check` already refuses a card citing a file that is

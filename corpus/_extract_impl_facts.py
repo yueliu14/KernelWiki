@@ -71,6 +71,8 @@ class Scope:
     def __init__(self, path, raw):
         self.path = path
         self.family = raw["family"]
+        self.include_symbols = bool(raw.get("include_symbols", False))
+        self.exclusions = tuple(raw.get("exclude", ()))
         # Kept as the (language, subtree, globs) triples the rest of this module was written
         # against: the YAML is the authoring form, this is the reading form.
         self.impls = [(i["language"], i["subtree"], tuple(i.get("globs") or ()))
@@ -549,7 +551,7 @@ def routing_records(scope, path, rel):
     return list({record["evidence_id"]: record for record in out}.values()), raw
 
 
-def scan_file(path, rel, language):
+def scan_file(path, rel, language, include_symbols=False):
     """Every rule hit in one file, as source-evidence records.
 
     A hit answers only "what is written here?". It is not yet a development decision: deciding
@@ -568,6 +570,39 @@ def scan_file(path, rel, language):
     vlines, rlines = view.splitlines(), raw.splitlines()
     ends = statement_ends(raw) if python else {}
     out = []
+    language_spans = []
+    if python and include_symbols:
+        tree = ast.parse(raw)
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            for decorator in node.decorator_list:
+                spelling = ast.unparse(decorator)
+                backend = ("gluon" if spelling.startswith(("gluon.jit", "gl.jit")) else
+                           "triton" if spelling.startswith("triton.jit") else
+                           "flydsl" if spelling.startswith(("flyc.kernel", "flyc.jit")) else None)
+                if backend:
+                    language_spans.append((node.lineno, node.end_lineno, backend))
+
+    def language_at(line):
+        enclosing = [(hi - lo, backend) for lo, hi, backend in language_spans if lo <= line <= hi]
+        return min(enclosing)[1] if enclosing else language
+
+    if python and include_symbols:
+        # A declaration gives a precise extent for a manually reviewed mechanism, including
+        # operators whose math is not represented by the low-level GEMM idiom rules. It says
+        # only that a function exists; the decision card supplies its interpretation.
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            record = {
+                "category": "symbol_declaration", "language": language_at(node.lineno), "file": rel,
+                "line": node.lineno, "end_line": node.end_lineno,
+                "match": rlines[node.lineno - 1].strip(), "captured": [node.name],
+                "arch_scope": "", "evidence": excerpt(rlines, node.lineno - 1),
+            }
+            record["evidence_id"] = source_evidence_id(record)
+            out.append(record)
     for category, pattern in RULES:
         # MULTILINE so a rule can anchor to a line, which is what a declaration-per-line construct
         # like Triton's `NAME: tl.constexpr,` parameter list needs. No rule uses `$` to mean
@@ -579,7 +614,7 @@ def scan_file(path, rel, language):
             groups = [g for g in m.groups() if g] if m.groups() else []
             record = {
                 "category": category,
-                "language": language,
+                "language": language_at(idx + 1),
                 "file": rel,
                 "line": idx + 1,
             }
@@ -676,6 +711,8 @@ def tuned_configs(scope, aiter):
     and which M bucket it applies to. A knob set is only meaningful with both, and a corpus that
     dropped them would read as a global recommendation, which is exactly what it is not.
     """
+    if not scope.tuned_config_dir:
+        return [], []
     base = os.path.join(aiter, scope.tuned_config_dir)
     if not os.path.isdir(base):
         return [], [{"language": "triton", "subtree": scope.tuned_config_dir,
@@ -1031,6 +1068,7 @@ def dirty_paths(aiter):
 def collect(scope, aiter):
     """Walk the six implementation sets. Missing subtrees are reported, never silently empty."""
     import glob as globmod
+    import fnmatch
     evidence, configs, seen, missing = [], [], [], []
     for language, subtree, patterns in scope.impls:
         base = os.path.join(aiter, subtree)
@@ -1040,7 +1078,9 @@ def collect(scope, aiter):
         files, empty_patterns = [], []
         for pat in patterns:
             hits = [f for f in sorted(globmod.glob(os.path.join(base, pat), recursive=True))
-                    if "__pycache__" not in f and os.path.isfile(f)]
+                    if "__pycache__" not in f and os.path.isfile(f)
+                    and not any(fnmatch.fnmatch(os.path.relpath(f, aiter), excluded)
+                                for excluded in scope.exclusions)]
             if not hits:
                 empty_patterns.append(pat)
             files += hits
@@ -1054,9 +1094,9 @@ def collect(scope, aiter):
         for pat in empty_patterns:
             missing.append({"language": language, "subtree": subtree,
                             "why": f"declared pattern matched no file: {pat}"})
-        for path in files:
+        for path in sorted(set(files)):
             rel = os.path.relpath(path, aiter)
-            got, raw, _ = scan_file(path, rel, language)
+            got, raw, _ = scan_file(path, rel, language, include_symbols=scope.include_symbols)
             evidence += got
             if language in ("triton", "gluon") and path.endswith(".py"):
                 configs += [dict(c, language=language) for c in autotune_configs(path, rel)]
@@ -1078,7 +1118,7 @@ def collect(scope, aiter):
     # all: the search space lives in the shipped JSON instead. Worth saying out loud, because an
     # author who greps for autotune in a GEMM kernel and finds nothing will otherwise conclude the
     # kernel is untuned, when in fact it is the most heavily swept code in the tree.
-    if not configs:
+    if not configs and scope.tuned_config_dir:
         missing.append({"language": "triton", "subtree": scope.autotune_expected_in,
                         "why": f"no @triton.autotune in the {scope.family.upper()} family — tuning "
                                f"is shipped as per-shape JSON under {scope.tuned_config_dir} "
@@ -1114,7 +1154,7 @@ def emit_yaml(payload, path):
     """
     L = ["# GENERATED by corpus/_extract_impl_facts.py — do not hand-edit.",
          "# These are SOURCE-EVIDENCE records: what a file states, not what an author should choose.",
-         "# Actionable choices live in decisions/gemm.yaml and are rendered to gemm_decisions.md.", ""]
+         f"# Actionable choices live in decisions/{payload['provenance']['operator_family']}.yaml.", ""]
     L.append("provenance:")
     for k, v in payload["provenance"].items():
         if isinstance(v, list):
@@ -1145,7 +1185,7 @@ def emit_yaml(payload, path):
                     L.append(f"{lead}{k}: {yaml_quote(v)}")
         L.append("")
     with open(path, "w", encoding="utf-8") as f:
-        f.write("\n".join(L) + "\n")
+        f.write("\n".join(L).rstrip() + "\n")
 
 
 def main():
@@ -1253,17 +1293,21 @@ def main():
     tuned_out = os.path.join(EVIDENCE, f"{scope.family}_tuned_configs.yaml")
     db_out = os.path.join(EVIDENCE, f"{scope.family}_csv_tuned_configs.yaml")
     emit_yaml(payload, out)
-    emit_yaml(tuned_payload, tuned_out)
-    emit_yaml(db_payload, db_out)
+    if scope.tuned_config_dir:
+        emit_yaml(tuned_payload, tuned_out)
+    if scope.tuned_db_dirs:
+        emit_yaml(db_payload, db_out)
     by_lang = collections.Counter(f["language"] for f in evidence)
     print(f"OK: {len(evidence)} source-evidence records from {len(seen)} files "
           f"({', '.join(f'{k}={v}' for k, v in sorted(by_lang.items()))}), "
           f"{len(configs)} autotune -> {os.path.relpath(out, ROOT)}")
-    print(f"OK: {len(tuned)} shipped tuned rows in {len(grouped)} (gfx, tags, M) groups "
-          f"-> {os.path.relpath(tuned_out, ROOT)}")
-    print(f"OK: {len(db_rows)} tuned-DB rows from {len(db_inventory)} CSVs -> {len(flydsl_groups)} "
-          f"FlyDSL groups, {len(selection)} backend-selection groups "
-          f"-> {os.path.relpath(db_out, ROOT)}")
+    if scope.tuned_config_dir:
+        print(f"OK: {len(tuned)} shipped tuned rows in {len(grouped)} (gfx, tags, M) groups "
+              f"-> {os.path.relpath(tuned_out, ROOT)}")
+    if scope.tuned_db_dirs:
+        print(f"OK: {len(db_rows)} tuned-DB rows from {len(db_inventory)} CSVs -> {len(flydsl_groups)} "
+              f"FlyDSL groups, {len(selection)} backend-selection groups "
+              f"-> {os.path.relpath(db_out, ROOT)}")
     for m in missing:
         print(f"  gap: {m['language']} — {m['why']} ({m['subtree']})")
     return 0

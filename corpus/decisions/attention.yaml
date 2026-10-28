@@ -1,0 +1,456 @@
+provenance:
+  schema_version: 4
+  operator_family: attention
+  curator_contract: Source-observed candidates only; correctness and performance require target-workload
+    validation.
+traits:
+  paged_kv: The design reads a paged KV cache.
+cards:
+- id: attention-online-softmax-mask
+  type: semantic
+  axes:
+  - attention_semantics
+  - numerical_contract
+  match:
+    operator_families:
+    - attention_prefill_fmha
+    - gqa_mqa_attention
+    target_languages:
+    - triton
+    - flydsl
+    - gluon
+  question: How must tiled forward attention preserve masking and online softmax normalization?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The operation is scaled dot-product forward attention, with an explicit causal or noncausal contract.
+  actions:
+  - Carry the running maximum, exponential sum and output accumulator together across KV tiles; rescale
+    prior contributions when the maximum changes.
+  - Apply sequence-tail and causal masks to scores before exponentiation; a zero-filled invalid key is
+    not an excluded softmax position.
+  - Keep QK scale, exponential base and accumulator precision consistent through the update and any final
+    normalization.
+  alternatives:
+  - Retain a straightforward unfused reference for the same mask and scale contract.
+  why:
+  - The Triton prefill kernel updates m_i, l_i and acc jointly, masks invalid scores with negative infinity,
+    and casts probabilities to the value dtype before the PV dot.
+  source_evidence:
+  - src_a3adfa0056dbdf43
+  measurement_evidence: []
+  limitations:
+  - This softmax recurrence does not describe gated-delta or other recurrent attention.
+  - An all-masked row needs an explicitly validated convention; the cited prefill body is not proof that
+    every empty-row input is supported.
+  references:
+  - knowledge/operator/attention_prefill_fmha/README.md
+  - knowledge/operator/gqa_mqa_attention/README.md
+- id: attention-paged-kv-addressing
+  type: constraint
+  axes:
+  - cache_layout
+  - implementation_contract
+  match:
+    operator_families:
+    - attention_decode_paged
+    - mla_attention
+    - chunked_prefill
+    target_languages:
+    - triton
+    - flydsl
+    - gluon
+    requires:
+    - paged_kv
+  question: What must remain consistent when loading a paged KV cache?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - KV positions are logical sequence positions mapped through a per-request page table.
+  actions:
+  - Resolve each logical token through its block-table entry and its offset within the page; preserve
+    the independent K/V cache strides.
+  - 'Distinguish a compute tile from a cache page: the general path may need multiple page-table lookups,
+    while TILE_SIZE == BLOCK_SIZE enables a specialized path.'
+  - Validate ragged sequence lengths, nontrivial block-table strides and the final partial page against
+    the actual cache producer.
+  alternatives:
+  - Use the general paged load path before specializing page-aligned tiles.
+  why:
+  - The unified Triton kernel has distinct TILE_SIZE == BLOCK_SIZE and general page-lookup paths, with
+    explicit K and V strides.
+  source_evidence:
+  - src_49cb5bdc816cb102
+  measurement_evidence: []
+  limitations:
+  - A page-size constant is not evidence that all cache layouts use the same physical order.
+  - Source availability does not establish support for every dtype or head dimension.
+  references:
+  - knowledge/operator/attention_decode_paged/README.md
+  - knowledge/operator/mla_attention/README.md
+  - knowledge/operator/chunked_prefill/README.md
+- id: attention-split-kv-merge
+  type: performance_candidate
+  axes:
+  - kv_partition
+  - attention_semantics
+  - numerical_contract
+  match:
+    operator_families:
+    - attention_decode_paged
+    - mla_attention
+    - context_parallel_attention
+    target_languages:
+    - triton
+    - flydsl
+    - gluon
+  question: When splitting KV work, what information must the merge preserve?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - A long KV sequence leaves too few independent query/head workgroups, or partial attention outputs
+    already exist.
+  actions:
+  - Try multiple KV partitions together with an explicit partial-output and normalization-statistics layout.
+  - Merge partials using their maxima and exponential sums, or the equivalent LSE representation; never
+    take an unweighted average of already-normalized partial outputs.
+  - Include the merge and scratch traffic when assessing a split count, and mask unused partitions.
+  alternatives:
+  - Keep an unsplit path for short contexts or sufficiently large query batches.
+  why:
+  - The Triton MLA reduce kernel rescales segment sums and outputs by exp2(segment_max - overall_max),
+    then divides by the combined exponential sum.
+  source_evidence:
+  - src_a726e480b7d62ccf
+  measurement_evidence: []
+  limitations:
+  - The source demonstrates local segment merging, not an implementation of cross-rank transport; context-parallel
+    ownership and communication require separate evidence.
+  - The cited raw-max/exp-sum representation cannot be mixed directly with another backend's LSE ABI.
+  references:
+  - knowledge/operator/attention_decode_paged/README.md
+  - knowledge/operator/mla_attention/README.md
+  - knowledge/operator/context_parallel_attention/README.md
+  solutions:
+  - backend: flydsl
+    mechanism: The FlyDSL reducer consumes partial outputs, partial LSE and explicit partial/final maps;
+      its host validator defines a separate ABI.
+    source_evidence:
+    - src_a6768ea282169992
+- id: attention-mla-reduce-abi
+  type: constraint
+  axes:
+  - implementation_contract
+  - kv_partition
+  match:
+    operator_families:
+    - mla_attention
+    - attention_decode_paged
+    target_languages:
+    - flydsl
+  question: Which tensor and mapping invariants does the FlyDSL MLA reducer require?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected path calls flydsl_mla_reduce_v1 with mapped partial outputs.
+  actions:
+  - Use FP32 partial_output [rows,H,Dv] and partial_lse [rows,H], int32 mapping/indptr arrays, and a common
+    GPU device.
+  - Provide a 3D BF16/FP16 final output with packed last dimension and matching H/Dv; validate optional
+    final LSE and final-map tensors too.
+  - Pass only valid split counts and map bounds, and preserve the difference between allocated maximum
+    splits and actual splits.
+  alternatives:
+  - Convert layouts explicitly at the boundary, accounting for their cost, or select a reducer that natively
+    accepts the producer layout.
+  why:
+  - The host validator checks dtype, rank, strides, shape relationships and split metadata before raw
+    pointers reach the kernel.
+  source_evidence:
+  - src_a6768ea282169992
+  - src_6e49a7e29550a915
+  measurement_evidence: []
+  limitations:
+  - These are the cited reducer's requirements, not a universal MLA ABI.
+  - A dtype-correct mapping can still point at the wrong sequence; validate mapping contents.
+  references:
+  - knowledge/operator/mla_attention/README.md
+  - knowledge/operator/attention_decode_paged/README.md
+- id: attention-gqa-head-mapping
+  type: semantic
+  axes:
+  - attention_semantics
+  - cache_layout
+  match:
+    operator_families:
+    - gqa_mqa_attention
+    - attention_decode_paged
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+  question: How should query heads share KV heads without changing GQA/MQA semantics?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The workload has more query heads than KV heads.
+  actions:
+  - Preserve the query-head-to-KV-head mapping and the required divisibility when grouping query heads
+    into a workgroup.
+  - Treat query-head grouping as a reuse opportunity; tune the group and tile sizes while retaining each
+    query head's separate normalization state.
+  - Check unequal query/KV head counts and nontrivial strides, not only ordinary equal-head MHA.
+  alternatives:
+  - One independent query head per program is a simple baseline for the same shared KV cache.
+  why:
+  - The unified kernel separates query head indexing from KV-head indexing while carrying per-query softmax
+    state.
+  source_evidence:
+  - src_49cb5bdc816cb102
+  measurement_evidence: []
+  limitations:
+  - MQA/GQA reuse does not imply the same best workgroup geometry for every head ratio.
+  references:
+  - knowledge/operator/gqa_mqa_attention/README.md
+  - knowledge/operator/attention_decode_paged/README.md
+- id: attention-window-prefix-boundaries
+  type: constraint
+  axes:
+  - attention_semantics
+  - kv_partition
+  match:
+    operator_families:
+    - sliding_window_attention
+    - chunked_prefill
+    - attention_prefill_fmha
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+  question: How do cached prefixes and sliding windows change the causal boundary?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - Queries cover only a suffix/chunk, or the model restricts each query to a local attention window.
+  actions:
+  - Express the causal boundary in logical sequence coordinates including the cached prefix; do not substitute
+    the query tile's local row number.
+  - Intersect the sliding window, causal boundary and actual sequence length before dropping KV tiles.
+  - Preserve the unified kernel's restriction that SPLIT_UNMASKED_LOOP is incompatible with sliding-window
+    attention.
+  alternatives:
+  - Retain per-element score masking while first validating any tile-pruning optimization.
+  why:
+  - The extend kernel distinguishes prefix/cache work from extension work; unified attention separately
+    prunes window tiles and asserts the loop restriction.
+  source_evidence:
+  - src_77fdd041c1e25e15
+  - src_49cb5bdc816cb102
+  measurement_evidence: []
+  limitations:
+  - An optimization for fully valid KV tiles is not valid for every prefix/window boundary.
+  references:
+  - knowledge/operator/sliding_window_attention/README.md
+  - knowledge/operator/chunked_prefill/README.md
+  - knowledge/operator/attention_prefill_fmha/README.md
+- id: attention-sparse-selected-slots
+  type: constraint
+  axes:
+  - sparse_selection
+  - cache_layout
+  match:
+    operator_families:
+    - sparse_attention_nsa
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+  question: What distinguishes sparse selected-slot attention from dense paged attention?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - An upstream indexer supplies selected KV indices or slots for each query.
+  actions:
+  - Keep the selected-slot representation, valid count and sentinel convention aligned with the cache
+    lookup.
+  - Mask invalid selected entries before loading cache data and before softmax; do not reinterpret sparse-list
+    positions as logical token IDs.
+  - Validate repeated, missing and boundary indices according to the producer contract before tuning gather
+    or LDS staging.
+  alternatives:
+  - Use a reference that gathers the same selected indices and computes attention over that set.
+  why:
+  - The sparse MLA implementations explicitly load selected slots and perform sparse gathers rather than
+    iterating a dense KV range.
+  source_evidence:
+  - src_ed78f2dc4c308f3e
+  measurement_evidence: []
+  limitations:
+  - This card does not establish indexer ranking correctness or a policy for duplicate selections.
+  references:
+  - knowledge/operator/sparse_attention_nsa/README.md
+  solutions:
+  - backend: gluon
+    mechanism: The sparse MLA path isolates slot loading and cache gather helpers before its compute path.
+    source_evidence:
+    - src_2bcb9480481ff798
+    - src_513194697c804a41
+- id: attention-compression-cache-contract
+  type: constraint
+  axes:
+  - compression
+  - cache_layout
+  - numerical_contract
+  match:
+    operator_families:
+    - compressed_attention
+    target_languages:
+    - flydsl
+  question: Which compression-window and quantized-cache contracts must travel together?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The chosen source path is the fused compression/cache preparation kernel, not ordinary dense attention.
+  actions:
+  - 'Preserve the overlap setting: the builder uses K = 2*ratio for overlap and K = ratio without overlap,
+    with a state-size requirement.'
+  - 'Select the cache output format explicitly: per-row FP8, grouped FP8 and FP4 have different scales
+    and layouts.'
+  - Enforce the builder's vector-width, rotary-dimension, state-size and FP4 alignment checks before tuning
+    its pipeline.
+  alternatives:
+  - Keep compression and quantized cache packing separate until both intermediate outputs agree with the
+    reference.
+  why:
+  - The builder couples compression geometry, online rescaling, quantization and cache scatter in one
+    implementation.
+  source_evidence:
+  - src_24c98837f9940bb0
+  measurement_evidence: []
+  limitations:
+  - This source is a compression/preparation stage; it is not proof of a complete compressed-attention
+    serving path.
+  - FP4 and FP8 scale contracts are not interchangeable.
+  references:
+  - knowledge/operator/compressed_attention/README.md
+- id: attention-gated-delta-state-contract
+  type: constraint
+  axes:
+  - recurrent_state
+  - implementation_contract
+  match:
+    operator_families:
+    - linear_attention_gated_delta
+    target_languages:
+    - flydsl
+    - gluon
+  question: What state and index contracts distinguish gated-delta decode from softmax attention?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The workload executes the recurrent gated-delta decode path.
+  actions:
+  - Preserve the distinction between read_indices and write_indices; both default to indices but may designate
+    different state slots.
+  - Respect the state alignment, dtype and Q/K last-dimension stride checks; use need_shuffle_state only
+    with its corresponding layout conversion.
+  - Validate the updated recurrent state as well as the visible output, including multi-step execution
+    and state-slot reuse.
+  alternatives:
+  - Use the unfused recurrent state update as a correctness reference; evaluate prefill/chunk implementations
+    separately.
+  why:
+  - flydsl_gdr_decode explicitly validates index dtypes and state layout before selecting its tiling and
+    launching the recurrent update.
+  source_evidence:
+  - src_c67a55e3e97ebe90
+  measurement_evidence: []
+  limitations:
+  - Softmax KV-split reduction is not an implementation of this recurrence.
+  - A one-step output match does not verify the next token's state.
+  references:
+  - knowledge/operator/linear_attention_gated_delta/README.md
+- id: attention-qk-rope-cache-fusion
+  type: performance_candidate
+  axes:
+  - cache_layout
+  - numerical_contract
+  - data_movement
+  match:
+    operator_families:
+    - qk_norm_rope_cache
+    target_languages:
+    - flydsl
+    - hip
+    - gluon
+  question: What must a Q/K normalization, RoPE and cache-write fusion preserve?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - Q/K preparation produces data consumed by attention or an indexer cache.
+  actions:
+  - Keep normalization weights/epsilon, rotary pair convention, positional indices and cache slot mapping
+    identical to the unfused path.
+  - For the wave64 builder, enforce its even rotary dimension and vector divisibility requirements before
+    attempting packed FP8 stores.
+  - 'Separate model-lifetime tensor adapters from request-lifetime tensors: the source caches static weights/cos/sin,
+    while request tensors must not be retained as static adapters.'
+  alternatives:
+  - Keep a sequence of norm, RoPE and cache write operations as the same-contract baseline.
+  why:
+  - The implementation couples norm/RoPE with vectorized stores and contains separate wave32/wave64 builders
+    and static-adapter lifetime handling.
+  source_evidence:
+  - src_93c5bb1f38501f1d
+  - src_9069bff48d95f97b
+  measurement_evidence: []
+  limitations:
+  - The constraints cited for the wave64 builder do not automatically describe the wave32 builder.
+  - A successful fusion must match the consumer's quantization and cache layout, not only its Q/K values.
+  references:
+  - knowledge/operator/qk_norm_rope_cache/README.md
+- id: attention-query-kv-tile-pipeline
+  type: performance_candidate
+  axes:
+  - kv_partition
+  - compute_schedule
+  - data_movement
+  match:
+    operator_families:
+    - attention_prefill_fmha
+    - attention_decode_paged
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+  question: Which coupled decisions should be explored when changing attention tile sizes?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - Correct forward attention already exists and the next candidate changes query/KV tile geometry or
+    buffering.
+  actions:
+  - Consider query rows, KV tile width, head dimensions, waves and shared-memory buffering as a coupled
+    resource bundle.
+  - Compare the single-buffer and standard attention-loop precedents with the same mask and cache layout.
+  - Retain tail masking and per-query normalization state when changing the amount of work per program.
+  alternatives:
+  - Retain the simpler single-buffer or current tiling as a candidate.
+  why:
+  - The Gluon unified implementation exposes distinct attention-loop buffering structures; the Triton
+    prefill source exposes BLOCK_M/BLOCK_N.
+  source_evidence:
+  - src_a3adfa0056dbdf43
+  measurement_evidence: []
+  limitations:
+  - Source structure alone gives no preferred tile or pipeline depth.
+  - The gfx950 Gluon precedent is not a claim of support on another architecture.
+  references:
+  - knowledge/operator/attention_prefill_fmha/README.md
+  - knowledge/operator/attention_decode_paged/README.md
+  solutions:
+  - backend: gluon
+    mechanism: Separate single-buffer and standard loops make the buffering choice explicit.
+    source_evidence:
+    - src_df1d1897d6e20027
+    - src_c7b298210cc66981

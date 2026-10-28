@@ -750,7 +750,7 @@ def test_extraction_refuses_a_dirty_source_by_default(tmp_path, monkeypatch):
           "category": "mfma_intrinsic", "match": "x", "captured": [], "arch_scope": "",
           "evidence": ["1: x"]}], [], [], [], []))
     monkeypatch.setattr(EX, "aiter_commit", lambda a: "0" * 40)
-    monkeypatch.setattr(sys, "argv", ["x", "--aiter", str(tmp_path), "--emit"])
+    monkeypatch.setattr(sys, "argv", ["x", "--family", "gemm", "--aiter", str(tmp_path), "--emit"])
     assert EX.main() == 3, "a dirty contributing file must abort the emit"
     assert calls["asked"] == str(tmp_path)
 
@@ -763,7 +763,7 @@ def test_allow_dirty_records_but_marks_every_affected_record(tmp_path, monkeypat
          {"file": "clean.py", "line": 2, "language": "flydsl", "category": "tile_shape",
           "match": "y", "captured": [], "arch_scope": "", "evidence": ["2: y"]}], [], [], [], []))
     monkeypatch.setattr(EX, "aiter_commit", lambda a: "0" * 40)
-    monkeypatch.setattr(sys, "argv", ["x", "--aiter", str(tmp_path), "--json", "--allow-dirty"])
+    monkeypatch.setattr(sys, "argv", ["x", "--family", "gemm", "--aiter", str(tmp_path), "--json", "--allow-dirty"])
     assert EX.main() == 0
     payload = json.loads(capsys.readouterr().out)
     got = {e["file"]: e.get("unreproducible")
@@ -780,7 +780,7 @@ def test_an_unrelated_dirty_file_does_not_block_extraction(tmp_path, monkeypatch
         [{"file": "clean.py", "line": 1, "language": "flydsl", "category": "tile_shape",
           "match": "x", "captured": [], "arch_scope": "", "evidence": ["1: x"]}], [], [], [], []))
     monkeypatch.setattr(EX, "aiter_commit", lambda a: "0" * 40)
-    monkeypatch.setattr(sys, "argv", ["x", "--aiter", str(tmp_path), "--json"])
+    monkeypatch.setattr(sys, "argv", ["x", "--family", "gemm", "--aiter", str(tmp_path), "--json"])
     assert EX.main() == 0
     assert json.loads(capsys.readouterr().out)["evidence"]["provenance"]["aiter_dirty_sources"] == []
 
@@ -997,7 +997,7 @@ def test_json_mode_is_machine_readable():
     # nothing to do with that. Without it the test asserts reproducibility twice and fails on any
     # developer box with a modified aiter, which teaches people to skip it.
     r = subprocess.run([sys.executable, os.path.join(HERE, "_extract_impl_facts.py"),
-                        "--aiter", aiter, "--json", "--allow-dirty"],
+                        "--family", "gemm", "--aiter", aiter, "--json", "--allow-dirty"],
                        capture_output=True, text=True, check=False)
     assert r.returncode == 0, r.stderr
     payload = json.loads(r.stdout)

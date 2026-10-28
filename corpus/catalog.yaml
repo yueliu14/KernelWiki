@@ -29,26 +29,18 @@ authoring_languages:
 # curated decisions, generated human pages and optional benchmark adapters stay
 # separate artifacts; the catalog only says which files belong to one family.
 #
-# `patterns` lists every taxonomy operator id (index/taxonomy.md) this family's
-# cards speak to, so a TechLead that resolved `kk_operator` from the taxonomy
-# reaches the decision page instead of an unknown-family error. `grouped_gemm_moe`
-# is the taxonomy's grouped GEMM (one GEMM per expert over a sorted token layout)
-# and sits in its GEMM family.
-#
-# The MoE operators -- `fused_moe_grouped_gemm`, `moe_routing_topk`,
-# `moe_dispatch_combine` -- have NO family here yet, so resolving one raises
-# `no corpus family publishes operator/pattern ...`. That is the intended answer
-# rather than a gap to paper over: the fused MoE kernel is a routing-and-layout
-# problem whose decisions are not the dense GEMM's, and listing it under `gemm`
-# to avoid the error would hand a TechLead tiling advice for a kernel whose cost
-# is in the sort. A MoE family belongs in a later corpus with its own evidence.
+# Every operator has one discovery owner. Grouped expert GEMM belongs to MoE,
+# where routing, intermediate layouts and combine are part of its contract;
+# the historical GEMM cards remain available as linked compute precedents.
+# A family pin describes its extracted snapshot, not a claim that every backend
+# is present or supported on every GPU. See each family's coverage_notes.
 families:
   - id: gemm
+    title: GEMM and projection fusions
     patterns:
       - gemm
       - dense_gemm
       - scaled_quant_gemm
-      - grouped_gemm_moe
       - batched_gemm
       - splitk_streamk_gemm
       - skinny_gemv_decode
@@ -78,3 +70,89 @@ families:
     # manifest lives with the consumer. Declaring it here would make this catalog name a path
     # that does not exist in this repo, which is exactly the kind of claim the gates exist to
     # refuse.
+  - id: attention
+    title: Attention, KV caches and preparation fusions
+    patterns:
+      - attention_prefill_fmha
+      - attention_decode_paged
+      - mla_attention
+      - gqa_mqa_attention
+      - sparse_attention_nsa
+      - compressed_attention
+      - linear_attention_gated_delta
+      - chunked_prefill
+      - sliding_window_attention
+      - context_parallel_attention
+      - qk_norm_rope_cache
+    source_scope: scopes/attention.yaml
+    source_extractor: _extract_impl_facts.py
+    source_evidence: evidence/attention_source.yaml
+    performance_axes: performance_axes/attention.yaml
+    performance_normalizer: _normalize_performance_decisions.py
+    decisions: decisions/attention.yaml
+    source_document: attention_source_evidence.md
+    decision_document: attention_decisions.md
+    coverage_notes:
+      - Forward inference precedents only; explicit backward/training sources are excluded.
+      - Context-parallel coverage concerns partial-result normalization; cross-rank transport is not extracted.
+      - Gated-delta and compression have distinct semantics; softmax cards do not apply to them by default.
+      - Native OPUS source is classified as HIP/C++; ASM records describe launch contracts, not disassembled instructions.
+      - Tuned attention databases and new GPU measurements are not included.
+    validation_sources:
+      - op_tests/test_mla.py
+      - op_tests/test_flydsl_mla_reduce.py
+      - op_tests/test_flydsl_compress_attn.py
+      - op_tests/test_flydsl_linear_attention.py
+      - op_tests/test_flydsl_qk_norm_rope_quant.py
+  - id: moe
+    title: MoE routing, expert GEMMs and combine
+    patterns:
+      - grouped_gemm_moe
+      - fused_moe_grouped_gemm
+      - moe_routing_topk
+      - moe_dispatch_combine
+      - shared_expert_fusion
+    source_scope: scopes/moe.yaml
+    source_extractor: _extract_impl_facts.py
+    source_evidence: evidence/moe_source.yaml
+    performance_axes: performance_axes/moe.yaml
+    performance_normalizer: _normalize_performance_decisions.py
+    decisions: decisions/moe.yaml
+    source_document: moe_source_evidence.md
+    decision_document: moe_decisions.md
+    coverage_notes:
+      - Covers routing profiles, sorted/grouped row contracts, two-stage expert compute, shared partials and communication lifetimes.
+      - Historical GEMM tile/MFMA precedents remain in gemm_decisions.md; their older source pin is retained.
+      - TP device-communication precedents do not establish arbitrary EP topology support.
+      - No CK expert-template expansion, tuned MoE database extraction or multi-GPU validation is claimed.
+      - Native OPUS source is classified as HIP/C++; binary internals remain uninspected.
+    validation_sources:
+      - op_tests/test_moe_2stage.py
+      - op_tests/test_moe_sorting.py
+      - op_tests/test_moe_local_expert_ids.py
+      - op_tests/test_moe_dp_share_expert.py
+      - op_tests/test_moe_topk_gating.py
+  - id: indexer
+    title: Attention index scoring and selection
+    patterns:
+      - attention_indexer
+    source_scope: scopes/indexer.yaml
+    source_extractor: _extract_impl_facts.py
+    source_evidence: evidence/indexer_source.yaml
+    performance_axes: performance_axes/indexer.yaml
+    performance_normalizer: _normalize_performance_decisions.py
+    decisions: decisions/indexer.yaml
+    source_document: indexer_source_evidence.md
+    decision_document: indexer_decisions.md
+    coverage_notes:
+      - Separates DeepSeek weighted-ReLU MQA logits from MiniMax page-max scores and from the subsequent top-k operation.
+      - Includes contiguous FP8, paged MXFP4, row selection and DCP merge precedents; these are different layout and numerical contracts.
+      - Kernel and wrapper presence does not certify runtime dispatch, stable tie ordering or performance.
+      - Native OPUS source is classified as HIP/C++; ASM evidence is limited to host launchers.
+      - No tuned indexer database or GPU benchmark result is published here.
+    validation_sources:
+      - op_tests/test_flydsl_fp8_mqa_logits.py
+      - op_tests/test_flydsl_pa_mqa_logits_fp4.py
+      - op_tests/test_flydsl_minimax_m3_index_score.py
+      - op_tests/test_topk_per_row_stable.py
+      - op_tests/test_flydsl_dcp_topk_merge.py

@@ -1,0 +1,54 @@
+family: attention
+include_symbols: true
+exclude:
+- '*bwd*'
+- '*backward*'
+- '*wgrad*'
+- '*train*'
+impls:
+- language: flydsl
+  subtree: aiter/ops/flydsl
+  globs:
+  - mla_kernels.py
+  - mla_reduce_kernels.py
+  - linear_attention_kernels.py
+  - linear_attention_prefill_kernels.py
+  - kernels/mla_reduce.py
+  - kernels/pa_decode_kernel.py
+  - kernels/pa_decode_plan.py
+  - kernels/pa_decode_reduce.py
+  - kernels/flash_attn_func_fp8_gfx950.py
+  - kernels/fused_compress_attn.py
+  - kernels/fused_compress_attn_common.py
+  - kernels/qk_norm_rope_quant.py
+- language: triton
+  subtree: aiter/ops/triton/_triton_kernels
+  globs:
+  - attention/prefill_attention.py
+  - attention/extend_attention.py
+  - attention/mla.py
+  - attention/unified_attention.py
+  - attention/unified_attention_sparse_mla.py
+  - attention/mla_decode_rope.py
+- language: gluon
+  subtree: aiter/ops/triton/_gluon_kernels
+  globs:
+  - gfx950/attention/mha.py
+  - gfx950/attention/unified_attention.py
+  - gfx950/attention/sparse_mla.py
+  - gfx950/attention/kda_decode.py
+  - gfx950/gated_delta_net/fused_gdn_decode_qkvz.py
+  - gfx950/gated_delta_net/fused_gdn_prefill_qkvz.py
+- language: hip
+  subtree: csrc/kernels
+  globs:
+  - mla/reduce.cu
+  - mla/metadata.cu
+  - mla/opus_mla_decode_fwd.cu
+  - chunk_gated_delta_rule_fwd_h.cu
+  - fused_qk_norm_rope_cache_quant.cu
+- language: asm
+  subtree: csrc/py_itfs_cu
+  globs:
+  - asm_mla.cu
+  - asm_mla_sparse_prefill.cu

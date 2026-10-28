@@ -1,12 +1,10 @@
-# corpus/ — source evidence plus actionable development decisions
+# corpus/ — source evidence and development decisions for inference kernels
 
-A FlyDSL author writing a GEMM has to answer, by hand, roughly twenty questions that Triton answers
-for them: which MFMA instruction, what tile, how many waves, how LDS is laid out and swizzled, where
-to pin instruction order. AITER already contains the same operator family answered six ways — in
-FlyDSL, Triton, Gluon, CK, HIP and hand-written assembly. Source presence alone says nothing about
-whether an answer was measured or won.
-This directory turns them into two different products so the first move on a new kernel is a lookup
-rather than a guess:
+AITER contains several implementations of the main inference workloads, with different numerical,
+layout and scheduling contracts. This corpus covers GEMM, attention, MoE and attention indexers.
+Each family has its own extraction scope, pinned source evidence, curated decisions, performance
+axes and generated reading pages. Source presence says nothing about whether an implementation
+was measured or won. The directory publishes two different products:
 
 1. **Source evidence** — what an implementation literally contains, with a content-bound ID and
    reproducible `file:line`.
@@ -17,6 +15,34 @@ The cards also publish a small machine-readable `type` + `match` block.  `semant
 to express an invariant, `constraint` cards identify impossible/illegal candidates, and
 `performance_candidate` cards add something worth measuring.  A static match is never a performance
 ranking.
+
+## Families and coverage
+
+| Family | Operator scope | Start reading | Source snapshot |
+|---|---|---|---|
+| GEMM | Dense, quantized, batched, skinny, split-K/Stream-K and projection fusions | [Decisions](gemm_decisions.md) · [Evidence](gemm_source_evidence.md) | `a6bb49937584` |
+| Attention | Prefill, paged decode, MLA, GQA/MQA, sparse, compressed, gated-delta, chunked/windowed/context-parallel and Q/K preparation | [Decisions](attention_decisions.md) · [Evidence](attention_source_evidence.md) | `b3ad6c461703` |
+| MoE | Routing/top-k, sorting, grouped expert GEMMs, fused execution, dispatch/combine and shared experts | [Decisions](moe_decisions.md) · [Evidence](moe_source_evidence.md) | `b3ad6c461703` |
+| Indexer | Weighted MQA logits, page-max scores, packed/quantized caches, top-k and DCP merge | [Decisions](indexer_decisions.md) · [Evidence](indexer_source_evidence.md) | `b3ad6c461703` |
+
+The new families add **27 cards and 2,447 source observations from 77 scoped files**. Catalog
+membership is navigation, not exhaustive coverage: a kernel declaration, a registered runtime route
+and a measured implementation are separate claims. The family pages explicitly identify missing
+areas, including tuned databases, binary disassembly and cross-rank attention transport.
+
+`grouped_gemm_moe` is owned by the MoE family so its routing, intermediate-format and combine
+contracts are discoverable together. The older GEMM cards and evidence remain available as compute
+precedents; they have not been silently refreshed to a different upstream version.
+
+The new source records include `symbol_declaration`: a Python function's exact source extent for
+manual review, not an inferred semantic interpretation. Existing low-level idiom rules still collect
+MFMA, layout, scheduling, tuning and legality observations. Explicitly decorated functions in mixed
+Triton/Gluon/FlyDSL files are attributed to their own language; undecorated host helpers retain the
+scope's backend context. Native OPUS code uses the `hip` language ID, with provider identity stated
+by the source path. The shared language vocabulary is unchanged.
+
+Pinned upstream test links describe correctness references only. This expansion adds no GPU timing
+or validation results and no consumer-side retrieval, planning or benchmark execution.
 
 ## Why this is in this repo
 
@@ -90,7 +116,8 @@ and run that earned them. The always-on corpus does not copy them and bypass tho
 |---|---|
 | `catalog.yaml` | discovery surface for operator/pattern families; its `patterns` cover every taxonomy GEMM operator id, so a TechLead's `kk_operator` resolves. |
 | `scopes/<family>.yaml` | WHICH upstream files a family's evidence is read from: the per-language subtrees and globs, the dispatch files, the shipped-config directories. Data, so adding an operator family is adding a file here plus a `source_scope:` line in `catalog.yaml`. |
-| `_extract_impl_facts.py` | reads an AITER checkout through a scope and writes raw source/tuning evidence. Needs `--aiter`; `--family` once a second scope exists. Holds the rules (what a tiling, an arch gate or a cache hint looks like) — those are kernel idioms and are shared by every family, which is why no upstream path may appear in it. |
+| `_extract_impl_facts.py` | reads an AITER checkout through a scope and writes raw source/tuning evidence. Requires `--aiter` and `--family`. Shared rules capture kernel idioms; optional AST declarations preserve function extents. Upstream paths belong in scopes. |
+| `_build_corpus.py` | validates every catalog family, renders its pages, or re-resolves citations with `--verify-source`. It reuses the original GEMM presentation and the shared card schema. |
 | `evidence/gemm_source.yaml` | machine-readable source observations: stable ID, question category, language, `file:line` (plus `end_line` where a Python statement spans lines), match, arch scope, verbatim excerpt. Besides kernel source it holds one record per row of AITER's per-arch ASM kernel inventories (`hsa/<gfx>/<kind>/*.csv`) and the routing statements of AITER's runtime dispatch (`tuned_gemm.py`, `ops/gemm_op_*.py`), each filed under the backend it routes to. |
 | `evidence/gemm_tuned_configs.yaml` | AITER's shipped selected Triton configs, each with stable `cfg_…` attribution ID, grouped by `(gfx, variant, M bucket)` with exact source JSON paths. |
 | `evidence/gemm_csv_tuned_configs.yaml` | AITER's tuned GEMM databases (`aiter/configs/**/*tuned*gemm*.csv`) without their timing columns: FlyDSL selections decoded into knobs and grouped by `(gfx, CUs, database, family, dtype, M bucket)` (`cfg_…`), and per-bucket counts of which backend AITER's tuner selected (`sel_…`). |
@@ -111,14 +138,32 @@ longer existed.
 ## How to refresh
 
 ```bash
-python3 corpus/_extract_impl_facts.py --aiter /path/to/aiter --emit
-python3 corpus/_render_facts.py --emit
-python3 corpus/_render_decisions.py --emit
+python3 corpus/_extract_impl_facts.py --family attention --aiter /path/to/aiter --emit
+python3 corpus/_build_corpus.py --emit
+python3 corpus/_build_corpus.py --check
 ```
 
-The extractor writes all three evidence files (`gemm_source.yaml`, `gemm_tuned_configs.yaml`,
-`gemm_csv_tuned_configs.yaml`); `_render_decisions.py` writes `gemm_decisions.md` and
-`gemm_triton_seeds.md`. Commit the evidence, cards and every generated page together. CI rejects a page
+Specify `--family` when extracting: scopes are now plural. Use the corresponding pinned checkout
+for each family. For GEMM use `--family gemm`; for the new families use `attention`, `moe` or
+`indexer`. `_build_corpus.py` discovers every family from the catalog; `--family NAME` limits
+rendering. The two original renderer commands remain GEMM-only compatibility entry points.
+
+Re-resolve every quoted source line and every test path against the named git objects with:
+
+```bash
+python3 corpus/_build_corpus.py --family attention --verify-source /path/to/aiter
+python3 corpus/_build_corpus.py --family moe --verify-source /path/to/aiter
+python3 corpus/_build_corpus.py --family indexer --verify-source /path/to/aiter
+```
+
+This audit does not read the checkout's current working files. The checkout must hold the cited
+commit; its HEAD may differ. CI runs the offline schema, content-ID, dependency, link and rendering
+checks without needing AITER or a GPU. Run the source audit when refreshing evidence.
+
+For GEMM the extractor writes source, JSON-tuning and CSV-tuning evidence. The new families publish
+source evidence only; no empty tuning database is presented as an extracted artifact.
+`_build_corpus.py` renders all family pages, including GEMM's separate Triton seeds.
+Commit the evidence, cards and every generated page together. CI rejects a page
 when it does not match its inputs, and rejects a decision card whose content-bound evidence ID is
 absent or stale.
 
@@ -133,7 +178,7 @@ The fix when your working copy is dirty is a throwaway clean checkout, which lea
 
 ```bash
 git -C /path/to/aiter worktree add /tmp/aiter-clean <commit>
-python3 corpus/_extract_impl_facts.py --aiter /tmp/aiter-clean --emit
+python3 corpus/_extract_impl_facts.py --family attention --aiter /tmp/aiter-clean --emit
 ```
 
 `--allow-dirty` extracts anyway and marks every affected record `unreproducible: true`, which is
