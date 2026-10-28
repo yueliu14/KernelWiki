@@ -1,0 +1,360 @@
+# corpus/ — source evidence plus actionable development decisions
+
+A FlyDSL author writing a GEMM has to answer, by hand, roughly twenty questions that Triton answers
+for them: which MFMA instruction, what tile, how many waves, how LDS is laid out and swizzled, where
+to pin instruction order. AITER already contains the same operator family answered six ways — in
+FlyDSL, Triton, Gluon, CK, HIP and hand-written assembly. Source presence alone says nothing about
+whether an answer was measured or won.
+This directory turns them into two different products so the first move on a new kernel is a lookup
+rather than a guess:
+
+1. **Source evidence** — what an implementation literally contains, with a content-bound ID and
+   reproducible `file:line`.
+2. **Development decision cards** — when a pattern applies, what to try, why, alternatives, evidence
+   strength and limits.
+
+The cards also publish a small machine-readable `type` + `match` block.  `semantic` cards explain how
+to express an invariant, `constraint` cards identify impossible/illegal candidates, and
+`performance_candidate` cards add something worth measuring.  A static match is never a performance
+ranking.
+
+## Why this is in this repo
+
+`knowledge/` next door is written for a human to read. This tree is written for a program to query:
+every record carries a `file:line` provenance back to the source it was read from, an id bound to its
+own content, and a schema a consumer can version-check. The human-readable pages in here
+(`gemm_decisions.md` and friends) are **generated** from those records, never hand-edited.
+
+The consumer is AMD-AGI/GEAK's kernel workflow, which points `KERNEL_KNOWLEDGE_DIR` at a checkout of
+this repo and reads `corpus/catalog.yaml` to discover what is here. The boundary between the two
+repos is the **direction the data flows**, not "code vs. data":
+
+- Anything that **produces or verifies** a knowledge artifact lives here, next to the artifact.
+  Extractors, renderers and the gates that check that a rendered page still matches its inputs are
+  self-consistency checks on stored data. They need no consumer checkout to run, and the consumer
+  could not run them anyway without a copy of the data.
+- Anything that **consumes** a knowledge artifact during a kernel run lives in GEAK: picking which
+  decision cards apply to a problem, resolving a citation for a prompt, scoring an outcome, writing
+  a result back. Those need a live run, a GPU and a workspace; none of that belongs in a knowledge
+  store.
+
+Put the other way: this repo must be able to prove its own data is well-formed with nothing but
+itself. It can — `pytest corpus` touches no GEAK path.
+
+## The contract with GEAK
+
+`catalog.yaml` is the whole interface.
+
+| field | meaning |
+|---|---|
+| `schema_version` | bumped here when the corpus shape changes; GEAK asserts the version it supports |
+| `authoring_languages` | the join key between a corpus record and a GEAK learned card |
+| `families[].*` | relative paths to each family's evidence, decisions, axes and generated pages |
+
+`authoring_languages` is the one that is easy to get wrong, so it is worth being explicit: the list is
+**declared here and conformed to there**. GEAK's `kernel_workflow/scripts/kb.py` holds an
+`AUTHORING_LANGUAGES` constant, and its own test asserts that constant matches this file for the
+knowledge dir it is configured against. A corpus keyed on its own private language names cannot be
+joined to a learned card, which is the entire point of putting `language:` on a card — so the
+vocabulary gets one home and two enforced readers, rather than two copies that drift apart.
+
+## Where the cited pages are
+
+A card's `references` cite prose by `path:line`, resolved from the repository root — they name pages
+under `knowledge/`, which is a sibling of this directory rather than a child of it.
+`_render_decisions.py --check` refuses a card citing a file this repo does not contain, so a card and
+the page it cites travel together or the citation becomes a claim nothing backs.
+
+## The one rule
+
+**Never make the reader infer a recommendation from a source-match count.**
+
+Source evidence can establish: *this file, at this line, selects
+`mfma_f32_16x16x32_bf16`.* It cannot establish: *that instruction is right for this shape.* The old
+page stopped at the first sentence and called each regex category a "decision axis", leaving the
+author to reverse-engineer the actual advice from a raw hit dump. That is an evidence index, not knowledge.
+
+`gemm_decisions.md` supplies the missing semantic layer. Every card has conditions, actions,
+alternatives, rationale, evidence strength and limitations:
+
+- `source_observed` means "include this implementation precedent as a candidate", never "prefer it";
+- `shipped_config` means "AITER selected this parameter seed", not "the corpus has its benchmark";
+- measured guidance stays in learned cards/expert skills behind their existing feature switches.
+
+Measured claims remain in learned cards or `knowledge/general/expert_recipes/`, attached to the environment
+and run that earned them. The always-on corpus does not copy them and bypass those systems' switches.
+
+## Layout
+
+| path | what it is |
+|---|---|
+| `catalog.yaml` | discovery surface for operator/pattern families; its `patterns` cover every taxonomy GEMM operator id, so a TechLead's `kk_operator` resolves. |
+| `scopes/<family>.yaml` | WHICH upstream files a family's evidence is read from: the per-language subtrees and globs, the dispatch files, the shipped-config directories. Data, so adding an operator family is adding a file here plus a `source_scope:` line in `catalog.yaml`. |
+| `_extract_impl_facts.py` | reads an AITER checkout through a scope and writes raw source/tuning evidence. Needs `--aiter`; `--family` once a second scope exists. Holds the rules (what a tiling, an arch gate or a cache hint looks like) — those are kernel idioms and are shared by every family, which is why no upstream path may appear in it. |
+| `evidence/gemm_source.yaml` | machine-readable source observations: stable ID, question category, language, `file:line` (plus `end_line` where a Python statement spans lines), match, arch scope, verbatim excerpt. Besides kernel source it holds one record per row of AITER's per-arch ASM kernel inventories (`hsa/<gfx>/<kind>/*.csv`) and the routing statements of AITER's runtime dispatch (`tuned_gemm.py`, `ops/gemm_op_*.py`), each filed under the backend it routes to. |
+| `evidence/gemm_tuned_configs.yaml` | AITER's shipped selected Triton configs, each with stable `cfg_…` attribution ID, grouped by `(gfx, variant, M bucket)` with exact source JSON paths. |
+| `evidence/gemm_csv_tuned_configs.yaml` | AITER's tuned GEMM databases (`aiter/configs/**/*tuned*gemm*.csv`) without their timing columns: FlyDSL selections decoded into knobs and grouped by `(gfx, CUs, database, family, dtype, M bucket)` (`cfg_…`), and per-bucket counts of which backend AITER's tuner selected (`sel_…`). |
+| `performance_axes/gemm.yaml` | backend-neutral performance questions plus loss-aware aliases for FlyDSL, Triton, CK and ASM knobs, and the `development_order` that places those questions in the order a kernel is written. |
+| `_normalize_performance_decisions.py` | projects backend spelling onto those axes while retaining source fields, completeness and comparison limits. |
+| `gemm_source_evidence.md` | generated evidence index for tracing a card back to source; not the first page an author should read. |
+| `decisions/gemm.yaml` | curated development cards with axes, conditions, actions, alternatives, cross-backend solutions, background references and evidence strength, plus the `traits` a card may require. |
+| `_render_decisions.py` | validates every citation (source, shipped selection, background doc, axis, trait) and the development order, and renders both pages below. |
+| `gemm_decisions.md` | generated, actionable page the Workflow reads first: cards in development order (steps 1-10), then FlyDSL shipped seeds and the per-bucket backend-selection table. |
+| `gemm_triton_seeds.md` | generated page with the Triton shipped seeds, split out because they are another backend's knob names. |
+| `test_corpus.py` | source reproducibility, card grounding and generated-page contracts. |
+
+The extraction/rendering split matters: extraction needs a source tree that is not part of this repo,
+while both renderers must not. That is what lets `--check` run in CI on a box with no aiter and no GPU, and a
+generated doc that nothing checks is how `kernel_families.md` came to state a default tile that no
+longer existed.
+
+## How to refresh
+
+```bash
+python3 corpus/_extract_impl_facts.py --aiter /path/to/aiter --emit
+python3 corpus/_render_facts.py --emit
+python3 corpus/_render_decisions.py --emit
+```
+
+The extractor writes all three evidence files (`gemm_source.yaml`, `gemm_tuned_configs.yaml`,
+`gemm_csv_tuned_configs.yaml`); `_render_decisions.py` writes `gemm_decisions.md` and
+`gemm_triton_seeds.md`. Commit the evidence, cards and every generated page together. CI rejects a page
+when it does not match its inputs, and rejects a decision card whose content-bound evidence ID is
+absent or stale.
+
+**Extraction refuses a dirty source.** If any file that produces evidence has uncommitted changes, the
+emit aborts, because its `file:line` would resolve for you and for nobody else — and a citation index
+whose citations do not resolve is not a weaker index, it is a different document that looks like one.
+This is not hypothetical: the first version of this corpus shipped 56 records pointing into a locally
+modified kernel, under a commit that did not contain those edits, with the whole suite green. The test
+asserted a commit was *present*; it never asked whether the commit *identified* what was read.
+
+The fix when your working copy is dirty is a throwaway clean checkout, which leaves your edits alone:
+
+```bash
+git -C /path/to/aiter worktree add /tmp/aiter-clean <commit>
+python3 corpus/_extract_impl_facts.py --aiter /tmp/aiter-clean --emit
+```
+
+`--allow-dirty` extracts anyway and marks every affected record `unreproducible: true`, which is
+useful for a local look and is rejected by `test_corpus.py` for the committed artifact. The refusal is
+scoped to files that actually *contributed* evidence — an unrelated edit elsewhere in aiter cannot make a
+citation unresolvable, and refusing on it would be superstition rather than a check.
+
+Provenance records `aiter_origin` (the remote) rather than a local path, since the pair that
+identifies a source is repository plus commit. A path like `/tmp/aiter-clean` names a directory that
+no longer exists and never meant anything to anyone else.
+
+## The consumer side is not here
+
+Four things this README used to document moved to AMD-AGI/GEAK when the corpus and its consumer
+were split: `_select_candidates.py` (match cards to a run's context), `_validate_products.py`
+(check the cards against what a run actually produced), `_aggregate_decision_outcomes.py` (fold
+run outcomes back into per-decision summaries) and the whole `benchmarks/` tree (adapters, the
+implementation registry, the normalized fp8 runner).
+
+They are not missing — they are on the other side of the line this repo draws. All four need a
+live run, a GPU and a workspace, and none of them can tell you anything about whether the data
+here is well-formed. They live in GEAK's `corpus/`, which reaches this repo
+through `KERNEL_KNOWLEDGE_DIR`; see **Why this is in this repo** above.
+
+## Cards follow the development order, and carry other backends' answers
+
+The questions a GEMM author answers are the axes of `performance_axes/gemm.yaml`; its
+`development_order` puts them in the order a kernel is written — 1 interface and math semantics,
+2 architecture and implementation path, 3 grid/tile/waves/split-K, 4 layout and addressing, 5 data
+movement, 6 MFMA compute, 7 pipeline and synchronization, 8 reduction/epilogue/write-back, 9 host,
+ABI and launch, 10 validation and tuning. The order is a reading order, not a second vocabulary:
+every axis sits in exactly one step. Step 1 carries a note instead of axes (the math contract is
+fixed by the task), and step 10 a note beside its axes: the task's oracle and timing belong to the
+workflow's verify step, while `validation_contract` records the gate AITER's own test applies.
+
+A card's first axis is the question it answers, and `gemm_decisions.md` places the card under that
+axis's step, constraint cards first. Every other step its axes touch lists it again by link, so a
+decision's consequences are visible where they land — the split-K combine card sits in step 8 and is
+listed in step 3, where split-K is chosen, and step 9, where its host state is written. A step no
+card answers says so on the page; that is the coverage gap, stated rather than hidden.
+
+A card's optional `solutions` block is the same question as other AITER implementations answer it —
+Triton's `remap_xcd`/`pid_grid` next to FlyDSL's `xcd_swizzle`, Gluon's `SwizzledSharedLayout` next
+to the FlyDSL XOR16 helper, Triton's reduce-kernel split-K next to the FlyDSL flag-then-atomic combine. Each
+solution cites its own source evidence, and the renderer checks that the evidence's language is the
+stated backend. Transfer the intent, not the spelling; a CK template name or Triton compiler op is not
+a FlyDSL instruction.
+
+`references` point at always-on background docs under `knowledge/` (hardware facts such as LDS
+bank counts or FNUZ/OCP formats, how-to), as `path.md[:line[-line]]`; the renderer checks that the
+file and the lines exist. They are never measured guidance, which stays behind the learned-card and
+expert-skill switches.
+
+## Shipped tuned databases: FlyDSL seeds and backend selection
+
+AITER's tuned GEMM databases record, per shipped `(gfx, CU count, M, N, K)`, which backend its tuner
+selected among asm, ck, cktile, flydsl and triton, and the selected configuration. The extractor keeps
+the selection and drops the timing columns (`us`, `tflops`, `bw`, `errRatio`) on read: they belong to a
+box this corpus cannot name. Two products follow:
+
+- **FlyDSL seeds** (`cfg_…`): FlyDSL kernel names decoded with AITER's own naming schemes (split-K
+  HGEMM and A8 preshuffle) and grouped by `(gfx, CUs, database, family, dtype, M bucket)`, rendered as
+  *seed candidate / vary next* like the Triton seeds.
+- **Backend selection** (`sel_…`): per-bucket row counts of the selected backend. They show where
+  FlyDSL is AITER's production choice and where it has never been selected (for example gfx942 fp8
+  and every block-scale database). A count is a selection, never a speedup; a shape shipped in two
+  model databases counts twice.
+
+Cards cite these IDs in `shipped_evidence`. Databases without a `libtype` column are inventoried and
+reported as gaps rather than attributed to a backend by kernel-name guessing.
+
+## Unified performance decisions
+
+`performance_axes/gemm.yaml` supplies the common vocabulary that raw API mapping does not:
+
+```text
+compute_instruction  workgroup_tile  work_partition  execution_geometry
+pipeline_schedule    operand_layout  memory_access   epilogue
+architecture_capability  configuration_constraints  tunable_surface
+implementation_variant  runtime_contract  validation_contract
+```
+
+Each axis keeps its comparison contract. For example, a direct FlyDSL `rocdl.mfma_*`, Triton's
+`tl.dot`, a CK XDL template and an ASM object name all answer the `compute_instruction` question,
+but they remain respectively instruction/compiler-op, template-family and binary-identity evidence.
+The normalizer never calls those values equivalent.
+
+The model also publishes:
+
+- `comparison_context`: math contract, dtype, architecture, shape, baseline, accounting and
+  toolchain/provenance fields that must match before measured bundles are comparable;
+- `dependencies`: cross-axis rules such as architecture selecting the MFMA/DMA/async-copy bundle,
+  tile geometry setting resource legality, and preshuffle changing both host and kernel layout;
+- axis `kind`: separates performance choices from hard constraints, search spaces, structural
+  variants and runtime integration contracts.
+
+Every category currently emitted by `gemm_source.yaml` maps to at least one axis. A source record may
+answer more than one question—for example an ASM launch formula is both execution geometry and a
+runtime contract—but it remains one observation and gains no extra performance weight.
+
+Inspect current source coverage and normalize shipped configs with:
+
+```bash
+python3 corpus/_normalize_performance_decisions.py \
+  --source-evidence corpus/evidence/gemm_source.yaml \
+  --tuned-evidence corpus/evidence/gemm_tuned_configs.yaml \
+  --config-id cfg_386a49c8c892741c
+```
+
+`benchmarks/merge_results.py` applies the same normalizer to every measured implementation. Registry
+rows therefore carry a `performance_decisions` vector alongside the untouched backend config:
+
+- exact components such as `workgroup_tile.{m,n,k}` and `work_partition.split_k` can be compared;
+- partial source/config observations stay `partial`;
+- opaque runtime-selected CK/ASM configs remain explicitly unresolved;
+- whole-bundle speedup remains on the implementation and is never copied onto an individual axis.
+
+## Reading the source-evidence table without drawing the wrong conclusion
+
+The table counts **where an implementation question is answered in source**, per question per
+language. The zeros mislead if read as absences of the choice itself:
+
+- `scheduling` is 118 in FlyDSL, a handful of barrier/wait builtins in HIP's `opus.hpp`, and
+  empty elsewhere. Triton kernels *are* scheduled — by a compiler pass. CK picks a
+  `BlockGemmPipelineScheduler` enum. Neither writes a per-instruction ordering statement, so neither
+  appears. The real content of that row is "FlyDSL is the language where this becomes your
+  problem", which is worth knowing and is not the same sentence.
+- `tile_shape` is nearly empty for Triton. Its tiles are `tl.constexpr` parameters, so the source
+  states *that there is a knob* (`tunable_param`, 448 of them) while the values live in the shipped
+  JSON. Two different source observations, in two different places, both recorded.
+- An empty cell can also just mean no rule matches that idiom yet. The rules are a list at the top of
+  `_extract_impl_facts.py`. A missing idiom is a fixable gap, not a finding about the language.
+
+## What AITER states outside kernel source
+
+Four kinds of AITER knowledge are not kernel code and are still read:
+
+- **ASM kernel inventories.** The `.co` binaries publish no source, but `hsa/<gfx>/<kind>/*.csv`
+  lists every kernel an architecture has: tile, B-preshuffle and split-K capability. Read by header,
+  because the kinds disagree on column spelling. They answer "which tiles does the vendor ship for
+  this dtype on this arch" — the fp8 block-scale kernels are the same six on gfx942 and gfx950
+  (tile_n = 128, tile_m 32 to 128, all split-K capable); bf16 is 22 kernels on gfx942 and 24 on
+  gfx950, which adds 256x256; fp4 exists only on gfx950 (35 kernels).
+- **Grid-fill heuristics in the launchers.** The ASM launchers choose tile and split by the number
+  of rounds `ceil(workgroups / num_cu)`, the idle CUs in the last round and `tile_m*tile_n /
+  (tile_m + tile_n)`; the HIP skinny launcher sizes waves per group with `mindiv(rows, CuCount *
+  YTILE, …)`. They are recorded as `grid_fill`, and they hold on every architecture because the CU
+  count is read at run time.
+- **Runtime dispatch.** `tuned_gemm.py` and `ops/gemm_op_*.py` decide the default backend when no
+  tuned row exists — for example the bf16/fp16 skinny route for M <= 16, and the gfx950-only ASM
+  route for B-preshuffled block scale. A routing statement is filed under the backend it routes to,
+  with an excerpt that reaches up to its condition; no architecture is inferred, because a route in
+  the `else` of a gfx942 test belongs to the other architectures.
+- **Test gates.** `test_flydsl_splitk_hgemm.py` states the reference and tolerance AITER holds its
+  FlyDSL HGEMM to, and the cases where it relaxes them — two M=1 B-in-LDS split-K cases. Recorded
+  as `parity_tolerance` under the `validation_contract` axis: where the implementation says its
+  numerics drift, never a replacement for the task's own oracle.
+
+## Why regex, and where that runs out
+
+Six languages is six grammars, and a Python AST pass cannot read a `.cu`. For a citation index what
+matters is that a hit points at the right *line* — the reader opens the file. Where structure is
+genuinely required there is an AST pass, applied only to the `.py` files where it is valid.
+
+One such place is extent. A record is one line plus a two-line excerpt, which is enough for a
+constant and not for a mechanism: the FlyDSL split-K combine sits in a 76-line
+`if const_expr(IS_SPLIT_K):` block. For `.py`
+files the extractor records `end_line` for any hit that starts a multi-line statement, and pages
+cite `file:line-end`. `end_line` is location, not identity — it is left out of the content-bound ID,
+so an edit deep inside a long function does not invalidate every card that cites its first line.
+
+Comments are stripped before matching. This is not hypothetical: `detect_language.py` learned it by
+classifying five plainly-HIP files as CK on the strength of `ck_tile::` mentions that appeared only
+inside commented-out code.
+
+Two things the regex approach deliberately does not attempt:
+
+- **CK's positional template arguments.** Forty-odd unnamed positions are exactly what a regex gets
+  subtly wrong. What is recorded is the instance template chosen and the two arguments CK names —
+  loop scheduler and pipeline version — because those have an analogue a FlyDSL author must decide.
+- **Instruction-level detail inside the `.co` binaries.** The launchers (`asm_gemm_*.cu`) publish the
+  assembly's contract: object name, workgroup size, grid formula, argument block layout. The
+  instructions themselves need a disassembly pass, which is separate work.
+
+## Invariants `test_corpus.py` enforces
+
+1. Every source record carries a language from the same vocabulary `kernel_workflow/scripts/kb.py` uses, so a
+   corpus record and a learned card can be filtered by the same term.
+2. Every source record carries `file` and a positive integer `line`, and the excerpt is verbatim — no
+   paraphrase, because a paraphrase is a new artifact that can be wrong, while a quote can only be
+   stale, and staleness is detectable from the commit.
+3. No source-evidence record contains a performance number. Timings there would be measurements without
+   a machine, which is the shape of an unfalsifiable claim.
+4. Missing subtrees are reported in `missing`, never silently dropped. A section that is empty because
+   nothing was found and one that is empty because the search never ran look identical otherwise, and
+   the difference decides whether the next person repeats the search.
+5. `gemm_source_evidence.md` matches the evidence, and `gemm_decisions.md` matches cards plus evidence.
+6. The committed corpus resolves at the commit it names: `aiter_dirty_sources` is empty and no record
+   is flagged `unreproducible`. This is the promise in the first paragraph, checked rather than
+   assumed — "a commit is recorded" and "the commit identifies what was read" are different
+   properties, and only the second one is worth anything here.
+7. Every decision card states conditions, actions, rationale and limitations; source IDs must resolve
+   to unchanged evidence, and measured guidance is rejected from this always-on layer.
+8. Every card names known `axes`; `development_order` places every axis in exactly one step, so
+   every card has a step; each solution's evidence is in the stated backend's language; references
+   name existing files and lines; shipped IDs resolve in the tuned evidence.
+9. The tuned-database evidence carries no timing column, and its `cfg_…`/`sel_…` IDs are unique.
+10. `missing` is reported per declared pattern, not only when a whole language matched nothing.
+11. New extraction rules are additive: they must not change the identity of any existing record, so
+    no card citation moves when a rule is added. Deliberate exceptions so far: `padded_m` moved from
+    `lds_pad` to `dispatch_padding`, where no card cited it; and ten `scale_operand` records were
+    dropped because they were Triton kernel-name serialisers (`*_repr =`), not scales — the one card
+    that cited three of them now cites the lines that actually apply the scale.
+12. Every `match.requires` names a defined trait, and every card dtype is already canonical, so no
+    card can be deferred or rejected forever by a spelling nobody passes.
+13. `end_line` appears only on `.py` records and only after `line`; it never enters an evidence ID.
+14. Both target architectures are covered from source: gfx942 and gfx950 each have ASM inventory
+    records, and the page's *Coverage by architecture* table counts, per gfx, the cards that can
+    apply, arch-specific source, ASM kernels by kind, FlyDSL seeds, backend selections and Triton
+    seeds. An inventory CSV's `splitK` column is a capability flag (`split_k_capable`), not a split
+    factor: the launchers accept a split above 1 only for a kernel whose flag is 1.
+15. A dispatch routing record carries a kernel language (the backend it routes to) and no inferred
+    architecture; routes to libraries (`hipblaslt`, `torch`) are not recorded, since they are not
+    languages a kernel is written in.

@@ -1,0 +1,176 @@
+# Extraction scope for the GEMM family.
+#
+# This file answers one question and no other: WHICH files in an AITER checkout does the GEMM corpus
+# read? What to look for inside them is the extractor's business and is deliberately not here --
+# `RULES` in `_extract_impl_facts.py` describes kernel idioms (tiling, LDS, MFMA, cache policy) that
+# are not GEMM-specific, and copying them per family would mean a fix to a regex landing in one
+# operator's corpus and not another's.
+#
+# So: the rules are shared code, the scope is data, and adding an operator family is adding a file
+# next to this one plus a `source_scope:` line in catalog.yaml. It is not an edit to the extractor.
+#
+# The one thing that does NOT generalise by configuration is the kernel-name decoders
+# (`decode_flydsl_kernel`): a serialised configuration like
+# `flydsl_gemm2_abf16_wbf16_bf16_t128x128x64_split_k4_...` is a grammar, and a grammar in YAML is a
+# regex in a string with none of the places a reader would look for it. A family whose names this
+# extractor cannot decode gets its rows inventoried and a gap reported, which is the right failure:
+# visible, and fixable by adding a decoder in code where the other decoders are.
+family: gemm
+
+# Each entry is (language, subtree, globs) -- the subtree is where that language's implementations
+# live in aiter, and languages are kept apart because "which language is this" must not be inferred
+# here: `kernel_workflow/scripts/detect_language.py` exists for source whose language is unknown, and
+# a corpus keyed on a guess is worse than a smaller correct one.
+impls:
+  # `gemm_tune/…_common.py` is where the A8 (fp8/int8) preshuffle family states its search space --
+  # per-arch tile catalogs, the lds_stage x cshuffle x async x waves_per_eu sweep and the register
+  # cap on waves_per_eu. Without it the corpus could cite that family's kernel but not the set of
+  # configurations AITER is willing to build for it. `utils.py` carries the per-arch LDS budget
+  # every tiling estimate is compared against.
+  - language: flydsl
+    subtree: aiter/ops/flydsl
+    globs:
+      - kernels/splitk_hgemm.py
+      - kernels/small_m_hgemm.py
+      - kernels/preshuffle_gemm.py
+      - kernels/mfma_preshuffle_pipeline.py
+      - kernels/moe_gemm_2stage.py
+      - kernels/mixed_moe_gemm_2stage.py
+      - kernels/hgemm_dispatch.py
+      - kernels/mfma_epilogues.py
+      - kernels/layout_utils.py
+      - gemm_kernels.py
+      - gemm_tune/flydsl_gemm_a8w8_bpreshuffle_common.py
+      - utils.py
+      - test_flydsl_splitk_hgemm.py
+
+  - language: triton
+    subtree: aiter/ops/triton/_triton_kernels/gemm
+    globs: ["basic/*.py", "batched/*.py", "fused/*.py"]
+
+  # The GEMM kernels above call `remap_xcd` / `pid_grid` but do not define them; the definitions --
+  # which are the actual workgroup-to-XCD and grouped-M rasterization -- live in a shared helper.
+  - language: triton
+    subtree: aiter/ops/triton/utils/_triton
+    globs: [pid_preprocessing.py]
+
+  # How a shape reaches a shipped Triton config: a per-(N, K) file if one exists, else the generic
+  # file, then M_LEQ/M_GEQ buckets, then `any`. An untuned shape gets the generic `any` entry at
+  # every M, which is where a frozen Triton baseline for such a task actually sits.
+  - language: triton
+    subtree: aiter/ops/triton/utils
+    globs: [gemm_config_utils.py]
+
+  - language: gluon
+    subtree: aiter/ops/triton
+    globs:
+      - "_gluon_kernels/*/moe/*gemm*.py"
+      - "_gluon_kernels/*/gemm/*.py"
+      - "gluon/*gemm*.py"
+
+  # HIP and CK both live under `csrc/` and both are `.cu`/`.cuh`, so the split is by DIRECTORY,
+  # not by extension: `ck_*` subtrees are CK template instantiations, `py_itfs_cu/` and `kernels/`
+  # are hand-written HIP. Getting this backwards is the mis-filing `detect_language.py` guards
+  # against on the source side -- a CK instance read as HIP teaches a FlyDSL author to look for a
+  # hand-written loop where there is a template parameter list.
+  # Hand-written HIP GEMM in aiter is the `opus_gemm` tree. The kernels themselves are the per-arch
+  # `include/gfx*/opus_gemm_pipeline_*.cuh` and `..._traits_*.cuh` -- the top-level `.cu` is only a
+  # dispatcher -- and the codegen scripts hold the tile tables the instances are stamped from. All
+  # three layers are wanted: the pipeline says how, the traits say with what, the codegen says which
+  # combinations were thought worth building.
+  # `kernels/custom_kernels.cu` is AITER's hand-written skinny GEMM/GEMV family (`wvSplitK*`,
+  # `HGEMV_WFPerRow`) -- the default bf16/fp16 route for M <= 16 -- and `include/opus/opus.hpp` is
+  # the single-header HIP micro-DSL (buffer load/store, MFMA wrappers, layouts) AITER's HIP kernels
+  # are written in. The `opus_gemm/` tree lives on AITER branches newer than the pinned commit, so
+  # its patterns report as `missing` until an AITER bump brings it in.
+  - language: hip
+    subtree: csrc
+    globs:
+      - py_itfs_cu/gemm_common.cu
+      - include/gemm_common.h
+      - include/gemm_dispatch_utils.h
+      - kernels/custom_kernels.cu
+      - include/opus/opus.hpp
+      - "opus_gemm/*.cu"
+      - "opus_gemm/include/*.cuh"
+      - "opus_gemm/include/*.h"
+      - "opus_gemm/include/gfx*/opus_gemm_pipeline_*.cuh"
+      - "opus_gemm/include/gfx*/opus_gemm_traits_*.cuh"
+      - "opus_gemm/codegen/gen_instances_*.py"
+      - opus_gemm/opus_gemm_common.py
+
+  - language: ck
+    subtree: csrc
+    globs:
+      - "ck_gemm*/*.cu"
+      - "ck_gemm*/include/*.cuh"
+      - "ck_gemm*/include/*.h"
+      - "ck_batched_gemm*/*.cu"
+      - "ck_batched_gemm*/include/*.cuh"
+      - "cktile_gemm*/**/*.cu"
+      - "cktile_gemm*/**/*.cuh"
+      - "ck_tile_gemm_moe_2stages/**/*.cu"
+      - "ck_tile_gemm_moe_2stages/**/*.cuh"
+      - "ck_deepgemm/**/*.cu"
+      - "ck_deepgemm/**/*.cuh"
+
+  # Hand-written assembly is not readable from `hsa/**/*.co` by a text pass, and the binary itself
+  # is not where the decisions are stated anyway. What IS readable is the launcher: `asm_gemm_*.cu`
+  # names the `.co` to load, the block/grid it is launched with, and the argument block layout the
+  # assembly expects. That is the asm contract, and it is the part a FlyDSL author has to match.
+  # The instructions inside the binary are a separate, deeper layer. They require a future
+  # disassembly evidence pass; this source pass does not pretend that file:line can describe a
+  # binary instruction.
+  - language: asm
+    subtree: csrc/py_itfs_cu
+    globs: ["asm_gemm_*.cu", "asm_flatmm_*.cu", asm_a8w8_blockscale_bpreshuffle.cu]
+
+  # The binaries publish no source, but each `hsa/<gfx>/<kind>/*.csv` states which kernels exist
+  # for that architecture: tile, B-preshuffle and split-K capability. One record per row, per gfx.
+  - language: asm
+    subtree: hsa
+    globs: ["gfx*/*gemm*/*.csv"]
+
+# AITER's runtime dispatch -- which backend a shape is routed to by default. Dispatch is library
+# code, not a kernel language, so each routing statement is filed under the language of the backend
+# it routes TO; library targets (`hipblaslt`, `torch`) are not languages and are not recorded.
+routing:
+  files:
+    - aiter/tuned_gemm.py
+    - aiter/ops/gemm_op_a8w8.py
+    - aiter/ops/gemm_op_a16w16.py
+    - aiter/ops/gemm_op_a4w4.py
+  # Matched against `_`-separated name tokens, first hit wins: `blockscale_ck` is CK, `block` is not.
+  # Order is therefore significant and this is a list of pairs, not a mapping.
+  targets:
+    - [cktile, ck]
+    - [skinny, hip]
+    - [flydsl, flydsl]
+    - [triton, triton]
+    - [gluon, gluon]
+    - [asm, asm]
+    - [ck, ck]
+
+# Per-shape selected knob sets that AITER ships for its Triton GEMMs: one JSON per
+# `{gfx}-{KERNEL}-{VARIANT}[-N=..-K=..]`, each mapping an M bucket to a concrete config. The source
+# tree preserves neither the benchmark archive nor rejected alternatives, so these are useful seeds,
+# not measured winners.
+tuned_json:
+  dir: aiter/ops/triton/configs/gemm
+  # Where a reader who greps for `@triton.autotune` and finds nothing would have looked. Stated
+  # rather than derived from `impls` above, because "the first triton subtree" is an accident of list
+  # order and this is a claim about where the search space is NOT.
+  autotune_expected_in: aiter/ops/triton/_triton_kernels/gemm
+
+# The Triton JSON above records one backend's selected knobs. The CSV databases record something the
+# JSON cannot: for each shipped (gfx, CU count, M, N, K) AITER raced its backends -- asm, ck, cktile,
+# flydsl, triton -- and kept one. That is the only place in AITER where "which implementation for
+# which shape regime" is written down, and it is where the FlyDSL configurations AITER actually ships
+# live. What is kept is the selection; what is dropped on read is how long anything took.
+tuned_db:
+  dirs: [aiter/configs, aiter/configs/model_configs]
+  # Names the database kind from the filename, and by not matching also decides what is skipped.
+  name_pattern: '(?P<kind>(?:bf16|a8w8|a4w4)(?:_blockscale)?(?:_bpreshuffle)?_tuned_(?:batched_)?gemm)'
+  # Columns that qualify a row without timing it. Family-specific: a GEMM row is keyed by its
+  # quantisation and layout flags, an attention row would not be.
+  context_columns: [bias, bpreshuffle, dtype, outdtype, q_dtype_w, scaleAB]

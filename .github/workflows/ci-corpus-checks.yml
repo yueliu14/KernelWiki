@@ -1,0 +1,46 @@
+name: corpus checks
+
+# The gates live in the repo that holds the data they check.
+#
+# `corpus/` is machine-readable knowledge: evidence extracted from upstream
+# source with file:line provenance, curated decision cards grounded in that evidence, and
+# human-readable pages RENDERED from both. Nothing here is hand-edited, so the only thing
+# worth gating is whether the committed artifacts still match their inputs -- which is a
+# property of this repo alone and needs no consumer checkout to verify.
+#
+# The extraction step (`_extract_impl_facts.py`) is deliberately NOT run here: it reads an
+# upstream AITER checkout pinned by `evidence/gemm_source.yaml`'s `provenance.aiter_commit`,
+# which is a multi-GB clone. The round trip is run by hand when the pin moves.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  corpus:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pytest pyyaml
+
+      # The rendered pages are generated artifacts. A hand-edit to one of them, or an edit to
+      # the evidence without a re-render, makes the page a claim nothing backs.
+      - name: rendered pages match their inputs
+        run: |
+          set -e
+          python3 corpus/_render_facts.py --check
+          python3 corpus/_render_decisions.py --check
+
+      # Schema, provenance, citation grounding, and the no-performance-number rule on source
+      # evidence. `_render_decisions.py --check` already refuses a card citing a file that is
+      # not in this repo, so the grounding pages must stay checked in alongside the cards.
+      - name: corpus self-consistency
+        run: python3 -m pytest corpus -q
+
+      - name: repo tests
+        run: python3 -m pytest tests kernelwiki/_store/tests -q

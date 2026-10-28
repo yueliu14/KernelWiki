@@ -30,6 +30,7 @@ Cross-operator reference material. Source revisions and evidence remain attached
 - [FlyDSL — knobs](flydsl/knobs.md)
 - [FlyDSL — overview](flydsl/overview.md)
 - [FlyDSL — usage patterns](flydsl/patterns.md)
+- [FlyDSL — version map (symbol locations per version)](flydsl/version_map.md)
 - [AITER gluon: shared implementation support](gluon/aiter_support.md)
 - [Gluon GEMM cookbook (CDNA4, gfx950)](gluon/gemm_cookbook.md)
 - [Gluon on AMD — overview](gluon/overview.md)

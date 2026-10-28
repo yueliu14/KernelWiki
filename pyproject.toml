@@ -19,4 +19,4 @@ test = ["pytest>=8"]
 include = ["kernelwiki", "kernelwiki._store"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "kernelwiki/_store/tests"]
+testpaths = ["tests", "kernelwiki/_store/tests", "corpus"]

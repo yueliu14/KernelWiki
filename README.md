@@ -8,6 +8,7 @@ An **operator-centered GPU kernel knowledge base for LLM inference**, focused on
 | --- | --- | --- |
 | Written knowledge | [Operators](knowledge/operator/README.md) · [General](knowledge/general/README.md) | Implementation details, source entry points, performance and applicability, tuning methods and lessons from previous runs |
 | Kernel implementations | [Source collection](kernels/README.md) · [Put, search and fetch API](kernelwiki/README.md) | Reuse complete source bundles with entry points, dependencies, correctness checks and benchmarks |
+| Machine-queryable corpus | [GEMM corpus](corpus/README.md) | Source-cited evidence records and tuning decisions a program can query; the written pages here are generated from them |
 
 ```text
 knowledge/
@@ -32,6 +33,14 @@ kernels/<operator>/<backend>/<implementation>/
   README.md
 kernelwiki/
   client.py
+corpus/
+  catalog.yaml
+  evidence/<family>.yaml
+  decisions/<family>.yaml
+  performance_axes/<family>.yaml
+  scopes/
+  <family>_source_evidence.md
+  <family>_decisions.md
 ```
 
 ## Getting started
