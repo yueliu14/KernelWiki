@@ -3,7 +3,8 @@
 Knowledge lives in `knowledge/operator/<operator>/corpus/`. The
 [`catalog`](../../knowledge/operator/catalog.yaml) declares operator directories, aliases, workload
 groups and source snapshots; the generated [corpus index](../../knowledge/operator/CORPUS.md)
-lives beside it. The catalog uses schema version 2 and repository-relative paths.
+lives beside it. The catalog uses schema version 3 and repository-relative paths. Reusable method
+cards live in `knowledge/general/corpus/`; both use decision schema version 5.
 
 ## Commands
 
@@ -38,6 +39,8 @@ normalization and schema helpers; the three scripts above are the maintenance en
 - `decisions.yaml` stores complete owned cards and a `shared_cards` list of canonical card IDs.
   A shared reference never duplicates a card body. Each referenced card must include the importing
   operator in its applicability list; its other conditions still need review.
+  A decision can also carry scoped `experience` summaries. Keep one decision per question and
+  add supporting or contrary experience to it instead of creating a second learned-card collection.
 - Source and seed references are snapshot-qualified, for example
   `aiter_b3ad6c46:src_0123456789abcdef`. This preserves the original content-ID suffix and keeps
   identical observations at different revisions distinguishable. Owners may move without changing
@@ -68,3 +71,31 @@ normalization and schema helpers; the three scripts above are the maintenance en
 quoted lines, source extents, upstream-test paths and seed-source paths through `git show`. Offline
 CI validates IDs, ownership, schemas, dependencies, references, links and generated artifacts.
 No knowledge-production command executes an upstream correctness test or records GPU timings.
+
+## Updating conclusions from private runs
+
+Run histories, traces, candidates, raw measurements and their internal locations stay in a private
+store. Publish a reviewed conclusion in the relevant decision's `experience` list. Each entry needs
+an outcome (`beneficial`, `no_gain`, `regressed`, `mixed` or `constraint`), explicit conditions,
+a concise summary and provenance. Keep a private mapping from the public card ID to its run artifacts.
+
+Imported summaries use `kind: historical_summary`, pinned public summary references,
+`artifacts: not_published` and `verification: not_reproduced`. These links attribute already-public
+historical explanations; they do not make the original runs independently reproducible. The migration
+publishes qualitative findings rather than incomplete benchmark rankings or isolated leaderboard numbers.
+
+New results may use `kind: private_summary`, `artifacts: not_published` and
+`verification: internally_validated`; public references may be empty. They also require a public
+`context` with `gfx`, `software`, `dtype`, `shape_layout`, `baseline`, `protocol` and `correctness`.
+Internal validation is an attribution claim, not public reproduction. Do not publish a result that
+cannot disclose enough context to bound its applicability.
+
+Source observations stay content-bound and separate from experience. A new card without source
+observations uses `evidence_level: reported_experience`; existing `source_observed` cards keep their
+source references when experience is added. All remain `candidate_only` for a new target workload.
+The `measurement_evidence` field remains empty: raw runs are not embedded into the public schema.
+
+Do not turn a run-specific negative into a permanent rule. Keep contradictory outcomes with their
+conditions, revisit them when the implementation changes, and attribute a combined improvement to the
+combination unless independent ablations establish component effects. Preserve the accepted numerical
+contract; a diagnostic control that omits work is not a valid implementation.

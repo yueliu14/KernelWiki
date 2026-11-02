@@ -5,7 +5,7 @@
 
 Recurrent and chunked gated-delta attention, including its causal-conv front end.
 
-5 AITER implementation references; 6 historical experience cards.
+5 AITER implementation references; 6 owned corpus decisions.
 
 ## AITER implementations
 
@@ -23,9 +23,9 @@ Each page pins its source revision. Source references describe implementations a
 
 - [Causal state mixing inside gated-delta attention](backend/aiter_notes.md)
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ### Historical case studies
 

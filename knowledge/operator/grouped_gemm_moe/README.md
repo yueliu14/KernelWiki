@@ -5,7 +5,7 @@
 
 Expert grouped GEMMs, token imbalance and low-bit expert weights.
 
-8 AITER implementation references; 37 historical experience cards.
+8 AITER implementation references; 8 owned corpus decisions.
 
 ## AITER implementations
 
@@ -27,9 +27,9 @@ Each page pins its source revision. Source references describe implementations a
 - [AITER FlyDSL MoE: requested tiles versus executed tiles](backend/flydsl_notes.md)
 - [OPUS MoE: stage-1 schedules and stage-2 output strategies](backend/opus_notes.md)
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

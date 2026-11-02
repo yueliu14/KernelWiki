@@ -5,7 +5,7 @@
 
 Attention split across context-parallel ranks and output merging.
 
-1 AITER implementation references; 0 historical experience cards.
+1 AITER implementation references; 1 owned corpus decisions.
 
 ## AITER implementations
 
@@ -15,9 +15,9 @@ Each page pins its source revision. Source references describe implementations a
 | --- | --- |
 | aiter | [Round-robin context-parallel MLA and index selection](backend/aiter_aiter.md) |
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

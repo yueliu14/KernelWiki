@@ -8,7 +8,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 2 owned cards; 1 shared-card references. Shared cards retain one canonical body in their owning operator.
 
-[Source evidence](source_evidence.md)
+[Canonical decisions](decisions.yaml)
 
 ## Design traits
 
@@ -44,6 +44,8 @@ A required trait must be established for the actual design before the card appli
 - Try multiple KV partitions together with an explicit partial-output and normalization-statistics layout.
 - Merge partials using their maxima and exponential sums, or the equivalent LSE representation; never take an unweighted average of already-normalized partial outputs.
 - Include the merge and scratch traffic when assessing a split count, and mask unused partitions.
+- Test the split/merge path at one partition as a control, then validate each split count against the unchanged accepted reference and an independent high-precision diagnostic.
+- Check cancellation-sensitive and near-zero outputs; distinguish agreement with the golden implementation from mathematical accuracy.
 
 #### Rationale
 
@@ -57,9 +59,19 @@ A required trait must be established for the actual design before the card appli
 
 - **flydsl** — The FlyDSL reducer consumes partial outputs, partial LSE and explicit partial/final maps; its host validator defines a separate ABI. [aiter_b3ad6c46:src_a6768ea282169992](source_evidence.md#aiter_b3ad6c46-src_a6768ea282169992)
 
-#### Evidence
+#### Source evidence
 
 - [aiter_b3ad6c46:src_a726e480b7d62ccf](source_evidence.md#aiter_b3ad6c46-src_a726e480b7d62ccf) — [aiter/ops/triton/_triton_kernels/attention/mla.py:669-762](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/mla.py#L669-L762).
+
+#### Reported experience
+
+Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
+
+- **constraint** — Historical attention reports found reduction reassociation and lower-precision KV could fail the existing gate even when an alternative was closer to a high-precision diagnostic.
+  Conditions: The target numerical contract constrains softmax reduction order and intermediate casts.
+  Verification: <code>not_reproduced</code>.
+  Sources: [Historical summary 1](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/a-single-partition-control-separates-a-rejected-kv-split-fro-attention-decode-gfx950-decode.md), [Historical summary 2](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/reproduce-the-golden-s-own-rounding-before-costing-a-kv-reas-attention-decode-gfx950-decode.md)
+
 
 #### Background
 
@@ -71,6 +83,7 @@ A required trait must be established for the actual design before the card appli
 
 - The source demonstrates local segment merging, not an implementation of cross-rank transport; context-parallel ownership and communication require separate evidence.
 - The cited raw-max/exp-sum representation cannot be mixed directly with another backend's LSE ABI.
+- A diagnostic reference does not authorize weakening or replacing the required oracle. A precision change needs an explicitly accepted numerical/task-accuracy contract.
 
 <a id="attention-mla-reduce-abi"></a>
 ### Which tensor and mapping invariants does the FlyDSL MLA reducer require?
@@ -102,7 +115,7 @@ A required trait must be established for the actual design before the card appli
 
 - Convert layouts explicitly at the boundary, accounting for their cost, or select a reducer that natively accepts the producer layout.
 
-#### Evidence
+#### Source evidence
 
 - [aiter_b3ad6c46:src_a6768ea282169992](source_evidence.md#aiter_b3ad6c46-src_a6768ea282169992) — [aiter/ops/flydsl/mla_reduce_kernels.py:112-243](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/mla_reduce_kernels.py#L112-L243).
 - [aiter_b3ad6c46:src_6e49a7e29550a915](source_evidence.md#aiter_b3ad6c46-src_6e49a7e29550a915) — [aiter/ops/flydsl/mla_reduce_kernels.py:98-109](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/mla_reduce_kernels.py#L98-L109).

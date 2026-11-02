@@ -51,4 +51,4 @@ Evidence may use an external HTTP/KB/object-store/run reference. A local evidenc
 
 Use Git to review and evolve your source collection. The [KernelWiki API](README.md) can add or fetch local entries, and upload/download complete candidates through the existing GEAK KB service. Local `put()` is idempotent for identical content and refuses to overwrite a different existing implementation. Remote revisions coexist and can be retrieved by their full digest.
 
-Link a curated entry from its operator/backend knowledge page. Preserve useful lessons from unsuccessful runs in `learned_knowledge/`, with the exact code and measurement references that support them.
+Link a curated entry from its operator/backend knowledge page. Preserve useful lessons from unsuccessful runs as scoped corpus conclusions, with public evidence summaries; keep raw code/measurement run histories in a private store.

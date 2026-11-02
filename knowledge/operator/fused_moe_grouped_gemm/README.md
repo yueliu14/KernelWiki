@@ -5,7 +5,7 @@
 
 Fused expert execution and compute/communication overlap.
 
-2 AITER implementation references; 0 historical experience cards.
+2 AITER implementation references; 1 owned corpus decisions.
 
 ## AITER implementations
 
@@ -16,9 +16,9 @@ Each page pins its source revision. Source references describe implementations a
 | aiter | [Fused MoE compute and communication — AITER aiter](backend/aiter_aiter.md) |
 | flydsl | [Fused MoE compute and communication — AITER flydsl](backend/flydsl_aiter.md) |
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

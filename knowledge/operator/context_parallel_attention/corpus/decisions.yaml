@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: context_parallel_attention
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits: {}

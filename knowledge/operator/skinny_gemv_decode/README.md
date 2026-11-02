@@ -5,7 +5,7 @@
 
 Small-M decode projections and GEMV-like regimes.
 
-1 AITER implementation references; 0 historical experience cards.
+1 AITER implementation references; 2 owned corpus decisions.
 
 ## AITER implementations
 
@@ -15,9 +15,9 @@ Each page pins its source revision. Source references describe implementations a
 | --- | --- |
 | hip | [Small-M decode GEMM: three HIP dispatch paths](backend/hip_aiter.md) |
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

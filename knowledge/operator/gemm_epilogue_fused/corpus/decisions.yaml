@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: gemm_epilogue_fused
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -147,6 +147,60 @@ cards:
   - This is an implementation precedent, not a measured performance preference on a new workload.
   references:
   - knowledge/operator/gemm_epilogue_fused/README.md
+- id: fused-gemm-regime-specific-chain
+  type: performance_candidate
+  axes:
+  - epilogue
+  - runtime_contract
+  - compute_instruction
+  match:
+    operator_families:
+    - gemm_epilogue_fused
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Which fusion boundary helps each regime of a normalization/GEMM chain?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id001
+  - The chain has distinct prefill and decode execution arms and explicit intermediate/output ownership.
+  actions:
+  - Measure the full chain and each arm before selecting a fusion; preserve normalization, casts, residual
+    updates and output initialization.
+  - For compute-bound arms, inspect native cast and packed arithmetic lowering; for short arms, compare the
+    removed dispatch cost to added synchronization and resource pressure.
+  - Keep a change conditional on the regime where its complete effect is beneficial.
+  why:
+  - Historical composed norm/GEMM reports combined dispatch reduction with prefill arithmetic changes; further
+    overlap and cache-load hints could regress a roof-bound arm.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - A fused call is not proof of a single device launch. Changes to cast placement or normalization need an
+    independent numerical check.
+  references:
+  - knowledge/operator/gemm_epilogue_fused/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id001
+    summary: Historical composed norm/GEMM reports combined dispatch reduction with prefill arithmetic changes;
+      further overlap and cache-load hints could regress a roof-bound arm.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/axes-that-stayed-closed-on-a-roof-bound-fused-norm-gemm-path-fused-norm-gemm-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/collapse-the-dispatch-chain-inside-each-shape-regime-arm-fused-norm-gemm-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/cut-valu-on-the-prefill-arm-with-native-casts-and-packed-dot-fused-norm-gemm-gfx950-prefill.md
+      artifacts: not_published
+      verification: not_reproduced
 shared_cards:
 - flydsl-a8-data-movement-helpers
 - flydsl-a8-interleaved-schedule

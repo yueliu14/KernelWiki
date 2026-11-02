@@ -5,7 +5,7 @@
 
 Window-limited attention and local/global layer combinations.
 
-1 AITER implementation references; 0 historical experience cards.
+1 AITER implementation references; 3 owned corpus decisions.
 
 ## AITER implementations
 
@@ -15,9 +15,9 @@ Each page pins its source revision. Source references describe implementations a
 | --- | --- |
 | triton | [Sliding-window attention: mask and tile-pruning variants](backend/triton_aiter.md) |
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

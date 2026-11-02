@@ -5,7 +5,7 @@
 
 Selected-block and sparse MLA/NSA attention execution.
 
-5 AITER implementation references; 2 historical experience cards.
+5 AITER implementation references; 2 owned corpus decisions.
 
 ## AITER implementations
 
@@ -19,9 +19,9 @@ Each page pins its source revision. Source references describe implementations a
 | opus | [Sparse attention — AITER opus](backend/opus_aiter.md) |
 | triton | [Sparse attention — AITER triton](backend/triton_aiter.md) |
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

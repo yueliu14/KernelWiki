@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: mla_attention
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -31,6 +31,10 @@ cards:
   - Merge partials using their maxima and exponential sums, or the equivalent LSE representation; never take
     an unweighted average of already-normalized partial outputs.
   - Include the merge and scratch traffic when assessing a split count, and mask unused partitions.
+  - Test the split/merge path at one partition as a control, then validate each split count against the unchanged
+    accepted reference and an independent high-precision diagnostic.
+  - Check cancellation-sensitive and near-zero outputs; distinguish agreement with the golden implementation
+    from mathematical accuracy.
   alternatives:
   - Keep an unsplit path for short contexts or sufficiently large query batches.
   why:
@@ -43,6 +47,8 @@ cards:
   - The source demonstrates local segment merging, not an implementation of cross-rank transport; context-parallel
     ownership and communication require separate evidence.
   - The cited raw-max/exp-sum representation cannot be mixed directly with another backend's LSE ABI.
+  - A diagnostic reference does not authorize weakening or replacing the required oracle. A precision change
+    needs an explicitly accepted numerical/task-accuracy contract.
   references:
   - knowledge/operator/attention_decode_paged/README.md
   - knowledge/operator/mla_attention/README.md
@@ -53,6 +59,19 @@ cards:
       host validator defines a separate ABI.
     source_evidence:
     - aiter_b3ad6c46:src_a6768ea282169992
+  experience:
+  - outcome: constraint
+    conditions:
+    - The target numerical contract constrains softmax reduction order and intermediate casts.
+    summary: Historical attention reports found reduction reassociation and lower-precision KV could fail the
+      existing gate even when an alternative was closer to a high-precision diagnostic.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/a-single-partition-control-separates-a-rejected-kv-split-fro-attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/reproduce-the-golden-s-own-rounding-before-costing-a-kv-reas-attention-decode-gfx950-decode.md
+      artifacts: not_published
+      verification: not_reproduced
 - id: attention-mla-reduce-abi
   type: constraint
   axes:

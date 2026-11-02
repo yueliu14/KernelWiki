@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: moe_routing_topk
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -80,4 +80,58 @@ cards:
   - knowledge/operator/moe_routing_topk/README.md
   - knowledge/operator/grouped_gemm_moe/README.md
   - knowledge/operator/fused_moe_grouped_gemm/README.md
+- id: router-launch-and-selection-cost
+  type: performance_candidate
+  axes:
+  - implementation_contract
+  - routing_semantics
+  match:
+    operator_families:
+    - moe_routing_topk
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Is router top-k limited by launch preparation or by the selection network?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id001
+  - Small router rows expose a host/launch floor while larger rows may be selection-bound.
+  actions:
+  - Measure both regions separately and compare direct compiled launches with graph replay using the same contract.
+  - Cache invariant compilation/options only with complete validity checks, stream safety and updated dynamic
+    arguments.
+  - For small fixed k, compare iterative selection or partitioned merges with the existing network, preserving
+    tie rules, indices, output masks and softmax semantics.
+  why:
+  - Historical router reports found substantial host-path effects for small cases and narrower device benefits
+    for larger ones; replay and blindly combined device changes could regress.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Pointer-only or trusted-steady-state shortcuts are not general cache keys. An oracle that imports the edited
+    helper is not independent correctness evidence.
+  references:
+  - knowledge/operator/moe_routing_topk/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id001
+    summary: Historical router reports found substantial host-path effects for small cases and narrower device
+      benefits for larger ones; replay and blindly combined device changes could regress.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/bypass-the-jit-launcher-for-a-dispatch-bound-triton-op-moe-router-topk-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/dispatch-floored-router-select-spend-the-budget-on-the-host--topk-router-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/graph-capture-loses-to-a-direct-launch-when-the-graph-holds--topk-router-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/the-device-lane-on-a-small-router-top-k-is-close-to-closed-moe-router-topk-gfx950-both.md
+      artifacts: not_published
+      verification: not_reproduced
 shared_cards: []

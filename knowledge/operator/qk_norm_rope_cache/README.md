@@ -5,7 +5,7 @@
 
 Fused Q/K normalization, positional encoding, quantization and cache writes.
 
-5 AITER implementation references; 0 historical experience cards.
+5 AITER implementation references; 2 owned corpus decisions.
 
 ## AITER implementations
 
@@ -19,9 +19,9 @@ Each page pins its source revision. Source references describe implementations a
 | hip | [Fused Q/K normalization, RoPE and cache writes — AITER hip](backend/hip_aiter.md) |
 | triton | [Fused Q/K normalization, RoPE and cache writes — AITER triton](backend/triton_aiter.md) |
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## Operator contract
 

@@ -1,4 +1,4 @@
-schema_version: 2
+schema_version: 3
 description: Operator-local corpus; paths are repository-relative. Source/config references are snapshot-qualified.
 authoring_languages:
 - triton
@@ -149,3 +149,4 @@ operators:
   family: gemm
   directory: knowledge/operator/splitk_streamk_gemm/corpus
   aliases: []
+general_corpus: knowledge/general/corpus

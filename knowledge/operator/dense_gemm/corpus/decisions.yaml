@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: dense_gemm
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -352,6 +352,9 @@ cards:
   - Keep the unmapped kernel as the control arm (`xcd_swizzle=0` is the grouped kernel's default), gate the
     remap by grid size, and prove every tile is still visited exactly once when the grid is not a multiple
     of the XCD count.
+  - Prove any grid remapping is a bijection on every legal shape and provide a fallback for unhandled divisibility/tails.
+  - Re-test cache mapping after dtype or tile changes and verify which operand/stage can actually share the
+    targeted reuse.
   alternatives:
   - No remap — the default dispatch order.
   - Grouped-M rasterisation alone (`GROUP_SIZE_M`) without an XCD remap.
@@ -381,8 +384,23 @@ cards:
   limitations:
   - The grouped kernel's tile decode after the remap is MoE-specific; the remap ports, the decode has to be
     rewritten for a dense grid.
-  - Measured effects of XCD remapping live in learned cards and expert skills behind their switches; this card
-    carries none.
+  - Logical XCD grouping is a measured mapping choice, not a guarantee of physical scheduling affinity.
+  - Source mappings establish implementation precedents; reported remapping outcomes are separately scoped
+    in the experience summaries below.
+  experience:
+  - outcome: mixed
+    conditions:
+    - The reported grouped-GEMM grid had repeated weight reuse that could be made contiguous in a logical workgroup
+      order.
+    summary: A historical chunk-interleaved remap improved some grouped-GEMM regimes, while a non-bijective
+      map silently skipped output tiles and another regime regressed.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/invert-the-xcd-round-robin-with-a-chunk-interleaved-workgrou-moe-grouped-gemm-gfx950-mixed.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/host-dispatch-and-backend-swap-closed-on-a-saturated-grouped-moe-grouped-gemm-gfx950-prefill.md
+      artifacts: not_published
+      verification: not_reproduced
 - id: flydsl-hgemm-config-space
   type: performance_candidate
   axes:
@@ -693,6 +711,9 @@ cards:
   - 'For a case no database row covers, read AITER''s default route instead (gemm-default-backend-routing):
     the HIP skinny kernels for small-M bf16/fp16, hipblaslt (gfx942) or ASM (elsewhere) for B-preshuffled bf16,
     CK for fp8 — that is what a FlyDSL kernel competes with there.'
+  - Capture the exact live lookup key, including bias, layout, dtype and CU count, before choosing a tuner.
+  - Verify every selected backend and fallback on the actual caller; retain valid defaults outside the tuned
+    table and invalidate version-specific algorithm IDs after an upgrade.
   alternatives:
   - Ignore the shipped selection and search blind — the control arm, and the only option for a bucket the database
     does not cover.
@@ -724,6 +745,22 @@ cards:
   - The tuner's box, competing set and toolchain are not recorded; a selection says where AITER chose a backend,
     never by how much.
   - The table reflects AITER at the pinned commit; re-extract after an AITER bump.
+  - This does not imply all SGLang or vLLM GEMMs use AITER. Input contracts and selector schemas depend on
+    the pinned framework/library version.
+  experience:
+  - outcome: mixed
+    conditions:
+    - For the reported serving paths, the caller dispatched through a shape-keyed GEMM selector.
+    summary: Historical dense-GEMM reports found real gains from tuning the engaged selector and false conclusions
+      when a different dispatch layer was tuned.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/aiter-bf16-tuned-gemm-gfx942.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/dense-gemm-bf16-gfx950-sglang.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/own-the-dispatch-layer-then-race-backends-behind-it-dense-gemm-gfx950-compute-bound.md
+      artifacts: not_published
+      verification: not_reproduced
 - id: gemm-default-backend-routing
   type: performance_candidate
   axes:
@@ -1150,6 +1187,112 @@ cards:
     passing a parameter.
   - 'Deeper is not monotonically better: once global latency is hidden, further stages only take LDS away from
     occupancy.'
+- id: gemm-host-plan-cache
+  type: performance_candidate
+  axes:
+  - runtime_contract
+  match:
+    operator_families:
+    - dense_gemm
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: When should a GEMM wrapper cache launch plans or temporary storage?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id001
+  - Small-M GEMM is measured with exposed host or allocation work.
+  actions:
+  - Measure the raw wrapper, device dispatch and candidate replay under the same protocol before adding a cache.
+  - Cache only invariant plans; include device, stream requirements, shape, strides, dtype, scalar arguments
+    and all captured pointers in validity checks. Reuse scratch only with safe lifetimes and concurrency.
+  - Compare a direct cached launch with graph replay; graph capture is a candidate rather than a default optimization.
+  why:
+  - Host allocation/lookup caching helped some tiny GEMMs, whereas one-node replay and additional signature
+    wrappers regressed other cases.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Pointer identity alone does not establish tensor contents or scalar invariance. A host optimization can
+    be invisible under device-only replay timing.
+  references:
+  - knowledge/operator/dense_gemm/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id001
+    summary: Host allocation/lookup caching helped some tiny GEMMs, whereas one-node replay and additional
+      signature wrappers regressed other cases.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/cache-the-per-call-host-work-when-the-host-owns-a-large-shar-dense-gemm-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/graph-capture-of-a-single-tiny-dispatch-can-be-a-higher-floo-dense-gemm-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/measure-the-launch-floor-before-buying-a-device-side-round-o-dense-gemm-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/size-the-exposed-host-residue-before-buying-a-launch-overhea-dense-gemm-gfx950-compute-bound.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: gemm-compiler-schedule-and-register-budget
+  type: performance_candidate
+  axes:
+  - pipeline_schedule
+  - workgroup_tile
+  match:
+    operator_families:
+    - dense_gemm
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: When is an explicit GEMM pipeline worth replacing the compiler-selected loop?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id002
+  - A matrix-core GEMM has a measured schedule or resource limitation, and the intended compiler controls are
+    available.
+  actions:
+  - Start with a faithful baseline loop and inspect its actual MFMA/LDS schedule before replacing it.
+  - Tune tile extent, stage count and wave geometry together; test wide-K register staging only within a verified
+    accumulator and LDS budget.
+  - Check that occupancy hints survive code generation and preserve useful workgroups per CU, not only wave
+    count.
+  why:
+  - Historical FP16 experiments reported gains from explicit register staging, but larger accumulators spilled
+    and hand-written loops could lose to the compiler schedule.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Tutorial optima for large square matrices do not establish an optimum for skinny or low-K matrices. Resource
+    improvements require correctness and latency validation.
+  references:
+  - knowledge/operator/dense_gemm/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id002
+    summary: Historical FP16 experiments reported gains from explicit register staging, but larger accumulators
+      spilled and hand-written loops could lose to the compiler schedule.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/a-hand-written-loop-has-to-out-schedule-not-out-structure-th-dense-gemm-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/gluon-register-staged-wide-k-mfma-for-fp16-dense-gemm-dense-gemm-gfx950-compute-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/occupancy-axis-closes-when-the-backend-pins-waves-per-eu-dense-gemm-gfx950-compute-bound.md
+      artifacts: not_published
+      verification: not_reproduced
 shared_cards:
 - flydsl-a8-data-movement-helpers
 - flydsl-a8-interleaved-schedule

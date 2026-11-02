@@ -8,7 +8,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 1 owned cards; 0 shared-card references. Shared cards retain one canonical body in their owning operator.
 
-[Source evidence](source_evidence.md)
+[Canonical decisions](decisions.yaml)
 
 ## Design traits
 
@@ -52,7 +52,7 @@ A required trait must be established for the actual design before the card appli
 
 - Keep compression and quantized cache packing separate until both intermediate outputs agree with the reference.
 
-#### Evidence
+#### Source evidence
 
 - [aiter_b3ad6c46:src_24c98837f9940bb0](source_evidence.md#aiter_b3ad6c46-src_24c98837f9940bb0) — [aiter/ops/flydsl/kernels/fused_compress_attn.py:168-1235](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/fused_compress_attn.py#L168-L1235).
 

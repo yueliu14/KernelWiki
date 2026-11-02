@@ -8,7 +8,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 2 owned cards; 0 shared-card references. Shared cards retain one canonical body in their owning operator.
 
-[Source evidence](source_evidence.md)
+[Canonical decisions](decisions.yaml)
 
 ## Design traits
 
@@ -53,7 +53,7 @@ A required trait must be established for the actual design before the card appli
 
 - Keep a sequence of norm, RoPE and cache write operations as the same-contract baseline.
 
-#### Evidence
+#### Source evidence
 
 - [aiter_b3ad6c46:src_93c5bb1f38501f1d](source_evidence.md#aiter_b3ad6c46-src_93c5bb1f38501f1d) — [aiter/ops/flydsl/kernels/qk_norm_rope_quant.py:291-801](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/qk_norm_rope_quant.py#L291-L801).
 - [aiter_b3ad6c46:src_9069bff48d95f97b](source_evidence.md#aiter_b3ad6c46-src_9069bff48d95f97b) — [aiter/ops/flydsl/kernels/qk_norm_rope_quant.py:54-81](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/qk_norm_rope_quant.py#L54-L81).
@@ -97,7 +97,7 @@ A required trait must be established for the actual design before the card appli
 
 - Keep a simpler implementation with the identical numerical and layout contract for comparison.
 
-#### Evidence
+#### Source evidence
 
 - [aiter_b3ad6c46:src_03307b826f486d6f](source_evidence.md#aiter_b3ad6c46-src_03307b826f486d6f) — [aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py:110-556](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py#L110-L556).
 - [aiter_b3ad6c46:src_f1da93f2cb82843a](source_evidence.md#aiter_b3ad6c46-src_f1da93f2cb82843a) — [aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py:560-620](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py#L560-L620).

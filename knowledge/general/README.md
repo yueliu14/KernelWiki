@@ -9,7 +9,7 @@ Multi-operator execution chains live in [workload knowledge](../workload/README.
 - [expert_recipes](expert_recipes/README.md)
 - [hardware](hardware/README.md)
 - [landscape](landscape/README.md)
-- [learned_knowledge](learned_knowledge/README.md)
+- [Corpus: reusable development decisions](corpus/decisions.md)
 - [libraries](libraries/README.md)
 - [optimization](optimization/README.md)
 - [profile_bottleneck](profile_bottleneck/README.md)
@@ -32,8 +32,8 @@ procedures apply across models, shapes and implementations.
 | Reusable workflow, skill or library/tool procedure | `general/workflows/`, `expert_recipes/`, `backend/`, `libraries/` | Capture shapes, tune GEMM, deploy configuration and verify engagement |
 | Hardware, numerics, profiling and optimization methods | Corresponding `general/` section | LDS layout, roofline analysis, FP8 formats, paired A/B measurement |
 | An operator's implementation contract and source observations | `operator/<op>/backend/` and `corpus/` | MLA cache ABI, MoE routing weights, supported GEMM layouts |
-| An outcome for a particular operator, dtype, shape and environment | `operator/<op>/learned_knowledge/` or `case_studies/` | A gfx950 FP8 blockscale tuning result |
-| Whole-model reports and examples teaching a transferable method | `general/case_studies/` and `learned_knowledge/` | End-to-end Amdahl accounting, measurement controls |
+| An outcome for a particular operator, dtype, shape and environment | `operator/<op>/corpus/decisions.yaml` | A gfx950 FP8 blockscale tuning result |
+| Whole-model reports and examples teaching a transferable method | `general/case_studies/` and `general/corpus/` | End-to-end Amdahl accounting, measurement controls |
 
 Start with the [operator collection](../operator/README.md) for implementation-specific knowledge.
 General guides link to that knowledge instead of maintaining another operator overview or repeating
@@ -42,3 +42,7 @@ its measurements. A reusable skill can still declare an operator-specific applic
 Imported documents retain their source dates and evidence. Historical `sota`, validation statuses,
 serving flags and performance thresholds describe those sources; they do not certify the current
 stack. Broader ecosystem references do not expand the active operator scope.
+
+Reusable conclusions from the former learned cards are maintained in the [general corpus](corpus/decisions.md).
+The public corpus stores scoped findings and evidence summaries. Complete run histories, logs,
+candidate artifacts and private locations stay outside KernelWiki.

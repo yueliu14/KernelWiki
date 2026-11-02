@@ -43,8 +43,8 @@ class Catalog:
     def __init__(self, root=ROOT):
         self.root = Path(root).resolve()
         self.data = read(self.root / "knowledge/operator/catalog.yaml")
-        if self.data.get("schema_version") != 2:
-            raise ValueError("expected operator-local catalog schema_version 2")
+        if self.data.get("schema_version") != 3:
+            raise ValueError("expected operator-local catalog schema_version 3")
         self.snapshots = self.data["snapshots"]
         self.operators = {}
         self.sources, self.cards, self.seeds = {}, {}, {}
@@ -69,6 +69,17 @@ class Catalog:
                 self._register(self.cards, self.card_owners, card["id"], card, op)
             for row in bundle["tuning"]["records"]:
                 self._register(self.seeds, self.seed_owners, qualified(row), row, op)
+        self.general = dict(path=self.repo_path(self.data["general_corpus"]))
+        if self.general["path"] != self.root / "knowledge/general/corpus":
+            raise ValueError("general corpus must live under knowledge/general")
+        for key, file in (("decisions", "decisions.yaml"), ("axes", "performance_axes.yaml")):
+            self.general[key] = read(self.general["path"] / file)
+        for card in self.general["decisions"]["cards"]:
+            self._register(self.cards, self.card_owners, card["id"], card, "general")
+
+    def card_directory(self, ref):
+        owner = self.card_owners[ref]
+        return self.general["path"] if owner == "general" else self.operators[owner]["path"]
 
     @staticmethod
     def _register(table, owners, key, value, owner):
@@ -161,6 +172,8 @@ class Catalog:
             if bundle["family"] != family_owners[op]:
                 raise ValueError(f"{op}: family mismatch")
             scope, evidence, decisions, axes = [bundle[k] for k in ("scope", "evidence", "decisions", "axes")]
+            if decisions.get("provenance", {}).get("schema_version") != card_schema.SCHEMA_VERSION:
+                raise ValueError(f"{op}: unsupported decision schema")
             if scope.get("operator") != op or evidence.get("operator") != op or axes.get("family") != op:
                 raise ValueError(f"{op}: mismatched operator identity")
             if decisions.get("provenance", {}).get("operator_family") != op:
@@ -208,6 +221,26 @@ class Catalog:
             for dependency in axes.get("dependencies", []):
                 if set(dependency.get("decision_refs", [])) - self.cards.keys():
                     raise ValueError(f"{op}: unknown card in dependency")
+        decisions, axes = self.general["decisions"], self.general["axes"]
+        if decisions.get("provenance", {}).get("schema_version") != card_schema.SCHEMA_VERSION or not decisions["cards"]:
+            raise ValueError("general: missing cards or unsupported decision schema")
+        if decisions.get("provenance", {}).get("operator_family") != "general" or axes.get("family") != "general":
+            raise ValueError("general: mismatched corpus identity")
+        normalizer.validate_schema(axes)
+        errors = card_schema.development_steps(axes)[2]
+        errors += card_schema.validate_traits(decisions.get("traits", {}))
+        errors += card_schema.validate(decisions["cards"], source_view,
+                                      card_schema.axis_ids_of(axes), self.seeds, decisions.get("traits", {}))
+        for card in decisions["cards"]:
+            if card["status"] != "candidate_only" or set(card["match"]["operator_families"]) - known_ops:
+                errors.append(f"general: invalid card applicability or status: {card['id']}")
+        for dependency in axes.get("dependencies", []):
+            if set(dependency.get("decision_refs", [])) - self.cards.keys():
+                errors.append("general: unknown card in dependency")
+        if decisions.get("shared_cards"):
+            errors.append("general: method corpus owns its decisions; operator references belong in their own corpus")
+        if errors:
+            raise ValueError("general: " + "\n".join(errors))
         return self
 
     @staticmethod

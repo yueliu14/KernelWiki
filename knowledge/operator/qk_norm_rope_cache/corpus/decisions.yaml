@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: qk_norm_rope_cache
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:

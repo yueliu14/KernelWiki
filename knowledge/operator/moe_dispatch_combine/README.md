@@ -5,7 +5,7 @@
 
 Expert-parallel dispatch, gather, reduction and combine.
 
-3 AITER implementation references; 0 historical experience cards.
+3 AITER implementation references; 4 owned corpus decisions.
 
 ## AITER implementations
 
@@ -17,9 +17,9 @@ Each page pins its source revision. Source references describe implementations a
 | flydsl | [MoE dispatch and combine — AITER flydsl](backend/flydsl_aiter.md) |
 | hip | [All to all dispatch combine — AITER hip](backend/hip_aiter.md) |
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

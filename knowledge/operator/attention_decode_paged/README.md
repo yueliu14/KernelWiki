@@ -5,7 +5,7 @@
 
 Decode attention over paged KV caches, split/reduce and mixed precision.
 
-5 AITER implementation references; 35 historical experience cards.
+5 AITER implementation references; 7 owned corpus decisions.
 
 ## AITER implementations
 
@@ -23,9 +23,9 @@ Each page pins its source revision. Source references describe implementations a
 
 - [KV-cache preparation belongs to the attention workload](backend/aiter_notes.md)
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

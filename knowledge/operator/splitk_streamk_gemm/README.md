@@ -5,7 +5,7 @@
 
 Split-K and Stream-K schedules for poorly occupied GEMMs.
 
-4 AITER implementation references; 0 historical experience cards.
+4 AITER implementation references; 3 owned corpus decisions.
 
 ## AITER implementations
 
@@ -18,9 +18,9 @@ Each page pins its source revision. Source references describe implementations a
 | opus | [OPUS Split-K: workspace, cluster launch and fused reduction](backend/opus_aiter.md) |
 | triton | [Splitk streamk gemm — AITER triton](backend/triton_aiter.md) |
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: grouped_gemm_moe
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -28,6 +28,10 @@ cards:
   - Match the intermediate dtype, quantization scale layout and sorted-route ownership across both stages.
   - Choose stage-1 split/tiling and stage-2 consumption together; a fast stage-1 output is unusable if stage
     2 interprets it differently.
+  - Consider the complete expert call and its metadata preparation when sizing a fusion or rewrite; preserve
+    routed weights, activation order, layouts and intermediate lifetimes.
+  - Check reduction order and deterministic-output requirements when adding split-K or moving work between
+    stages.
   alternatives:
   - Keep the intermediate in a simple floating format before introducing compressed partials.
   why:
@@ -38,6 +42,8 @@ cards:
   measurement_evidence: []
   limitations:
   - These FP8 family precedents do not establish arbitrary MXFP4 or mixed-expert-weight compatibility.
+  - A dense-GEMM replacement may not match a fused expert callable. Combined serving improvements cannot be
+    attributed to either GEMM without ablations.
   references:
   - knowledge/operator/grouped_gemm_moe/README.md
   - knowledge/operator/fused_moe_grouped_gemm/README.md
@@ -47,6 +53,395 @@ cards:
     mechanism: The grouped GEMM exposes activation and quantization parameters in its own kernel contract.
     source_evidence:
     - aiter_b3ad6c46:src_51116808a6bd2b48
+  experience:
+  - outcome: mixed
+    conditions:
+    - A reported expert path included routing-metadata and intermediate-processing dispatches around two GEMM
+      stages.
+    summary: Historical MoE reports found metadata/auxiliary-dispatch removal useful after tuning the GEMMs,
+      while a fast order-changing rewrite failed serving parity.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/moe-mxfp4-grouped-authored-gfx950-vllm.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/axes-that-stayed-closed-on-a-bf16-fused-moe-with-a-decode-we-moe-grouped-gemm-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/delete-the-satellite-dispatches-once-both-moe-gemms-sit-at-t-moe-grouped-gemm-gfx950-both.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: moe-live-config-and-scale-domain
+  type: performance_candidate
+  axes:
+  - runtime_contract
+  - configuration_constraints
+  match:
+    operator_families:
+    - grouped_gemm_moe
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Which tuning surface controls the served expert GEMM contract?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id001
+  - Expert GEMMs use a framework- and version-specific combination of dtype, quantization, layout, topology
+    and dispatch keys.
+  actions:
+  - Derive per-rank expert/intermediate dimensions from the actual TP/EP configuration and capture the exact
+    selector key and served token buckets.
+  - Tune each valid bucket with matched baseline initialization and warmup, preserving defaults for unserved
+    or regressing cases.
+  - Inspect override-versus-merge semantics at the installed revision; keep native per-32 E8M0, arbitrary blockscale
+    and W4A16 paths distinct.
+  why:
+  - Historical MoE reports found useful configuration tuning and native-kernel rewrites on different paths,
+    plus zero engagement when a dense or incompatible quantization selector was targeted.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - A single-process versus subprocess timing disagreement needs controlled cache/warmup analysis; neither
+    protocol is automatically more trustworthy. Tile-only changes still require correctness checks.
+  references:
+  - knowledge/operator/grouped_gemm_moe/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id001
+    summary: Historical MoE reports found useful configuration tuning and native-kernel rewrites on different
+      paths, plus zero engagement when a dense or incompatible quantization selector was targeted.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/moe-bf16-tune-gfx942.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/moe-fp8-blockscale-tune-gfx950.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/moe-int4-w4a16-tune-gfx942.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/moe-mxfp4-fused-aiter-fmoe-gfx950-sglang.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/mxfp8-e8m0-grouped-moe-gfx950.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/mxfp8-grouped-moe-gemm-gfx950.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: moe-stage-instance-layout
+  type: performance_candidate
+  axes:
+  - compute_instruction
+  - expert_layout
+  - epilogue
+  match:
+    operator_families:
+    - grouped_gemm_moe
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: How should MFMA shape and pipeline instance be chosen for each MoE stage?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id002
+  - The selected CK or similar grouped-GEMM instance has a matching weight shuffle and expert-sort granularity.
+  actions:
+  - Tune gate/up and down projection using their own N extents; update host preshuffle and device instance
+    together.
+  - Keep tile ownership within the sorted expert block contract and validate any new padding or CShuffle layout.
+  - Measure stage-level and full-call results, including changed register/LDS residency.
+  why:
+  - Historical blockscale reports found stage-specific MFMA/pipeline changes useful, but reusing an incompatible
+    shuffle or letting a tile span expert groups broke correctness.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - MFMA-32 is a scoped candidate, not a replacement for MFMA-16 everywhere. A stage selector may constrain
+    which tile combinations are expressible.
+  references:
+  - knowledge/operator/grouped_gemm_moe/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id002
+    summary: Historical blockscale reports found stage-specific MFMA/pipeline changes useful, but reusing an
+      incompatible shuffle or letting a tile span expert groups broke correctness.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/32x32-mfma-remap-carries-a-block-scale-moe-grouped-gemm-epil-moe-grouped-gemm-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/mfma-32-plus-a-lds-pad-on-a-frozen-gridwise-ck-block-scale-m-moe-grouped-gemm-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/pick-the-pipeline-variant-per-stage-then-shrink-the-cshuffle-moe-grouped-gemm-gfx950-mixed.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: moe-dequant-reuse-and-chain
+  type: performance_candidate
+  axes:
+  - expert_compute
+  - operand_layout
+  - pipeline_schedule
+  match:
+    operator_families:
+    - grouped_gemm_moe
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Can expert-weight dequantization be reused or shortened on the critical path?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id003
+  - Packed expert weights or scale metadata are converted repeatedly while feeding grouped GEMM.
+  actions:
+  - Load a packed value once when extracting multiple components; consider reusing a dequantized weight tile
+    across M blocks only when expert and scale ownership match.
+  - 'Distinguish widening the number of dot tiles from widening each tile: compiler warp-layout changes can
+    duplicate the very work being removed.'
+  - Inspect scale gathers and dependent conversion chains, then re-tune tile grouping within register/LDS budgets.
+  why:
+  - Historical reports found useful packed extraction, shared dequantized tiles and shorter scale/convert chains;
+    nominal instruction savings could be off the critical path or disappear after retiling.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Preserve group-scale application and cancellation-sensitive arithmetic. Extra dequantized weight copies
+    must be included in deployment memory accounting.
+  references:
+  - knowledge/operator/grouped_gemm_moe/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id003
+    summary: Historical reports found useful packed extraction, shared dequantized tiles and shorter scale/convert
+      chains; nominal instruction savings could be off the critical path or disappear after retiling.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/amortize-int4-dequant-across-m-blocks-instead-of-shrinking-i-moe-grouped-gemm-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/axes-that-closed-on-a-dequant-latency-bound-quantized-groupe-moe-grouped-gemm-gfx950-compute-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/block-scale-moe-grouped-gemm-fund-the-scale-metadata-path-no-moe-grouped-gemm-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/dequant-op-count-is-off-the-critical-path-once-the-gemm-is-o-moe-grouped-gemm-gfx950-mixed.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/diagnose-dependency-chain-vs-load-latency-before-spending-a--moe-grouped-gemm-gfx950-mixed.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/per-bucket-tile-shape-carries-an-int4-weight-moe-grouped-gem-moe-grouped-gemm-gfx950-mixed.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/price-a-counter-with-a-deletion-control-before-funding-a-rou-moe-grouped-gemm-gfx950-prefill.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/share-the-dequantised-weight-tile-across-row-blocks-widen-m--moe-grouped-gemm-gfx950-prefill.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: moe-per-bucket-binary-and-config
+  type: performance_candidate
+  axes:
+  - runtime_contract
+  - tunable_surface
+  match:
+    operator_families:
+    - grouped_gemm_moe
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: When should expert token buckets use separate configurations or compiled entries?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id004
+  - Different token/width regimes have distinct compiler resource footprints and valid launch configurations.
+  actions:
+  - Select configurations by runtime shape with a complete fallback; isolate compiled entries when a shared
+    binary forces the narrow path to carry the wide path resource budget.
+  - Keep every host/device-coupled layout or threshold consistent and distinguish compile-time availability
+    from per-call selection.
+  - Re-tune coupled launch parameters per arm and test boundary buckets and the final combined dispatch.
+  why:
+  - Historical reports found per-bucket routing useful where global settings canceled opposing gains; separate
+    entries could reduce register or code-size costs.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - A startup-only preshuffle is not a freely changeable per-call knob. Do not encode benchmark case identities
+    or depend on fixed input pointers.
+  references:
+  - knowledge/operator/grouped_gemm_moe/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id004
+    summary: Historical reports found per-bucket routing useful where global settings canceled opposing gains;
+      separate entries could reduce register or code-size costs.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/one-binary-per-shape-arm-selected-by-a-host-launcher-shim-moe-grouped-gemm-gfx950-prefill.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/per-m-bucket-launch-config-on-an-int4-weight-only-grouped-ge-moe-grouped-gemm-gfx950-compute-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/route-discarded-sub-noise-knobs-per-shape-instead-of-shippin-moe-grouped-gemm-gfx950-mixed.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: moe-precision-and-scale-gates
+  type: performance_candidate
+  axes:
+  - numerical_contract
+  - expert_layout
+  match:
+    operator_families:
+    - grouped_gemm_moe
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: When does narrowing expert operands remain valid and deployable?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id005
+  - An explicitly permitted precision change targets streamed operand traffic or dequantization cost.
+  actions:
+  - Validate scale-group indexing, quantizer range, rounding and the complete expert output before comparing
+    performance.
+  - Use the actual SNR/error/task-accuracy gate; a cosine-only success does not transfer to a stricter cancellation-sensitive
+    contract.
+  - Include preparation cost and extra persistent weight storage in both the timing boundary and the serving
+    memory budget.
+  why:
+  - Historical reports contained both useful narrow-weight representations and failed numeric or memory gates;
+    the accepted scale contract determined which transformations were available.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Distinct per-K-group scales cannot be replaced by an average. Do not reuse data-dependent quantization
+    solely because pointer addresses remain stable.
+  references:
+  - knowledge/operator/grouped_gemm_moe/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id005
+    summary: Historical reports contained both useful narrow-weight representations and failed numeric or memory
+      gates; the accepted scale contract determined which transformations were available.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/activation-narrowing-is-gated-by-parity-and-by-the-benchmark-moe-grouped-gemm-gfx950-mixed.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/derive-the-tile-then-renegotiate-the-scale-contract-moe-grouped-gemm-gfx950-prefill.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/narrow-the-streamed-weight-operand-first-then-chase-the-mfma-moe-grouped-gemm-gfx950-mixed.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/where-a-native-mfma-block-scaled-moe-gemm-has-no-headroom-le-moe-grouped-gemm-gfx950-mixed.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: moe-epilogue-lds-stride
+  type: performance_candidate
+  axes:
+  - epilogue
+  - operand_layout
+  match:
+    operator_families:
+    - grouped_gemm_moe
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: When can padding an expert epilogue staging tile reduce its critical-path conflicts?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id006
+  - An LDS staging layout exhibits conflicts for the actual target bank geometry and access pattern.
+  actions:
+  - Change row stride and allocated group-segment size together, preserving the read/write mapping and vector
+    alignment.
+  - Validate full output coverage and measure end-to-end stage latency after the conflict counter changes.
+  why:
+  - A historical epilogue-pad change helped, but incomplete allocation updates broke correctness and further
+    counter reductions brought little additional latency benefit.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Do not transplant a fixed bank count or padding value to another architecture or access width.
+  references:
+  - knowledge/operator/grouped_gemm_moe/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id006
+    summary: A historical epilogue-pad change helped, but incomplete allocation updates broke correctness and
+      further counter reductions brought little additional latency benefit.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/pad-the-epilogue-lds-row-stride-off-the-32-bank-period-moe-grouped-gemm-gfx950-mixed.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: moe-per-buffer-cache-policy
+  type: performance_candidate
+  axes:
+  - memory_access
+  match:
+    operator_families:
+    - grouped_gemm_moe
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Should expert input, weights, scratch and output use the same cache policy?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id007
+  - The buffers have different reuse distances and token-bucket working sets.
+  actions:
+  - Measure policy changes per buffer and regime with representative reuse; inspect emitted modifiers and the
+    whole MoE call.
+  - Re-evaluate after changing dtype, tile mapping, intermediate layout or dispatch fusion.
+  why:
+  - A historical BF16 expert path required different cache choices by buffer and token bucket rather than one
+    kernel-wide hint.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - A cache counter improvement is not a performance result, and a write-once kernel output may be read soon
+    by the next stage.
+  references:
+  - knowledge/operator/grouped_gemm_moe/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id007
+    summary: A historical BF16 expert path required different cache choices by buffer and token bucket rather
+      than one kernel-wide hint.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/cache-policy-is-a-per-buffer-per-bucket-decision-on-a-bf16-f-moe-grouped-gemm-gfx950-both.md
+      artifacts: not_published
+      verification: not_reproduced
 shared_cards:
 - flydsl-a8-data-movement-helpers
 - flydsl-a8-interleaved-schedule

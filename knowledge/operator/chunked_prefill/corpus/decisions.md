@@ -8,7 +8,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 1 owned cards; 2 shared-card references. Shared cards retain one canonical body in their owning operator.
 
-[Source evidence](source_evidence.md)
+[Canonical decisions](decisions.yaml)
 
 ## Owned decisions
 
@@ -46,7 +46,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 - Keep a simpler implementation with the identical numerical and layout contract for comparison.
 
-#### Evidence
+#### Source evidence
 
 - [aiter_b3ad6c46:src_77fdd041c1e25e15](source_evidence.md#aiter_b3ad6c46-src_77fdd041c1e25e15) — [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:54-317](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L54-L317).
 

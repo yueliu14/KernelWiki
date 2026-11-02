@@ -8,7 +8,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 1 owned cards; 7 shared-card references. Shared cards retain one canonical body in their owning operator.
 
-[Source evidence](source_evidence.md)
+[Canonical decisions](decisions.yaml)
 
 ## Owned decisions
 
@@ -46,7 +46,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 - Keep a simpler implementation with the identical numerical and layout contract for comparison.
 
-#### Evidence
+#### Source evidence
 
 - [aiter_b3ad6c46:src_ad97471fc6357f3b](source_evidence.md#aiter_b3ad6c46-src_ad97471fc6357f3b) — [aiter/ops/flydsl/kernels/mega_moe/mega_moe_prepare.py:21-276](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/mega_moe/mega_moe_prepare.py#L21-L276).
 

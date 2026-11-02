@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: sparse_attention_nsa
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -46,4 +46,56 @@ cards:
     source_evidence:
     - aiter_b3ad6c46:src_2bcb9480481ff798
     - aiter_b3ad6c46:src_513194697c804a41
+- id: sparse-prefill-block-subtiling
+  type: performance_candidate
+  axes:
+  - execution_geometry
+  - sparse_selection
+  match:
+    operator_families:
+    - sparse_attention_nsa
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Which sparse-attention partition should be tuned without changing selected-slot semantics?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id001
+  - The implementation consumes selected KV blocks with explicit per-query masks and separate prefill/decode
+    entry points.
+  actions:
+  - Tune KV-block subtiles and MFMA launch parameters by architecture while preserving block indices, real-top-k
+    bounds and per-row causal masks.
+  - Treat query packing as a separate experiment rather than assuming it caused a reported sub-tiling gain.
+  - Validate partial prefill chunks and the full serving path independently of decode.
+  why:
+  - An earlier report proposed query packing; a later report attributed the useful prefill change to KV-block
+    sub-tiling instead.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - A backend unavailable in an old stack may exist in a newer one. Preserve the sparse math contract when
+    comparing candidates.
+  references:
+  - knowledge/operator/sparse_attention_nsa/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id001
+    summary: An earlier report proposed query packing; a later report attributed the useful prefill change
+      to KV-block sub-tiling instead.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/sparse-attn-nsa-triton-gfx950.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/sparse-attn-triton2triton-opt-gfx942-gfx950.md
+      artifacts: not_published
+      verification: not_reproduced
 shared_cards: []

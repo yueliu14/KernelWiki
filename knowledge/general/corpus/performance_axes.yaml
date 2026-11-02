@@ -1,0 +1,61 @@
+schema_version: 1
+family: general
+development_order:
+- step: 1
+  title: Measurement
+  axes:
+  - measurement
+- step: 2
+  title: Integration
+  axes:
+  - integration
+- step: 3
+  title: Experiment Design
+  axes:
+  - experiment_design
+- step: 4
+  title: Resource Model
+  axes:
+  - resource_model
+axes:
+- id: measurement
+  kind: performance_choice
+  question: Measurement
+  source_mappings: []
+  knob_aliases: {}
+- id: integration
+  kind: integration_contract
+  question: Integration
+  source_mappings: []
+  knob_aliases: {}
+- id: experiment_design
+  kind: performance_choice
+  question: Experiment Design
+  source_mappings: []
+  knob_aliases: {}
+- id: resource_model
+  kind: performance_choice
+  question: Resource Model
+  source_mappings: []
+  knob_aliases: {}
+dependencies:
+- id: effect_requires_identity_and_protocol
+  axes:
+  - measurement
+  - integration
+  rule: A latency comparison supports a conclusion only when the measured binary/call path and the measurement
+    protocol are both established.
+  decision_refs:
+  - method-paired-measurement-controls
+  - method-live-binary-and-integration
+  - method-end-to-end-attribution
+- id: negative_results_follow_the_operating_point
+  axes:
+  - resource_model
+  - experiment_design
+  rule: A changed implementation or resource bottleneck invalidates an old negative result until its causal
+    hypothesis is rechecked.
+  decision_refs:
+  - method-conditional-negative-results
+  - method-causal-resource-model
+  - method-register-limited-occupancy
