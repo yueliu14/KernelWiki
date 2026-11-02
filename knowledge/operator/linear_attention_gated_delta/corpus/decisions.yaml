@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: linear_attention_gated_delta
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -107,4 +107,156 @@ cards:
   - This is an implementation precedent, not a measured performance preference on a new workload.
   references:
   - knowledge/operator/linear_attention_gated_delta/README.md
+- id: gated-delta-launch-ownership
+  type: performance_candidate
+  axes:
+  - execution_geometry
+  - recurrent_state
+  match:
+    operator_families:
+    - linear_attention_gated_delta
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Does the recurrent-attention launch assign each output tile exactly once?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id001
+  - A wrapper-derived grid can duplicate work or disagree with the kernel indexing.
+  actions:
+  - Audit output/state ownership from launch dimensions through kernel indices, including tails and triangular
+    regions.
+  - Remove redundant grid work only after proving all required outputs remain written exactly as specified.
+  - Compare against an independently correct reference and distinguish repairing an inefficient baseline from
+    exceeding a well-tuned one.
+  why:
+  - Historical reports found redundant launch-grid work, while further one-node replay and occupancy probes
+    often failed to improve the corrected path.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Do not infer ownership from plausible output shape or sampled parity alone. Persistent state and unwritten-output
+    contracts must remain explicit.
+  references:
+  - knowledge/operator/linear_attention_gated_delta/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id001
+    summary: Historical reports found redundant launch-grid work, while further one-node replay and occupancy
+      probes often failed to improve the corrected path.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/audit-the-baseline-launch-grid-before-believing-a-large-head-linear-attention-gfx950-prefill.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/collapse-a-redundant-launch-grid-instead-of-guarding-inside--linear-attention-gfx950-launch-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/host-and-knob-axes-that-measured-closed-on-a-one-node-launch-linear-attention-gfx950-prefill.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: gated-delta-write-policy
+  type: performance_candidate
+  axes:
+  - data_movement
+  match:
+    operator_families:
+    - linear_attention_gated_delta
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: When is streaming output useful for a gated-delta preparation stage?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id002
+  - Store traffic is limiting and actual downstream consumers do not require near-term cache residency.
+  actions:
+  - Verify store vector width first, then inspect whether the requested cache modifier lowers on the target
+    backend.
+  - Measure producer plus relevant consumers across the cache-capacity and workgroup-count regimes.
+  why:
+  - Historical store-bound cases benefited from selected streaming writes, whereas additional occupancy or
+    store-traffic probes did not always improve the bottleneck.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - 'Write-once within one kernel is not sufficient: a following stage can reuse the output immediately. Cache
+    modifiers are backend- and architecture-specific.'
+  references:
+  - knowledge/operator/linear_attention_gated_delta/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id002
+    summary: Historical store-bound cases benefited from selected streaming writes, whereas additional occupancy
+      or store-traffic probes did not always improve the bottleneck.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/axes-that-stay-closed-once-the-store-pipe-is-saturated-linear-attention-gfx950-memory-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/streaming-non-temporal-store-for-write-once-output-linear-attention-gfx950-memory-bound.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: gated-delta-factorable-scale-and-head-reuse
+  type: performance_candidate
+  axes:
+  - compute_schedule
+  - recurrent_state
+  match:
+    operator_families:
+    - linear_attention_gated_delta
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Can a gated-delta contraction share head work or hoist a scale?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id003
+  - The scale is provably independent of the reduced axis and grouped heads share the same contracted operand.
+  actions:
+  - Derive the factorization and preserve gate/scale placement relative to casts and accumulation; compare
+    with an independent numerical reference.
+  - Share common contraction work across compatible heads while retaining their separate epilogues and outputs.
+  - Re-tune resource use and evaluate the combined chain after each hoist or head-packing change.
+  why:
+  - A historical contraction benefited from shorter load-to-dot chains and shared head work, but overlapping
+    changes did not add independently.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Do not remove zero stores unless the public output-initialization contract guarantees them. A harness-prezeroed
+    buffer is not sufficient.
+  references:
+  - knowledge/operator/linear_attention_gated_delta/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id003
+    summary: A historical contraction benefited from shorter load-to-dot chains and shared head work, but overlapping
+      changes did not add independently.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/shorten-the-load-to-dot-chain-before-chasing-bytes-linear-attention-gfx950-prefill.md
+      artifacts: not_published
+      verification: not_reproduced
 shared_cards: []

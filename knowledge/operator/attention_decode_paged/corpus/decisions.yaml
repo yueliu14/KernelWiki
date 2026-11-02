@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: attention_decode_paged
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -48,6 +48,337 @@ cards:
   - knowledge/operator/attention_decode_paged/README.md
   - knowledge/operator/mla_attention/README.md
   - knowledge/operator/chunked_prefill/README.md
+- id: paged-attention-live-layout-dispatch
+  type: performance_candidate
+  axes:
+  - implementation_contract
+  - cache_layout
+  match:
+    operator_families:
+    - attention_decode_paged
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: How do page layout and compiled template contracts constrain paged-attention tuning?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id001
+  - The served path uses paged or ragged KV with a version-specific dispatch/template selector.
+  actions:
+  - Inspect the actual page size, cache dtype, head width and called entry before selecting a rewrite or library
+    candidate.
+  - Keep producer and reduce partition sizes consistent with the compiled kernel; validate a partition sweep
+    before accepting its latency.
+  - Check shape/dtype eligibility and actual engagement of experimental template variants, including graph
+    execution.
+  why:
+  - Historical reports found that non-power-of-two and one-token pages changed the usable path; an experimental
+    BF16/head-width-specific template existed despite an earlier no-knob claim. Incompatible partition sizes
+    produced invalid fast results.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Do not generalize old framework flags or template eligibility to another revision. A template intended
+    for BF16 KV may cease to apply after KV quantization.
+  references:
+  - knowledge/operator/attention_decode_paged/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id001
+    summary: Historical reports found that non-power-of-two and one-token pages changed the usable path; an
+      experimental BF16/head-width-specific template existed despite an earlier no-knob claim. Incompatible
+      partition sizes produced invalid fast results.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/paged-attn-nonpow2-gfx942.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/paged-attn-ragged-aiter-gfx950-sglang.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/paged-attn-ragged-qkvversion-gfx950-sglang.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: decode-kv-cache-policy
+  type: performance_candidate
+  axes:
+  - cache_layout
+  - compute_schedule
+  match:
+    operator_families:
+    - attention_decode_paged
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: When should KV loads bypass cache or use explicit prefetch?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id002
+  - The KV working set, reuse across heads/calls and load representation can be measured for each served regime.
+  actions:
+  - First remove avoidable scratch or repeated gathers; compare cache policy separately for each operand and
+    workload bucket.
+  - Inspect generated loads to prove the intended cache modifier survives vectorization, with alignment and
+    tail masking preserved.
+  - When testing global-to-LDS transfer, measure whether it buys useful prefetch depth without excessive live
+    registers or LDS pressure.
+  why:
+  - Historical decode reports found both positive and negative non-temporal results; footprint changes reversed
+    the preferred policy. A DMA instruction alone did not establish a gain.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Read-once source code does not imply zero hardware/cache reuse. Re-test policies after changing KV dtype,
+    tile geometry or concurrency.
+  references:
+  - knowledge/operator/attention_decode_paged/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id002
+    summary: Historical decode reports found both positive and negative non-temporal results; footprint changes
+      reversed the preferred policy. A DMA instruction alone did not establish a gain.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/ask-whether-the-traffic-is-removable-before-you-tune-how-it--attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/buy-prefetch-depth-with-a-global-to-lds-dma-on-bandwidth-bou-attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/choose-the-non-temporal-hint-per-operand-not-per-kernel-attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/drop-the-non-temporal-cache-hint-on-once-read-kv-streams-attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/get-the-nt-bit-onto-kv-loads-by-loading-one-native-128-bit-v-attention-decode-gfx950-both.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: decode-tile-and-split-geometry
+  type: performance_candidate
+  axes:
+  - execution_geometry
+  - compute_schedule
+  match:
+    operator_families:
+    - attention_decode_paged
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: How should a decode tile and its split grid be sized together?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id003
+  - The kernel has head-width-dependent resource use, paged or windowed KV, and a legal split/reduce path.
+  actions:
+  - Inspect the real launched grid before tuning; decouple logical KV tile size from storage page size only
+    if the gather implementation supports it.
+  - Sweep tile size, useful split count, warp count and pipeline depth together, accounting for head width,
+    CU count and scratch round trips.
+  - Pass identical tile/segment bounds through producer and reducer, cull truly empty window segments and validate
+    widest heads and ragged tails.
+  why:
+  - Historical reports improved underfilled or oversplit launches through coupled geometry changes; their optimal
+    workgroups-per-CU targets differed, and a previously helpful memory change could regress after retiling.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Neither one workgroup per CU nor a fixed multiple is a universal optimum. Graph metadata and fallback branches
+    must remain valid for every supported shape.
+  references:
+  - knowledge/operator/attention_decode_paged/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id003
+    summary: Historical reports improved underfilled or oversplit launches through coupled geometry changes;
+      their optimal workgroups-per-CU targets differed, and a previously helpful memory change could regress
+      after retiling.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/collapse-the-co-resident-sequence-set-to-break-the-kv-addres-attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/collapse-the-partition-grid-instead-of-optimizing-the-round--attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/derive-the-split-kv-decode-launch-shape-from-a-constant-byte-attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/dispatch-collapse-first-then-per-regime-specialisation-on-la-attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/enable-the-source-s-own-dormant-split-kv-path-before-authori-attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/launch-meta-first-on-latency-floored-paged-decode-and-let-th-attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/split-only-up-to-one-workgroup-per-cu-and-make-pipeline-dept-attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/unclamp-the-kv-tile-from-the-page-size-then-de-rate-it-by-he-attention-decode-gfx950-decode.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: decode-single-dispatch-merge
+  type: performance_candidate
+  axes:
+  - implementation_contract
+  - compute_schedule
+  match:
+    operator_families:
+    - attention_decode_paged
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: When can combining split-KV stages in one dispatch beat a separate reduction?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id004
+  - Partial results are shared across workgroups and the complete publish/signal/consume protocol can be implemented
+    correctly.
+  actions:
+  - Price the second dispatch and its reduction work against the cost of cross-workgroup visibility, counter
+    traffic, held registers and LDS residency.
+  - Use a memory-model-correct protocol with initialized per-invocation state, proper scope and ordering; validate
+    concurrent streams and repeated calls.
+  - Compare small and wide grids separately and retain the two-dispatch path when protocol/resource costs exceed
+    the saved launch.
+  why:
+  - Historical summaries reported both useful fused merges and large regressions caused by synchronization
+    or residency cost; fewer launches did not consistently mean lower latency.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Instruction-level fence shortcuts from one report are not portable synchronization recipes. A last-arriver
+    scheme must not require unscheduled workgroups to run while resident workgroups spin.
+  references:
+  - knowledge/operator/attention_decode_paged/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id004
+    summary: Historical summaries reported both useful fused merges and large regressions caused by synchronization
+      or residency cost; fewer launches did not consistently mean lower latency.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/one-dispatch-for-split-kv-decode-and-the-protocol-that-pays--attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/price-the-residual-before-funding-fusion-or-geometry-work-at-attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/split-kv-decode-the-two-dispatch-shape-is-welded-budget-the--attention-decode-gfx950-decode.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: decode-wrapper-plan-lifetime
+  type: performance_candidate
+  axes:
+  - implementation_contract
+  match:
+    operator_families:
+    - attention_decode_paged
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: What host state can a decode wrapper reuse safely?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id005
+  - The actual timing boundary exposes repeated allocation, argument preparation or binding overhead.
+  actions:
+  - Compare direct launch, reusable plans and capture using the same input/stream contract and benchmark protocol.
+  - Reuse only invariant device properties and plans; refresh every mutable tensor pointer, scalar and derived
+    bound, and manage scratch per concurrent invocation.
+  - Treat scale tensors as data-dependent unless their invariance is proven; re-test cache and occupancy policy
+    after a storage-dtype change.
+  why:
+  - Historical reports benefited from host-plan/scratch reuse in some regimes, but stale pointer memoization
+    corrupted results and one-node replay often cost more than direct dispatch.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - A warm benchmark that reuses identical tensors does not prove correctness on new inputs. Avoid result caching
+    and shape-only caching of data-dependent scales.
+  references:
+  - knowledge/operator/attention_decode_paged/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id005
+    summary: Historical reports benefited from host-plan/scratch reuse in some regimes, but stale pointer memoization
+      corrupted results and one-node replay often cost more than direct dispatch.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/decode-attention-pay-the-host-tax-first-then-halve-kv-bytes--attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/decode-attention-the-python-ctypes-prologue-is-the-first-thr-attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/measure-the-empty-graph-replay-floor-before-funding-a-captur-attention-decode-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/price-the-host-fraction-before-spending-a-round-on-the-launc-attention-decode-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/the-residual-launch-axis-on-decode-attention-closes-once-hos-attention-decode-gfx950-decode.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: decode-resource-counters-and-latency
+  type: performance_candidate
+  axes:
+  - compute_schedule
+  - execution_geometry
+  match:
+    operator_families:
+    - attention_decode_paged
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Does a high LDS or instruction counter identify removable decode latency?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id006
+  - The attention kernel has substantial overlap between memory, LDS traffic and computation.
+  actions:
+  - Attribute elapsed time to the actual dependent chain and test a targeted change, rather than promoting
+    an instruction/register reduction from counters alone.
+  - Check the regime again after changing tile footprint or parallelism; preserve required masks and ownership
+    even when their cost looks redundant.
+  why:
+  - Reported decode variants with fewer instructions or registers could lose because the removed work was overlapped;
+    some footprint changes helped only underfilled cases.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - A memory-stall observation from one grid does not close compute or occupancy work on all shapes.
+  references:
+  - knowledge/operator/attention_decode_paged/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id006
+    summary: Reported decode variants with fewer instructions or registers could lose because the removed work
+      was overlapped; some footprint changes helped only underfilled cases.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/high-lds-wait-counters-next-to-a-high-roofline-fraction-can--attention-decode-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/instructions-and-registers-are-not-currency-at-near-total-me-attention-decode-gfx950-decode.md
+      artifacts: not_published
+      verification: not_reproduced
 shared_cards:
 - attention-gqa-head-mapping
 - attention-mla-reduce-abi

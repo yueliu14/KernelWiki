@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: sliding_window_attention
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -78,4 +78,53 @@ cards:
   - This predicate does not replace checking the per-query sliding-window bounds.
   references:
   - knowledge/operator/sliding_window_attention/README.md
+- id: window-specific-split-metadata
+  type: performance_candidate
+  axes:
+  - implementation_contract
+  - kv_partition
+  match:
+    operator_families:
+    - sliding_window_attention
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Does decode use split metadata for the attended window or for the full context?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id001
+  - A sliding-window decode path carries separate full-context and window-local KV metadata.
+  actions:
+  - Trace the split-count tensor through eager initialization, graph updates and the final launch; select the
+    metadata corresponding to the attended KV domain.
+  - Validate both sliding and full-attention layers plus short/long contexts when changing the split cap.
+  why:
+  - A historical serving report found window-local split metadata was prepared but not consumed by the decode
+    launch; a global cap also harmed a different regime.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - The reported framework bug and flags are revision-specific. A fixed split count is not a universal window-attention
+    setting.
+  references:
+  - knowledge/operator/sliding_window_attention/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id001
+    summary: A historical serving report found window-local split metadata was prepared but not consumed by
+      the decode launch; a global cap also harmed a different regime.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/decode-attn-splitkv-triton-gfx950-sglang.md
+      artifacts: not_published
+      verification: not_reproduced
 shared_cards: []

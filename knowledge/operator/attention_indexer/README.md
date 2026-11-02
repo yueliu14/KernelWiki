@@ -5,7 +5,7 @@
 
 MQA logits, index scores, block selection and top-k for sparse attention.
 
-6 AITER implementation references; 0 historical experience cards.
+6 AITER implementation references; 9 owned corpus decisions.
 
 ## AITER implementations
 
@@ -26,9 +26,9 @@ Each page pins its source revision. Source references describe implementations a
 - [Sparse block selection: scoring, top-k and fused CP selection](backend/hip_notes.md)
 - [OPUS MXFP4 indexer: architecture layouts and dynamic schedules](backend/opus_notes.md)
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## Operator contract
 

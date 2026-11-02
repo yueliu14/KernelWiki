@@ -723,3 +723,23 @@ dependencies:
   decision_refs:
   - flydsl-lds-pipeline-depth
   - flydsl-hgemm-tiling-validity
+- id: host_plan_cache_preserves_call_identity
+  axes:
+  - runtime_contract
+  - configuration_constraints
+  - validation_contract
+  rule: A cached plan is usable only while its complete call contract remains valid; benchmark it within the
+    actual timing boundary.
+  decision_refs:
+  - gemm-host-plan-cache
+  - flydsl-host-launch-contract
+- id: explicit_schedule_requires_resource_headroom
+  axes:
+  - pipeline_schedule
+  - workgroup_tile
+  - execution_geometry
+  rule: A wider register-staged tile or explicit schedule must retain useful residency and beat the compiled
+    baseline on the intended shape regime.
+  decision_refs:
+  - gemm-compiler-schedule-and-register-budget
+  - flydsl-lds-pipeline-depth

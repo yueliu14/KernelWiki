@@ -8,7 +8,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 1 owned cards; 1 shared-card references. Shared cards retain one canonical body in their owning operator.
 
-[Source evidence](source_evidence.md)
+[Canonical decisions](decisions.yaml)
 
 ## Owned decisions
 
@@ -47,7 +47,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 - Keep a simpler implementation with the identical numerical and layout contract for comparison.
 
-#### Evidence
+#### Source evidence
 
 - [aiter_b3ad6c46:src_cfc951315c97cae9](source_evidence.md#aiter_b3ad6c46-src_cfc951315c97cae9) — [csrc/py_itfs_cu/asm_mla.cu:755](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/csrc/py_itfs_cu/asm_mla.cu#L755).
 - [aiter_b3ad6c46:src_c4a0b087d74b3d3f](source_evidence.md#aiter_b3ad6c46-src_c4a0b087d74b3d3f) — [csrc/py_itfs_cu/asm_mla.cu:830](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/csrc/py_itfs_cu/asm_mla.cu#L830).

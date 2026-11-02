@@ -20,7 +20,8 @@ def test_every_operator_has_owned_knowledge(catalog):
         assert bundle['scope']['sources']
         assert bundle['evidence']['source_evidence']
         assert bundle['decisions']['cards']
-    assert len(catalog.cards) == sum(len(b['decisions']['cards']) for b in catalog.operators.values())
+    assert len(catalog.cards) == (sum(len(b['decisions']['cards']) for b in catalog.operators.values())
+                                 + len(catalog.general['decisions']['cards']))
     assert len(catalog.sources) == sum(len(b['evidence']['source_evidence']) for b in catalog.operators.values())
 
 

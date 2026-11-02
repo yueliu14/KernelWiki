@@ -37,6 +37,6 @@ The quantized variant distinguishes per-token FP8, per-group FP8 and MXFP4. Scal
 - For the norm/quant/GEMM chain, validate against the decomposed wrapper with identical scales and workspace contents. A dedicated test for this wrapper was not found in the pinned `op_tests` tree.
 - [AllReduce + RMSNorm tests](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/op_tests/multigpu_tests/test_fused_ar_rms.py).
 - [Per-group quantization tests](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/op_tests/multigpu_tests/test_fused_ar_rms_per_group_quant.py).
-- [Historical norm+GEMM campaign lessons](../learned_knowledge/README.md), moved from GEAK's `fused_norm_quant` category without changing their original measurements.
+- [Historical norm+GEMM campaign lessons](../corpus/decisions.md), moved from GEAK's `fused_norm_quant` category without changing their original measurements.
 
 These are source-derived contracts and validation routes. KernelWiki has not run these GPU or multi-GPU tests and makes no new performance claim.

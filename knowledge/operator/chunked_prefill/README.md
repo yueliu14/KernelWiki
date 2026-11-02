@@ -5,7 +5,7 @@
 
 Prompt chunks attending to cached prefixes.
 
-1 AITER implementation references; 0 historical experience cards.
+1 AITER implementation references; 1 owned corpus decisions.
 
 ## AITER implementations
 
@@ -15,9 +15,9 @@ Each page pins its source revision. Source references describe implementations a
 | --- | --- |
 | triton | [Chunked prefill over an existing paged prefix](backend/triton_aiter.md) |
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

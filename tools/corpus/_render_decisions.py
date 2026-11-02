@@ -32,6 +32,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 
 sys.path.insert(0, HERE)
 import _render_facts as source_renderer
+import experience
 
 DECISIONS = os.path.join(HERE, "decisions", "gemm.yaml")
 SOURCE_EVIDENCE = os.path.join(HERE, "evidence", "gemm_source.yaml")
@@ -41,13 +42,13 @@ PERFORMANCE_AXES = os.path.join(HERE, "performance_axes", "gemm.yaml")
 DOC = os.path.join(HERE, "gemm_decisions.md")
 TRITON_DOC = os.path.join(HERE, "gemm_triton_seeds.md")
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 REQUIRED = {
     "id", "type", "axes", "match", "question", "evidence_level", "status", "conditions",
     "actions", "alternatives", "why", "source_evidence", "measurement_evidence", "limitations",
 }
-OPTIONAL = {"solutions", "references", "shipped_evidence"}
-LEVELS = {"source_observed"}
+OPTIONAL = {"solutions", "references", "shipped_evidence", "experience"}
+LEVELS = {"source_observed", "reported_experience"}
 CARD_TYPES = {"semantic", "constraint", "performance_candidate"}
 # Within a step, what must hold is read before what to try.
 TYPE_RANK = {"constraint": 0, "semantic": 1, "performance_candidate": 2}
@@ -236,12 +237,15 @@ def validate(cards, source_evidence, axis_ids=None, shipped=None, traits=None):
         for field in ("conditions", "actions", "why", "limitations"):
             if not card.get(field):
                 errors.append(f"{label}: {field} must not be empty")
-        if not card.get("source_evidence"):
+        if card["evidence_level"] == "source_observed" and not card.get("source_evidence"):
             errors.append(f"{label}: source_observed card needs source_evidence")
+        if card["evidence_level"] == "reported_experience" and not card.get("experience"):
+            errors.append(f"{label}: reported_experience card needs experience")
+        errors.extend(experience.validate(label, card.get("experience", [])))
         if card.get("measurement_evidence"):
             errors.append(
-                f"{label}: measured evidence belongs in learned cards/expert skills behind their "
-                "feature switch, not in the always-on corpus"
+                f"{label}: raw measured evidence and run history stay outside the public corpus; "
+                "publish a scoped experience summary instead"
             )
         check_source_refs(label, card.get("source_evidence"))
         for j, solution in enumerate(card.get("solutions") or []):
@@ -704,8 +708,8 @@ def render(decision_data, source_data, tuned_data, tuned_db_data=None, axes_data
          "locally."),
         ("- Background references point at always-on docs under `knowledge/` (hardware facts, "
          "how-to), never at measurements."),
-        ("- Measured guidance is deliberately not copied here: it stays in learned cards/expert skills "
-         "behind their existing feature switches."),
+        ("- Operator-local publication uses tools/corpus/build.py, which renders scoped experience "
+         "separately from source observations. Raw run artifacts remain private."),
         "",
     ]
     out += render_traits(decision_data.get("traits") or {})

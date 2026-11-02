@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: splitk_streamk_gemm
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -59,6 +59,8 @@ cards:
   - 'Seed from where AITER shipped split-K: FlyDSL bf16 on gfx950 selects split_k > 1 in 83 of 86 rows at M<=16
     and 38 of 45 at M 17-64, and split_k = 1 in every row above M = 256; Triton''s gfx942 fp8 block-scale configs
     vary NUM_KSPLIT (1 to 16) only in the buckets up to M<=512 and fix it at 1 from M<=1024 on.'
+  - Re-tune the body after enabling split-K and include partial-output/reduction costs; test shallow splits
+    before deeper partitioning.
   alternatives:
   - 'Keep split_k = 1 and shrink tile_m / tile_n to raise the tile count: nothing to combine, but less MFMA
     work per workgroup (background).'
@@ -120,6 +122,20 @@ cards:
   - The CU counts are hardware facts from the background docs, not from this source.
   - 'A split that fills the grid can still be illegal for its combine: the FlyDSL HGEMM counters allow at most
     128 output tiles when split_k > 1.'
+  - Splitting changes the reduction tree and can fail a strict numerical contract even if each partition is
+    individually valid.
+  experience:
+  - outcome: mixed
+    conditions:
+    - A reported gfx950 quantized GEMM had small-M grid underfill and sufficient K work to partition.
+    summary: A historical small-M case benefited from a shallow split, while deeper splits lost the benefit
+      to reduction overhead.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/split-k-by-2-to-fill-the-grid-on-the-tiny-m-case-quantized-gemm-gfx950-small-batch.md
+      artifacts: not_published
+      verification: not_reproduced
 - id: flydsl-splitk-hot-loop-schedule-bundle
   type: performance_candidate
   axes:

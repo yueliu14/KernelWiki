@@ -5,7 +5,7 @@
 
 Grouped-query and multi-query head sharing.
 
-1 AITER implementation references; 5 historical experience cards.
+1 AITER implementation references; 3 owned corpus decisions.
 
 ## AITER implementations
 
@@ -15,9 +15,9 @@ Each page pins its source revision. Source references describe implementations a
 | --- | --- |
 | triton | [GQA and MQA in unified paged attention](backend/triton_aiter.md) |
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

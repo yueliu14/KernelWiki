@@ -31,6 +31,6 @@ Validate consecutive token updates against a full-sequence reference. Check stat
 - [Prefill split-QKV tests](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/op_tests/test_causal_conv1d_prefill_split_qkv.py).
 - [HIP update tests](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/op_tests/test_causal_conv1d_update.py).
 - [Triton single-token tests](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/op_tests/triton_tests/conv/test_causal_conv1d_update_single_token.py).
-- [Attention implementations](triton_aiter.md) and [historical run lessons](../learned_knowledge/README.md).
+- [Attention implementations](triton_aiter.md) and [historical run lessons](../corpus/decisions.md).
 
 No GPU measurements were collected for this page.

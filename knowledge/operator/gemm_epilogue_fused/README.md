@@ -5,7 +5,7 @@
 
 GEMM with activation, residual, normalization/quantization and communication boundaries.
 
-2 AITER implementation references; 3 historical experience cards.
+2 AITER implementation references; 4 owned corpus decisions.
 
 ## AITER implementations
 
@@ -16,9 +16,9 @@ Each page pins its source revision. Source references describe implementations a
 | aiter | [GEMM fusion boundaries in AITER](backend/aiter_aiter.md) |
 | triton | [Gemm epilogue fused — AITER triton](backend/triton_aiter.md) |
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

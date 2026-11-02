@@ -5,7 +5,7 @@
 
 Multi-head latent attention, compressed KV and decode/prefill variants.
 
-7 AITER implementation references; 0 historical experience cards.
+7 AITER implementation references; 2 owned corpus decisions.
 
 ## AITER implementations
 
@@ -26,9 +26,9 @@ Each page pins its source revision. Source references describe implementations a
 - [AITER MLA: cache layout, causal queries and backend dispatch](backend/aiter_notes.md)
 - [Native HK MLA: v3.2 and v4.0 decode pipelines](backend/hip_notes.md)
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

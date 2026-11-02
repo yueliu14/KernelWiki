@@ -5,7 +5,7 @@
 
 Expert selection, routing weights, token sorting and alignment for MoE GEMMs.
 
-5 AITER implementation references; 4 historical experience cards.
+5 AITER implementation references; 3 owned corpus decisions.
 
 ## AITER implementations
 
@@ -19,9 +19,9 @@ Each page pins its source revision. Source references describe implementations a
 | opus | [MoE routing, sorting and token assignment — AITER opus](backend/opus_aiter.md) |
 | triton | [MoE routing, sorting and token assignment — AITER triton](backend/triton_aiter.md) |
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 

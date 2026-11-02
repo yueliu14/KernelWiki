@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: gqa_mqa_attention
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -42,5 +42,108 @@ cards:
   references:
   - knowledge/operator/gqa_mqa_attention/README.md
   - knowledge/operator/attention_decode_paged/README.md
+- id: gqa-storage-precision-contract
+  type: performance_candidate
+  axes:
+  - cache_layout
+  - attention_semantics
+  match:
+    operator_families:
+    - gqa_mqa_attention
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Can KV storage be narrowed while retaining the attention compute contract?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id001
+  - KV traffic is limiting and the accepted accuracy contract permits a storage-precision experiment.
+  actions:
+  - Separate storage, conversion and dot/accumulation dtypes; derive packed K addressing from element size
+    and validate scale/layout compatibility.
+  - Gate QK, softmax probabilities and PV precision changes independently, including near-cancellation outputs
+    and model accuracy.
+  - Re-measure cache residency and occupancy after the byte footprint changes.
+  why:
+  - Some historical attention cases benefited from FP8 KV storage with wider in-register computation, while
+    narrowing a different dot or intermediate failed its accuracy gate.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - A successful KV-storage change does not validate quantizing softmax probabilities or QK arithmetic. Quantizer
+    distributions and extreme inputs matter.
+  references:
+  - knowledge/operator/gqa_mqa_attention/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id001
+    summary: Some historical attention cases benefited from FP8 KV storage with wider in-register computation,
+      while narrowing a different dot or intermediate failed its accuracy gate.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/fp8-kv-storage-with-bf16-in-register-dequant-on-scatter-boun-attention-gfx950-memory-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/traffic-is-the-only-live-axis-once-attention-is-scatter-boun-attention-gfx950-memory-bound.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: gqa-head-tile-gather-reuse
+  type: performance_candidate
+  axes:
+  - execution_geometry
+  - attention_semantics
+  match:
+    operator_families:
+    - gqa_mqa_attention
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: When can one program share gathered KV across more query heads?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id002
+  - Grouped heads attend to compatible gathered KV, and output ownership remains separate for every query/head.
+  actions:
+  - Widen the head tile to reduce repeated KV gathers, measuring accumulator pressure and occupancy together.
+  - Inspect QK and PV warp layouts and remove only provably redundant rendezvous or indexing work.
+  - Preserve online-softmax maxima/denominators, per-query masks and ragged-tail handling; validate the supported
+    logit domain.
+  why:
+  - Historical sparse/GQA reports benefited from head-group tiling, but instruction-count reductions and occupancy
+    changes did not translate uniformly to latency.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Do not freeze a softmax maximum, drop normalization updates or clamp logits merely because sampled cases
+    pass. Such changes require an explicit semantic bound or accepted approximation contract.
+  references:
+  - knowledge/operator/gqa_mqa_attention/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id002
+    summary: Historical sparse/GQA reports benefited from head-group tiling, but instruction-count reductions
+      and occupancy changes did not translate uniformly to latency.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/pack-heads-per-workgroup-then-strip-the-inner-loop-attention-gfx950-prefill.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/retile-to-one-program-per-query-then-delete-every-per-trip-r-attention-gfx950-prefill.md
+      artifacts: not_published
+      verification: not_reproduced
 shared_cards:
 - attention-online-softmax-mask

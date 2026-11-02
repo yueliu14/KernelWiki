@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: attention_prefill_fmha
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -88,5 +88,57 @@ cards:
     source_evidence:
     - aiter_b3ad6c46:src_df1d1897d6e20027
     - aiter_b3ad6c46:src_c7b298210cc66981
+- id: prefill-live-path-and-phase
+  type: performance_candidate
+  axes:
+  - implementation_contract
+  - attention_semantics
+  match:
+    operator_families:
+    - attention_prefill_fmha
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Which prefill path and phase actually benefit from an attention change?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id001
+  - A framework routes full attention separately from decode or recurrent-attention layers.
+  actions:
+  - Identify the actual full-attention callable and importing call sites in every worker; compare eligible
+    backend flags without assuming the historical winner transfers.
+  - Specialize a zero-prefix path only behind its real prefix-length contract, preserving nonzero-prefix fallback
+    and per-row causal masking.
+  - Measure serving with its actual prefill/decode mix and unchanged numerical contract.
+  why:
+  - Historical reports found backend flags or short-chunk specialization useful on particular stacks, while
+    isolated prefill gains translated weakly to a decode-heavy workload.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Do not infer a full-model speedup from an isolated prefill ratio. Small numerical changes can affect greedy
+    token selection even when a loose local tolerance passes.
+  references:
+  - knowledge/operator/attention_prefill_fmha/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id001
+    summary: Historical reports found backend flags or short-chunk specialization useful on particular stacks,
+      while isolated prefill gains translated weakly to a decode-heavy workload.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/attention-backend-triton-gfx942.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/prefill-attn-prefix-triton-gfx950-vllm.md
+      artifacts: not_published
+      verification: not_reproduced
 shared_cards:
 - attention-window-prefix-boundaries

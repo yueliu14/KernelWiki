@@ -8,7 +8,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 2 owned cards; 7 shared-card references. Shared cards retain one canonical body in their owning operator.
 
-[Source evidence](source_evidence.md)
+[Canonical decisions](decisions.yaml)
 
 ## Owned decisions
 
@@ -47,7 +47,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 - Keep a simpler implementation with the identical numerical and layout contract for comparison.
 
-#### Evidence
+#### Source evidence
 
 - [aiter_b3ad6c46:src_0c6d9aed9bf8a1da](source_evidence.md#aiter_b3ad6c46-src_0c6d9aed9bf8a1da) — [aiter/ops/flydsl/batched_gemm_a8w8.py:56-78](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8.py#L56-L78).
 - [aiter_b3ad6c46:src_5fe68591fabd20e2](source_evidence.md#aiter_b3ad6c46-src_5fe68591fabd20e2) — [aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py:301-379](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py#L301-L379).
@@ -90,7 +90,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 - Keep a simpler implementation with the identical numerical and layout contract for comparison.
 
-#### Evidence
+#### Source evidence
 
 - [aiter_b3ad6c46:src_48ce71b95815ba5a](source_evidence.md#aiter_b3ad6c46-src_48ce71b95815ba5a) — [aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py:166-200](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py#L166-L200).
 - [aiter_b3ad6c46:src_4036c46474899d75](source_evidence.md#aiter_b3ad6c46-src_4036c46474899d75) — [aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py:131-150](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py#L131-L150).

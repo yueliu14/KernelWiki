@@ -1,0 +1,421 @@
+provenance:
+  schema_version: 5
+  operator_family: general
+  curator_contract: Reusable conditioned conclusions; private run artifacts are not published.
+traits: {}
+cards:
+- id: method-paired-measurement-controls
+  type: performance_candidate
+  axes:
+  - measurement
+  match:
+    operator_families: &id002
+    - attention_decode_paged
+    - attention_indexer
+    - attention_prefill_fmha
+    - batched_gemm
+    - chunked_prefill
+    - compressed_attention
+    - context_parallel_attention
+    - dense_gemm
+    - fused_moe_grouped_gemm
+    - gemm_epilogue_fused
+    - gqa_mqa_attention
+    - grouped_gemm_moe
+    - linear_attention_gated_delta
+    - mla_attention
+    - moe_dispatch_combine
+    - moe_routing_topk
+    - qk_norm_rope_cache
+    - scaled_quant_gemm
+    - shared_expert_fusion
+    - skinny_gemv_decode
+    - sliding_window_attention
+    - sparse_attention_nsa
+    - splitk_streamk_gemm
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: How can a small performance change be distinguished from measurement drift?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id001
+  - The candidate and baseline implement the same contract and are timed under the actual execution protocol.
+  actions:
+  - Interleave paired baseline/candidate blocks in both orders and include an A/A control. Keep warmup, allocations,
+    clocks, power limits and contention comparable.
+  - Report per-case results and uncertainty with the intended workload weights. Choose a justified acceptance
+    rule instead of inheriting a historical fixed percentage.
+  - Check correctness independently of the edited implementation, and separate a counter change from a latency
+    change.
+  why:
+  - Historical experiments found order bias, power/clock drift and timing-bracket effects large enough to reverse
+    small apparent wins.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - A non-overlap rule or median alone is not a universal statistical guarantee. Raw timing histories remain
+    private.
+  experience:
+  - outcome: constraint
+    conditions: *id001
+    summary: Historical experiments found order bias, power/clock drift and timing-bracket effects large enough
+      to reverse small apparent wins.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/method-e2e-ab-harness.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/a-b-in-the-graded-case-mix-and-price-a-direction-against-the-method-gfx950-n-a.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/a-b-protocol-and-oracle-confounds-on-a-power-capped-gpu-method-gfx950-n-a.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/a-fixed-order-a-a-control-measures-order-bias-and-then-hides-method-gfx950-n-a.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/gate-a-tiny-kernel-win-on-a-median-or-a-paired-a-b-method-gfx950-launch-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/measure-a-tiny-op-with-the-harness-s-own-protocol-rotated-ag-method-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/per-rep-geomean-plus-a-two-sided-negative-control-method-gfx950-n-a.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: method-live-binary-and-integration
+  type: performance_candidate
+  axes:
+  - integration
+  match:
+    operator_families: *id002
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: How can an optimization be tied to the code and call path that actually ran?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id003
+  - Compilation caches, imported aliases or serving workers can resolve a different implementation from the
+    edited source.
+  actions:
+  - Record source and binary identities privately; inspect the compiled artifact and prove the intended callable
+    executes in every relevant worker.
+  - After changing module-level flags or included headers, invalidate or isolate the relevant compilation cache
+    and verify that the changed binary was loaded.
+  - Validate graph capture, stream handling, dynamic inputs and repeated calls on the real integration path
+    before measuring end-to-end behavior.
+  why:
+  - Historical summaries repeatedly reported unchanged or stale binaries and unpatched importing call sites
+    being mistaken for optimization results.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - A loaded-module message does not prove the timed path used the candidate. A correct isolated kernel does
+    not establish successful serving integration.
+  experience:
+  - outcome: constraint
+    conditions: *id003
+    summary: Historical summaries repeatedly reported unchanged or stale binaries and unpatched importing call
+      sites being mistaken for optimization results.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/method-cudagraph-safe-integration.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/method-verify-engagement.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/force-the-rebuild-pair-the-blocks-dump-the-registers-before--method-gfx950-n-a.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/prove-the-edit-built-and-prove-the-win-separately-from-the-h-method-gfx950-n-a.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: method-conditional-negative-results
+  type: performance_candidate
+  axes:
+  - experiment_design
+  match:
+    operator_families: *id002
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: When should an optimization direction that previously failed be tested again?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id004
+  - A negative result was obtained for a particular implementation, operating regime and baseline.
+  actions:
+  - Preserve the mechanism and tested conditions of a negative result, then revisit it when dtype, tile, accumulation,
+    cache footprint, compiler or timing protocol changes.
+  - Test a proposed combination against the same baseline and against its strongest component; individually
+    positive changes can interfere or become unreachable after dispatch changes.
+  why:
+  - Several discarded directions became useful after the limiting resource or selected implementation changed;
+    other combinations erased an earlier gain.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - An unmeasured idea, build failure and measured no-gain result are different outcomes. None establishes
+    a permanent prohibition.
+  experience:
+  - outcome: mixed
+    conditions: *id004
+    summary: Several discarded directions became useful after the limiting resource or selected implementation
+      changed; other combinations erased an earlier gain.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/a-closure-is-conditional-on-the-body-that-measured-it-method-gfx950-n-a.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/re-measure-shelved-partials-after-the-bound-class-moves-method-gfx950-n-a.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/re-price-the-dead-list-when-the-operating-point-moves-method-gfx950-compute-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/scope-a-closure-a-gate-and-a-stack-by-case-regime-method-gfx950-n-a.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: method-host-and-replay-floor
+  type: performance_candidate
+  axes:
+  - measurement
+  - integration
+  match:
+    operator_families: *id002
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Is launch or host work inside the metric being optimized?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id005
+  - A small kernel may be dominated by allocation, argument binding, dispatch or graph replay rather than its
+    device body.
+  actions:
+  - Measure eager and captured execution using the actual benchmark bracket; compare a minimal launch/replay
+    control on the same stack.
+  - Use controlled host-delay or allocation probes to determine whether that work is exposed or hidden by queued
+    GPU work.
+  - Recheck state lifetime and allocator behavior before attributing periodic per-case differences to device
+    code.
+  why:
+  - Some reports benefited from reducing host work while others timed only captured device execution or paid
+    more for graph replay than for a direct launch.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Device time and host time from different profiling protocols cannot simply be subtracted to claim exact
+    overhead. Empty controls bound possibilities; they are not deployable implementations.
+  experience:
+  - outcome: mixed
+    conditions: *id005
+    summary: Some reports benefited from reducing host work while others timed only captured device execution
+      or paid more for graph replay than for a direct launch.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/a-stuck-tiny-case-may-be-floored-by-the-timing-bracket-not-t-method-gfx950-launch-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/test-the-allocator-before-designing-a-kernel-fix-for-a-perio-method-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/the-host-lane-pays-once-the-exhaustion-test-is-submit-cost-v-method-gfx950-both.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: method-causal-resource-model
+  type: performance_candidate
+  axes:
+  - resource_model
+  - experiment_design
+  match:
+    operator_families: *id002
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: How should roofline and counter observations guide a concrete experiment?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id006
+  - The deployed CU count, dtype, shape and execution boundaries are known.
+  actions:
+  - Count required bytes and FLOPs for the actual semantics, including sparse gathers, partial buffers and
+    scale metadata; use the resources actually available to the process.
+  - Attribute instructions and dependencies to the hot region, and compare plausible traffic/compute bounds
+    to a matching measurement.
+  - Use a controlled ablation to test the proposed cause. A deliberately incomplete control must stay separate
+    from correctness-gated candidate results.
+  why:
+  - Historical reports found inflated peak denominators, removable scratch traffic and misleading instruction/counter
+    proxies behind apparently exhausted kernels.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - A high counter or fraction of peak does not prove that reducing it will improve latency. Bounds and measured
+    performance are separate claims.
+  experience:
+  - outcome: constraint
+    conditions: *id006
+    summary: Historical reports found inflated peak denominators, removable scratch traffic and misleading
+      instruction/counter proxies behind apparently exhausted kernels.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/hand-count-the-bytes-and-build-a-read-only-twin-before-staff-method-gfx950-decode.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/per-region-isa-census-before-hot-loop-tuning-locate-on-cpu-p-method-gfx950-n-a.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/scale-percent-of-peak-to-the-cus-the-box-actually-exposes-method-gfx950-compute-bound.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: method-register-limited-occupancy
+  type: performance_candidate
+  axes:
+  - resource_model
+  match:
+    operator_families: *id002
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: What resource limits occupancy on a matrix-core kernel?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id007
+  - Matrix instructions use architecture-specific vector and accumulator register allocation.
+  actions:
+  - Use the code object and the target architecture allocation rules to account for VGPRs, AGPRs, LDS, waves
+    and workgroups together.
+  - Verify achieved residency and scratch behavior after a change; lower register counts or higher waves per
+    SIMD are not sufficient evidence of improved throughput.
+  why:
+  - A historical CDNA4 analysis found that counting only one register class overestimated available occupancy.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Register accounting is architecture- and toolchain-specific; no fixed register budget or waves-per-CU target
+    applies to every device.
+  experience:
+  - outcome: constraint
+    conditions: *id007
+    summary: A historical CDNA4 analysis found that counting only one register class overestimated available
+      occupancy.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/cdna4-sums-archvgpr-and-agpr-for-occupancy-method-gfx950-n-a.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: method-end-to-end-attribution
+  type: performance_candidate
+  axes:
+  - measurement
+  - experiment_design
+  match:
+    operator_families: *id002
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: How should isolated improvements be evaluated as an end-to-end change?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id008
+  - The workload contains multiple kernels or phases, potentially with host work and communication overlap.
+  actions:
+  - Screen a candidate using its time share within a clearly stated boundary, then measure the full workload
+    with the intended phase mix and topology.
+  - Report a combined improvement as a combined result unless independent ablations isolate component effects.
+  - Retain correct modest improvements only when the final combination passes the full correctness and performance
+    gate.
+  why:
+  - Historical serving summaries found that individually small kernels and phase-specific gains did not translate
+    proportionally to whole-model throughput.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Do not multiply a time share by a phase fraction a second time if the measured share already includes that
+    phase weighting. An Amdahl estimate is a model, not a measured serving gain.
+  experience:
+  - outcome: mixed
+    conditions: *id008
+    summary: Historical serving summaries found that individually small kernels and phase-specific gains did
+      not translate proportionally to whole-model throughput.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/editable-triton-cluster-amdahl.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: method-grid-and-lifetime-contract
+  type: performance_candidate
+  axes:
+  - resource_model
+  - integration
+  match:
+    operator_families: *id002
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: When can a new grid axis improve a composed kernel chain?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id009
+  - A stage partitions only tokens while another independent dimension can supply useful parallelism.
+  actions:
+  - Check useful workgroups against available CUs, then partition the independent dimension while preserving
+    output ownership and producer/consumer lifetimes.
+  - Hoist invariant bounds checks only when the full dynamic domain is covered; inspect the generated code
+    and validate tails.
+  - Measure each stage and the complete chain after combining grid, tile and fusion changes.
+  why:
+  - A historical composed TileLang chain benefited from exposing hidden-dimension parallelism and removing
+    invariant loop work; further fusion did not automatically improve the result.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - The original combined speedup cannot be assigned independently to each technique. More workgroups may increase
+    memory traffic or change the limiting resource.
+  experience:
+  - outcome: mixed
+    conditions: *id009
+    summary: A historical composed TileLang chain benefited from exposing hidden-dimension parallelism and
+      removing invariant loop work; further fusion did not automatically improve the result.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/fill-the-cus-with-a-hidden-dim-block-axis-then-hoist-the-k-l-composable-gfx950-both.md
+      artifacts: not_published
+      verification: not_reproduced
+shared_cards: []

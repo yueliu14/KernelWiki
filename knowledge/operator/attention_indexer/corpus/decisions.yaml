@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: attention_indexer
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -306,4 +306,54 @@ cards:
   - The decode-only row/indptr contract cannot be assumed valid for arbitrary prefill queries.
   references:
   - knowledge/operator/attention_indexer/README.md
+- id: indexer-single-query-vector-path
+  type: performance_candidate
+  axes:
+  - compute_schedule
+  - score_semantics
+  match:
+    operator_families:
+    - attention_indexer
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: When can a single-query index score use a vector reduction instead of a degenerate matrix product?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id001
+  - Exactly one query is scored and the reference operation is the corresponding dot product over the same
+    keys/features.
+  actions:
+  - Compare an FP32 multiply/reduce specialization with the matrix path, preserving the score formula, masks
+    and output layout.
+  - Keep the multi-query fallback and its required FP32 accumulation for low-precision cache inputs.
+  why:
+  - A historical sparse-attention report included a separate decode index-score vector specialization alongside
+    its prefill sub-tiling change.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - A combined serving improvement does not isolate this specialization. Reduction-order and low-precision
+    accuracy must pass the unchanged accepted gate.
+  references:
+  - knowledge/operator/attention_indexer/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id001
+    summary: A historical sparse-attention report included a separate decode index-score vector specialization
+      alongside its prefill sub-tiling change.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/sparse-attn-triton2triton-opt-gfx942-gfx950.md
+      artifacts: not_published
+      verification: not_reproduced
 shared_cards: []

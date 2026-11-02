@@ -5,7 +5,7 @@
 
 Dense attention and FFN projections; prefill versus decode tiling.
 
-8 AITER implementation references; 16 historical experience cards.
+8 AITER implementation references; 18 owned corpus decisions.
 
 ## AITER implementations
 
@@ -27,9 +27,9 @@ Each page pins its source revision. Source references describe implementations a
 - [AITER FlyDSL A16W16: useful tiles and occupancy-aware policy](backend/flydsl_notes.md)
 - [AITER OPUS: exact kernel ids and shape-driven dispatch](backend/opus_notes.md)
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ### Historical case studies
 

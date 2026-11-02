@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 4
+  schema_version: 5
   operator_family: scaled_quant_gemm
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -638,6 +638,228 @@ cards:
   - The helpers are the A8/MoE family's; the HGEMM stages its operands with its own code, and a block-scale
     kernel adds scale loads these helpers do not cover.
   - Which width is fastest for a tile is a measurement; the helpers state which widths are legal.
+- id: quant-gemm-format-reinterpretation
+  type: performance_candidate
+  axes:
+  - compute_instruction
+  - configuration_constraints
+  match:
+    operator_families:
+    - scaled_quant_gemm
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: When can a legacy FP8 representation use the native matrix instruction without a conversion pass?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id001
+  - A specific pair of FP8 encodings differs by a proven scale relationship on the allowed input domain.
+  actions:
+  - Derive the operand-wise scale relationship, including sign, subnormal, zero, NaN and saturation encodings;
+    enumerate all byte codes for any claim of exact conversion.
+  - Use reinterpretation only behind a predicate proving that relationship for the actual quantizer outputs,
+    and compensate the product scale in the permitted arithmetic location.
+  - Confirm the intended native MFMA in the generated code, validate cancellation-sensitive outputs and re-tune
+    for its K depth.
+  why:
+  - Some historical FP8 GEMMs replaced emulated conversions with native instructions, while incorrect scale
+    direction or special-value encodings broke parity.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - There is no universal FNUZ-to-OCP bitcast or constant multiplier valid for every encoding. If the full
+    input domain cannot be proven, retain the explicit correct conversion.
+  references:
+  - knowledge/operator/scaled_quant_gemm/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id001
+    summary: Some historical FP8 GEMMs replaced emulated conversions with native instructions, while incorrect
+      scale direction or special-value encodings broke parity.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/bitcast-the-fp8-flavour-the-matrix-pipe-actually-has-dense-gemm-gfx950-both.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/bit-exact-integer-re-encode-of-the-fp8-fnuz-upcast-quantized-gemm-gfx950-compute-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/reinterpret-legacy-fp8-bits-to-the-arch-native-fp8-type-to-r-quantized-gemm-gfx950-compute-bound.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: quant-gemm-engaged-tuning-surface
+  type: performance_candidate
+  axes:
+  - runtime_contract
+  - implementation_variant
+  match:
+    operator_families:
+    - scaled_quant_gemm
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Which configuration or source edit controls the live FP8 blockscale GEMM?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id002
+  - A framework selects among CK, preshuffled CK or authored blockscale implementations.
+  actions:
+  - Identify the called symbol and exact scale/layout contract before choosing a configuration database or
+    source rewrite.
+  - Match preshuffle, scale granularity, output dtype and all lookup fields to the live path; inspect version-specific
+    environment override semantics.
+  - Measure the complete deployed path, including any conversion, startup, memory and communication effects.
+  why:
+  - Historical FP8 reports used different valid levers on different stacks; a configuration file for a sibling
+    path could be ignored despite a plausible isolated result.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - A deprecated overlay is not a current recommendation. An arbitrary-fp32 block scale must not be silently
+    rounded to E8M0.
+  references:
+  - knowledge/operator/scaled_quant_gemm/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id002
+    summary: Historical FP8 reports used different valid levers on different stacks; a configuration file for
+      a sibling path could be ignored despite a plausible isolated result.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/fp8-blockscale-dense-gemm-authored-triton-gfx950-vllm.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/fp8-a8w8-blockscale-bpreshuffle-ck-tune-gfx950-sglang.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/fp8-a8w8-blockscale-ck-tune-gfx950-vllm.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: mxfp8-shape-specific-native-path
+  type: performance_candidate
+  axes:
+  - workgroup_tile
+  - work_partition
+  - runtime_contract
+  match:
+    operator_families:
+    - scaled_quant_gemm
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: How should a native per-32 E8M0 GEMM be tuned across prefill and decode?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id003
+  - The live kernel consumes MXFP8 payloads and per-32 E8M0 scales, rather than a dense BF16 or arbitrary-fp32-scale
+    GEMM ABI.
+  actions:
+  - Tune the native path by the served shape regimes and validate decode buckets as well as prefill.
+  - Keep format/scale layout checks at the dispatch boundary; compare split-K including reduction and scratch
+    costs.
+  - Evaluate end-to-end behavior at the intended concurrency and phase mix rather than transferring a kernel-only
+    ratio.
+  why:
+  - Historical MXFP8 summaries reported shape-dependent tile and split-K gains, with substantially different
+    serving effects at different concurrency regimes.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Specific BLOCK_K/BLOCK_N values are historical candidates, not defaults. A dense BF16 tuning database does
+    not control an unrelated native MXFP8 callable.
+  references:
+  - knowledge/operator/scaled_quant_gemm/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id003
+    summary: Historical MXFP8 summaries reported shape-dependent tile and split-K gains, with substantially
+      different serving effects at different concurrency regimes.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/mxfp8-dense-linear-gemm-gfx950.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/mxfp8-microscale-gemm-gfx950.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/mxfp8-e8m0-dense-linear-gfx950.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/mxfp8-linear-decode-rewrite-gfx950.md
+      artifacts: not_published
+      verification: not_reproduced
+- id: quant-gemm-dequant-dependency-chain
+  type: performance_candidate
+  axes:
+  - compute_instruction
+  - pipeline_schedule
+  - operand_layout
+  match:
+    operator_families:
+    - scaled_quant_gemm
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+    - hip
+    - ck
+    - asm
+    - tilelang
+  question: Which dequantization work is on the GEMM critical path?
+  evidence_level: reported_experience
+  status: candidate_only
+  conditions: &id004
+  - Conversion, scale lookup or repacking lies on the operand-to-MFMA dependency chain.
+  actions:
+  - Separate scale gathering, conversion, repacking and arithmetic costs in the generated loop; target the
+    dependent chain rather than static instruction count alone.
+  - Fold exactly representable constants and collapse scale broadcasts only when the tensor indexing and scale
+    granularity prove equivalence.
+  - Sweep sub-K grouping and overlap jointly with register/LDS budgets while preserving required reduction
+    order; re-test after each conversion-path change.
+  why:
+  - Historical reports found useful conversion/packing and two-dot overlap changes, alongside occupancy, prefetch
+    and instruction-cut variants that were neutral or slower.
+  alternatives:
+  - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Do not average distinct K-group scales or move them outside a contraction without an algebraic proof. A
+    scale-free diagnostic is an upper-bound probe, not a correct candidate.
+  references:
+  - knowledge/operator/scaled_quant_gemm/README.md
+  - knowledge/general/README.md
+  experience:
+  - outcome: mixed
+    conditions: *id004
+    summary: Historical reports found useful conversion/packing and two-dot overlap changes, alongside occupancy,
+      prefetch and instruction-cut variants that were neutral or slower.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/axes-that-closed-on-a-parity-gated-fp8-gemm-quantized-gemm-gfx950-compute-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/collapse-the-dequant-chain-in-a-block-scaled-fp8-gemm-quantized-gemm-gfx950-compute-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/collapse-the-fp8-dequant-chain-into-one-scaled-convert-quantized-gemm-gfx950-compute-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/five-closed-axes-above-an-ilp-bound-block-scaled-fp8-gemm-quantized-gemm-gfx950-compute-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/sub-k-coarsening-regroup-the-same-reduction-order-into-fewer-quantized-gemm-gfx950-compute-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/the-residual-axes-on-a-decoded-fp8-gemm-are-already-closed-quantized-gemm-gfx950-compute-bound.md
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/where-the-headroom-is-not-and-the-two-floors-that-tell-you-s-quantized-gemm-gfx950-compute-bound.md
+      artifacts: not_published
+      verification: not_reproduced
 shared_cards:
 - flydsl-async-copy-by-family
 - flydsl-cshuffle-epilogue

@@ -8,7 +8,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 2 owned cards; 0 shared-card references. Shared cards retain one canonical body in their owning operator.
 
-[Source evidence](source_evidence.md)
+[Canonical decisions](decisions.yaml)
 
 ## Design traits
 
@@ -53,7 +53,7 @@ A required trait must be established for the actual design before the card appli
 
 - Synchronize and add the shared expert in a separate step as a correctness baseline.
 
-#### Evidence
+#### Source evidence
 
 - [aiter_b3ad6c46:src_655dabf7c3f76085](source_evidence.md#aiter_b3ad6c46-src_655dabf7c3f76085) — [aiter/ops/flydsl/comm_fused_moe_host.py:1206-1213](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/comm_fused_moe_host.py#L1206-L1213).
 
@@ -97,7 +97,7 @@ A required trait must be established for the actual design before the card appli
 
 - Keep a simpler implementation with the identical numerical and layout contract for comparison.
 
-#### Evidence
+#### Source evidence
 
 - [aiter_b3ad6c46:src_ca185a9d80571fcd](source_evidence.md#aiter_b3ad6c46-src_ca185a9d80571fcd) — [aiter/ops/flydsl/comm_fused_moe_host.py:774-801](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/comm_fused_moe_host.py#L774-L801).
 - [aiter_b3ad6c46:src_b4f6dd82b97d2c6c](source_evidence.md#aiter_b3ad6c46-src_b4f6dd82b97d2c6c) — [aiter/ops/flydsl/comm_fused_moe_host.py:1064-1078](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/comm_fused_moe_host.py#L1064-L1078).

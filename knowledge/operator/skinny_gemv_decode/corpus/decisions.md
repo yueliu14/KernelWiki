@@ -8,7 +8,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 2 owned cards; 18 shared-card references. Shared cards retain one canonical body in their owning operator.
 
-[Source evidence](source_evidence.md)
+[Canonical decisions](decisions.yaml)
 
 ## Design traits
 
@@ -68,7 +68,7 @@ A required trait must be established for the actual design before the card appli
 - Port the HIP skinny kernels' structure instead — rows spread over CUs, K split across the lanes of a wave, no combine (gemm-skinny-decode-wave-split). That is what AITER's default route runs for an untuned bf16 decode case, on both architectures.
 - Keep the generic default configuration as the control arm regardless of which family is chosen.
 
-#### Evidence
+#### Source evidence
 
 - [aiter_a6bb4993:src_38699a8ce57faf0c](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_38699a8ce57faf0c) — [aiter/ops/flydsl/kernels/hgemm_dispatch.py:8](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/hgemm_dispatch.py#L8).
 - [aiter_a6bb4993:src_8ffea30406cf0355](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_8ffea30406cf0355) — [aiter/ops/flydsl/kernels/hgemm_dispatch.py:9](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/hgemm_dispatch.py#L9).
@@ -135,7 +135,7 @@ A required trait must be established for the actual design before the card appli
 
 - An MFMA tile with split-K across workgroups (gemm-split-k-when-grid-underfills) — what the FlyDSL HGEMM and the Triton baselines do at decode.
 
-#### Evidence
+#### Source evidence
 
 - [aiter_a6bb4993:src_b8e76e6d00fd7ca3](source_evidence.md#aiter_a6bb4993-src_b8e76e6d00fd7ca3) — [csrc/kernels/custom_kernels.cu:2229](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/csrc/kernels/custom_kernels.cu#L2229).
 - [aiter_a6bb4993:src_abfa46c903cb04ea](source_evidence.md#aiter_a6bb4993-src_abfa46c903cb04ea) — [csrc/kernels/custom_kernels.cu:1736](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/csrc/kernels/custom_kernels.cu#L1736).

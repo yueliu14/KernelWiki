@@ -5,7 +5,7 @@
 
 FP8, INT8, FP4 and microscaled projections, including packing and scale contracts.
 
-8 AITER implementation references; 18 historical experience cards.
+8 AITER implementation references; 12 owned corpus decisions.
 
 ## AITER implementations
 
@@ -27,9 +27,9 @@ Each page pins its source revision. Source references describe implementations a
 - [FP4 GEMM input and output contracts](backend/asm_notes.md)
 - [OPUS FP8 GEMM: scale and preshuffle families](backend/opus_notes.md)
 
-## Optimization experience
+## Development decisions
 
-[Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
 ### Historical case studies
 

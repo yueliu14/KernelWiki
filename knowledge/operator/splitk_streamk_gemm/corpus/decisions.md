@@ -8,7 +8,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 3 owned cards; 15 shared-card references. Shared cards retain one canonical body in their owning operator.
 
-[Source evidence](source_evidence.md)
+[Canonical decisions](decisions.yaml)
 
 ## Design traits
 
@@ -52,6 +52,7 @@ A required trait must be established for the actual design before the card appli
 - Choose the combine together with the split, because split-K is not a knob on its own: the FlyDSL HGEMM initialises the output from split 0 and atomically adds the others (flydsl-splitk-reduction-contract), Triton writes fp32 partials and runs a separate reduce kernel, ASM multiplies the launch grid by the split. An authored kernel has to pick one and supply its host-side state.
 - Re-check numerics with the split: a different accumulation order — and, in FlyDSL's atomic combine, adding partials already rounded to the output dtype — changes the result, so gate against the task's oracle at its stated tolerance.
 - Seed from where AITER shipped split-K: FlyDSL bf16 on gfx950 selects split_k > 1 in 83 of 86 rows at M<=16 and 38 of 45 at M 17-64, and split_k = 1 in every row above M = 256; Triton's gfx942 fp8 block-scale configs vary NUM_KSPLIT (1 to 16) only in the buckets up to M<=512 and fix it at 1 from M<=1024 on.
+- Re-tune the body after enabling split-K and include partial-output/reduction costs; test shallow splits before deeper partitioning.
 
 #### Rationale
 
@@ -70,7 +71,7 @@ A required trait must be established for the actual design before the card appli
 - **asm** — the launcher scores every (kernel, split) of the architecture by rounds = ceil(tiles*split / CUs), keeps the fewest rounds, and multiplies the launch grid by the split; the bf16 launcher caps split at min(CUs / output tiles, 16, K / sub_k) [aiter_a6bb4993:src_4044f249c79abf90](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_4044f249c79abf90), [aiter_a6bb4993:src_b07a8dc43c913b9d](../../scaled_quant_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_b07a8dc43c913b9d), [aiter_a6bb4993:src_3528bd18e9f8f895](../../scaled_quant_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_3528bd18e9f8f895), [aiter_a6bb4993:src_787ebf8727d0c7e1](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_787ebf8727d0c7e1)
 - **hip** — the decode skinny kernels split K across the lanes of a wave instead of across workgroups: weight rows are spread over CUs x YTILE (`mindiv`) and each lane's partial is reduced with cross-lane shuffles, so nothing is combined in memory [aiter_a6bb4993:src_4afbdde799d96232](../../skinny_gemv_decode/corpus/source_evidence.md#aiter_a6bb4993-src_4afbdde799d96232), [aiter_a6bb4993:src_0b8de37c2b304d4a](../../skinny_gemv_decode/corpus/source_evidence.md#aiter_a6bb4993-src_0b8de37c2b304d4a)
 
-#### Evidence
+#### Source evidence
 
 - [aiter_a6bb4993:src_642476c9b693d5f1](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_642476c9b693d5f1) — [aiter/ops/flydsl/gemm_kernels.py:229-246](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/gemm_kernels.py#L229-L246).
 - [aiter_a6bb4993:src_58d4bf39e7ca8f03](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_58d4bf39e7ca8f03) — [aiter/ops/flydsl/gemm_kernels.py:397-399](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/gemm_kernels.py#L397-L399).
@@ -82,6 +83,16 @@ A required trait must be established for the actual design before the card appli
 - Shipped selection: [aiter_a6bb4993:cfg_d2642e1347a53ea1](../../dense_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_d2642e1347a53ea1); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:cfg_c23460f537b313ac](../../dense_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_c23460f537b313ac); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:cfg_da4a49e152c50056](../../dense_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_da4a49e152c50056); no measurement is inferred.
+
+#### Reported experience
+
+Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
+
+- **mixed** — A historical small-M case benefited from a shallow split, while deeper splits lost the benefit to reduction overhead.
+  Conditions: A reported gfx950 quantized GEMM had small-M grid underfill and sufficient K work to partition.
+  Verification: <code>not_reproduced</code>.
+  Sources: [Historical summary 1](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/split-k-by-2-to-fill-the-grid-on-the-tiny-m-case-quantized-gemm-gfx950-small-batch.md)
+
 
 #### Background
 
@@ -95,6 +106,7 @@ A required trait must be established for the actual design before the card appli
 - Whether split-K pays for a shape is a measurement; the tile count says when it is worth trying, not that it wins.
 - The CU counts are hardware facts from the background docs, not from this source.
 - A split that fills the grid can still be illegal for its combine: the FlyDSL HGEMM counters allow at most 128 output tiles when split_k > 1.
+- Splitting changes the reduction tree and can fail a strict numerical contract even if each partition is individually valid.
 
 <a id="flydsl-splitk-hot-loop-schedule-bundle"></a>
 ### What explicit instruction-order bundle can seed a hand-scheduled FlyDSL split-K GEMM hot loop?
@@ -135,7 +147,7 @@ A required trait must be established for the actual design before the card appli
 
 - **ck** — a named loop scheduler (`BlockGemmPipelineScheduler::Intrawave` / `Interwave`) plus a pipeline version chosen per template instance [aiter_a6bb4993:src_75b377d9dfc10083](../../scaled_quant_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_75b377d9dfc10083), [aiter_a6bb4993:src_bb0d15e277ff0a86](../../scaled_quant_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_bb0d15e277ff0a86), [aiter_a6bb4993:src_6a2107cadf863683](../../scaled_quant_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_6a2107cadf863683)
 
-#### Evidence
+#### Source evidence
 
 - [aiter_a6bb4993:src_5da6811a509d9806](source_evidence.md#aiter_a6bb4993-src_5da6811a509d9806) — [aiter/ops/flydsl/kernels/splitk_hgemm.py:688](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/splitk_hgemm.py#L688).
 - [aiter_a6bb4993:src_b0da890c19bc671e](source_evidence.md#aiter_a6bb4993-src_b0da890c19bc671e) — [aiter/ops/flydsl/kernels/splitk_hgemm.py:690](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/splitk_hgemm.py#L690).
@@ -196,7 +208,7 @@ A required trait must be established for the actual design before the card appli
 - **triton** — partial buffers per K split plus a reduce kernel (`NUM_KSPLIT`, `ACTUAL_KSPLIT`/`MAX_KSPLIT`), or `tl.atomic_add` into the output in the atomic variant [aiter_a6bb4993:src_0f50a57ed622a4f4](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_0f50a57ed622a4f4), [aiter_a6bb4993:src_8f1fdafc50973349](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_8f1fdafc50973349), [aiter_a6bb4993:src_f5043ecafb832fa0](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_f5043ecafb832fa0), [aiter_a6bb4993:src_9e9cdadae23d0f5f](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_9e9cdadae23d0f5f)
 - **asm** — the split count is part of the selected object's config and becomes the launch grid's z dimension [aiter_a6bb4993:src_05e16505bb238998](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_05e16505bb238998), [aiter_a6bb4993:src_4044f249c79abf90](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_4044f249c79abf90)
 
-#### Evidence
+#### Source evidence
 
 - [aiter_a6bb4993:src_1a4b9ad5c5b109de](source_evidence.md#aiter_a6bb4993-src_1a4b9ad5c5b109de) — [aiter/ops/flydsl/kernels/splitk_hgemm.py:296-391](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/splitk_hgemm.py#L296-L391).
 - [aiter_a6bb4993:src_ad151ebc96795a5e](source_evidence.md#aiter_a6bb4993-src_ad151ebc96795a5e) — [aiter/ops/flydsl/kernels/splitk_hgemm.py:393-432](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/splitk_hgemm.py#L393-L432).
