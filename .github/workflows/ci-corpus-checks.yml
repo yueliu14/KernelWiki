@@ -6,7 +6,7 @@ name: corpus checks
 # cards and generated reading pages. Validate their schemas, ownership, references and
 # generated artifacts without a consumer checkout.
 #
-# Source extraction and citation audits read AITER git objects pinned by corpus/catalog.yaml.
+# Source extraction and citation audits use snapshots in knowledge/operator/catalog.yaml.
 # Run tools/corpus/extract.py --check and validate.py --verify-source when refreshing sources;
 # this offline job does not fetch the upstream repository or execute GPU tests.
 

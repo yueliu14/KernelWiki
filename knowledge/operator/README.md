@@ -3,7 +3,7 @@
 The operator collection focuses on the main LLM inference workloads: GEMM, MoE, attention and attention indexers, including their variants and fusions. Start with a workload family, then follow its backend implementations and run-derived lessons.
 
 Every operator below owns a `corpus/` directory containing structured development cards, pinned
-source evidence, extraction scope and performance axes. The [corpus catalog](../../corpus/README.md)
+source evidence, extraction scope and performance axes. The [corpus catalog](CORPUS.md)
 lists all 23 corpora and their shared-card references. These cards organize conditions, alternatives
 and implementation constraints; the operator pages provide broader explanations and historical
 experience. The table's learned-card counts describe historical experience separately from corpus cards.

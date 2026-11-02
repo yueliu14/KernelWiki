@@ -1,8 +1,9 @@
 # Corpus production and validation
 
-Knowledge lives in `knowledge/operator/<operator>/corpus/`. The root
-[`catalog`](../../corpus/catalog.yaml) declares operator directories, aliases, workload groups and
-source snapshots. It is schema version 2; the former family-level file layout is retired.
+Knowledge lives in `knowledge/operator/<operator>/corpus/`. The
+[`catalog`](../../knowledge/operator/catalog.yaml) declares operator directories, aliases, workload
+groups and source snapshots; the generated [corpus index](../../knowledge/operator/CORPUS.md)
+lives beside it. The catalog uses schema version 2 and repository-relative paths.
 
 ## Commands
 

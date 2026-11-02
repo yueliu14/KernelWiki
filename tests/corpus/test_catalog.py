@@ -47,10 +47,11 @@ def test_generated_pages_and_relative_links(op, catalog):
                 assert f'<a id="{fragment}"></a>' in destination.read_text(), (path, target)
 
 
-def test_root_corpus_is_a_thin_catalog(catalog):
-    directory = catalog.root / 'corpus'
-    assert {p.name for p in directory.iterdir() if p.is_file()} == {'README.md', 'catalog.yaml'}
+def test_corpus_index_lives_with_the_operators(catalog):
+    directory = catalog.root / 'knowledge/operator'
+    assert (directory / 'catalog.yaml').is_file()
     path, text = build.render_index(catalog)
+    assert path == directory / 'CORPUS.md'
     assert path.read_text() == text
 
 

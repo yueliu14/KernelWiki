@@ -1,4 +1,0 @@
-# Install ROCm-compatible PyTorch and its matching Triton build.
-torch>=2.6
-triton>=3.2
-# benchmark.py also uses the KernelWiki SDK installed from this repository.

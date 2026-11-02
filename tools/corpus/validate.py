@@ -42,7 +42,7 @@ def source_refs(card):
 class Catalog:
     def __init__(self, root=ROOT):
         self.root = Path(root).resolve()
-        self.data = read(self.root / "corpus/catalog.yaml")
+        self.data = read(self.root / "knowledge/operator/catalog.yaml")
         if self.data.get("schema_version") != 2:
             raise ValueError("expected operator-local catalog schema_version 2")
         self.snapshots = self.data["snapshots"]

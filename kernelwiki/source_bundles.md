@@ -1,12 +1,9 @@
-# Kernel source collection
+# Kernel source-bundle format
 
-Store complete implementations that can be called, tested and benchmarked. Organize each entry as `kernels/<operator>/<backend>/<implementation>/`. Textual explanations and lessons remain under [knowledge](../knowledge/README.md).
-
-## Included implementation
-
-| Implementation | Applicability | Evidence |
-| --- | --- | --- |
-| [AITER row-tiled RMSNorm](rmsnorm/triton/aiter_row_tiled/README.md) | Triton, gfx942/gfx950, BF16/FP16, M > 8192 and N <= 2048 | Pinned source and upstream-reported ratios; extracted bundle has not been GPU-tested locally |
+The [KernelWiki API](README.md) stores complete implementations that can be called, tested and
+benchmarked. A local collection uses `<collection-root>/<operator>/<backend>/<implementation>/`.
+Supply your own source collection or use a remote store. Textual explanations and lessons live
+under [knowledge](../knowledge/README.md).
 
 ## Required bundle contents
 
@@ -21,7 +18,7 @@ Files are explicitly declared in metadata. Cache files, environment files and un
 
 ## Metadata
 
-Use [the RMSNorm metadata](rmsnorm/triton/aiter_row_tiled/metadata.yaml) as a complete example.
+Each source bundle declares the following metadata in `metadata.yaml`.
 
 | Field | Meaning |
 | --- | --- |
@@ -52,6 +49,6 @@ Evidence may use an external HTTP/KB/object-store/run reference. A local evidenc
 
 ## Curating and retrieving code
 
-Use Git to review and evolve the source collection. The [KernelWiki API](../kernelwiki/README.md) can add or fetch local entries, and upload/download complete candidates through the existing GEAK KB service. Local `put()` is idempotent for identical content and refuses to overwrite a different existing implementation. Remote revisions coexist and can be retrieved by their full digest.
+Use Git to review and evolve your source collection. The [KernelWiki API](README.md) can add or fetch local entries, and upload/download complete candidates through the existing GEAK KB service. Local `put()` is idempotent for identical content and refuses to overwrite a different existing implementation. Remote revisions coexist and can be retrieved by their full digest.
 
 Link a curated entry from its operator/backend knowledge page. Preserve useful lessons from unsuccessful runs in `learned_knowledge/`, with the exact code and measurement references that support them.

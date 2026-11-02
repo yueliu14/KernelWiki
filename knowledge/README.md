@@ -2,7 +2,7 @@
 
 - [Operators](operator/README.md): GEMM, MoE, attention and indexer implementations, variants, fusions and lessons for LLM inference.
 - [General knowledge](general/README.md): profiling, optimization, backend programming, hardware and reusable recipes.
-- [Kernel source collection](../kernels/README.md): complete implementations with entry points, dependencies, tests and benchmarks.
+- [Operator corpus](operator/CORPUS.md): structured development cards, pinned source evidence and configuration records.
 
 ## Reading a backend page
 
@@ -20,6 +20,10 @@ Keep new operator entries within GEMM, MoE, attention or attention indexers and 
 
 Put operator-specific implementation knowledge under `operator/<op>/backend/`; put transferable run-derived lessons under that operator's `learned_knowledge/`. Put methods that apply across operators under `general/`. Add a local navigation link and cite the relevant source or measurement. AITER implementation links should include a commit.
 
-Store reusable code as a complete source bundle under `kernels/<operator>/<backend>/<implementation>/`. Link its implementation ID from the corresponding knowledge page. Include the exact source digest with measured results; historical patch references remain historical evidence, not the current storage format. All repository documentation and comments use English.
+Put structured evidence and development cards under `operator/<op>/corpus/`; follow the
+[corpus maintenance guide](../tools/corpus/README.md). Cite reusable implementations through pinned
+upstream source links or source-bundle references. Include the exact source digest with measured
+results; historical patch references retain their original context. All repository documentation
+and comments use English.
 
 The AITER references prioritize inference-relevant files changed from 2026-07-21 through 2026-10-21. Backend pages can link shared source files or test suites containing both forward and backward code; the documented target is inference, with gradients and dropout disabled. Older GEAK evidence retains its original context. There is no scheduled update process or automatic best-kernel promotion.
