@@ -1,0 +1,74 @@
+reviewed_on: '2026-10-28'
+evidence_kind: source_inspection_and_local_reports
+access: Local artifacts are not bundled in KernelWiki. Resolve each path against its named root and verify
+  its SHA-256 before reuse. The CI run is a workload reference, not a public copy of these sources.
+roots:
+  c8_extraction: /shared_nfs/yueliu14/musespark_c8_opt_1023_hongtaom/target/kernel_extract_c8
+  earlier_run: /shared_nfs/yueliu14/muse_spark_opt_1021/handoff_1026
+artifacts:
+- id: c8_environment
+  root: c8_extraction
+  path: environment.json
+  sha256: 2c764d2b6f7977c44c68049250797f83b07f7f687cfa5c3796c77c622f77cc4f
+  supports: Serving configuration, image digest and installed versions.
+- id: c8_report
+  root: c8_extraction
+  path: REPORT.md
+  sha256: c039e09add622cc6e83a558bc53c7feaf0d120e1c7ff800940676a543c0c9354
+  supports: Extraction-reported coverage, task boundaries and evidence limitations.
+- id: qkv_source
+  root: c8_extraction
+  path: tasks/decode_qkv_proj_qk_norm_rope_cache/kernel_src/qk_norm_rope_cache.py
+  sha256: 6a9433935acbe2f4e3e491bb767d3bf367f6d56148196fa8fe2978c68833d0a7
+  supports: qkv_proj_qk_norm_rope_cache; _dense_partial; _project_slice; _norm_rope; _qkv_epilogue.
+- id: qkv_metadata
+  root: c8_extraction
+  path: tasks/decode_qkv_proj_qk_norm_rope_cache/meta.json
+  sha256: 573e72752e53aca9f2657b7c82f4b503d09fbb75bed4cba076b4a2d0954b3247
+  supports: Observed branches, shapes, cache mutation and oracle coverage.
+- id: qkv_provenance
+  root: c8_extraction
+  path: tasks/decode_qkv_proj_qk_norm_rope_cache/kernel_src/PROVENANCE.json
+  sha256: b8fb17d040989e9f6f75e08e1da5beda8116e1bc0694907df9dfbb8e0c8e6fb7
+  supports: Installed source hashes, extraction transformation and image provenance.
+- id: router_source
+  root: c8_extraction
+  path: tasks/decode_joint_router_pooler_topk/kernel_src/router_pooler_topk.py
+  sha256: 393125bc188612d369a12e1b901ab3f5d7d74047593714628fe3a0a85f0a774e
+  supports: pack_joint_router_pooler_weight; joint_router_pooler_topk; _joint_epilogue.
+- id: router_metadata
+  root: c8_extraction
+  path: tasks/decode_joint_router_pooler_topk/meta.json
+  sha256: 01feb3ab0a0caecdd98efaeb03f302c9923b6a872f116562a8c7bbda4ed16b70
+  supports: M=8/16/24 branches, fallback exclusion and oracle coverage.
+- id: unpool_source
+  root: c8_extraction
+  path: tasks/decode_unpool_gemm_norm_residual/kernel_src/unpool_gemm_norm_residual.py
+  sha256: 1499a3bacfa913ecc23608ee95bcfb65db93d5438065bf2cd7ad2b8b2a3fc277
+  supports: unpool_gemm_norm_residual; _unpool_reduce_boundary.
+- id: unpool_metadata
+  root: c8_extraction
+  path: tasks/decode_unpool_gemm_norm_residual/meta.json
+  sha256: 42978da902bba523c464e19487d43ceabee990ad013b2324649b888253583326
+  supports: Serving dispatch predicate, shape weights and numerical contract.
+- id: moe_source
+  root: c8_extraction
+  path: tasks/decode_mxfp4_compact_a4_moe/kernel_src/muse_compact_a4_cand.py
+  sha256: 84402b4d73bb085b08c933ece2fa67d17e7760de700b3eeec419381c53d397fa
+  supports: compact_a4_experts; _prepare_a4; _scatter_a4; _expert_a4; build_finalize; run_compact_a4.
+- id: moe_metadata
+  root: c8_extraction
+  path: tasks/decode_mxfp4_compact_a4_moe/meta.json
+  sha256: 670327bd1223b6565560b218d6092043014de6631b47ecef4f77a49b415273ac
+  supports: Compact A4 workload and oracle context.
+- id: swa_source
+  root: c8_extraction
+  path: tasks/decode_swa_verify_splitkv/kernel_src/swa_verify_splitkv.py
+  sha256: 46187f5cb142ae95942d588866119f615da5f597fb2de8002a53cd8a077692d9
+  supports: swa_verify_splitkv; _swa_verify_partials; _swa_verify_reduce.
+- id: earlier_handoff
+  root: earlier_run
+  path: README.md
+  sha256: c293b614de0c018040f3e15ae1ed44a7594458bd5c52b4eb33a58480f97de827
+  supports: Different image digest and historical run context; its performance results are not used as
+    fusion measurements.

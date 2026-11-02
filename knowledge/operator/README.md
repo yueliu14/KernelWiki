@@ -8,6 +8,8 @@ lists all 23 corpora and their shared-card references. These cards organize cond
 and implementation constraints; the operator pages provide broader explanations and historical
 experience. The table's learned-card counts describe historical experience separately from corpus cards.
 
+For execution chains spanning these operators, see [workload knowledge](../workload/README.md), including [QKV projection and preparation](../workload/qkv_projection_norm_rope_cache/README.md) and the [MoE expert pipeline](../workload/moe_expert_pipeline/README.md). Workload directories are named by semantic composition; their cases record model-specific inputs, outputs, dispatch and serving behavior.
+
 Standalone normalization, activation, softmax, positional encoding, quantization, sampling, copy/transpose, scans and generic collectives are outside this operator index. Their relevant contracts belong with the main kernel that consumes them. MoE routing/dispatch and Q/K preparation fusions remain because they define the corresponding workload.
 
 AITER is the primary implementation source. Provider pages describe dispatch; backend pages cover Triton, Gluon, FlyDSL, HIP, CK, ASM or OPUS where an applicable source reference exists. A source reference is not a measured winner. Historical GEAK notes may cite excluded operators through pinned archived documents.
