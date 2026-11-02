@@ -1,5 +1,8 @@
 # attention_indexer
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 MQA logits, index scores, block selection and top-k for sparse attention.
 
 6 AITER implementation references; 0 historical experience cards.

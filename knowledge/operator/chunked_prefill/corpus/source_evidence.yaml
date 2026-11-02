@@ -1,0 +1,401 @@
+schema_version: 2
+operator: chunked_prefill
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_b3ad6c46
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  lines: 330
+  evidence_records: 25
+missing: []
+source_evidence:
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 54
+  end_line: 317
+  match: def _fwd_kernel(
+  captured:
+  - _fwd_kernel
+  arch_scope: ''
+  evidence:
+  - '53: @triton.jit(repr=_fwd_kernel_extend_repr)'
+  - '54: def _fwd_kernel('
+  - '55:     Q_Extend,'
+  - '56:     K_Extend,'
+  evidence_id: src_77fdd041c1e25e15
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 321
+  end_line: 329
+  match: 'def _get_config(HEAD_SIZE, dtype):'
+  captured:
+  - _get_config
+  arch_scope: ''
+  evidence:
+  - '320: @functools.lru_cache(maxsize=1024)'
+  - '321: def _get_config(HEAD_SIZE, dtype):'
+  - '322:     cfg_dir = resolve_config_dir("attention", "EXTEND_ATTENTION", backend="triton")'
+  - '323:     config = load_config_json(f"{cfg_dir}/DEFAULT.json")'
+  evidence_id: src_b838d8edc262844c
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 168
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '166:         )'
+  - '168:         qk = tl.dot(q.to(k.dtype), k)'
+  - '169:         if BLOCK_DPE > 0:'
+  - '170:             offs_kpe = ('
+  evidence_id: src_d85824aeff6bfc7a
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 180
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '178:                 other=0.0,'
+  - '179:             )'
+  - '180:             qk = tl.dot(qpe.to(kpe.dtype), kpe, acc=qk)'
+  - '181:         qk *= sm_scale'
+  evidence_id: src_409cbfb780dceb61
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 215
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '213:         )'
+  - '214:         p = p.to(v.dtype)'
+  - '215:         acc = acc * re_scale[:, None] + tl.dot(p, v)'
+  - '217:         e_max = n_e_max'
+  evidence_id: src_c83ac5e01a2063bd
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 240
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '238:         )'
+  - '240:         qk = tl.dot(q, k, out_dtype=tl.float32)'
+  - '241:         if BLOCK_DPE > 0:'
+  - '242:             offs_kpe = ('
+  evidence_id: src_154bf7732bd512e2
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 252
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '250:                 other=0.0,'
+  - '251:             )'
+  - '252:             qk = tl.dot(qpe, kpe, acc=qk)'
+  - '254:         qk *= sm_scale'
+  evidence_id: src_f383ff95365efdcd
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 296
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '294:         )'
+  - '295:         p = p.to(v.dtype)'
+  - '296:         acc = acc * re_scale[:, None] + tl.dot(p, v)'
+  - '298:         e_max = n_e_max'
+  evidence_id: src_3cb03cfd76d20cd6
+- snapshot: aiter_b3ad6c46
+  category: persistent
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 94
+  match: 'NUM_XCDS:'
+  captured:
+  - NUM_XCDS
+  arch_scope: ''
+  evidence:
+  - '92:     NUM_Q_HEADS: tl.constexpr,'
+  - '93:     NUM_BLOCKS: tl.constexpr,'
+  - '94:     NUM_XCDS: tl.constexpr,'
+  - '95: ):'
+  - '96:     workgroup_id = tl.program_id(0)  # workgroup index'
+  evidence_id: src_20fc7a734eadca43
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 80
+  match: 'logit_cap: tl.constexpr,'
+  captured:
+  - logit_cap
+  arch_scope: ''
+  evidence:
+  - '78:     stride_buf_vbs,'
+  - '79:     stride_buf_vh,'
+  - '80:     logit_cap: tl.constexpr,'
+  - '81:     Lq: tl.constexpr,'
+  - '82:     Lv: tl.constexpr,'
+  evidence_id: src_d605789aa205589b
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 81
+  match: 'Lq: tl.constexpr,'
+  captured:
+  - Lq
+  arch_scope: ''
+  evidence:
+  - '79:     stride_buf_vh,'
+  - '80:     logit_cap: tl.constexpr,'
+  - '81:     Lq: tl.constexpr,'
+  - '82:     Lv: tl.constexpr,'
+  - '83:     BLOCK_DMODEL: tl.constexpr,'
+  evidence_id: src_1d66bc7b9a8d080a
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 82
+  match: 'Lv: tl.constexpr,'
+  captured:
+  - Lv
+  arch_scope: ''
+  evidence:
+  - '80:     logit_cap: tl.constexpr,'
+  - '81:     Lq: tl.constexpr,'
+  - '82:     Lv: tl.constexpr,'
+  - '83:     BLOCK_DMODEL: tl.constexpr,'
+  - '84:     BLOCK_DPE: tl.constexpr,'
+  evidence_id: src_8e1841022a35c893
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 83
+  match: 'BLOCK_DMODEL: tl.constexpr,'
+  captured:
+  - BLOCK_DMODEL
+  arch_scope: ''
+  evidence:
+  - '81:     Lq: tl.constexpr,'
+  - '82:     Lv: tl.constexpr,'
+  - '83:     BLOCK_DMODEL: tl.constexpr,'
+  - '84:     BLOCK_DPE: tl.constexpr,'
+  - '85:     BLOCK_DV: tl.constexpr,'
+  evidence_id: src_a891a6b9bad4be86
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 84
+  match: 'BLOCK_DPE: tl.constexpr,'
+  captured:
+  - BLOCK_DPE
+  arch_scope: ''
+  evidence:
+  - '82:     Lv: tl.constexpr,'
+  - '83:     BLOCK_DMODEL: tl.constexpr,'
+  - '84:     BLOCK_DPE: tl.constexpr,'
+  - '85:     BLOCK_DV: tl.constexpr,'
+  - '86:     BLOCK_M: tl.constexpr,'
+  evidence_id: src_61b9957064456af1
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 85
+  match: 'BLOCK_DV: tl.constexpr,'
+  captured:
+  - BLOCK_DV
+  arch_scope: ''
+  evidence:
+  - '83:     BLOCK_DMODEL: tl.constexpr,'
+  - '84:     BLOCK_DPE: tl.constexpr,'
+  - '85:     BLOCK_DV: tl.constexpr,'
+  - '86:     BLOCK_M: tl.constexpr,'
+  - '87:     BLOCK_N: tl.constexpr,'
+  evidence_id: src_9f25f57eee16ee77
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 86
+  match: 'BLOCK_M: tl.constexpr,'
+  captured:
+  - BLOCK_M
+  arch_scope: ''
+  evidence:
+  - '84:     BLOCK_DPE: tl.constexpr,'
+  - '85:     BLOCK_DV: tl.constexpr,'
+  - '86:     BLOCK_M: tl.constexpr,'
+  - '87:     BLOCK_N: tl.constexpr,'
+  - '88:     USE_CUSTOM_MASK: tl.constexpr,'
+  evidence_id: src_a829baf389ea2ff6
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 87
+  match: 'BLOCK_N: tl.constexpr,'
+  captured:
+  - BLOCK_N
+  arch_scope: ''
+  evidence:
+  - '85:     BLOCK_DV: tl.constexpr,'
+  - '86:     BLOCK_M: tl.constexpr,'
+  - '87:     BLOCK_N: tl.constexpr,'
+  - '88:     USE_CUSTOM_MASK: tl.constexpr,'
+  - '89:     IS_CAUSAL: tl.constexpr,'
+  evidence_id: src_c3c24a7664ba5a78
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 88
+  match: 'USE_CUSTOM_MASK: tl.constexpr,'
+  captured:
+  - USE_CUSTOM_MASK
+  arch_scope: ''
+  evidence:
+  - '86:     BLOCK_M: tl.constexpr,'
+  - '87:     BLOCK_N: tl.constexpr,'
+  - '88:     USE_CUSTOM_MASK: tl.constexpr,'
+  - '89:     IS_CAUSAL: tl.constexpr,'
+  - '90:     SKIP_PREFIX_CUSTOM_MASK: tl.constexpr,'
+  evidence_id: src_f92c839359992c47
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 89
+  match: 'IS_CAUSAL: tl.constexpr,'
+  captured:
+  - IS_CAUSAL
+  arch_scope: ''
+  evidence:
+  - '87:     BLOCK_N: tl.constexpr,'
+  - '88:     USE_CUSTOM_MASK: tl.constexpr,'
+  - '89:     IS_CAUSAL: tl.constexpr,'
+  - '90:     SKIP_PREFIX_CUSTOM_MASK: tl.constexpr,'
+  - '91:     STORE_TRANSPOSE: tl.constexpr,'
+  evidence_id: src_56da3b0fd39c7bb6
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 90
+  match: 'SKIP_PREFIX_CUSTOM_MASK: tl.constexpr,'
+  captured:
+  - SKIP_PREFIX_CUSTOM_MASK
+  arch_scope: ''
+  evidence:
+  - '88:     USE_CUSTOM_MASK: tl.constexpr,'
+  - '89:     IS_CAUSAL: tl.constexpr,'
+  - '90:     SKIP_PREFIX_CUSTOM_MASK: tl.constexpr,'
+  - '91:     STORE_TRANSPOSE: tl.constexpr,'
+  - '92:     NUM_Q_HEADS: tl.constexpr,'
+  evidence_id: src_38dce6a3d59cc465
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 91
+  match: 'STORE_TRANSPOSE: tl.constexpr,'
+  captured:
+  - STORE_TRANSPOSE
+  arch_scope: ''
+  evidence:
+  - '89:     IS_CAUSAL: tl.constexpr,'
+  - '90:     SKIP_PREFIX_CUSTOM_MASK: tl.constexpr,'
+  - '91:     STORE_TRANSPOSE: tl.constexpr,'
+  - '92:     NUM_Q_HEADS: tl.constexpr,'
+  - '93:     NUM_BLOCKS: tl.constexpr,'
+  evidence_id: src_015b35e62add318c
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 92
+  match: 'NUM_Q_HEADS: tl.constexpr,'
+  captured:
+  - NUM_Q_HEADS
+  arch_scope: ''
+  evidence:
+  - '90:     SKIP_PREFIX_CUSTOM_MASK: tl.constexpr,'
+  - '91:     STORE_TRANSPOSE: tl.constexpr,'
+  - '92:     NUM_Q_HEADS: tl.constexpr,'
+  - '93:     NUM_BLOCKS: tl.constexpr,'
+  - '94:     NUM_XCDS: tl.constexpr,'
+  evidence_id: src_8c353e92a0d26564
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 93
+  match: 'NUM_BLOCKS: tl.constexpr,'
+  captured:
+  - NUM_BLOCKS
+  arch_scope: ''
+  evidence:
+  - '91:     STORE_TRANSPOSE: tl.constexpr,'
+  - '92:     NUM_Q_HEADS: tl.constexpr,'
+  - '93:     NUM_BLOCKS: tl.constexpr,'
+  - '94:     NUM_XCDS: tl.constexpr,'
+  - '95: ):'
+  evidence_id: src_43ecccfa9c89cda3
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 94
+  match: 'NUM_XCDS: tl.constexpr,'
+  captured:
+  - NUM_XCDS
+  arch_scope: ''
+  evidence:
+  - '92:     NUM_Q_HEADS: tl.constexpr,'
+  - '93:     NUM_BLOCKS: tl.constexpr,'
+  - '94:     NUM_XCDS: tl.constexpr,'
+  - '95: ):'
+  - '96:     workgroup_id = tl.program_id(0)  # workgroup index'
+  evidence_id: src_830e5e9a608e5aa7
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/attention/extend_attention.py
+  line: 320
+  match: '@functools.lru_cache(maxsize=1024)
+
+    def _get_config'
+  captured:
+  - '1024'
+  - _get_config
+  arch_scope: ''
+  evidence:
+  - '320: @functools.lru_cache(maxsize=1024)'
+  - '321: def _get_config(HEAD_SIZE, dtype):'
+  - '322:     cfg_dir = resolve_config_dir("attention", "EXTEND_ATTENTION", backend="triton")'
+  evidence_id: src_9ac04682437fd846

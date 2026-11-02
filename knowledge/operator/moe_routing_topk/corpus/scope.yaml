@@ -1,0 +1,61 @@
+schema_version: 2
+operator: moe_routing_topk
+sources:
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/herd_topk.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/herd_topk.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/moe_sorting_kernel.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/moe_sorting.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: csrc/kernels/moe_align_block_size_kernels.cu
+  language: hip
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: csrc/kernels/topk_gating_kernels.cu
+  language: hip
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: csrc/kernels/topk_softmax_kernels.cu
+  language: hip
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: csrc/py_itfs_cu/moe_sorting_opus_kernels.cu
+  language: hip
+  include_symbols: true
+validation_sources:
+- snapshot: aiter_b3ad6c46
+  file: op_tests/op_benchmarks/hip/bench_mxfp4_moe_sort_quant.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_moe_sorting.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_moe_sorting_mxfp4.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_moe_topk_gating.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_topk_softmax.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_topk_softmax_shared_gate.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/moe/moe_routing/__init__.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/moe/moe_routing/test_moe_routing.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/moe/moe_routing/test_moe_routing_herd.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/moe/moe_routing/test_topk_gating.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/torch_compile/test_compile_moe_routing.py
+coverage_notes:
+- Source observations and conditioned candidates for moe routing topk; source presence is not a measured winner.
+- No new GPU measurements or binary disassembly are included.

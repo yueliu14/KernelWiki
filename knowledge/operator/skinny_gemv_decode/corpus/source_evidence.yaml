@@ -1,0 +1,2291 @@
+schema_version: 2
+operator: skinny_gemv_decode
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_a6bb4993
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  lines: 1406
+  evidence_records: 95
+- snapshot: aiter_a6bb4993
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  lines: 2481
+  evidence_records: 48
+missing: []
+source_evidence:
+- snapshot: aiter_a6bb4993
+  category: tile_shape
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 8
+  match: TILE_M=16
+  captured:
+  - TILE_M
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '6: parameter point of one template:'
+  - '8: - `TILE_M=16` and `BLOCK_M_WARPS=1` are hard-wired so the block spends its'
+  - '9:   wave budget on N/K work instead of over-parallelizing the tiny M dimension.'
+  - '10:   Concretely, the block only covers one 16-row M tile and avoids launching'
+  evidence_id: src_0cd161d33fedb2a7
+- snapshot: aiter_a6bb4993
+  category: tile_shape
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 70
+  match: TILE_M = 16
+  captured:
+  - TILE_M
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '69: SMALL_M_KERNEL_MAX = 17'
+  - '70: TILE_M = 16'
+  - '71: BLOCK_M_WARPS = 1'
+  - '72: STAGES = 2'
+  evidence_id: src_034b3cc6e3fd6aa8
+- snapshot: aiter_a6bb4993
+  category: tile_shape
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 458
+  match: TILE_N=64
+  captured:
+  - TILE_N
+  - '64'
+  arch_scope: ''
+  evidence:
+  - '456:             raise ValueError('
+  - '457:                 "wide-N repeat path requires either the classic "'
+  - '458:                 "(BLOCK_N_WARPS=1, TILE_N=64, N_TILE_REPEAT>1) setup or the "'
+  - '459:                 "wave-specialized (N_TILE_REPEAT=2, BLOCK_N_WARPS=2, TILE_N=192) setup"'
+  - '460:             )'
+  evidence_id: src_6cec5e26c92418b3
+- snapshot: aiter_a6bb4993
+  category: tile_shape
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 459
+  match: TILE_N=192
+  captured:
+  - TILE_N
+  - '192'
+  arch_scope: ''
+  evidence:
+  - '457:                 "wide-N repeat path requires either the classic "'
+  - '458:                 "(BLOCK_N_WARPS=1, TILE_N=64, N_TILE_REPEAT>1) setup or the "'
+  - '459:                 "wave-specialized (N_TILE_REPEAT=2, BLOCK_N_WARPS=2, TILE_N=192) setup"'
+  - '460:             )'
+  - '461:     if PERSISTENT_N_TILES > 1:'
+  evidence_id: src_d2988efafca471b0
+- snapshot: aiter_a6bb4993
+  category: waves
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 8
+  match: BLOCK_M_WARPS=1
+  captured:
+  - BLOCK_M_WARPS
+  - '1'
+  arch_scope: ''
+  evidence:
+  - '6: parameter point of one template:'
+  - '8: - `TILE_M=16` and `BLOCK_M_WARPS=1` are hard-wired so the block spends its'
+  - '9:   wave budget on N/K work instead of over-parallelizing the tiny M dimension.'
+  - '10:   Concretely, the block only covers one 16-row M tile and avoids launching'
+  evidence_id: src_314f311d52e5331a
+- snapshot: aiter_a6bb4993
+  category: waves
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 71
+  match: BLOCK_M_WARPS = 1
+  captured:
+  - BLOCK_M_WARPS
+  - '1'
+  arch_scope: ''
+  evidence:
+  - '69: SMALL_M_KERNEL_MAX = 17'
+  - '70: TILE_M = 16'
+  - '71: BLOCK_M_WARPS = 1'
+  - '72: STAGES = 2'
+  - '73: WARP_SIZE = 64'
+  evidence_id: src_25a1c183f8a371dd
+- snapshot: aiter_a6bb4993
+  category: waves
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 73
+  match: WARP_SIZE = 64
+  captured:
+  - WARP_SIZE
+  - '64'
+  arch_scope: ''
+  evidence:
+  - '71: BLOCK_M_WARPS = 1'
+  - '72: STAGES = 2'
+  - '73: WARP_SIZE = 64'
+  - '74: DTYPE_BYTES = 2'
+  - '75: LDG_VEC_SIZE = 8'
+  evidence_id: src_6c72538f448d611c
+- snapshot: aiter_a6bb4993
+  category: waves
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 458
+  match: BLOCK_N_WARPS=1
+  captured:
+  - BLOCK_N_WARPS
+  - '1'
+  arch_scope: ''
+  evidence:
+  - '456:             raise ValueError('
+  - '457:                 "wide-N repeat path requires either the classic "'
+  - '458:                 "(BLOCK_N_WARPS=1, TILE_N=64, N_TILE_REPEAT>1) setup or the "'
+  - '459:                 "wave-specialized (N_TILE_REPEAT=2, BLOCK_N_WARPS=2, TILE_N=192) setup"'
+  - '460:             )'
+  evidence_id: src_14dfe05f6798178b
+- snapshot: aiter_a6bb4993
+  category: waves
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 459
+  match: BLOCK_N_WARPS=2
+  captured:
+  - BLOCK_N_WARPS
+  - '2'
+  arch_scope: ''
+  evidence:
+  - '457:                 "wide-N repeat path requires either the classic "'
+  - '458:                 "(BLOCK_N_WARPS=1, TILE_N=64, N_TILE_REPEAT>1) setup or the "'
+  - '459:                 "wave-specialized (N_TILE_REPEAT=2, BLOCK_N_WARPS=2, TILE_N=192) setup"'
+  - '460:             )'
+  - '461:     if PERSISTENT_N_TILES > 1:'
+  evidence_id: src_e8392924f24a573c
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 418
+  match: IS_SPLIT_K =
+  captured:
+  - IS_SPLIT_K
+  arch_scope: gfx942
+  evidence:
+  - '416:     MFMA_PER_WARP_K = 1'
+  - '417:     BLOCK_K = TILE_K'
+  - '418:     IS_SPLIT_K = SPLIT_K > 1'
+  - '419:     assert (k % SPLIT_K == 0) and (k // SPLIT_K >= 1)'
+  - '420:     ks = k // SPLIT_K'
+  evidence_id: src_97e99e4609f7ef9f
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 145
+  match: 'persistent_n_tiles:'
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '143:     block_n_warps: int,'
+  - '144:     n_tile_repeat: int,'
+  - '145:     persistent_n_tiles: int,'
+  - '146:     waves_per_eu: int,'
+  - '147:     b_to_lds_unroll: int,'
+  evidence_id: src_64af276711d0fa08
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 182
+  match: 'persistent_n_tiles:'
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '180:     block_n_warps: int,'
+  - '181:     n_tile_repeat: int,'
+  - '182:     persistent_n_tiles: int,'
+  - '183:     waves_per_eu: int,'
+  - '184:     b_to_lds_unroll: int,'
+  evidence_id: src_efeb8eac56ca74b3
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 240
+  match: 'persistent_n_tiles:'
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '238:         b_to_lds: bool,'
+  - '239:         n_tile_repeat: int = 1,'
+  - '240:         persistent_n_tiles: int = 1,'
+  - '241:         waves_per_eu: int = 0,'
+  - '242:         b_to_lds_unroll: int = 0,'
+  evidence_id: src_c273fc90d3c0f3a8
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 294
+  match: persistent_n_tiles=
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '292:                         block_n_warps=block_n_warps,'
+  - '293:                         b_to_lds=True,'
+  - '294:                         persistent_n_tiles=persistent_n_tiles,'
+  - '295:                         waves_per_eu=waves_per_eu,'
+  - '296:                         b_to_lds_unroll=b_to_lds_unroll,'
+  evidence_id: src_120db85c4d1a2065
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 373
+  match: persistent_n_tiles=
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '371:                             block_n_warps=config["block_n_warps"],'
+  - '372:                             n_tile_repeat=config["n_tile_repeat"],'
+  - '373:                             persistent_n_tiles=config["persistent_n_tiles"],'
+  - '374:                             waves_per_eu=config["waves_per_eu"],'
+  - '375:                             b_to_lds_unroll=config["b_to_lds_unroll"],'
+  evidence_id: src_7984608545b065d3
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 399
+  match: 'PERSISTENT_N_TILES:'
+  captured:
+  - PERSISTENT
+  arch_scope: ''
+  evidence:
+  - '397:     BLOCK_N_WARPS: int = 2,'
+  - '398:     N_TILE_REPEAT: int = 1,'
+  - '399:     PERSISTENT_N_TILES: int = 1,'
+  - '400:     WAVES_PER_EU_HINT: int = 0,'
+  - '401:     B_TO_LDS_UNROLL: int = 0,'
+  evidence_id: src_68de7eb933a46cd2
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 475
+  match: PERSISTENT_N =
+  captured:
+  - PERSISTENT
+  arch_scope: ''
+  evidence:
+  - '473:                 f"got {PERSISTENT_N_TILES} > {BLOCK_N_TILES}"'
+  - '474:             )'
+  - '475:     PERSISTENT_N = PERSISTENT_N_TILES > 1'
+  - '476:     WIDE_N_B_TO_LDS = ('
+  - '477:         B_TO_LDS and N_TILE_REPEAT == 1 and TILE_N >= 128 and BLOCK_N_WARPS >= 2'
+  evidence_id: src_c0ee833e072f2728
+- snapshot: aiter_a6bb4993
+  category: persistent
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 535
+  match: persistent_n_tiles=
+  captured:
+  - persistent
+  arch_scope: ''
+  evidence:
+  - '533:         block_n_warps=BLOCK_N_WARPS,'
+  - '534:         n_tile_repeat=N_TILE_REPEAT,'
+  - '535:         persistent_n_tiles=PERSISTENT_N_TILES,'
+  - '536:         waves_per_eu=WAVES_PER_EU,'
+  - '537:         b_to_lds_unroll=EFFECTIVE_B_TO_LDS_UNROLL if const_expr(B_TO_LDS) else 0,'
+  evidence_id: src_223d2f00cf741689
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 81
+  match: SMALL_M_TILE_K_OPTIONS = (
+  captured:
+  - SMALL_M_TILE_K_OPTIONS
+  arch_scope: ''
+  evidence:
+  - '79: # useful during the deeper exhaustive search, instead of maintaining separate'
+  - '80: # compact/exhaustive modes.'
+  - '81: SMALL_M_TILE_K_OPTIONS = (32, 64, 96, 128, 160, 192, 256)'
+  - '82: SMALL_M_MAX_SPLIT_K = 32'
+  - '83: SMALL_M_TILE_N_OPTIONS = ('
+  evidence_id: src_60717171485c58f5
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 83
+  end_line: 96
+  match: SMALL_M_TILE_N_OPTIONS = (
+  captured:
+  - SMALL_M_TILE_N_OPTIONS
+  arch_scope: ''
+  evidence:
+  - '81: SMALL_M_TILE_K_OPTIONS = (32, 64, 96, 128, 160, 192, 256)'
+  - '82: SMALL_M_MAX_SPLIT_K = 32'
+  - '83: SMALL_M_TILE_N_OPTIONS = ('
+  - '84:     32,'
+  - '85:     64,'
+  evidence_id: src_390ae8578e28ce34
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 97
+  match: SMALL_M_NON_B_TO_LDS_WAVES_PER_EU_OPTIONS = (
+  captured:
+  - SMALL_M_NON_B_TO_LDS_WAVES_PER_EU_OPTIONS
+  arch_scope: ''
+  evidence:
+  - '95:     1024,'
+  - '96: )'
+  - '97: SMALL_M_NON_B_TO_LDS_WAVES_PER_EU_OPTIONS = (0, 2, 4)'
+  - '98: # Keep 0 for narrow B_TO_LDS shapes where it remains a real candidate, and'
+  - '99: # canonicalize only the wide-N B_TO_LDS duplicates at registry emission time.'
+  evidence_id: src_1dcdf9c7b6794c6e
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 100
+  match: SMALL_M_B_TO_LDS_WAVES_PER_EU_OPTIONS = (
+  captured:
+  - SMALL_M_B_TO_LDS_WAVES_PER_EU_OPTIONS
+  arch_scope: ''
+  evidence:
+  - '98: # Keep 0 for narrow B_TO_LDS shapes where it remains a real candidate, and'
+  - '99: # canonicalize only the wide-N B_TO_LDS duplicates at registry emission time.'
+  - '100: SMALL_M_B_TO_LDS_WAVES_PER_EU_OPTIONS = (0, 2, 4)'
+  - '101: SMALL_M_B_TO_LDS_UNROLL_OPTIONS = (8, 16)'
+  - '102: SMALL_M_N_TILE_REPEAT_OPTIONS = (1, 2, 4)'
+  evidence_id: src_e47b5a4b1cf192ff
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 101
+  match: SMALL_M_B_TO_LDS_UNROLL_OPTIONS = (
+  captured:
+  - SMALL_M_B_TO_LDS_UNROLL_OPTIONS
+  arch_scope: ''
+  evidence:
+  - '99: # canonicalize only the wide-N B_TO_LDS duplicates at registry emission time.'
+  - '100: SMALL_M_B_TO_LDS_WAVES_PER_EU_OPTIONS = (0, 2, 4)'
+  - '101: SMALL_M_B_TO_LDS_UNROLL_OPTIONS = (8, 16)'
+  - '102: SMALL_M_N_TILE_REPEAT_OPTIONS = (1, 2, 4)'
+  - '103: SMALL_M_PERSISTENT_N_TILE_OPTIONS = (2, 4, 8)'
+  evidence_id: src_44b5602aacc7e7df
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 102
+  match: SMALL_M_N_TILE_REPEAT_OPTIONS = (
+  captured:
+  - SMALL_M_N_TILE_REPEAT_OPTIONS
+  arch_scope: ''
+  evidence:
+  - '100: SMALL_M_B_TO_LDS_WAVES_PER_EU_OPTIONS = (0, 2, 4)'
+  - '101: SMALL_M_B_TO_LDS_UNROLL_OPTIONS = (8, 16)'
+  - '102: SMALL_M_N_TILE_REPEAT_OPTIONS = (1, 2, 4)'
+  - '103: SMALL_M_PERSISTENT_N_TILE_OPTIONS = (2, 4, 8)'
+  - '104: SMALL_M_BASE_BLOCK_N_WARPS = (1, 2, 3, 4)'
+  evidence_id: src_a7c0de9870934fc0
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 103
+  match: SMALL_M_PERSISTENT_N_TILE_OPTIONS = (
+  captured:
+  - SMALL_M_PERSISTENT_N_TILE_OPTIONS
+  arch_scope: ''
+  evidence:
+  - '101: SMALL_M_B_TO_LDS_UNROLL_OPTIONS = (8, 16)'
+  - '102: SMALL_M_N_TILE_REPEAT_OPTIONS = (1, 2, 4)'
+  - '103: SMALL_M_PERSISTENT_N_TILE_OPTIONS = (2, 4, 8)'
+  - '104: SMALL_M_BASE_BLOCK_N_WARPS = (1, 2, 3, 4)'
+  - '105: SMALL_M_REPEAT_BLOCK_N_WARPS = (1, 2)'
+  evidence_id: src_28936b493eeb6f6f
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 104
+  match: SMALL_M_BASE_BLOCK_N_WARPS = (
+  captured:
+  - SMALL_M_BASE_BLOCK_N_WARPS
+  arch_scope: ''
+  evidence:
+  - '102: SMALL_M_N_TILE_REPEAT_OPTIONS = (1, 2, 4)'
+  - '103: SMALL_M_PERSISTENT_N_TILE_OPTIONS = (2, 4, 8)'
+  - '104: SMALL_M_BASE_BLOCK_N_WARPS = (1, 2, 3, 4)'
+  - '105: SMALL_M_REPEAT_BLOCK_N_WARPS = (1, 2)'
+  - '106: SMALL_M_B_TO_LDS_BLOCK_N_WARPS = (1, 2, 3, 4)'
+  evidence_id: src_1d782887938ee0c3
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 105
+  match: SMALL_M_REPEAT_BLOCK_N_WARPS = (
+  captured:
+  - SMALL_M_REPEAT_BLOCK_N_WARPS
+  arch_scope: ''
+  evidence:
+  - '103: SMALL_M_PERSISTENT_N_TILE_OPTIONS = (2, 4, 8)'
+  - '104: SMALL_M_BASE_BLOCK_N_WARPS = (1, 2, 3, 4)'
+  - '105: SMALL_M_REPEAT_BLOCK_N_WARPS = (1, 2)'
+  - '106: SMALL_M_B_TO_LDS_BLOCK_N_WARPS = (1, 2, 3, 4)'
+  - '107: SMALL_M_PERSISTENT_BLOCK_N_WARPS = (2, 3, 4)'
+  evidence_id: src_6c80e293610d630a
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 106
+  match: SMALL_M_B_TO_LDS_BLOCK_N_WARPS = (
+  captured:
+  - SMALL_M_B_TO_LDS_BLOCK_N_WARPS
+  arch_scope: ''
+  evidence:
+  - '104: SMALL_M_BASE_BLOCK_N_WARPS = (1, 2, 3, 4)'
+  - '105: SMALL_M_REPEAT_BLOCK_N_WARPS = (1, 2)'
+  - '106: SMALL_M_B_TO_LDS_BLOCK_N_WARPS = (1, 2, 3, 4)'
+  - '107: SMALL_M_PERSISTENT_BLOCK_N_WARPS = (2, 3, 4)'
+  evidence_id: src_d4a8b0951c7d9302
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 107
+  match: SMALL_M_PERSISTENT_BLOCK_N_WARPS = (
+  captured:
+  - SMALL_M_PERSISTENT_BLOCK_N_WARPS
+  arch_scope: ''
+  evidence:
+  - '105: SMALL_M_REPEAT_BLOCK_N_WARPS = (1, 2)'
+  - '106: SMALL_M_B_TO_LDS_BLOCK_N_WARPS = (1, 2, 3, 4)'
+  - '107: SMALL_M_PERSISTENT_BLOCK_N_WARPS = (2, 3, 4)'
+  evidence_id: src_7a0fb4b6500460f5
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 118
+  end_line: 126
+  match: def _small_m_tile_k_options(
+  captured:
+  - _small_m_tile_k_options
+  arch_scope: ''
+  evidence:
+  - '118: def _small_m_tile_k_options(k: int) -> tuple[int, ...]:'
+  - '119:     return tuple('
+  - '120:         tile_k'
+  evidence_id: src_fa010963acd32253
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 129
+  end_line: 134
+  match: def _small_m_split_k_options(
+  captured:
+  - _small_m_split_k_options
+  arch_scope: ''
+  evidence:
+  - '129: def _small_m_split_k_options(k: int, tile_k: int) -> tuple[int, ...]:'
+  - '130:     return tuple('
+  - '131:         split_k'
+  evidence_id: src_7f876ace4ed752ae
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 231
+  end_line: 299
+  match: def _small_m_registry_variants(
+  captured:
+  - _small_m_registry_variants
+  arch_scope: ''
+  evidence:
+  - '231: def _small_m_registry_variants():'
+  - '232:     variants = []'
+  - '233:     seen_variants = set()'
+  evidence_id: src_85d270e21f161c35
+- snapshot: aiter_a6bb4993
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 319
+  end_line: 385
+  match: def iter_small_m_registry_configs(
+  captured:
+  - iter_small_m_registry_configs
+  arch_scope: ''
+  evidence:
+  - '319: def iter_small_m_registry_configs('
+  - '320:     dtype: str,'
+  - '321:     out_dtype: str,'
+  evidence_id: src_2063b8c8cc71ba95
+- snapshot: aiter_a6bb4993
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 69
+  match: SMALL_M_KERNEL_MAX = 17
+  captured:
+  - SMALL_M_KERNEL_MAX
+  - '17'
+  arch_scope: ''
+  evidence:
+  - '67: ]'
+  - '69: SMALL_M_KERNEL_MAX = 17'
+  - '70: TILE_M = 16'
+  - '71: BLOCK_M_WARPS = 1'
+  evidence_id: src_b446c07f43b11542
+- snapshot: aiter_a6bb4993
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 76
+  match: MAX_LDS_BYTES = 163840
+  captured:
+  - MAX_LDS_BYTES
+  - '163840'
+  arch_scope: ''
+  evidence:
+  - '74: DTYPE_BYTES = 2'
+  - '75: LDG_VEC_SIZE = 8'
+  - '76: MAX_LDS_BYTES = 163840'
+  - '78: # Expand the original small-M catalog with the additional cases that proved'
+  evidence_id: src_bc6d04baf2182ba4
+- snapshot: aiter_a6bb4993
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 82
+  match: SMALL_M_MAX_SPLIT_K = 32
+  captured:
+  - SMALL_M_MAX_SPLIT_K
+  - '32'
+  arch_scope: ''
+  evidence:
+  - '80: # compact/exhaustive modes.'
+  - '81: SMALL_M_TILE_K_OPTIONS = (32, 64, 96, 128, 160, 192, 256)'
+  - '82: SMALL_M_MAX_SPLIT_K = 32'
+  - '83: SMALL_M_TILE_N_OPTIONS = ('
+  - '84:     32,'
+  evidence_id: src_ee5e839c6374f38f
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 172
+  end_line: 228
+  match: def _validate_small_m_registry_config(
+  captured:
+  - _validate_small_m_registry_config
+  arch_scope: ''
+  evidence:
+  - '172: def _validate_small_m_registry_config('
+  - '173:     m: int,'
+  - '174:     n: int,'
+  evidence_id: src_cceaeb92fb86b540
+- snapshot: aiter_a6bb4993
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 331
+  end_line: 332
+  match: gpu_arch == "gfx942"
+  captured:
+  - gfx942
+  arch_scope: gfx942
+  evidence:
+  - '330:     gpu_arch = get_rocm_arch()'
+  - '331:     if gpu_arch == "gfx942" or not (1 <= m < SMALL_M_KERNEL_MAX):'
+  - '332:         return'
+  evidence_id: src_e04716b6d760605b
+- snapshot: aiter_a6bb4993
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 411
+  end_line: 412
+  match: GPU_ARCH == "gfx942"
+  captured:
+  - gfx942
+  arch_scope: gfx942
+  evidence:
+  - '410:     GPU_ARCH = get_rocm_arch()'
+  - '411:     if GPU_ARCH == "gfx942":'
+  - '412:         raise ValueError("small-M kernel currently targets the async-copy bf16 path")'
+  evidence_id: src_7eee3f6769348b4c
+- snapshot: aiter_a6bb4993
+  category: lds_stage
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 72
+  match: STAGES = 2
+  captured:
+  - STAGES
+  - '2'
+  arch_scope: ''
+  evidence:
+  - '70: TILE_M = 16'
+  - '71: BLOCK_M_WARPS = 1'
+  - '72: STAGES = 2'
+  - '73: WARP_SIZE = 64'
+  - '74: DTYPE_BYTES = 2'
+  evidence_id: src_8a036c537a13ff24
+- snapshot: aiter_a6bb4993
+  category: lds_swizzle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 58
+  match: swizzle_xor16
+  captured:
+  - swizzle_xor16
+  arch_scope: ''
+  evidence:
+  - '56:     SPLIT_K_COUNTER_MAX_LEN,'
+  - '57:     WmmaHalf_m16n16k32,'
+  - '58:     swizzle_xor16,'
+  - '59: )'
+  - '60: from .tensor_shim import GTensor, STensor, _to_raw, get_dtype_in_kernel'
+  evidence_id: src_a863ece61069026a
+- snapshot: aiter_a6bb4993
+  category: lds_swizzle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 786
+  match: swizzle_xor16
+  captured:
+  - swizzle_xor16
+  arch_scope: ''
+  evidence:
+  - '784:                 k_local_idx = global_tid % LDG_A_X_THREADS * LDG_VEC_SIZE'
+  - '785:                 col_in_bytes = k_local_idx * DTYPE_BYTES'
+  - '786:                 col_in_bytes = swizzle_xor16(m_local_idx, col_in_bytes, k_blocks16)'
+  - '787:                 slot_valid = arith.cmpi('
+  - '788:                     arith.CmpIPredicate.ult,'
+  evidence_id: src_79368bcf31f690bf
+- snapshot: aiter_a6bb4993
+  category: lds_swizzle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 807
+  match: swizzle_xor16
+  captured:
+  - swizzle_xor16
+  arch_scope: ''
+  evidence:
+  - '805:                 k_local_idx = global_tid % LDG_A_X_THREADS_AS * LDG_ASYNC_VEC_SIZE'
+  - '806:                 col_in_bytes = k_local_idx * DTYPE_BYTES'
+  - '807:                 col_in_bytes = swizzle_xor16(m_local_idx, col_in_bytes, k_blocks16)'
+  - '808:                 row_idx = m_offset + fx.Index(m_local_idx)'
+  - '809:                 col_idx = fx.Index(k_offset + col_in_bytes // DTYPE_BYTES)'
+  evidence_id: src_167a02e403080aa3
+- snapshot: aiter_a6bb4993
+  category: lds_swizzle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 871
+  match: swizzle_xor16
+  captured:
+  - swizzle_xor16
+  arch_scope: ''
+  evidence:
+  - '869:                         warp_atom_k_idx + ldmatrix_a_k_vec_idx'
+  - '870:                     ) * DTYPE_BYTES'
+  - '871:                     col_in_bytes = swizzle_xor16(row, col_in_bytes, k_blocks16)'
+  - '872:                     vec = as_.vec_load('
+  - '873:                         (s, row, col_in_bytes // DTYPE_BYTES),'
+  evidence_id: src_c2d96238aed50ca6
+- snapshot: aiter_a6bb4993
+  category: lds_swizzle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1062
+  match: swizzle_xor16
+  captured:
+  - swizzle_xor16
+  arch_scope: ''
+  evidence:
+  - '1060:                     k_local_idx = global_tid % LDG_B_X_THREADS_AS * LDG_ASYNC_VEC_SIZE'
+  - '1061:                     col_in_bytes = k_local_idx * DTYPE_BYTES'
+  - '1062:                     col_in_bytes = swizzle_xor16(n_local_idx, col_in_bytes, k_blocks16)'
+  - '1063:                     col_idx = fx.Index(k_offset + col_in_bytes // DTYPE_BYTES)'
+  - '1064:                     slot_valid = arith.cmpi('
+  evidence_id: src_bc0057e886df2c0b
+- snapshot: aiter_a6bb4993
+  category: lds_swizzle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1114
+  match: swizzle_xor16
+  captured:
+  - swizzle_xor16
+  arch_scope: ''
+  evidence:
+  - '1112:                             warp_atom_k_idx + ldmatrix_b_k_vec_idx'
+  - '1113:                         ) * DTYPE_BYTES'
+  - '1114:                         col_in_bytes = swizzle_xor16(row, col_in_bytes, k_blocks16)'
+  - '1115:                         vec = bs_s.vec_load('
+  - '1116:                             (s, row, col_in_bytes // DTYPE_BYTES),'
+  evidence_id: src_a59be91e50f193cc
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 74
+  match: DTYPE_BYTES = 2
+  captured:
+  - DTYPE_BYTES
+  - '2'
+  arch_scope: ''
+  evidence:
+  - '72: STAGES = 2'
+  - '73: WARP_SIZE = 64'
+  - '74: DTYPE_BYTES = 2'
+  - '75: LDG_VEC_SIZE = 8'
+  - '76: MAX_LDS_BYTES = 163840'
+  evidence_id: src_7691f6e7e337af74
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 75
+  match: LDG_VEC_SIZE = 8
+  captured:
+  - LDG_VEC_SIZE
+  - '8'
+  arch_scope: ''
+  evidence:
+  - '73: WARP_SIZE = 64'
+  - '74: DTYPE_BYTES = 2'
+  - '75: LDG_VEC_SIZE = 8'
+  - '76: MAX_LDS_BYTES = 163840'
+  evidence_id: src_958bf8b628cb0dec
+- snapshot: aiter_a6bb4993
+  category: access_width
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 415
+  match: DMA_BYTES = 16
+  captured:
+  - DMA_BYTES
+  - '16'
+  arch_scope: gfx942
+  evidence:
+  - '414:     WMMA_IMPL = WmmaHalf_m16n16k32(dtype)'
+  - '415:     DMA_BYTES = 16'
+  - '416:     MFMA_PER_WARP_K = 1'
+  - '417:     BLOCK_K = TILE_K'
+  evidence_id: src_3fb0d950c04abfde
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1031
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '1029:                             scf.YieldOp([])'
+  - '1030:                     scf.YieldOp([])'
+  - '1031:                 rocdl.sched_barrier(0)'
+  - '1032:                 gpu.barrier()'
+  evidence_id: src_5359b4194d46889b
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1044
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '1042:                             scf.YieldOp([])'
+  - '1043:                     scf.YieldOp([])'
+  - '1044:                 rocdl.sched_barrier(0)'
+  - '1045:                 gpu.barrier()'
+  evidence_id: src_3ae8f62cfecc4f57
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1051
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '1049:                 cleanup_stale_counters_once(COUNTER_)'
+  - '1050:                 scf.YieldOp([])'
+  - '1051:             rocdl.sched_barrier(0)'
+  - '1052:             gpu.barrier()'
+  evidence_id: src_eaa23e267a7c713d
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1129
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '1127:                         zero_c_tile(C_, BIAS_, tile_n_offset)'
+  - '1128:                         scf.YieldOp([])'
+  - '1129:                     rocdl.sched_barrier(0)'
+  - '1130:                     gpu.barrier()'
+  evidence_id: src_8bd7771a41d9c4a4
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1136
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '1134:                         init_split_k_counter(COUNTER, tile_counter_idx)'
+  - '1135:                         scf.YieldOp([])'
+  - '1136:                     rocdl.sched_barrier(0)'
+  - '1137:                     gpu.barrier()'
+  evidence_id: src_85f705d32c226f70
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1150
+  match: rocdl.sched_dsrd(
+  captured:
+  - sched_dsrd
+  arch_scope: ''
+  evidence:
+  - '1148:                     if const_expr(WIDE_N_B_TO_LDS):'
+  - '1149:                         for _ in range_constexpr(WARP_K_STEPS * WARP_M_STEPS):'
+  - '1150:                             rocdl.sched_dsrd(1)'
+  - '1151:                         for _ in range_constexpr(WARP_K_STEPS * WARP_N_STEPS):'
+  - '1152:                             rocdl.sched_dsrd(1)'
+  evidence_id: src_e5d1c3a34c85bca0
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1152
+  match: rocdl.sched_dsrd(
+  captured:
+  - sched_dsrd
+  arch_scope: ''
+  evidence:
+  - '1150:                             rocdl.sched_dsrd(1)'
+  - '1151:                         for _ in range_constexpr(WARP_K_STEPS * WARP_N_STEPS):'
+  - '1152:                             rocdl.sched_dsrd(1)'
+  - '1153:                         for _ in range_constexpr(LDG_REG_A_COUNT_AS):'
+  - '1154:                             rocdl.sched_vmem(1)'
+  evidence_id: src_bf6d2a7a156536bf
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1154
+  match: rocdl.sched_vmem(
+  captured:
+  - sched_vmem
+  arch_scope: ''
+  evidence:
+  - '1152:                             rocdl.sched_dsrd(1)'
+  - '1153:                         for _ in range_constexpr(LDG_REG_A_COUNT_AS):'
+  - '1154:                             rocdl.sched_vmem(1)'
+  - '1155:                             rocdl.sched_mfma(2)'
+  - '1156:                         for _ in range_constexpr(LDG_REG_B_COUNT_AS):'
+  evidence_id: src_1841cc194be99c2b
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1155
+  match: rocdl.sched_mfma(
+  captured:
+  - sched_mfma
+  arch_scope: ''
+  evidence:
+  - '1153:                         for _ in range_constexpr(LDG_REG_A_COUNT_AS):'
+  - '1154:                             rocdl.sched_vmem(1)'
+  - '1155:                             rocdl.sched_mfma(2)'
+  - '1156:                         for _ in range_constexpr(LDG_REG_B_COUNT_AS):'
+  - '1157:                             rocdl.sched_vmem(1)'
+  evidence_id: src_317d7af0c211b51d
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1157
+  match: rocdl.sched_vmem(
+  captured:
+  - sched_vmem
+  arch_scope: ''
+  evidence:
+  - '1155:                             rocdl.sched_mfma(2)'
+  - '1156:                         for _ in range_constexpr(LDG_REG_B_COUNT_AS):'
+  - '1157:                             rocdl.sched_vmem(1)'
+  - '1158:                             rocdl.sched_mfma(2)'
+  - '1159:                         remaining = max(MFMA_TOTAL - LDG_TOTAL * 2, 0)'
+  evidence_id: src_5f6cb587bcfbbaf1
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1158
+  match: rocdl.sched_mfma(
+  captured:
+  - sched_mfma
+  arch_scope: ''
+  evidence:
+  - '1156:                         for _ in range_constexpr(LDG_REG_B_COUNT_AS):'
+  - '1157:                             rocdl.sched_vmem(1)'
+  - '1158:                             rocdl.sched_mfma(2)'
+  - '1159:                         remaining = max(MFMA_TOTAL - LDG_TOTAL * 2, 0)'
+  - '1160:                         for _ in range_constexpr(remaining):'
+  evidence_id: src_a11b4fe273f8d64f
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1161
+  match: rocdl.sched_mfma(
+  captured:
+  - sched_mfma
+  arch_scope: ''
+  evidence:
+  - '1159:                         remaining = max(MFMA_TOTAL - LDG_TOTAL * 2, 0)'
+  - '1160:                         for _ in range_constexpr(remaining):'
+  - '1161:                             rocdl.sched_mfma(1)'
+  - '1162:                     else:'
+  - '1163:                         for _ in range_constexpr(WARP_K_STEPS * WARP_M_STEPS):'
+  evidence_id: src_5c9e92b46e8b3da8
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1164
+  match: rocdl.sched_dsrd(
+  captured:
+  - sched_dsrd
+  arch_scope: ''
+  evidence:
+  - '1162:                     else:'
+  - '1163:                         for _ in range_constexpr(WARP_K_STEPS * WARP_M_STEPS):'
+  - '1164:                             rocdl.sched_dsrd(1)'
+  - '1165:                         for _ in range_constexpr(WARP_K_STEPS * WARP_N_STEPS):'
+  - '1166:                             rocdl.sched_dsrd(1)'
+  evidence_id: src_56b83f58011ce7b5
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1166
+  match: rocdl.sched_dsrd(
+  captured:
+  - sched_dsrd
+  arch_scope: ''
+  evidence:
+  - '1164:                             rocdl.sched_dsrd(1)'
+  - '1165:                         for _ in range_constexpr(WARP_K_STEPS * WARP_N_STEPS):'
+  - '1166:                             rocdl.sched_dsrd(1)'
+  - '1167:                         for _ in range_constexpr(LDG_TOTAL):'
+  - '1168:                             rocdl.sched_vmem(1)'
+  evidence_id: src_f22a65ab1210ddec
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1168
+  match: rocdl.sched_vmem(
+  captured:
+  - sched_vmem
+  arch_scope: ''
+  evidence:
+  - '1166:                             rocdl.sched_dsrd(1)'
+  - '1167:                         for _ in range_constexpr(LDG_TOTAL):'
+  - '1168:                             rocdl.sched_vmem(1)'
+  - '1169:                             rocdl.sched_mfma(2)'
+  - '1170:                         remaining = max(MFMA_TOTAL - LDG_TOTAL * 2, 0)'
+  evidence_id: src_123841c8a77e75dd
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1169
+  match: rocdl.sched_mfma(
+  captured:
+  - sched_mfma
+  arch_scope: ''
+  evidence:
+  - '1167:                         for _ in range_constexpr(LDG_TOTAL):'
+  - '1168:                             rocdl.sched_vmem(1)'
+  - '1169:                             rocdl.sched_mfma(2)'
+  - '1170:                         remaining = max(MFMA_TOTAL - LDG_TOTAL * 2, 0)'
+  - '1171:                         for _ in range_constexpr(remaining):'
+  evidence_id: src_c0271ed5b613f6aa
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1172
+  match: rocdl.sched_mfma(
+  captured:
+  - sched_mfma
+  arch_scope: ''
+  evidence:
+  - '1170:                         remaining = max(MFMA_TOTAL - LDG_TOTAL * 2, 0)'
+  - '1171:                         for _ in range_constexpr(remaining):'
+  - '1172:                             rocdl.sched_mfma(1)'
+  - '1173:                     rocdl.sched_barrier(0)'
+  evidence_id: src_f81255d62866ef3f
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1173
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '1171:                         for _ in range_constexpr(remaining):'
+  - '1172:                             rocdl.sched_mfma(1)'
+  - '1173:                     rocdl.sched_barrier(0)'
+  - '1175:                 UNROLL = EFFECTIVE_B_TO_LDS_UNROLL'
+  evidence_id: src_6f1f2af08d541679
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1257
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '1255:                     )'
+  - '1256:                 )'
+  - '1257:             rocdl.sched_barrier(0)'
+  - '1259:             def hot_loop_scheduler():'
+  evidence_id: src_051a878cb05a2755
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1274
+  match: rocdl.sched_vmem(
+  captured:
+  - sched_vmem
+  arch_scope: ''
+  evidence:
+  - '1272:                 ldg_sched = OnlineScheduler(LDG_TOTAL, LDG_TOTAL)'
+  - '1273:                 for _ in range_constexpr(LDG_TOTAL):'
+  - '1274:                     rocdl.sched_vmem(ldg_sched.consume(1))'
+  - '1275:                     rocdl.sched_mfma(mfma_sched.consume(avg_mfma_count))'
+  - '1276:                 rocdl.sched_barrier(0)'
+  evidence_id: src_d0ca0d46a81dc1fb
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1275
+  match: rocdl.sched_mfma(
+  captured:
+  - sched_mfma
+  arch_scope: ''
+  evidence:
+  - '1273:                 for _ in range_constexpr(LDG_TOTAL):'
+  - '1274:                     rocdl.sched_vmem(ldg_sched.consume(1))'
+  - '1275:                     rocdl.sched_mfma(mfma_sched.consume(avg_mfma_count))'
+  - '1276:                 rocdl.sched_barrier(0)'
+  evidence_id: src_bbf6c5255caee2a1
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1276
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '1274:                     rocdl.sched_vmem(ldg_sched.consume(1))'
+  - '1275:                     rocdl.sched_mfma(mfma_sched.consume(avg_mfma_count))'
+  - '1276:                 rocdl.sched_barrier(0)'
+  - '1278:             TOTAL_C_FRAGS_LEN = C_FRAGS_LEN * N_TILE_REPEAT'
+  evidence_id: src_6259a3f62a721702
+- snapshot: aiter_a6bb4993
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1324
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '1322:                 a_frags_next = lds_matrix_a(next_stage)'
+  - '1323:                 k_offset = k_offset + fx.Int32(BLOCK_K)'
+  - '1324:                 rocdl.sched_barrier(0)'
+  - '1325:                 results = ('
+  - '1326:                     yield [k_offset, next_stage] + c_frags + a_frags_next + b_frags_next'
+  evidence_id: src_3593410a0d6adadc
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 406
+  match: raise ValueError(f"`small_m_hgemm.py` only supports bf16, got {dtype!r}
+  captured:
+  - '`small_m_hgemm.py` only supports bf16, got {dtype!r}'
+  arch_scope: ''
+  evidence:
+  - '404: ):'
+  - '405:     if dtype != "bf16":'
+  - '406:         raise ValueError(f"`small_m_hgemm.py` only supports bf16, got {dtype!r}")'
+  - '407:     if SPLIT_K < 1:'
+  - '408:         raise ValueError(f"SPLIT_K must be >= 1, got {SPLIT_K}")'
+  evidence_id: src_28bd92a5ca76bcf1
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 408
+  match: raise ValueError(f"SPLIT_K must be >= 1, got {SPLIT_K}
+  captured:
+  - SPLIT_K must be >= 1, got {SPLIT_K}
+  arch_scope: ''
+  evidence:
+  - '406:         raise ValueError(f"`small_m_hgemm.py` only supports bf16, got {dtype!r}")'
+  - '407:     if SPLIT_K < 1:'
+  - '408:         raise ValueError(f"SPLIT_K must be >= 1, got {SPLIT_K}")'
+  - '410:     GPU_ARCH = get_rocm_arch()'
+  evidence_id: src_1e56a42a78c2f47e
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 452
+  match: raise ValueError("wide-N repeat path only supports B_TO_LDS=False
+  captured:
+  - wide-N repeat path only supports B_TO_LDS=False
+  arch_scope: ''
+  evidence:
+  - '450:     if N_TILE_REPEAT > 1:'
+  - '451:         if B_TO_LDS:'
+  - '452:             raise ValueError("wide-N repeat path only supports B_TO_LDS=False")'
+  - '453:         classic_repeat = BLOCK_N_WARPS == 1 and TILE_N == 64'
+  - '454:         wave_repeat = N_TILE_REPEAT == 2 and BLOCK_N_WARPS == 2 and TILE_N == 192'
+  evidence_id: src_2ff1b5608a1ee285
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 456
+  end_line: 460
+  match: "raise ValueError(\n                \"wide-N repeat path requires either the classic"
+  captured:
+  - 'wide-N repeat path requires either the classic '
+  arch_scope: ''
+  evidence:
+  - '454:         wave_repeat = N_TILE_REPEAT == 2 and BLOCK_N_WARPS == 2 and TILE_N == 192'
+  - '455:         if not (classic_repeat or wave_repeat):'
+  - '456:             raise ValueError('
+  - '457:                 "wide-N repeat path requires either the classic "'
+  - '458:                 "(BLOCK_N_WARPS=1, TILE_N=64, N_TILE_REPEAT>1) setup or the "'
+  evidence_id: src_a122c82569632726
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 463
+  match: raise ValueError("persistent-N path requires B_TO_LDS=True
+  captured:
+  - persistent-N path requires B_TO_LDS=True
+  arch_scope: ''
+  evidence:
+  - '461:     if PERSISTENT_N_TILES > 1:'
+  - '462:         if not B_TO_LDS:'
+  - '463:             raise ValueError("persistent-N path requires B_TO_LDS=True")'
+  - '464:         if N_TILE_REPEAT != 1:'
+  - '465:             raise ValueError("persistent-N path requires N_TILE_REPEAT=1")'
+  evidence_id: src_cfc091e8259d80c1
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 465
+  match: raise ValueError("persistent-N path requires N_TILE_REPEAT=1
+  captured:
+  - persistent-N path requires N_TILE_REPEAT=1
+  arch_scope: ''
+  evidence:
+  - '463:             raise ValueError("persistent-N path requires B_TO_LDS=True")'
+  - '464:         if N_TILE_REPEAT != 1:'
+  - '465:             raise ValueError("persistent-N path requires N_TILE_REPEAT=1")'
+  - '466:         if TILE_N < 128:'
+  - '467:             raise ValueError("persistent-N path currently requires TILE_N >= 128")'
+  evidence_id: src_0f98a360fff0f2bc
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 467
+  match: raise ValueError("persistent-N path currently requires TILE_N >= 128
+  captured:
+  - persistent-N path currently requires TILE_N >= 128
+  arch_scope: ''
+  evidence:
+  - '465:             raise ValueError("persistent-N path requires N_TILE_REPEAT=1")'
+  - '466:         if TILE_N < 128:'
+  - '467:             raise ValueError("persistent-N path currently requires TILE_N >= 128")'
+  - '468:         if BLOCK_N_WARPS < 2:'
+  - '469:             raise ValueError("persistent-N path currently requires BLOCK_N_WARPS >= 2")'
+  evidence_id: src_aaa857993d1b21ad
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 469
+  match: raise ValueError("persistent-N path currently requires BLOCK_N_WARPS >= 2
+  captured:
+  - persistent-N path currently requires BLOCK_N_WARPS >= 2
+  arch_scope: ''
+  evidence:
+  - '467:             raise ValueError("persistent-N path currently requires TILE_N >= 128")'
+  - '468:         if BLOCK_N_WARPS < 2:'
+  - '469:             raise ValueError("persistent-N path currently requires BLOCK_N_WARPS >= 2")'
+  - '470:         if PERSISTENT_N_TILES > BLOCK_N_TILES:'
+  - '471:             raise ValueError('
+  evidence_id: src_4b4bf04065af1414
+- snapshot: aiter_a6bb4993
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 471
+  end_line: 474
+  match: "raise ValueError(\n                \"persistent-N path requires PERSISTENT_N_TILES <= total N tiles;"
+  captured:
+  - 'persistent-N path requires PERSISTENT_N_TILES <= total N tiles; '
+  arch_scope: ''
+  evidence:
+  - '469:             raise ValueError("persistent-N path currently requires BLOCK_N_WARPS >= 2")'
+  - '470:         if PERSISTENT_N_TILES > BLOCK_N_TILES:'
+  - '471:             raise ValueError('
+  - '472:                 "persistent-N path requires PERSISTENT_N_TILES <= total N tiles; "'
+  - '473:                 f"got {PERSISTENT_N_TILES} > {BLOCK_N_TILES}"'
+  evidence_id: src_cdafe9cc84c5bde8
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 712
+  end_line: 751
+  match: def split_k_barrier(
+  captured:
+  - split_k_barrier
+  arch_scope: ''
+  evidence:
+  - '710:                 scf.YieldOp([])'
+  - '712:         def split_k_barrier(counter_tensor, tile_counter_idx):'
+  - '713:             init_cur = arith.constant(0, type=T.i32)'
+  - '714:             w = scf.WhileOp([T.i32], [init_cur])'
+  evidence_id: src_284881f3cc4c325a
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1018
+  end_line: 1052
+  match: 'if const_expr(IS_SPLIT_K):'
+  captured:
+  - IS_SPLIT_K
+  arch_scope: ''
+  evidence:
+  - '1016:                         c_s[lds_m_idx, lds_n_idx] = val.truncf(dtype_)'
+  - '1018:         if const_expr(IS_SPLIT_K):'
+  - '1019:             cond_ks0 = arith.cmpi(arith.CmpIPredicate.eq, ks_idx, fx.Index(0))'
+  - '1020:             if const_expr(not B_TO_LDS):'
+  evidence_id: src_4b84b45f2f0d908c
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1124
+  end_line: 1137
+  match: 'if const_expr(IS_SPLIT_K):'
+  captured:
+  - IS_SPLIT_K
+  arch_scope: ''
+  evidence:
+  - '1122:             def run_b_to_lds_tile(tile_n_offset, tile_counter_idx):'
+  - '1123:                 c_frags_local = [acc_init] * C_FRAGS_LEN'
+  - '1124:                 if const_expr(IS_SPLIT_K):'
+  - '1125:                     cond_ks0_if = scf.IfOp(cond_ks0, results_=[], has_else=False)'
+  - '1126:                     with ir.InsertionPoint(cond_ks0_if.then_block):'
+  evidence_id: src_81debd304cec74a7
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1228
+  end_line: 1232
+  match: 'if const_expr(IS_SPLIT_K):'
+  captured:
+  - IS_SPLIT_K
+  arch_scope: ''
+  evidence:
+  - '1226:                 write_c_frags_to_lds(cs_, c_frags_local)'
+  - '1227:                 gpu.barrier()'
+  - '1228:                 if const_expr(IS_SPLIT_K):'
+  - '1229:                     split_k_barrier(COUNTER, tile_counter_idx)'
+  - '1230:                     store_split_k_tile(C, C_, cs_, tile_n_offset)'
+  evidence_id: src_50e8f7b1fa293082
+- snapshot: aiter_a6bb4993
+  category: split_k
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1365
+  end_line: 1369
+  match: 'if const_expr(IS_SPLIT_K):'
+  captured:
+  - IS_SPLIT_K
+  arch_scope: ''
+  evidence:
+  - '1363:                     write_c_frags_to_lds(cs_, tile_c_frags[tile_i])'
+  - '1364:                     gpu.barrier()'
+  - '1365:                     if const_expr(IS_SPLIT_K):'
+  - '1366:                         split_k_barrier(COUNTER, tile_counter_indices[tile_i])'
+  - '1367:                         store_split_k_tile(C, C_, cs_, tile_n_offsets[tile_i])'
+  evidence_id: src_03a3589096fb80e8
+- snapshot: aiter_a6bb4993
+  category: atomic_combine
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 966
+  end_line: 973
+  match: "llvm.AtomicRMWOp(\n                            llvm.AtomicBinOp.fadd"
+  captured:
+  - fadd
+  arch_scope: ''
+  evidence:
+  - '964:                         )'
+  - '965:                         pair_v = pair._value if hasattr(pair, "_value") else pair'
+  - '966:                         llvm.AtomicRMWOp('
+  - '967:                             llvm.AtomicBinOp.fadd,'
+  - '968:                             pair_ptr_v,'
+  evidence_id: src_39dac9712009eb08
+- snapshot: aiter_a6bb4993
+  category: fragment_layout
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 625
+  match: ldmatrix_a_m_idx = w_tid % WMMA_M
+  captured:
+  - ldmatrix_a_m_idx
+  - w_tid % WMMA_M
+  arch_scope: ''
+  evidence:
+  - '623:         warp_m_idx = fx.Int32(0)'
+  - '624:         warp_n_idx = wid * WARP_N'
+  - '625:         ldmatrix_a_m_idx = w_tid % WMMA_M'
+  - '626:         ldmatrix_a_k_vec_idx = w_tid // WMMA_M * WMMA_A_FRAG_VALUES * MFMA_PER_WARP_K'
+  - '627:         ldmatrix_b_n_idx = w_tid % WMMA_N'
+  evidence_id: src_0a8dcfc8b5e51958
+- snapshot: aiter_a6bb4993
+  category: fragment_layout
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 626
+  match: ldmatrix_a_k_vec_idx = w_tid // WMMA_M * WMMA_A_FRAG_VALUES * MFMA_PER_WARP_K
+  captured:
+  - ldmatrix_a_k_vec_idx
+  - w_tid // WMMA_M * WMMA_A_FRAG_VALUES * MFMA_PER_WARP_K
+  arch_scope: ''
+  evidence:
+  - '624:         warp_n_idx = wid * WARP_N'
+  - '625:         ldmatrix_a_m_idx = w_tid % WMMA_M'
+  - '626:         ldmatrix_a_k_vec_idx = w_tid // WMMA_M * WMMA_A_FRAG_VALUES * MFMA_PER_WARP_K'
+  - '627:         ldmatrix_b_n_idx = w_tid % WMMA_N'
+  - '628:         ldmatrix_b_k_vec_idx = w_tid // WMMA_N * WMMA_B_FRAG_VALUES * MFMA_PER_WARP_K'
+  evidence_id: src_6e9c30448f72b4fd
+- snapshot: aiter_a6bb4993
+  category: fragment_layout
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 627
+  match: ldmatrix_b_n_idx = w_tid % WMMA_N
+  captured:
+  - ldmatrix_b_n_idx
+  - w_tid % WMMA_N
+  arch_scope: ''
+  evidence:
+  - '625:         ldmatrix_a_m_idx = w_tid % WMMA_M'
+  - '626:         ldmatrix_a_k_vec_idx = w_tid // WMMA_M * WMMA_A_FRAG_VALUES * MFMA_PER_WARP_K'
+  - '627:         ldmatrix_b_n_idx = w_tid % WMMA_N'
+  - '628:         ldmatrix_b_k_vec_idx = w_tid // WMMA_N * WMMA_B_FRAG_VALUES * MFMA_PER_WARP_K'
+  evidence_id: src_9cc81482ab9ce6e9
+- snapshot: aiter_a6bb4993
+  category: fragment_layout
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 628
+  match: ldmatrix_b_k_vec_idx = w_tid // WMMA_N * WMMA_B_FRAG_VALUES * MFMA_PER_WARP_K
+  captured:
+  - ldmatrix_b_k_vec_idx
+  - w_tid // WMMA_N * WMMA_B_FRAG_VALUES * MFMA_PER_WARP_K
+  arch_scope: ''
+  evidence:
+  - '626:         ldmatrix_a_k_vec_idx = w_tid // WMMA_M * WMMA_A_FRAG_VALUES * MFMA_PER_WARP_K'
+  - '627:         ldmatrix_b_n_idx = w_tid % WMMA_N'
+  - '628:         ldmatrix_b_k_vec_idx = w_tid // WMMA_N * WMMA_B_FRAG_VALUES * MFMA_PER_WARP_K'
+  - '630:         A_FRAGS_LEN = WARP_K_STEPS * WARP_M_STEPS'
+  evidence_id: src_87453420ec13d5de
+- snapshot: aiter_a6bb4993
+  category: fragment_layout
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 998
+  match: stmatrix_c_m_vec_idx = w_tid // WMMA_N * WMMA_C_FRAG_VALUES
+  captured:
+  - stmatrix_c_m_vec_idx
+  - w_tid // WMMA_N * WMMA_C_FRAG_VALUES
+  arch_scope: ''
+  evidence:
+  - '996:                     scf.YieldOp([])'
+  - '998:         stmatrix_c_m_vec_idx = w_tid // WMMA_N * WMMA_C_FRAG_VALUES'
+  - '999:         stmatrix_c_n_idx = w_tid % WMMA_N'
+  evidence_id: src_2a3938a5bfbd5582
+- snapshot: aiter_a6bb4993
+  category: fragment_layout
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 999
+  match: stmatrix_c_n_idx = w_tid % WMMA_N
+  captured:
+  - stmatrix_c_n_idx
+  - w_tid % WMMA_N
+  arch_scope: ''
+  evidence:
+  - '998:         stmatrix_c_m_vec_idx = w_tid // WMMA_N * WMMA_C_FRAG_VALUES'
+  - '999:         stmatrix_c_n_idx = w_tid % WMMA_N'
+  - '1001:         def write_c_frags_to_lds(c_s, tile_c_frags_):'
+  evidence_id: src_0201f421d09959ff
+- snapshot: aiter_a6bb4993
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 1399
+  end_line: 1403
+  match: ".launch(\n            grid=(bm, bn, SPLIT_K)"
+  captured:
+  - bm, bn, SPLIT_K
+  arch_scope: ''
+  evidence:
+  - '1397:         bn = (n // BLOCK_N + tile_group - 1) // tile_group'
+  - '1398:         small_m_hgemm_kernel._func.__name__ = KERNEL_NAME'
+  - '1399:         small_m_hgemm_kernel(C, A, B, BIAS, m, COUNTER, signal_state).launch('
+  - '1400:             grid=(bm, bn, SPLIT_K),'
+  - '1401:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_569b9cec48bd2103
+- snapshot: aiter_a6bb4993
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  line: 388
+  match: '@functools.lru_cache(maxsize=1024)
+
+    def compile_small_m_hgemm_kernel'
+  captured:
+  - '1024'
+  - compile_small_m_hgemm_kernel
+  arch_scope: ''
+  evidence:
+  - '388: @functools.lru_cache(maxsize=1024)'
+  - '389: def compile_small_m_hgemm_kernel('
+  - '390:     dtype: str,'
+  evidence_id: src_1e5ae08be5adf756
+- snapshot: aiter_a6bb4993
+  category: config_limit
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1658
+  match: MAX_N = 16
+  captured:
+  - MAX_N
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '1656: }'
+  - '1658: constexpr int MAX_N = 16;'
+  - '1659: template <typename fptype, int N>'
+  - '1660: void launch_wv_splitk_small_fp16_bf16_kernel('
+  evidence_id: src_b17fb1dac97b8345
+- snapshot: aiter_a6bb4993
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 287
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '285:     auto bf4 = reinterpret_cast<const scalar2_t*>(in_b);'
+  - '286:     auto c   = reinterpret_cast<scalar2_t*>(out_c);'
+  - '287:     __shared__ float red_smem[NUM_A_ROWS_PER_BLOCK][WARP_SIZE];'
+  - '288:     const int row_addr  = blockIdx.x * NUM_A_ROWS_PER_BLOCK * K / 8;'
+  - '289:     const int threadid  = threadIdx.x;'
+  evidence_id: src_e67d974c794d2c30
+- snapshot: aiter_a6bb4993
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 713
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - "711:     //\t     then this is not goint to work!"
+  - '712:     //----------------------------------------------------'
+  - '713:     __shared__ scalar_t s[1024 * 32];'
+  - '715:     //----------------------------------------------------'
+  evidence_id: src_f9a2106c23412f25
+- snapshot: aiter_a6bb4993
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 976
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - "974:     //\t     then this is not goint to work!"
+  - '975:     //----------------------------------------------------'
+  - '976:     __shared__ scalar_t s[1024 * 32];'
+  - '978:     //----------------------------------------------------'
+  evidence_id: src_553fca16fc1cb85c
+- snapshot: aiter_a6bb4993
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1284
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - "1282:     //\t     then this is not goint to work!"
+  - '1283:     //----------------------------------------------------'
+  - '1284:     __shared__ scalar_t s[1024 * 32];'
+  - '1286:     //----------------------------------------------------'
+  evidence_id: src_21790301b27b0a3b
+- snapshot: aiter_a6bb4993
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1808
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '1806:     };'
+  - '1808:     __shared__ fp8_t s[1024 * 64];'
+  - '1810:     for(uint32_t k = (threadIdx.y * THRDS + threadIdx.x) * A_CHUNK; k < min(K * N, 64 * 1024);'
+  evidence_id: src_c3cebd71da3c515d
+- snapshot: aiter_a6bb4993
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2029
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '2027:     };'
+  - '2029:     __shared__ fp8_t s[1024 * 64];'
+  - '2031:     for(uint32_t k = (threadIdx.y * THRDS + threadIdx.x) * A_CHUNK; k < min(K * N, 64 * 1024);'
+  evidence_id: src_306af81d1fcf71a3
+- snapshot: aiter_a6bb4993
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2419
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '2417:                                      int numCColumns)'
+  - '2418: {'
+  - '2419:     __shared__ float sA[TILE_WIDTH][TILE_WIDTH]; // Tile size of 32x32'
+  - '2420:     __shared__ float sB[TILE_WIDTH][TILE_WIDTH];'
+  evidence_id: src_fe6117870489cf91
+- snapshot: aiter_a6bb4993
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2420
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '2418: {'
+  - '2419:     __shared__ float sA[TILE_WIDTH][TILE_WIDTH]; // Tile size of 32x32'
+  - '2420:     __shared__ float sB[TILE_WIDTH][TILE_WIDTH];'
+  - '2422:     int Row                      = blockDim.y * blockIdx.y + threadIdx.y;'
+  evidence_id: src_396f7df79329c192
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1894
+  match: __builtin_amdgcn_mfma_f32_32x32x16_fp8_fp8(
+  captured:
+  - mfma_f32_32x32x16_fp8_fp8
+  arch_scope: ''
+  evidence:
+  - '1892:                         for(int y = 0; y < YTILE; ++y)'
+  - '1893:                         {'
+  - '1894:                             sum[n][y] = __builtin_amdgcn_mfma_f32_32x32x16_fp8_fp8('
+  - '1895:                                 bigA[n][k2].l[i / 8], bigB[y][k2].l[i / 8], sum[n][y], 0, 0, 0);'
+  - '1896:                         }'
+  evidence_id: src_336caef9e32ee7b3
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2109
+  match: __builtin_amdgcn_mfma_f32_32x32x16_fp8_fp8(
+  captured:
+  - mfma_f32_32x32x16_fp8_fp8
+  arch_scope: ''
+  evidence:
+  - '2107:                         for(int y = 0; y < YTILE; ++y)'
+  - '2108:                         {'
+  - '2109:                             sum[n][y] = __builtin_amdgcn_mfma_f32_32x32x16_fp8_fp8('
+  - '2110:                                 bigA[n][k2].l[i / 8], bigB[y][k2].l[i / 8], sum[n][y], 0, 0, 0);'
+  - '2111:                         }'
+  evidence_id: src_a04d0d59b5f2a8f9
+- snapshot: aiter_a6bb4993
+  category: waves
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 436
+  match: __launch_bounds__(WvPrGrp* THRDS)
+  captured:
+  - WvPrGrp* THRDS
+  arch_scope: ''
+  evidence:
+  - '434: // This version targets cases where A[] fits LDS capacity'
+  - '435: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>'
+  - '436: __global__ void __launch_bounds__(WvPrGrp* THRDS)'
+  - '437:     wv_splitk_small_fp16_bf16_kernel(const int K,'
+  - '438:                                      const int M,'
+  evidence_id: src_8ad9766662f97b19
+- snapshot: aiter_a6bb4993
+  category: waves
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 688
+  match: __launch_bounds__(WvPrGrp* THRDS)
+  captured:
+  - WvPrGrp* THRDS
+  arch_scope: ''
+  evidence:
+  - '686: // This version targets cases where A[] fits LDS capacity'
+  - '687: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>'
+  - '688: __global__ void __launch_bounds__(WvPrGrp* THRDS) wvSplitK_hf_sml_(const int K,'
+  - '689:                                                                    const int M,'
+  - '690:                                                                    const scalar_t* B,'
+  evidence_id: src_d33d9c364eba88bd
+- snapshot: aiter_a6bb4993
+  category: waves
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 951
+  match: __launch_bounds__(WvPrGrp* THRDS)
+  captured:
+  - WvPrGrp* THRDS
+  arch_scope: ''
+  evidence:
+  - '949: // This version targets cases where A[] marginally exceeds LDS capacity'
+  - '950: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>'
+  - '951: __global__ void __launch_bounds__(WvPrGrp* THRDS) wvSplitK_hf_(const int K,'
+  - '952:                                                                const int M,'
+  - '953:                                                                const scalar_t* B,'
+  evidence_id: src_ae811c921394c387
+- snapshot: aiter_a6bb4993
+  category: waves
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1258
+  match: __launch_bounds__(WvPrGrp* THRDS)
+  captured:
+  - WvPrGrp* THRDS
+  arch_scope: ''
+  evidence:
+  - '1256: // This version targets big A[] cases, where it is much larger than LDS capacity'
+  - '1257: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>'
+  - '1258: __global__ void __launch_bounds__(WvPrGrp* THRDS) wvSplitK_hf_big_(const int K,'
+  - '1259:                                                                    const int M,'
+  - '1260:                                                                    const scalar_t* B,'
+  evidence_id: src_1e38a39ffda0b887
+- snapshot: aiter_a6bb4993
+  category: waves
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1783
+  match: __launch_bounds__(WvPrGrp* THRDS)
+  captured:
+  - WvPrGrp* THRDS
+  arch_scope: ''
+  evidence:
+  - '1781:           int UNRL,'
+  - '1782:           int N>'
+  - '1783: __global__ void __launch_bounds__(WvPrGrp* THRDS) wvSplitKQ_hf_sml_(const int K,'
+  - '1784:                                                                     const int Kp,'
+  - '1785:                                                                     const int M,'
+  evidence_id: src_7a124b7859153458
+- snapshot: aiter_a6bb4993
+  category: waves
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2004
+  match: __launch_bounds__(WvPrGrp* THRDS)
+  captured:
+  - WvPrGrp* THRDS
+  arch_scope: ''
+  evidence:
+  - '2002:           int UNRL,'
+  - '2003:           int N>'
+  - '2004: __global__ void __launch_bounds__(WvPrGrp* THRDS) wvSplitKQ_hf_(const int K,'
+  - '2005:                                                                 const int Kp,'
+  - '2006:                                                                 const int M,'
+  evidence_id: src_0f46defa8452287e
+- snapshot: aiter_a6bb4993
+  category: waves
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2267
+  match: __launch_bounds__(512)
+  captured:
+  - '512'
+  arch_scope: ''
+  evidence:
+  - '2266: template <int nThreads_per_row, int CTA, int MT0, int MT1>'
+  - '2267: __global__ __launch_bounds__(512) void HGEMV_WFPerRow('
+  - '2268:     int m, int n, const _Float16* A, int lda, const _Float16* x, _Float16* y)'
+  - '2269: {'
+  evidence_id: src_fba0f93e614e1b90
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 435
+  match: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>
+  captured:
+  - typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N
+  arch_scope: ''
+  evidence:
+  - '434: // This version targets cases where A[] fits LDS capacity'
+  - '435: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>'
+  - '436: __global__ void __launch_bounds__(WvPrGrp* THRDS)'
+  - '437:     wv_splitk_small_fp16_bf16_kernel(const int K,'
+  evidence_id: src_346fe67511bac3d2
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 671
+  match: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>
+  captured:
+  - typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N
+  arch_scope: ''
+  evidence:
+  - '669: #else // !defined(__HIP__MI350_MI300_MI250__) TODO: Add NAVI support'
+  - '671: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>'
+  - '672: __global__ void wv_splitk_small_fp16_bf16_kernel(const int K,'
+  - '673:                                                  const int M,'
+  evidence_id: src_f5fb8394038e718b
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 687
+  match: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>
+  captured:
+  - typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N
+  arch_scope: ''
+  evidence:
+  - '685: #if defined(__HIP__MI350_MI300_MI250__) // TODO: Add NAVI support'
+  - '686: // This version targets cases where A[] fits LDS capacity'
+  - '687: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>'
+  - '688: __global__ void __launch_bounds__(WvPrGrp* THRDS) wvSplitK_hf_sml_(const int K,'
+  - '689:                                                                    const int M,'
+  evidence_id: src_d78de056f0337d85
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 935
+  match: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>
+  captured:
+  - typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N
+  arch_scope: ''
+  evidence:
+  - '933: }'
+  - '934: #else  // !defined(__HIP__MI350_MI300_MI250__) TODO: Add NAVI support'
+  - '935: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>'
+  - '936: __global__ void wvSplitK_hf_sml_(const int K,'
+  - '937:                                  const int M,'
+  evidence_id: src_1c4e900550681cf1
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 950
+  match: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>
+  captured:
+  - typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N
+  arch_scope: ''
+  evidence:
+  - '948: #if defined(__HIP__MI350_MI300_MI250__) // TODO: Add NAVI support'
+  - '949: // This version targets cases where A[] marginally exceeds LDS capacity'
+  - '950: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>'
+  - '951: __global__ void __launch_bounds__(WvPrGrp* THRDS) wvSplitK_hf_(const int K,'
+  - '952:                                                                const int M,'
+  evidence_id: src_7c65703639466867
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1242
+  match: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>
+  captured:
+  - typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N
+  arch_scope: ''
+  evidence:
+  - '1241: #else  // !defined(__HIP__MI350_MI300_MI250__) TODO: Add NAVI support'
+  - '1242: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>'
+  - '1243: __global__ void wvSplitK_hf_(const int K,'
+  - '1244:                              const int M,'
+  evidence_id: src_a6f022872d863d0c
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1257
+  match: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>
+  captured:
+  - typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N
+  arch_scope: ''
+  evidence:
+  - '1255: #if defined(__HIP__MI350_MI300_MI250__) // TODO: Add NAVI support'
+  - '1256: // This version targets big A[] cases, where it is much larger than LDS capacity'
+  - '1257: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>'
+  - '1258: __global__ void __launch_bounds__(WvPrGrp* THRDS) wvSplitK_hf_big_(const int K,'
+  - '1259:                                                                    const int M,'
+  evidence_id: src_76c31a798be1b677
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1608
+  match: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>
+  captured:
+  - typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N
+  arch_scope: ''
+  evidence:
+  - '1606: }'
+  - '1607: #else  // !defined(__HIP__MI350_MI300_MI250__) TODO: Add NAVI support'
+  - '1608: template <typename scalar_t, int THRDS, int YTILE, int WvPrGrp, int A_CHUNK, int UNRL, int N>'
+  - '1609: __global__ void wvSplitK_hf_big_(const int K,'
+  - '1610:                                  const int M,'
+  evidence_id: src_83da15736b6241da
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1775
+  match: "template <typename scalar_t,\n          typename fp8_t,\n          int THRDS,\n          int YTILE,\n\
+    \          int WvPrGrp,\n          int A_CHUNK,\n          int UNRL,\n          int N>"
+  captured:
+  - "typename scalar_t,\n          typename fp8_t,\n          int THRDS,\n          int YTILE,\n          int\
+    \ WvPrGrp,\n          int A_CHUNK,\n          int UNRL,\n          int N"
+  arch_scope: ''
+  evidence:
+  - '1774: #if defined(__HIP__MI350_MI300_MI250__) // TODO: Add NAVI support'
+  - '1775: template <typename scalar_t,'
+  - '1776:           typename fp8_t,'
+  - '1777:           int THRDS,'
+  evidence_id: src_5147e7cddd350323
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1972
+  match: "template <typename scalar_t,\n          typename fp8_t,\n          int THRDS,\n          int YTILE,\n\
+    \          int WvPrGrp,\n          int A_CHUNK,\n          int UNRL,\n          int N>"
+  captured:
+  - "typename scalar_t,\n          typename fp8_t,\n          int THRDS,\n          int YTILE,\n          int\
+    \ WvPrGrp,\n          int A_CHUNK,\n          int UNRL,\n          int N"
+  arch_scope: ''
+  evidence:
+  - '1970: }'
+  - '1971: #else  // !defined(__HIP__MI350_MI300_MI250__) TODO: Add NAVI support'
+  - '1972: template <typename scalar_t,'
+  - '1973:           typename fp8_t,'
+  - '1974:           int THRDS,'
+  evidence_id: src_476c3b249ceab7f6
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1996
+  match: "template <typename scalar_t,\n          typename fp8_t,\n          int THRDS,\n          int YTILE,\n\
+    \          int WvPrGrp,\n          int A_CHUNK,\n          int UNRL,\n          int N>"
+  captured:
+  - "typename scalar_t,\n          typename fp8_t,\n          int THRDS,\n          int YTILE,\n          int\
+    \ WvPrGrp,\n          int A_CHUNK,\n          int UNRL,\n          int N"
+  arch_scope: ''
+  evidence:
+  - '1995: #if defined(__HIP__MI350_MI300_MI250__) // TODO: Add NAVI support'
+  - '1996: template <typename scalar_t,'
+  - '1997:           typename fp8_t,'
+  - '1998:           int THRDS,'
+  evidence_id: src_a86279d9f1c24768
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2189
+  match: "template <typename scalar_t,\n          typename fp8_t,\n          int THRDS,\n          int YTILE,\n\
+    \          int WvPrGrp,\n          int A_CHUNK,\n          int UNRL,\n          int N>"
+  captured:
+  - "typename scalar_t,\n          typename fp8_t,\n          int THRDS,\n          int YTILE,\n          int\
+    \ WvPrGrp,\n          int A_CHUNK,\n          int UNRL,\n          int N"
+  arch_scope: ''
+  evidence:
+  - '2187: }'
+  - '2188: #else  // !defined(__HIP__MI350_MI300_MI250__) TODO: Add NAVI support'
+  - '2189: template <typename scalar_t,'
+  - '2190:           typename fp8_t,'
+  - '2191:           int THRDS,'
+  evidence_id: src_3d82e86b5f00ea7c
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1736
+  match: if((K_in * N_in <= 32 * 1024)
+  captured:
+  - K_in * N_in <= 32 * 1024
+  arch_scope: ''
+  evidence:
+  - '1734:     {                                                                                      \'
+  - '1735:         dim3 block(64, _WvPrGrp);                                                          \'
+  - '1736:         if((K_in * N_in <= 32 * 1024) && (M_in % _YTILEs == 0))                            \'
+  - '1737:         {                                                                                  \'
+  - '1738:             int __wvPrGrp = mindiv(M_in, CuCount * _YTILEs, _WvPrGrp);                     \'
+  evidence_id: src_abfa46c903cb04ea
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1742
+  match: if(K_in * N_in <= 32 * 1024 * 1.2)
+  captured:
+  - K_in * N_in <= 32 * 1024 * 1.2
+  arch_scope: ''
+  evidence:
+  - '1740:                 <<<grid, block, 0, stream>>>(K_in, M_in, af4, bf4, c, __wvPrGrp, CuCount); \'
+  - '1741:         }                                                                                  \'
+  - '1742:         else if(K_in * N_in <= 32 * 1024 * 1.2)                                            \'
+  - '1743:         {                                                                                  \'
+  - '1744:             int __wvPrGrp = mindiv(M_in, CuCount * _YTILEm, _WvPrGrp);                     \'
+  evidence_id: src_abb2ef768886f8dc
+- snapshot: aiter_a6bb4993
+  category: kernel_family
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2229
+  match: if((K_in * N_in <= 64 * 1024)
+  captured:
+  - K_in * N_in <= 64 * 1024
+  arch_scope: ''
+  evidence:
+  - '2227:     {                                                                                              \'
+  - '2228:         dim3 block(64, _WvPrGrp);                                                                  \'
+  - '2229:         if((K_in * N_in <= 64 * 1024) && (M_in % _YTILEs == 0))                                    \'
+  - '2230:         {                                                                                          \'
+  - '2231:             int __wvPrGrp = mindiv(M_in, CuCount * _YTILEs, _WvPrGrp);                             \'
+  evidence_id: src_b8e76e6d00fd7ca3
+- snapshot: aiter_a6bb4993
+  category: grid_fill
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1738
+  match: __wvPrGrp = mindiv(M_in, CuCount * _YTILEs, _WvPrGrp)
+  captured:
+  - __wvPrGrp
+  - mindiv(M_in, CuCount * _YTILEs, _WvPrGrp)
+  arch_scope: ''
+  evidence:
+  - '1736:         if((K_in * N_in <= 32 * 1024) && (M_in % _YTILEs == 0))                            \'
+  - '1737:         {                                                                                  \'
+  - '1738:             int __wvPrGrp = mindiv(M_in, CuCount * _YTILEs, _WvPrGrp);                     \'
+  - '1739:             wvSplitK_hf_sml_<fptype, 64, _YTILEs, _WvPrGrp, 8, _UNRLs, _N>                 \'
+  - '1740:                 <<<grid, block, 0, stream>>>(K_in, M_in, af4, bf4, c, __wvPrGrp, CuCount); \'
+  evidence_id: src_4afbdde799d96232
+- snapshot: aiter_a6bb4993
+  category: grid_fill
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1744
+  match: __wvPrGrp = mindiv(M_in, CuCount * _YTILEm, _WvPrGrp)
+  captured:
+  - __wvPrGrp
+  - mindiv(M_in, CuCount * _YTILEm, _WvPrGrp)
+  arch_scope: ''
+  evidence:
+  - '1742:         else if(K_in * N_in <= 32 * 1024 * 1.2)                                            \'
+  - '1743:         {                                                                                  \'
+  - '1744:             int __wvPrGrp = mindiv(M_in, CuCount * _YTILEm, _WvPrGrp);                     \'
+  - '1745:             wvSplitK_hf_<fptype, 64, _YTILEm, _WvPrGrp, 8, _UNRLm, _N>                     \'
+  - '1746:                 <<<grid, block, 0, stream>>>(K_in, M_in, af4, bf4, c, __wvPrGrp, CuCount); \'
+  evidence_id: src_1403228fc6c1ccdb
+- snapshot: aiter_a6bb4993
+  category: grid_fill
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1750
+  match: __wvPrGrp = mindiv(M_in, CuCount * _YTILEb, _WvPrGrp)
+  captured:
+  - __wvPrGrp
+  - mindiv(M_in, CuCount * _YTILEb, _WvPrGrp)
+  arch_scope: ''
+  evidence:
+  - '1748:         else                                                                               \'
+  - '1749:         {                                                                                  \'
+  - '1750:             int __wvPrGrp = mindiv(M_in, CuCount * _YTILEb, _WvPrGrp);                     \'
+  - '1751:             wvSplitK_hf_big_<fptype, 64, _YTILEb, _WvPrGrp, 8, _UNRLb, _N>                 \'
+  - '1752:                 <<<grid, block, 0, stream>>>(K_in, M_in, af4, bf4, c, __wvPrGrp, CuCount); \'
+  evidence_id: src_b7ec40f16de5bd46
+- snapshot: aiter_a6bb4993
+  category: grid_fill
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2231
+  match: __wvPrGrp = mindiv(M_in, CuCount * _YTILEs, _WvPrGrp)
+  captured:
+  - __wvPrGrp
+  - mindiv(M_in, CuCount * _YTILEs, _WvPrGrp)
+  arch_scope: ''
+  evidence:
+  - '2229:         if((K_in * N_in <= 64 * 1024) && (M_in % _YTILEs == 0))                                    \'
+  - '2230:         {                                                                                          \'
+  - '2231:             int __wvPrGrp = mindiv(M_in, CuCount * _YTILEs, _WvPrGrp);                             \'
+  - '2232:             wvSplitKQ_hf_sml_<fptype, fp8_t, 64, _YTILEs, _WvPrGrp, 16, _UNRLs, _N>                \'
+  - '2233:                 <<<grid, block, 0, stream>>>(                                                      \'
+  evidence_id: src_e32202e7a829f4ab
+- snapshot: aiter_a6bb4993
+  category: grid_fill
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2238
+  match: __wvPrGrp = mindiv(M_in, CuCount * _YTILEm, _WvPrGrp)
+  captured:
+  - __wvPrGrp
+  - mindiv(M_in, CuCount * _YTILEm, _WvPrGrp)
+  arch_scope: ''
+  evidence:
+  - '2236:         else                                                                                       \'
+  - '2237:         {                                                                                          \'
+  - '2238:             int __wvPrGrp = mindiv(M_in, CuCount * _YTILEm, _WvPrGrp);                             \'
+  - '2239:             wvSplitKQ_hf_<fptype, fp8_t, 64, _YTILEm, _WvPrGrp, 16, _UNRLm, _N>                    \'
+  - '2240:                 <<<grid, block, 0, stream>>>(                                                      \'
+  evidence_id: src_ae2942278a285f31
+- snapshot: aiter_a6bb4993
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 350
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '348:         for(int i = 0; i < NUM_A_ROWS_PER_BLOCK; i++)'
+  - '349:         {'
+  - '350:             acc[i] += __shfl_xor(acc[i], mask);'
+  - '351:         }'
+  - '352:     }'
+  evidence_id: src_0b8de37c2b304d4a
+- snapshot: aiter_a6bb4993
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 368
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '366:         for(int mask = num_warps / 2; mask >= 1; mask /= 2)'
+  - '367:         {'
+  - '368:             acc[qwarpid] += __shfl_xor(acc[qwarpid], mask);'
+  - '369:         }'
+  - '370:         float oval2 = __shfl_xor(acc[qwarpid], num_warps);'
+  evidence_id: src_bb221ee547586bda
+- snapshot: aiter_a6bb4993
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 370
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '368:             acc[qwarpid] += __shfl_xor(acc[qwarpid], mask);'
+  - '369:         }'
+  - '370:         float oval2 = __shfl_xor(acc[qwarpid], num_warps);'
+  - '372:         if(lane % (num_warps * 2) == 0)'
+  evidence_id: src_a9ca628df4d7f9f9
+- snapshot: aiter_a6bb4993
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1951
+  match: __shfl(
+  captured:
+  - __shfl
+  arch_scope: ''
+  evidence:
+  - '1949:                     : "=v"(accm16)'
+  - '1950:                     : "0"(accm16), "v"(sum[n][y][15]), "v"(accm16));'
+  - '1951:                 accm0 += __shfl(accm0, 36);'
+  - '1952:                 accm16 += __shfl(accm16, 52);'
+  - '1953:                 sum[n][y][0] = accm0 + __shfl(accm16, 16);'
+  evidence_id: src_c99341de831ed9d8
+- snapshot: aiter_a6bb4993
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1952
+  match: __shfl(
+  captured:
+  - __shfl
+  arch_scope: ''
+  evidence:
+  - '1950:                     : "0"(accm16), "v"(sum[n][y][15]), "v"(accm16));'
+  - '1951:                 accm0 += __shfl(accm0, 36);'
+  - '1952:                 accm16 += __shfl(accm16, 52);'
+  - '1953:                 sum[n][y][0] = accm0 + __shfl(accm16, 16);'
+  - '1954:             }'
+  evidence_id: src_ea240ed2d9a34b12
+- snapshot: aiter_a6bb4993
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 1953
+  match: __shfl(
+  captured:
+  - __shfl
+  arch_scope: ''
+  evidence:
+  - '1951:                 accm0 += __shfl(accm0, 36);'
+  - '1952:                 accm16 += __shfl(accm16, 52);'
+  - '1953:                 sum[n][y][0] = accm0 + __shfl(accm16, 16);'
+  - '1954:             }'
+  - '1955:         }'
+  evidence_id: src_f3b7cd77f71cdcb2
+- snapshot: aiter_a6bb4993
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2166
+  match: __shfl(
+  captured:
+  - __shfl
+  arch_scope: ''
+  evidence:
+  - '2164:                     : "=v"(accm16)'
+  - '2165:                     : "0"(accm16), "v"(sum[n][y][15]), "v"(accm16));'
+  - '2166:                 accm0 += __shfl(accm0, 36);'
+  - '2167:                 accm16 += __shfl(accm16, 52);'
+  - '2168:                 sum[n][y][0] = accm0 + __shfl(accm16, 16);'
+  evidence_id: src_3c871a9f030845a1
+- snapshot: aiter_a6bb4993
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2167
+  match: __shfl(
+  captured:
+  - __shfl
+  arch_scope: ''
+  evidence:
+  - '2165:                     : "0"(accm16), "v"(sum[n][y][15]), "v"(accm16));'
+  - '2166:                 accm0 += __shfl(accm0, 36);'
+  - '2167:                 accm16 += __shfl(accm16, 52);'
+  - '2168:                 sum[n][y][0] = accm0 + __shfl(accm16, 16);'
+  - '2169:             }'
+  evidence_id: src_0308fb2e6e71b219
+- snapshot: aiter_a6bb4993
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2168
+  match: __shfl(
+  captured:
+  - __shfl
+  arch_scope: ''
+  evidence:
+  - '2166:                 accm0 += __shfl(accm0, 36);'
+  - '2167:                 accm16 += __shfl(accm16, 52);'
+  - '2168:                 sum[n][y][0] = accm0 + __shfl(accm16, 16);'
+  - '2169:             }'
+  - '2170:         }'
+  evidence_id: src_ae2617e9376b0155
+- snapshot: aiter_a6bb4993
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/custom_kernels.cu
+  line: 2333
+  match: __shfl_down(
+  captured:
+  - __shfl_down
+  arch_scope: ''
+  evidence:
+  - '2331:             for(int offset = nThreads_per_row >> 1; offset >= 1; offset = offset >> 1)'
+  - '2332:             {'
+  - '2333:                 sum[i] += __shfl_down(sum[i], offset, nThreads_per_row);'
+  - '2334:             }'
+  - '2335:         }'
+  evidence_id: src_6eb77efbe9c9c8cb

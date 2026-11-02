@@ -1,0 +1,58 @@
+schema_version: 2
+operator: qk_norm_rope_cache
+sources:
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  language: triton
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  language: hip
+  include_symbols: true
+validation_sources:
+- snapshot: aiter_b3ad6c46
+  file: op_tests/multigpu_tests/test_fused_qknorm_ar.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/op_benchmarks/triton/bench_fused_qk_norm_rope_gate_fp8_quant.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/op_benchmarks/triton/bench_fused_qk_norm_rope_group_quant.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/op_benchmarks/triton/bench_fused_reduce_qk_norm_rope_swa_write.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_flydsl_qk_norm_rope_quant.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_fused_qk_norm.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_fused_qk_norm_mrope_cache_quant.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_fused_qk_norm_rope_1way_perhead.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_fused_qk_norm_rope_2way_perhead.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_fused_qk_norm_rope_cache_quant.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_fused_qk_norm_rope_group_quant.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_fused_qk_rmsnorm_group_quant.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_fused_qk_rmsnorm_per_token_quant.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_fused_qknorm_idxrqknorm.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/fusions/test_fused_qk_norm_rope_group_quant.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/fusions/test_fused_reduce_qk_norm_rope_swa_write.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/rope/test_fused_qk_norm_rope_cached.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/rope/test_fused_qk_norm_rope_gate_fp8_quant.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/rope/test_fused_qkv_split_qk_rope.py
+coverage_notes:
+- Source observations and conditioned candidates for qk norm rope cache; source presence is not a measured
+  winner.
+- No new GPU measurements or binary disassembly are included.

@@ -1,0 +1,151 @@
+schema_version: 2
+description: Operator-local corpus; paths are repository-relative. Source/config references are snapshot-qualified.
+authoring_languages:
+- triton
+- flydsl
+- hip
+- ck
+- asm
+- tilelang
+- gluon
+- rocwmma
+- hipkittens
+- mojo
+- cutlass_port
+snapshots:
+  aiter_a6bb4993:
+    repository: https://github.com/ROCm/aiter.git
+    commit: a6bb499375849eec45d68c5ccaebc8865fd422c0
+  aiter_b3ad6c46:
+    repository: https://github.com/ROCm/aiter.git
+    commit: b3ad6c461703110dc36286265c16e453ef0e2dd2
+families:
+- id: gemm
+  title: GEMM and projection fusions
+  operators:
+  - batched_gemm
+  - dense_gemm
+  - gemm_epilogue_fused
+  - scaled_quant_gemm
+  - skinny_gemv_decode
+  - splitk_streamk_gemm
+- id: attention
+  title: Attention, KV caches and preparation fusions
+  operators:
+  - attention_decode_paged
+  - attention_prefill_fmha
+  - chunked_prefill
+  - compressed_attention
+  - context_parallel_attention
+  - gqa_mqa_attention
+  - linear_attention_gated_delta
+  - mla_attention
+  - qk_norm_rope_cache
+  - sliding_window_attention
+  - sparse_attention_nsa
+- id: moe
+  title: MoE routing, expert GEMMs and combine
+  operators:
+  - fused_moe_grouped_gemm
+  - grouped_gemm_moe
+  - moe_dispatch_combine
+  - moe_routing_topk
+  - shared_expert_fusion
+- id: indexer
+  title: Attention index scoring and selection
+  operators:
+  - attention_indexer
+operators:
+- id: attention_decode_paged
+  family: attention
+  directory: knowledge/operator/attention_decode_paged/corpus
+  aliases: []
+- id: attention_indexer
+  family: indexer
+  directory: knowledge/operator/attention_indexer/corpus
+  aliases: []
+- id: attention_prefill_fmha
+  family: attention
+  directory: knowledge/operator/attention_prefill_fmha/corpus
+  aliases: []
+- id: batched_gemm
+  family: gemm
+  directory: knowledge/operator/batched_gemm/corpus
+  aliases: []
+- id: chunked_prefill
+  family: attention
+  directory: knowledge/operator/chunked_prefill/corpus
+  aliases: []
+- id: compressed_attention
+  family: attention
+  directory: knowledge/operator/compressed_attention/corpus
+  aliases: []
+- id: context_parallel_attention
+  family: attention
+  directory: knowledge/operator/context_parallel_attention/corpus
+  aliases: []
+- id: dense_gemm
+  family: gemm
+  directory: knowledge/operator/dense_gemm/corpus
+  aliases:
+  - gemm
+- id: fused_moe_grouped_gemm
+  family: moe
+  directory: knowledge/operator/fused_moe_grouped_gemm/corpus
+  aliases: []
+- id: gemm_epilogue_fused
+  family: gemm
+  directory: knowledge/operator/gemm_epilogue_fused/corpus
+  aliases: []
+- id: gqa_mqa_attention
+  family: attention
+  directory: knowledge/operator/gqa_mqa_attention/corpus
+  aliases: []
+- id: grouped_gemm_moe
+  family: moe
+  directory: knowledge/operator/grouped_gemm_moe/corpus
+  aliases: []
+- id: linear_attention_gated_delta
+  family: attention
+  directory: knowledge/operator/linear_attention_gated_delta/corpus
+  aliases: []
+- id: mla_attention
+  family: attention
+  directory: knowledge/operator/mla_attention/corpus
+  aliases: []
+- id: moe_dispatch_combine
+  family: moe
+  directory: knowledge/operator/moe_dispatch_combine/corpus
+  aliases: []
+- id: moe_routing_topk
+  family: moe
+  directory: knowledge/operator/moe_routing_topk/corpus
+  aliases: []
+- id: qk_norm_rope_cache
+  family: attention
+  directory: knowledge/operator/qk_norm_rope_cache/corpus
+  aliases: []
+- id: scaled_quant_gemm
+  family: gemm
+  directory: knowledge/operator/scaled_quant_gemm/corpus
+  aliases: []
+- id: shared_expert_fusion
+  family: moe
+  directory: knowledge/operator/shared_expert_fusion/corpus
+  aliases: []
+- id: skinny_gemv_decode
+  family: gemm
+  directory: knowledge/operator/skinny_gemv_decode/corpus
+  aliases: []
+- id: sliding_window_attention
+  family: attention
+  directory: knowledge/operator/sliding_window_attention/corpus
+  aliases: []
+- id: sparse_attention_nsa
+  family: attention
+  directory: knowledge/operator/sparse_attention_nsa/corpus
+  aliases: []
+- id: splitk_streamk_gemm
+  family: gemm
+  directory: knowledge/operator/splitk_streamk_gemm/corpus
+  aliases: []

@@ -1,6 +1,7 @@
 # Kernel source API
 
-`KernelClient` provides `put`, `search` and `fetch` for complete source bundles. Use a local source collection or the existing GEAK KB service. The bundle format is described in [kernels](../kernels/README.md).
+`KernelClient` provides `put`, `search` and `fetch` for complete source bundles. Use your own local
+source collection or the existing GEAK KB service. See the [source-bundle format](source_bundles.md).
 
 ## Install and choose a store
 
@@ -11,7 +12,7 @@ python -m pip install -e .
 ```python
 from kernelwiki import KernelClient, SourceBundle
 
-local = KernelClient.local("kernels")
+local = KernelClient.local("/path/to/your/source-collection")
 ```
 
 For remote storage:
@@ -30,7 +31,7 @@ URL precedence is `GEAK_KB_URL`, `GEAK_KB_STORE_URL`, then `KB_STORE_URL`; blank
 ## Inspect and put
 
 ```python
-path = "kernels/rmsnorm/triton/aiter_row_tiled"
+path = "/path/to/your/source-bundle"
 bundle = SourceBundle.load(path)
 print(bundle.implementation_id, bundle.source_digest, bundle.revision)
 

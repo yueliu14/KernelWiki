@@ -1,0 +1,2947 @@
+schema_version: 2
+operator: batched_gemm
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/__init__.py
+  lines: 1
+  evidence_records: 0
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  lines: 321
+  evidence_records: 18
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8.py
+  lines: 204
+  evidence_records: 9
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  lines: 222
+  evidence_records: 13
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  lines: 348
+  evidence_records: 16
+- snapshot: aiter_a6bb4993
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  lines: 183
+  evidence_records: 8
+- snapshot: aiter_a6bb4993
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/batched_gemm_a8w8.cu
+  lines: 182
+  evidence_records: 2
+- snapshot: aiter_a6bb4993
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/batched_gemm_a8w8_tune.cu
+  lines: 104
+  evidence_records: 0
+- snapshot: aiter_a6bb4993
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/include/batched_gemm_a8w8_common.cuh
+  lines: 315
+  evidence_records: 10
+- snapshot: aiter_a6bb4993
+  language: ck
+  file: csrc/ck_batched_gemm_bf16/batched_gemm_bf16.cu
+  lines: 151
+  evidence_records: 2
+- snapshot: aiter_a6bb4993
+  language: ck
+  file: csrc/ck_batched_gemm_bf16/batched_gemm_bf16_tune.cu
+  lines: 80
+  evidence_records: 0
+- snapshot: aiter_a6bb4993
+  language: ck
+  file: csrc/ck_batched_gemm_bf16/include/batched_gemm_bf16_common.cuh
+  lines: 192
+  evidence_records: 7
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/batched_gemm_a8w8.py
+  language: flydsl
+  lines: 82
+  evidence_records: 6
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  language: flydsl
+  lines: 389
+  evidence_records: 30
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  language: flydsl
+  lines: 1124
+  evidence_records: 39
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  language: triton
+  lines: 240
+  evidence_records: 18
+missing: []
+source_evidence:
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 203
+  match: tl.dot_scaled(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '201:                 )'
+  - '203:             accumulator += tl.dot_scaled(a, a_scales, "e2m1", b, b_scales, "e2m1")'
+  - '205:             # Advance the ptrs to the next K block.'
+  evidence_id: src_cda0f4d2990380ef
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 84
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '82:     PRE_QUANT: tl.constexpr,'
+  - '83:     HAVE_Y_SCALE: tl.constexpr,'
+  - '84:     cache_modifier: tl.constexpr,'
+  - '85: ):'
+  - '86:     """'
+  evidence_id: src_6f0affb1ff07f1db
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 189
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '187:             if EVEN_K:'
+  - '188:                 a_bf16 = tl.load(a_ptrs)'
+  - '189:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '190:             else:'
+  - '191:                 a_bf16 = tl.load('
+  evidence_id: src_0a213ffadf760b8a
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 73
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '71:     stride_bsn,'
+  - '72:     stride_bsk,'
+  - '73:     # Meta-parameters'
+  - '74:     BLOCK_SIZE_M: tl.constexpr,'
+  - '75:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_92fc4dd627f80e19
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 75
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '73:     # Meta-parameters'
+  - '74:     BLOCK_SIZE_M: tl.constexpr,'
+  - '75:     BLOCK_SIZE_N: tl.constexpr,'
+  - '76:     BLOCK_SIZE_K: tl.constexpr,'
+  - '77:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_538af21a8a5db408
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 76
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '74:     BLOCK_SIZE_M: tl.constexpr,'
+  - '75:     BLOCK_SIZE_N: tl.constexpr,'
+  - '76:     BLOCK_SIZE_K: tl.constexpr,'
+  - '77:     GROUP_SIZE_M: tl.constexpr,'
+  - '78:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_518c43fd72c132dc
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 77
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '75:     BLOCK_SIZE_N: tl.constexpr,'
+  - '76:     BLOCK_SIZE_K: tl.constexpr,'
+  - '77:     GROUP_SIZE_M: tl.constexpr,'
+  - '78:     NUM_KSPLIT: tl.constexpr,'
+  - '79:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_82e59a025d43738a
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 78
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '76:     BLOCK_SIZE_K: tl.constexpr,'
+  - '77:     GROUP_SIZE_M: tl.constexpr,'
+  - '78:     NUM_KSPLIT: tl.constexpr,'
+  - '79:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '80:     EVEN_K: tl.constexpr,'
+  evidence_id: src_7b3131100a20e871
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 79
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '77:     GROUP_SIZE_M: tl.constexpr,'
+  - '78:     NUM_KSPLIT: tl.constexpr,'
+  - '79:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '80:     EVEN_K: tl.constexpr,'
+  - '81:     GRID_MN: tl.constexpr,'
+  evidence_id: src_d94cfecafcae2926
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 80
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '78:     NUM_KSPLIT: tl.constexpr,'
+  - '79:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '80:     EVEN_K: tl.constexpr,'
+  - '81:     GRID_MN: tl.constexpr,'
+  - '82:     PRE_QUANT: tl.constexpr,'
+  evidence_id: src_6eb7d7063b0e8fbd
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 81
+  match: 'GRID_MN: tl.constexpr,'
+  captured:
+  - GRID_MN
+  arch_scope: ''
+  evidence:
+  - '79:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '80:     EVEN_K: tl.constexpr,'
+  - '81:     GRID_MN: tl.constexpr,'
+  - '82:     PRE_QUANT: tl.constexpr,'
+  - '83:     HAVE_Y_SCALE: tl.constexpr,'
+  evidence_id: src_1e60c16f91315cdb
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 82
+  match: 'PRE_QUANT: tl.constexpr,'
+  captured:
+  - PRE_QUANT
+  arch_scope: ''
+  evidence:
+  - '80:     EVEN_K: tl.constexpr,'
+  - '81:     GRID_MN: tl.constexpr,'
+  - '82:     PRE_QUANT: tl.constexpr,'
+  - '83:     HAVE_Y_SCALE: tl.constexpr,'
+  - '84:     cache_modifier: tl.constexpr,'
+  evidence_id: src_b830105a0c99e800
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 83
+  match: 'HAVE_Y_SCALE: tl.constexpr,'
+  captured:
+  - HAVE_Y_SCALE
+  arch_scope: ''
+  evidence:
+  - '81:     GRID_MN: tl.constexpr,'
+  - '82:     PRE_QUANT: tl.constexpr,'
+  - '83:     HAVE_Y_SCALE: tl.constexpr,'
+  - '84:     cache_modifier: tl.constexpr,'
+  - '85: ):'
+  evidence_id: src_92054a7d862e480e
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 84
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '82:     PRE_QUANT: tl.constexpr,'
+  - '83:     HAVE_Y_SCALE: tl.constexpr,'
+  - '84:     cache_modifier: tl.constexpr,'
+  - '85: ):'
+  - '86:     """'
+  evidence_id: src_fa57cc15c9a98f27
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 242
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '240:     stride_c_out_m,'
+  - '241:     stride_c_out_n,'
+  - '242:     BLOCK_SIZE_M: tl.constexpr,'
+  - '243:     BLOCK_SIZE_N: tl.constexpr,'
+  - '244:     ACTUAL_KSPLIT: tl.constexpr,'
+  evidence_id: src_93f99f1ddb0774b1
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 243
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '241:     stride_c_out_n,'
+  - '242:     BLOCK_SIZE_M: tl.constexpr,'
+  - '243:     BLOCK_SIZE_N: tl.constexpr,'
+  - '244:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '245:     MAX_KSPLIT: tl.constexpr,'
+  evidence_id: src_fae1ba4afc371c79
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 244
+  match: 'ACTUAL_KSPLIT: tl.constexpr,'
+  captured:
+  - ACTUAL_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '242:     BLOCK_SIZE_M: tl.constexpr,'
+  - '243:     BLOCK_SIZE_N: tl.constexpr,'
+  - '244:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '245:     MAX_KSPLIT: tl.constexpr,'
+  - '246: ):'
+  evidence_id: src_6afba14dcc5592a9
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a16wfp4.py
+  line: 245
+  match: 'MAX_KSPLIT: tl.constexpr,'
+  captured:
+  - MAX_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '243:     BLOCK_SIZE_N: tl.constexpr,'
+  - '244:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '245:     MAX_KSPLIT: tl.constexpr,'
+  - '246: ):'
+  - '247:     pid_batch = tl.program_id(axis=0)'
+  evidence_id: src_8227ca19d2004648
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8.py
+  line: 166
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '164:             b = tl.load(b_ptrs, mask=offs_k[:, None] < K - k * BLOCK_SIZE_K, other=0.0)'
+  - '166:         accumulator += tl.dot(a, b, input_precision="ieee")'
+  - '168:         # Advance the ptrs to the next K block.'
+  evidence_id: src_57f5f5af7d5a5dcd
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8.py
+  line: 60
+  match: 'HAS_BIAS: tl.constexpr,'
+  captured:
+  - HAS_BIAS
+  arch_scope: ''
+  evidence:
+  - '58:     stride_bscaleb,'
+  - '59:     stride_biasb,'
+  - '60:     # Meta-parameters'
+  - '61:     HAS_BIAS: tl.constexpr,'
+  - '62:     BLOCK_SIZE_M: tl.constexpr,'
+  evidence_id: src_9aef784051c15493
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8.py
+  line: 62
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '60:     # Meta-parameters'
+  - '61:     HAS_BIAS: tl.constexpr,'
+  - '62:     BLOCK_SIZE_M: tl.constexpr,'
+  - '63:     BLOCK_SIZE_N: tl.constexpr,'
+  - '64:     BLOCK_SIZE_K: tl.constexpr,'
+  evidence_id: src_461d061d31905af5
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8.py
+  line: 63
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '61:     HAS_BIAS: tl.constexpr,'
+  - '62:     BLOCK_SIZE_M: tl.constexpr,'
+  - '63:     BLOCK_SIZE_N: tl.constexpr,'
+  - '64:     BLOCK_SIZE_K: tl.constexpr,'
+  - '65:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_3c51eeef1a4a55af
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8.py
+  line: 64
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '62:     BLOCK_SIZE_M: tl.constexpr,'
+  - '63:     BLOCK_SIZE_N: tl.constexpr,'
+  - '64:     BLOCK_SIZE_K: tl.constexpr,'
+  - '65:     GROUP_SIZE_M: tl.constexpr,'
+  - '66:     EVEN_K: tl.constexpr,'
+  evidence_id: src_a8c9d58bf8d3b1c5
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8.py
+  line: 65
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '63:     BLOCK_SIZE_N: tl.constexpr,'
+  - '64:     BLOCK_SIZE_K: tl.constexpr,'
+  - '65:     GROUP_SIZE_M: tl.constexpr,'
+  - '66:     EVEN_K: tl.constexpr,'
+  - '67:     GRID_MN: tl.constexpr,'
+  evidence_id: src_9857a7fc5f45e408
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8.py
+  line: 66
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '64:     BLOCK_SIZE_K: tl.constexpr,'
+  - '65:     GROUP_SIZE_M: tl.constexpr,'
+  - '66:     EVEN_K: tl.constexpr,'
+  - '67:     GRID_MN: tl.constexpr,'
+  - '68: ):'
+  evidence_id: src_a1dca6d8d16629d5
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8.py
+  line: 67
+  match: 'GRID_MN: tl.constexpr,'
+  captured:
+  - GRID_MN
+  arch_scope: ''
+  evidence:
+  - '65:     GROUP_SIZE_M: tl.constexpr,'
+  - '66:     EVEN_K: tl.constexpr,'
+  - '67:     GRID_MN: tl.constexpr,'
+  - '68: ):'
+  - '69:     """'
+  evidence_id: src_2feb07da60530c16
+- snapshot: aiter_a6bb4993
+  category: scale_after_k_loop
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8.py
+  line: 173
+  match: accumulator *= a_scale[:, None] * b_scale[None, :]
+  captured:
+  - accumulator
+  - a_scale
+  - b_scale
+  arch_scope: ''
+  evidence:
+  - '172:     # Apply scale'
+  - '173:     accumulator *= a_scale[:, None] * b_scale[None, :]'
+  - '175:     # Add bias'
+  evidence_id: src_7ef1d1b6e3ac3715
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  line: 178
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '176:         a = tl.clamp(a * a_scale_recip, DTYPE_MIN, DTYPE_MAX).to(b_ptr.dtype.element_ty)'
+  - '178:         accumulator += tl.dot(a, b, input_precision="ieee") * a_scale'
+  - '180:         a_ptrs += BLOCK_SIZE_K * stride_ak'
+  evidence_id: src_540a7587b4d13c0c
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  line: 71
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '69:     EVEN_K: tl.constexpr,'
+  - '70:     EVEN_MN: tl.constexpr,'
+  - '71:     cache_modifier: tl.constexpr,'
+  - '72: ):'
+  - '73:     """'
+  evidence_id: src_bb97cd2956b75227
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  line: 168
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '166:         if EVEN_K:'
+  - '167:             a = tl.load(a_ptrs)'
+  - '168:             b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '169:         else:'
+  - '170:             a = tl.load(a_ptrs, mask=offs_k[None, :] < K - k * BLOCK_SIZE_K, other=0.0)'
+  evidence_id: src_733f3cea655162a1
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  line: 61
+  match: 'HAS_BIAS: tl.constexpr,'
+  captured:
+  - HAS_BIAS
+  arch_scope: ''
+  evidence:
+  - '59:     stride_in_cn,'
+  - '60:     stride_in_biasb,'
+  - '61:     # Meta-parameters'
+  - '62:     HAS_BIAS: tl.constexpr,'
+  - '63:     DTYPE_MAX: tl.constexpr,'
+  evidence_id: src_4a007c00634d0588
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  line: 63
+  match: 'DTYPE_MAX: tl.constexpr,'
+  captured:
+  - DTYPE_MAX
+  arch_scope: ''
+  evidence:
+  - '61:     # Meta-parameters'
+  - '62:     HAS_BIAS: tl.constexpr,'
+  - '63:     DTYPE_MAX: tl.constexpr,'
+  - '64:     DTYPE_MIN: tl.constexpr,'
+  - '65:     BLOCK_SIZE_M: tl.constexpr,'
+  evidence_id: src_0a1d9cdba3735b08
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  line: 64
+  match: 'DTYPE_MIN: tl.constexpr,'
+  captured:
+  - DTYPE_MIN
+  arch_scope: ''
+  evidence:
+  - '62:     HAS_BIAS: tl.constexpr,'
+  - '63:     DTYPE_MAX: tl.constexpr,'
+  - '64:     DTYPE_MIN: tl.constexpr,'
+  - '65:     BLOCK_SIZE_M: tl.constexpr,'
+  - '66:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_6554643d891a123d
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  line: 65
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '63:     DTYPE_MAX: tl.constexpr,'
+  - '64:     DTYPE_MIN: tl.constexpr,'
+  - '65:     BLOCK_SIZE_M: tl.constexpr,'
+  - '66:     BLOCK_SIZE_N: tl.constexpr,'
+  - '67:     BLOCK_SIZE_K: tl.constexpr,'
+  evidence_id: src_74aba65c4f6d711b
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  line: 66
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '64:     DTYPE_MIN: tl.constexpr,'
+  - '65:     BLOCK_SIZE_M: tl.constexpr,'
+  - '66:     BLOCK_SIZE_N: tl.constexpr,'
+  - '67:     BLOCK_SIZE_K: tl.constexpr,'
+  - '68:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_37b51afd70821220
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  line: 67
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '65:     BLOCK_SIZE_M: tl.constexpr,'
+  - '66:     BLOCK_SIZE_N: tl.constexpr,'
+  - '67:     BLOCK_SIZE_K: tl.constexpr,'
+  - '68:     GROUP_SIZE_M: tl.constexpr,'
+  - '69:     EVEN_K: tl.constexpr,'
+  evidence_id: src_a3a7151b58e0d766
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  line: 68
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '66:     BLOCK_SIZE_N: tl.constexpr,'
+  - '67:     BLOCK_SIZE_K: tl.constexpr,'
+  - '68:     GROUP_SIZE_M: tl.constexpr,'
+  - '69:     EVEN_K: tl.constexpr,'
+  - '70:     EVEN_MN: tl.constexpr,'
+  evidence_id: src_fd4ef6940fd68196
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  line: 69
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '67:     BLOCK_SIZE_K: tl.constexpr,'
+  - '68:     GROUP_SIZE_M: tl.constexpr,'
+  - '69:     EVEN_K: tl.constexpr,'
+  - '70:     EVEN_MN: tl.constexpr,'
+  - '71:     cache_modifier: tl.constexpr,'
+  evidence_id: src_fb798bd4621cdd69
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  line: 70
+  match: 'EVEN_MN: tl.constexpr,'
+  captured:
+  - EVEN_MN
+  arch_scope: ''
+  evidence:
+  - '68:     GROUP_SIZE_M: tl.constexpr,'
+  - '69:     EVEN_K: tl.constexpr,'
+  - '70:     EVEN_MN: tl.constexpr,'
+  - '71:     cache_modifier: tl.constexpr,'
+  - '72: ):'
+  evidence_id: src_44a53d1c31c7acdc
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py
+  line: 71
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '69:     EVEN_K: tl.constexpr,'
+  - '70:     EVEN_MN: tl.constexpr,'
+  - '71:     cache_modifier: tl.constexpr,'
+  - '72: ):'
+  - '73:     """'
+  evidence_id: src_fd59a9d0c29224c6
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 212
+  match: tl.dot_scaled(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '210:                 )'
+  - '212:             accumulator += tl.dot_scaled(a, a_scales, "e2m1", b, b_scales, "e2m1")'
+  - '214:             # Advance the ptrs to the next K block.'
+  evidence_id: src_6cb2b428bf7f6c18
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 81
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '79:     EVEN_K: tl.constexpr,'
+  - '80:     GRID_MN: tl.constexpr,'
+  - '81:     cache_modifier: tl.constexpr,'
+  - '82: ):'
+  - '83:     """Kernel for computing the matmul C = A x B.'
+  evidence_id: src_3098c5ec5a83859e
+- snapshot: aiter_a6bb4993
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 203
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '201:             if EVEN_K:'
+  - '202:                 a = tl.load(a_ptrs)'
+  - '203:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '204:             else:'
+  - '205:                 a = tl.load('
+  evidence_id: src_b22290afe98f1292
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 72
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '70:     stride_in_bsn,'
+  - '71:     stride_in_bsk,'
+  - '72:     # Meta-parameters'
+  - '73:     BLOCK_SIZE_M: tl.constexpr,'
+  - '74:     BLOCK_SIZE_N: tl.constexpr,'
+  evidence_id: src_151cdd7c62ecfcb0
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 74
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '72:     # Meta-parameters'
+  - '73:     BLOCK_SIZE_M: tl.constexpr,'
+  - '74:     BLOCK_SIZE_N: tl.constexpr,'
+  - '75:     BLOCK_SIZE_K: tl.constexpr,'
+  - '76:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_32632b275def856b
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 75
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '73:     BLOCK_SIZE_M: tl.constexpr,'
+  - '74:     BLOCK_SIZE_N: tl.constexpr,'
+  - '75:     BLOCK_SIZE_K: tl.constexpr,'
+  - '76:     GROUP_SIZE_M: tl.constexpr,'
+  - '77:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_955a2ed237b1c8a4
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 76
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '74:     BLOCK_SIZE_N: tl.constexpr,'
+  - '75:     BLOCK_SIZE_K: tl.constexpr,'
+  - '76:     GROUP_SIZE_M: tl.constexpr,'
+  - '77:     NUM_KSPLIT: tl.constexpr,'
+  - '78:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_0bc76fa1192393bc
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 77
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '75:     BLOCK_SIZE_K: tl.constexpr,'
+  - '76:     GROUP_SIZE_M: tl.constexpr,'
+  - '77:     NUM_KSPLIT: tl.constexpr,'
+  - '78:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '79:     EVEN_K: tl.constexpr,'
+  evidence_id: src_4031d3c78599650d
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 78
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '76:     GROUP_SIZE_M: tl.constexpr,'
+  - '77:     NUM_KSPLIT: tl.constexpr,'
+  - '78:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '79:     EVEN_K: tl.constexpr,'
+  - '80:     GRID_MN: tl.constexpr,'
+  evidence_id: src_fe1cd9c739e15124
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 79
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '77:     NUM_KSPLIT: tl.constexpr,'
+  - '78:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '79:     EVEN_K: tl.constexpr,'
+  - '80:     GRID_MN: tl.constexpr,'
+  - '81:     cache_modifier: tl.constexpr,'
+  evidence_id: src_85c6676db8c4a51f
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 80
+  match: 'GRID_MN: tl.constexpr,'
+  captured:
+  - GRID_MN
+  arch_scope: ''
+  evidence:
+  - '78:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '79:     EVEN_K: tl.constexpr,'
+  - '80:     GRID_MN: tl.constexpr,'
+  - '81:     cache_modifier: tl.constexpr,'
+  - '82: ):'
+  evidence_id: src_da65d9da650ad7aa
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 81
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '79:     EVEN_K: tl.constexpr,'
+  - '80:     GRID_MN: tl.constexpr,'
+  - '81:     cache_modifier: tl.constexpr,'
+  - '82: ):'
+  - '83:     """Kernel for computing the matmul C = A x B.'
+  evidence_id: src_f86717e35334024a
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 249
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '247:     stride_c_out_m,'
+  - '248:     stride_c_out_n,'
+  - '249:     BLOCK_SIZE_M: tl.constexpr,'
+  - '250:     BLOCK_SIZE_N: tl.constexpr,'
+  - '251:     ACTUAL_KSPLIT: tl.constexpr,'
+  evidence_id: src_b6a6f012baa94e37
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 250
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '248:     stride_c_out_n,'
+  - '249:     BLOCK_SIZE_M: tl.constexpr,'
+  - '250:     BLOCK_SIZE_N: tl.constexpr,'
+  - '251:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '252:     MAX_KSPLIT: tl.constexpr,'
+  evidence_id: src_240e087a05d4cb5d
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 251
+  match: 'ACTUAL_KSPLIT: tl.constexpr,'
+  captured:
+  - ACTUAL_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '249:     BLOCK_SIZE_M: tl.constexpr,'
+  - '250:     BLOCK_SIZE_N: tl.constexpr,'
+  - '251:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '252:     MAX_KSPLIT: tl.constexpr,'
+  - '253: ):'
+  evidence_id: src_e192503fe650afe7
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_afp4wfp4.py
+  line: 252
+  match: 'MAX_KSPLIT: tl.constexpr,'
+  captured:
+  - MAX_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '250:     BLOCK_SIZE_N: tl.constexpr,'
+  - '251:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '252:     MAX_KSPLIT: tl.constexpr,'
+  - '253: ):'
+  - '254:     pid_batch = tl.program_id(axis=0)'
+  evidence_id: src_7138bc87980ac29f
+- snapshot: aiter_a6bb4993
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 148
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '146:             b = tl.load(b_ptrs, mask=offs_k[:, None] < K - k * BLOCK_SIZE_K, other=0.0)'
+  - '148:         accumulator += tl.dot(a, b, input_precision="ieee")'
+  - '150:         # Advance the ptrs to the next K block.'
+  evidence_id: src_0fca0b71d381b9a8
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 56
+  match: 'HAS_BIAS: tl.constexpr,'
+  captured:
+  - HAS_BIAS
+  arch_scope: ''
+  evidence:
+  - '54:     stride_cn,'
+  - '55:     stride_biasb,'
+  - '56:     # Meta-parameters'
+  - '57:     HAS_BIAS: tl.constexpr,'
+  - '58:     BLOCK_SIZE_M: tl.constexpr,'
+  evidence_id: src_8823fd04aa2f1fec
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 58
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '56:     # Meta-parameters'
+  - '57:     HAS_BIAS: tl.constexpr,'
+  - '58:     BLOCK_SIZE_M: tl.constexpr,'
+  - '59:     BLOCK_SIZE_N: tl.constexpr,'
+  - '60:     BLOCK_SIZE_K: tl.constexpr,'
+  evidence_id: src_088c6c3a427d5bf8
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 59
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '57:     HAS_BIAS: tl.constexpr,'
+  - '58:     BLOCK_SIZE_M: tl.constexpr,'
+  - '59:     BLOCK_SIZE_N: tl.constexpr,'
+  - '60:     BLOCK_SIZE_K: tl.constexpr,'
+  - '61:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_4c56be0f7026c3d7
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 60
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '58:     BLOCK_SIZE_M: tl.constexpr,'
+  - '59:     BLOCK_SIZE_N: tl.constexpr,'
+  - '60:     BLOCK_SIZE_K: tl.constexpr,'
+  - '61:     GROUP_SIZE_M: tl.constexpr,'
+  - '62:     EVEN_K: tl.constexpr,'
+  evidence_id: src_9630aa35dcef7540
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 61
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '59:     BLOCK_SIZE_N: tl.constexpr,'
+  - '60:     BLOCK_SIZE_K: tl.constexpr,'
+  - '61:     GROUP_SIZE_M: tl.constexpr,'
+  - '62:     EVEN_K: tl.constexpr,'
+  - '63:     GRID_MN: tl.constexpr,'
+  evidence_id: src_7557f13bffbc2e00
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 62
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '60:     BLOCK_SIZE_K: tl.constexpr,'
+  - '61:     GROUP_SIZE_M: tl.constexpr,'
+  - '62:     EVEN_K: tl.constexpr,'
+  - '63:     GRID_MN: tl.constexpr,'
+  - '64: ):'
+  evidence_id: src_61f3d15d371a0ac0
+- snapshot: aiter_a6bb4993
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 63
+  match: 'GRID_MN: tl.constexpr,'
+  captured:
+  - GRID_MN
+  arch_scope: ''
+  evidence:
+  - '61:     GROUP_SIZE_M: tl.constexpr,'
+  - '62:     EVEN_K: tl.constexpr,'
+  - '63:     GRID_MN: tl.constexpr,'
+  - '64: ):'
+  - '65:     """'
+  evidence_id: src_befdf3e818d39762
+- snapshot: aiter_a6bb4993
+  category: dispatch_padding
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/batched_gemm_a8w8.cu
+  line: 116
+  match: padded_m = 16
+  captured:
+  - padded_m
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '114:   if (M > 1 && M <= 16)'
+  - '115:   {'
+  - '116:     padded_m = 16;'
+  - '117:   }'
+  - '118:   else if (M <= 16384)'
+  evidence_id: src_7c7d8f6fdcbb4ac5
+- snapshot: aiter_a6bb4993
+  category: dispatch_padding
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/batched_gemm_a8w8.cu
+  line: 124
+  match: padded_m = 20480
+  captured:
+  - padded_m
+  - '20480'
+  arch_scope: ''
+  evidence:
+  - '122:   else if (M <= 20480)'
+  - '123:   {'
+  - '124:     padded_m = 20480;'
+  - '125:   }'
+  - '126:   // Second check if this shape(B,padded_m,N,K) is available in the direct lookup.'
+  evidence_id: src_a91a85acdbbb2d27
+- snapshot: aiter_a6bb4993
+  category: dispatch_padding
+  language: ck
+  file: csrc/ck_batched_gemm_bf16/batched_gemm_bf16.cu
+  line: 107
+  match: padded_m = 16
+  captured:
+  - padded_m
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '105:   if (M > 1 && M <= 16)'
+  - '106:   {'
+  - '107:     padded_m = 16;'
+  - '108:   }'
+  - '109:   else if (M <= 16384)'
+  evidence_id: src_088b1a1bf2d2157c
+- snapshot: aiter_a6bb4993
+  category: dispatch_padding
+  language: ck
+  file: csrc/ck_batched_gemm_bf16/batched_gemm_bf16.cu
+  line: 115
+  match: padded_m = 20480
+  captured:
+  - padded_m
+  - '20480'
+  arch_scope: ''
+  evidence:
+  - '113:   else if (M <= 20480)'
+  - '114:   {'
+  - '115:     padded_m = 20480;'
+  - '116:   }'
+  - '117:   // Second check if this shape(B,padded_m,N,K) is available in the direct lookup.'
+  evidence_id: src_6fbc7262d10fbc0e
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/include/batched_gemm_a8w8_common.cuh
+  line: 52
+  match: CShuffleDataType =
+  captured:
+  - CShuffle
+  arch_scope: ''
+  evidence:
+  - '50: using BDataType = I8;'
+  - '51: using AccDataType = I32;'
+  - '52: using CShuffleDataType = I32;'
+  - '53: using ComputeDataType = I8;'
+  evidence_id: src_37ff0fd38708c83d
+- snapshot: aiter_a6bb4993
+  category: ck_instance
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/include/batched_gemm_a8w8_common.cuh
+  line: 170
+  match: "DeviceBatchedGemmMultiD_Xdl_CShuffle_V3\n                   \n                                  \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                \n                                                                                   \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                    \n                               \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                   \n                                                                                \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                       \n             \n             \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \                                                                                                     \
+    \      \n             \n         <"
+  captured:
+  - DeviceBatchedGemmMultiD_Xdl_CShuffle_V3
+  arch_scope: ''
+  evidence:
+  - '168: #if 0'
+  - '169: template <typename DDataType, typename EDataType=DDataType>'
+  - '170: using DeviceOpInstance = ck::tensor_operation::device::DeviceBatchedGemmMultiD_Xdl_CShuffle_V3'
+  - '171: // clang-format off'
+  - '172: ///######|  ALayout|  BLayout| DsLayout| ELayout|      AData|      BData|               DsData|                 EData|     AccData|         CShuffle|           A|           B|          CDE|           GEMM|
+    Block|  MPer|  NPer|  KPer| AK1| BK1| MPer| NPer| MXdl| NXdl|  ABlockTransfer| ABlockTransfer| ABlockTransfer|
+    ABlockTransfer| ABlockTransfer| ABlockTransfer| ABlockLds|  BBlockTransfer| BBlockTransfer| BBlockTransfer|
+    BlockTransfer| BBlockTransfer| BBlockTransfer| BBlockLds|    CShuffle|    CShuffle| CBlockTransferClusterLengths|  CBlockTransfer|'
+  evidence_id: src_2dd11adec1468b08
+- snapshot: aiter_a6bb4993
+  category: ck_instance
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/include/batched_gemm_a8w8_common.cuh
+  line: 203
+  match: DeviceGemmHelper
+  captured:
+  - DeviceGemmHelper
+  arch_scope: ''
+  evidence:
+  - '201:     auto GEMM_SPEC ='
+  - '202:         ck::tensor_operation::device::GemmSpecialization::MNPadding>'
+  - '203: using DeviceGemmHelper ='
+  - '204:     ck::tensor_operation::device::DeviceBatchedGemmMultiD_Xdl_CShuffle_V3<'
+  - '205:         ALayout,'
+  evidence_id: src_2323790920c1cf3a
+- snapshot: aiter_a6bb4993
+  category: ck_instance
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/include/batched_gemm_a8w8_common.cuh
+  line: 204
+  match: DeviceBatchedGemmMultiD_Xdl_CShuffle_V3<
+  captured:
+  - DeviceBatchedGemmMultiD_Xdl_CShuffle_V3
+  arch_scope: ''
+  evidence:
+  - '202:         ck::tensor_operation::device::GemmSpecialization::MNPadding>'
+  - '203: using DeviceGemmHelper ='
+  - '204:     ck::tensor_operation::device::DeviceBatchedGemmMultiD_Xdl_CShuffle_V3<'
+  - '205:         ALayout,'
+  - '206:         BLayout,'
+  evidence_id: src_4d242cc24f97078d
+- snapshot: aiter_a6bb4993
+  category: ck_instance
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/include/batched_gemm_a8w8_common.cuh
+  line: 252
+  match: DeviceGemmInstance
+  captured:
+  - DeviceGemmInstance
+  arch_scope: ''
+  evidence:
+  - '251: template <typename DDataType, typename EDataType,'
+  - '252:           typename DeviceGemmInstance>'
+  - '253: __forceinline__ torch::Tensor batched_gemm_a8w8_rowwise_impl('
+  - '254:     torch::Tensor &XQ,'
+  evidence_id: src_45b194b17c046d86
+- snapshot: aiter_a6bb4993
+  category: ck_instance
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/include/batched_gemm_a8w8_common.cuh
+  line: 276
+  match: DeviceGemmInstance
+  captured:
+  - DeviceGemmInstance
+  arch_scope: ''
+  evidence:
+  - '275:     const at::hip::OptionalHIPGuardMasqueradingAsCUDA device_guard(device_of(XQ));'
+  - '276:     auto device_gemm = DeviceGemmInstance{};'
+  - '277:     auto invoker = device_gemm.MakeInvoker();'
+  evidence_id: src_759a1b5f92dcba32
+- snapshot: aiter_a6bb4993
+  category: ck_instance
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/include/batched_gemm_a8w8_common.cuh
+  line: 283
+  match: DeviceGemmInstance
+  captured:
+  - DeviceGemmInstance
+  arch_scope: ''
+  evidence:
+  - '281:     auto cde_element_op = CDEElementOp{};'
+  - '283:     constexpr ck::index_t NumDTensor = DeviceGemmInstance::NumDTensor;'
+  - '285:     auto argument = device_gemm.MakeArgument('
+  evidence_id: src_2095cb9eab89f0a1
+- snapshot: aiter_a6bb4993
+  category: ck_pipeline
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/include/batched_gemm_a8w8_common.cuh
+  line: 179
+  match: BlockGemmPipelineScheduler::Interwave
+  captured:
+  - Interwave
+  arch_scope: ''
+  evidence:
+  - '177: ///      <      Row,      Row, DsLayout, ELayout, ADataType, BDataType, DsDataType<DDataType>, EDataType,
+    AccDataType, CShuffleDataType,  AElementOp,  BElementOp, CDEElementOp,       GemmSpec,   256,   256,   128,    64,  16,   4,  32,   32,    4,    2,     S<4,
+    64, 1>,     S<1, 0, 2>,    S<1, 0, 2>,               2,             16,             16,          0,    S<16,
+    16, 1>,    S<0, 2, 1>,     S<0, 2, 1>,             1,               8,              4,          0,          1,           1,               S<1,
+    32, 1, 8>,      S<8, 8, 1>,  ck::BlockGemmPipelineScheduler::Interwave, ck::BlockGemmPipelineVersion::v1,
+    I8>;'
+  - '178: ///###### RCR'
+  - '179:          <      Row,      Col, DsLayout, ELayout, ADataType, BDataType, DsDataType<DDataType>, EDataType,
+    AccDataType, CShuffleDataType,  AElementOp,  BElementOp, CDEElementOp,       GemmSpec,   256,   256,   128,    64,  16,  16,  32,   32,    4,    2,     S<4,
+    64, 1>,     S<1, 0, 2>,    S<1, 0, 2>,               2,             16,             16,          0,     S<4,
+    64, 1>,    S<1, 0, 2>,     S<1, 0, 2>,             2,              16,             16,          0,          1,           1,               S<1,
+    32, 1, 8>,      S<8, 8, 1>,  ck::BlockGemmPipelineScheduler::Interwave, ck::BlockGemmPipelineVersion::v1,
+    I8>;'
+  - '180: // clang-format on'
+  - '181: #endif'
+  evidence_id: src_836182b5a9e64fdd
+- snapshot: aiter_a6bb4993
+  category: ck_pipeline
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/include/batched_gemm_a8w8_common.cuh
+  line: 179
+  match: BlockGemmPipelineVersion::v1
+  captured:
+  - v1
+  arch_scope: ''
+  evidence:
+  - '177: ///      <      Row,      Row, DsLayout, ELayout, ADataType, BDataType, DsDataType<DDataType>, EDataType,
+    AccDataType, CShuffleDataType,  AElementOp,  BElementOp, CDEElementOp,       GemmSpec,   256,   256,   128,    64,  16,   4,  32,   32,    4,    2,     S<4,
+    64, 1>,     S<1, 0, 2>,    S<1, 0, 2>,               2,             16,             16,          0,    S<16,
+    16, 1>,    S<0, 2, 1>,     S<0, 2, 1>,             1,               8,              4,          0,          1,           1,               S<1,
+    32, 1, 8>,      S<8, 8, 1>,  ck::BlockGemmPipelineScheduler::Interwave, ck::BlockGemmPipelineVersion::v1,
+    I8>;'
+  - '178: ///###### RCR'
+  - '179:          <      Row,      Col, DsLayout, ELayout, ADataType, BDataType, DsDataType<DDataType>, EDataType,
+    AccDataType, CShuffleDataType,  AElementOp,  BElementOp, CDEElementOp,       GemmSpec,   256,   256,   128,    64,  16,  16,  32,   32,    4,    2,     S<4,
+    64, 1>,     S<1, 0, 2>,    S<1, 0, 2>,               2,             16,             16,          0,     S<4,
+    64, 1>,    S<1, 0, 2>,     S<1, 0, 2>,             2,              16,             16,          0,          1,           1,               S<1,
+    32, 1, 8>,      S<8, 8, 1>,  ck::BlockGemmPipelineScheduler::Interwave, ck::BlockGemmPipelineVersion::v1,
+    I8>;'
+  - '180: // clang-format on'
+  - '181: #endif'
+  evidence_id: src_8ecd139553a801a3
+- snapshot: aiter_a6bb4993
+  category: ck_pipeline
+  language: ck
+  file: csrc/ck_batched_gemm_a8w8/include/batched_gemm_a8w8_common.cuh
+  line: 202
+  match: GemmSpecialization::MNPadding
+  captured:
+  - GemmSpecialization::MNPadding
+  arch_scope: ''
+  evidence:
+  - '200:     ck::BlockGemmPipelineVersion PIPELINE_VERSION,'
+  - '201:     auto GEMM_SPEC ='
+  - '202:         ck::tensor_operation::device::GemmSpecialization::MNPadding>'
+  - '203: using DeviceGemmHelper ='
+  - '204:     ck::tensor_operation::device::DeviceBatchedGemmMultiD_Xdl_CShuffle_V3<'
+  evidence_id: src_b9cf618e5229faf1
+- snapshot: aiter_a6bb4993
+  category: layout_epilogue
+  language: ck
+  file: csrc/ck_batched_gemm_bf16/include/batched_gemm_bf16_common.cuh
+  line: 48
+  match: CShuffleDataType =
+  captured:
+  - CShuffle
+  arch_scope: ''
+  evidence:
+  - '46: using BDataType = BF16;'
+  - '47: using AccDataType = F32;'
+  - '48: using CShuffleDataType = F32;'
+  - '49: using ComputeDataType = BF16;'
+  - '50: using EDataType = BF16;'
+  evidence_id: src_9c622e6ef4d51c42
+- snapshot: aiter_a6bb4993
+  category: ck_instance
+  language: ck
+  file: csrc/ck_batched_gemm_bf16/include/batched_gemm_bf16_common.cuh
+  line: 85
+  match: DeviceGemmHelper
+  captured:
+  - DeviceGemmHelper
+  arch_scope: ''
+  evidence:
+  - '83:     auto GEMM_SPEC ='
+  - '84:         ck::tensor_operation::device::GemmSpecialization::MNPadding>'
+  - '85: using DeviceGemmHelper ='
+  - '86:     ck::tensor_operation::device::DeviceBatchedGemmMultiD_Xdl_CShuffle_V3<'
+  - '87:         ALayout,'
+  evidence_id: src_0ee616bf91deb1d8
+- snapshot: aiter_a6bb4993
+  category: ck_instance
+  language: ck
+  file: csrc/ck_batched_gemm_bf16/include/batched_gemm_bf16_common.cuh
+  line: 86
+  match: DeviceBatchedGemmMultiD_Xdl_CShuffle_V3<
+  captured:
+  - DeviceBatchedGemmMultiD_Xdl_CShuffle_V3
+  arch_scope: ''
+  evidence:
+  - '84:         ck::tensor_operation::device::GemmSpecialization::MNPadding>'
+  - '85: using DeviceGemmHelper ='
+  - '86:     ck::tensor_operation::device::DeviceBatchedGemmMultiD_Xdl_CShuffle_V3<'
+  - '87:         ALayout,'
+  - '88:         BLayout,'
+  evidence_id: src_780fadebcc954d06
+- snapshot: aiter_a6bb4993
+  category: ck_instance
+  language: ck
+  file: csrc/ck_batched_gemm_bf16/include/batched_gemm_bf16_common.cuh
+  line: 133
+  match: DeviceGemmInstance
+  captured:
+  - DeviceGemmInstance
+  arch_scope: ''
+  evidence:
+  - '131:         ComputeDataType>;'
+  - '133: template <typename DeviceGemmInstance>'
+  - '134: __forceinline__ torch::Tensor batched_gemm_bf16_impl('
+  - '135:     torch::Tensor &XQ,'
+  evidence_id: src_639580588608ca4d
+- snapshot: aiter_a6bb4993
+  category: ck_instance
+  language: ck
+  file: csrc/ck_batched_gemm_bf16/include/batched_gemm_bf16_common.cuh
+  line: 155
+  match: DeviceGemmInstance
+  captured:
+  - DeviceGemmInstance
+  arch_scope: ''
+  evidence:
+  - '154:     const at::hip::OptionalHIPGuardMasqueradingAsCUDA device_guard(device_of(XQ));'
+  - '155:     auto device_gemm = DeviceGemmInstance{};'
+  - '156:     auto invoker = device_gemm.MakeInvoker();'
+  evidence_id: src_07d432ba94807e71
+- snapshot: aiter_a6bb4993
+  category: ck_instance
+  language: ck
+  file: csrc/ck_batched_gemm_bf16/include/batched_gemm_bf16_common.cuh
+  line: 162
+  match: DeviceGemmInstance
+  captured:
+  - DeviceGemmInstance
+  arch_scope: ''
+  evidence:
+  - '160:     auto cde_element_op = CDEElementOp{};'
+  - '162:     constexpr ck::index_t NumDTensor = DeviceGemmInstance::NumDTensor;'
+  - '164:     auto argument = device_gemm.MakeArgument('
+  evidence_id: src_3c6f6d6e3ceb3737
+- snapshot: aiter_a6bb4993
+  category: ck_pipeline
+  language: ck
+  file: csrc/ck_batched_gemm_bf16/include/batched_gemm_bf16_common.cuh
+  line: 84
+  match: GemmSpecialization::MNPadding
+  captured:
+  - GemmSpecialization::MNPadding
+  arch_scope: ''
+  evidence:
+  - '82:     ck::BlockGemmPipelineVersion PIPELINE_VERSION,'
+  - '83:     auto GEMM_SPEC ='
+  - '84:         ck::tensor_operation::device::GemmSpecialization::MNPadding>'
+  - '85: using DeviceGemmHelper ='
+  - '86:     ck::tensor_operation::device::DeviceBatchedGemmMultiD_Xdl_CShuffle_V3<'
+  evidence_id: src_14e600f607e38d69
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8.py
+  line: 40
+  end_line: 46
+  match: 'def _runner(gfx: str, w_scale_block: str, x_scale_transposed: bool) -> Callable | None:'
+  captured:
+  - _runner
+  arch_scope: ''
+  evidence:
+  - '39: @functools.cache'
+  - '40: def _runner(gfx: str, w_scale_block: str, x_scale_transposed: bool) -> Callable | None:'
+  - '41:     entry = _RUNNERS.get((gfx, w_scale_block, x_scale_transposed))'
+  - '42:     if entry is None:'
+  evidence_id: src_fdc94221bb54a343
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8.py
+  line: 49
+  end_line: 53
+  match: def bmm_a8w8_mxfp8_supported(
+  captured:
+  - bmm_a8w8_mxfp8_supported
+  arch_scope: ''
+  evidence:
+  - '49: def bmm_a8w8_mxfp8_supported('
+  - '50:     w_scale_block: str, x_scale_transposed: bool = False'
+  - '51: ) -> bool:'
+  evidence_id: src_e4af599a058ed755
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8.py
+  line: 56
+  end_line: 78
+  match: def run_bmm_a8w8_mxfp8(
+  captured:
+  - run_bmm_a8w8_mxfp8
+  arch_scope: ''
+  evidence:
+  - '56: def run_bmm_a8w8_mxfp8('
+  - '57:     XQ: Tensor,'
+  - '58:     WQ: Tensor,'
+  evidence_id: src_0c6d9aed9bf8a1da
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8.py
+  line: 27
+  match: _GFX950 = (
+  captured:
+  - _GFX950
+  arch_scope: ''
+  evidence:
+  - '25: from ..gemm_op_common import mxscale_w_scale_block'
+  - '27: _GFX950 = ("batched_gemm_a8w8_gfx950", "run_bmm_a8w8_mxfp8_gfx950")'
+  - '28: _GFX1250 = ("batched_gemm_a8w8_gfx1250", "run_bmm_a8w8_mxfp8_128_gfx1250")'
+  - '29: # (gfx, w_scale block, x_scale column-major) -> (module, runner, its layout'
+  evidence_id: src_68d6c7cf7415a97b
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8.py
+  line: 28
+  match: _GFX1250 = (
+  captured:
+  - _GFX1250
+  arch_scope: ''
+  evidence:
+  - '27: _GFX950 = ("batched_gemm_a8w8_gfx950", "run_bmm_a8w8_mxfp8_gfx950")'
+  - '28: _GFX1250 = ("batched_gemm_a8w8_gfx1250", "run_bmm_a8w8_mxfp8_128_gfx1250")'
+  - '29: # (gfx, w_scale block, x_scale column-major) -> (module, runner, its layout'
+  - '30: # argument). Only the running arch''s module is ever imported.'
+  evidence_id: src_46241840a0d9f3a2
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8.py
+  line: 31
+  end_line: 36
+  match: _RUNNERS = {
+  captured:
+  - _RUNNERS
+  arch_scope: ''
+  evidence:
+  - '29: # (gfx, w_scale block, x_scale column-major) -> (module, runner, its layout'
+  - '30: # argument). Only the running arch''s module is ever imported.'
+  - '31: _RUNNERS = {'
+  - '32:     ("gfx950", "32x32", False): (*_GFX950, {}),'
+  - '33:     ("gfx950", "128x128", False): (*_GFX950, {}),'
+  evidence_id: src_582a0383465ce12e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 56
+  end_line: 72
+  match: 'def _launch_config(name: str) -> MappingProxyType | None:'
+  captured:
+  - _launch_config
+  arch_scope: ''
+  evidence:
+  - '55: @functools.cache'
+  - '56: def _launch_config(name: str) -> MappingProxyType | None:'
+  - '57:     """Launch arguments of a kernelName, parsed once per name (read-only)."""'
+  - '58:     match = _BMM_KERNEL_NAME_RE.fullmatch(name)'
+  evidence_id: src_44b7717e794f91df
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 75
+  end_line: 79
+  match: 'def parse_bmm_kernel_name(name: str) -> dict | None:'
+  captured:
+  - parse_bmm_kernel_name
+  arch_scope: ''
+  evidence:
+  - '75: def parse_bmm_kernel_name(name: str) -> dict | None:'
+  - '76:     """Parse a tuned kernelName into launch arguments, or ``None`` if it is not'
+  - '77:     one of ours."""'
+  evidence_id: src_204dab398d0d5c2c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 82
+  end_line: 105
+  match: def bmm_kernel_name(
+  captured:
+  - bmm_kernel_name
+  arch_scope: ''
+  evidence:
+  - '82: def bmm_kernel_name('
+  - '83:     tile_m: int,'
+  - '84:     tile_n: int,'
+  evidence_id: src_3e09793c2cfda710
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 123
+  end_line: 128
+  match: 'def _runs(b: int, n: int, k: int, scale_args: dict, cfg: dict) -> bool:'
+  captured:
+  - _runs
+  arch_scope: ''
+  evidence:
+  - '123: def _runs(b: int, n: int, k: int, scale_args: dict, cfg: dict) -> bool:'
+  - '124:     try:'
+  - '125:         check_bmm_config(n, k, b, **cfg, **scale_args)'
+  evidence_id: src_214ba29a418b69f0
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 131
+  end_line: 150
+  match: 'def _variants(tier: dict, b_direct: bool):'
+  captured:
+  - _variants
+  arch_scope: ''
+  evidence:
+  - '131: def _variants(tier: dict, b_direct: bool):'
+  - '132:     """The tier''s config, then ever looser ones for shapes it cannot take:'
+  - '133:     shorter K tiles, narrower N tiles, fewer stages, B through LDS, per-stage'
+  evidence_id: src_4036c46474899d75
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 153
+  end_line: 162
+  match: 'def _max_split(cfg: dict, tiles: int, runs) -> int:'
+  captured:
+  - _max_split
+  arch_scope: ''
+  evidence:
+  - '153: def _max_split(cfg: dict, tiles: int, runs) -> int:'
+  - '154:     """The largest power-of-two K split that keeps about 256 workgroups in'
+  - '155:     flight and that cfg runs at, or 0. More splits only shrink a preloaded'
+  evidence_id: src_0d0df7919d9edf67
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 166
+  end_line: 200
+  match: def pick_bmm_kernel_name(
+  captured:
+  - pick_bmm_kernel_name
+  arch_scope: ''
+  evidence:
+  - '165: @functools.lru_cache(maxsize=1024)'
+  - '166: def pick_bmm_kernel_name('
+  - '167:     b: int,'
+  - '168:     m: int,'
+  evidence_id: src_48ce71b95815ba5a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 203
+  end_line: 207
+  match: 'def _x_scale_column_major(m: int, x_scale_transposed: bool) -> bool:'
+  captured:
+  - _x_scale_column_major
+  arch_scope: ''
+  evidence:
+  - '203: def _x_scale_column_major(m: int, x_scale_transposed: bool) -> bool:'
+  - '204:     """Whether the kernel reads x_scale column-major. A single row reads the'
+  - '205:     same either way and takes the row-major kernel: a column-major dword there'
+  evidence_id: src_e7b8bf85738ea3ae
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 216
+  end_line: 218
+  match: 'def _split_counters(device: int, stream: int) -> Tensor:'
+  captured:
+  - _split_counters
+  arch_scope: ''
+  evidence:
+  - '215: @functools.cache'
+  - '216: def _split_counters(device: int, stream: int) -> Tensor:'
+  - '217:     with persistent_alloc(torch.device("cuda", device)):'
+  - '218:         return torch.zeros(_SPLIT_COUNTERS, dtype=torch.int32, device=device)'
+  evidence_id: src_d9ddd411f49c0ebc
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 221
+  end_line: 228
+  match: 'def _scale_block(extent: int, blocks: int, what: str) -> int:'
+  captured:
+  - _scale_block
+  arch_scope: ''
+  evidence:
+  - '221: def _scale_block(extent: int, blocks: int, what: str) -> int:'
+  - '222:     """The block edge that splits extent into blocks: 32 or 128."""'
+  - '223:     if blocks and extent % blocks == 0 and extent // blocks in SCALE_BLOCKS:'
+  evidence_id: src_5f36c753e84d7256
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 231
+  end_line: 235
+  match: 'def _require_config(name: str) -> MappingProxyType:'
+  captured:
+  - _require_config
+  arch_scope: ''
+  evidence:
+  - '231: def _require_config(name: str) -> MappingProxyType:'
+  - '232:     cfg = _launch_config(name)'
+  - '233:     if cfg is None:'
+  evidence_id: src_9cadd953034d44ef
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 245
+  end_line: 257
+  match: 'def _constexprs(name: str, n: int, k: int, b: int, *scale_args) -> tuple:'
+  captured:
+  - _constexprs
+  arch_scope: ''
+  evidence:
+  - '244: @functools.lru_cache(maxsize=1024)'
+  - '245: def _constexprs(name: str, n: int, k: int, b: int, *scale_args) -> tuple:'
+  - '246:     """A kernel''s Constexpr arguments in parameter order, the key of its'
+  - '247:     compiled launcher. ``scale_args`` are the _SCALE_PARAMS values."""'
+  evidence_id: src_4940f05ee7d4400b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 265
+  end_line: 278
+  match: 'def _launch(tensors, m, stream, constexprs: tuple) -> None:'
+  captured:
+  - _launch
+  arch_scope: ''
+  evidence:
+  - '265: def _launch(tensors, m, stream, constexprs: tuple) -> None:'
+  - '266:     """The one call into the kernel, shared by the runtime and AOT paths so'
+  - '267:     both build the same FlyDSL cache key. ``tensors`` are Out, XQ, WQ,'
+  evidence_id: src_fb4b9fa235fb95da
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 281
+  end_line: 298
+  match: def compile_bmm_a8w8_mxfp8_gfx950(
+  captured:
+  - compile_bmm_a8w8_mxfp8_gfx950
+  arch_scope: ''
+  evidence:
+  - '281: def compile_bmm_a8w8_mxfp8_gfx950('
+  - '282:     kernel_name: str,'
+  - '283:     b: int,'
+  evidence_id: src_a5a7cbadeeeb3888
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 301
+  end_line: 379
+  match: def run_bmm_a8w8_mxfp8_gfx950(
+  captured:
+  - run_bmm_a8w8_mxfp8_gfx950
+  arch_scope: ''
+  evidence:
+  - '301: def run_bmm_a8w8_mxfp8_gfx950('
+  - '302:     XQ: Tensor,'
+  - '303:     WQ: Tensor,'
+  evidence_id: src_5fe68591fabd20e2
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 317
+  end_line: 320
+  match: get_gfx() != "gfx950"
+  captured:
+  - gfx950
+  arch_scope: ''
+  evidence:
+  - '315:     column-major, [K / 128, M], the blockscale convention, under its'
+  - '316:     [M, 1, K / 128] shape; a single row takes the row-major kernel."""'
+  - '317:     if get_gfx() != "gfx950":'
+  - '318:         raise RuntimeError('
+  - '319:             f"[FlyDSL gfx950 bmm] batched mxfp8 requires gfx950, got {get_gfx()}"'
+  evidence_id: src_6f3841040bec5987
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 10
+  match: preshuffled (
+  captured:
+  - preshuffle
+  arch_scope: ''
+  evidence:
+  - '8: ===========  =============================  ================================'
+  - '9: ``XQ``       ``[M, B, K]`` fp8              M-outer, K-contiguous'
+  - '10: ``WQ``       ``[B, N, K]`` fp8              16x16 preshuffled (ops.shuffle.shuffle_weight)'
+  - '11: ``x_scale``  ``[M, B, K//XK]`` e8m0         row-major, XK = 32 or 128'
+  - '12: ``w_scale``  ``[B, N//WN, K//WK]`` e8m0     WN x WK = 32x32 or 128x128'
+  evidence_id: src_233ef6100b7fc4d9
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 111
+  match: _FALLBACK_FIELDS = (
+  captured:
+  - _FALLBACK_FIELDS
+  arch_scope: ''
+  evidence:
+  - '109: # the weight through narrow tiles and deep LDS rings (split K is sized in'
+  - '110: # pick_bmm_kernel_name); large M reads it straight into registers.'
+  - '111: _FALLBACK_FIELDS = ("tile_m", "tile_n", "tile_k", "m_warp", "n_warp", "num_buffers")'
+  - '112: _FALLBACK = ['
+  - '113:     (16, (16, 32, 256, 1, 1, 4), False),'
+  evidence_id: src_c257388ae9e83a59
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 112
+  end_line: 120
+  match: _FALLBACK = [
+  captured:
+  - _FALLBACK
+  arch_scope: ''
+  evidence:
+  - '110: # pick_bmm_kernel_name); large M reads it straight into registers.'
+  - '111: _FALLBACK_FIELDS = ("tile_m", "tile_n", "tile_k", "m_warp", "n_warp", "num_buffers")'
+  - '112: _FALLBACK = ['
+  - '113:     (16, (16, 32, 256, 1, 1, 4), False),'
+  - '114:     (32, (32, 64, 512, 1, 4, 3), False),'
+  evidence_id: src_fede0b60ac0e29d1
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 241
+  match: _SCALE_PARAMS = (
+  captured:
+  - _SCALE_PARAMS
+  arch_scope: ''
+  evidence:
+  - '239: # later one is a Constexpr, baked into the kernel it compiles.'
+  - '240: _RUNTIME_PARAMS = 9'
+  - '241: _SCALE_PARAMS = ("x_scale_k", "w_scale_n", "w_scale_k", "x_scale_transposed")'
+  evidence_id: src_f4e2bea1f56baded
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 318
+  end_line: 320
+  match: "raise RuntimeError(\n            f\"[FlyDSL gfx950 bmm] batched mxfp8 requires gfx950, got {get_gfx()}"
+  captured:
+  - '[FlyDSL gfx950 bmm] batched mxfp8 requires gfx950, got {get_gfx()}'
+  arch_scope: ''
+  evidence:
+  - '316:     [M, 1, K / 128] shape; a single row takes the row-major kernel."""'
+  - '317:     if get_gfx() != "gfx950":'
+  - '318:         raise RuntimeError('
+  - '319:             f"[FlyDSL gfx950 bmm] batched mxfp8 requires gfx950, got {get_gfx()}"'
+  - '320:         )'
+  evidence_id: src_53c1ded3543a1f60
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 322
+  end_line: 325
+  match: "raise RuntimeError(\n            \"[FlyDSL gfx950 bmm] XQ/WQ/Out must be 3-D, got"
+  captured:
+  - '[FlyDSL gfx950 bmm] XQ/WQ/Out must be 3-D, got '
+  arch_scope: ''
+  evidence:
+  - '320:         )'
+  - '321:     if XQ.dim() != 3 or WQ.dim() != 3 or Out.dim() != 3:'
+  - '322:         raise RuntimeError('
+  - '323:             "[FlyDSL gfx950 bmm] XQ/WQ/Out must be 3-D, got "'
+  - '324:             f"{tuple(XQ.shape)}, {tuple(WQ.shape)}, {tuple(Out.shape)}"'
+  evidence_id: src_e5b0f51748e4a5a1
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 334
+  match: raise RuntimeError("[FlyDSL gfx950 bmm] XQ/WQ must be 1-byte fp8 storage
+  captured:
+  - '[FlyDSL gfx950 bmm] XQ/WQ must be 1-byte fp8 storage'
+  arch_scope: ''
+  evidence:
+  - '332:         )'
+  - '333:     if XQ.element_size() != 1 or WQ.element_size() != 1:'
+  - '334:         raise RuntimeError("[FlyDSL gfx950 bmm] XQ/WQ must be 1-byte fp8 storage")'
+  - '335:     if Out.dtype != torch.bfloat16:'
+  - '336:         raise RuntimeError(f"[FlyDSL gfx950 bmm] Out must be bf16, got {Out.dtype}")'
+  evidence_id: src_b85677ef6e60d792
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 336
+  match: raise RuntimeError(f"[FlyDSL gfx950 bmm] Out must be bf16, got {Out.dtype}
+  captured:
+  - '[FlyDSL gfx950 bmm] Out must be bf16, got {Out.dtype}'
+  arch_scope: ''
+  evidence:
+  - '334:         raise RuntimeError("[FlyDSL gfx950 bmm] XQ/WQ must be 1-byte fp8 storage")'
+  - '335:     if Out.dtype != torch.bfloat16:'
+  - '336:         raise RuntimeError(f"[FlyDSL gfx950 bmm] Out must be bf16, got {Out.dtype}")'
+  - '337:     if not (XQ.is_contiguous() and WQ.is_contiguous() and Out.is_contiguous()):'
+  - '338:         raise RuntimeError("[FlyDSL gfx950 bmm] XQ/WQ/Out must be contiguous")'
+  evidence_id: src_af27844c5b5bbd63
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 338
+  match: raise RuntimeError("[FlyDSL gfx950 bmm] XQ/WQ/Out must be contiguous
+  captured:
+  - '[FlyDSL gfx950 bmm] XQ/WQ/Out must be contiguous'
+  arch_scope: ''
+  evidence:
+  - '336:         raise RuntimeError(f"[FlyDSL gfx950 bmm] Out must be bf16, got {Out.dtype}")'
+  - '337:     if not (XQ.is_contiguous() and WQ.is_contiguous() and Out.is_contiguous()):'
+  - '338:         raise RuntimeError("[FlyDSL gfx950 bmm] XQ/WQ/Out must be contiguous")'
+  - '339:     if x_scale.dim() != 3 or tuple(x_scale.shape[:2]) != (m, b):'
+  - '340:         raise RuntimeError('
+  evidence_id: src_dbf03ba4f0c87f68
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 340
+  end_line: 343
+  match: "raise RuntimeError(\n            f\"[FlyDSL gfx950 bmm] x_scale must be [{m}, {b}, K / block],"
+  captured:
+  - '[FlyDSL gfx950 bmm] x_scale must be [{m}, {b}, K / block], '
+  arch_scope: ''
+  evidence:
+  - '338:         raise RuntimeError("[FlyDSL gfx950 bmm] XQ/WQ/Out must be contiguous")'
+  - '339:     if x_scale.dim() != 3 or tuple(x_scale.shape[:2]) != (m, b):'
+  - '340:         raise RuntimeError('
+  - '341:             f"[FlyDSL gfx950 bmm] x_scale must be [{m}, {b}, K / block], "'
+  - '342:             f"got {tuple(x_scale.shape)}"'
+  evidence_id: src_b7173ce3b084fe3e
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 345
+  end_line: 348
+  match: "raise RuntimeError(\n            f\"[FlyDSL gfx950 bmm] w_scale must be [{b}, N / block, K / block],"
+  captured:
+  - '[FlyDSL gfx950 bmm] w_scale must be [{b}, N / block, K / block], '
+  arch_scope: ''
+  evidence:
+  - '343:         )'
+  - '344:     if w_scale.dim() != 3 or w_scale.shape[0] != b:'
+  - '345:         raise RuntimeError('
+  - '346:             f"[FlyDSL gfx950 bmm] w_scale must be [{b}, N / block, K / block], "'
+  - '347:             f"got {tuple(w_scale.shape)}"'
+  evidence_id: src_56d8e0cb151b3899
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 367
+  end_line: 370
+  match: "raise RuntimeError(\n                f\"[FlyDSL gfx950 bmm] {name}: {tiles} split-K tiles exceed\
+    \ the"
+  captured:
+  - '[FlyDSL gfx950 bmm] {name}: {tiles} split-K tiles exceed the '
+  arch_scope: ''
+  evidence:
+  - '365:         tiles = ceildiv(m, cfg["tile_m"]) * (n // cfg["tile_n"]) * b'
+  - '366:         if tiles > _SPLIT_COUNTERS:'
+  - '367:             raise RuntimeError('
+  - '368:                 f"[FlyDSL gfx950 bmm] {name}: {tiles} split-K tiles exceed the "'
+  - '369:                 f"{_SPLIT_COUNTERS} arrival counters"'
+  evidence_id: src_dcd62cc50f5d2399
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 165
+  match: '@functools.lru_cache(maxsize=1024)
+
+    def pick_bmm_kernel_name'
+  captured:
+  - '1024'
+  - pick_bmm_kernel_name
+  arch_scope: ''
+  evidence:
+  - '165: @functools.lru_cache(maxsize=1024)'
+  - '166: def pick_bmm_kernel_name('
+  - '167:     b: int,'
+  evidence_id: src_724c017622519e3f
+- snapshot: aiter_b3ad6c46
+  category: jit_cache
+  language: flydsl
+  file: aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py
+  line: 244
+  match: '@functools.lru_cache(maxsize=1024)
+
+    def _constexprs'
+  captured:
+  - '1024'
+  - _constexprs
+  arch_scope: ''
+  evidence:
+  - '244: @functools.lru_cache(maxsize=1024)'
+  - '245: def _constexprs(name: str, n: int, k: int, b: int, *scale_args) -> tuple:'
+  - '246:     """A kernel''s Constexpr arguments in parameter order, the key of its'
+  evidence_id: src_34da1136543a06f4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 71
+  end_line: 127
+  match: def _lds_layout(
+  captured:
+  - _lds_layout
+  arch_scope: ''
+  evidence:
+  - '71: def _lds_layout('
+  - '72:     tile_m,'
+  - '73:     tile_n,'
+  evidence_id: src_2b32c66d9b693341
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 130
+  end_line: 133
+  match: 'def _padded_k(K):'
+  captured:
+  - _padded_k
+  arch_scope: ''
+  evidence:
+  - '130: def _padded_k(K):'
+  - '131:     """K rounded up to whole MFMA steps. A K of 64 mod 128 ends in a half step'
+  - '132:     whose upper 64 K the kernel zeroes in A."""'
+  evidence_id: src_475de3a62443364c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 136
+  end_line: 224
+  match: def check_bmm_config(
+  captured:
+  - check_bmm_config
+  arch_scope: ''
+  evidence:
+  - '136: def check_bmm_config('
+  - '137:     N,'
+  - '138:     K,'
+  evidence_id: src_dabb4d799cbecf52
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 227
+  end_line: 233
+  match: 'def _byte_slots(row_bytes, cols):'
+  captured:
+  - _byte_slots
+  arch_scope: ''
+  evidence:
+  - '227: def _byte_slots(row_bytes, cols):'
+  - '228:     """Whether a row-major scale panel is filled a byte per 4-byte slot. Its'
+  - '229:     copies start at a row plus a multiple of cols, so unless both are whole'
+  evidence_id: src_68e55c94927a7f72
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 236
+  end_line: 263
+  match: def _scale_panels(
+  captured:
+  - _scale_panels
+  arch_scope: ''
+  evidence:
+  - '236: def _scale_panels('
+  - '237:     tile_m,'
+  - '238:     tile_n,'
+  evidence_id: src_170f3f0bacab35ba
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 267
+  end_line: 1123
+  match: def launch_bmm_a8w8_mxscale(
+  captured:
+  - launch_bmm_a8w8_mxscale
+  arch_scope: ''
+  evidence:
+  - '266: @flyc.jit'
+  - '267: def launch_bmm_a8w8_mxscale('
+  - '268:     arg_c: fx.Pointer,'
+  - '269:     arg_a: fx.Pointer,'
+  evidence_id: src_8c2593f32cf9b87f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 399
+  end_line: 1101
+  match: def kernel_bmm(
+  captured:
+  - kernel_bmm
+  arch_scope: ''
+  evidence:
+  - '398:     @flyc.kernel(name=kernel_name, known_block_size=[threads, 1, 1])'
+  - '399:     def kernel_bmm('
+  - '400:         arg_c: fx.Int64,'
+  - '401:         arg_a: fx.Int64,'
+  evidence_id: src_fa52f7895b13417b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 436
+  end_line: 1094
+  match: 'def body():'
+  captured:
+  - body
+  arch_scope: ''
+  evidence:
+  - '434:             kt0 = 0'
+  - '436:         def body():'
+  - '437:             wave = rocdl.readfirstlane(T.i32, tid // WAVE)'
+  - '438:             lane = tid % WAVE'
+  evidence_id: src_ee5e305330c56ed3
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 454
+  end_line: 464
+  match: 'def _buffer(base, elem, align, nbytes):'
+  captured:
+  - _buffer
+  arch_scope: ''
+  evidence:
+  - '452:             sb_base = arg_scale_b + bz * ((N // w_scale_n) * (K // w_scale_k))'
+  - '454:             def _buffer(base, elem, align, nbytes):'
+  - '455:                 ptr_ty = fx.PointerType.get('
+  - '456:                     elem, address_space=fx.AddressSpace.Global, alignment=align'
+  evidence_id: src_eee27fcc8d8c9157
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 510
+  end_line: 523
+  match: 'def _raw_dma(rsrc, size, byte, lds_off, aux=0):'
+  captured:
+  - _raw_dma
+  arch_scope: ''
+  evidence:
+  - '508:                 )'
+  - '510:             def _raw_dma(rsrc, size, byte, lds_off, aux=0):'
+  - '511:                 # Lane l lands at lds_off + l * 4: the base is wave-uniform.'
+  - '512:                 lds_ptr = fx.to_llvm_ptr('
+  evidence_id: src_014bac70fa5eccfc
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 525
+  end_line: 526
+  match: 'def _dma_b(byte, lds_off):'
+  captured:
+  - _dma_b
+  arch_scope: ''
+  evidence:
+  - '523:                 )'
+  - '525:             def _dma_b(byte, lds_off):'
+  - '526:                 _raw_dma(b_rsrc, 16, byte, lds_off, 2 if b_nt else 0)'
+  evidence_id: src_eb651088733509ba
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 528
+  end_line: 534
+  match: 'def _dma(atom, src, byte, lds_off):'
+  captured:
+  - _dma
+  arch_scope: ''
+  evidence:
+  - '526:                 _raw_dma(b_rsrc, 16, byte, lds_off, 2 if b_nt else 0)'
+  - '528:             def _dma(atom, src, byte, lds_off):'
+  - '529:                 # Lane l lands at lds_off + l * width: the base is wave-uniform.'
+  - '530:                 dst = fx.make_view('
+  evidence_id: src_ea3070440b7853e2
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 556
+  end_line: 639
+  match: 'def issue_scales(base, kt):'
+  captured:
+  - issue_scales
+  arch_scope: ''
+  evidence:
+  - '554:             # read spans land on 16 banks instead of stacking W dwords apart on'
+  - '555:             # the same few. A byte-copied one keeps a scale per slot, in order.'
+  - '556:             def issue_scales(base, kt):'
+  - '557:                 """The A and B scales of scale_span K from K tile kt, into the'
+  - '558:                 panels at base. Physical dword c of a panel is row c // W; the spare'
+  evidence_id: src_75f594e315cfcbb0
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 641
+  end_line: 670
+  match: 'def issue(stage, kt):'
+  captured:
+  - issue
+  arch_scope: ''
+  evidence:
+  - '639:                             )'
+  - '641:             def issue(stage, kt):'
+  - '642:                 base = stage * pitch'
+  - '643:                 for i in range_constexpr(copies_a):'
+  evidence_id: src_b77b18d517502347
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 672
+  end_line: 675
+  match: 'def fence(pending_stages):'
+  captured:
+  - fence
+  arch_scope: ''
+  evidence:
+  - '670:                 rocdl.asyncmark()  # one group per stage'
+  - '672:             def fence(pending_stages):'
+  - '673:                 # Async LDS copies retire on vmcnt; the barrier publishes them.'
+  - '674:                 rocdl.wait_asyncmark(pending_stages)'
+  evidence_id: src_5249a2416778ef02
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 677
+  end_line: 683
+  match: 'def _read(off_i32):'
+  captured:
+  - _read
+  arch_scope: ''
+  evidence:
+  - '675:                 gpu.barrier()'
+  - '677:             def _read(off_i32):'
+  - '678:                 frag = fx.make_rmem_tensor(4, Int32)'
+  - '679:                 view = fx.make_view('
+  evidence_id: src_1d1970f34b898231
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 685
+  end_line: 693
+  match: 'def _pair(lo_off, hi_off, hi_mask=None):'
+  captured:
+  - _pair
+  arch_scope: ''
+  evidence:
+  - '683:                 return fx.memref_load_vec(frag)'
+  - '685:             def _pair(lo_off, hi_off, hi_mask=None):'
+  - '686:                 # fp8 halves 64 K apart form one i32[8] MFMA operand (f8f6f4 ABI).'
+  - '687:                 # hi_mask (0 or -1) keeps or clears the upper half.'
+  evidence_id: src_50630e92df6d5eb5
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 695
+  end_line: 702
+  match: 'def load_a(stage_i32, mi, ks, hi_mask=None):'
+  captured:
+  - load_a
+  arch_scope: ''
+  evidence:
+  - '693:                 return frag'
+  - '695:             def load_a(stage_i32, mi, ks, hi_mask=None):'
+  - '696:                 row = wmb + mi * MFMA_M + lane16'
+  - '697:                 lo = ks * 8 + kgrp'
+  evidence_id: src_318199b1de9c7110
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 704
+  end_line: 713
+  match: 'def load_b(stage_i32, ni, ks):'
+  captured:
+  - load_b
+  arch_scope: ''
+  evidence:
+  - '702:                 )'
+  - '704:             def load_b(stage_i32, ni, ks):'
+  - '705:                 group = (wnb + ni * MFMA_N) // 16'
+  - '706:                 lo = ('
+  evidence_id: src_c3b96e358bbdbc43
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 715
+  end_line: 719
+  match: 'def scale_col(t, ks, block):'
+  captured:
+  - scale_col
+  arch_scope: ''
+  evidence:
+  - '713:                 return _pair(lo, lo + 256)'
+  - '715:             def scale_col(t, ks, block):'
+  - '716:                 """Panel column of this lane''s 32-K group in MFMA step ks of K tile'
+  - '717:                 t: a 128-wide block serves all four groups from one byte."""'
+  evidence_id: src_488cb8cda7122933
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 721
+  end_line: 736
+  match: 'def load_scale(base, row, cols, slots, col, const_row=0):'
+  captured:
+  - load_scale
+  arch_scope: ''
+  evidence:
+  - '719:                 return col + kgrp if block == SCALE_GROUP else col'
+  - '721:             def load_scale(base, row, cols, slots, col, const_row=0):'
+  - '722:                 """Scale col of panel row row + const_row. The compile-time'
+  - '723:                 const_row goes to the LDS offset, and a rotated panel''s rotation'
+  evidence_id: src_a4d3a390f18a0968
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 755
+  end_line: 758
+  match: 'def _load_global(off_i32):'
+  captured:
+  - _load_global
+  arch_scope: ''
+  evidence:
+  - '753:             b_words = _buffer(b_base, T.i32, 16, fx.Int64(N * K))'
+  - '755:             def _load_global(off_i32):'
+  - '756:                 frag = fx.make_rmem_tensor(4, Int32)'
+  - '757:                 fx.copy(load_b16, fx.slice(b_words, (None, off_i32)), frag)'
+  evidence_id: src_b5a64a68380c3526
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 762
+  end_line: 765
+  match: 'def _load_byte(src, off):'
+  captured:
+  - _load_byte
+  arch_scope: ''
+  evidence:
+  - '760:             byte8 = fx.make_copy_atom(fx.rocdl.BufferCopy8b(), 8)'
+  - '762:             def _load_byte(src, off):'
+  - '763:                 frag = fx.make_rmem_tensor(1, Int8)'
+  - '764:                 fx.copy(byte8, fx.slice(src, (None, off)), frag)'
+  evidence_id: src_57c2f98116dec21e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 785
+  end_line: 801
+  match: 'def load_b_global(kt, frags):'
+  captured:
+  - load_b_global
+  arch_scope: ''
+  evidence:
+  - '783:                 ]'
+  - '785:             def load_b_global(kt, frags):'
+  - '786:                 # B straight from the preshuffled weight: the same 16-byte chunks'
+  - '787:                 # the LDS path reads, one 16-row group per MFMA N tile.'
+  evidence_id: src_31b4239e78a9bfdd
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 818
+  end_line: 823
+  match: 'def prefetch_b(t, phase):'
+  captured:
+  - prefetch_b
+  arch_scope: ''
+  evidence:
+  - '816:             ]'
+  - '818:             def prefetch_b(t, phase):'
+  - '819:                 # vmcnt retires in order: loads issued ahead of the next stage''s'
+  - '820:                 # DMA can be waited on without waiting for it.'
+  evidence_id: src_76f210425cee2692
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 825
+  end_line: 911
+  match: 'def read_stage(stage, t, b_set):'
+  captured:
+  - read_stage
+  arch_scope: ''
+  evidence:
+  - '823:                     rocdl.sched_barrier(0)'
+  - '825:             def read_stage(stage, t, b_set):'
+  - '826:                 """Every fragment and scale of K tile t, read out of LDS."""'
+  - '827:                 stage_i32 = stage * (pitch // 4)'
+  evidence_id: src_25b1cdd19fc95f57
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 913
+  end_line: 926
+  match: 'def mma(frags):'
+  captured:
+  - mma
+  arch_scope: ''
+  evidence:
+  - '911:                 return frags'
+  - '913:             def mma(frags):'
+  - '914:                 for a, b, sa, sb in frags:'
+  - '915:                     for mi in range_constexpr(m_rep):'
+  evidence_id: src_5c30caa865a4e915
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 928
+  end_line: 948
+  match: 'def step(t, phase, tail=None):'
+  captured:
+  - step
+  arch_scope: ''
+  evidence:
+  - '926:                             )'
+  - '928:             def step(t, phase, tail=None):'
+  - '929:                 """K tile t, whose B set is phase (t % unroll, static). In the'
+  - '930:                 steady state (tail None) stage t + num_buffers - 1 and B tile'
+  evidence_id: src_68524be54e4602db
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 970
+  end_line: 1009
+  match: 'def store_tile(vals):'
+  captured:
+  - store_tile
+  arch_scope: ''
+  evidence:
+  - '968:             )'
+  - '970:             def store_tile(vals):'
+  - '971:                 """Stage the bf16 tile in LDS c_rows rows at a time, and store whole'
+  - '972:                 16-byte rows of each chunk."""'
+  evidence_id: src_9791e0d1706c3a0d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 1011
+  end_line: 1031
+  match: 'def store_direct(vals):'
+  captured:
+  - store_direct
+  arch_scope: ''
+  evidence:
+  - '1009:                             )'
+  - '1011:             def store_direct(vals):'
+  - '1012:                 """Store the bf16 tile straight from the accumulators, 2 bytes'
+  - '1013:                 an element: no LDS round trip, which the last split of a small'
+  evidence_id: src_f53fc4651161333b
+- snapshot: aiter_b3ad6c46
+  category: mfma_shape
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 49
+  match: MFMA_N = 16
+  captured:
+  - '16'
+  arch_scope: ''
+  evidence:
+  - '48: WAVE = 64'
+  - '49: MFMA_M = MFMA_N = 16'
+  - '50: MFMA_K = 128'
+  - '51: SCALE_GROUP = 32  # K per MFMA scale operand'
+  evidence_id: src_f726c9c40140aad0
+- snapshot: aiter_b3ad6c46
+  category: mfma_shape
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 50
+  match: MFMA_K = 128
+  captured:
+  - '128'
+  arch_scope: ''
+  evidence:
+  - '48: WAVE = 64'
+  - '49: MFMA_M = MFMA_N = 16'
+  - '50: MFMA_K = 128'
+  - '51: SCALE_GROUP = 32  # K per MFMA scale operand'
+  - '52: SCALE_BLOCKS = (32, 128)'
+  evidence_id: src_5341cdd2d837472b
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 52
+  match: SCALE_BLOCKS = (
+  captured:
+  - SCALE_BLOCKS
+  arch_scope: ''
+  evidence:
+  - '50: MFMA_K = 128'
+  - '51: SCALE_GROUP = 32  # K per MFMA scale operand'
+  - '52: SCALE_BLOCKS = (32, 128)'
+  - '53: _LDS_BYTES = get_lds_capacity_bytes("gfx950")'
+  evidence_id: src_184f65b9bcd514fe
+- snapshot: aiter_b3ad6c46
+  category: layout_preshuffle
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 16
+  match: shuffle_weight(
+  captured:
+  - shuffle_weight
+  arch_scope: ''
+  evidence:
+  - '14: ===========  ===========================  =================================='
+  - '15: ``XQ``       ``[M, B, K]`` fp8            K-contiguous, token-major'
+  - '16: ``WQ``       ``[B, N, K]`` fp8            shuffle_weight(., (16, 16))'
+  - '17: ``x_scale``  ``[M, B, K // XK]`` e8m0     row-major, XK = x_scale_k'
+  - '18: ``w_scale``  ``[B, N // WN, K // WK]``    e8m0, WN x WK = w_scale_n x w_scale_k'
+  evidence_id: src_eed3a61bc31897df
+- snapshot: aiter_b3ad6c46
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 823
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '821:                 if const_expr(b_direct):'
+  - '822:                     load_b_global(kt0 + t, b_regs[phase % b_sets])'
+  - '823:                     rocdl.sched_barrier(0)'
+  - '825:             def read_stage(stage, t, b_set):'
+  evidence_id: src_115dc0bfcbb27845
+- snapshot: aiter_b3ad6c46
+  category: scheduling
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 947
+  match: rocdl.sched_barrier(
+  captured:
+  - sched_barrier
+  arch_scope: ''
+  evidence:
+  - '945:                         (t + num_buffers - 1) % num_buffers, kt0 + t + num_buffers - 1'
+  - '946:                     )'
+  - '947:                     rocdl.sched_barrier(0)  # keep the copies ahead of the MFMAs'
+  - '948:                 mma(frags)'
+  evidence_id: src_c243ea1a466381e6
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 220
+  match: raise ValueError("[FlyDSL gfx950] b_ahead must be in [1, num_buffers - 1]
+  captured:
+  - '[FlyDSL gfx950] b_ahead must be in [1, num_buffers - 1]'
+  arch_scope: ''
+  evidence:
+  - '218:         )'
+  - '219:     if b_direct and not 1 <= b_ahead <= num_buffers - 1:'
+  - '220:         raise ValueError("[FlyDSL gfx950] b_ahead must be in [1, num_buffers - 1]")'
+  - '221:     if layout.stage_a % (threads * 16) or layout.stage_b % (threads * 16):'
+  - '222:         raise ValueError("[FlyDSL gfx950] A/B stages must split evenly over threads")'
+  evidence_id: src_d1d11fa904bdfbf5
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 428
+  match: per_xcd =
+  captured:
+  - per_xcd
+  arch_scope: ''
+  evidence:
+  - '426:             # fastest, so the N tiles sharing an A row block, and the M tiles'
+  - '427:             # sharing a B column block, meet in that XCD''s L2.'
+  - '428:             per_xcd = ceildiv(tiles, 8) if padded else tiles // 8'
+  - '429:             tile = bid_x % 8 * per_xcd + bid_x // 8'
+  - '430:             rest = tile // (N // tile_n)'
+  evidence_id: src_36af0b2f7fb71870
+- snapshot: aiter_b3ad6c46
+  category: access_width
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/bmm_a8w8_mxscale_gfx950.py
+  line: 785
+  end_line: 801
+  match: def load_b_global(
+  captured:
+  - load_b_global
+  arch_scope: ''
+  evidence:
+  - '783:                 ]'
+  - '785:             def load_b_global(kt, frags):'
+  - '786:                 # B straight from the preshuffled weight: the same 16-byte chunks'
+  - '787:                 # the LDS path reads, one 16-row group per MFMA N tile.'
+  evidence_id: src_802a254ee8cfad97
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 39
+  end_line: 227
+  match: def _batched_gemm_bf16_kernel(
+  captured:
+  - _batched_gemm_bf16_kernel
+  arch_scope: ''
+  evidence:
+  - '37: )'
+  - '38: @triton.jit(repr=_batched_gemm_bf16_repr)'
+  - '39: def _batched_gemm_bf16_kernel('
+  - '40:     # Pointers to matrices'
+  - '41:     a_ptr,'
+  evidence_id: src_49a6b4a47b4f3682
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 230
+  end_line: 239
+  match: def _get_config(
+  captured:
+  - _get_config
+  arch_scope: ''
+  evidence:
+  - '230: def _get_config('
+  - '231:     M: int,'
+  - '232:     N: int,'
+  evidence_id: src_80dacf0916fe6d37
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 197
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '195:                 )'
+  - '197:             accumulator = tl.dot(a, b, acc=accumulator)'
+  - '199:             # Advance the ptrs to the next K block.'
+  evidence_id: src_4f125599c2ce5089
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 75
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '73:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '74:     EVEN_K: tl.constexpr,'
+  - '75:     cache_modifier: tl.constexpr,'
+  - '76:     num_warps: tl.constexpr,'
+  - '77:     num_stages: tl.constexpr,'
+  evidence_id: src_3de474436c243689
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 184
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '182:             # If it is out of bounds, set it to 0.'
+  - '183:             if EVEN_K:'
+  - '184:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '185:                 a = tl.load(a_ptrs)'
+  - '186:             else:'
+  evidence_id: src_a0041d58b574a5a6
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 191
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '189:                     mask=offs_k[:, None] < k_span - k * BLOCK_SIZE_K,'
+  - '190:                     other=0.0,'
+  - '191:                     cache_modifier=cache_modifier,'
+  - '192:                 )'
+  - '193:                 a = tl.load('
+  evidence_id: src_991eaa258cca7fae
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 66
+  match: 'HAS_BIAS: tl.constexpr,'
+  captured:
+  - HAS_BIAS
+  arch_scope: ''
+  evidence:
+  - '64:     stride_ck,'
+  - '65:     stride_biasb,'
+  - '66:     # Meta-parameters'
+  - '67:     HAS_BIAS: tl.constexpr,'
+  - '68:     BLOCK_SIZE_M: tl.constexpr,'
+  evidence_id: src_3a4bf6faa9381aae
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 68
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '66:     # Meta-parameters'
+  - '67:     HAS_BIAS: tl.constexpr,'
+  - '68:     BLOCK_SIZE_M: tl.constexpr,'
+  - '69:     BLOCK_SIZE_N: tl.constexpr,'
+  - '70:     BLOCK_SIZE_K: tl.constexpr,'
+  evidence_id: src_62c47b489f467275
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 69
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '67:     HAS_BIAS: tl.constexpr,'
+  - '68:     BLOCK_SIZE_M: tl.constexpr,'
+  - '69:     BLOCK_SIZE_N: tl.constexpr,'
+  - '70:     BLOCK_SIZE_K: tl.constexpr,'
+  - '71:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_6e8150750490eb89
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 70
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '68:     BLOCK_SIZE_M: tl.constexpr,'
+  - '69:     BLOCK_SIZE_N: tl.constexpr,'
+  - '70:     BLOCK_SIZE_K: tl.constexpr,'
+  - '71:     GROUP_SIZE_M: tl.constexpr,'
+  - '72:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_3844eea3fd972409
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 71
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '69:     BLOCK_SIZE_N: tl.constexpr,'
+  - '70:     BLOCK_SIZE_K: tl.constexpr,'
+  - '71:     GROUP_SIZE_M: tl.constexpr,'
+  - '72:     NUM_KSPLIT: tl.constexpr,'
+  - '73:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_15c14654c5b2ca7e
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 72
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '70:     BLOCK_SIZE_K: tl.constexpr,'
+  - '71:     GROUP_SIZE_M: tl.constexpr,'
+  - '72:     NUM_KSPLIT: tl.constexpr,'
+  - '73:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '74:     EVEN_K: tl.constexpr,'
+  evidence_id: src_b170f53eb26aa2bb
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 73
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '71:     GROUP_SIZE_M: tl.constexpr,'
+  - '72:     NUM_KSPLIT: tl.constexpr,'
+  - '73:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '74:     EVEN_K: tl.constexpr,'
+  - '75:     cache_modifier: tl.constexpr,'
+  evidence_id: src_bd6b2fdcb10907d2
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 74
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '72:     NUM_KSPLIT: tl.constexpr,'
+  - '73:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '74:     EVEN_K: tl.constexpr,'
+  - '75:     cache_modifier: tl.constexpr,'
+  - '76:     num_warps: tl.constexpr,'
+  evidence_id: src_89f5e4a2eced6532
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 75
+  match: 'cache_modifier: tl.constexpr,'
+  captured:
+  - cache_modifier
+  arch_scope: ''
+  evidence:
+  - '73:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '74:     EVEN_K: tl.constexpr,'
+  - '75:     cache_modifier: tl.constexpr,'
+  - '76:     num_warps: tl.constexpr,'
+  - '77:     num_stages: tl.constexpr,'
+  evidence_id: src_199cadbfae2fc38b
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 76
+  match: 'num_warps: tl.constexpr,'
+  captured:
+  - num_warps
+  arch_scope: ''
+  evidence:
+  - '74:     EVEN_K: tl.constexpr,'
+  - '75:     cache_modifier: tl.constexpr,'
+  - '76:     num_warps: tl.constexpr,'
+  - '77:     num_stages: tl.constexpr,'
+  - '78:     waves_per_eu: tl.constexpr,'
+  evidence_id: src_5c712a7ed103a92b
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 77
+  match: 'num_stages: tl.constexpr,'
+  captured:
+  - num_stages
+  arch_scope: ''
+  evidence:
+  - '75:     cache_modifier: tl.constexpr,'
+  - '76:     num_warps: tl.constexpr,'
+  - '77:     num_stages: tl.constexpr,'
+  - '78:     waves_per_eu: tl.constexpr,'
+  - '79: ):'
+  evidence_id: src_cbced2bc27971537
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/gemm/batched/batched_gemm_bf16.py
+  line: 78
+  match: 'waves_per_eu: tl.constexpr,'
+  captured:
+  - waves_per_eu
+  arch_scope: ''
+  evidence:
+  - '76:     num_warps: tl.constexpr,'
+  - '77:     num_stages: tl.constexpr,'
+  - '78:     waves_per_eu: tl.constexpr,'
+  - '79: ):'
+  - '80:     """'
+  evidence_id: src_241c4a21b135d5bd

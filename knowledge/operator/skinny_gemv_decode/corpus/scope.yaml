@@ -1,0 +1,18 @@
+schema_version: 2
+operator: skinny_gemv_decode
+sources:
+- snapshot: aiter_a6bb4993
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  language: flydsl
+  include_symbols: false
+- snapshot: aiter_a6bb4993
+  file: csrc/kernels/custom_kernels.cu
+  language: hip
+  include_symbols: false
+validation_sources:
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_gemm_a16w16.py
+coverage_notes:
+- Source observations and conditioned candidates for skinny gemv decode; source presence is not a measured
+  winner.
+- No new GPU measurements or binary disassembly are included.

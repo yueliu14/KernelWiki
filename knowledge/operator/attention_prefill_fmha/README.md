@@ -1,5 +1,8 @@
 # attention_prefill_fmha
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Forward FMHA for prompt processing, including variable-length causal attention.
 
 6 AITER implementation references; 1 historical experience cards.

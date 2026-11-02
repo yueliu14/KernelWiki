@@ -1,0 +1,39 @@
+schema_version: 2
+operator: fused_moe_grouped_gemm
+sources:
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/comm_fused_moe/gfx950/a8w4/config.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/mega_moe/mega_moe_prepare.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/mega_moe_tp/communication.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/mega_moe_tp/mega_moe_tp.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/mega_moe_tp/schedule.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/mega_moe_tp.py
+  language: flydsl
+  include_symbols: true
+validation_sources:
+- snapshot: aiter_b3ad6c46
+  file: op_tests/multigpu_tests/test_comm_fused_moe.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/multigpu_tests/test_mega_moe_tp.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/tuners/tune_comm_fused_moe.py
+coverage_notes:
+- Source observations and conditioned candidates for fused moe grouped gemm; source presence is not a measured
+  winner.
+- TP and EP communication contracts are distinct; source availability does not establish topology support.
+- No new GPU measurements or binary disassembly are included.

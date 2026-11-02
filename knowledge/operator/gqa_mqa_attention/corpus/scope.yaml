@@ -1,0 +1,13 @@
+schema_version: 2
+operator: gqa_mqa_attention
+sources:
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  language: gluon
+  include_symbols: true
+validation_sources:
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/attention/test_unified_attention.py
+coverage_notes:
+- Source observations and conditioned candidates for gqa mqa attention; source presence is not a measured winner.
+- No new GPU measurements or binary disassembly are included.

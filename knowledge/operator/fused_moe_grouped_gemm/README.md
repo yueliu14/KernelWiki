@@ -1,5 +1,8 @@
 # fused_moe_grouped_gemm
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Fused expert execution and compute/communication overlap.
 
 2 AITER implementation references; 0 historical experience cards.

@@ -1,0 +1,49 @@
+provenance:
+  schema_version: 4
+  operator_family: fused_moe_grouped_gemm
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits: {}
+cards:
+- id: fused-moe-prepare-partition-contract
+  type: constraint
+  axes:
+  - implementation_contract
+  - communication
+  - expert_layout
+  match:
+    operator_families:
+    - fused_moe_grouped_gemm
+    target_languages:
+    - flydsl
+  question: What work partition and initialization are required before the fused MoE kernel?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected implementation matches the cited path and its input contract.
+  actions:
+  - Keep prepare, dispatch and quantization block counts consistent with the peer count and reserved quantization
+    capacity.
+  - Honor model_dim divisibility by the 32-element quantization group and the positive chunk-row/state-stride
+    requirements.
+  - Include preparation and initialized route/state buffers in the implementation contract when comparing a
+    fused launch with staged execution.
+  alternatives:
+  - Keep a simpler implementation with the identical numerical and layout contract for comparison.
+  why:
+  - The cited source declares these operations and checks; the combination is part of its interface.
+  source_evidence:
+  - aiter_b3ad6c46:src_ad97471fc6357f3b
+  measurement_evidence: []
+  limitations:
+  - A fused compute body is not a complete implementation without its preparation protocol.
+  - The assertions in this builder do not establish support for every TP/EP topology.
+  references:
+  - knowledge/operator/fused_moe_grouped_gemm/README.md
+shared_cards:
+- moe-communication-arena-lifetime
+- moe-route-map-capacity
+- moe-route-quant-scatter-fusion
+- moe-shared-expert-readiness
+- moe-sort-padding-sentinels
+- moe-two-stage-intermediate
+- moe-weighted-gather-dropped-routes

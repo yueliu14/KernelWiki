@@ -1,5 +1,8 @@
 # grouped_gemm_moe
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Expert grouped GEMMs, token imbalance and low-bit expert weights.
 
 8 AITER implementation references; 37 historical experience cards.

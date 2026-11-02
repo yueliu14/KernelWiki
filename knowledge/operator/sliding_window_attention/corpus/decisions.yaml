@@ -1,0 +1,81 @@
+provenance:
+  schema_version: 4
+  operator_family: sliding_window_attention
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  paged_kv: The design reads a paged KV cache.
+cards:
+- id: attention-window-prefix-boundaries
+  type: constraint
+  axes:
+  - attention_semantics
+  - kv_partition
+  match:
+    operator_families:
+    - sliding_window_attention
+    - chunked_prefill
+    - attention_prefill_fmha
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+  question: How do cached prefixes and sliding windows change the causal boundary?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - Queries cover only a suffix/chunk, or the model restricts each query to a local attention window.
+  actions:
+  - Express the causal boundary in logical sequence coordinates including the cached prefix; do not substitute
+    the query tile's local row number.
+  - Intersect the sliding window, causal boundary and actual sequence length before dropping KV tiles.
+  - Preserve the unified kernel's restriction that SPLIT_UNMASKED_LOOP is incompatible with sliding-window
+    attention.
+  alternatives:
+  - Retain per-element score masking while first validating any tile-pruning optimization.
+  why:
+  - The extend kernel distinguishes prefix/cache work from extension work; unified attention separately prunes
+    window tiles and asserts the loop restriction.
+  source_evidence:
+  - aiter_b3ad6c46:src_77fdd041c1e25e15
+  - aiter_b3ad6c46:src_49cb5bdc816cb102
+  measurement_evidence: []
+  limitations:
+  - An optimization for fully valid KV tiles is not valid for every prefix/window boundary.
+  references:
+  - knowledge/operator/sliding_window_attention/README.md
+  - knowledge/operator/chunked_prefill/README.md
+  - knowledge/operator/attention_prefill_fmha/README.md
+- id: windowed-attention-backend-admission
+  type: constraint
+  axes:
+  - implementation_contract
+  - attention_semantics
+  match:
+    operator_families:
+    - sliding_window_attention
+    target_languages:
+    - triton
+  question: Which additional conditions must hold before selecting the gfx950 Gluon unified-attention path?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected implementation matches the cited path and its input contract.
+  actions:
+  - Check the wrapper eligibility predicate with windowing and all other active features, not just the GPU
+    name.
+  - At this snapshot the gfx950 Gluon predicate excludes softcap, QQ bias and ALiBi; it also constrains head
+    widths, Q/cache dtypes and shuffled-cache block geometry.
+  - Preserve an applicable alternate backend when a feature combination does not satisfy the predicate.
+  alternatives:
+  - Keep a simpler implementation with the identical numerical and layout contract for comparison.
+  why:
+  - The cited source declares these operations and checks; the combination is part of its interface.
+  source_evidence:
+  - aiter_b3ad6c46:src_1ae1d84244f6eca6
+  measurement_evidence: []
+  limitations:
+  - A wrapper eligibility predicate is version-specific and is not a hardware impossibility claim.
+  - This predicate does not replace checking the per-query sliding-window bounds.
+  references:
+  - knowledge/operator/sliding_window_attention/README.md
+shared_cards: []

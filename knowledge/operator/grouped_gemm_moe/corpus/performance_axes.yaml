@@ -1,0 +1,598 @@
+schema_version: 1
+family: grouped_gemm_moe
+contract:
+  source_observation: A source observation is implementation evidence, not measured preference.
+  attribution: Whole-implementation performance must not be assigned to an isolated axis.
+comparison_context:
+  required:
+  - operator_family
+  - math_contract
+  - dtype
+  - gfx
+  - shape
+  - layout
+  - baseline
+  - accounting
+  - aiter_commit
+  - toolchain
+  contract: Different masks, scale formats, index conventions, routing or state semantics define different
+    workloads.
+development_order:
+- step: 1
+  title: Mathematical and validity contracts
+  axes:
+  - numerical_contract
+  - configuration_constraints
+- step: 2
+  title: Layout and host interfaces
+  axes:
+  - implementation_contract
+  - expert_layout
+  - runtime_contract
+- step: 3
+  title: Candidate design space
+  axes:
+  - execution_geometry
+  - compute_schedule
+  - data_movement
+  - expert_compute
+  - compute_instruction
+  - workgroup_tile
+  - work_partition
+  - pipeline_schedule
+  - operand_layout
+  - memory_access
+  - epilogue
+  - tunable_surface
+  - implementation_variant
+axes:
+- id: implementation_contract
+  kind: integration_contract
+  question: What declarations, dispatch gates, shape checks and host state define a legal implementation?
+  comparison_contract: Compare only the same workload and ABI; a source declaration supplies no performance
+    ranking.
+  source_mappings:
+  - representation: source_observation
+    categories:
+    - symbol_declaration
+    - arch_gate
+    - config_limit
+    - config_space
+    - config_validity
+    - kernel_family
+    - jit_cache
+    - asm_object
+    - asm_argblock
+    - config_lookup
+    - dispatch_padding
+    - tunable_param
+    - instance_name
+  knob_aliases: {}
+- id: execution_geometry
+  kind: performance_choice
+  question: How much work does each program own and how is the grid mapped?
+  comparison_contract: Compare only the same workload and ABI; a source declaration supplies no performance
+    ranking.
+  source_mappings:
+  - representation: source_observation
+    categories:
+    - tile_shape
+    - waves
+    - split_k
+    - persistent
+    - grid_mapping
+    - grid_fill
+    - asm_tile
+    - asm_launch
+  knob_aliases:
+    token_tile:
+    - BLOCK_SIZE_M
+    - BLOCK_M
+    - tile_m
+    output_channel_tile:
+    - BLOCK_SIZE_N
+    - BLOCK_N
+    - tile_n
+    reduction_tile:
+    - BLOCK_SIZE_K
+    - BLOCK_K
+    - tile_k
+    waves:
+    - num_warps
+    - NUM_WARPS
+    - waves_per_eu
+- id: compute_schedule
+  kind: performance_choice
+  question: Which compute, reduction and scheduling structures are written explicitly?
+  comparison_contract: Compare only the same workload and ABI; a source declaration supplies no performance
+    ranking.
+  source_mappings:
+  - representation: source_observation
+    categories:
+    - mfma_intrinsic
+    - mfma_shape
+    - scheduling
+    - ck_instance
+    - ck_pipeline
+    - pipeline_variant
+    - lane_reduction
+    - atomic_combine
+  knob_aliases: {}
+- id: data_movement
+  kind: performance_choice
+  question: How do data move between global memory, LDS and registers?
+  comparison_contract: Compare only the same workload and ABI; a source declaration supplies no performance
+    ranking.
+  source_mappings:
+  - representation: source_observation
+    categories:
+    - lds_stage
+    - lds_swizzle
+    - lds_pad
+    - lds_alloc
+    - async_copy
+    - access_width
+    - cache_policy
+    - layout_preshuffle
+    - layout_transpose
+    - layout_epilogue
+    - fragment_layout
+  knob_aliases:
+    stages:
+    - num_stages
+    - lds_stage
+    - STAGES
+    async_copy:
+    - use_async_copy
+    - async_copy
+- id: numerical_contract
+  kind: hard_constraint
+  question: Which scale, precision and parity conventions must remain unchanged?
+  comparison_contract: Compare only the same workload and ABI; a source declaration supplies no performance
+    ranking.
+  source_mappings:
+  - representation: source_observation
+    categories:
+    - scale_operand
+    - scale_in_k_loop
+    - scale_after_k_loop
+    - parity_tolerance
+  knob_aliases: {}
+- id: expert_layout
+  kind: integration_contract
+  question: How do route IDs, sorted/padded expert rows and inverse maps relate?
+  comparison_contract: Meaning is established by the curated cards and cited function bodies, not inferred
+    from an API name.
+  source_mappings: []
+  knob_aliases: {}
+- id: expert_compute
+  kind: structural_choice
+  question: How do the gate/up, activation and down stages exchange intermediates?
+  comparison_contract: Meaning is established by the curated cards and cited function bodies, not inferred
+    from an API name.
+  source_mappings: []
+  knob_aliases: {}
+- id: compute_instruction
+  kind: performance_choice
+  question: Which matrix-compute family and instruction shape does the implementation request?
+  comparison_contract: Instruction names are exact only for direct MFMA source. tl.dot, CK XDL templates and
+    an ASM object name are family-level evidence until compiler/ISA evidence resolves them.
+  source_mappings:
+  - categories:
+    - mfma_intrinsic
+    - mfma_shape
+    representation: instruction_or_compiler_op
+  - categories:
+    - ck_instance
+    representation: template_family
+  - categories:
+    - asm_object
+    representation: binary_identity
+  - categories:
+    - instance_name
+    representation: encoded_kernel_name
+  - categories:
+    - scale_in_k_loop
+    representation: per_k_block_scale_multiply
+  knob_aliases:
+    non_k_dim:
+    - matrix_instr_nonkdim
+    - MATRIX_INSTR_NONKDIM
+    instruction_m:
+    - mfma_m
+    - instr_m
+    instruction_n:
+    - mfma_n
+    - instr_n
+    instruction_k:
+    - mfma_k
+    - instr_k
+    instruction:
+    - mfma
+    - mfma_intrinsic
+    - instruction
+    - instr_shape
+- id: workgroup_tile
+  kind: performance_choice
+  question: How much M/N/K work does one workgroup own?
+  comparison_contract: M/N/K are directly comparable only when all three name workgroup-level extents; source
+    hits that expose one symbol remain partial.
+  required_components:
+  - m
+  - n
+  - k
+  source_mappings:
+  - categories:
+    - tile_shape
+    representation: source_parameter
+  - categories:
+    - asm_tile
+    representation: launcher_or_object_contract
+  - categories:
+    - config_space
+    representation: legal_search_space
+  knob_aliases:
+    m:
+    - BLOCK_SIZE_M
+    - BLOCK_M
+    - TILE_M
+    - tile_m
+    - tileM
+    - TileM
+    - SUBM
+    - MPerBlock
+    n:
+    - BLOCK_SIZE_N
+    - BLOCK_N
+    - TILE_N
+    - tile_n
+    - tileN
+    - TileN
+    - SUBN
+    - NPerBlock
+    k:
+    - BLOCK_SIZE_K
+    - BLOCK_K
+    - TILE_K
+    - tile_k
+    - tileK
+    - TileK
+    - SUBK
+    - KPerBlock
+- id: work_partition
+  kind: performance_choice
+  question: How is work partitioned or persisted across tiles and the K dimension?
+  comparison_contract: split_k is numeric when exposed; persistent and grouping fields describe different scheduling
+    choices and must not be collapsed into one scalar.
+  source_mappings:
+  - categories:
+    - split_k
+    representation: source_parameter
+  - categories:
+    - persistent
+    representation: structural_variant
+  - categories:
+    - grid_mapping
+    representation: workgroup_to_tile_and_xcd_mapping
+  - categories:
+    - grid_fill
+    representation: cu_count_fill_heuristic
+  - categories:
+    - lane_reduction
+    representation: intra_wave_k_split_reduction
+  knob_aliases:
+    split_k:
+    - split_k
+    - splitK
+    - SPLIT_K
+    - NUM_KSPLIT
+    - ACTUAL_KSPLIT
+    - selectedksplit
+    - selectedsplitK
+    group_m:
+    - GROUP_SIZE_M
+    - group_size_m
+    persistent_tiles:
+    - persistent_n_tiles
+    - PERSISTENT_N_TILES
+    n_tile_repeat:
+    - n_tile_repeat
+    xcd_swizzle:
+    - xcd_swizzle
+    - XCD_SWIZZLE
+    num_xcds:
+    - NUM_XCDS
+    - num_xcds
+    grid_mn:
+    - GRID_MN
+- id: pipeline_schedule
+  kind: performance_choice
+  question: How are loads, LDS buffering and matrix instructions pipelined and ordered?
+  comparison_contract: Stage counts are numeric seeds. CK scheduler/version and explicit FlyDSL scheduling
+    are structural choices, not interchangeable numeric values.
+  source_mappings:
+  - categories:
+    - lds_stage
+    - async_copy
+    - scheduling
+    - pipeline_variant
+    representation: source_pipeline_construct
+  - categories:
+    - ck_pipeline
+    representation: template_scheduler_or_version
+  knob_aliases:
+    stages:
+    - num_stages
+    - NUM_STAGES
+    - stages
+    - STAGES
+    - lds_stage
+    scheduler:
+    - scheduler
+    - pipeline_scheduler
+    - BlockGemmPipelineScheduler
+    version:
+    - pipeline_version
+    - BlockGemmPipelineVersion
+    async_copy:
+    - async_copy
+    - use_async_copy
+    - ASYNC_COPY
+    lds_read_preload:
+    - dsrd_preload
+    global_load_preload:
+    - dvmem_preload
+- id: operand_layout
+  kind: performance_choice
+  question: How are operands transformed before and inside LDS?
+  comparison_contract: Preshuffle, LDS swizzle and padding are independent components. Matching labels do not
+    prove identical byte layouts.
+  source_mappings:
+  - categories:
+    - layout_preshuffle
+    representation: host_and_kernel_layout_contract
+  - categories:
+    - lds_swizzle
+    - lds_pad
+    representation: lds_address_transform
+  - categories:
+    - lds_alloc
+    representation: lds_allocation
+  - categories:
+    - fragment_layout
+    representation: mfma_fragment_lane_mapping
+  knob_aliases:
+    layout:
+    - layout
+    - operand_layout
+    preshuffle_b:
+    - b_preshuffle
+    - preshuffle_b
+    - BPreshuffle
+    - bpreshuffle
+    b_via_lds:
+    - b_to_lds
+    b_via_lds_unroll:
+    - b_to_lds_unroll
+    weight_pack:
+    - pack_n
+    lds_swizzle:
+    - lds_swizzle
+    - swizzle
+    lds_pad:
+    - lds_pad
+    - pad_k
+- id: memory_access
+  kind: performance_choice
+  question: Which access width and cache policy does the data path use?
+  comparison_contract: Widths compare only in the same address space and dtype; cache hints retain their backend
+    spelling.
+  source_mappings:
+  - categories:
+    - access_width
+    representation: source_access_width
+  - categories:
+    - cache_policy
+    representation: source_cache_hint
+  knob_aliases:
+    access_bytes:
+    - DMA_BYTES
+    - access_bytes
+    - vector_bytes
+    cache_policy:
+    - cache_modifier
+    - cache_policy
+    kpack:
+    - kpack
+    - KPACK
+- id: epilogue
+  kind: performance_choice
+  question: How is the accumulator rearranged and written?
+  comparison_contract: CShuffle/cshuffle names establish an epilogue family only; exact layouts require backend-specific
+    evidence.
+  source_mappings:
+  - categories:
+    - layout_epilogue
+    representation: epilogue_family
+  - categories:
+    - scale_after_k_loop
+    representation: accumulator_scale_multiply
+  - categories:
+    - atomic_combine
+    representation: atomic_accumulate_into_output
+  knob_aliases:
+    family:
+    - epilogue
+    - epilogue_family
+    - CShuffle
+    - cshuffle
+    - use_cshuffle_epilog
+    c_via_lds:
+    - c_to_lds
+- id: configuration_constraints
+  kind: hard_constraint
+  question: Which combinations are legal with respect to divisibility, LDS/register budgets and fixed parameters?
+  comparison_contract: Constraints filter impossible candidates; satisfying them makes a candidate legal, not
+    fast.
+  source_mappings:
+  - categories:
+    - config_limit
+    - config_validity
+    representation: source_legality_rule
+  knob_aliases:
+    max_lds_bytes:
+    - max_lds_bytes
+    - lds_limit
+    - LDS_LIMIT
+    max_split_k:
+    - MAX_KSPLIT
+    - max_split_k
+    even_k:
+    - EVEN_K
+    - even_k
+    kpack:
+    - kpack
+    - KPACK
+    fixed_stages:
+    - fixed_stages
+    fixed_pack_n:
+    - fixed_pack_n
+- id: tunable_surface
+  kind: search_space
+  question: Which knobs exist, which values are legal seeds, and which fields are derived rather than tunable?
+  comparison_contract: A declared knob or shipped value defines a candidate/search surface; occurrence and
+    selection do not prove optimality.
+  source_mappings:
+  - categories:
+    - tunable_param
+    representation: declared_knob
+  - categories:
+    - config_space
+    representation: legal_or_shipped_space
+  - categories:
+    - config_lookup
+    representation: shipped_config_lookup
+  knob_aliases:
+    tile_m:
+    - BLOCK_SIZE_M
+    - BLOCK_M
+    - TILE_M
+    - tile_m
+    - tileM
+    - TileM
+    - SUBM
+    - MPerBlock
+    tile_n:
+    - BLOCK_SIZE_N
+    - BLOCK_N
+    - TILE_N
+    - tile_n
+    - tileN
+    - TileN
+    - SUBN
+    - NPerBlock
+    tile_k:
+    - BLOCK_SIZE_K
+    - BLOCK_K
+    - TILE_K
+    - tile_k
+    - tileK
+    - TileK
+    - SUBK
+    - KPerBlock
+    split_k:
+    - split_k
+    - splitK
+    - NUM_KSPLIT
+    - MAX_KSPLIT
+    stages:
+    - num_stages
+    - stages
+    - STAGES
+    num_warps:
+    - num_warps
+    - NUM_WARPS
+    waves_per_eu:
+    - waves_per_eu
+    - WAVES_PER_EU
+- id: implementation_variant
+  kind: structural_choice
+  question: Which kernel family or opaque backend implementation is selected for this scenario?
+  comparison_contract: Variant identity is comparable as a bundle label only; a CK template or ASM object name
+    does not expose its internal decisions.
+  source_mappings:
+  - categories:
+    - kernel_family
+    representation: source_kernel_family
+  - categories:
+    - ck_instance
+    representation: template_family
+  - categories:
+    - asm_object
+    representation: binary_identity
+  - categories:
+    - instance_name
+    - pipeline_variant
+    representation: encoded_variant_name
+  knob_aliases:
+    variant:
+    - implementation_name
+    - kernel_family
+    - variant
+    object:
+    - object_name
+    - co_name
+    - hsaco
+- id: runtime_contract
+  kind: integration_contract
+  question: Which host-side layout, argument block, workspace and launch contract must the kernel satisfy?
+  comparison_contract: Runtime contracts are correctness/integration requirements. Launch geometry can affect
+    performance but cannot be copied without matching the kernel's decode.
+  source_mappings:
+  - categories:
+    - asm_argblock
+    representation: packed_argument_abi
+  - categories:
+    - asm_launch
+    representation: launcher_grid_and_workgroup
+  - categories:
+    - layout_preshuffle
+    representation: host_and_kernel_layout_contract
+  - categories:
+    - scale_operand
+    representation: scale_granularity_contract
+  - categories:
+    - dispatch_padding
+    representation: tuned_lookup_granularity
+  - categories:
+    - jit_cache
+    representation: compiled_kernel_cache
+  knob_aliases:
+    argument_block:
+    - argument_block
+    - argblock
+    - KernelArgs
+    grid_formula:
+    - grid_formula
+    - launch_grid
+    workgroup_size:
+    - workgroup_size
+    - block_size
+    - blockSize
+    - blockSizeX
+    workspace_bytes:
+    - workspace_bytes
+    - workspace_size
+    layout:
+    - layout
+    - operand_layout
+dependencies:
+- id: stage-format
+  axes:
+  - expert_compute
+  - expert_layout
+  - numerical_contract
+  relation: coupled_contract
+  rule: Both expert stages must agree on activation, intermediate layout and scales.
+  decision_refs:
+  - moe-two-stage-intermediate

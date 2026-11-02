@@ -1,5 +1,8 @@
 # splitk_streamk_gemm
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Split-K and Stream-K schedules for poorly occupied GEMMs.
 
 4 AITER implementation references; 0 historical experience cards.

@@ -340,10 +340,3 @@ def test_remote_pagination_and_bound_are_visible(source):
     assert client.search("rmsnorm", scan=300)["matched_count"] == 1
     bounded = client.search("rmsnorm", scan=100)
     assert bounded["scan_truncated"] and not bounded["implementations"]
-
-
-@pytest.mark.parametrize("manifest", sorted((Path(__file__).parents[1] / "kernels").glob("*/*/*/metadata.yaml")))
-def test_curated_bundles_meet_the_source_contract(manifest):
-    root = Path(__file__).parents[1] / "kernels"
-    bundle = SourceBundle.load(manifest.parent)
-    assert bundle.implementation_id == manifest.parent.relative_to(root).as_posix()

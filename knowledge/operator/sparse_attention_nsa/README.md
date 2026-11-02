@@ -1,5 +1,8 @@
 # sparse_attention_nsa
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Selected-block and sparse MLA/NSA attention execution.
 
 5 AITER implementation references; 2 historical experience cards.

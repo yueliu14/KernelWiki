@@ -7,16 +7,29 @@ An **operator- and workload-level GPU kernel knowledge base for LLM inference**,
 | Content | Start here | Purpose |
 | --- | --- | --- |
 | Written knowledge | [Operators](knowledge/operator/README.md) · [Workloads](knowledge/workload/README.md) · [General](knowledge/general/README.md) | Implementations, multi-operator execution contracts and optimization, source entry points, applicability and evidence |
-| Kernel implementations | [Source collection](kernels/README.md) · [Put, search and fetch API](kernelwiki/README.md) | Reuse complete source bundles with entry points, dependencies, correctness checks and benchmarks |
-| Machine-queryable corpus | [GEMM corpus](corpus/README.md) | Source-cited evidence records and tuning decisions a program can query; the written pages here are generated from them |
+| Structured corpus | [Operator catalog](knowledge/operator/catalog.yaml) · [Corpus guide](knowledge/operator/CORPUS.md) | Operator-local source observations, conditioned development cards and upstream configuration seeds |
+| Source-bundle API | [Put, search and fetch](kernelwiki/README.md) | Manage complete source bundles in your own local collection or a remote store |
 
 ```text
 knowledge/
-  operator/<operator>/
+  operator/
     README.md
-    backend/<backend>_aiter.md
-    backend/<backend>_notes.md
-    learned_knowledge/
+    catalog.yaml
+    CORPUS.md                   # generated navigation
+    <operator>/
+      README.md
+      backend/<backend>_aiter.md
+      backend/<backend>_notes.md
+      learned_knowledge/
+      corpus/
+        scope.yaml
+        source_evidence.yaml
+        decisions.yaml
+        performance_axes.yaml
+        source_evidence.md      # generated
+        decisions.md            # generated
+        tuned_configs.yaml      # where upstream seeds are available
+        seeds.md                # generated where applicable
   workload/
     README.md
     fusion_patterns.md
@@ -38,23 +51,13 @@ knowledge/
     hardware/
     quantization/
     ...
-kernels/<operator>/<backend>/<implementation>/
-  kernel.py
-  entry.py
-  test.py
-  benchmark.py
-  metadata.yaml
-  README.md
 kernelwiki/
   client.py
-corpus/
-  catalog.yaml
-  evidence/<family>.yaml
-  decisions/<family>.yaml
-  performance_axes/<family>.yaml
-  scopes/
-  <family>_source_evidence.md
-  <family>_decisions.md
+  source_bundles.md
+tools/corpus/
+  extract.py
+  validate.py
+  build.py
 ```
 
 ## Getting started
@@ -67,6 +70,19 @@ corpus/
 
 ## Operator scope and evidence
 
+For source-grounded implementation decisions, start with the [GEMM](knowledge/operator/dense_gemm/corpus/decisions.md),
+[attention](knowledge/operator/attention_prefill_fmha/corpus/decisions.md), [MoE](knowledge/operator/grouped_gemm_moe/corpus/decisions.md) or
+[indexer](knowledge/operator/attention_indexer/corpus/decisions.md) corpus. All **23 operators** own a local
+`corpus/` with source evidence, development cards, extraction scope and performance axes.
+The collection contains **69 canonical cards, 4,481 source observations and 359 upstream
+configuration/selection groups**. Cross-operator knowledge uses shared references to a single owner;
+the catalog under `knowledge/operator/` provides navigation and snapshot metadata. See the [maintenance guide](tools/corpus/README.md).
+
+The corpus preserves the AITER `a6bb49937584` GEMM evidence and adds source from `b3ad6c461703`
+across GEMM, attention, MoE and indexers. References include a snapshot prefix and stable content ID;
+source links use the full commit. Each operator records its coverage limits and pinned upstream
+correctness-test sources. Cards describe source precedents, constraints and unmeasured candidates.
+
 - **23 operator directories**, grouped by GEMM, MoE, attention and indexer workloads, with **92 AITER backend/provider reference pages**, **13 implementation-note pages** and **122 operator experience cards**.
 - Standalone small operators, spatial convolutions, training losses, recommendation attention and general solvers are excluded from the operator collection. Quantization, activation, cache layout, normalization and communication are documented where they affect a main kernel or fusion. MoE routing/dispatch and Q/K preparation fusions remain part of those workloads.
 - AITER references primarily use [`e9995854abbd`](https://github.com/ROCm/aiter/tree/e9995854abbd935f0190b19abebe9938b6b90cca), with a recent-source window of 2026-07-21 through 2026-10-21. Additional native-pipeline and workload-variant reviews, including [Split-K](knowledge/operator/splitk_streamk_gemm/backend/opus_aiter.md), [shared experts](knowledge/operator/shared_expert_fusion/backend/flydsl_aiter.md) and [FP4 GEMM](knowledge/operator/scaled_quant_gemm/backend/asm_notes.md), use [`b3ad6c461703`](https://github.com/ROCm/aiter/tree/b3ad6c461703110dc36286265c16e453ef0e2dd2). Explicit gradient-only implementations and tests are excluded from current operator reference pages.
@@ -74,44 +90,25 @@ corpus/
 
 AITER is the main source of implementation knowledge. This is a curated workload collection, not a claim to cover every AITER kernel. Documents include pinned links to source, configuration and tests. Choosing the best implementation requires a specific GPU, dtype, shape/layout and comparable measurements. Source coverage adds no GPU benchmark results and does not certify historical SOTA labels as current winners.
 
-## Kernel source collection
-
-The repository now stores complete kernel implementations alongside their explanatory knowledge. The first source bundle is [AITER's row-tiled Triton RMSNorm](kernels/rmsnorm/triton/aiter_row_tiled/README.md), with its kernel body, standalone entry point, launch configurations, numerical reference, correctness checks and benchmark program. It retains AITER's MIT license and pinned source attribution.
-
-This initial bundle is a source reference with upstream-reported performance. It has not been remeasured on the packaging host and is not labeled `best_known`. A best-known entry must identify exact measured cases and attach correctness/performance evidence to its source digest. See the [source-bundle contract](kernels/README.md).
-
 ## Using the source API
 
 ```bash
 python -m pip install -e .
 ```
 
-```python
-from kernelwiki import KernelClient
-
-client = KernelClient.local("kernels")
-result = client.search(
-    "rmsnorm", backend="triton", gfx="gfx950", dtype="bf16",
-    shape={"M": 16384, "N": 128},
-)
-item = result["implementations"][0]
-client.fetch(
-    item["implementation_id"], revision=item["revision"],
-    destination="downloaded_rmsnorm",
-)
-```
-
-For remote candidates, set `GEAK_KB_URL` and use `KernelClient.from_env()`. The existing `GEAK_KB_STORE_URL`, `KB_STORE_URL` and token variables remain supported. `put()` uploads a complete source bundle; `fetch()` returns the same runnable directory layout. New source records use `geak:kernel_code:...` identities. The previous patch-specific Python API has been removed in version 0.2. Historical remote patch records are not modified or presented as complete source implementations.
-
-Repository entries are curated with Git. The remote service can retain multiple candidate revisions and measurement artifacts. Both use the same implementation ID, source digest and bundle revision. Read text knowledge directly from Markdown. See the [API guide](kernelwiki/README.md) for publication, search and retrieval details.
+Use `KernelClient.local("/path/to/your/source-collection")` for your own source bundles. For remote
+candidates, set `GEAK_KB_URL` and use `KernelClient.from_env()`. The API supports publishing,
+searching and fetching complete bundles with source digests and revision identities. See the
+[API guide](kernelwiki/README.md) and [bundle format](kernelwiki/source_bundles.md) for details.
 
 ## Development checks
 
 ```bash
 python -m pip install -e '.[test]'
 python -m pytest -q
+python tools/corpus/build.py --check
 ```
 
 ## Attribution and licenses
 
-Imported GEAK content retains its attribution and Apache-2.0 license. AITER references and excerpts retain their MIT license notice. See [LICENSE](LICENSE.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
+Imported GEAK content retains its attribution and Apache-2.0 license. AITER excerpts retain upstream notices, including MIT and per-file Apache-2.0 notices. See [LICENSE](LICENSE.md) and [third-party notices](THIRD_PARTY_NOTICES.md).

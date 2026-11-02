@@ -1,0 +1,22 @@
+schema_version: 2
+operator: splitk_streamk_gemm
+sources:
+- snapshot: aiter_a6bb4993
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  language: flydsl
+  include_symbols: false
+- snapshot: aiter_a6bb4993
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  language: flydsl
+  include_symbols: false
+validation_sources:
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_opus_a16w16_gemm.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_opus_a16w16_registry.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/tuning_tests/test_asm_splitk_guard.py
+coverage_notes:
+- Source observations and conditioned candidates for splitk streamk gemm; source presence is not a measured
+  winner.
+- No new GPU measurements or binary disassembly are included.
