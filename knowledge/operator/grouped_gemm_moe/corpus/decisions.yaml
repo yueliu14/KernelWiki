@@ -1,0 +1,67 @@
+provenance:
+  schema_version: 4
+  operator_family: grouped_gemm_moe
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  grouped_routes: Tokens are expanded into expert routes with explicit forward/inverse maps.
+cards:
+- id: moe-two-stage-intermediate
+  type: semantic
+  axes:
+  - expert_compute
+  - numerical_contract
+  - expert_layout
+  match:
+    operator_families:
+    - grouped_gemm_moe
+    - fused_moe_grouped_gemm
+    target_languages:
+    - flydsl
+    - triton
+  question: What must match at the gate/up to down-projection boundary?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - MoE execution uses two expert GEMMs with an activation or gate between them.
+  actions:
+  - Preserve gate/up ordering, the exact activation and any clipping before the down projection.
+  - Match the intermediate dtype, quantization scale layout and sorted-route ownership across both stages.
+  - Choose stage-1 split/tiling and stage-2 consumption together; a fast stage-1 output is unusable if stage
+    2 interprets it differently.
+  alternatives:
+  - Keep the intermediate in a simple floating format before introducing compressed partials.
+  why:
+  - The FlyDSL family has distinct gate/up and down builders, including separate dequantization and scale helpers.
+  source_evidence:
+  - aiter_b3ad6c46:src_716da92976cf21bc
+  - aiter_b3ad6c46:src_fd19baacbd3c48ef
+  measurement_evidence: []
+  limitations:
+  - These FP8 family precedents do not establish arbitrary MXFP4 or mixed-expert-weight compatibility.
+  references:
+  - knowledge/operator/grouped_gemm_moe/README.md
+  - knowledge/operator/fused_moe_grouped_gemm/README.md
+  - knowledge/operator/dense_gemm/README.md
+  solutions:
+  - backend: triton
+    mechanism: The grouped GEMM exposes activation and quantization parameters in its own kernel contract.
+    source_evidence:
+    - aiter_b3ad6c46:src_51116808a6bd2b48
+shared_cards:
+- flydsl-a8-data-movement-helpers
+- flydsl-a8-interleaved-schedule
+- flydsl-async-copy-by-family
+- flydsl-cshuffle-epilogue
+- flydsl-gfx942-path-gates
+- flydsl-half-mfma-call-forms
+- flydsl-host-launch-contract
+- flydsl-mfma-fragment-lane-layout
+- flydsl-splitk-hot-loop-schedule-bundle
+- flydsl-xor16-lds-layout-consistency
+- gemm-shape-regime-routing
+- gemm-split-k-when-grid-underfills
+- gemm-streamed-operand-cache-policy
+- gemm-workgroup-xcd-mapping
+- moe-route-map-capacity
+- moe-sort-padding-sentinels
+- moe-weighted-gather-dropped-routes

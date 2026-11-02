@@ -1,0 +1,18 @@
+schema_version: 2
+operator: shared_expert_fusion
+sources:
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/comm_fused_moe_host.py
+  language: flydsl
+  include_symbols: true
+validation_sources:
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_fhmoe.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_moe_dp_share_expert.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/tuners/tune_fhmoe.py
+coverage_notes:
+- Source observations and conditioned candidates for shared expert fusion; source presence is not a measured
+  winner.
+- No new GPU measurements or binary disassembly are included.

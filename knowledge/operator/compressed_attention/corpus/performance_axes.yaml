@@ -1,0 +1,151 @@
+schema_version: 1
+family: compressed_attention
+contract:
+  source_observation: A source observation is implementation evidence, not measured preference.
+  attribution: Whole-implementation performance must not be assigned to an isolated axis.
+comparison_context:
+  required:
+  - operator_family
+  - math_contract
+  - dtype
+  - gfx
+  - shape
+  - layout
+  - baseline
+  - accounting
+  - aiter_commit
+  - toolchain
+  contract: Different masks, scale formats, index conventions, routing or state semantics define different
+    workloads.
+development_order:
+- step: 1
+  title: Mathematical and validity contracts
+  axes:
+  - numerical_contract
+- step: 2
+  title: Layout and host interfaces
+  axes:
+  - implementation_contract
+  - cache_layout
+- step: 3
+  title: Candidate design space
+  axes:
+  - execution_geometry
+  - data_movement
+  - compression
+axes:
+- id: implementation_contract
+  kind: integration_contract
+  question: What declarations, dispatch gates, shape checks and host state define a legal implementation?
+  comparison_contract: Compare only the same workload and ABI; a source declaration supplies no performance
+    ranking.
+  source_mappings:
+  - representation: source_observation
+    categories:
+    - symbol_declaration
+    - arch_gate
+    - config_limit
+    - config_space
+    - config_validity
+    - kernel_family
+    - jit_cache
+    - asm_object
+    - asm_argblock
+    - config_lookup
+    - dispatch_padding
+    - tunable_param
+    - instance_name
+  knob_aliases: {}
+- id: execution_geometry
+  kind: performance_choice
+  question: How much work does each program own and how is the grid mapped?
+  comparison_contract: Compare only the same workload and ABI; a source declaration supplies no performance
+    ranking.
+  source_mappings:
+  - representation: source_observation
+    categories:
+    - tile_shape
+    - waves
+    - split_k
+    - persistent
+    - grid_mapping
+    - grid_fill
+    - asm_tile
+    - asm_launch
+  knob_aliases:
+    query_tile:
+    - BLOCK_M
+    - TILE_Q
+    - block_q
+    kv_tile:
+    - BLOCK_N
+    - BLOCK_KV
+    - TILE_SIZE
+    waves:
+    - num_warps
+    - NUM_WARPS
+    - waves_per_eu
+- id: data_movement
+  kind: performance_choice
+  question: How do data move between global memory, LDS and registers?
+  comparison_contract: Compare only the same workload and ABI; a source declaration supplies no performance
+    ranking.
+  source_mappings:
+  - representation: source_observation
+    categories:
+    - lds_stage
+    - lds_swizzle
+    - lds_pad
+    - lds_alloc
+    - async_copy
+    - access_width
+    - cache_policy
+    - layout_preshuffle
+    - layout_transpose
+    - layout_epilogue
+    - fragment_layout
+  knob_aliases:
+    stages:
+    - num_stages
+    - lds_stage
+    - STAGES
+    async_copy:
+    - use_async_copy
+    - async_copy
+- id: numerical_contract
+  kind: hard_constraint
+  question: Which scale, precision and parity conventions must remain unchanged?
+  comparison_contract: Compare only the same workload and ABI; a source declaration supplies no performance
+    ranking.
+  source_mappings:
+  - representation: source_observation
+    categories:
+    - scale_operand
+    - scale_in_k_loop
+    - scale_after_k_loop
+    - parity_tolerance
+  knob_aliases: {}
+- id: cache_layout
+  kind: integration_contract
+  question: How are logical KV positions, physical pages and cache formats related?
+  comparison_contract: Meaning is established by the curated cards and cited function bodies, not inferred
+    from an API name.
+  source_mappings: []
+  knob_aliases: {}
+- id: compression
+  kind: structural_choice
+  question: What compression window and output-cache contract is implemented?
+  comparison_contract: Meaning is established by the curated cards and cited function bodies, not inferred
+    from an API name.
+  source_mappings: []
+  knob_aliases: {}
+dependencies:
+- id: compression-format
+  axes:
+  - compression
+  - cache_layout
+  - numerical_contract
+  relation: coupled_contract
+  rule: Compression output packing and scales must match the next cache consumer.
+  decision_refs:
+  - attention-compression-cache-contract

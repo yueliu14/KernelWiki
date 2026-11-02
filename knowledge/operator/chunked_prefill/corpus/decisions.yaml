@@ -1,0 +1,43 @@
+provenance:
+  schema_version: 4
+  operator_family: chunked_prefill
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits: {}
+cards:
+- id: chunked-prefill-prefix-and-extension
+  type: semantic
+  axes:
+  - attention_semantics
+  - cache_layout
+  match:
+    operator_families:
+    - chunked_prefill
+    target_languages:
+    - triton
+  question: How are cached-prefix and current-chunk attention combined?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected implementation matches the cited path and its input contract.
+  actions:
+  - Keep the prefix-cache gather separate from the triangular current-chunk region while carrying one common
+    maximum, denominator and output accumulator.
+  - 'Use the prefix/custom-mask policy explicitly: SKIP_PREFIX_CUSTOM_MASK changes which mask is applied to
+    cached positions.'
+  - Preserve query, key/value and optional positional-head dimensions rather than assuming one equal head width
+    for all operands.
+  alternatives:
+  - Keep a simpler implementation with the identical numerical and layout contract for comparison.
+  why:
+  - The cited source declares these operations and checks; the combination is part of its interface.
+  source_evidence:
+  - aiter_b3ad6c46:src_77fdd041c1e25e15
+  measurement_evidence: []
+  limitations:
+  - Skipping a custom mask over the prefix is valid only when the task contract permits it.
+  - Chunk length is not the total attended sequence length.
+  references:
+  - knowledge/operator/chunked_prefill/README.md
+shared_cards:
+- attention-paged-kv-addressing
+- attention-window-prefix-boundaries

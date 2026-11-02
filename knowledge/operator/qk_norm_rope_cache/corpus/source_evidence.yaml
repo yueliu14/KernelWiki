@@ -1,0 +1,2794 @@
+schema_version: 2
+operator: qk_norm_rope_cache
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_b3ad6c46
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  lines: 2294
+  evidence_records: 82
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  language: triton
+  lines: 1069
+  evidence_records: 55
+- snapshot: aiter_b3ad6c46
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  lines: 7161
+  evidence_records: 38
+missing: []
+source_evidence:
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 43
+  end_line: 47
+  match: 'def _idiv(a, b):'
+  captured:
+  - _idiv
+  arch_scope: ''
+  evidence:
+  - '43: def _idiv(a, b):'
+  - '44:     """Truncating integer divide. Signed ``//`` maps to arith.floordivsi, a'
+  - '45:     longer expansion; every dividend here is provably non-negative, so an'
+  evidence_id: src_d3aada7e9236db71
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 54
+  end_line: 81
+  match: 'def _cached_from_dlpack(t: torch.Tensor):'
+  captured:
+  - _cached_from_dlpack
+  arch_scope: ''
+  evidence:
+  - '54: def _cached_from_dlpack(t: torch.Tensor):'
+  - '55:     """Adaptor cache for STATIC tensors only (weights, cos/sin).'
+  evidence_id: src_9069bff48d95f97b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 100
+  end_line: 111
+  match: 'def _fp8_const():'
+  captured:
+  - _fp8_const
+  arch_scope: ''
+  evidence:
+  - '99: @lru_cache(maxsize=1)'
+  - '100: def _fp8_const():'
+  - '101:     """Lazy-resolve per-GFX fp8 coefficients. Cached; not resolved at import."""'
+  - '102:     from aiter.utility import dtypes as aiter_dtypes'
+  evidence_id: src_70d04d28d7906e07
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 133
+  end_line: 141
+  match: 'def _bf16_row_view(base_i64, num_elems, nbytes):'
+  captured:
+  - _bf16_row_view
+  arch_scope: ''
+  evidence:
+  - '133: def _bf16_row_view(base_i64, num_elems, nbytes):'
+  - '134:     """Build a (1, num_elems) bf16 buffer-tensor view at a folded base ptr."""'
+  - '135:     pt = fx.PointerType.get('
+  evidence_id: src_5a97258a1675bcb7
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 147
+  end_line: 157
+  match: 'def _scalar_view(base_i64, fx_dt):'
+  captured:
+  - _scalar_view
+  arch_scope: ''
+  evidence:
+  - '147: def _scalar_view(base_i64, fx_dt):'
+  - '148:     """A ``(N, 1)`` buffer-tensor view at i64 base ``base_i64`` for scalar'
+  - '149:     element-indexed loads/stores (slice ``(idx, None)`` keeps one dim)."""'
+  evidence_id: src_c2a462a44cec6f56
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 160
+  end_line: 166
+  match: 'def _scalar_load(base_i64, idx, fx_dt, copy_bits):'
+  captured:
+  - _scalar_load
+  arch_scope: ''
+  evidence:
+  - '160: def _scalar_load(base_i64, idx, fx_dt, copy_bits):'
+  - '161:     """Load one ``fx_dt`` element at element index ``idx`` from base ``base_i64``."""'
+  - '162:     buf = _scalar_view(base_i64, fx_dt)'
+  evidence_id: src_ffbbae235d35ad93
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 169
+  end_line: 175
+  match: 'def _scalar_store(base_i64, idx, val, fx_dt, copy_bits):'
+  captured:
+  - _scalar_store
+  arch_scope: ''
+  evidence:
+  - '169: def _scalar_store(base_i64, idx, val, fx_dt, copy_bits):'
+  - '170:     """Store one ``fx_dt`` value at element index ``idx`` into base ``base_i64``."""'
+  - '171:     buf = _scalar_view(base_i64, fx_dt)'
+  evidence_id: src_3ee8fb03bac5e798
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 178
+  end_line: 184
+  match: 'def _store_bf16_tiled(vals_list, p_dst, copy, vec):'
+  captured:
+  - _store_bf16_tiled
+  arch_scope: ''
+  evidence:
+  - '178: def _store_bf16_tiled(vals_list, p_dst, copy, vec):'
+  - '179:     """Convert VEC fp32 → bf16 and tiled-copy to ``p_dst``."""'
+  - '180:     f32v = fx.Vector.from_elements(vals_list, dtype=fx.Float32)'
+  evidence_id: src_be1c27a8b361dce5
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 187
+  end_line: 223
+  match: 'def _store_bf16_vec(vals, out_rsrc, row_base_bytes, idx, vec, cache_modifier=0):'
+  captured:
+  - _store_bf16_vec
+  arch_scope: ''
+  evidence:
+  - '187: def _store_bf16_vec(vals, out_rsrc, row_base_bytes, idx, vec, cache_modifier=0):'
+  - '188:     """Convert VEC fp32 → bf16 dwords and raw buffer_store (split for VEC>8)."""'
+  - '189:     if isinstance(vals, (list, tuple)):'
+  evidence_id: src_ee469599aa1a9ffa
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 226
+  end_line: 253
+  match: def _store_fp8_packed_w64(
+  captured:
+  - _store_fp8_packed_w64
+  arch_scope: ''
+  evidence:
+  - '226: def _store_fp8_packed_w64('
+  - '227:     vals_list, out_base_i64, row_base_bytes, idx, vec, *, skip_fnuz_clamp=False'
+  - '228: ):'
+  evidence_id: src_7aa8f10e199bfbdd
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 256
+  end_line: 287
+  match: def _store_fp8_packed_w32(
+  captured:
+  - _store_fp8_packed_w32
+  arch_scope: ''
+  evidence:
+  - '256: def _store_fp8_packed_w32('
+  - '257:     vals_list, out_rsrc, row_base_bytes, idx, vec, *, skip_fnuz_clamp=False'
+  - '258: ):'
+  evidence_id: src_2df35185df66f6f1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 291
+  end_line: 801
+  match: def _build_kernel_w64(
+  captured:
+  - _build_kernel_w64
+  arch_scope: ''
+  evidence:
+  - '290: @lru_cache(maxsize=32)'
+  - '291: def _build_kernel_w64('
+  - '292:     *,'
+  - '293:     num_q_heads: int,'
+  evidence_id: src_93c5bb1f38501f1d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 805
+  end_line: 1376
+  match: def _build_kernel_w32(
+  captured:
+  - _build_kernel_w32
+  arch_scope: ''
+  evidence:
+  - '804: @lru_cache(maxsize=32)'
+  - '805: def _build_kernel_w32('
+  - '806:     *,'
+  - '807:     num_q_heads: int,'
+  evidence_id: src_3a55d8c18519f522
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1379
+  end_line: 1742
+  match: def flydsl_qk_norm_rope_quant(
+  captured:
+  - flydsl_qk_norm_rope_quant
+  arch_scope: ''
+  evidence:
+  - '1379: def flydsl_qk_norm_rope_quant('
+  - '1380:     q: torch.Tensor,'
+  - '1381:     kv: torch.Tensor,'
+  evidence_id: src_5ea80c9d84fd93f3
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1754
+  end_line: 1763
+  match: 'def _tdm_tiles_per_wg(num_rows, head_dim=512):'
+  captured:
+  - _tdm_tiles_per_wg
+  arch_scope: ''
+  evidence:
+  - '1754: def _tdm_tiles_per_wg(num_rows, head_dim=512):'
+  - '1755:     """Pick (CT, K, RT). Both knobs ask the same thing: can a workgroup''s load'
+  - '1756:     latency be hidden by a neighbour, or must it cover its own? Thin grids need'
+  evidence_id: src_b62c61d98bc37dd3
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1767
+  end_line: 2293
+  match: def _build_kernel_w32_tdm(
+  captured:
+  - _build_kernel_w32_tdm
+  arch_scope: ''
+  evidence:
+  - '1766: @lru_cache(maxsize=32)'
+  - '1767: def _build_kernel_w32_tdm('
+  - '1768:     *,'
+  - '1769:     num_q_heads,'
+  evidence_id: src_e6cde01d8961b003
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 363
+  end_line: 746
+  match: def kernel(
+  captured:
+  - kernel
+  arch_scope: ''
+  evidence:
+  - '362:     @flyc.kernel(name=_kname)'
+  - '363:     def kernel('
+  - '364:         q_in: fx.Pointer,  # [T, H, D]         bf16, contig (H, D)'
+  - '365:         kv_in: fx.Pointer,  # [T, D]            bf16, may be strided'
+  evidence_id: src_4d821518083530a3
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 749
+  end_line: 798
+  match: def launch_qk_norm_rope_quant(
+  captured:
+  - launch_qk_norm_rope_quant
+  arch_scope: ''
+  evidence:
+  - '748:     @flyc.jit'
+  - '749:     def launch_qk_norm_rope_quant('
+  - '750:         q_in: fx.Pointer,'
+  - '751:         kv_in: fx.Pointer,'
+  evidence_id: src_62dbc8515b5e6ba0
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 881
+  end_line: 1320
+  match: def kernel(
+  captured:
+  - kernel
+  arch_scope: ''
+  evidence:
+  - '880:     @flyc.kernel(name=_kname, known_block_size=[BLOCK_THREADS, ROWS_PER_WG, 1])'
+  - '881:     def kernel('
+  - '882:         q_in: fx.Pointer,  # [T, H, D]         bf16, contig (H, D)'
+  - '883:         kv_in: fx.Pointer,  # [T, D]            bf16, may be strided'
+  evidence_id: src_c7429612ec2ad9c0
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1323
+  end_line: 1373
+  match: def launch_qk_norm_rope_quant(
+  captured:
+  - launch_qk_norm_rope_quant
+  arch_scope: ''
+  evidence:
+  - '1322:     @flyc.jit'
+  - '1323:     def launch_qk_norm_rope_quant('
+  - '1324:         q_in: fx.Pointer,'
+  - '1325:         kv_in: fx.Pointer,'
+  evidence_id: src_a0b3e1842730c456
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1588
+  end_line: 1593
+  match: 'def _ptr_arg(t):'
+  captured:
+  - _ptr_arg
+  arch_scope: ''
+  evidence:
+  - '1586:     has_direct = False'
+  - '1588:     def _ptr_arg(t):'
+  - '1589:         return ('
+  - '1590:             int(t.data_ptr())'
+  evidence_id: src_655400f6494bfc99
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1595
+  end_line: 1596
+  match: 'def _stream_arg():'
+  captured:
+  - _stream_arg
+  arch_scope: ''
+  evidence:
+  - '1593:         )'
+  - '1595:     def _stream_arg():'
+  - '1596:         return stream if has_direct else Stream(stream)'
+  evidence_id: src_1d62ae8a40317937
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1830
+  end_line: 2232
+  match: def kernel(
+  captured:
+  - kernel
+  arch_scope: ''
+  evidence:
+  - '1829:     @flyc.kernel(name=name, known_block_size=[BLOCK_THREADS, RT, 1])'
+  - '1830:     def kernel('
+  - '1831:         q_in: fx.Tensor,  # [T*H, D] bf16'
+  - '1832:         kv_in: fx.Pointer,  # [T, D] bf16, may be strided'
+  evidence_id: src_5c64c974e36a3007
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 2235
+  end_line: 2290
+  match: def launch(
+  captured:
+  - launch
+  arch_scope: ''
+  evidence:
+  - '2234:     @flyc.jit'
+  - '2235:     def launch('
+  - '2236:         q_in: fx.Tensor,'
+  - '2237:         kv_in: fx.Pointer,'
+  evidence_id: src_b96f371bb95540fa
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 392
+  end_line: 397
+  match: def load_vec(
+  captured:
+  - load_vec
+  arch_scope: ''
+  evidence:
+  - '390:         rope_lay = fx.make_layout(PAIRS_PER_THREAD, 1)'
+  - '392:         def load_vec('
+  - '393:             div_tensor, idx, *, layout=full_lay, atom=full_atom, dt=elem_dtype'
+  - '394:         ):'
+  evidence_id: src_bb3d677b84e0ab99
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 410
+  end_line: 413
+  match: 'def _row_part_S(buf):'
+  captured:
+  - _row_part_S
+  arch_scope: ''
+  evidence:
+  - '408:         row_thr = fx.make_tiled_copy(row_copy, row_tv, row_tile_mn).get_slice(tid)'
+  - '410:         def _row_part_S(buf):'
+  - '411:             return row_thr.partition_S('
+  - '412:                 fx.slice(fx.zipped_divide(buf, row_tile_mn), (None, (0, 0)))'
+  evidence_id: src_882c7a912eb93893
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 415
+  end_line: 418
+  match: 'def _row_part_D(buf):'
+  captured:
+  - _row_part_D
+  arch_scope: ''
+  evidence:
+  - '413:             )'
+  - '415:         def _row_part_D(buf):'
+  - '416:             return row_thr.partition_D('
+  - '417:                 fx.slice(fx.zipped_divide(buf, row_tile_mn), (None, (0, 0)))'
+  evidence_id: src_8a015065a944e2aa
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 430
+  end_line: 436
+  match: 'def wave_reduce_add(x):'
+  captured:
+  - wave_reduce_add
+  arch_scope: ''
+  evidence:
+  - '428:         sin_div = fx.logical_divide(sin_row, rope_lay)'
+  - '430:         def wave_reduce_add(x):'
+  - '431:             w = fx.Float32(x)'
+  - '432:             for sh_exp in range_constexpr(int(math.log2(BLOCK_THREADS))):'
+  evidence_id: src_e511e09ffeea260d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 438
+  end_line: 564
+  match: def emit_body(
+  captured:
+  - emit_body
+  arch_scope: ''
+  evidence:
+  - '436:             return w'
+  - '438:         def emit_body('
+  - '439:             *,'
+  - '440:             weighted: bool,'
+  evidence_id: src_dfe18b112b9f90ca
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 936
+  end_line: 960
+  match: 'def _load_bf16_raw(rsrc, off_dw):'
+  captured:
+  - _load_bf16_raw
+  arch_scope: ''
+  evidence:
+  - '934:                 return fx.memref_load_vec(rmem)'
+  - '936:         def _load_bf16_raw(rsrc, off_dw):'
+  - '937:             """Load VEC bf16 from a raw buffer resource at dword offset.'
+  - '938:             Returns list of VEC f32 scalars. Splits into dwordx4 chunks'
+  evidence_id: src_3af2e8d3f7c983ab
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 971
+  end_line: 978
+  match: 'def _ptr_buffer_resource(ptr, num_records_bytes=None):'
+  captured:
+  - _ptr_buffer_resource
+  arch_scope: ''
+  evidence:
+  - '969:         bid_t_idx = fx.Int64(tok)'
+  - '971:         def _ptr_buffer_resource(ptr, num_records_bytes=None):'
+  - '972:             addr = fx.ptrtoint(ptr)'
+  - '973:             addr_i64 = fx.Int64(addr)'
+  evidence_id: src_9b59da30d1d0ce44
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 992
+  end_line: 997
+  match: 'def wave_reduce_add(x):'
+  captured:
+  - wave_reduce_add
+  arch_scope: ''
+  evidence:
+  - '990:         sin_div = fx.logical_divide(sin_row, rope_lay)'
+  - '992:         def wave_reduce_add(x):'
+  - '993:             w = fx.Float32(x)'
+  - '994:             for sh_exp in range_constexpr(log2_block):'
+  evidence_id: src_447b7b3355b9ea3f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 999
+  end_line: 1127
+  match: def emit_body(
+  captured:
+  - emit_body
+  arch_scope: ''
+  evidence:
+  - '997:             return w'
+  - '999:         def emit_body('
+  - '1000:             *,'
+  - '1001:             weighted: bool,'
+  evidence_id: src_889a99e742f66d39
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1875
+  end_line: 1878
+  match: 'def _ptr_res(ptr):'
+  captured:
+  - _ptr_res
+  arch_scope: ''
+  evidence:
+  - '1873:         rope_rel = fx.max(tid - ROPE_LO, fx.Int32(0))'
+  - '1875:         def _ptr_res(ptr):'
+  - '1876:             return buffer_ops.create_buffer_resource_from_addr('
+  - '1877:                 fx.Int64(fx.ptrtoint(ptr))'
+  evidence_id: src_3fdebbf51cc246a9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1882
+  end_line: 1886
+  match: 'def _concat(chunks):'
+  captured:
+  - _concat
+  arch_scope: ''
+  evidence:
+  - '1880:         pos_t = ptr_buf_tensor(positions, fx.Int64)'
+  - '1882:         def _concat(chunks):'
+  - '1883:             v = chunks[0]'
+  - '1884:             for c in range_constexpr(len(chunks) - 1):'
+  evidence_id: src_2fcd2af9f7fd2ac1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1888
+  end_line: 1903
+  match: 'def _load_tensor_vec(tensor, tid_val):'
+  captured:
+  - _load_tensor_vec
+  arch_scope: ''
+  evidence:
+  - '1886:             return v.to(fx.Float32)'
+  - '1888:         def _load_tensor_vec(tensor, tid_val):'
+  - '1889:             """Load VEC bf16 from a 1D fx.Tensor via buffer_load chunks."""'
+  - '1890:             rsrc = buffer_ops.create_buffer_resource(tensor, max_size=True)'
+  evidence_id: src_9f0ce27bd68f3b8b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1905
+  end_line: 1906
+  match: 'def load_pos(tok):'
+  captured:
+  - load_pos
+  arch_scope: ''
+  evidence:
+  - '1903:             )'
+  - '1905:         def load_pos(tok):'
+  - '1906:             return fx.Int32(pos_t[tok])'
+  evidence_id: src_036fd022dc7e89f6
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1908
+  end_line: 1910
+  match: 'def load_cs(tok):'
+  captured:
+  - load_cs
+  arch_scope: ''
+  evidence:
+  - '1906:             return fx.Int32(pos_t[tok])'
+  - '1908:         def load_cs(tok):'
+  - '1909:             """cos/sin for this token, as PAIRS-wide f32 vectors."""'
+  - '1910:             return _cs_from_pos(load_pos(tok))'
+  evidence_id: src_b04192bc20647df8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1912
+  end_line: 1914
+  match: 'def issue_pos(tok):'
+  captured:
+  - issue_pos
+  arch_scope: ''
+  evidence:
+  - '1910:             return _cs_from_pos(load_pos(tok))'
+  - '1912:         def issue_pos(tok):'
+  - '1913:             """Fire the position load (returns i64, no wait)."""'
+  - '1914:             return pos_t[tok]'
+  evidence_id: src_c1e956d1cf72e280
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1916
+  end_line: 1932
+  match: 'def _cs_from_pos(pos_i32):'
+  captured:
+  - _cs_from_pos
+  arch_scope: ''
+  evidence:
+  - '1914:             return pos_t[tok]'
+  - '1916:         def _cs_from_pos(pos_i32):'
+  - '1917:             """Load cos/sin given an already-resolved position value."""'
+  - '1918:             cs = pos_i32 * (RD // 2) + rope_rel * PAIRS'
+  evidence_id: src_5a533ac13e2c70ea
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1934
+  end_line: 2029
+  match: def norm_rope_store(
+  captured:
+  - norm_rope_store
+  arch_scope: ''
+  evidence:
+  - '1932:             )'
+  - '1934:         def norm_rope_store('
+  - '1935:             xv,'
+  - '1936:             wv,'
+  evidence_id: src_dfd8d94e411b19ad
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 2031
+  end_line: 2142
+  match: 'def emit_q():'
+  captured:
+  - emit_q
+  arch_scope: ''
+  evidence:
+  - '2029:                     _store_bf16_vec(final, swa_rsrc, swa_row_base, tid, VEC)'
+  - '2031:         def emit_q():'
+  - '2032:             q_scale_rsrc = _ptr_res(q_scale) if const_expr(quant) else None'
+  - '2033:             nr_m1 = num_rows - 1'
+  evidence_id: src_0c7c16296b9944ec
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 2144
+  end_line: 2227
+  match: 'def emit_kv():'
+  captured:
+  - emit_kv
+  arch_scope: ''
+  evidence:
+  - '2142:                     cs_cache[0], cs_cache[1] = _cs_from_pos(pending_pos[0].to(fx.Int32))'
+  - '2144:         def emit_kv():'
+  - '2145:             gk = g - gx_q'
+  - '2146:             tok = fx.min(gk * RT + wave, num_tokens - 1)'
+  evidence_id: src_eb75b9e9e374e932
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 910
+  end_line: 916
+  match: 'def _load_weight_tensor(weight_tensor, tid_val):'
+  captured:
+  - _load_weight_tensor
+  arch_scope: ''
+  evidence:
+  - '908:             full_atom = fx.make_copy_atom(fx.rocdl.BufferCopy128b(), 16)'
+  - '910:             def _load_weight_tensor(weight_tensor, tid_val):'
+  - '911:                 """Load VEC bf16 from a 1D weight fx.Tensor at tid*VEC."""'
+  - '912:                 wbuf = fx.rocdl.make_buffer_tensor(weight_tensor)'
+  evidence_id: src_de86a129ec442b64
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 922
+  end_line: 934
+  match: 'def _load_weight_tensor(weight_tensor, tid_val):'
+  captured:
+  - _load_weight_tensor
+  arch_scope: ''
+  evidence:
+  - '920:             half_atom = fx.make_copy_atom(fx.rocdl.BufferCopy128b(), 16)'
+  - '922:             def _load_weight_tensor(weight_tensor, tid_val):'
+  - '923:                 wbuf = fx.rocdl.make_buffer_tensor(weight_tensor)'
+  - '924:                 wdiv = fx.logical_divide(wbuf, half_lay)'
+  evidence_id: src_9537bc6c0a9d2c00
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 2060
+  end_line: 2061
+  match: 'def row_of(tile_idx):'
+  captured:
+  - row_of
+  arch_scope: ''
+  evidence:
+  - '2058:             )'
+  - '2060:             def row_of(tile_idx):'
+  - '2061:                 return fx.min(tile_idx * RT + wave, nr_m1)'
+  evidence_id: src_ab23628054808a6f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 2063
+  end_line: 2075
+  match: 'def issue(buf, tile_idx):'
+  captured:
+  - issue
+  arch_scope: ''
+  evidence:
+  - '2061:                 return fx.min(tile_idx * RT + wave, nr_m1)'
+  - '2063:             def issue(buf, tile_idx):'
+  - '2064:                 dst = fx.Tensor('
+  - '2065:                     fx.make_view('
+  evidence_id: src_c2f00c18211dcec1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 2077
+  end_line: 2098
+  match: 'def compute_store(buf, tile_idx, cosv, sinv):'
+  captured:
+  - compute_store
+  arch_scope: ''
+  evidence:
+  - '2075:                 )'
+  - '2077:             def compute_store(buf, tile_idx, cosv, sinv):'
+  - '2078:                 xv = _concat('
+  - '2079:                     ['
+  evidence_id: src_e1a8534cd827f5ba
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 2100
+  end_line: 2104
+  match: 'def tok_of(tile_idx):'
+  captured:
+  - tok_of
+  arch_scope: ''
+  evidence:
+  - '2098:                 )'
+  - '2100:             def tok_of(tile_idx):'
+  - '2101:                 my_row = row_of(tile_idx)'
+  - '2102:                 if const_expr(log2H is not None):'
+  evidence_id: src_2b2bf974038a81c9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 2106
+  end_line: 2107
+  match: 'def cs_of(tile_idx):'
+  captured:
+  - cs_of
+  arch_scope: ''
+  evidence:
+  - '2104:                 return _idiv(my_row, fx.Int32(H))'
+  - '2106:             def cs_of(tile_idx):'
+  - '2107:                 return load_cs(tok_of(tile_idx))'
+  evidence_id: src_ff75007b8b1aaad4
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 2057
+  match: num_warps=1
+  captured:
+  - num_warps
+  - '1'
+  arch_scope: ''
+  evidence:
+  - '2055:                 [num_rows, None],'
+  - '2056:                 strides=[D, None],'
+  - '2057:                 num_warps=1,'
+  - '2058:             )'
+  evidence_id: src_c9a95af77928120b
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 116
+  match: SCALE_DTYPE_OPTIONS = (
+  captured:
+  - SCALE_DTYPE_OPTIONS
+  arch_scope: ''
+  evidence:
+  - '114: SCALE_DTYPE_FP32 = "fp32"'
+  - '115: SCALE_DTYPE_E8M0 = "e8m0"'
+  - '116: SCALE_DTYPE_OPTIONS = (SCALE_DTYPE_FP32, SCALE_DTYPE_E8M0)'
+  - '118: _TORCH_DTYPE_FOR_SCALE = {'
+  evidence_id: src_bc1750d5a6c362f1
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 90
+  match: TDM_MIN_ROWS = 32768
+  captured:
+  - TDM_MIN_ROWS
+  - '32768'
+  arch_scope: ''
+  evidence:
+  - '88: SMALL_T_THRESHOLD = 96'
+  - '89: USE_TDM_PREFILL = True'
+  - '90: TDM_MIN_ROWS = 32768'
+  - '91: # gfx1250 cache-policy bit 0 reduces the T=512 BF16 output-store drain; larger'
+  - '92: # T already reaches steady-state HBM bandwidth and keeps the default policy.'
+  evidence_id: src_c55504766670d54e
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1716
+  match: MAX_GRID_Y = 65535
+  captured:
+  - MAX_GRID_Y
+  - '65535'
+  arch_scope: ''
+  evidence:
+  - '1714:     # inside a @flyc.kernel body -- the rest still runs with bid_t past'
+  - '1715:     # num_tokens, faulting at tail blocks -- so a single folded launch is out.)'
+  - '1716:     MAX_GRID_Y = 65535'
+  - '1717:     for start in range(0, T_tok, MAX_GRID_Y):'
+  - '1718:         n = min(MAX_GRID_Y, T_tok - start)'
+  evidence_id: src_99332503819df230
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1750
+  match: TDM_DENSE_MIN_ROWS = 131072
+  captured:
+  - TDM_DENSE_MIN_ROWS
+  - '131072'
+  arch_scope: ''
+  evidence:
+  - '1748: NUM_BUFFERS_DENSE = 2  # K once the grid is deep enough to hide a short prologue'
+  - '1749: TILES_PER_WG = 16  # CT: one H=128 token/WG; keeps cos/sin hoisting enabled'
+  - '1750: TDM_DENSE_MIN_ROWS = 131072  # num_rows from which K=2 beats K=6'
+  - '1751: TDM_RT8_MIN_ROWS = 65536  # num_rows where RT=8 first reaches 2 WGs per 256 CUs'
+  evidence_id: src_b35380a8395c273c
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1751
+  match: TDM_RT8_MIN_ROWS = 65536
+  captured:
+  - TDM_RT8_MIN_ROWS
+  - '65536'
+  arch_scope: ''
+  evidence:
+  - '1749: TILES_PER_WG = 16  # CT: one H=128 token/WG; keeps cos/sin hoisting enabled'
+  - '1750: TDM_DENSE_MIN_ROWS = 131072  # num_rows from which K=2 beats K=6'
+  - '1751: TDM_RT8_MIN_ROWS = 65536  # num_rows where RT=8 first reaches 2 WGs per 256 CUs'
+  evidence_id: src_159aeb3a2c02e8c8
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1454
+  match: get_gfx() == "gfx1250"
+  captured:
+  - gfx1250
+  arch_scope: ''
+  evidence:
+  - '1452:     from aiter.jit.utils.chip_info import get_gfx as _get_gfx'
+  - '1454:     is_gfx1250 = _get_gfx() == "gfx1250"'
+  - '1456:     H = num_q_heads'
+  evidence_id: src_bcf56ce878f440d8
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 202
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '200:             out_rsrc,'
+  - '201:             off_bytes,'
+  - '202:             cache_modifier=cache_modifier,'
+  - '203:             offset_is_bytes=True,'
+  - '204:         )'
+  evidence_id: src_c052585e668df5b3
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 214
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '212:             out_rsrc,'
+  - '213:             off_bytes,'
+  - '214:             cache_modifier=cache_modifier,'
+  - '215:             offset_is_bytes=True,'
+  - '216:         )'
+  evidence_id: src_2056f7d4b5c4f48e
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 221
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '219:             out_rsrc,'
+  - '220:             off_bytes + 16,'
+  - '221:             cache_modifier=cache_modifier,'
+  - '222:             offset_is_bytes=True,'
+  - '223:         )'
+  evidence_id: src_4effa81b8ad9ee17
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 2025
+  match: cache_modifier=store
+  captured:
+  - store
+  arch_scope: ''
+  evidence:
+  - '2023:                     tid,'
+  - '2024:                     VEC,'
+  - '2025:                     cache_modifier=store_cache_modifier,'
+  - '2026:                 )'
+  - '2027:                 # Same bytes as kv_out, scattered into the SWA ring.'
+  evidence_id: src_76a03293be19e65a
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 50
+  match: _STATIC_ADAPTOR_CACHE = {
+  captured:
+  - _STATIC_ADAPTOR_CACHE
+  arch_scope: ''
+  evidence:
+  - '50: _STATIC_ADAPTOR_CACHE = {}'
+  - '51: _STATIC_ADAPTOR_CACHE_MAX = 64'
+  evidence_id: src_284ec88158802d45
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 118
+  end_line: 121
+  match: _TORCH_DTYPE_FOR_SCALE = {
+  captured:
+  - _TORCH_DTYPE_FOR_SCALE
+  arch_scope: ''
+  evidence:
+  - '116: SCALE_DTYPE_OPTIONS = (SCALE_DTYPE_FP32, SCALE_DTYPE_E8M0)'
+  - '118: _TORCH_DTYPE_FOR_SCALE = {'
+  - '119:     SCALE_DTYPE_FP32: torch.float32,'
+  - '120:     SCALE_DTYPE_E8M0: torch.uint8,  # no native torch e8m0 dtype; reinterpret as uint8'
+  evidence_id: src_cf948a7d88199d62
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 126
+  end_line: 130
+  match: _DEFAULT_COMPILE_HINTS = {
+  captured:
+  - _DEFAULT_COMPILE_HINTS
+  arch_scope: ''
+  evidence:
+  - '124: # Empirically best occupancy on MI355X V4-Pro (sweep): waves_per_eu=8 +'
+  - '125: # fast/unsafe fp math, no regression at large T.'
+  - '126: _DEFAULT_COMPILE_HINTS = {'
+  - '127:     "waves_per_eu": 8,'
+  - '128:     "fast_fp_math": True,'
+  evidence_id: src_93e4e31d794bd57d
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1424
+  match: raise ValueError(f"kv must be dense in the last dim, stride={kv.stride()}
+  captured:
+  - kv must be dense in the last dim, stride={kv.stride()}
+  arch_scope: ''
+  evidence:
+  - '1422:         raise TypeError(f"kv_weight must be bf16, got {kv_weight.dtype}")'
+  - '1423:     if kv.stride(-1) != 1:'
+  - '1424:         raise ValueError(f"kv must be dense in the last dim, stride={kv.stride()}")'
+  - '1425:     # KV loads cast bf16->dword; the >>1 in the offset is only correct when the'
+  - '1426:     # per-row byte offset is dword-aligned, i.e. the bf16 row stride is even.'
+  evidence_id: src_56ab3a8c0a29b238
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1428
+  end_line: 1431
+  match: "raise ValueError(\n            \"kv row stride (in bf16 elements) must be even for dword-cast"
+  captured:
+  - 'kv row stride (in bf16 elements) must be even for dword-cast '
+  arch_scope: ''
+  evidence:
+  - '1426:     # per-row byte offset is dword-aligned, i.e. the bf16 row stride is even.'
+  - '1427:     if kv.stride(0) % 2 != 0:'
+  - '1428:         raise ValueError('
+  - '1429:             "kv row stride (in bf16 elements) must be even for dword-cast "'
+  - '1430:             f"buffer loads, got kv.stride(0)={kv.stride(0)}"'
+  evidence_id: src_c6f82d55d242d4ca
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1439
+  match: raise ValueError(f"head_dim {D} must be divisible by quant_group_size {G}
+  captured:
+  - head_dim {D} must be divisible by quant_group_size {G}
+  arch_scope: ''
+  evidence:
+  - '1437:         raise TypeError(f"q_weight must be bf16, got {q_weight.dtype}")'
+  - '1438:     if D % G != 0:'
+  - '1439:         raise ValueError(f"head_dim {D} must be divisible by quant_group_size {G}")'
+  - '1440:     # cos/sin are view-reshaped to 2D [max_pos, RD/2] further down; accept any'
+  - '1441:     # leading shape whose last dim is RD/2 (DeepSeek-V4 stores [max_pos,1,1,RD/2]).'
+  evidence_id: src_ab9d3a7255b2000e
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1449
+  match: raise ValueError("cos/sin must be contiguous
+  captured:
+  - cos/sin must be contiguous
+  arch_scope: ''
+  evidence:
+  - '1447:         raise ValueError("cos/sin shape mismatch")'
+  - '1448:     if not (cos_cache.is_contiguous() and sin_cache.is_contiguous()):'
+  - '1449:         raise ValueError("cos/sin must be contiguous")'
+  - '1450:     if kv_write and quant:'
+  - '1451:         raise ValueError("kv_write (swa_kv) is BF16 only; not supported with quant")'
+  evidence_id: src_1e10df5d6ead7adb
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1451
+  match: raise ValueError("kv_write (swa_kv) is BF16 only; not supported with quant
+  captured:
+  - kv_write (swa_kv) is BF16 only; not supported with quant
+  arch_scope: ''
+  evidence:
+  - '1449:         raise ValueError("cos/sin must be contiguous")'
+  - '1450:     if kv_write and quant:'
+  - '1451:         raise ValueError("kv_write (swa_kv) is BF16 only; not supported with quant")'
+  - '1452:     from aiter.jit.utils.chip_info import get_gfx as _get_gfx'
+  evidence_id: src_079be690b5a330c9
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1468
+  match: raise ValueError("2D q must be contiguous to .view as [T,H,D]
+  captured:
+  - 2D q must be contiguous to .view as [T,H,D]
+  arch_scope: ''
+  evidence:
+  - '1466:             raise ValueError(f"q shape {tuple(q.shape)} != [T, H*D={H * D}]")'
+  - '1467:         if not q.is_contiguous():'
+  - '1468:             raise ValueError("2D q must be contiguous to .view as [T,H,D]")'
+  - '1469:         q_view = q.view(T_tok, H, D)'
+  - '1470:     else:'
+  evidence_id: src_dd16d64a5bd2d991
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1479
+  end_line: 1482
+  match: "raise ValueError(\n                \"3D q must be contiguous in the (H, D) inner block"
+  captured:
+  - '3D q must be contiguous in the (H, D) inner block '
+  arch_scope: ''
+  evidence:
+  - '1477:         # (strided views would silently read the wrong elements).'
+  - '1478:         if q_view.stride(-1) != 1 or q_view.stride(-2) != D:'
+  - '1479:             raise ValueError('
+  - '1480:                 "3D q must be contiguous in the (H, D) inner block "'
+  - '1481:                 f"(stride(-1)==1 and stride(-2)==D={D}), got stride={q_view.stride()}"'
+  evidence_id: src_fc4adb4b0c976433
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1513
+  match: raise ValueError("kv_write requires batch_id_per_token
+  captured:
+  - kv_write requires batch_id_per_token
+  arch_scope: ''
+  evidence:
+  - '1511:     if kv_write:'
+  - '1512:         if batch_id_per_token is None:'
+  - '1513:             raise ValueError("kv_write requires batch_id_per_token")'
+  - '1514:         if swa_kv.dtype != torch.bfloat16:'
+  - '1515:             raise TypeError(f"swa_kv must be bf16, got {swa_kv.dtype}")'
+  evidence_id: src_fd137eaece8d337b
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1517
+  match: raise ValueError("swa_kv must be contiguous
+  captured:
+  - swa_kv must be contiguous
+  arch_scope: ''
+  evidence:
+  - '1515:             raise TypeError(f"swa_kv must be bf16, got {swa_kv.dtype}")'
+  - '1516:         if not swa_kv.is_contiguous():'
+  - '1517:             raise ValueError("swa_kv must be contiguous")'
+  - '1518:         if batch_id_per_token.dim() != 1 or batch_id_per_token.dtype != torch.int32:'
+  - '1519:             raise TypeError("batch_id_per_token must be 1-D int32")'
+  evidence_id: src_9a8a21f0bcd9cc9f
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1526
+  match: raise ValueError("paged SWA write requires swa_block_size
+  captured:
+  - paged SWA write requires swa_block_size
+  arch_scope: ''
+  evidence:
+  - '1524:     if kv_write and paged:'
+  - '1525:         if swa_block_size is None:'
+  - '1526:             raise ValueError("paged SWA write requires swa_block_size")'
+  - '1527:         if swa_kv.dim() != 2 or swa_kv.shape[1] != D:'
+  - '1528:             raise ValueError('
+  evidence_id: src_8c5fd35b0ff7db47
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1528
+  end_line: 1530
+  match: "raise ValueError(\n                f\"paged swa_kv must be flat [num_pages, D={D}], got {tuple(swa_kv.shape)}"
+  captured:
+  - paged swa_kv must be flat [num_pages, D={D}], got {tuple(swa_kv.shape)}
+  arch_scope: ''
+  evidence:
+  - '1526:             raise ValueError("paged SWA write requires swa_block_size")'
+  - '1527:         if swa_kv.dim() != 2 or swa_kv.shape[1] != D:'
+  - '1528:             raise ValueError('
+  - '1529:                 f"paged swa_kv must be flat [num_pages, D={D}], got {tuple(swa_kv.shape)}"'
+  - '1530:             )'
+  evidence_id: src_1df9049a034f5608
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1540
+  match: raise ValueError("swa_block_tables must be contiguous in the last dim
+  captured:
+  - swa_block_tables must be contiguous in the last dim
+  arch_scope: ''
+  evidence:
+  - '1538:         # padding column instead of being skipped.'
+  - '1539:         if swa_block_tables.stride(1) != 1:'
+  - '1540:             raise ValueError("swa_block_tables must be contiguous in the last dim")'
+  - '1541:         if swa_block_tables.stride(0) != swa_block_tables.shape[1]:'
+  - '1542:             raise ValueError('
+  evidence_id: src_9dbaa46e0e6fe0f0
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1542
+  end_line: 1547
+  match: "raise ValueError(\n                \"swa_block_tables must be densely packed"
+  captured:
+  - 'swa_block_tables must be densely packed '
+  arch_scope: ''
+  evidence:
+  - '1540:             raise ValueError("swa_block_tables must be contiguous in the last dim")'
+  - '1541:         if swa_block_tables.stride(0) != swa_block_tables.shape[1]:'
+  - '1542:             raise ValueError('
+  - '1543:                 "swa_block_tables must be densely packed "'
+  - '1544:                 f"(stride(0)={swa_block_tables.stride(0)} != "'
+  evidence_id: src_e553aca0a909e263
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1557
+  match: raise ValueError("direct kv_write requires swa_dest_rows
+  captured:
+  - direct kv_write requires swa_dest_rows
+  arch_scope: ''
+  evidence:
+  - '1555:     elif kv_write:'
+  - '1556:         if swa_dest_rows is None:'
+  - '1557:             raise ValueError("direct kv_write requires swa_dest_rows")'
+  - '1558:         if swa_kv.dim() != 2 or swa_kv.shape[1] != D:'
+  - '1559:             raise ValueError('
+  evidence_id: src_2cd414ea2fe77a67
+- snapshot: aiter_b3ad6c46
+  category: config_validity
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1559
+  end_line: 1562
+  match: "raise ValueError(\n                f\"direct swa_kv must be flat [num_rows, D={D}],"
+  captured:
+  - 'direct swa_kv must be flat [num_rows, D={D}], '
+  arch_scope: ''
+  evidence:
+  - '1557:             raise ValueError("direct kv_write requires swa_dest_rows")'
+  - '1558:         if swa_kv.dim() != 2 or swa_kv.shape[1] != D:'
+  - '1559:             raise ValueError('
+  - '1560:                 f"direct swa_kv must be flat [num_rows, D={D}], "'
+  - '1561:                 f"got {tuple(swa_kv.shape)}"'
+  evidence_id: src_07e106771fc3c212
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 794
+  end_line: 798
+  match: ".launch(\n            grid=(H + 1, idx_tokens, 1)"
+  captured:
+  - H + 1, idx_tokens, 1
+  arch_scope: ''
+  evidence:
+  - '792:             swa_cache_size,'
+  - '793:         )'
+  - '794:         k.launch('
+  - '795:             grid=(H + 1, idx_tokens, 1),'
+  - '796:             block=(BLOCK_THREADS, 1, 1),'
+  evidence_id: src_480f0f8720c4aaa7
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 1369
+  end_line: 1373
+  match: ".launch(\n            grid=(H + 1, grid_y, 1)"
+  captured:
+  - H + 1, grid_y, 1
+  arch_scope: ''
+  evidence:
+  - '1367:             num_tokens,'
+  - '1368:         )'
+  - '1369:         k.launch('
+  - '1370:             grid=(H + 1, grid_y, 1),'
+  - '1371:             block=(BLOCK_THREADS, ROWS_PER_WG, 1),'
+  evidence_id: src_297045da08cb5ac9
+- snapshot: aiter_b3ad6c46
+  category: grid_mapping
+  language: flydsl
+  file: aiter/ops/flydsl/kernels/qk_norm_rope_quant.py
+  line: 2286
+  end_line: 2290
+  match: ".launch(\n            grid=(fx.Int64(gx)"
+  captured:
+  - fx.Int64(gx
+  arch_scope: ''
+  evidence:
+  - '2284:             swa_cache_size,'
+  - '2285:         )'
+  - '2286:         k.launch('
+  - '2287:             grid=(fx.Int64(gx), 1, 1),'
+  - '2288:             block=(BLOCK_THREADS, RT, 1),'
+  evidence_id: src_f7d0a78339bc6f65
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 6543
+  match: MIN_OVERSUBSCRIPTION     = 4
+  captured:
+  - MIN_OVERSUBSCRIPTION
+  - '4'
+  arch_scope: ''
+  evidence:
+  - '6541:                                  * (1 + prefill_q_waves_med);'
+  - '6543:   constexpr int MIN_OVERSUBSCRIPTION     = 4;    // decode -> med'
+  - '6544:   // med -> large at 16 blocks/CU, not 48.'
+  - '6545:   //'
+  evidence_id: src_e28129775d6e8add
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 6631
+  match: FG_MANY_HEADS_MIN = 128
+  captured:
+  - FG_MANY_HEADS_MIN
+  - '128'
+  arch_scope: ''
+  evidence:
+  - '6629:   // is faster under FG; H<=32 stays on coarse (FG regresses few-head shapes), and'
+  - '6630:   // H=64 is mixed so it stays coarse too.'
+  - '6631:   constexpr int FG_MANY_HEADS_MIN = 128;'
+  - '6632:   // Fine-grained (1 wave / (token,head)) wins for MANY-head shapes but regresses'
+  - '6633:   // few-head ones (the coarse path''s per-wave work amortizes better with few heads).'
+  evidence_id: src_2d32389fd2d4540a
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 7108
+  match: MIN_OVERSUBSCRIPTION     = 4
+  captured:
+  - MIN_OVERSUBSCRIPTION
+  - '4'
+  arch_scope: ''
+  evidence:
+  - '7106:   const int warp_size = static_cast<int>(get_warp_size_func());'
+  - '7107:   constexpr int PREFILL_TOKENS_PER_BLOCK = 4;'
+  - '7108:   constexpr int MIN_OVERSUBSCRIPTION     = 4;'
+  - '7109:   const int prefill_blocks ='
+  - '7110:       (num_tokens + PREFILL_TOKENS_PER_BLOCK - 1) / PREFILL_TOKENS_PER_BLOCK;'
+  evidence_id: src_abcce8c79a87a784
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 6569
+  match: gpu_arch == "gfx1250"
+  captured:
+  - gfx1250
+  arch_scope: gfx1250
+  evidence:
+  - '6567:   //    than this change was measured against.'
+  - '6568:   const std::string gpu_arch = get_gpu_arch();'
+  - '6569:   const bool has_tdm = gpu_arch == "gfx1250";'
+  - '6570:   const int LARGE_PREFILL_THRESHOLD ='
+  - '6571:       has_tdm ? 16 : 48;  // med -> large (blocks/CU)'
+  evidence_id: src_4ada3e274890ba04
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 383
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '381:     int64_t block_idx    = slot_id / page_size;'
+  - '382:     int64_t block_offset = slot_id % page_size;'
+  - '383:     __shared__ float shared_max[num_kv_heads];'
+  - '384:     float dtype_max = static_cast<float>(opus::finfo<kv_cache_scalar_t>::max());'
+  - '385:     float warp_max  = elements[0];'
+  evidence_id: src_d56282c8026f89ca
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 570
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '568:     if(first_token_idx > batch_start_idx && block_offset > 0)'
+  - '569:     {'
+  - '570:         __shared__ int64_t idx_smem[2];'
+  - '571:         if(threadIdx.x < page_size)'
+  - '572:         {'
+  evidence_id: src_8979ba5a141e03d4
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 2689
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '2687:         local = fmaxf(local, base[warp_offset_seg1 + t * H + h]);'
+  - '2689:     __shared__ float sm[256];'
+  - '2690:     sm[threadIdx.x] = local;'
+  - '2691:     __syncthreads();'
+  evidence_id: src_9d98cb4b13f83872
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 4113
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '4111:     }'
+  - '4113:     __shared__ float sm[BT];'
+  - '4114:     sm[threadIdx.x] = local;'
+  - '4115:     __syncthreads();'
+  evidence_id: src_1f63928ff6a197bc
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 4266
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '4264:     }'
+  - '4266:     __shared__ float sm[BT];'
+  - '4267:     sm[threadIdx.x] = local;'
+  - '4268:     __syncthreads();'
+  evidence_id: src_b1733e9d82316a76
+- snapshot: aiter_b3ad6c46
+  category: lds_alloc
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 5133
+  match: __shared__
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '5131:       [[maybe_unused]] uint16_t* q_scale_lds = nullptr;'
+  - '5132: #if defined(__gfx1250__)'
+  - '5133:       extern __shared__ char fqk_coarse_lds[];'
+  - '5134:       if constexpr (Q_TDM_DEPTH > 0) {'
+  - '5135:         const int32_t wave_in_blk = static_cast<int32_t>(threadIdx.x) / WARP_SIZE;'
+  evidence_id: src_329ae67eaa9eb146
+- snapshot: aiter_b3ad6c46
+  category: asm_launch
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 1064
+  match: constexpr int blockSize      = 64;
+  captured:
+  - '64'
+  arch_scope: ''
+  evidence:
+  - '1062:                                             hipStream_t stream)'
+  - '1063: {'
+  - '1064:     // make sure no thread is wasted, adopt 64 here'
+  - '1065:     constexpr int blockSize      = 64;'
+  - '1066:     constexpr int warp_per_block = blockSize / 32;'
+  evidence_id: src_66834c471660969c
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 3343
+  match: per_tensor_k_scale_ =
+  captured:
+  - per_tensor_k_scale_
+  arch_scope: ''
+  evidence:
+  - '3341:     auto qkv_dtype           = qkv.dtype();'
+  - '3342:     AITER_CHECK(positions.dim() == 1, "positions must be 1D");'
+  - '3343:     float per_tensor_k_scale_ = *reinterpret_cast<float*>(per_tensor_k_scale.data_ptr());'
+  - '3344:     float per_tensor_v_scale_ = *reinterpret_cast<float*>(per_tensor_v_scale.data_ptr());'
+  - '3345:     // Optional fp8 Q output (static per-tensor scale). When q_out_fp8 is absent the'
+  evidence_id: src_0ba6c808899c2bf1
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 3344
+  match: per_tensor_v_scale_ =
+  captured:
+  - per_tensor_v_scale_
+  arch_scope: ''
+  evidence:
+  - '3342:     AITER_CHECK(positions.dim() == 1, "positions must be 1D");'
+  - '3343:     float per_tensor_k_scale_ = *reinterpret_cast<float*>(per_tensor_k_scale.data_ptr());'
+  - '3344:     float per_tensor_v_scale_ = *reinterpret_cast<float*>(per_tensor_v_scale.data_ptr());'
+  - '3345:     // Optional fp8 Q output (static per-tensor scale). When q_out_fp8 is absent the'
+  - '3346:     // kernel writes only bf16 q_out; the scale is unused in that case.'
+  evidence_id: src_afcf65ea83f40fb6
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 3348
+  match: per_tensor_q_scale_ptr =
+  captured:
+  - per_tensor_q_scale_ptr
+  arch_scope: ''
+  evidence:
+  - '3346:     // kernel writes only bf16 q_out; the scale is unused in that case.'
+  - '3347:     const bool quant_q = has_q_out_fp8;'
+  - '3348:     const float* per_tensor_q_scale_ptr ='
+  - '3349:         quant_q ? reinterpret_cast<const float*>(per_tensor_q_scale->data_ptr()) : nullptr;'
+  - '3350:     // K/V cache indexing is stride-aware in block/token/head (innermost head_size'
+  evidence_id: src_92433195c9d12624
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 4908
+  match: batch_id_per_token =
+  captured:
+  - batch_id_per_token
+  arch_scope: ''
+  evidence:
+  - '4906:         const int32_t* __restrict__ swa_block_tables = nullptr,    // [bs, max_blocks] paged SWA
+    table'
+  - '4907:         const int32_t* __restrict__ swa_dest_row = nullptr,        // [T] plane row per token'
+  - '4908:         const int32_t* __restrict__ batch_id_per_token = nullptr   // [T] token->seq, -1 = skip'
+  - '4909:     ) {'
+  - '4910:       // ---- All compile-time constants ----'
+  evidence_id: src_f70d8db5f296df16
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 5655
+  match: batch_id_per_token =
+  captured:
+  - batch_id_per_token
+  arch_scope: ''
+  evidence:
+  - '5653:         const int32_t* __restrict__ swa_block_tables = nullptr,    // [bs, max_blocks] paged SWA
+    table'
+  - '5654:         const int32_t* __restrict__ swa_dest_row = nullptr,        // [T] plane row per token'
+  - '5655:         const int32_t* __restrict__ batch_id_per_token = nullptr   // [T] token->seq, -1 = skip'
+  - '5656:     ) {'
+  - '5657:       // ---- compile-time constants (identical to the coarse kernel) ----'
+  evidence_id: src_2ef5e9c9f9cf8a2f
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 6093
+  match: batch_id_per_token =
+  captured:
+  - batch_id_per_token
+  arch_scope: ''
+  evidence:
+  - '6091:         const int32_t* __restrict__ swa_block_tables = nullptr,'
+  - '6092:         const int32_t* __restrict__ swa_dest_row = nullptr,'
+  - '6093:         const int32_t* __restrict__ batch_id_per_token = nullptr'
+  - '6094:     ) {'
+  - '6095:       // Waves in a block cover consecutive TOKENS at the same head'
+  evidence_id: src_f0c496a3a9388d53
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 6174
+  match: batch_id_per_token =
+  captured:
+  - batch_id_per_token
+  arch_scope: ''
+  evidence:
+  - '6172:         const int32_t* __restrict__ swa_block_tables = nullptr,'
+  - '6173:         const int32_t* __restrict__ swa_dest_row = nullptr,'
+  - '6174:         const int32_t* __restrict__ batch_id_per_token = nullptr'
+  - '6175:     ) {'
+  - '6176:       #define DISPATCH_NEOX(NEOX) \'
+  evidence_id: src_91617bd18bc79165
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 4073
+  match: __launch_bounds__(256)
+  captured:
+  - '256'
+  arch_scope: ''
+  evidence:
+  - '4072: template <typename T, int TILE_T, int HEAD_SIZE>'
+  - '4073: __global__ void __launch_bounds__(256) v_2way_per_head_amax_tiled_kernel('
+  - '4074:     const T* __restrict__ v0_,'
+  - '4075:     const T* __restrict__ v1_,'
+  evidence_id: src_da81d6fdaedb4a9f
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 4126
+  match: __launch_bounds__(256)
+  captured:
+  - '256'
+  arch_scope: ''
+  evidence:
+  - '4125: template <typename T, int TILE_T, int HEAD_SIZE>'
+  - '4126: __global__ void __launch_bounds__(256) v_2way_per_head_quant_tiled_kernel('
+  - '4127:     const T* __restrict__ v0_,'
+  - '4128:     const T* __restrict__ v1_,'
+  evidence_id: src_876a65cea04d8564
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 4241
+  match: __launch_bounds__(256)
+  captured:
+  - '256'
+  arch_scope: ''
+  evidence:
+  - '4240: template <typename T, int TILE_T, int HEAD_SIZE>'
+  - '4241: __global__ void __launch_bounds__(256) v_1way_per_head_amax_tiled_kernel('
+  - '4242:     const T* __restrict__ v_,'
+  - '4243:     int num_tokens,'
+  evidence_id: src_2429e777040803fb
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 4279
+  match: __launch_bounds__(256)
+  captured:
+  - '256'
+  arch_scope: ''
+  evidence:
+  - '4278: template <typename T, int TILE_T, int HEAD_SIZE>'
+  - '4279: __global__ void __launch_bounds__(256) v_1way_per_head_quant_tiled_kernel('
+  - '4280:     const T* __restrict__ v_,'
+  - '4281:     int num_tokens,'
+  evidence_id: src_b2f49f14360ae49e
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 6071
+  match: __launch_bounds__(TOKENS_PER_BLOCK * 64, 512 / (TOKENS_PER_BLOCK * 64)
+  captured:
+  - TOKENS_PER_BLOCK * 64, 512 / (TOKENS_PER_BLOCK * 64
+  arch_scope: ''
+  evidence:
+  - '6069:               int HEAD_DIM = 512, int TOKENS_PER_BLOCK = 1 /*== HEADS_PER_BLOCK here*/,'
+  - '6070:               int HEADS_PER_WAVE = 1>'
+  - '6071:     __global__ __launch_bounds__(TOKENS_PER_BLOCK * 64, 512 / (TOKENS_PER_BLOCK * 64))'
+  - '6072:     void fuse_qk_norm_rope_finegrained_kernel('
+  - '6073:         const scalar_t* __restrict__ q,'
+  evidence_id: src_d5b8c2bed12c642e
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 6136
+  match: __launch_bounds__(TOKENS_PER_BLOCK * 64, 512 / (TOKENS_PER_BLOCK * 64)
+  captured:
+  - TOKENS_PER_BLOCK * 64, 512 / (TOKENS_PER_BLOCK * 64
+  arch_scope: ''
+  evidence:
+  - '6134:               int HEAD_DIM = 512, int TOKENS_PER_BLOCK = 1, int Q_TDM_DEPTH = 0,'
+  - '6135:               bool MERGE_Q_SCALE = false>'
+  - '6136:     __global__ __launch_bounds__(TOKENS_PER_BLOCK * 64, 512 / (TOKENS_PER_BLOCK * 64))'
+  - '6137:     // PARAMETER ORDER IS PERFORMANCE-CRITICAL, do not regroup for readability.'
+  - '6138:     //'
+  evidence_id: src_93a30cf4dac19589
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 6935
+  match: __launch_bounds__(TOKENS_PER_BLOCK * 64, 512 / (TOKENS_PER_BLOCK * 64)
+  captured:
+  - TOKENS_PER_BLOCK * 64, 512 / (TOKENS_PER_BLOCK * 64
+  arch_scope: ''
+  evidence:
+  - '6933:           int HEAD_DIM = 512, int PE_DIM = 64, int GROUP_SIZE = 64,'
+  - '6934:           int TOKENS_PER_BLOCK = 1, bool PLAN_BASED = false, typename rope_t = scalar_t>'
+  - '6935: __global__ __launch_bounds__(TOKENS_PER_BLOCK * 64, 512 / (TOKENS_PER_BLOCK * 64))'
+  - '6936: void fuse_kv_norm_rope_group_quant_cache_kernel('
+  - '6937:     const scalar_t* __restrict__ kv,'
+  evidence_id: src_77d88f110bab5495
+- snapshot: aiter_b3ad6c46
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 128
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '126: #pragma unroll'
+  - '127:     for(int mask = 16; mask > 0; mask >>= 1)'
+  - '128:         val = func(val, __shfl_xor(val, mask, 32));'
+  - '129:     return val;'
+  - '130: }'
+  evidence_id: src_2ba05574b7d17470
+- snapshot: aiter_b3ad6c46
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 325
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '323:                 {'
+  - '324:                     elements2[i] = static_cast<scalar_t>('
+  - '325:                         __shfl_xor(float(elements[i]), partner_lane_delta, 32));'
+  - '326:                     if(dim_idx < embed_dim)'
+  - '327:                     {'
+  evidence_id: src_154a4236e9ebfcd0
+- snapshot: aiter_b3ad6c46
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 2612
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '2610: #pragma unroll'
+  - '2611:     for(int mask = 16; mask > 0; mask >>= 1)'
+  - '2612:         local_max = fmaxf(local_max, __shfl_xor(local_max, mask, WARP_SIZE));'
+  - '2613:     if(lane_id == 0)'
+  - '2614:     {'
+  evidence_id: src_73bf619003354aa6
+- snapshot: aiter_b3ad6c46
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 2758
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '2756:         {'
+  - '2757:             float const self = static_cast<float>(x[i]);'
+  - '2758:             float const peer = __shfl_xor(self, partner_delta, WARP_SIZE);'
+  - '2759:             float const c    = static_cast<float>(cos_ptr[cos_base + i]);'
+  - '2760:             float const s    = static_cast<float>(sin_ptr[cos_base + i]);'
+  evidence_id: src_28d96ac22b0069a2
+- snapshot: aiter_b3ad6c46
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 3680
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '3678: #pragma unroll'
+  - '3679:     for(int mask = 16; mask > 0; mask >>= 1)'
+  - '3680:         local_max = fmaxf(local_max, __shfl_xor(local_max, mask, WARP_SIZE));'
+  - '3682:     if(lane_id == 0)'
+  evidence_id: src_9e314377fe658e73
+- snapshot: aiter_b3ad6c46
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 4831
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '4829:           for (int i = 0; i < vec_size_i; i++) {'
+  - '4830:             float my_val   = k_normed[i];'
+  - '4831:             float pair_val = __shfl_xor(my_val, half_pe_threads, WARP_SIZE);'
+  - '4832:             // Explicit fma for the same reason as the GPT-J branch below: under'
+  - '4833:             // SWA this is stored twice, and a rematerialised copy that contracts'
+  evidence_id: src_62fb74230a478a20
+- snapshot: aiter_b3ad6c46
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 5385
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '5383:             for (int i = 0; i < vec_size_i; i++) {'
+  - '5384:               float my_val = src[i];'
+  - '5385:               float pair_val = __shfl_xor(my_val, half_pe_threads, WARP_SIZE);'
+  - '5386:               dst[i] = is_x_half ? (my_val * pe_cos[i] - pair_val * pe_sin[i])'
+  - '5387:                                  : (my_val * pe_cos[i] + pair_val * pe_sin[i]);'
+  evidence_id: src_20b6e6e7aacb3a58
+- snapshot: aiter_b3ad6c46
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 5586
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '5584:           const float f32_sin = f32_sin_v[i];'
+  - '5585:           float my_val = normed[i];'
+  - '5586:           float pair_val = __shfl_xor(my_val, half_pe_threads, WARP_SIZE);'
+  - '5587:           out[i] = is_x_half ? (my_val * f32_cos - pair_val * f32_sin)'
+  - '5588:                              : (my_val * f32_cos + pair_val * f32_sin);'
+  evidence_id: src_045bb3f14f0dc917
+- snapshot: aiter_b3ad6c46
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 5789
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '5787:         #pragma unroll'
+  - '5788:         for (int off = WARP_SIZE / 2; off > 0; off >>= 1) {'
+  - '5789:           sum_sq += __shfl_xor(sum_sq, off, WARP_SIZE);'
+  - '5790:           if constexpr (K_QUANT) {'
+  - '5791:             if (off < reduce_thread_size) amax_raw = fmaxf(amax_raw, __shfl_xor(amax_raw, off, WARP_SIZE));'
+  evidence_id: src_51f2fa253ae28fc3
+- snapshot: aiter_b3ad6c46
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 5791
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '5789:           sum_sq += __shfl_xor(sum_sq, off, WARP_SIZE);'
+  - '5790:           if constexpr (K_QUANT) {'
+  - '5791:             if (off < reduce_thread_size) amax_raw = fmaxf(amax_raw, __shfl_xor(amax_raw, off, WARP_SIZE));'
+  - '5792:           }'
+  - '5793:         }'
+  evidence_id: src_f2a92916f7df55b9
+- snapshot: aiter_b3ad6c46
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 5875
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '5873:             for (int i = 0; i < vec_size_i; i++) {'
+  - '5874:               float my_val = k_normed[i];'
+  - '5875:               float pair_val = __shfl_xor(my_val, half_pe_threads, WARP_SIZE);'
+  - '5876:               // Explicit fma: vrot feeds two stores under SWA, and a'
+  - '5877:               // rematerialised copy is free to contract the other product.'
+  evidence_id: src_1d0987d358ed6a7f
+- snapshot: aiter_b3ad6c46
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 5971
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '5969:       #pragma unroll'
+  - '5970:       for (int off = WARP_SIZE / 2; off > 0; off >>= 1) {'
+  - '5971:         sum_sq += __shfl_xor(sum_sq, off, WARP_SIZE);'
+  - '5972:         if constexpr (Q_QUANT) {'
+  - '5973:           if (off < Q_REDUCE) amax_raw = fmaxf(amax_raw, __shfl_xor(amax_raw, off, WARP_SIZE));'
+  evidence_id: src_6e50290d138da30b
+- snapshot: aiter_b3ad6c46
+  category: lane_reduction
+  language: hip
+  file: csrc/kernels/fused_qk_norm_rope_cache_quant.cu
+  line: 5973
+  match: __shfl_xor(
+  captured:
+  - __shfl_xor
+  arch_scope: ''
+  evidence:
+  - '5971:         sum_sq += __shfl_xor(sum_sq, off, WARP_SIZE);'
+  - '5972:         if constexpr (Q_QUANT) {'
+  - '5973:           if (off < Q_REDUCE) amax_raw = fmaxf(amax_raw, __shfl_xor(amax_raw, off, WARP_SIZE));'
+  - '5974:         }'
+  - '5975:       }'
+  evidence_id: src_9d53e97166fac454
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 73
+  end_line: 97
+  match: def _unit_rope(
+  captured:
+  - _unit_rope
+  arch_scope: ''
+  evidence:
+  - '72: @triton.jit'
+  - '73: def _unit_rope('
+  - '74:     x_ptrs,'
+  - '75:     cos,'
+  evidence_id: src_5d8e051170851547
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 110
+  end_line: 556
+  match: def _fused_fp4_bmm_rope_cat_and_cache_mla_kernel(
+  captured:
+  - _fused_fp4_bmm_rope_cat_and_cache_mla_kernel
+  arch_scope: ''
+  evidence:
+  - '108: )'
+  - '109: @triton.jit(repr=_fused_fp4_bmm_rope_cat_and_cache_mla_repr)'
+  - '110: def _fused_fp4_bmm_rope_cat_and_cache_mla_kernel('
+  - '111:     a_ptr,'
+  - '112:     b_ptr,'
+  evidence_id: src_03307b826f486d6f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 560
+  end_line: 620
+  match: def _fused_fp4_bmm_reduce_kernel(
+  captured:
+  - _fused_fp4_bmm_reduce_kernel
+  arch_scope: ''
+  evidence:
+  - '559: @triton.jit(repr=_fused_fp4_bmm_reduce_repr)'
+  - '560: def _fused_fp4_bmm_reduce_kernel('
+  - '561:     c_in_ptr,'
+  - '562:     c_out_ptr,'
+  evidence_id: src_f1da93f2cb82843a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 631
+  end_line: 1038
+  match: def _fused_fp8_bmm_rope_cat_and_cache_mla_kernel(
+  captured:
+  - _fused_fp8_bmm_rope_cat_and_cache_mla_kernel
+  arch_scope: ''
+  evidence:
+  - '629: )'
+  - '630: @triton.jit(repr=_fused_fp8_bmm_rope_cat_and_cache_mla_repr)'
+  - '631: def _fused_fp8_bmm_rope_cat_and_cache_mla_kernel('
+  - '632:     a_ptr,'
+  - '633:     b_ptr,'
+  evidence_id: src_81bbcc31da934b40
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 1041
+  end_line: 1053
+  match: def _get_fp4_config(
+  captured:
+  - _get_fp4_config
+  arch_scope: ''
+  evidence:
+  - '1041: def _get_fp4_config('
+  - '1042:     M: int,'
+  - '1043:     N: int,'
+  evidence_id: src_6dd5def764b742ad
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 1056
+  end_line: 1068
+  match: def _get_fp8_config(
+  captured:
+  - _get_fp8_config
+  arch_scope: ''
+  evidence:
+  - '1056: def _get_fp8_config('
+  - '1057:     M: int,'
+  - '1058:     N: int,'
+  evidence_id: src_32fc30a7ca3b2eed
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 324
+  end_line: 326
+  match: tl.dot_scaled(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '322:                     )'
+  - '324:                 accumulator = tl.dot_scaled('
+  - '325:                     a, a_scales, "e2m1", b, b_scales, "e2m1", acc=accumulator'
+  - '326:                 )'
+  evidence_id: src_d63992664a5324af
+- snapshot: aiter_b3ad6c46
+  category: mfma_intrinsic
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 819
+  match: tl.dot(
+  captured: []
+  arch_scope: ''
+  evidence:
+  - '817:             )'
+  - '819:             accumulator += tl.dot(a, b) * a_scale'
+  - '821:             a_ptrs += BLOCK_SIZE_K * stride_ak_i64'
+  evidence_id: src_a20a6d292dbf2d70
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 200
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '198:     EVEN_K: tl.constexpr,'
+  - '199:     GRID_MN: tl.constexpr,'
+  - '200:     cache_modifier: tl.constexpr = ".ca",'
+  - '201: ):'
+  - '202:     """'
+  evidence_id: src_101a5e1d485a4e17
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 306
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '304:                 if EVEN_K:'
+  - '305:                     a_bf16 = tl.load(a_ptrs)'
+  - '306:                     b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '307:                 else:'
+  - '308:                     a_bf16 = tl.load('
+  evidence_id: src_5ee83d3af8b44204
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 712
+  match: 'cache_modifier: tl'
+  captured:
+  - tl
+  arch_scope: ''
+  evidence:
+  - '710:     EVEN_K: tl.constexpr,'
+  - '711:     GRID_MN: tl.constexpr,'
+  - '712:     cache_modifier: tl.constexpr = ".ca",'
+  - '713: ):'
+  - '714:     """'
+  evidence_id: src_f266230b0c7d6929
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 802
+  match: cache_modifier=cache
+  captured:
+  - cache
+  arch_scope: ''
+  evidence:
+  - '800:             if EVEN_K:'
+  - '801:                 a = tl.load(a_ptrs)'
+  - '802:                 b = tl.load(b_ptrs, cache_modifier=cache_modifier)'
+  - '803:             else:'
+  - '804:                 a = tl.load('
+  evidence_id: src_b953f53854c41ed0
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 78
+  match: 'IS_NEOX: tl.constexpr,'
+  captured:
+  - IS_NEOX
+  arch_scope: ''
+  evidence:
+  - '76:     sin,'
+  - '77:     d_pe_offs,'
+  - '78:     IS_NEOX: tl.constexpr,'
+  - '79:     BLOCK_D_pe: tl.constexpr,'
+  - '80:     BLOCK_D_HALF_pe: tl.constexpr,'
+  evidence_id: src_411b5b91f805ad3d
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 79
+  match: 'BLOCK_D_pe: tl.constexpr,'
+  captured:
+  - BLOCK_D_pe
+  arch_scope: ''
+  evidence:
+  - '77:     d_pe_offs,'
+  - '78:     IS_NEOX: tl.constexpr,'
+  - '79:     BLOCK_D_pe: tl.constexpr,'
+  - '80:     BLOCK_D_HALF_pe: tl.constexpr,'
+  - '81: ):'
+  evidence_id: src_213be35ebd42267c
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 80
+  match: 'BLOCK_D_HALF_pe: tl.constexpr,'
+  captured:
+  - BLOCK_D_HALF_pe
+  arch_scope: ''
+  evidence:
+  - '78:     IS_NEOX: tl.constexpr,'
+  - '79:     BLOCK_D_pe: tl.constexpr,'
+  - '80:     BLOCK_D_HALF_pe: tl.constexpr,'
+  - '81: ):'
+  - '82:     """Apply RoPE to a vector. Copied from fused_kv_cache.py"""'
+  evidence_id: src_70d13aad912c5545
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 181
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '179:     kv_cache_stride_d,'
+  - '180:     k_scale_ptr,'
+  - '181:     BLOCK_SIZE_M: tl.constexpr,'
+  - '182:     BLOCK_SIZE_N: tl.constexpr,'
+  - '183:     BLOCK_SIZE_K: tl.constexpr,'
+  evidence_id: src_729e2f261e35ee99
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 182
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '180:     k_scale_ptr,'
+  - '181:     BLOCK_SIZE_M: tl.constexpr,'
+  - '182:     BLOCK_SIZE_N: tl.constexpr,'
+  - '183:     BLOCK_SIZE_K: tl.constexpr,'
+  - '184:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_e08bb43b94d9adaa
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 183
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '181:     BLOCK_SIZE_M: tl.constexpr,'
+  - '182:     BLOCK_SIZE_N: tl.constexpr,'
+  - '183:     BLOCK_SIZE_K: tl.constexpr,'
+  - '184:     GROUP_SIZE_M: tl.constexpr,'
+  - '185:     NUM_KSPLIT: tl.constexpr,'
+  evidence_id: src_8892a0d31b1636ca
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 184
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '182:     BLOCK_SIZE_N: tl.constexpr,'
+  - '183:     BLOCK_SIZE_K: tl.constexpr,'
+  - '184:     GROUP_SIZE_M: tl.constexpr,'
+  - '185:     NUM_KSPLIT: tl.constexpr,'
+  - '186:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  evidence_id: src_a5642f2871c1ebec
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 185
+  match: 'NUM_KSPLIT: tl.constexpr,'
+  captured:
+  - NUM_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '183:     BLOCK_SIZE_K: tl.constexpr,'
+  - '184:     GROUP_SIZE_M: tl.constexpr,'
+  - '185:     NUM_KSPLIT: tl.constexpr,'
+  - '186:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '187:     QH_PER_KH: tl.constexpr,'
+  evidence_id: src_a5519eeabf420578
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 186
+  match: 'SPLITK_BLOCK_SIZE: tl.constexpr,'
+  captured:
+  - SPLITK_BLOCK_SIZE
+  arch_scope: ''
+  evidence:
+  - '184:     GROUP_SIZE_M: tl.constexpr,'
+  - '185:     NUM_KSPLIT: tl.constexpr,'
+  - '186:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '187:     QH_PER_KH: tl.constexpr,'
+  - '188:     REUSE_FREQS_FRONT_PART: tl.constexpr,'
+  evidence_id: src_47cc4630f4cdc1b5
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 187
+  match: 'QH_PER_KH: tl.constexpr,'
+  captured:
+  - QH_PER_KH
+  arch_scope: ''
+  evidence:
+  - '185:     NUM_KSPLIT: tl.constexpr,'
+  - '186:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '187:     QH_PER_KH: tl.constexpr,'
+  - '188:     REUSE_FREQS_FRONT_PART: tl.constexpr,'
+  - '189:     IS_NEOX: tl.constexpr,'
+  evidence_id: src_1e60035a28b9edca
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 188
+  match: 'REUSE_FREQS_FRONT_PART: tl.constexpr,'
+  captured:
+  - REUSE_FREQS_FRONT_PART
+  arch_scope: ''
+  evidence:
+  - '186:     SPLITK_BLOCK_SIZE: tl.constexpr,'
+  - '187:     QH_PER_KH: tl.constexpr,'
+  - '188:     REUSE_FREQS_FRONT_PART: tl.constexpr,'
+  - '189:     IS_NEOX: tl.constexpr,'
+  - '190:     BLOCK_D_nope: tl.constexpr,'
+  evidence_id: src_0e1bd58a4aa8f870
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 189
+  match: 'IS_NEOX: tl.constexpr,'
+  captured:
+  - IS_NEOX
+  arch_scope: ''
+  evidence:
+  - '187:     QH_PER_KH: tl.constexpr,'
+  - '188:     REUSE_FREQS_FRONT_PART: tl.constexpr,'
+  - '189:     IS_NEOX: tl.constexpr,'
+  - '190:     BLOCK_D_nope: tl.constexpr,'
+  - '191:     BLOCK_DK_nope: tl.constexpr,'
+  evidence_id: src_7adf8625b20fa8f6
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 190
+  match: 'BLOCK_D_nope: tl.constexpr,'
+  captured:
+  - BLOCK_D_nope
+  arch_scope: ''
+  evidence:
+  - '188:     REUSE_FREQS_FRONT_PART: tl.constexpr,'
+  - '189:     IS_NEOX: tl.constexpr,'
+  - '190:     BLOCK_D_nope: tl.constexpr,'
+  - '191:     BLOCK_DK_nope: tl.constexpr,'
+  - '192:     BLOCK_D_pe: tl.constexpr,'
+  evidence_id: src_79cdb38915adc610
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 191
+  match: 'BLOCK_DK_nope: tl.constexpr,'
+  captured:
+  - BLOCK_DK_nope
+  arch_scope: ''
+  evidence:
+  - '189:     IS_NEOX: tl.constexpr,'
+  - '190:     BLOCK_D_nope: tl.constexpr,'
+  - '191:     BLOCK_DK_nope: tl.constexpr,'
+  - '192:     BLOCK_D_pe: tl.constexpr,'
+  - '193:     BLOCK_D_HALF_pe: tl.constexpr,'
+  evidence_id: src_7d538250542efd61
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 192
+  match: 'BLOCK_D_pe: tl.constexpr,'
+  captured:
+  - BLOCK_D_pe
+  arch_scope: ''
+  evidence:
+  - '190:     BLOCK_D_nope: tl.constexpr,'
+  - '191:     BLOCK_DK_nope: tl.constexpr,'
+  - '192:     BLOCK_D_pe: tl.constexpr,'
+  - '193:     BLOCK_D_HALF_pe: tl.constexpr,'
+  - '194:     PRE_QUANT: tl.constexpr,'
+  evidence_id: src_1ee318c4149ab4b2
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 193
+  match: 'BLOCK_D_HALF_pe: tl.constexpr,'
+  captured:
+  - BLOCK_D_HALF_pe
+  arch_scope: ''
+  evidence:
+  - '191:     BLOCK_DK_nope: tl.constexpr,'
+  - '192:     BLOCK_D_pe: tl.constexpr,'
+  - '193:     BLOCK_D_HALF_pe: tl.constexpr,'
+  - '194:     PRE_QUANT: tl.constexpr,'
+  - '195:     OUTPUT_Q_NOPE_ZEROS: tl.constexpr,'
+  evidence_id: src_475b49630691e709
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 194
+  match: 'PRE_QUANT: tl.constexpr,'
+  captured:
+  - PRE_QUANT
+  arch_scope: ''
+  evidence:
+  - '192:     BLOCK_D_pe: tl.constexpr,'
+  - '193:     BLOCK_D_HALF_pe: tl.constexpr,'
+  - '194:     PRE_QUANT: tl.constexpr,'
+  - '195:     OUTPUT_Q_NOPE_ZEROS: tl.constexpr,'
+  - '196:     HAVE_Y_SCALE: tl.constexpr,'
+  evidence_id: src_c49e42c79b8fc889
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 195
+  match: 'OUTPUT_Q_NOPE_ZEROS: tl.constexpr,'
+  captured:
+  - OUTPUT_Q_NOPE_ZEROS
+  arch_scope: ''
+  evidence:
+  - '193:     BLOCK_D_HALF_pe: tl.constexpr,'
+  - '194:     PRE_QUANT: tl.constexpr,'
+  - '195:     OUTPUT_Q_NOPE_ZEROS: tl.constexpr,'
+  - '196:     HAVE_Y_SCALE: tl.constexpr,'
+  - '197:     HAVE_K_SCALE: tl.constexpr,'
+  evidence_id: src_dcc9eac80916e116
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 196
+  match: 'HAVE_Y_SCALE: tl.constexpr,'
+  captured:
+  - HAVE_Y_SCALE
+  arch_scope: ''
+  evidence:
+  - '194:     PRE_QUANT: tl.constexpr,'
+  - '195:     OUTPUT_Q_NOPE_ZEROS: tl.constexpr,'
+  - '196:     HAVE_Y_SCALE: tl.constexpr,'
+  - '197:     HAVE_K_SCALE: tl.constexpr,'
+  - '198:     EVEN_K: tl.constexpr,'
+  evidence_id: src_770200c6771c77a9
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 197
+  match: 'HAVE_K_SCALE: tl.constexpr,'
+  captured:
+  - HAVE_K_SCALE
+  arch_scope: ''
+  evidence:
+  - '195:     OUTPUT_Q_NOPE_ZEROS: tl.constexpr,'
+  - '196:     HAVE_Y_SCALE: tl.constexpr,'
+  - '197:     HAVE_K_SCALE: tl.constexpr,'
+  - '198:     EVEN_K: tl.constexpr,'
+  - '199:     GRID_MN: tl.constexpr,'
+  evidence_id: src_0f74c310395b25dc
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 198
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '196:     HAVE_Y_SCALE: tl.constexpr,'
+  - '197:     HAVE_K_SCALE: tl.constexpr,'
+  - '198:     EVEN_K: tl.constexpr,'
+  - '199:     GRID_MN: tl.constexpr,'
+  - '200:     cache_modifier: tl.constexpr = ".ca",'
+  evidence_id: src_90285f2d4903704e
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 199
+  match: 'GRID_MN: tl.constexpr,'
+  captured:
+  - GRID_MN
+  arch_scope: ''
+  evidence:
+  - '197:     HAVE_K_SCALE: tl.constexpr,'
+  - '198:     EVEN_K: tl.constexpr,'
+  - '199:     GRID_MN: tl.constexpr,'
+  - '200:     cache_modifier: tl.constexpr = ".ca",'
+  - '201: ):'
+  evidence_id: src_6fa64e868c5f86d4
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 573
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '571:     stride_c_out_h,'
+  - '572:     stride_c_out_d,'
+  - '573:     BLOCK_SIZE_M: tl.constexpr,'
+  - '574:     BLOCK_SIZE_N: tl.constexpr,'
+  - '575:     ACTUAL_KSPLIT: tl.constexpr,'
+  evidence_id: src_2b20f4abbb47f094
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 574
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '572:     stride_c_out_d,'
+  - '573:     BLOCK_SIZE_M: tl.constexpr,'
+  - '574:     BLOCK_SIZE_N: tl.constexpr,'
+  - '575:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '576:     MAX_KSPLIT: tl.constexpr,'
+  evidence_id: src_b83db94d9c2e5288
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 575
+  match: 'ACTUAL_KSPLIT: tl.constexpr,'
+  captured:
+  - ACTUAL_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '573:     BLOCK_SIZE_M: tl.constexpr,'
+  - '574:     BLOCK_SIZE_N: tl.constexpr,'
+  - '575:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '576:     MAX_KSPLIT: tl.constexpr,'
+  - '577:     TRANSPOSE_BM: tl.constexpr,'
+  evidence_id: src_afec99580300dd87
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 576
+  match: 'MAX_KSPLIT: tl.constexpr,'
+  captured:
+  - MAX_KSPLIT
+  arch_scope: ''
+  evidence:
+  - '574:     BLOCK_SIZE_N: tl.constexpr,'
+  - '575:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '576:     MAX_KSPLIT: tl.constexpr,'
+  - '577:     TRANSPOSE_BM: tl.constexpr,'
+  - '578: ):'
+  evidence_id: src_047a5d97c5676104
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 577
+  match: 'TRANSPOSE_BM: tl.constexpr,'
+  captured:
+  - TRANSPOSE_BM
+  arch_scope: ''
+  evidence:
+  - '575:     ACTUAL_KSPLIT: tl.constexpr,'
+  - '576:     MAX_KSPLIT: tl.constexpr,'
+  - '577:     TRANSPOSE_BM: tl.constexpr,'
+  - '578: ):'
+  - '579:     """Reduce kernel for split-K BMM results."""'
+  evidence_id: src_6032c036fc16b4a6
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 696
+  match: 'BLOCK_SIZE_M: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '694:     kv_cache_stride_d,'
+  - '695:     k_scale_ptr,'
+  - '696:     BLOCK_SIZE_M: tl.constexpr,'
+  - '697:     BLOCK_SIZE_N: tl.constexpr,'
+  - '698:     BLOCK_SIZE_K: tl.constexpr,'
+  evidence_id: src_bebe5e8c2fcb61a4
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 697
+  match: 'BLOCK_SIZE_N: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_N
+  arch_scope: ''
+  evidence:
+  - '695:     k_scale_ptr,'
+  - '696:     BLOCK_SIZE_M: tl.constexpr,'
+  - '697:     BLOCK_SIZE_N: tl.constexpr,'
+  - '698:     BLOCK_SIZE_K: tl.constexpr,'
+  - '699:     GROUP_SIZE_M: tl.constexpr,'
+  evidence_id: src_d6be085a90ee9a4b
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 698
+  match: 'BLOCK_SIZE_K: tl.constexpr,'
+  captured:
+  - BLOCK_SIZE_K
+  arch_scope: ''
+  evidence:
+  - '696:     BLOCK_SIZE_M: tl.constexpr,'
+  - '697:     BLOCK_SIZE_N: tl.constexpr,'
+  - '698:     BLOCK_SIZE_K: tl.constexpr,'
+  - '699:     GROUP_SIZE_M: tl.constexpr,'
+  - '700:     QH_PER_KH: tl.constexpr,'
+  evidence_id: src_7a10369414695fd9
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 699
+  match: 'GROUP_SIZE_M: tl.constexpr,'
+  captured:
+  - GROUP_SIZE_M
+  arch_scope: ''
+  evidence:
+  - '697:     BLOCK_SIZE_N: tl.constexpr,'
+  - '698:     BLOCK_SIZE_K: tl.constexpr,'
+  - '699:     GROUP_SIZE_M: tl.constexpr,'
+  - '700:     QH_PER_KH: tl.constexpr,'
+  - '701:     REUSE_FREQS_FRONT_PART: tl.constexpr,'
+  evidence_id: src_7acc02457d5d64cc
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 700
+  match: 'QH_PER_KH: tl.constexpr,'
+  captured:
+  - QH_PER_KH
+  arch_scope: ''
+  evidence:
+  - '698:     BLOCK_SIZE_K: tl.constexpr,'
+  - '699:     GROUP_SIZE_M: tl.constexpr,'
+  - '700:     QH_PER_KH: tl.constexpr,'
+  - '701:     REUSE_FREQS_FRONT_PART: tl.constexpr,'
+  - '702:     IS_NEOX: tl.constexpr,'
+  evidence_id: src_a1f749a64a02bb06
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 701
+  match: 'REUSE_FREQS_FRONT_PART: tl.constexpr,'
+  captured:
+  - REUSE_FREQS_FRONT_PART
+  arch_scope: ''
+  evidence:
+  - '699:     GROUP_SIZE_M: tl.constexpr,'
+  - '700:     QH_PER_KH: tl.constexpr,'
+  - '701:     REUSE_FREQS_FRONT_PART: tl.constexpr,'
+  - '702:     IS_NEOX: tl.constexpr,'
+  - '703:     BLOCK_D_nope: tl.constexpr,'
+  evidence_id: src_c5392edf96b170b8
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 702
+  match: 'IS_NEOX: tl.constexpr,'
+  captured:
+  - IS_NEOX
+  arch_scope: ''
+  evidence:
+  - '700:     QH_PER_KH: tl.constexpr,'
+  - '701:     REUSE_FREQS_FRONT_PART: tl.constexpr,'
+  - '702:     IS_NEOX: tl.constexpr,'
+  - '703:     BLOCK_D_nope: tl.constexpr,'
+  - '704:     BLOCK_DK_nope: tl.constexpr,'
+  evidence_id: src_a06a3376e759480a
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 703
+  match: 'BLOCK_D_nope: tl.constexpr,'
+  captured:
+  - BLOCK_D_nope
+  arch_scope: ''
+  evidence:
+  - '701:     REUSE_FREQS_FRONT_PART: tl.constexpr,'
+  - '702:     IS_NEOX: tl.constexpr,'
+  - '703:     BLOCK_D_nope: tl.constexpr,'
+  - '704:     BLOCK_DK_nope: tl.constexpr,'
+  - '705:     BLOCK_D_pe: tl.constexpr,'
+  evidence_id: src_21f8a14455b946bb
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 704
+  match: 'BLOCK_DK_nope: tl.constexpr,'
+  captured:
+  - BLOCK_DK_nope
+  arch_scope: ''
+  evidence:
+  - '702:     IS_NEOX: tl.constexpr,'
+  - '703:     BLOCK_D_nope: tl.constexpr,'
+  - '704:     BLOCK_DK_nope: tl.constexpr,'
+  - '705:     BLOCK_D_pe: tl.constexpr,'
+  - '706:     BLOCK_D_HALF_pe: tl.constexpr,'
+  evidence_id: src_242838bc277b8da9
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 705
+  match: 'BLOCK_D_pe: tl.constexpr,'
+  captured:
+  - BLOCK_D_pe
+  arch_scope: ''
+  evidence:
+  - '703:     BLOCK_D_nope: tl.constexpr,'
+  - '704:     BLOCK_DK_nope: tl.constexpr,'
+  - '705:     BLOCK_D_pe: tl.constexpr,'
+  - '706:     BLOCK_D_HALF_pe: tl.constexpr,'
+  - '707:     OUTPUT_Q_NOPE_ZEROS: tl.constexpr,'
+  evidence_id: src_32b978377f0db7c5
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 706
+  match: 'BLOCK_D_HALF_pe: tl.constexpr,'
+  captured:
+  - BLOCK_D_HALF_pe
+  arch_scope: ''
+  evidence:
+  - '704:     BLOCK_DK_nope: tl.constexpr,'
+  - '705:     BLOCK_D_pe: tl.constexpr,'
+  - '706:     BLOCK_D_HALF_pe: tl.constexpr,'
+  - '707:     OUTPUT_Q_NOPE_ZEROS: tl.constexpr,'
+  - '708:     HAVE_K_SCALE: tl.constexpr,'
+  evidence_id: src_9082c17271d3ebeb
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 707
+  match: 'OUTPUT_Q_NOPE_ZEROS: tl.constexpr,'
+  captured:
+  - OUTPUT_Q_NOPE_ZEROS
+  arch_scope: ''
+  evidence:
+  - '705:     BLOCK_D_pe: tl.constexpr,'
+  - '706:     BLOCK_D_HALF_pe: tl.constexpr,'
+  - '707:     OUTPUT_Q_NOPE_ZEROS: tl.constexpr,'
+  - '708:     HAVE_K_SCALE: tl.constexpr,'
+  - '709:     DTYPE_MAX: tl.constexpr,'
+  evidence_id: src_b703ec8a714754bb
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 708
+  match: 'HAVE_K_SCALE: tl.constexpr,'
+  captured:
+  - HAVE_K_SCALE
+  arch_scope: ''
+  evidence:
+  - '706:     BLOCK_D_HALF_pe: tl.constexpr,'
+  - '707:     OUTPUT_Q_NOPE_ZEROS: tl.constexpr,'
+  - '708:     HAVE_K_SCALE: tl.constexpr,'
+  - '709:     DTYPE_MAX: tl.constexpr,'
+  - '710:     EVEN_K: tl.constexpr,'
+  evidence_id: src_f2e49bfbcc63d382
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 709
+  match: 'DTYPE_MAX: tl.constexpr,'
+  captured:
+  - DTYPE_MAX
+  arch_scope: ''
+  evidence:
+  - '707:     OUTPUT_Q_NOPE_ZEROS: tl.constexpr,'
+  - '708:     HAVE_K_SCALE: tl.constexpr,'
+  - '709:     DTYPE_MAX: tl.constexpr,'
+  - '710:     EVEN_K: tl.constexpr,'
+  - '711:     GRID_MN: tl.constexpr,'
+  evidence_id: src_7e059987c40448c9
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 710
+  match: 'EVEN_K: tl.constexpr,'
+  captured:
+  - EVEN_K
+  arch_scope: ''
+  evidence:
+  - '708:     HAVE_K_SCALE: tl.constexpr,'
+  - '709:     DTYPE_MAX: tl.constexpr,'
+  - '710:     EVEN_K: tl.constexpr,'
+  - '711:     GRID_MN: tl.constexpr,'
+  - '712:     cache_modifier: tl.constexpr = ".ca",'
+  evidence_id: src_761f5b789884a382
+- snapshot: aiter_b3ad6c46
+  category: tunable_param
+  language: triton
+  file: aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py
+  line: 711
+  match: 'GRID_MN: tl.constexpr,'
+  captured:
+  - GRID_MN
+  arch_scope: ''
+  evidence:
+  - '709:     DTYPE_MAX: tl.constexpr,'
+  - '710:     EVEN_K: tl.constexpr,'
+  - '711:     GRID_MN: tl.constexpr,'
+  - '712:     cache_modifier: tl.constexpr = ".ca",'
+  - '713: ):'
+  evidence_id: src_af418909ba25ca4e

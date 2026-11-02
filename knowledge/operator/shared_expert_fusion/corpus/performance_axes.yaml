@@ -1,0 +1,84 @@
+schema_version: 1
+family: shared_expert_fusion
+contract:
+  source_observation: A source observation is implementation evidence, not measured preference.
+  attribution: Whole-implementation performance must not be assigned to an isolated axis.
+comparison_context:
+  required:
+  - operator_family
+  - math_contract
+  - dtype
+  - gfx
+  - shape
+  - layout
+  - baseline
+  - accounting
+  - aiter_commit
+  - toolchain
+  contract: Different masks, scale formats, index conventions, routing or state semantics define different
+    workloads.
+development_order:
+- step: 1
+  title: Mathematical and validity contracts
+  axes:
+  - combine
+- step: 2
+  title: Layout and host interfaces
+  axes:
+  - implementation_contract
+  - shared_expert
+  - communication
+axes:
+- id: implementation_contract
+  kind: integration_contract
+  question: What declarations, dispatch gates, shape checks and host state define a legal implementation?
+  comparison_contract: Compare only the same workload and ABI; a source declaration supplies no performance
+    ranking.
+  source_mappings:
+  - representation: source_observation
+    categories:
+    - symbol_declaration
+    - arch_gate
+    - config_limit
+    - config_space
+    - config_validity
+    - kernel_family
+    - jit_cache
+    - asm_object
+    - asm_argblock
+    - config_lookup
+    - dispatch_padding
+    - tunable_param
+    - instance_name
+  knob_aliases: {}
+- id: combine
+  kind: hard_constraint
+  question: How are route weights, partials and dropped routes combined?
+  comparison_contract: Meaning is established by the curated cards and cited function bodies, not inferred
+    from an API name.
+  source_mappings: []
+  knob_aliases: {}
+- id: shared_expert
+  kind: integration_contract
+  question: When and where is the shared-expert contribution consumed?
+  comparison_contract: Meaning is established by the curated cards and cited function bodies, not inferred
+    from an API name.
+  source_mappings: []
+  knob_aliases: {}
+- id: communication
+  kind: integration_contract
+  question: What ownership, readiness and buffer lifetimes accompany peer communication?
+  comparison_contract: Meaning is established by the curated cards and cited function bodies, not inferred
+    from an API name.
+  source_mappings: []
+  knob_aliases: {}
+dependencies:
+- id: shared-ready
+  axes:
+  - shared_expert
+  - communication
+  - combine
+  relation: coupled_contract
+  rule: Wait for shared partials before the collective that consumes them.
+  decision_refs:
+  - moe-shared-expert-readiness

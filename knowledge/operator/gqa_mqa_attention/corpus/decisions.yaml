@@ -1,0 +1,46 @@
+provenance:
+  schema_version: 4
+  operator_family: gqa_mqa_attention
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  paged_kv: The design reads a paged KV cache.
+cards:
+- id: attention-gqa-head-mapping
+  type: semantic
+  axes:
+  - attention_semantics
+  - cache_layout
+  match:
+    operator_families:
+    - gqa_mqa_attention
+    - attention_decode_paged
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+  question: How should query heads share KV heads without changing GQA/MQA semantics?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The workload has more query heads than KV heads.
+  actions:
+  - Preserve the query-head-to-KV-head mapping and the required divisibility when grouping query heads into
+    a workgroup.
+  - Treat query-head grouping as a reuse opportunity; tune the group and tile sizes while retaining each query
+    head's separate normalization state.
+  - Check unequal query/KV head counts and nontrivial strides, not only ordinary equal-head MHA.
+  alternatives:
+  - One independent query head per program is a simple baseline for the same shared KV cache.
+  why:
+  - The unified kernel separates query head indexing from KV-head indexing while carrying per-query softmax
+    state.
+  source_evidence:
+  - aiter_b3ad6c46:src_49cb5bdc816cb102
+  measurement_evidence: []
+  limitations:
+  - MQA/GQA reuse does not imply the same best workgroup geometry for every head ratio.
+  references:
+  - knowledge/operator/gqa_mqa_attention/README.md
+  - knowledge/operator/attention_decode_paged/README.md
+shared_cards:
+- attention-online-softmax-mask

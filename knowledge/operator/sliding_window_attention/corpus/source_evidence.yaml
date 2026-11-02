@@ -1,0 +1,369 @@
+schema_version: 2
+operator: sliding_window_attention
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/triton/attention/unified_attention.py
+  language: triton
+  lines: 1181
+  evidence_records: 24
+missing: []
+source_evidence:
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 63
+  end_line: 64
+  match: 'def _is_gluon_available():'
+  captured:
+  - _is_gluon_available
+  arch_scope: ''
+  evidence:
+  - '63: def _is_gluon_available():'
+  - '64:     return any(supported in DEVICE_ARCH for supported in _GLUON_SUPPORTED_ARCHS)'
+  evidence_id: src_8991d0d60a392a3e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 127
+  end_line: 147
+  match: 'def _gfx950_gluon_supported(params: _UAParams):'
+  captured:
+  - _gfx950_gluon_supported
+  arch_scope: ''
+  evidence:
+  - '127: def _gfx950_gluon_supported(params: _UAParams):'
+  - '128:     """GFX950 Gluon supported configs."""'
+  - '129:     if params.shuffled_kv_cache and ('
+  evidence_id: src_1ae1d84244f6eca6
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 150
+  end_line: 158
+  match: 'def _gfx950_split_params(params: _UAParams):'
+  captured:
+  - _gfx950_split_params
+  arch_scope: ''
+  evidence:
+  - '150: def _gfx950_split_params(params: _UAParams):'
+  - '151:     """Size the split by the gluon grid when a sequence spans several query blocks."""'
+  - '152:     if params.all_decode or params.max_seqlen_q * params.num_queries_per_kv <= 128:'
+  evidence_id: src_9b6f0ef32b8cbf99
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 161
+  end_line: 171
+  match: 'def _gfx950_split_grid(params: _UAParams):'
+  captured:
+  - _gfx950_split_grid
+  arch_scope: ''
+  evidence:
+  - '161: def _gfx950_split_grid(params: _UAParams):'
+  - '162:     """Decode, and batches too small to fill the GPU, take the split grid."""'
+  - '163:     if params.all_decode:'
+  evidence_id: src_73ba1fbe317806f4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 174
+  end_line: 201
+  match: 'def use_2d_kernel(params: _UAParams, backend: str = "triton"):'
+  captured:
+  - use_2d_kernel
+  arch_scope: ''
+  evidence:
+  - '174: def use_2d_kernel(params: _UAParams, backend: str = "triton"):'
+  - '175:     # if IS_DEVICE_ARCH_GFX12, always use 3D if all_decode and 2D otherwise'
+  - '176:     if IS_DEVICE_ARCH_GFX12:'
+  evidence_id: src_f671176cd68311e5
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 204
+  end_line: 500
+  match: def unified_attention(
+  captured:
+  - unified_attention
+  arch_scope: ''
+  evidence:
+  - '204: def unified_attention('
+  - '205:     q,'
+  - '206:     k,'
+  evidence_id: src_f5f02b63eec3263c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 503
+  end_line: 522
+  match: 'def is_2d_gluon_available(params: _UAParams, backend: str):'
+  captured:
+  - is_2d_gluon_available
+  arch_scope: ''
+  evidence:
+  - '503: def is_2d_gluon_available(params: _UAParams, backend: str):'
+  - '504:     use_gluon = backend == "gluon" and _is_gluon_available()'
+  evidence_id: src_25a1f1020225758b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 525
+  end_line: 538
+  match: 'def is_3d_gluon_available(params: _UAParams, backend: str):'
+  captured:
+  - is_3d_gluon_available
+  arch_scope: ''
+  evidence:
+  - '525: def is_3d_gluon_available(params: _UAParams, backend: str):'
+  - '526:     use_gluon = backend == "gluon" and _is_gluon_available()'
+  evidence_id: src_ca2e6effd0a0d73f
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 541
+  end_line: 559
+  match: 'def is_reduce_gluon_available(params: _UAParams, NUM_SEGMENTS, backend: str):'
+  captured:
+  - is_reduce_gluon_available
+  arch_scope: ''
+  evidence:
+  - '541: def is_reduce_gluon_available(params: _UAParams, NUM_SEGMENTS, backend: str):'
+  - '542:     use_gluon = backend == "gluon" and _is_gluon_available()'
+  evidence_id: src_712282302c3c4346
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 562
+  end_line: 637
+  match: 'def _unified_attention_2d_triton(params: _UAParams):'
+  captured:
+  - _unified_attention_2d_triton
+  arch_scope: ''
+  evidence:
+  - '562: def _unified_attention_2d_triton(params: _UAParams):'
+  - '563:     if params.shuffled_kv_cache and ('
+  - '564:         params.q_dtype == e4m3_dtype and params.kv_cache_dtype == e4m3_dtype'
+  evidence_id: src_517fc47a1e4f396d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 640
+  end_line: 719
+  match: def _unified_attention_3d_triton(
+  captured:
+  - _unified_attention_3d_triton
+  arch_scope: ''
+  evidence:
+  - '640: def _unified_attention_3d_triton('
+  - '641:     params: _UAParams,'
+  - '642:     segm_output,'
+  evidence_id: src_140c10660a89257b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 722
+  end_line: 755
+  match: def _reduce_segments_triton(
+  captured:
+  - _reduce_segments_triton
+  arch_scope: ''
+  evidence:
+  - '722: def _reduce_segments_triton('
+  - '723:     params: _UAParams,'
+  - '724:     segm_output,'
+  evidence_id: src_96cdf34fdd892678
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 788
+  end_line: 880
+  match: 'def _unified_attention_2d_gfx1250(params: _UAParams):'
+  captured:
+  - _unified_attention_2d_gfx1250
+  arch_scope: ''
+  evidence:
+  - '788: def _unified_attention_2d_gfx1250(params: _UAParams):'
+  - '789:     """'
+  - '790:     Internal wrapper for the gfx1250 gluon kernel.'
+  evidence_id: src_bb30a7a448f50a6c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 883
+  end_line: 975
+  match: def _unified_attention_3d_gfx1250(
+  captured:
+  - _unified_attention_3d_gfx1250
+  arch_scope: ''
+  evidence:
+  - '883: def _unified_attention_3d_gfx1250('
+  - '884:     params: _UAParams,'
+  - '885:     segm_output,'
+  evidence_id: src_1e62e9026a87d1a3
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 978
+  end_line: 1012
+  match: def _reduce_segments_gfx1250(
+  captured:
+  - _reduce_segments_gfx1250
+  arch_scope: ''
+  evidence:
+  - '978: def _reduce_segments_gfx1250('
+  - '979:     params: _UAParams,'
+  - '980:     segm_output,'
+  evidence_id: src_2b58a069005fb9f5
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 1015
+  end_line: 1126
+  match: def _unified_attention_gfx950(
+  captured:
+  - _unified_attention_gfx950
+  arch_scope: ''
+  evidence:
+  - '1015: def _unified_attention_gfx950('
+  - '1016:     params: _UAParams,'
+  - '1017:     config: dict,'
+  evidence_id: src_d6494b3c97615219
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 1129
+  end_line: 1140
+  match: 'def _unified_attention_2d_gfx950(params: _UAParams):'
+  captured:
+  - _unified_attention_2d_gfx950
+  arch_scope: ''
+  evidence:
+  - '1129: def _unified_attention_2d_gfx950(params: _UAParams):'
+  - '1130:     """Prefill and mixed batches: one program per (kv head, query block)."""'
+  evidence_id: src_edcffc277f25d2f7
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 1143
+  end_line: 1180
+  match: def _unified_attention_3d_gfx950(
+  captured:
+  - _unified_attention_3d_gfx950
+  arch_scope: ''
+  evidence:
+  - '1143: def _unified_attention_3d_gfx950('
+  - '1144:     params: _UAParams,'
+  - '1145:     segm_output,'
+  evidence_id: src_9bf529e24c83e1a3
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 55
+  match: WARP_SIZE = 32
+  captured:
+  - WARP_SIZE
+  - '32'
+  arch_scope: gfx1250
+  evidence:
+  - '53: DEVICE_ARCH = arch_info.get_arch()'
+  - '54: IS_DEVICE_ARCH_GFX12 = DEVICE_ARCH in ("gfx1250",)'
+  - '55: WARP_SIZE = 32 if IS_DEVICE_ARCH_GFX12 else 64'
+  - '57: _GLUON_SUPPORTED_ARCHS = ("gfx1250", "gfx950")'
+  evidence_id: src_d17d83b1526b25e6
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 827
+  match: MAX_INT32 = 2
+  captured:
+  - MAX_INT32
+  - '2'
+  arch_scope: ''
+  evidence:
+  - '826:     # buffer ops need the tensor to fit a 32-bit offset; gfx1250 loads through TDM'
+  - '827:     MAX_INT32 = 2**31 - 1'
+  - '828:     USE_STORE_BUFFER_OP = params.out.nelement() * params.out.element_size() <= MAX_INT32'
+  - '829:     _unified_attention_kernel_2d_gfx1250[(params.num_kv_heads, total_query_blocks)]('
+  evidence_id: src_961f38ef952f6e5c
+- snapshot: aiter_b3ad6c46
+  category: config_limit
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 1064
+  match: MAX_INT32 = 2
+  captured:
+  - MAX_INT32
+  - '2'
+  arch_scope: ''
+  evidence:
+  - '1063:     # buffer ops need the tensor to fit a 32-bit offset'
+  - '1064:     MAX_INT32 = 2**31 - 1'
+  - '1065:     USE_LOAD_BUFFER_OP = params.k.nelement() * params.k.element_size() <= MAX_INT32'
+  - '1066:     USE_STORE_BUFFER_OP = params.out.nelement() * params.out.element_size() <= MAX_INT32'
+  evidence_id: src_90b991b2e8caf879
+- snapshot: aiter_b3ad6c46
+  category: arch_gate
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 54
+  match: in ("gfx1250"
+  captured:
+  - gfx1250
+  arch_scope: gfx1250
+  evidence:
+  - '53: DEVICE_ARCH = arch_info.get_arch()'
+  - '54: IS_DEVICE_ARCH_GFX12 = DEVICE_ARCH in ("gfx1250",)'
+  - '55: WARP_SIZE = 32 if IS_DEVICE_ARCH_GFX12 else 64'
+  evidence_id: src_31582887cf0152ea
+- snapshot: aiter_b3ad6c46
+  category: config_space
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 57
+  match: _GLUON_SUPPORTED_ARCHS = (
+  captured:
+  - _GLUON_SUPPORTED_ARCHS
+  arch_scope: gfx1250
+  evidence:
+  - '55: WARP_SIZE = 32 if IS_DEVICE_ARCH_GFX12 else 64'
+  - '57: _GLUON_SUPPORTED_ARCHS = ("gfx1250", "gfx950")'
+  - '59: # LDS the gfx950 KV double buffer may occupy; a wider tile falls back to one buffer.'
+  evidence_id: src_df656c703150d5cd
+- snapshot: aiter_b3ad6c46
+  category: scale_operand
+  language: triton
+  file: aiter/ops/triton/attention/unified_attention.py
+  line: 359
+  match: block_scales_size=
+  captured:
+  - block_scales_size
+  arch_scope: ''
+  evidence:
+  - '357:         k_width=K_WIDTH,'
+  - '358:         scale_k_width=SCALE_K_WIDTH,'
+  - '359:         block_scales_size=BLOCK_SCALES_SIZE,'
+  - '360:         q_dtype=q_dtype,'
+  - '361:         kv_cache_dtype=kv_cache_dtype,'
+  evidence_id: src_7117330b801e04fc

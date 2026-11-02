@@ -1,0 +1,82 @@
+schema_version: 2
+operator: gemm_epilogue_fused
+sources:
+- snapshot: aiter_a6bb4993
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/__init__.py
+  language: triton
+  include_symbols: false
+- snapshot: aiter_a6bb4993
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py
+  language: triton
+  include_symbols: false
+- snapshot: aiter_a6bb4993
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  language: triton
+  include_symbols: false
+- snapshot: aiter_a6bb4993
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py
+  language: triton
+  include_symbols: false
+- snapshot: aiter_a6bb4993
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py
+  language: triton
+  include_symbols: false
+- snapshot: aiter_a6bb4993
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py
+  language: triton
+  include_symbols: false
+- snapshot: aiter_a6bb4993
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py
+  language: triton
+  include_symbols: false
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py
+  language: triton
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py
+  language: triton
+  include_symbols: true
+validation_sources:
+- snapshot: aiter_b3ad6c46
+  file: op_tests/multigpu_tests/test_fused_ar_rms.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/multigpu_tests/test_fused_ar_rms_per_group_quant.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/op_benchmarks/triton/bench_ff_a16w16_fused.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/op_benchmarks/triton/bench_fused_gemm_a8w8_blockscale_a16w16.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/op_benchmarks/triton/bench_fused_gemm_a8w8_blockscale_mul_add.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/op_benchmarks/triton/bench_fused_gemm_afp4wfp4_a16w16.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/op_benchmarks/triton/bench_fused_gemm_afp4wfp4_mul_add.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/op_benchmarks/triton/bench_fused_gemm_commons.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/gemm/feed_forward/__init__.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/gemm/feed_forward/ff_test_utils.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/gemm/feed_forward/test_ff_a16w16.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/gemm/feed_forward/test_ff_a16w16_fused.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/gemm/fused/test_fused_gemm_a16w16_quant_x.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/gemm/fused/test_fused_gemm_a8w8_blockscale_a16w16.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/gemm/fused/test_fused_gemm_a8w8_blockscale_mul_add.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/gemm/fused/test_fused_gemm_a8w8_blockscale_split_cat.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/gemm/fused/test_fused_gemm_afp4wfp4_a16w16.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/gemm/fused/test_fused_gemm_afp4wfp4_mul_add.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/gemm/fused/test_fused_gemm_afp4wfp4_split_cat.py
+coverage_notes:
+- Source observations and conditioned candidates for gemm epilogue fused; source presence is not a measured
+  winner.
+- No new GPU measurements or binary disassembly are included.

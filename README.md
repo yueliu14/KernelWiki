@@ -7,8 +7,8 @@ An **operator-centered GPU kernel knowledge base for LLM inference**, focused on
 | Content | Start here | Purpose |
 | --- | --- | --- |
 | Written knowledge | [Operators](knowledge/operator/README.md) · [General](knowledge/general/README.md) | Implementation details, source entry points, performance and applicability, tuning methods and lessons from previous runs |
+| Structured corpus | [Operator catalog](corpus/catalog.yaml) · [Corpus guide](corpus/README.md) | Operator-local source observations, conditioned development cards and upstream configuration seeds |
 | Kernel implementations | [Source collection](kernels/README.md) · [Put, search and fetch API](kernelwiki/README.md) | Reuse complete source bundles with entry points, dependencies, correctness checks and benchmarks |
-| Machine-queryable corpus | [GEMM corpus](corpus/README.md) | Source-cited evidence records and tuning decisions a program can query; the written pages here are generated from them |
 
 ```text
 knowledge/
@@ -17,6 +17,15 @@ knowledge/
     backend/<backend>_aiter.md
     backend/<backend>_notes.md
     learned_knowledge/
+    corpus/
+      scope.yaml
+      source_evidence.yaml
+      decisions.yaml
+      performance_axes.yaml
+      source_evidence.md       # generated
+      decisions.md             # generated
+      tuned_configs.yaml       # where upstream seeds are available
+      seeds.md                 # generated where applicable
   general/
     profile_bottleneck/
     optimization/
@@ -35,12 +44,11 @@ kernelwiki/
   client.py
 corpus/
   catalog.yaml
-  evidence/<family>.yaml
-  decisions/<family>.yaml
-  performance_axes/<family>.yaml
-  scopes/
-  <family>_source_evidence.md
-  <family>_decisions.md
+  README.md                    # generated navigation
+tools/corpus/
+  extract.py
+  validate.py
+  build.py
 ```
 
 ## Getting started
@@ -51,6 +59,19 @@ corpus/
 - [Bottleneck analysis](knowledge/general/profile_bottleneck/README.md) · [Optimization methods](knowledge/general/optimization/README.md) · [Writing knowledge and recording evidence](knowledge/README.md)
 
 ## Operator scope and evidence
+
+For source-grounded implementation decisions, start with the [GEMM](knowledge/operator/dense_gemm/corpus/decisions.md),
+[attention](knowledge/operator/attention_prefill_fmha/corpus/decisions.md), [MoE](knowledge/operator/grouped_gemm_moe/corpus/decisions.md) or
+[indexer](knowledge/operator/attention_indexer/corpus/decisions.md) corpus. All **23 operators** own a local
+`corpus/` with source evidence, development cards, extraction scope and performance axes.
+The collection contains **69 canonical cards, 4,481 source observations and 359 upstream
+configuration/selection groups**. Cross-operator knowledge uses shared references to a single owner;
+the root catalog provides navigation and snapshot metadata. See the [maintenance guide](tools/corpus/README.md).
+
+The corpus preserves the AITER `a6bb49937584` GEMM evidence and adds source from `b3ad6c461703`
+across GEMM, attention, MoE and indexers. References include a snapshot prefix and stable content ID;
+source links use the full commit. Each operator records its coverage limits and pinned upstream
+correctness-test sources. Cards describe source precedents, constraints and unmeasured candidates.
 
 - **23 operator directories**, grouped by GEMM, MoE, attention and indexer workloads, with **92 AITER backend/provider reference pages**, **13 implementation-note pages** and **122 operator experience cards**.
 - Standalone small operators, spatial convolutions, training losses, recommendation attention and general solvers are excluded from the operator collection. Quantization, activation, cache layout, normalization and communication are documented where they affect a main kernel or fusion. MoE routing/dispatch and Q/K preparation fusions remain part of those workloads.
@@ -95,8 +116,9 @@ Repository entries are curated with Git. The remote service can retain multiple 
 ```bash
 python -m pip install -e '.[test]'
 python -m pytest -q
+python tools/corpus/build.py --check
 ```
 
 ## Attribution and licenses
 
-Imported GEAK content retains its attribution and Apache-2.0 license. AITER references and excerpts retain their MIT license notice. See [LICENSE](LICENSE.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
+Imported GEAK content retains its attribution and Apache-2.0 license. AITER excerpts retain upstream notices, including MIT and per-file Apache-2.0 notices. See [LICENSE](LICENSE.md) and [third-party notices](THIRD_PARTY_NOTICES.md).

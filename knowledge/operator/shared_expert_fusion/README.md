@@ -1,5 +1,8 @@
 # shared_expert_fusion
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Shared-expert computation and its overlap or fusion with routed experts.
 
 1 AITER implementation references; 0 historical experience cards.

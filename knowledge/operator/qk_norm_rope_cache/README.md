@@ -1,5 +1,8 @@
 # qk_norm_rope_cache
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Fused Q/K normalization, positional encoding, quantization and cache writes.
 
 5 AITER implementation references; 0 historical experience cards.

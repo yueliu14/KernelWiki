@@ -1,0 +1,83 @@
+provenance:
+  schema_version: 4
+  operator_family: moe_routing_topk
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  grouped_routes: Tokens are expanded into expert routes with explicit forward/inverse maps.
+cards:
+- id: moe-herd-routing-profile
+  type: constraint
+  axes:
+  - routing_semantics
+  - implementation_contract
+  match:
+    operator_families:
+    - moe_routing_topk
+    target_languages:
+    - flydsl
+  question: When is the specialized HERD routing path a valid candidate?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - A candidate intends to reuse the FlyDSL HERD sigmoid routing implementation.
+  actions:
+  - Check the source's supported (score_func, experts, topk) profile instead of treating HERD as a generic
+    top-k replacement.
+  - Preserve correction-bias scoring, candidate generation, final weight normalization and routed_scaling_factor
+    as distinct parts of the contract.
+  - Honor the token-count, contiguous expert-column, output dtype/device and wave64 checks in _unsupported_reason.
+  alternatives:
+  - Use the existing general routing implementation for unmatched profiles.
+  why:
+  - The orchestration separates sigmoid-bias candidate selection from finalize, and publishes explicit narrow
+    supported profiles.
+  source_evidence:
+  - aiter_b3ad6c46:src_07127917d294dfe9
+  - aiter_b3ad6c46:src_938ee9ec013bdbd5
+  - aiter_b3ad6c46:src_6aed3c9825dd64f4
+  measurement_evidence: []
+  limitations:
+  - The existence of a fast-path wrapper says nothing about its speed on a new workload.
+  - Do not substitute sigmoid routing for a softmax or grouped-routing contract.
+  references:
+  - knowledge/operator/moe_routing_topk/README.md
+- id: moe-sort-padding-sentinels
+  type: constraint
+  axes:
+  - expert_layout
+  - implementation_contract
+  match:
+    operator_families:
+    - moe_routing_topk
+    - grouped_gemm_moe
+    - fused_moe_grouped_gemm
+    target_languages:
+    - flydsl
+  question: Which outputs of expert sorting are part of the downstream GEMM ABI?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - Token/expert routes are sorted and padded into expert-aligned work blocks.
+  actions:
+  - Carry sorted token IDs, sorted route weights, sorted expert IDs and valid-count metadata together.
+  - Use the same unit_size for sorting/padding and downstream compute; preserve sentinel slots rather than
+    interpreting padding as real routes.
+  - Size and initialize the sorting workspace according to token count, experts, top-k and alignment.
+  alternatives:
+  - Keep sorting separate from GEMM while validating a new expert layout.
+  why:
+  - The sorting wrapper passes all four output structures and unit_size together; the kernel has explicit expert-block
+    and sentinel-fill helpers.
+  source_evidence:
+  - aiter_b3ad6c46:src_ac3c69d9503ae1e9
+  - aiter_b3ad6c46:src_2dd6e2d5481889d9
+  - aiter_b3ad6c46:src_813a1fbae51448b9
+  measurement_evidence: []
+  limitations:
+  - A padding factor selected for one GEMM tile is not automatically legal for another.
+  - The cached wrapper workspace is not by itself evidence of arbitrary concurrent-stream safety.
+  references:
+  - knowledge/operator/moe_routing_topk/README.md
+  - knowledge/operator/grouped_gemm_moe/README.md
+  - knowledge/operator/fused_moe_grouped_gemm/README.md
+shared_cards: []

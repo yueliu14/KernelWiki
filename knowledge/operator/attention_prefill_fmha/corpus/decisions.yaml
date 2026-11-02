@@ -1,0 +1,92 @@
+provenance:
+  schema_version: 4
+  operator_family: attention_prefill_fmha
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  paged_kv: The design reads a paged KV cache.
+cards:
+- id: attention-online-softmax-mask
+  type: semantic
+  axes:
+  - attention_semantics
+  - numerical_contract
+  match:
+    operator_families:
+    - attention_prefill_fmha
+    - gqa_mqa_attention
+    target_languages:
+    - triton
+    - flydsl
+    - gluon
+  question: How must tiled forward attention preserve masking and online softmax normalization?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The operation is scaled dot-product forward attention, with an explicit causal or noncausal contract.
+  actions:
+  - Carry the running maximum, exponential sum and output accumulator together across KV tiles; rescale prior
+    contributions when the maximum changes.
+  - Apply sequence-tail and causal masks to scores before exponentiation; a zero-filled invalid key is not
+    an excluded softmax position.
+  - Keep QK scale, exponential base and accumulator precision consistent through the update and any final normalization.
+  alternatives:
+  - Retain a straightforward unfused reference for the same mask and scale contract.
+  why:
+  - The Triton prefill kernel updates m_i, l_i and acc jointly, masks invalid scores with negative infinity,
+    and casts probabilities to the value dtype before the PV dot.
+  source_evidence:
+  - aiter_b3ad6c46:src_a3adfa0056dbdf43
+  measurement_evidence: []
+  limitations:
+  - This softmax recurrence does not describe gated-delta or other recurrent attention.
+  - An all-masked row needs an explicitly validated convention; the cited prefill body is not proof that every
+    empty-row input is supported.
+  references:
+  - knowledge/operator/attention_prefill_fmha/README.md
+  - knowledge/operator/gqa_mqa_attention/README.md
+- id: attention-query-kv-tile-pipeline
+  type: performance_candidate
+  axes:
+  - kv_partition
+  - compute_schedule
+  - data_movement
+  match:
+    operator_families:
+    - attention_prefill_fmha
+    - attention_decode_paged
+    target_languages:
+    - triton
+    - gluon
+    - flydsl
+  question: Which coupled decisions should be explored when changing attention tile sizes?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - Correct forward attention already exists and the next candidate changes query/KV tile geometry or buffering.
+  actions:
+  - Consider query rows, KV tile width, head dimensions, waves and shared-memory buffering as a coupled resource
+    bundle.
+  - Compare the single-buffer and standard attention-loop precedents with the same mask and cache layout.
+  - Retain tail masking and per-query normalization state when changing the amount of work per program.
+  alternatives:
+  - Retain the simpler single-buffer or current tiling as a candidate.
+  why:
+  - The Gluon unified implementation exposes distinct attention-loop buffering structures; the Triton prefill
+    source exposes BLOCK_M/BLOCK_N.
+  source_evidence:
+  - aiter_b3ad6c46:src_a3adfa0056dbdf43
+  measurement_evidence: []
+  limitations:
+  - Source structure alone gives no preferred tile or pipeline depth.
+  - The gfx950 Gluon precedent is not a claim of support on another architecture.
+  references:
+  - knowledge/operator/attention_prefill_fmha/README.md
+  - knowledge/operator/attention_decode_paged/README.md
+  solutions:
+  - backend: gluon
+    mechanism: Separate single-buffer and standard loops make the buffering choice explicit.
+    source_evidence:
+    - aiter_b3ad6c46:src_df1d1897d6e20027
+    - aiter_b3ad6c46:src_c7b298210cc66981
+shared_cards:
+- attention-window-prefix-boundaries

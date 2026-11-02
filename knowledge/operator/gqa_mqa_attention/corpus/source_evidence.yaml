@@ -1,0 +1,1017 @@
+schema_version: 2
+operator: gqa_mqa_attention
+provenance:
+  extractor: tools/corpus/extract.py
+coverage:
+- snapshot: aiter_b3ad6c46
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  lines: 2027
+  evidence_records: 63
+missing: []
+source_evidence:
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 34
+  end_line: 47
+  match: 'def _async_copy_accepts_distributed_layout() -> bool:'
+  captured:
+  - _async_copy_accepts_distributed_layout
+  arch_scope: ''
+  evidence:
+  - '34: def _async_copy_accepts_distributed_layout() -> bool:'
+  - '35:     # The offset_bases KV-load path builds a DistributedLinearLayout for the'
+  - '36:     # async_copy offsets. Triton >=3.8 accepts that; 3.7.x''s async_copy requires'
+  evidence_id: src_8366a9bd377c01da
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 58
+  end_line: 59
+  match: 'def elementwise_max_prop_nan(a, b):'
+  captured:
+  - elementwise_max_prop_nan
+  arch_scope: ''
+  evidence:
+  - '57: @gluon.jit'
+  - '58: def elementwise_max_prop_nan(a, b):'
+  - '59:     return gl.maximum(a, b, propagate_nan=_MAX_PROPAGATE_NAN_ALL)'
+  evidence_id: src_f0238b9e678f8863
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 63
+  end_line: 65
+  match: 'def reduce_max_prop_nan(input, axis=None, keep_dims=False):'
+  captured:
+  - reduce_max_prop_nan
+  arch_scope: ''
+  evidence:
+  - '62: @gluon.jit'
+  - '63: def reduce_max_prop_nan(input, axis=None, keep_dims=False):'
+  - '64:     """Reduce-max that propagates NaN. Skipping NaN handling is extra work on AMD."""'
+  - '65:     return gl.reduce(input, axis, elementwise_max_prop_nan, keep_dims=keep_dims)'
+  evidence_id: src_a8b60e7dd9e2fc14
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 69
+  end_line: 100
+  match: 'def _offset_bases_to_blocked(offset_bases, contiguity, num_warps, warp_size, shape):'
+  captured:
+  - _offset_bases_to_blocked
+  arch_scope: ''
+  evidence:
+  - '68: @gluon.constexpr_function'
+  - '69: def _offset_bases_to_blocked(offset_bases, contiguity, num_warps, warp_size, shape):'
+  - '70:     """'
+  - '71:     Derive a DistributedLinearLayout from a PaddedSharedLayout''s offset_bases.'
+  evidence_id: src_34ec957eb99ebbf8
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 104
+  end_line: 125
+  match: 'def _padded_pair(n0, n1, CONTIGUITY, NUM_WARPS, WARP_SIZE, padding):'
+  captured:
+  - _padded_pair
+  arch_scope: ''
+  evidence:
+  - '103: @gluon.constexpr_function'
+  - '104: def _padded_pair(n0, n1, CONTIGUITY, NUM_WARPS, WARP_SIZE, padding):'
+  - '105:     """Shared + load layout for a tile whose dim0 is the contiguous axis in memory.'
+  evidence_id: src_9c217166dc409efb
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 129
+  end_line: 166
+  match: 'def _shuffled_kv_layouts(HEAD_SIZE, TILE_SIZE, NUM_WARPS, C, WARP_SIZE, GATHER):'
+  captured:
+  - _shuffled_kv_layouts
+  arch_scope: ''
+  evidence:
+  - '128: @gluon.constexpr_function'
+  - '129: def _shuffled_kv_layouts(HEAD_SIZE, TILE_SIZE, NUM_WARPS, C, WARP_SIZE, GATHER):'
+  - '130:     if GATHER:'
+  - '131:         # A gathered tile carries a per-token page address. Direct-to-LDS only'
+  evidence_id: src_49c1d14393b67cb7
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 170
+  end_line: 218
+  match: 'def _padded_kv_layouts(HEAD_SIZE, TILE_SIZE, NUM_WARPS, C, WARP_SIZE, FP8_KV):'
+  captured:
+  - _padded_kv_layouts
+  arch_scope: ''
+  evidence:
+  - '169: @gluon.constexpr_function'
+  - '170: def _padded_kv_layouts(HEAD_SIZE, TILE_SIZE, NUM_WARPS, C, WARP_SIZE, FP8_KV):'
+  - '171:     """Plain cache: padded shared layouts with a rotated basis, and the matching'
+  - '172:     load layouts derived from the same bases the way CoalesceAsyncCopy would."""'
+  evidence_id: src_fb437904cf44c55a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 222
+  end_line: 242
+  match: 'def _legacy_kv_layouts(HEAD_SIZE, NUM_WARPS, C, WARP_SIZE, FP8_KV):'
+  captured:
+  - _legacy_kv_layouts
+  arch_scope: ''
+  evidence:
+  - '221: @gluon.constexpr_function'
+  - '222: def _legacy_kv_layouts(HEAD_SIZE, NUM_WARPS, C, WARP_SIZE, FP8_KV):'
+  - '223:     """Fallback for a triton whose async_copy will not take a linear load layout:'
+  - '224:     plain blocked loads over XOR-swizzled shared memory."""'
+  evidence_id: src_842f59468108dc80
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 246
+  end_line: 274
+  match: def _make_cdna4_kv_load_layouts(
+  captured:
+  - _make_cdna4_kv_load_layouts
+  arch_scope: ''
+  evidence:
+  - '245: @gluon.constexpr_function'
+  - '246: def _make_cdna4_kv_load_layouts('
+  - '247:     HEAD_SIZE,'
+  - '248:     TILE_SIZE,'
+  evidence_id: src_d0c946134c541887
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1470
+  end_line: 1542
+  match: 'def attention_loop_single_buffer(pgm, kv_loader, q, M, L, acc):'
+  captured:
+  - attention_loop_single_buffer
+  arch_scope: ''
+  evidence:
+  - '1469: @gluon.jit'
+  - '1470: def attention_loop_single_buffer(pgm, kv_loader, q, M, L, acc):'
+  - '1471:     # One shared buffer, and every warp reads the whole tile because operand B is'
+  - '1472:     # replicated across warps'
+  evidence_id: src_df1d1897d6e20027
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1546
+  end_line: 1680
+  match: 'def attention_loop_standard(pgm, kv_loader, q, M, L, acc):'
+  captured:
+  - attention_loop_standard
+  arch_scope: ''
+  evidence:
+  - '1545: @gluon.jit'
+  - '1546: def attention_loop_standard(pgm, kv_loader, q, M, L, acc):'
+  - '1547:     """Double-buffered attention loop, safe/masked tile split.'
+  evidence_id: src_c7b298210cc66981
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1684
+  end_line: 1701
+  match: def find_seq_idx(
+  captured:
+  - find_seq_idx
+  arch_scope: ''
+  evidence:
+  - '1683: @gluon.jit'
+  - '1684: def find_seq_idx('
+  - '1685:     query_start_len_ptr,'
+  - '1686:     target_idx,'
+  evidence_id: src_a3f8660b7a72df28
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1705
+  end_line: 2026
+  match: def _unified_attention_gluon_kernel(
+  captured:
+  - _unified_attention_gluon_kernel
+  arch_scope: ''
+  evidence:
+  - '1704: @gluon.jit(do_not_specialize=["num_blocks"])'
+  - '1705: def _unified_attention_gluon_kernel('
+  - '1706:     query_ptr,  # [num_tokens, num_query_heads, head_size]'
+  - '1707:     key_cache_ptr,  # [num_blks, blk_size, num_kv_heads, head_size]'
+  evidence_id: src_bd270d38b1ddeb40
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 21
+  end_line: 22
+  match: 'def _barrier():'
+  captured:
+  - _barrier
+  arch_scope: ''
+  evidence:
+  - '20:     @gluon.jit'
+  - '21:     def _barrier():'
+  - '22:         gl.barrier()'
+  evidence_id: src_3c04686ffa522737
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 27
+  end_line: 28
+  match: 'def _barrier():'
+  captured:
+  - _barrier
+  arch_scope: ''
+  evidence:
+  - '26:     @gluon.jit'
+  - '27:     def _barrier():'
+  - '28:         gl.thread_barrier()'
+  evidence_id: src_ab4de934876693d7
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 156
+  end_line: 163
+  match: 'def blocked(cols):'
+  captured:
+  - blocked
+  arch_scope: ''
+  evidence:
+  - '154:         )'
+  - '156:     def blocked(cols):'
+  - '157:         along_1 = max(1, min(NUM_WARPS, cols // (WARP_SIZE * C)))'
+  - '158:         return gl.BlockedLayout('
+  evidence_id: src_dbe79542ac07f210
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 334
+  end_line: 466
+  match: def __init__(
+  captured:
+  - __init__
+  arch_scope: ''
+  evidence:
+  - '333:     @gluon.constexpr_function'
+  - '334:     def __init__('
+  - '335:         self,'
+  - '336:         ARCH_NAME,'
+  evidence_id: src_d3c68f5f9923467a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 484
+  end_line: 498
+  match: 'def __init__(self, cfg, REMOVE_INDIRECT_ACCESS):'
+  captured:
+  - __init__
+  arch_scope: ''
+  evidence:
+  - '483:     @gluon.constexpr_function'
+  - '484:     def __init__(self, cfg, REMOVE_INDIRECT_ACCESS):'
+  - '485:         blocked_k, blocked_v, shared_k, shared_v = _make_cdna4_kv_load_layouts('
+  - '486:             cfg.HEAD_SIZE,'
+  evidence_id: src_5c3af1af546aa7a5
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 516
+  end_line: 538
+  match: def __init__(
+  captured:
+  - __init__
+  arch_scope: ''
+  evidence:
+  - '515:     @gluon.constexpr_function'
+  - '516:     def __init__('
+  - '517:         self,'
+  - '518:         cfg,'
+  evidence_id: src_34d5e46785a1d00c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 541
+  end_line: 639
+  match: def initialize(
+  captured:
+  - initialize
+  arch_scope: ''
+  evidence:
+  - '540:     @gluon.jit'
+  - '541:     def initialize('
+  - '542:         cfg,'
+  - '543:         key_cache_ptr,'
+  evidence_id: src_d1b39349074680b3
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 642
+  end_line: 657
+  match: 'def load_k_to_shared(self, k_offset, buffer_id=0):'
+  captured:
+  - load_k_to_shared
+  arch_scope: ''
+  evidence:
+  - '641:     @gluon.jit'
+  - '642:     def load_k_to_shared(self, k_offset, buffer_id=0):'
+  - '643:         # Async copy K tile from global to shared memory'
+  - '644:         if self.cfg.USE_LOAD_BUFFER_OP:'
+  evidence_id: src_d1b6c0a68cdaf061
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 660
+  end_line: 675
+  match: 'def load_v_to_shared(self, v_offset, buffer_id=0):'
+  captured:
+  - load_v_to_shared
+  arch_scope: ''
+  evidence:
+  - '659:     @gluon.jit'
+  - '660:     def load_v_to_shared(self, v_offset, buffer_id=0):'
+  - '661:         # Async copy V tile from global to shared memory'
+  - '662:         if self.cfg.USE_LOAD_BUFFER_OP:'
+  evidence_id: src_d7eff459285951c1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 678
+  end_line: 689
+  match: 'def k_tile(self, buffer_id):'
+  captured:
+  - k_tile
+  arch_scope: ''
+  evidence:
+  - '677:     @gluon.jit'
+  - '678:     def k_tile(self, buffer_id):'
+  - '679:         # [HEAD_SIZE // W, TILE_SIZE * W] -> [HEAD_SIZE, TILE_SIZE]'
+  - '680:         KW: gl.constexpr = self.cfg.KV_SHUFFLE_WIDTH'
+  evidence_id: src_701af6361ca04a20
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 692
+  end_line: 703
+  match: 'def v_tile(self, buffer_id):'
+  captured:
+  - v_tile
+  arch_scope: ''
+  evidence:
+  - '691:     @gluon.jit'
+  - '692:     def v_tile(self, buffer_id):'
+  - '693:         # [TILE_SIZE // W, HEAD_SIZE * W] -> [TILE_SIZE, HEAD_SIZE]'
+  - '694:         KW: gl.constexpr = self.cfg.KV_SHUFFLE_WIDTH'
+  evidence_id: src_9238355375e9d2d9
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 706
+  end_line: 724
+  match: def load_k_from_shared(
+  captured:
+  - load_k_from_shared
+  arch_scope: ''
+  evidence:
+  - '705:     @gluon.jit'
+  - '706:     def load_k_from_shared('
+  - '707:         self,'
+  - '708:         wait_count,'
+  evidence_id: src_605f853ec42e83fe
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 727
+  end_line: 745
+  match: def load_v_from_shared(
+  captured:
+  - load_v_from_shared
+  arch_scope: ''
+  evidence:
+  - '726:     @gluon.jit'
+  - '727:     def load_v_from_shared('
+  - '728:         self,'
+  - '729:         wait_count,'
+  evidence_id: src_c55c654ae4ebeba6
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 748
+  end_line: 761
+  match: 'def load_block_ids(self, i):'
+  captured:
+  - load_block_ids
+  arch_scope: ''
+  evidence:
+  - '747:     @gluon.jit'
+  - '748:     def load_block_ids(self, i):'
+  - '749:         if self.kv_cfg.REMOVE_INDIRECT_ACCESS:'
+  - '750:             blk = i'
+  evidence_id: src_0ef336a868e66225
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 789
+  end_line: 817
+  match: def __init__(
+  captured:
+  - __init__
+  arch_scope: ''
+  evidence:
+  - '788:     @gluon.constexpr_function'
+  - '789:     def __init__('
+  - '790:         self,'
+  - '791:         cfg,'
+  evidence_id: src_6208f031731cbde7
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 820
+  end_line: 932
+  match: def initialize(
+  captured:
+  - initialize
+  arch_scope: ''
+  evidence:
+  - '819:     @gluon.jit'
+  - '820:     def initialize('
+  - '821:         cfg,'
+  - '822:         key_cache_ptr,'
+  evidence_id: src_53ebe7425942655d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 935
+  end_line: 944
+  match: 'def k_tile(self, buffer_id):'
+  captured:
+  - k_tile
+  arch_scope: ''
+  evidence:
+  - '934:     @gluon.jit'
+  - '935:     def k_tile(self, buffer_id):'
+  - '936:         # [HEAD_SIZE // W, TILE_SIZE, W] -> [HEAD_SIZE, TILE_SIZE]'
+  - '937:         if self.cfg.SHUFFLED_KV_CACHE:'
+  evidence_id: src_0cb3cf499f6fe127
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 947
+  end_line: 956
+  match: 'def v_tile(self, buffer_id):'
+  captured:
+  - v_tile
+  arch_scope: ''
+  evidence:
+  - '946:     @gluon.jit'
+  - '947:     def v_tile(self, buffer_id):'
+  - '948:         # [TILE_SIZE // W, HEAD_SIZE, W] -> [TILE_SIZE, HEAD_SIZE]'
+  - '949:         if self.cfg.SHUFFLED_KV_CACHE:'
+  evidence_id: src_50d31e5d9af3087a
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 959
+  end_line: 975
+  match: 'def load_k_to_shared(self, k_offset, buffer_id=0):'
+  captured:
+  - load_k_to_shared
+  arch_scope: ''
+  evidence:
+  - '958:     @gluon.jit'
+  - '959:     def load_k_to_shared(self, k_offset, buffer_id=0):'
+  - '960:         # load_block_ids returns the (k, v) offset pair'
+  - '961:         k_offset_tensor = k_offset[0]'
+  evidence_id: src_3e1fe65c2b3c8de6
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 978
+  end_line: 993
+  match: 'def load_v_to_shared(self, v_offset, buffer_id=0):'
+  captured:
+  - load_v_to_shared
+  arch_scope: ''
+  evidence:
+  - '977:     @gluon.jit'
+  - '978:     def load_v_to_shared(self, v_offset, buffer_id=0):'
+  - '979:         v_offset_tensor = v_offset[1]'
+  - '980:         if self.cfg.USE_LOAD_BUFFER_OP:'
+  evidence_id: src_6be2b83f61a358ac
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 996
+  end_line: 1013
+  match: def load_k_from_shared(
+  captured:
+  - load_k_from_shared
+  arch_scope: ''
+  evidence:
+  - '995:     @gluon.jit'
+  - '996:     def load_k_from_shared('
+  - '997:         self,'
+  - '998:         wait_count,'
+  evidence_id: src_24e08d9ceb3ecb81
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1016
+  end_line: 1033
+  match: def load_v_from_shared(
+  captured:
+  - load_v_from_shared
+  arch_scope: ''
+  evidence:
+  - '1015:     @gluon.jit'
+  - '1016:     def load_v_from_shared('
+  - '1017:         self,'
+  - '1018:         wait_count,'
+  evidence_id: src_a4cf418a0a40f56b
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1036
+  end_line: 1077
+  match: 'def load_block_ids(self, i):'
+  captured:
+  - load_block_ids
+  arch_scope: ''
+  evidence:
+  - '1035:     @gluon.jit'
+  - '1036:     def load_block_ids(self, i):'
+  - '1037:         # The loop calls this two tiles ahead of the copy that uses it'
+  - '1038:         seq_offset_k = i * self.cfg.TILE_SIZE + self.offs_n_k'
+  evidence_id: src_ca32159418a2d033
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1104
+  end_line: 1138
+  match: def __init__(
+  captured:
+  - __init__
+  arch_scope: ''
+  evidence:
+  - '1103:     @gluon.constexpr_function'
+  - '1104:     def __init__('
+  - '1105:         self,'
+  - '1106:         cfg,'
+  evidence_id: src_3221da631c913a81
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1141
+  end_line: 1260
+  match: def initialize(
+  captured:
+  - initialize
+  arch_scope: ''
+  evidence:
+  - '1140:     @gluon.jit'
+  - '1141:     def initialize('
+  - '1142:         cfg,'
+  - '1143:         q,'
+  evidence_id: src_8db9ce42a31368e1
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1263
+  end_line: 1284
+  match: 'def compute_qk(self, k):'
+  captured:
+  - compute_qk
+  arch_scope: ''
+  evidence:
+  - '1262:     @gluon.jit'
+  - '1263:     def compute_qk(self, k):'
+  - '1264:         S = gl.zeros('
+  - '1265:             [self.cfg.BLOCK_M, self.cfg.TILE_SIZE],'
+  evidence_id: src_15acfdd2ff941576
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1287
+  end_line: 1292
+  match: 'def apply_softcap(self, S):'
+  captured:
+  - apply_softcap
+  arch_scope: ''
+  evidence:
+  - '1286:     @gluon.jit'
+  - '1287:     def apply_softcap(self, S):'
+  - '1288:         # softcap * tanh(score / softcap), as (e - 1)/(e + 1) with e = 2**(2d) since'
+  - '1289:         # 2**-d is 1/2**d, so one exp2 instead of two, reusing the log2 in the scale.'
+  evidence_id: src_1d6f3cf91548de7d
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1295
+  end_line: 1310
+  match: 'def apply_mask_qk(self, S, j):'
+  captured:
+  - apply_mask_qk
+  arch_scope: ''
+  evidence:
+  - '1294:     @gluon.jit'
+  - '1295:     def apply_mask_qk(self, S, j):'
+  - '1296:         seq_offset = ('
+  - '1297:             j * self.cfg.TILE_SIZE'
+  evidence_id: src_6103ab55d1960f3e
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1313
+  end_line: 1327
+  match: 'def softmax_part0(self, S, M):'
+  captured:
+  - softmax_part0
+  arch_scope: ''
+  evidence:
+  - '1312:     @gluon.jit'
+  - '1313:     def softmax_part0(self, S, M):'
+  - '1314:         # more numerically stable'
+  - '1315:         # TODO: investigate why'
+  evidence_id: src_ef8418449368b4a4
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1330
+  end_line: 1337
+  match: 'def softmax_part0_cdna4(self, S, M):'
+  captured:
+  - softmax_part0_cdna4
+  arch_scope: ''
+  evidence:
+  - '1329:     @gluon.jit'
+  - '1330:     def softmax_part0_cdna4(self, S, M):'
+  - '1331:         # QK_scale > 0, so scaling the reduced vector is equivalent to scaling the tile.'
+  - '1332:         # Delaying the scaling fixes certain compilation issues'
+  evidence_id: src_d9d51388455b24fc
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1340
+  end_line: 1348
+  match: 'def softmax_part1(self, p, L, acc, alpha, target_dtype=gl.bfloat16):'
+  captured:
+  - softmax_part1
+  arch_scope: ''
+  evidence:
+  - '1339:     @gluon.jit'
+  - '1340:     def softmax_part1(self, p, L, acc, alpha, target_dtype=gl.bfloat16):'
+  - '1341:         acc = acc * alpha[:, None]'
+  - '1342:         l_ij = gl.sum(p, 1)'
+  evidence_id: src_f26d010a0729933c
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1351
+  end_line: 1364
+  match: 'def compute_pv(self, p, v, acc):'
+  captured:
+  - compute_pv
+  arch_scope: ''
+  evidence:
+  - '1350:     @gluon.jit'
+  - '1351:     def compute_pv(self, p, v, acc):'
+  - '1352:         p = gl.convert_layout(p, self.cfg.p_layout, assert_trivial=False)'
+  - '1353:         if not self.cfg.DOT_FP8:'
+  evidence_id: src_49dae0b172cf8269
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1367
+  end_line: 1404
+  match: def store_output(
+  captured:
+  - store_output
+  arch_scope: ''
+  evidence:
+  - '1366:     @gluon.jit'
+  - '1367:     def store_output('
+  - '1368:         self,'
+  - '1369:         out,'
+  evidence_id: src_92d0c8a95508f4ca
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 1407
+  end_line: 1466
+  match: def store_partial(
+  captured:
+  - store_partial
+  arch_scope: ''
+  evidence:
+  - '1406:     @gluon.jit'
+  - '1407:     def store_partial('
+  - '1408:         self,'
+  - '1409:         M,'
+  evidence_id: src_0df4d7a5d781fa42
+- snapshot: aiter_b3ad6c46
+  category: symbol_declaration
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 135
+  end_line: 144
+  match: 'def blocked3(dim0, dim1):'
+  captured:
+  - blocked3
+  arch_scope: ''
+  evidence:
+  - '133:         # to be one a lane does not span: split the tile into [outer, token, W]'
+  - '134:         # and give the lane the W run alone.'
+  - '135:         def blocked3(dim0, dim1):'
+  - '136:             t1 = min(WARP_SIZE, dim1)'
+  - '137:             t0 = WARP_SIZE // t1'
+  evidence_id: src_83f86b1d65b2ebb9
+- snapshot: aiter_b3ad6c46
+  category: waves
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 251
+  match: WARP_SIZE=64
+  captured:
+  - WARP_SIZE
+  - '64'
+  arch_scope: ''
+  evidence:
+  - '249:     NUM_WARPS,'
+  - '250:     FP8_KV,'
+  - '251:     WARP_SIZE=64,'
+  - '252:     SHUFFLED=False,'
+  - '253:     GATHER=False,'
+  evidence_id: src_0b6ec2f61d71c0c1
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 649
+  match: cache_modifier=self
+  captured:
+  - self
+  arch_scope: ''
+  evidence:
+  - '647:                 self.key_cache_ptr,'
+  - '648:                 self.k_base_offset + k_offset,'
+  - '649:                 cache_modifier=self.cfg.KV_CACHE_MODIFIER,'
+  - '650:             )'
+  - '651:         else:'
+  evidence_id: src_a4c19bdeb1c685e9
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 655
+  match: cache_modifier=self
+  captured:
+  - self
+  arch_scope: ''
+  evidence:
+  - '653:                 self.k_shared.index(buffer_id),'
+  - '654:                 self.key_cache_ptr + self.k_base_offset + k_offset,'
+  - '655:                 cache_modifier=self.cfg.KV_CACHE_MODIFIER,'
+  - '656:             )'
+  - '657:         gl.amd.cdna4.async_copy.commit_group()'
+  evidence_id: src_4c6ef89eef9dfab1
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 667
+  match: cache_modifier=self
+  captured:
+  - self
+  arch_scope: ''
+  evidence:
+  - '665:                 self.value_cache_ptr,'
+  - '666:                 self.v_base_offset + v_offset,'
+  - '667:                 cache_modifier=self.cfg.KV_CACHE_MODIFIER,'
+  - '668:             )'
+  - '669:         else:'
+  evidence_id: src_8657bc125e45b3ce
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 673
+  match: cache_modifier=self
+  captured:
+  - self
+  arch_scope: ''
+  evidence:
+  - '671:                 self.v_shared.index(buffer_id),'
+  - '672:                 self.value_cache_ptr + self.v_base_offset + v_offset,'
+  - '673:                 cache_modifier=self.cfg.KV_CACHE_MODIFIER,'
+  - '674:             )'
+  - '675:         gl.amd.cdna4.async_copy.commit_group()'
+  evidence_id: src_13e8056335ac0f83
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 967
+  match: cache_modifier=self
+  captured:
+  - self
+  arch_scope: ''
+  evidence:
+  - '965:                 self.key_cache_ptr,'
+  - '966:                 k_offset_tensor,'
+  - '967:                 cache_modifier=self.cfg.KV_CACHE_MODIFIER,'
+  - '968:             )'
+  - '969:         else:'
+  evidence_id: src_d15ec9096d2d2bc3
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 973
+  match: cache_modifier=self
+  captured:
+  - self
+  arch_scope: ''
+  evidence:
+  - '971:                 self.k_shared.index(buffer_id),'
+  - '972:                 self.key_cache_ptr + k_offset_tensor,'
+  - '973:                 cache_modifier=self.cfg.KV_CACHE_MODIFIER,'
+  - '974:             )'
+  - '975:         gl.amd.cdna4.async_copy.commit_group()'
+  evidence_id: src_9bf9f8839221961e
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 985
+  match: cache_modifier=self
+  captured:
+  - self
+  arch_scope: ''
+  evidence:
+  - '983:                 self.value_cache_ptr,'
+  - '984:                 v_offset_tensor,'
+  - '985:                 cache_modifier=self.cfg.KV_CACHE_MODIFIER,'
+  - '986:             )'
+  - '987:         else:'
+  evidence_id: src_e82d3765dbf5bd84
+- snapshot: aiter_b3ad6c46
+  category: cache_policy
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 991
+  match: cache_modifier=self
+  captured:
+  - self
+  arch_scope: ''
+  evidence:
+  - '989:                 self.v_shared.index(buffer_id),'
+  - '990:                 self.value_cache_ptr + v_offset_tensor,'
+  - '991:                 cache_modifier=self.cfg.KV_CACHE_MODIFIER,'
+  - '992:             )'
+  - '993:         gl.amd.cdna4.async_copy.commit_group()'
+  evidence_id: src_4139f3630c8c5b95
+- snapshot: aiter_b3ad6c46
+  category: lds_swizzle
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 116
+  end_line: 121
+  match: gl.PaddedSharedLayout(
+  captured:
+  - PaddedSharedLayout
+  arch_scope: ''
+  evidence:
+  - '114:         [0, 1 << ((i + lane0) % lg1)] for i in range(lg1)'
+  - '115:     ]'
+  - '116:     shared = gl.PaddedSharedLayout('
+  - '117:         interval_padding_pairs=[padding],'
+  - '118:         offset_bases=bases,'
+  evidence_id: src_30f820cb3dac415d
+- snapshot: aiter_b3ad6c46
+  category: lds_swizzle
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 146
+  end_line: 148
+  match: gl.SwizzledSharedLayout(
+  captured:
+  - SwizzledSharedLayout
+  arch_scope: ''
+  evidence:
+  - '144:             )'
+  - '146:         flat3 = gl.SwizzledSharedLayout('
+  - '147:             vec=1, per_phase=1, max_phase=1, order=[2, 1, 0]'
+  - '148:         )'
+  evidence_id: src_8e559e44538b8c40
+- snapshot: aiter_b3ad6c46
+  category: lds_swizzle
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 165
+  match: gl.SwizzledSharedLayout(
+  captured:
+  - SwizzledSharedLayout
+  arch_scope: ''
+  evidence:
+  - '163:         )'
+  - '165:     flat = gl.SwizzledSharedLayout(vec=1, per_phase=1, max_phase=1, order=[1, 0])'
+  - '166:     return blocked(TILE_SIZE * C), blocked(HEAD_SIZE * C), flat, flat'
+  evidence_id: src_503a643dc317035a
+- snapshot: aiter_b3ad6c46
+  category: lds_swizzle
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 209
+  end_line: 214
+  match: gl.PaddedSharedLayout(
+  captured:
+  - PaddedSharedLayout
+  arch_scope: ''
+  evidence:
+  - '207:         ([1 << ((i + v_N) % v_M), 0] if i < v_M else [1 << i, 0]) for i in range(LG2_TS)'
+  - '208:     ]'
+  - '209:     shared_v = gl.PaddedSharedLayout('
+  - '210:         interval_padding_pairs=[[1024, 32] if FP8_KV else [512, 32]],'
+  - '211:         offset_bases=v_offset,'
+  evidence_id: src_9dd04d40226ecf53
+- snapshot: aiter_b3ad6c46
+  category: lds_swizzle
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 238
+  match: gl.SwizzledSharedLayout(
+  captured:
+  - SwizzledSharedLayout
+  arch_scope: ''
+  evidence:
+  - '236:         order=[0, 1],'
+  - '237:     )'
+  - '238:     shared_k = gl.SwizzledSharedLayout(vec=C, per_phase=2, max_phase=8, order=[0, 1])'
+  - '239:     shared_v = gl.SwizzledSharedLayout('
+  - '240:         vec=C, per_phase=1, max_phase=1 if not FP8_KV else 8, order=[1, 0]'
+  evidence_id: src_588688f7ae99e125
+- snapshot: aiter_b3ad6c46
+  category: lds_swizzle
+  language: gluon
+  file: aiter/ops/triton/_gluon_kernels/gfx950/attention/unified_attention.py
+  line: 239
+  end_line: 241
+  match: gl.SwizzledSharedLayout(
+  captured:
+  - SwizzledSharedLayout
+  arch_scope: ''
+  evidence:
+  - '237:     )'
+  - '238:     shared_k = gl.SwizzledSharedLayout(vec=C, per_phase=2, max_phase=8, order=[0, 1])'
+  - '239:     shared_v = gl.SwizzledSharedLayout('
+  - '240:         vec=C, per_phase=1, max_phase=1 if not FP8_KV else 8, order=[1, 0]'
+  - '241:     )'
+  evidence_id: src_68d21dd63043b98b

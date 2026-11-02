@@ -1,5 +1,8 @@
 # dense_gemm
 
+[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+
+
 Dense attention and FFN projections; prefill versus decode tiling.
 
 8 AITER implementation references; 16 historical experience cards.

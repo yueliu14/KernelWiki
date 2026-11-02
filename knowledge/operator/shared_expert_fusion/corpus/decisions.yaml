@@ -1,0 +1,77 @@
+provenance:
+  schema_version: 4
+  operator_family: shared_expert_fusion
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  grouped_routes: Tokens are expanded into expert routes with explicit forward/inverse maps.
+cards:
+- id: moe-shared-expert-readiness
+  type: constraint
+  axes:
+  - shared_expert
+  - communication
+  - combine
+  match:
+    operator_families:
+    - shared_expert_fusion
+    - fused_moe_grouped_gemm
+    target_languages:
+    - flydsl
+  question: When may a fused collective consume the shared-expert partial?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The fused runner is configured to add a shared-expert output produced on a potentially separate path.
+  actions:
+  - Preserve the explicit readiness dependency before the first operation that consumes shared_partial.
+  - Keep add_shared and output ownership consistent with gather versus reduce-scatter modes; ensure the shared
+    contribution is added exactly once.
+  - Validate ragged/padded shared-partial preparation before overlapping it with routed-expert computation.
+  alternatives:
+  - Synchronize and add the shared expert in a separate step as a correctness baseline.
+  why:
+  - The host orchestration has dedicated shared-partial preparation and wait_for_shared_if_used handling around
+    collective consumption.
+  source_evidence:
+  - aiter_b3ad6c46:src_655dabf7c3f76085
+  measurement_evidence: []
+  limitations:
+  - A shared-expert speedup cannot be inferred from the presence of an overlap callback.
+  - Communication topology and scheduling are outside a single expert GEMM's contract.
+  references:
+  - knowledge/operator/shared_expert_fusion/README.md
+  - knowledge/operator/fused_moe_grouped_gemm/README.md
+- id: shared-expert-padded-partial-layout
+  type: constraint
+  axes:
+  - shared_expert
+  - communication
+  - combine
+  match:
+    operator_families:
+    - shared_expert_fusion
+    target_languages:
+    - flydsl
+  question: How is a shared-expert partial adapted to the communication runner's row layout?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected implementation matches the cited path and its input contract.
+  actions:
+  - Use the runner's shared-partial preparation path to distinguish real rows from padded collective capacity.
+  - Preserve the local-row view and rank offset before a shared contribution is consumed.
+  - Keep the readiness dependency from the shared producer even when the view operation itself performs no
+    copy.
+  alternatives:
+  - Keep a simpler implementation with the identical numerical and layout contract for comparison.
+  why:
+  - The cited source declares these operations and checks; the combination is part of its interface.
+  source_evidence:
+  - aiter_b3ad6c46:src_ca185a9d80571fcd
+  - aiter_b3ad6c46:src_b4f6dd82b97d2c6c
+  measurement_evidence: []
+  limitations:
+  - This is an implementation precedent, not a measured performance preference on a new workload.
+  references:
+  - knowledge/operator/shared_expert_fusion/README.md
+shared_cards: []

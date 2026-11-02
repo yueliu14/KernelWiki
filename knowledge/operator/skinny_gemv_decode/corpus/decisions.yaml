@@ -1,0 +1,187 @@
+provenance:
+  schema_version: 4
+  operator_family: skinny_gemv_decode
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  lds_staging: 'The design stages at least one operand tile through LDS: it is stored to LDS and the MFMA fragments
+    are read back from it.'
+  reused_weight: B, the weight, is reused across calls, so a one-time host-side layout transform such as a
+    preshuffle is paid once per weight rather than per call.
+  split_k_hot_loop: The K loop is hand-scheduled with ROCm scheduling directives over LDS-staged operands,
+    as the FlyDSL split-K HGEMM hot loop is.
+cards:
+- id: flydsl-small-m-hgemm-family
+  type: performance_candidate
+  axes:
+  - implementation_variant
+  - architecture_capability
+  - workgroup_tile
+  - work_partition
+  - execution_geometry
+  match:
+    operator_families:
+    - dense_gemm
+    - skinny_gemv_decode
+    target_languages:
+    - flydsl
+    dtypes:
+    - bf16
+    exclude_gfx:
+    - gfx942
+    shape:
+      m_max: 16
+  question: What does AITER do differently when M is a handful of rows, and which knobs does that open?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - operator_family=gemm
+  - target_language=flydsl
+  - M is small — the shipped routing threshold is M < 17
+  - dtype is bf16
+  actions:
+  - 'Check the architecture first. gfx942 is excluded by the source: the compile entry point raises and the
+    config registry returns an empty set before it looks at the shape. gfx950 is where the registry is exercised;
+    other architectures are not excluded by the gate but have no shipped configuration. On gfx942 read this
+    card as a porting reference.'
+  - 'Treat small M as a different kernel family rather than the generic kernel with a smaller tile: AITER routes
+    it to a separate implementation selected by an explicit kernel_family value.'
+  - In that family tile_m is fixed at 16 with block_m_warps=1 and 2 stages — the M dimension stops being a
+    search axis, and the search moves entirely onto N and K.
+  - Search tile_n far wider than the generic family allows — the shipped set runs (32, 64, 96, 128, 160, 192,
+    224, 256, 384, 512, 768, 1024) — with tile_k in (32, 64, 96, 128, 160, 192, 256) and split_k up to 32.
+  - 'Consider the axes this family adds and the generic one does not: n_tile_repeat, persistent_n_tiles, waves_per_eu
+    and a b_to_lds unroll factor.'
+  - 'Respect the combination rules: n_tile_repeat > 1 only without B-in-LDS and only for the two shipped shapes;
+    persistent_n_tiles > 1 only with B-in-LDS, tile_n >= 128, block_n_warps >= 2 and no more persistent tiles
+    than N/tile_n.'
+  - 'Give the generic family a real arm, not a token one: all 86 FlyDSL rows AITER ships for gfx950 bf16 at
+    M<=16 are generic-family kernels (mostly tile_m=32 with split_k 4-16), none from this family. The database
+    does not say whether this family was in that race.'
+  alternatives:
+  - Stay on the generic family with a small tile_m and split_k > 1 when a second kernel cannot be written or
+    maintained; that is what AITER shipped for these buckets and is the cheaper first move.
+  - Port the HIP skinny kernels' structure instead — rows spread over CUs, K split across the lanes of a wave,
+    no combine (gemm-skinny-decode-wave-split). That is what AITER's default route runs for an untuned bf16
+    decode case, on both architectures.
+  - Keep the generic default configuration as the control arm regardless of which family is chosen.
+  why:
+  - A skinny-M GEMM is bounded by how much of the machine the few M tiles can occupy, and every axis this family
+    adds — repeat, persistent tiles, waves per EU — is an occupancy axis rather than a tiling one.
+  - The routing threshold, the fixed tile_m and the option sets are stated as named constants in the source,
+    so the boundary between the two families is readable rather than folklore.
+  source_evidence:
+  - aiter_a6bb4993:src_38699a8ce57faf0c
+  - aiter_a6bb4993:src_8ffea30406cf0355
+  - aiter_a6bb4993:src_bca963564a69909c
+  - aiter_a6bb4993:src_b446c07f43b11542
+  - aiter_a6bb4993:src_034b3cc6e3fd6aa8
+  - aiter_a6bb4993:src_390ae8578e28ce34
+  - aiter_a6bb4993:src_60717171485c58f5
+  - aiter_a6bb4993:src_ee5e839c6374f38f
+  - aiter_a6bb4993:src_a7c0de9870934fc0
+  - aiter_a6bb4993:src_28936b493eeb6f6f
+  - aiter_a6bb4993:src_1dcdf9c7b6794c6e
+  - aiter_a6bb4993:src_44b5602aacc7e7df
+  - aiter_a6bb4993:src_cceaeb92fb86b540
+  - aiter_a6bb4993:src_bc6d04baf2182ba4
+  - aiter_a6bb4993:src_7eee3f6769348b4c
+  - aiter_a6bb4993:src_e04716b6d760605b
+  shipped_evidence:
+  - aiter_a6bb4993:cfg_973fe63f897809df
+  references:
+  - knowledge/general/backend/flydsl/knobs.md:77-80
+  - knowledge/general/backend/flydsl/patterns.md:78-82
+  - knowledge/operator/skinny_gemv_decode/backend/flydsl.md:19-28
+  measurement_evidence: []
+  limitations:
+  - On gfx942 none of this is callable; see the first action. The rest of the card describes the gfx950 path.
+  - That AITER maintains a separate family for small M is a design precedent, not a measurement that it beats
+    a well-tuned generic configuration on your shape.
+  - The option sets are what the shipped registry enumerates; they are candidates to search, and nothing here
+    says which member wins.
+  - The family is bf16-only and its LDS budget is its own; do not carry its constants into the generic kernel.
+- id: gemm-skinny-decode-wave-split
+  type: performance_candidate
+  axes:
+  - work_partition
+  - execution_geometry
+  - memory_access
+  - implementation_variant
+  match:
+    operator_families:
+    - dense_gemm
+    - skinny_gemv_decode
+    - scaled_quant_gemm
+    target_languages:
+    - flydsl
+    regimes:
+    - decode
+  question: How does AITER's hand-written HIP skinny GEMM organise work for M <= 16, and what can a FlyDSL
+    decode kernel take from it?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - target_language=flydsl
+  - 'decode: M is a handful of rows (AITER''s skinny route covers M <= 16), so an MFMA tile along M is mostly
+    padding'
+  actions:
+  - 'Stage the whole activation in LDS when it fits and keep it there for the workgroup''s lifetime: the `_sml_`
+    variant reserves 64 KB — one workgroup per CU on gfx942''s 64 KB LDS, as the source comment intends, while
+    gfx950''s 160 KB would fit two — and is chosen when K*M <= 32K elements for bf16/fp16 (64K for the fp8
+    variant); up to 1.2x of that the `_hf_` variant, beyond it `_big_`.'
+  - 'Split the output rows over every CU and the K dimension over the lanes: each wave owns YTILE rows of the
+    weight, waves per workgroup are sized with `mindiv(rows, CuCount * YTILE, WvPrGrp)`, and each lane takes
+    A_CHUNK elements of K per step.'
+  - Reduce the lanes' partial dot products inside the wave with cross-lane shuffles (`__shfl_xor`, `__shfl`)
+    — no second kernel and no atomics.
+  - 'Treat the knobs as a family, not constants: THRDS, YTILE, WvPrGrp, A_CHUNK and UNRL are template parameters
+    of every variant.'
+  - 'Compare with the FlyDSL small-M HGEMM (flydsl-small-m-hgemm-family), which answers the same regime with
+    16-row MFMA tiles: choose the structure for a FlyDSL decode kernel by measurement, not by precedent.'
+  alternatives:
+  - An MFMA tile with split-K across workgroups (gemm-split-k-when-grid-underfills) — what the FlyDSL HGEMM
+    and the Triton baselines do at decode.
+  why:
+  - It is AITER's default bf16/fp16 decode kernel (gemm-default-backend-routing), and its launcher is the grid-fill
+    rule for decode written in HIP.
+  source_evidence:
+  - aiter_a6bb4993:src_b8e76e6d00fd7ca3
+  - aiter_a6bb4993:src_abfa46c903cb04ea
+  - aiter_a6bb4993:src_abb2ef768886f8dc
+  - aiter_a6bb4993:src_4afbdde799d96232
+  - aiter_a6bb4993:src_e32202e7a829f4ab
+  - aiter_a6bb4993:src_0b8de37c2b304d4a
+  - aiter_a6bb4993:src_c99341de831ed9d8
+  - aiter_a6bb4993:src_f9a2106c23412f25
+  - aiter_a6bb4993:src_d33d9c364eba88bd
+  - aiter_a6bb4993:src_d78de056f0337d85
+  - aiter_a6bb4993:src_5147e7cddd350323
+  - aiter_a6bb4993:src_2577a978dcbebafb
+  references:
+  - knowledge/operator/skinny_gemv_decode/tuning.md:16-33
+  - knowledge/general/backend/flydsl/knobs.md:77-80
+  measurement_evidence: []
+  limitations:
+  - The HIP family is fp16/bf16 plus an fp8 variant that multiplies by two scalar (per-tensor) scales at the
+    end; a block-scale decode kernel still needs the per-K-block scale loop.
+  - 'Its structure is a precedent for a FlyDSL decode kernel, not a drop-in: FlyDSL has no skinny kernel in
+    AITER to copy.'
+shared_cards:
+- flydsl-async-copy-by-family
+- flydsl-gfx942-path-gates
+- flydsl-half-mfma-call-forms
+- flydsl-hgemm-config-space
+- flydsl-hgemm-tiling-validity
+- flydsl-host-launch-contract
+- flydsl-lds-pipeline-depth
+- flydsl-mfma-fragment-lane-layout
+- flydsl-preshuffle-b-layout-contract
+- flydsl-splitk-hot-loop-schedule-bundle
+- flydsl-splitk-reduction-contract
+- flydsl-test-parity-gate
+- flydsl-xor16-lds-layout-consistency
+- gemm-asm-tile-inventory-and-selection
+- gemm-default-backend-routing
+- gemm-shape-regime-routing
+- gemm-split-k-when-grid-underfills
+- gemm-streamed-operand-cache-policy

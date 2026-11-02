@@ -1,0 +1,44 @@
+schema_version: 2
+operator: attention_decode_paged
+sources:
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/pa_decode_kernel.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/pa_decode_plan.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/pa_decode_reduce.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/triton/_triton_kernels/attention/unified_attention.py
+  language: triton
+  include_symbols: true
+validation_sources:
+- snapshot: aiter_b3ad6c46
+  file: op_tests/cpp/test_pa_decode_gluon_aot.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/op_benchmarks/triton/bench_pa_decode.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/op_benchmarks/triton/bench_paged_attention_output_gate.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/op_benchmarks/triton/bench_unified_attention.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_flydsl_pa_decode.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_pa_decode_bf16_asm.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/attention/test_pa_decode.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/attention/test_paged_attention_output_gate.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/attention/test_unified_attention.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/triton_tests/test_pa_decode_gluon.py
+coverage_notes:
+- Source observations and conditioned candidates for attention decode paged; source presence is not a measured
+  winner.
+- No new GPU measurements or binary disassembly are included.

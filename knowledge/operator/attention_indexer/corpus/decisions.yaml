@@ -1,0 +1,309 @@
+provenance:
+  schema_version: 4
+  operator_family: attention_indexer
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  paged_kv: The design resolves logical KV positions through a physical page table.
+  distributed_candidates: Top-k candidates are gathered from multiple ranks in a declared ownership order.
+cards:
+- id: indexer-mqa-score-semantics
+  type: semantic
+  axes:
+  - score_semantics
+  - numerical_contract
+  match:
+    operator_families:
+    - attention_indexer
+    target_languages:
+    - triton
+    - flydsl
+    - gluon
+  question: What does the DeepSeek-style MQA indexer compute before top-k?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The workload uses weighted, rectified MQA logits over a per-query KV window.
+  actions:
+  - Preserve logits[m,n] = sum_h ReLU(dot(Q[m,h,:], K[n,:]) * kv_scale[n]) * weights[m,h].
+  - Keep rectification before the head reduction and preserve the signed head weights and KV scale placement.
+  - Validate selected indices after top-k as well as score error; small score changes near the cutoff may change
+    the sparse attention input.
+  alternatives:
+  - Use a direct FP32 scoring expression and top-k over the same valid window as a reference.
+  why:
+  - The Triton score kernel performs the dot, KV scaling, ReLU, per-head weighting and reduction without softmax
+    or a value projection.
+  source_evidence:
+  - aiter_b3ad6c46:src_e7b7a5ef2934fb22
+  measurement_evidence: []
+  limitations:
+  - This is not ordinary softmax attention and not the MiniMax page-max scoring contract.
+  references:
+  - knowledge/operator/attention_indexer/README.md
+  solutions:
+  - backend: flydsl
+    mechanism: The host API supplies the same Q, KV, scales, weights and row windows to explicitly selected
+      kernel variants.
+    source_evidence:
+    - aiter_b3ad6c46:src_744823ffb69cb339
+- id: indexer-fp8-architecture-format
+  type: constraint
+  axes:
+  - numerical_contract
+  - implementation_contract
+  match:
+    operator_families:
+    - attention_indexer
+    target_languages:
+    - flydsl
+    gfx:
+    - gfx942
+    - gfx950
+  question: Which FP8 format conversions does the contiguous FlyDSL MQA logits path require?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected path is flydsl_fp8_mqa_logits on gfx942 or gfx950.
+  actions:
+  - On gfx950, respect the wrapper's native e4m3fn Q/KV requirement.
+  - On gfx942, keep the FN-to-FNUZ byte interpretation, negative-zero handling and compensating scale factor
+    together; each FN operand contributes a factor of two.
+  - Retain the wrapper's contiguous Q/KV materialization and logical-rank restoration for single-token scales
+    and weights.
+  alternatives:
+  - Use a native-format path or an explicit higher-precision reference before attempting a byte reinterpretation.
+  why:
+  - The host wrapper explicitly distinguishes the two architectures and adjusts kv_scales consistently with
+    operand recasting.
+  source_evidence:
+  - aiter_b3ad6c46:src_744823ffb69cb339
+  measurement_evidence: []
+  limitations:
+  - The conversion is specific to the stated e4m3 formats and implementation; it is not a generic FP8 cast
+    rule.
+  references:
+  - knowledge/operator/attention_indexer/README.md
+- id: indexer-window-and-clean-output
+  type: constraint
+  axes:
+  - score_semantics
+  - selection_contract
+  - implementation_contract
+  match:
+    operator_families:
+    - attention_indexer
+    target_languages:
+    - flydsl
+    - triton
+  question: Who initializes logits outside each query's valid window?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The score buffer may be consumed by top-k over a larger allocated row.
+  actions:
+  - Preserve the half-open [cu_starts, cu_ends) validity interval and mask the tail.
+  - With clean_logits=True the FlyDSL kernel writes negative infinity outside the window; with False the caller
+    owns the skipped positions.
+  - Never feed uninitialized or stale out-of-window values into a selector that does not independently honor
+    the same bounds.
+  alternatives:
+  - Initialize invalid scores explicitly, or use a selector with verified matching row bounds.
+  why:
+  - The public FlyDSL API makes output cleaning an explicit behavior flag rather than an unconditional prefill
+    of the output tensor.
+  source_evidence:
+  - aiter_b3ad6c46:src_744823ffb69cb339
+  measurement_evidence: []
+  limitations:
+  - Skipping output cleaning is only valid when the downstream validity contract excludes those positions.
+  references:
+  - knowledge/operator/attention_indexer/README.md
+- id: indexer-paged-mxfp4-layout
+  type: constraint
+  axes:
+  - cache_layout
+  - numerical_contract
+  - implementation_contract
+  match:
+    operator_families:
+    - attention_indexer
+    target_languages:
+    - flydsl
+    requires:
+    - paged_kv
+  question: Which packed payload, scale and tile constraints accompany paged MXFP4 scoring?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The candidate targets build_pa_mqa_logits_fp4_module and its packed cache representation.
+  actions:
+  - Keep packed Q/KV bytes, E8M0 scale indexing and physical block-table addressing aligned; head_dim is not
+    the byte width of a packed row.
+  - Enforce head_dim multiples of 128, head-count/MFMA alignment and page/block tile divisibility from the
+    builder.
+  - Preserve the per-K-tile Q and KV scale application inside scaled MFMAs rather than substituting one scale
+    for a whole row.
+  alternatives:
+  - Use explicit unpack/dequant scoring as a reference for the same logical cache.
+  why:
+  - The builder separately derives packed data and KV-scale strides and applies scale_a/scale_b for each compute
+    tile.
+  source_evidence:
+  - aiter_b3ad6c46:src_e48c6dafa5c4e45b
+  measurement_evidence: []
+  limitations:
+  - A contiguous FP8 score kernel cannot consume this cache by changing dtype alone.
+  - Builder existence is not proof that the current host route enables this variant.
+  references:
+  - knowledge/operator/attention_indexer/README.md
+- id: indexer-minimax-page-max-score
+  type: semantic
+  axes:
+  - score_semantics
+  - cache_layout
+  - numerical_contract
+  match:
+    operator_families:
+    - attention_indexer
+    target_languages:
+    - flydsl
+    gfx:
+    - gfx950
+  question: How does MiniMax block scoring differ from per-token MQA logits?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The task is the MiniMax-M3 decode page-score implementation on gfx950.
+  actions:
+  - Compute a maximum over the tokens in each page for each query/head feature, respecting the per-query causal
+    cutoff.
+  - Keep the source's FP8-cache-to-BF16 widening before the BF16 dot when Q is BF16; rounding Q down changes
+    the ranking contract.
+  - Match the page layout, supported dimensions and output score layout before choosing decode or prefill tiling.
+  alternatives:
+  - Use a reference that widens K to Q precision, scores each token and takes the page maximum.
+  why:
+  - The source uses token-major MFMA fragments so much of the page maximum is reduced within registers, with
+    final lane reductions.
+  source_evidence:
+  - aiter_b3ad6c46:src_4822325ce3d92482
+  - aiter_b3ad6c46:src_9b289ddfb1f104a8
+  measurement_evidence: []
+  limitations:
+  - This page-max score is not the DeepSeek weighted-ReLU head sum.
+  - The cited geometry is a gfx950 implementation, not a universal 128-token-page recommendation.
+  references:
+  - knowledge/operator/attention_indexer/README.md
+- id: indexer-score-work-partition
+  type: performance_candidate
+  axes:
+  - work_partition
+  - compute_schedule
+  match:
+    operator_families:
+    - attention_indexer
+    target_languages:
+    - flydsl
+    - triton
+    - gluon
+  question: How should scoring work be partitioned across short decode and long prefill rows?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - Correct scoring exists but query-row count and valid KV window lengths leave an uneven grid.
+  actions:
+  - Try query-row grouping and KV splitting with the exact row-window contract, keeping any split workspace
+    and completion protocol.
+  - Use the wrapper's variant resolver and split policy as legal starting points; they are shape- and architecture-dependent.
+  - Account for score writes and top-k/merge work when comparing partitions rather than considering only the
+    dot-product body.
+  alternatives:
+  - Keep an unsplit row-per-program score kernel for comparison.
+  why:
+  - The FlyDSL host module separates _auto_variant and _auto_num_splits and derives split choices from shape
+    and CU count.
+  source_evidence:
+  - aiter_b3ad6c46:src_1477d451c719b073
+  - aiter_b3ad6c46:src_e4ca822ec3a190b3
+  measurement_evidence: []
+  limitations:
+  - An upstream heuristic is not a measured winner for a new shape or GPU.
+  references:
+  - knowledge/operator/attention_indexer/README.md
+- id: indexer-topk-row-index-contract
+  type: constraint
+  axes:
+  - selection_contract
+  - implementation_contract
+  match:
+    operator_families:
+    - attention_indexer
+    target_languages:
+    - flydsl
+  question: What must a top-k implementation preserve beyond score values?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - A per-row selector converts scores into the indices consumed by sparse attention.
+  actions:
+  - Validate effective row lengths, k, output index dtype and strides, and optional score outputs.
+  - For packed rows, preserve the convention that output indices are relative to row_starts, while plane_width
+    bounds the launch geometry.
+  - Check tie behavior and padding explicitly for the selected implementation; a stable parameter in a wrapper
+    signature is not proof that every fast path enforces stable ordering.
+  - For graph capture, initialize the split path's stream-local arrival state on the capture stream as documented
+    by the wrapper.
+  alternatives:
+  - Compare against a reference top-k with an explicitly stated tie convention and row bounds.
+  why:
+  - The host wrapper validates tensor signatures, has packed-row inputs, and dispatches between one-workgroup
+    and split implementations.
+  source_evidence:
+  - aiter_b3ad6c46:src_f484e96fd009362f
+  - aiter_b3ad6c46:src_37b61d0cec250b59
+  measurement_evidence: []
+  limitations:
+  - Score closeness alone does not prove index equivalence.
+  - Allocated row width and effective per-request context length are separate quantities.
+  references:
+  - knowledge/operator/attention_indexer/README.md
+- id: indexer-dcp-merge-ownership
+  type: constraint
+  axes:
+  - distributed_merge
+  - selection_contract
+  - cache_layout
+  match:
+    operator_families:
+    - attention_indexer
+    target_languages:
+    - flydsl
+    requires:
+    - distributed_candidates
+  question: How does DCP top-k merge preserve rank ownership and physical KV slots?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected implementation merges rank-major candidate scores for qlen=1 decode.
+  actions:
+  - 'Keep gathered candidate columns in rank-major order: column // local_k identifies the owner rank.'
+  - Pad unused score candidates with negative infinity, not zero; another rank's plane has no local index liveness
+    signal.
+  - Provide int32 block tables, indices, indptr, staging and counts with the validated capacity; convert the
+    owned winning logical tokens to physical cache slots.
+  - Respect the wave64 and qlen=1 restrictions and warm each compiled shape before graph capture.
+  alternatives:
+  - Keep candidate gathering, global selection and rank-local packing as explicit stages while validating ownership.
+  why:
+  - The merge API documents positional ownership, and its validator checks dtype, dimensionality, rank range
+    and output capacities.
+  source_evidence:
+  - aiter_b3ad6c46:src_6a4f259be2e3b17c
+  - aiter_b3ad6c46:src_ebe0c6b763af4201
+  measurement_evidence: []
+  limitations:
+  - This merge does not implement the all-gather itself.
+  - The decode-only row/indptr contract cannot be assumed valid for arbitrary prefill queries.
+  references:
+  - knowledge/operator/attention_indexer/README.md
+shared_cards: []

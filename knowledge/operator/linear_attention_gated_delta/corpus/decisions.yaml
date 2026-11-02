@@ -1,0 +1,110 @@
+provenance:
+  schema_version: 4
+  operator_family: linear_attention_gated_delta
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits:
+  paged_kv: The design reads a paged KV cache.
+cards:
+- id: attention-gated-delta-state-contract
+  type: constraint
+  axes:
+  - recurrent_state
+  - implementation_contract
+  match:
+    operator_families:
+    - linear_attention_gated_delta
+    target_languages:
+    - flydsl
+    - gluon
+  question: What state and index contracts distinguish gated-delta decode from softmax attention?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The workload executes the recurrent gated-delta decode path.
+  actions:
+  - Preserve the distinction between read_indices and write_indices; both default to indices but may designate
+    different state slots.
+  - Respect the state alignment, dtype and Q/K last-dimension stride checks; use need_shuffle_state only with
+    its corresponding layout conversion.
+  - Validate the updated recurrent state as well as the visible output, including multi-step execution and
+    state-slot reuse.
+  alternatives:
+  - Use the unfused recurrent state update as a correctness reference; evaluate prefill/chunk implementations
+    separately.
+  why:
+  - flydsl_gdr_decode explicitly validates index dtypes and state layout before selecting its tiling and launching
+    the recurrent update.
+  source_evidence:
+  - aiter_b3ad6c46:src_c67a55e3e97ebe90
+  measurement_evidence: []
+  limitations:
+  - Softmax KV-split reduction is not an implementation of this recurrence.
+  - A one-step output match does not verify the next token's state.
+  references:
+  - knowledge/operator/linear_attention_gated_delta/README.md
+- id: gated-delta-prefill-state-and-snapshots
+  type: constraint
+  axes:
+  - recurrent_state
+  - implementation_contract
+  match:
+    operator_families:
+    - linear_attention_gated_delta
+    target_languages:
+    - flydsl
+  question: How are persistent states and per-chunk snapshots distinguished in gated-delta prefill?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected implementation matches the cited path and its input contract.
+  actions:
+  - Keep persistent state_dtype separate from snapshot_dtype, which controls the per-chunk h snapshots.
+  - When initial_state_indices is provided, supply a state pool and enable in-place final-state write-back
+    with output_final_state=True.
+  - Preserve the public [...,V,K] state layout and contiguous K/W/U inputs; reuse valid host metadata for varlen
+    chunk scheduling.
+  alternatives:
+  - Keep a simpler implementation with the identical numerical and layout contract for comparison.
+  why:
+  - The cited source declares these operations and checks; the combination is part of its interface.
+  source_evidence:
+  - aiter_b3ad6c46:src_fa1931cd4a8e61ea
+  measurement_evidence: []
+  limitations:
+  - Changing snapshot precision can change resource use and numerical behavior independently of persistent-state
+    precision.
+  - Prefill state semantics cannot be inferred from the decode output shape alone.
+  references:
+  - knowledge/operator/linear_attention_gated_delta/README.md
+- id: gated-delta-mtp-parent-snapshots
+  type: constraint
+  axes:
+  - recurrent_state
+  - implementation_contract
+  match:
+    operator_families:
+    - linear_attention_gated_delta
+    target_languages:
+    - flydsl
+  question: What state semantics change for multi-token prediction over a draft tree?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected implementation matches the cited path and its input contract.
+  actions:
+  - Keep the sequence pool slot separate from the per-token intermediate-state buffers.
+  - With retrieve_parent_token, restart each token from its parent snapshot; without it, the draft is a chain.
+  - Pass intermediate_states_buffer and intermediate_state_indices together, and honor disable_state_update
+    when verification must leave the pool unchanged.
+  alternatives:
+  - Keep a simpler implementation with the identical numerical and layout contract for comparison.
+  why:
+  - The cited source declares these operations and checks; the combination is part of its interface.
+  source_evidence:
+  - aiter_b3ad6c46:src_c90d6f1a5c4c63f3
+  measurement_evidence: []
+  limitations:
+  - This is an implementation precedent, not a measured performance preference on a new workload.
+  references:
+  - knowledge/operator/linear_attention_gated_delta/README.md
+shared_cards: []

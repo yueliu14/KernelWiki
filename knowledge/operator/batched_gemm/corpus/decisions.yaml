@@ -1,0 +1,83 @@
+provenance:
+  schema_version: 4
+  operator_family: batched_gemm
+  curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
+traits: {}
+cards:
+- id: batched-mxfp8-scale-layout
+  type: constraint
+  axes:
+  - runtime_contract
+  - operand_layout
+  match:
+    operator_families:
+    - batched_gemm
+    target_languages:
+    - flydsl
+  question: Which batch and scale layouts does the MXFP8 BMM wrapper accept?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected implementation matches the cited path and its input contract.
+  actions:
+  - Preserve XQ [M,B,K], preshuffled WQ [B,N,K] and Out [M,B,N]; batch is not a freely broadcast dimension
+    in this entry point.
+  - Select a runner using the architecture, weight-scale block and activation-scale orientation together.
+  - On the gfx950 path distinguish 32x32 from 128x128 weight-scale blocks and row-major from the supported
+    column-major activation scales.
+  alternatives:
+  - Keep a simpler implementation with the identical numerical and layout contract for comparison.
+  why:
+  - The cited source declares these operations and checks; the combination is part of its interface.
+  source_evidence:
+  - aiter_b3ad6c46:src_0c6d9aed9bf8a1da
+  - aiter_b3ad6c46:src_5fe68591fabd20e2
+  measurement_evidence: []
+  limitations:
+  - This is an implementation precedent, not a measured performance preference on a new workload.
+  references:
+  - knowledge/operator/batched_gemm/README.md
+- id: batched-mxfp8-fallback-configuration
+  type: performance_candidate
+  axes:
+  - workgroup_tile
+  - work_partition
+  - pipeline_schedule
+  match:
+    operator_families:
+    - batched_gemm
+    target_languages:
+    - flydsl
+  question: How can batched GEMM tile, buffering and split choices be seeded legally?
+  evidence_level: source_observed
+  status: candidate_only
+  conditions:
+  - The selected implementation matches the cited path and its input contract.
+  actions:
+  - 'Treat the parsed kernel name as a configuration bundle: tile M/N/K, warp grid, buffers, K splits, direct-B
+    mode and scale preloading.'
+  - Use the shape tier as a starting point and retain the fallback legality search over narrower tiles, fewer
+    stages and per-stage scales.
+  - Check the complete configuration before compiling; direct-B candidates and LDS-staged candidates have different
+    split policies.
+  alternatives:
+  - Keep a simpler implementation with the identical numerical and layout contract for comparison.
+  why:
+  - The cited source declares these operations and checks; the combination is part of its interface.
+  source_evidence:
+  - aiter_b3ad6c46:src_48ce71b95815ba5a
+  - aiter_b3ad6c46:src_4036c46474899d75
+  - aiter_b3ad6c46:src_0d0df7919d9edf67
+  measurement_evidence: []
+  limitations:
+  - This is an implementation precedent, not a measured performance preference on a new workload.
+  references:
+  - knowledge/operator/batched_gemm/README.md
+shared_cards:
+- flydsl-async-copy-by-family
+- flydsl-gfx942-path-gates
+- flydsl-half-mfma-call-forms
+- flydsl-xor16-lds-layout-consistency
+- gemm-shape-regime-routing
+- gemm-streamed-operand-cache-policy
+- gemm-workgroup-xcd-mapping

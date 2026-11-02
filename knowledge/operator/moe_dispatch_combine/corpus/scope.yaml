@@ -1,0 +1,32 @@
+schema_version: 2
+operator: moe_dispatch_combine
+sources:
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  language: flydsl
+  include_symbols: true
+- snapshot: aiter_b3ad6c46
+  file: aiter/ops/triton/_triton_kernels/moe/reduce.py
+  language: triton
+  include_symbols: true
+validation_sources:
+- snapshot: aiter_b3ad6c46
+  file: op_tests/multigpu_tests/test_dispatch_combine.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/multigpu_tests/test_mori_all2all.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/multigpu_tests/test_sp_head_exchange.py
+- snapshot: aiter_b3ad6c46
+  file: op_tests/test_all2all_manager_lifecycle.py
+coverage_notes:
+- Source observations and conditioned candidates for moe dispatch combine; source presence is not a measured
+  winner.
+- No new GPU measurements or binary disassembly are included.
