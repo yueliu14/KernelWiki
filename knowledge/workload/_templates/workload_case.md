@@ -35,10 +35,17 @@ Separate implementation eligibility, caller dispatch and observed coverage. List
 
 ## Evidence or proposed experiment
 
-For source-only cases, state what was inspected and what remains unknown. For an experiment, identify exact baseline/candidate revisions, the variable changed, expected effect, semantic checks and cases likely to regress. Launch counts may remain unchanged.
+For source-only cases, state what was inspected, whether it is publicly accessible and what remains
+unknown. Cite public source links or evidence IDs with explicit availability. Keep private source
+locations, hashes and raw run mappings outside this repository. For an experiment, identify exact
+baseline/candidate revisions, the variable changed, expected effect, semantic checks and cases likely
+to regress. Launch counts may remain unchanged.
 
 Measure the same complete subgraph boundary under comparable inputs, layouts, routing, graph mode and cache policy. Report correctness (including state mutations), latency/noise, workload weights, scratch footprint and relevant stage/communication timing. A single-kernel speedup or a logical byte reduction does not establish a subgraph or serving improvement.
 
 ## Transferable lesson and limits
 
-State the reusable conclusion, conditions under which it applies and unresolved questions. Link the relevant topic pages, constituent operators and source/measurement artifacts. For fusion-specific comparisons, also use the [fusion supplement](fusion_case.md).
+State the reusable conclusion, conditions under which it applies and unresolved questions. Link the
+relevant topic pages, constituent operators and public evidence summaries. Publish a scoped validation
+summary; retain raw measurements, traces and candidate artifacts privately. For fusion-specific
+comparisons, also use the [fusion supplement](fusion_case.md).

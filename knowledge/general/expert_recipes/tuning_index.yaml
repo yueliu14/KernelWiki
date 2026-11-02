@@ -1,22 +1,10 @@
-# tuning_index.yaml — the selector descriptor for the VENDORED tuning skillset.
-#
-# Why this file exists at all, given that every other expert skill declares its own selector fields in
-# its skill.md frontmatter: the tuning skills are vendored from upstream and hash-pinned as ONE tree
-# (e2e_workflow/knowledge/tuning_skillset.manifest.sha256). Adding GEAK-specific frontmatter inside
-# `tuning/` would make the pin fail on every re-sync and turn a byte-exact vendoring into a fork. So the
-# selector metadata lives OUT here, next to the index it feeds, and the tree underneath stays untouched.
-#
-# `scaffold.py --reindex` reads this file and merges the entries into index.yaml with `scope: tuning`,
-# alongside the skills/ entries — same schema, same filter, same validation gate. Edit the metadata here;
-# never edit index.yaml by hand.
-#
-# validation_status is NOT written here. It is computed at reindex time from validate/claims.py output:
-# the four reports the skillset ships (`tuning/validate/report_*.json`) by default, or a fresh run
-# (`--claims-report out.json`) when you want the status of the image you are actually in. A skill with a
-# FAIL anywhere is demoted to `draft`; a skill with nothing but N/A is `unvalidated`, because an image
-# that cannot answer has not answered. Only `validated` skills are auto-applied.
+# Selector metadata for the locally maintained tuning procedures.
+# Keep metadata here and regenerate index.yaml with _contribute/scaffold.py --reindex.
+# The upstream manifest is historical provenance; it does not freeze this local copy.
+# Validation statuses are derived from recorded claim reports or an explicit --claims-report.
+# Their environment and source revision must be checked before treating them as current validation.
 
-tree: tuning                     # relative to expert_skills/; the vendored, hash-pinned root
+tree: tuning                     # relative to this expert_recipes directory
 
 skills:
 - id: tuning_core

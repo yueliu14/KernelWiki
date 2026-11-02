@@ -37,8 +37,8 @@ expert_skills/
 ├── skills/<id>/               # one SUBDIRECTORY per skill
 │   ├── skill.md               #   the main recipe (frontmatter selector + body) — REQUIRED
 │   └── ...                    #   optional extra files: reference kernels, configs, validation manifest
-├── tuning/                    # the VENDORED tuning skillset, hash-pinned WHOLE and unmodified
-│   ├── tuning-<backend>/SKILL.md   #   one skill per backend, upstream layout, byte-for-byte
+├── tuning/                    # locally maintained copy of imported tuning methods
+│   ├── tuning-<backend>/SKILL.md   #   one skill per backend, retaining source attribution
 │   └── validate/claims.py     #   its own executable validator (drives validation_status)
 ├── _template/                 # SKILL_TEMPLATE.md + validation_manifest.yaml
 └── _contribute/               # the "add a skill to GEAK" skill: scaffold / validate / make_pr / SKILL.md
@@ -48,13 +48,10 @@ Each skill lives in its own directory `skills/<id>/` so a skill that needs more 
 kernel, tuned config JSONs, a custom validation manifest — can carry those files alongside its
 `skill.md`. The selector (`index.yaml`) always points at `skills/<id>/skill.md`.
 
-`tuning/` is the one skill family that does not follow that layout, because it is not ours to lay
-out: it is vendored from upstream and pinned byte-for-byte by
-`e2e_workflow/knowledge/tuning_skillset.manifest.sha256`, so putting GEAK frontmatter inside it would
-break the pin on the next re-sync and quietly turn a vendoring into a fork. Its selector metadata
-therefore lives in `tuning_index.yaml` and is merged into `index.yaml` by the same
-`scaffold.py --reindex` that indexes everything else — same schema, same filter, same gate. Edit
-`tuning_index.yaml`; never `index.yaml`, and never anything under `tuning/`.
+`tuning/` retains the imported per-backend layout. Its selector metadata lives in `tuning_index.yaml`
+and is merged into `index.yaml` by `scaffold.py --reindex`. Edit the source metadata and regenerate
+the index. Local changes to the methods are allowed through review; retain attribution and revisit
+any validation claims affected by the change.
 
 ## How a skill is selected by the workflows
 
@@ -114,11 +111,16 @@ bash   _contribute/make_pr.sh <slug>                                            
 
 ## Canonical copy
 
-KernelWiki maintains this imported copy with Git. Preserve its upstream attribution and distinguish
-local changes from the imported version. The vendored `tuning/` subtree remains pinned by
-[`tuning_skillset.manifest.sha256`](../workflows/geak/tuning_skillset.manifest.sha256); the selector
-metadata and validation reports describe their recorded revisions. This repository has no automatic
-sync or automatic validation-status refresh.
+KernelWiki maintains this imported copy with Git. The local Git revision identifies the maintained
+files. [`tuning_skillset.manifest.sha256`](../workflows/geak/tuning_skillset.manifest.sha256) is an
+archived upstream manifest: it is provenance, not a checksum contract for this modified copy.
+It intentionally includes historical files that are no longer maintained here. Do not overwrite
+local changes to satisfy that historical manifest or run GEAK-specific sync commands in KernelWiki.
+
+The selector metadata and validation reports describe their recorded revisions. Re-run applicable
+checks after changing executable methods; a historical `validated` label does not validate the
+current environment. Reusable outcomes go into corpus, and run histories and deployable run
+artifacts stay private. There is no automatic sync or validation-status refresh.
 
 ## Sources
 - Design discussion 2026-06-17 (this repo).

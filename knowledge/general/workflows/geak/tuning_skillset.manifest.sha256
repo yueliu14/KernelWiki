@@ -1,11 +1,10 @@
-# sha256 manifest of the VENDORED tuning skillset — do not hand-edit.
-# tree: <repo>/perf_knowledge/expert_skills/tuning/   files: 42
-# regenerate: python3 e2e_workflow/scripts/tuning_skillset_sync.py --update
-# verify:     python3 e2e_workflow/scripts/tuning_skillset_sync.py --verify
-#
-# The tree is vendored WHOLE and UNMODIFIED from the standalone skillset repo so that the
-# standalone validation (validate/claims.py + the SKILL.md set) applies to what GEAK runs.
-# A mismatch here means the vendored copy drifted: re-sync it, never patch it in place.
+# HISTORICAL UPSTREAM MANIFEST — not a checksum of the current KernelWiki files.
+# Source: AMD-AGI/GEAK@02bfbb0b72746941be3ab3ad48fb21a284ae2fde
+# Original tree: perf_knowledge/expert_skills/tuning/ (42 entries).
+# Original manifest: e2e_workflow/knowledge/tuning_skillset.manifest.sha256
+# KernelWiki has adapted documents and removed the separate result-store entry points.
+# Preserve these hashes as upstream provenance; use the local Git revision for this copy.
+# Do not re-sync or overwrite local files to make this historical manifest pass.
 fdc651134b3ecb7b073a2a5f7a80d01d94c031d77bfe50010338d1782573769d  README.md
 709de0df688e37b49dca3c881a38ab36f364f53285d1a9ac07f8f6b70c09d644  benchmark/README.md
 2f71fe2cbc6a7455922cda3b06bc1c2c1a79312a1a60ee2821bd90c746b8c0f6  benchmark/graph_harness.py

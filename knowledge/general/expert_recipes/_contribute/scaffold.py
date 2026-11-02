@@ -16,9 +16,9 @@ Usage:
 The index is AUTO-GENERATED from each skill file's frontmatter, so contributors only ever edit one
 markdown file; the selector stays consistent and merge-conflict-free.
 
-The vendored tuning skillset (`tuning/`) is the one exception, and only in *where* the frontmatter
-lives: that tree is hash-pinned byte-for-byte against upstream, so its selector metadata sits outside it
-in `tuning_index.yaml` and is merged in here. Same schema, same filter, same validation gate.
+The imported tuning skillset (`tuning/`) keeps selector metadata in `tuning_index.yaml`,
+which is merged here. KernelWiki maintains the methods locally through Git review; the archived
+upstream manifest is provenance rather than a constraint on edits to this copy.
 """
 import argparse, glob, os, re, sys
 import yaml
@@ -107,7 +107,7 @@ def claims_status(tree_dir, report=None):
 
 
 def tuning_index_entries(report=None):
-    """Selector entries for the vendored tuning tree, from tuning_index.yaml + claims.py."""
+    """Selector entries for local tuning methods, from metadata and recorded claim reports."""
     if not os.path.exists(TUNING_INDEX):
         return []
     with open(TUNING_INDEX) as f:
@@ -155,9 +155,9 @@ def reindex(claims_report=None):
         "validate_skill.py).\n"
         "# Regenerate with:  python _contribute/scaffold.py --reindex\n"
         "# NOT a ranking. Filter by (operator, gen, arch_class, [from->to], status==validated) -> MEASURE.\n"
-        "# scope: kernel | e2e | dependency | tuning. 'tuning' entries describe the VENDORED tree under\n"
-        "# tuning/ and are declared in tuning_index.yaml (the tree is hash-pinned, so its metadata is\n"
-        "# outside it); their status comes from tuning/validate/claims.py, not from a hand-typed field.\n"
+        "# scope: kernel | e2e | dependency | tuning. Tuning metadata is declared in tuning_index.yaml.\n"
+        "# Local methods are maintained through Git; the upstream checksum manifest is historical.\n"
+        "# Status comes from recorded tuning/validate/claims.py reports; check their environment and revision.\n"
         "# Only 'validated' skills are auto-applied by the workflows (advisory priors, never override A/B).\n\n"
         "schema: {id, file, scope, match, expects, validation_status}\n\n"
     )

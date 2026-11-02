@@ -26,17 +26,16 @@ numbers look plausible. So every skill here ends with an engagement check, not a
 
 | you want to… | read |
 | --- | --- |
-| **check whether this model + stack is already tuned** | **`tuning-kb/README.md`** |
+| review prior tuning conclusions and their conditions | [Operator corpus](../../../operator/CORPUS.md) · [General methods](../../corpus/decisions.md) |
 | understand the loop everything else specializes | `tuning-core/SKILL.md` |
 | get a container ready to tune | `env-setup/SKILL.md` |
 | find shapes to tune against | `benchmark/README.md` |
 | tune a serving decode path (graph-captured) | `tuning-core/graph_captured_benchmarking.md` |
 
-**Check `tuning-kb/` first.** It records wins that were already found and reproduced on specific
-model + hardware + library combinations, with the deployable artifact and the numbers to expect. If
-your environment matches an entry, deploy the known answer in an hour and spend the rest of your
-time somewhere new. If it partially matches, the entry's shape list and its record of what turned
-out *not* to work are still worth more than starting cold.
+Read applicable corpus decisions before choosing a tuning direction. Historical outcomes identify
+candidates and limitations; validate them on the actual caller. The imported campaign summary did
+not include its per-model artifacts, so it cannot supply a deployable configuration from this repository.
+Its reusable measurement, engagement and attribution lessons are maintained in the general corpus.
 
 ## By source language
 
@@ -97,9 +96,9 @@ sees the kernel that ran regardless of which language produced it.
 
 ![skill map](docs/skill_map.png)
 
-`tuning-kb/` sits alongside this tree rather than inside it: it is the memory, not the method —
-per-model records of results already verified on a specific stack, so a matching environment can
-skip to deployment.
+Methods live in this skillset; reviewed outcomes are maintained in operator or general corpus
+decisions. Keep complete run histories, tuned configuration artifacts and their internal locations
+in a private store. See the [corpus contribution guide](../../../../tools/corpus/README.md#updating-conclusions-from-private-runs).
 
 aiter is the integration point. Its gradlib tuner races hipBLASLt, Triton, FlyDSL, CK, asm,
 skinny and torch against each other on your shapes and records the winner in a `libtype`
@@ -223,10 +222,9 @@ Each directory holds a `SKILL.md` with frontmatter and is independently invocabl
 files sit alongside and are referenced by relative path. `tuning-core/` is the shared
 foundation every other skill assumes.
 
-`tuning-kb/` is the exception: it has no `SKILL.md` because it is data, not method — a set of
-per-model records to be looked up. **If you are using a task bundle as a blind evaluation, remove
-`tuning-kb/` from the copy you hand the agent**, or it may find the answer instead of deriving it.
-See the note at the end of `tuning-kb/README.md`.
+KernelWiki maintains this imported skillset through reviewed Git changes. Preserve source attribution
+and distinguish historical validation reports from new validation. The archived upstream checksum
+manifest describes the original copy, not the current local files.
 
 ## Migration provenance
 

@@ -77,23 +77,24 @@ graph tracing without executing the real kernel. This is the AMD analog of vLLM'
 shape `[*A.shape[:-1], B.shape[0]]`.
 
 ## The levers (where you actually intervene)
-1. **Per-shape tuned DB** — the only GEMM/MoE lever that engages the live serving path. Capture →
-   tune → deploy via env. ([tuned_gemm.md](tuned_gemm.md), [fmoe.md](../../../operator/grouped_gemm_moe/backend/aiter.md), [configs_db.md](configs_db.md))
+1. **Per-shape tuned DB** — a tuning surface when the active GEMM/MoE caller consumes it. Capture →
+   tune → deploy via env, then verify the selected implementation. Kernel or dispatch changes are
+   additional candidates when allowed by the workload. ([tuned_gemm.md](tuned_gemm.md), [fmoe.md](../../../operator/grouped_gemm_moe/backend/aiter.md), [configs_db.md](configs_db.md))
 2. **Framework switches** — `VLLM_ROCM_USE_AITER=1` (vLLM master switch, required even when forcing an
    attention backend); SGLang enables aiter by default on ROCm. ([integration.md](integration.md))
 3. **Diagnostics** — `AITER_LOG_MORE=1`, `AITER_LOG_TUNED_CONFIG=1` (logs `is tuned on cu_num` per shape),
    `AITER_TUNE_GEMM=1` (capture live shapes).
 
-## Measured impact (on-box validation)
-- **+2.23% e2e** from tuning aiter's bf16 GEMM DB, stacked on `--attention-backend triton`
-  (ref 1548.9 → cand 1583.5 tok/s, 5-rep non-overlapping, 246 `is tuned on cu_num` hits) @ MI300X gfx942,
-  sglang 0.5.11 / aiter@a6bb49937, 2026-06-08 (perf_knowledge run `e2e_Qwen-Qwen3.5-27B_20260607_193315`).
-- Vendor-reported (AMD, for context, not measured here): block-scale GEMM up to **2×**, block-scale fused
-  MoE up to **3×**, MLA decode up to **17×** vs naive @ MI300X (tested 2025-03; see attn_mla/fmoe cards).
+## Reported experience
+
+The [GEMM corpus](../../../operator/dense_gemm/corpus/decisions.md#gemm-shape-regime-routing)
+maintains conditioned dispatch/tuning conclusions and attributed historical experience. Vendor
+ratios and past end-to-end gains depend on their comparison set and environment; re-measure on the
+actual caller before using a selection as a recommendation.
 
 ## Pitfalls
-- ⚠ Tuning hipBLASLt's `HIPBLASLT_TUNING_OVERRIDE_FILE` does **nothing** on sglang/vLLM — aiter bypasses
-  the PyTorch BLAS dispatch and calls `hipb_mm` by solution index directly.
+- A call selecting `hipb_mm` by solution index bypasses PyTorch BLAS selection. Verify the active
+  caller before using `HIPBLASLT_TUNING_OVERRIDE_FILE` or TunableOp; other paths may consult them.
 - ⚠ DB lookup key includes `bias` and `cu_num`; a capture/live mismatch → every lookup misses → tuned
   CSV is inert (verified failure). See [tuned_gemm.md](tuned_gemm.md).
 - gfx942 coverage gap: newest-model paths (sparse MLA, paged MQA logits) may only exist on gfx950; on
