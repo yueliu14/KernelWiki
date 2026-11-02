@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install pytest pyyaml
+      - run: python3 -m pip install -r requirements-dev.txt
 
       # The rendered pages are generated artifacts. A hand-edit to one of them, or an edit to
       # the evidence without a re-render, makes the page a claim nothing backs.

@@ -8,7 +8,7 @@ An **operator- and workload-level GPU kernel knowledge base for LLM inference**,
 | --- | --- | --- |
 | Written knowledge | [Operators](knowledge/operator/README.md) · [Workloads](knowledge/workload/README.md) · [General](knowledge/general/README.md) | Implementations, multi-operator execution contracts and optimization, source entry points, applicability and evidence |
 | Structured corpus | [Operator catalog](knowledge/operator/catalog.yaml) · [Corpus guide](knowledge/operator/CORPUS.md) · [General decisions](knowledge/general/corpus/decisions.md) | Source observations, conditioned decisions, experience summaries and upstream configuration seeds |
-| Source-bundle API | [Put, search and fetch](kernelwiki/README.md) | Manage complete source bundles in your own local collection or a remote store |
+| Corpus maintenance | [Tools](tools/corpus/README.md) · [AITER refresh skill](tools/corpus/skills/aiter-corpus-refresh/SKILL.md) | Extract pinned source evidence, update decisions, validate references and generate reading pages |
 
 ```text
 knowledge/
@@ -54,13 +54,12 @@ knowledge/
     hardware/
     quantization/
     ...
-kernelwiki/
-  client.py
-  source_bundles.md
 tools/corpus/
   extract.py
   validate.py
   build.py
+  skills/aiter-corpus-refresh/
+tests/corpus/
 ```
 
 ## Getting started
@@ -94,23 +93,30 @@ reports have not been reproduced for this corpus. Complete run histories and raw
 
 AITER is the main source of implementation knowledge. This is a curated workload collection, not a claim to cover every AITER kernel. Documents include pinned links to source, configuration and tests. Choosing the best implementation requires a specific GPU, dtype, shape/layout and comparable measurements. Source coverage adds no GPU benchmark results and does not certify historical SOTA labels as current winners.
 
-## Using the source API
+## Reading and searching
+
+Browse the operator, workload and general indexes, or search the Markdown and YAML files directly.
+Agents can use the catalog to locate an operator's corpus, read its decisions and follow the cited
+evidence to pinned upstream source. For example, from the repository root:
 
 ```bash
-python -m pip install -e .
+rg -n -i 'split.?k' knowledge/operator/dense_gemm knowledge/operator/splitk_streamk_gemm
+rg -n 'source_evidence:' knowledge/operator/dense_gemm/corpus/decisions.yaml
 ```
 
-Use `KernelClient.local("/path/to/your/source-collection")` for your own source bundles. For remote
-candidates, set `GEAK_KB_URL` and use `KernelClient.from_env()`. The API supports publishing,
-searching and fetching complete bundles with source digests and revision identities. See the
-[API guide](kernelwiki/README.md) and [bundle format](kernelwiki/source_bundles.md) for details.
+Use the [AITER corpus refresh skill](tools/corpus/skills/aiter-corpus-refresh/SKILL.md) to review
+upstream changes and maintain the corpus. Keep run histories and raw artifacts in your private store.
 
 ## Development checks
 
+Maintenance tools require Python 3.10+ and Git. Install their dependencies in a virtual environment:
+
 ```bash
-python -m pip install -e '.[test]'
-python -m pytest -q
-python tools/corpus/build.py --check
+python3 -m venv .venv
+. .venv/bin/activate
+python3 -m pip install -r requirements-dev.txt
+python3 -m pytest -q
+python3 tools/corpus/build.py --check
 ```
 
 ## Attribution and licenses

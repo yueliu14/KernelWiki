@@ -2,10 +2,10 @@
 
 ## GEAK
 
-Knowledge and the `kernelwiki/_store` protocol implementation are derived from AMD-AGI/GEAK, commit `02bfbb0b72746941be3ab3ad48fb21a284ae2fde`.
+Knowledge and bundled workflow resources are derived from AMD-AGI/GEAK, commit `02bfbb0b72746941be3ab3ad48fb21a284ae2fde`.
 Copyright © 2026 Advanced Micro Devices, Inc. All rights reserved. Distributed under the Apache License 2.0 in [LICENSE.md](LICENSE.md).
 
-KernelWiki reorganized documents, adjusted links and Python package imports, added the GEAK_KB_URL alias, and added source-bundle validation, storage and retrieval. Per-document migration provenance identifies original paths. Nested resources retain their own notices where present.
+KernelWiki reorganized documents, adjusted links and distilled reusable conclusions into corpus decisions. Per-document migration provenance identifies original paths. Nested resources retain their own notices where present.
 
 ## AITER
 

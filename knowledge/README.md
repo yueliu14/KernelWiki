@@ -23,7 +23,7 @@ Put operator-specific implementation knowledge under `operator/<op>/backend/`; p
 
 Put structured evidence and development cards under `operator/<op>/corpus/`; follow the
 [corpus maintenance guide](../tools/corpus/README.md). Cite reusable implementations through pinned
-upstream source links or source-bundle references. Include the exact source digest with measured
+upstream source links. Include the exact source revision or digest with measured
 results; historical patch references retain their original context. All repository documentation
 and comments use English.
 
