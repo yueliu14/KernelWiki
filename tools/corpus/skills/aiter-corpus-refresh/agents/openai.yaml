@@ -1,0 +1,4 @@
+interface:
+  display_name: "AITER Corpus Refresh"
+  short_description: "Refresh KernelWiki corpus from pinned AITER changes"
+  default_prompt: "Use $aiter-corpus-refresh to review new AITER inference kernels, update KernelWiki corpus, validate citations, and prepare a draft PR."
