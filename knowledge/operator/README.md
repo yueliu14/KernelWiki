@@ -21,7 +21,7 @@ All 23 workload families have pinned AITER implementation references. A single u
 | Operator | Inference focus | AITER references | Learned cards |
 | --- | --- | --- | ---: |
 | [dense_gemm](dense_gemm/README.md) | Dense attention and FFN projections; prefill versus decode tiling. | aiter, asm, ck, flydsl, gluon, hip, opus, triton | 16 |
-| [scaled_quant_gemm](scaled_quant_gemm/README.md) | FP8, INT8, FP4 and microscaled projections, including packing and scale contracts. | aiter, asm, ck, flydsl, gluon, hip, opus, triton | 13 |
+| [scaled_quant_gemm](scaled_quant_gemm/README.md) | FP8, INT8, FP4 and microscaled projections, including packing and scale contracts. | aiter, asm, ck, flydsl, gluon, hip, opus, triton | 18 |
 | [batched_gemm](batched_gemm/README.md) | Batched matrix products and head-wise projection variants. | aiter, ck, flydsl, gluon, opus, triton | 0 |
 | [skinny_gemv_decode](skinny_gemv_decode/README.md) | Small-M decode projections and GEMV-like regimes. | hip | 0 |
 | [splitk_streamk_gemm](splitk_streamk_gemm/README.md) | Split-K and Stream-K schedules for poorly occupied GEMMs. | asm, flydsl, opus, triton | 0 |
@@ -41,7 +41,7 @@ All 23 workload families have pinned AITER implementation references. A single u
 
 | Operator | Inference focus | AITER references | Learned cards |
 | --- | --- | --- | ---: |
-| [attention_prefill_fmha](attention_prefill_fmha/README.md) | Forward FMHA for prompt processing, including variable-length causal attention. | aiter, asm, flydsl, gluon, hip, triton | 1 |
+| [attention_prefill_fmha](attention_prefill_fmha/README.md) | Forward FMHA for prompt processing, including variable-length causal attention. | aiter, asm, flydsl, gluon, hip, triton | 2 |
 | [attention_decode_paged](attention_decode_paged/README.md) | Decode attention over paged KV caches, split/reduce and mixed precision. | asm, flydsl, gluon, hip, triton | 35 |
 | [mla_attention](mla_attention/README.md) | Multi-head latent attention, compressed KV and decode/prefill variants. | aiter, asm, flydsl, gluon, hip, opus, triton | 0 |
 | [gqa_mqa_attention](gqa_mqa_attention/README.md) | Grouped-query and multi-query head sharing. | triton | 5 |

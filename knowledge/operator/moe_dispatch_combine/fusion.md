@@ -49,7 +49,7 @@ the MoE layer.
 ## Cross-links
 [moe_routing_topk](../moe_routing_topk/README.md) (feeds dispatch) · [fused_moe_grouped_gemm](../fused_moe_grouped_gemm/README.md) (consumes dispatch) ·
 [shared_expert_fusion](../shared_expert_fusion/README.md) · [`backends/mori_rccl/mori_ep.md`](../../general/libraries/mori_rccl/mori_ep.md) ·
-[`backends/aiter/fmoe.md`](../../general/libraries/aiter/fmoe.md).
+[`backends/aiter/fmoe.md`](../grouped_gemm_moe/backend/aiter.md).
 
 ## Sources
 - prob-mult-in-combine, 3D adapter, ENABLE_STANDARD_MOE_ADAPT, zero-copy buffers: https://github.com/ROCm/mori/blob/main/docs/MORI-EP-GUIDE.md

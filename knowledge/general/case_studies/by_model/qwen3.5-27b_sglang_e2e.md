@@ -63,7 +63,7 @@ above the noise band** — this is the Amdahl read that drove the whole run.
 > ledger ([`gemm_attention_backends.md`](../../workflows/geak/gemm_attention_backends.md)
 > records "+~5%"). The spread is box drift across sessions — all are measured-by-us; the
 > per-iteration eval-dir numbers (+4.15 / +4.44%) are the auditable ones. See
-> [`../by_kernel/gated_delta_backend_swap.md`](../by_kernel/gated_delta_backend_swap.md).
+> [`../by_kernel/gated_delta_backend_swap.md`](../../../operator/linear_attention_gated_delta/case_studies/gated_delta_backend_swap.md).
 
 ### Head-kernel track — dense GEMM (the 79% mass)
 Two iterations, opposite outcomes — and the difference is the whole lesson:
@@ -78,7 +78,7 @@ Two iterations, opposite outcomes — and the difference is the whole lesson:
   `AITER_TUNE_GEMM=1` (proved 228/234 are `bias=False`), bucket-reduced 234 → 78, tuned with
   gradlib (FLOPs-DESC order), deployed via `AITER_CONFIG_GEMM_BF16`. **246 engagement hits**,
   **+2.23% e2e** stacked on triton attention. Full write-up:
-  [`../by_kernel/gemm_aiter_db_tuning.md`](../by_kernel/gemm_aiter_db_tuning.md).
+  [`../by_kernel/gemm_aiter_db_tuning.md`](../../../operator/dense_gemm/case_studies/gemm_aiter_db_tuning.md).
 - **Authored Triton GEMM** (recursive `kernel_workflow`): iso 1.466× on the up/gate shape in
   iter2 (0.99× in iter1 — couldn't beat hipBLASLt), but the e2e gate was won by the aiter env
   path, so the authored kernel did not enter the stack.
@@ -145,8 +145,8 @@ accepted. Parity safe (same bf16 math; tuner gated every row at `err_ratio < 0.0
    tuner shape count and kernel budget.
 
 ## Cross-links
-- The GEMM lever in depth: [`../by_kernel/gemm_aiter_db_tuning.md`](../by_kernel/gemm_aiter_db_tuning.md)
-- The attention flag in depth: [`../by_kernel/gated_delta_backend_swap.md`](../by_kernel/gated_delta_backend_swap.md)
+- The GEMM lever in depth: [`../by_kernel/gemm_aiter_db_tuning.md`](../../../operator/dense_gemm/case_studies/gemm_aiter_db_tuning.md)
+- The attention flag in depth: [`../by_kernel/gated_delta_backend_swap.md`](../../../operator/linear_attention_gated_delta/case_studies/gated_delta_backend_swap.md)
 - GEMM recipe: [`../../workflows/gemm_tuning_workflow.md`](../../workflows/gemm_tuning_workflow.md) · e2e flow: [`../../workflows/optimize_e2e_model.md`](../../workflows/optimize_e2e_model.md)
 - Attention selection: [`../../workflows/attention_backend_selection.md`](../../workflows/attention_backend_selection.md)
 - Operators: [`../../operators/dense_gemm/`](../../../operator/dense_gemm/README.md) · [`../../operators/linear_attention_gated_delta/`](../../../operator/linear_attention_gated_delta/README.md)

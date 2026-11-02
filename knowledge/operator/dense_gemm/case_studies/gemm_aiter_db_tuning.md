@@ -25,8 +25,8 @@ by **`aiter.tuned_gemm.gemm_a16w16` / `tgemm.mm`**, which picks the fastest of
 hipBLASLt/asm/triton/skinny/flydsl **per shape from aiter's own per-shape DB**. The only GEMM
 lever that engages this live path is **tuning that DB** — *not* PyTorch TunableOp, *not*
 `HIPBLASLT_TUNING_FILE` (both sit under code paths sglang bypasses). Full recipe:
-[`../../workflows/gemm_tuning_workflow.md`](../../workflows/gemm_tuning_workflow.md). Dispatch
-internals: [`../../backends/aiter/tuned_gemm.md`](../../libraries/aiter/tuned_gemm.md).
+[`../../workflows/gemm_tuning_workflow.md`](../../../general/workflows/gemm_tuning_workflow.md). Dispatch
+internals: [`../../backends/aiter/tuned_gemm.md`](../../../general/libraries/aiter/tuned_gemm.md).
 
 The hot shapes: up/gate prefill **K=5120, N∈{14336,16384,34816}**; down/qkv **N=5120,
 K∈{17408,6144}**; M-buckets from the live conc=64 workload (padded, e.g. 16040→16128,
@@ -110,11 +110,11 @@ bf16 math, `err_ratio=0.0` on every row.
    regenerate on any upgrade; never ship a hand-copied CSV.
 
 ## Cross-links
-- The recipe (capture → tune → deploy → gate, both traps): [`../../workflows/gemm_tuning_workflow.md`](../../workflows/gemm_tuning_workflow.md)
-- Dispatch + key construction: [`../../backends/aiter/tuned_gemm.md`](../../libraries/aiter/tuned_gemm.md) · DB: [`../../backends/aiter/configs_db.md`](../../libraries/aiter/configs_db.md) · FlyDSL: [`../../backends/aiter/flydsl_path.md`](../../libraries/aiter/flydsl_path.md)
-- GEMM operator: [`../../operators/dense_gemm/overview.md`](../../../operator/dense_gemm/README.md) · [`../../operators/dense_gemm/tuning.md`](../../../operator/dense_gemm/tuning.md)
-- The full run this lives in: [`../by_model/qwen3.5-27b_sglang_e2e.md`](../by_model/qwen3.5-27b_sglang_e2e.md)
-- e2e flow / gate: [`../../workflows/optimize_e2e_model.md`](../../workflows/optimize_e2e_model.md)
+- The recipe (capture → tune → deploy → gate, both traps): [`../../workflows/gemm_tuning_workflow.md`](../../../general/workflows/gemm_tuning_workflow.md)
+- Dispatch + key construction: [`../../backends/aiter/tuned_gemm.md`](../../../general/libraries/aiter/tuned_gemm.md) · DB: [`../../backends/aiter/configs_db.md`](../../../general/libraries/aiter/configs_db.md) · FlyDSL: [`../../backends/aiter/flydsl_path.md`](../../../general/libraries/aiter/flydsl_path.md)
+- GEMM operator: [`../../operators/dense_gemm/overview.md`](../README.md) · [`../../operators/dense_gemm/tuning.md`](../tuning.md)
+- The full run this lives in: [`../by_model/qwen3.5-27b_sglang_e2e.md`](../../../general/case_studies/by_model/qwen3.5-27b_sglang_e2e.md)
+- e2e flow / gate: [`../../workflows/optimize_e2e_model.md`](../../../general/workflows/optimize_e2e_model.md)
 
 ## Sources
 - The +2.23% win, 246 hits, the A/B table, the bias fix.

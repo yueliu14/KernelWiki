@@ -57,7 +57,7 @@ outweighs the per-op amortization.
   drains (a single accumulator + dependent K-chain exposes MFMA latency every step).
 
 > **Connection to the measured GEMM win:** the aiter DB tune
-> ([`gemm_aiter_db_tuning.md`](gemm_aiter_db_tuning.md)) is the *automated* form of this — gradlib
+> ([`gemm_aiter_db_tuning.md`](../../../operator/dense_gemm/case_studies/gemm_aiter_db_tuning.md)) is the *automated* form of this — gradlib
 > races solutions (each with its own internal MFMA shape) and banks the fastest per shape, which
 > is why a hand MFMA-tile choice rarely beats the tuned DB on the live path. This case study is
 > the *why* behind the default that the tuner usually lands on.
@@ -86,7 +86,7 @@ outweighs the per-op amortization.
 - Occupancy/registers: [`../../optimization/occupancy_and_registers.md`](../../optimization/occupancy_and_registers.md) · LDS: [`../../optimization/lds_and_bank_conflicts.md`](../../optimization/lds_and_bank_conflicts.md) · pipelining: [`../../optimization/memory_pipelining.md`](../../optimization/memory_pipelining.md)
 - Hardware: [`../../hardware/cdna3_mi300/matrix_core.md`](../../hardware/cdna3_mi300/matrix_core.md) · [`../../hardware/shared/matrix_core_mfma_smfmac.md`](../../hardware/shared/matrix_core_mfma_smfmac.md)
 - GEMM tuning: [`../../operators/dense_gemm/tuning.md`](../../../operator/dense_gemm/tuning.md) · epilogue: [`../../operators/gemm_epilogue_fused/overview.md`](../../../operator/gemm_epilogue_fused/README.md)
-- The automated form (DB tune): [`gemm_aiter_db_tuning.md`](gemm_aiter_db_tuning.md)
+- The automated form (DB tune): [`gemm_aiter_db_tuning.md`](../../../operator/dense_gemm/case_studies/gemm_aiter_db_tuning.md)
 - ISA verify: [`../../languages/triton_amd/isa_verify.md`](../../backend/triton_amd/isa_verify.md) · asm: [`../../languages/asm_mfma/`](../../backend/asm_mfma/overview.md)
 
 ## Sources

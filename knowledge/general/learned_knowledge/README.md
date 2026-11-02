@@ -1,19 +1,16 @@
 # Learned knowledge
 
-Cross-operator reference material. Source revisions and evidence remain attached to individual documents.
+Methods that transfer across operators: measurement controls, engagement, graph-safe integration,
+occupancy analysis and optimization experiments. A worked example may name kernels without becoming
+an operator-specific recommendation. Source revisions and evidence stay attached to each document.
 
-- [Archive — superseded / disproven cards](e2e-_archive.md)
-- [`--attention-backend triton` — a cheap server-flag win on hybrid models](e2e-attention-backend-triton-gfx942.md)
-- [--- discovery header ---](e2e-editable-triton-cluster-amdahl.md)
-- [gfx950 sglang fp8 a8w8 blockscale — the live kernel is CK **bpreshuffle**, so tune THAT DB](e2e-fp8-a8w8-blockscale-bpreshuffle-ck-tune-gfx950-sglang.md)
-- [gfx950 vLLM fp8 a8w8 blockscale — per-shape CK tune DB (no overlay needed)](e2e-fp8-a8w8-blockscale-ck-tune-gfx950-vllm.md)
-- [fp8 a8w8 blockscale GEMM → per-(N,K) M-bucketed Triton config-JSON overlay  (DEPRECATED — see banner)](e2e-fp8-a8w8-blockscale-overlay-gfx942.md)
+Specific FP8/MXFP8 GEMM and attention-backend outcomes live with the
+[operator learned knowledge](../../operator/README.md).
+
+- [Stacking small kernel wins under an end-to-end Amdahl budget](e2e-editable-triton-cluster-amdahl.md)
 - [Make an optimized kernel survive CUDA/HIP-graph capture (or the win vanishes e2e)](e2e-method-cudagraph-safe-integration.md)
 - [Honest e2e A/B: tight interleave + non-overlap gate (not just a positive median)](e2e-method-e2e-ab-harness.md)
 - [Prove the optimized kernel ran on the LIVE serving path (don't infer it from an e2e wiggle)](e2e-method-verify-engagement.md)
-- [MXFP8 (1x32 E8M0 microscale) DENSE LINEAR GEMM — route via Tier-C author, not env](e2e-mxfp8-e8m0-dense-linear-gfx950.md)
-- [MXFP8 dense-linear decode-tile rewrite is the main e2e lever (decode-bound serving)](e2e-mxfp8-linear-decode-rewrite-gfx950.md)
-- [kernel-_archive](kernel-_archive.md)
 - [A/B in the graded case mix, and price a direction against the noise floor first](kernel-a-b-in-the-graded-case-mix-and-price-a-direction-against-the-method-gfx950-n-a.md)
 - [A/B protocol and oracle confounds on a power-capped GPU](kernel-a-b-protocol-and-oracle-confounds-on-a-power-capped-gpu-method-gfx950-n-a.md)
 - [A closure is conditional on the body that measured it](kernel-a-closure-is-conditional-on-the-body-that-measured-it-method-gfx950-n-a.md)

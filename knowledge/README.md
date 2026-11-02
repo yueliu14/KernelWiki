@@ -28,3 +28,8 @@ results; historical patch references retain their original context. All reposito
 and comments use English.
 
 The AITER references prioritize inference-relevant files changed from 2026-07-21 through 2026-10-21. Backend pages can link shared source files or test suites containing both forward and backward code; the documented target is inference, with gradients and dropout disabled. Older GEAK evidence retains its original context. There is no scheduled update process or automatic best-kernel promotion.
+
+Reusable skills and tuning workflows remain in `general/` even when they focus on GEMM or attention.
+Place a specific operator's measured outcome or implementation constraint under that operator.
+Use the [content boundaries](general/README.md#content-boundaries) to distinguish a reusable procedure
+from a case-specific result; avoid duplicate overviews and copies of evidence.

@@ -147,7 +147,7 @@ covered multiple or fall to Triton.
 ## Alternatives / cross-links
 [fused_moe_grouped_gemm](../README.md) · [ck.md](ck.md) (stage-2) · [hip.md](hip.md) (stage-1 asm) ·
 [triton.md](triton.md) (portable fallback) · [moe_routing_topk](../../moe_routing_topk/README.md) · [moe_dispatch_combine](../../moe_dispatch_combine/README.md) ·
-[`backends/aiter/fmoe.md`](../../../general/libraries/aiter/fmoe.md) · [overview.md](../README.md) ·
+[`backends/aiter/fmoe.md`](../../grouped_gemm_moe/backend/aiter.md) · [overview.md](../README.md) ·
 [numerics.md](../numerics.md).
 
 ## Sources

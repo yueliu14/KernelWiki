@@ -76,7 +76,11 @@ gfx (`..._gfx942`). Key arch behavior baked into aiter's wrappers:
 - [deep.md](deep.md) — FLIR layout algebra, the ROCDL intrinsic surface, compile/JIT flow, LDS/sched.
 - [patterns.md](patterns.md) — `flydsl_hgemm` usage, preshuffle, split-K, small-M, the sched pipeline.
 - [knobs.md](knobs.md) — the full `flydsl_hgemm` knob set (verified against source) + autotune.
-- [kernel_families.md](kernel_families.md) — HGEMM / small-M / preshuffle / 2-stage MoE / GDR decode.
+- Operator implementations: [dense GEMM](../../../operator/dense_gemm/backend/flydsl_aiter.md),
+  [small-M/decode](../../../operator/skinny_gemv_decode/README.md),
+  [scaled GEMM](../../../operator/scaled_quant_gemm/backend/flydsl_aiter.md),
+  [grouped MoE](../../../operator/grouped_gemm_moe/backend/flydsl_aiter.md) and
+  [gated-delta attention](../../../operator/linear_attention_gated_delta/backend/flydsl_aiter.md).
 
 **Authoring your own `@flyc.kernel`** (ingested from the FlyDSL authoring skill — reference how-to):
 - [authoring_tile_programming.md](authoring_tile_programming.md) — write a first correct kernel (CuTe-style tile model, the 4 patterns, MFMA reference).

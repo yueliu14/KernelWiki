@@ -48,7 +48,7 @@ On decode, fuse aggressively and **HIP-graph-capture the whole router** (gate+to
 
 ## Cross-links
 [shared_expert_fusion](../shared_expert_fusion/README.md) · [moe_dispatch_combine](../moe_dispatch_combine/README.md) · [fused_moe_grouped_gemm](../fused_moe_grouped_gemm/README.md) ·
-[backends/aiter.md](backend/aiter.md) · [`backends/aiter/fmoe.md`](../../general/libraries/aiter/fmoe.md).
+[backends/aiter.md](backend/aiter.md) · [`backends/aiter/fmoe.md`](../grouped_gemm_moe/backend/aiter.md).
 
 ## Sources
 - aiter fused gate / biased_grouped_topk: `ROCm/aiter@a6bb49937:aiter/ops/topk.py`, `csrc/kernels/moe_fused_gate.cu`.

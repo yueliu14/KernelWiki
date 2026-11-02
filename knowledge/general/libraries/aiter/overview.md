@@ -57,9 +57,9 @@ key.
 - **GEMM**: `tuned_gemm.gemm_a16w16` / `tgemm.mm` (bf16/fp16), `gemm_a8w8` (fp8/int8 + fused dequant),
   `gemm_a4w4` (4-bit weights via FlyDSL/CK), `deepgemm` (fine-grained fp8 block GEMM), batched variants.
 - **Attention**: `flash_attn_func` (MHA prefill), paged/decode attention, `mla_decode_fwd` +
-  MLA prefill (DeepSeek). See [attn_mla.md](attn_mla.md).
+  MLA prefill (DeepSeek). See [attn_mla.md](../../../operator/mla_attention/backend/aiter.md).
 - **MoE**: `fused_moe` (sorting + grouped GEMM + activation + weighted combine fused), shared-expert
-  fusion, block-scale fp8, A4W4 FlyDSL. See [fmoe.md](fmoe.md).
+  fusion, block-scale fp8, A4W4 FlyDSL. See [fmoe.md](../../../operator/grouped_gemm_moe/backend/aiter.md).
 - **Norm/RoPE/quant**: `rms_norm`, `layernorm2d_with_add_asm`, `rope_fwd`, fused QK-norm+RoPE+KV-write+quant,
   gated-RMSNorm+fp8-group-quant.
 - **Collectives**: `custom_all_reduce`, `quick_all_reduce` (RCCL bypass).
@@ -78,7 +78,7 @@ shape `[*A.shape[:-1], B.shape[0]]`.
 
 ## The levers (where you actually intervene)
 1. **Per-shape tuned DB** — the only GEMM/MoE lever that engages the live serving path. Capture →
-   tune → deploy via env. ([tuned_gemm.md](tuned_gemm.md), [fmoe.md](fmoe.md), [configs_db.md](configs_db.md))
+   tune → deploy via env. ([tuned_gemm.md](tuned_gemm.md), [fmoe.md](../../../operator/grouped_gemm_moe/backend/aiter.md), [configs_db.md](configs_db.md))
 2. **Framework switches** — `VLLM_ROCM_USE_AITER=1` (vLLM master switch, required even when forcing an
    attention backend); SGLang enables aiter by default on ROCm. ([integration.md](integration.md))
 3. **Diagnostics** — `AITER_LOG_MORE=1`, `AITER_LOG_TUNED_CONFIG=1` (logs `is tuned on cu_num` per shape),
@@ -104,8 +104,8 @@ shape `[*A.shape[:-1], B.shape[0]]`.
 to confirm hot shapes hit asm/CK rather than Triton fallback.
 
 ## Sub-pages
-[tuned_gemm.md](tuned_gemm.md) · [flydsl_path.md](flydsl_path.md) · [fmoe.md](fmoe.md) ·
-[attn_mla.md](attn_mla.md) · [configs_db.md](configs_db.md) · [integration.md](integration.md)
+[tuned_gemm.md](tuned_gemm.md) · [flydsl_path.md](flydsl_path.md) · [fmoe.md](../../../operator/grouped_gemm_moe/backend/aiter.md) ·
+[attn_mla.md](../../../operator/mla_attention/backend/aiter.md) · [configs_db.md](configs_db.md) · [integration.md](integration.md)
 
 ## Sources
 - On-box source: `/sgl-workspace/aiter` = `ROCm/aiter@a6bb499375849eec45d68c5ccaebc8865fd422c0`

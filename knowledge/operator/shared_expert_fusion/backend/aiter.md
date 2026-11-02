@@ -54,7 +54,7 @@ with routed. fp8 shared is a quant gate. See [numerics.md](../numerics.md).
 fusion on/off; greedy parity.
 
 ## Alternatives / cross-links
-[hip.md](hip.md) · [triton.md](triton.md) · [`backends/aiter/fmoe.md`](../../../general/libraries/aiter/fmoe.md) ·
+[hip.md](hip.md) · [triton.md](triton.md) · [`backends/aiter/fmoe.md`](../../grouped_gemm_moe/backend/aiter.md) ·
 [`backends/mori_rccl/mori_ep.md`](../../../general/libraries/mori_rccl/mori_ep.md) · [overview.md](../README.md).
 
 ## Sources

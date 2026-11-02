@@ -88,7 +88,7 @@ confirms DB hits on the live path.
 
 ## Cross-links
 [overview.md](overview.md) · [tuned_gemm.md](tuned_gemm.md) · [configs_db.md](configs_db.md) ·
-[fmoe.md](fmoe.md) · [attn_mla.md](attn_mla.md).
+[fmoe.md](../../../operator/grouped_gemm_moe/backend/aiter.md) · [attn_mla.md](../../../operator/mla_attention/backend/aiter.md).
 
 ## Sources
 - On-box: `ROCm/aiter@a6bb499375849eec45d68c5ccaebc8865fd422c0`: `aiter/jit/utils/torch_guard.py`

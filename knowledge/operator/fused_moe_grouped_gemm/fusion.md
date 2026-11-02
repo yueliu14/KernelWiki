@@ -48,7 +48,7 @@ Under EP the grouped GEMM consumes MoRI-EP's **3D packed layout** (`packed_recv_
 
 ## Cross-links
 [moe_routing_topk](../moe_routing_topk/README.md) (feeds sort) · [moe_dispatch_combine](../moe_dispatch_combine/README.md) (EP feed) · [shared_expert_fusion](../shared_expert_fusion/README.md) ·
-[scaled_quant_gemm](../scaled_quant_gemm/README.md) · [grouped_gemm_moe](../grouped_gemm_moe/README.md) · [`backends/aiter/fmoe.md`](../../general/libraries/aiter/fmoe.md).
+[scaled_quant_gemm](../scaled_quant_gemm/README.md) · [grouped_gemm_moe](../grouped_gemm_moe/README.md) · [`backends/aiter/fmoe.md`](../grouped_gemm_moe/backend/aiter.md).
 
 ## Sources
 - on-box kernel names + fusion flags: `ROCm/aiter@a6bb49937:aiter/fused_moe.py`, `aiter/configs/tuned_fmoe.csv`.

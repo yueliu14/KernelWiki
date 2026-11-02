@@ -1,11 +1,14 @@
 # Libraries
 
-Cross-operator reference material. Source revisions and evidence remain attached to individual documents.
+Reusable library APIs, configuration formats, tuning tools and integration guidance. GEMM-specific
+libraries and tuners belong here when the procedure applies across models and GEMM variants.
+Operator implementation contracts live in the [operator collection](../../operator/README.md), including
+[AITER MLA](../../operator/mla_attention/backend/aiter.md) and
+[AITER grouped MoE](../../operator/grouped_gemm_moe/backend/aiter.md).
+Source revisions and evidence remain attached to individual documents.
 
-- [aiter attention & MLA](aiter/attn_mla.md)
 - [aiter configs DB](aiter/configs_db.md)
 - [aiter FlyDSL path](aiter/flydsl_path.md)
-- [aiter fused MoE (fmoe)](aiter/fmoe.md)
 - [aiter integration](aiter/integration.md)
 - [aiter — backend overview](aiter/overview.md)
 - [aiter tuned_gemm — dispatch + tuning recipe](aiter/tuned_gemm.md)

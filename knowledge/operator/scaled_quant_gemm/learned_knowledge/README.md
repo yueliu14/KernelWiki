@@ -16,6 +16,16 @@ One transferable lesson per card. Preserve the run, environment, workload and ou
 - [The residual axes on a decoded fp8 GEMM are already closed](kernel-the-residual-axes-on-a-decoded-fp8-gemm-are-already-closed-quantized-gemm-gfx950-compute-bound.md)
 - [Where the headroom is not, and the two floors that tell you so](kernel-where-the-headroom-is-not-and-the-two-floors-that-tell-you-s-quantized-gemm-gfx950-compute-bound.md)
 
+- [gfx950 sglang fp8 a8w8 blockscale — the live kernel is CK **bpreshuffle**, so tune THAT DB](e2e-fp8-a8w8-blockscale-bpreshuffle-ck-tune-gfx950-sglang.md)
+
+- [gfx950 vLLM fp8 a8w8 blockscale — per-shape CK tune DB (no overlay needed)](e2e-fp8-a8w8-blockscale-ck-tune-gfx950-vllm.md)
+
+- [fp8 a8w8 blockscale GEMM → per-(N,K) M-bucketed Triton config-JSON overlay  (DEPRECATED — see banner)](e2e-fp8-a8w8-blockscale-overlay-gfx942.md)
+
+- [MXFP8 (1x32 E8M0 microscale) DENSE LINEAR GEMM — route via Tier-C author, not env](e2e-mxfp8-e8m0-dense-linear-gfx950.md)
+
+- [MXFP8 dense-linear decode-tile rewrite is the main e2e lever (decode-bound serving)](e2e-mxfp8-linear-decode-rewrite-gfx950.md)
+
 ## New lesson fields
 
 Record the problem, applicable operator/backend/GPU/dtype/shapes, attempted change, positive or negative outcome, explanation, limitations, run reference and optional patch reference. Keep raw run logs in the run/patch store.

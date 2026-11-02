@@ -86,7 +86,7 @@ win on decode, not an approximation.
 
 ## Cross-links
 - MLA operator + SOTA cards: [`../../operators/mla_attention/`](../../../operator/mla_attention/README.md) · aiter card: [`../../operators/mla_attention/backends/aiter.md`](../../../operator/mla_attention/backend/aiter.md) · triton fallback: [`../../operators/mla_attention/backends/triton.md`](../../../operator/mla_attention/backend/triton.md)
-- aiter MLA internals: [`../../backends/aiter/attn_mla.md`](../../libraries/aiter/attn_mla.md)
+- aiter MLA internals: [`../../backends/aiter/attn_mla.md`](../../../operator/mla_attention/backend/aiter.md)
 - Backend selection: [`../../workflows/attention_backend_selection.md`](../../workflows/attention_backend_selection.md)
 - Decode paged / KV: [`../../operators/attention_decode_paged/`](../../../operator/attention_decode_paged/README.md) · [`../../operators/kv_cache_quant/`](https://github.com/yueliu14/KernelWiki/blob/45cd3f5b51d16322db8dc301fa783148d323d27b/knowledge/operator/kv_cache_quant/README.md)
 - Serving wiring: [`../../quantization/deployment_recipes.md`](../../quantization/deployment_recipes.md)

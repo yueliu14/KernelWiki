@@ -5,7 +5,7 @@
 
 Forward FMHA for prompt processing, including variable-length causal attention.
 
-6 AITER implementation references; 1 historical experience cards.
+6 AITER implementation references; 2 historical experience cards.
 
 ## AITER implementations
 

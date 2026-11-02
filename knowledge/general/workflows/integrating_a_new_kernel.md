@@ -26,7 +26,7 @@ role ([`e2e_integrator.md`](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b7274694
 Candidate env = current env + the new var. Examples:
 - GEMM: `AITER_CONFIG_GEMM_BF16=<tuned.csv>` (see
   [`gemm_tuning_workflow.md`](gemm_tuning_workflow.md)).
-- MoE: `AITER_CONFIG_FMOE=<tuned.csv>` (see [`../backends/aiter/fmoe.md`](../libraries/aiter/fmoe.md)).
+- MoE: `AITER_CONFIG_FMOE=<tuned.csv>` (see [`../backends/aiter/fmoe.md`](../../operator/grouped_gemm_moe/backend/aiter.md)).
 Keep the artifact under `$EVAL_DIR/config/` so it's reproducible. **Engagement proof:**
 `AITER_LOG_TUNED_CONFIG=1` → `grep -c 'is tuned on cu_num' server.log` > 0.
 

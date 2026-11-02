@@ -67,7 +67,7 @@ cu_num, token, model_dim, inter_dim, expert, topk, act_type, dtype, q_dtype_a, q
 use_g1u1, doweight_stage1, block_m, ksplit,   # key
 us1, kernelName1, err1, us2, kernelName2, err2, us, run_1stage, tflops, bw, _tag   # result
 ```
-(stage-1 + stage-2 kernel names; see [fmoe.md](fmoe.md)).
+(stage-1 + stage-2 kernel names; see [fmoe.md](../../../operator/grouped_gemm_moe/backend/aiter.md)).
 
 ## Env override + merge semantics (`aiter/jit/core.py`)
 - `get_config_file(env_name, default_file, tuned_file_name)`: if `os.getenv(env_name)` is set it is used
@@ -88,7 +88,7 @@ us1, kernelName1, err1, us2, kernelName2, err2, us, run_1stage, tflops, bw, _tag
 - A `flydsl` row needs the FlyDSL package present to be honored (see [flydsl_path.md](flydsl_path.md)).
 
 ## Cross-links
-[tuned_gemm.md](tuned_gemm.md) · [fmoe.md](fmoe.md) · [flydsl_path.md](flydsl_path.md) ·
+[tuned_gemm.md](tuned_gemm.md) · [fmoe.md](../../../operator/grouped_gemm_moe/backend/aiter.md) · [flydsl_path.md](flydsl_path.md) ·
 [integration.md](integration.md).
 
 ## Sources
