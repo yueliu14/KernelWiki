@@ -100,7 +100,7 @@ E=256, EP=8 (32 experts/GPU), hidden 7168, top-8, fp8 dispatch.
 ## Alternatives / cross-links
 [moe_dispatch_combine](../README.md) · [mori.md](mori.md) (the actual EP comm) · [hip.md](hip.md) · [triton.md](triton.md) ·
 [fused_moe_grouped_gemm](../../fused_moe_grouped_gemm/README.md) · [moe_routing_topk](../../moe_routing_topk/README.md) (shares `moe_sorting`) ·
-[`backends/aiter/fmoe.md`](../../../general/libraries/aiter/fmoe.md) · [overview.md](../README.md) ·
+[`backends/aiter/fmoe.md`](../../grouped_gemm_moe/backend/aiter.md) · [overview.md](../README.md) ·
 [numerics.md](../numerics.md).
 
 ## Sources

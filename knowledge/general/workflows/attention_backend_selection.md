@@ -103,7 +103,7 @@ the GEMM tune — they're orthogonal and compound (validated).
 
 ## Cross-links
 - Prefill FMHA backends: [`../operators/attention_prefill_fmha/backends/`](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/operators/attention_prefill_fmha/backends)
-- MLA: [`../operators/mla_attention/`](../../operator/mla_attention/README.md) · aiter MLA: [`../backends/aiter/attn_mla.md`](../libraries/aiter/attn_mla.md)
+- MLA: [`../operators/mla_attention/`](../../operator/mla_attention/README.md) · aiter MLA: [`../backends/aiter/attn_mla.md`](../../operator/mla_attention/backend/aiter.md)
 - Decode paged: [`../operators/attention_decode_paged/`](../../operator/attention_decode_paged/README.md)
 - Choosing backends overall: [`choosing_a_backend.md`](choosing_a_backend.md)
 - Routing priors: [`../index/decision_trees.md`](../reference/geak_index/decision_trees.md)

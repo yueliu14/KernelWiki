@@ -95,7 +95,7 @@ A required trait must be established for the actual design before the card appli
 
 - [knowledge/general/hardware/cdna3_mi300/memory_hierarchy.md](../../../general/hardware/cdna3_mi300/memory_hierarchy.md)
 - [knowledge/general/backend/flydsl/knobs.md:71-75](../../../general/backend/flydsl/knobs.md)
-- [knowledge/general/backend/flydsl/kernel_families.md:19-32](../../../general/backend/flydsl/kernel_families.md)
+- [knowledge/operator/dense_gemm/backend/flydsl_aiter.md](../backend/flydsl_aiter.md)
 
 #### Limits
 

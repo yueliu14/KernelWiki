@@ -5,7 +5,7 @@
 
 FP8, INT8, FP4 and microscaled projections, including packing and scale contracts.
 
-8 AITER implementation references; 13 historical experience cards.
+8 AITER implementation references; 18 historical experience cards.
 
 ## AITER implementations
 
@@ -30,6 +30,10 @@ Each page pins its source revision. Source references describe implementations a
 ## Optimization experience
 
 [Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
+
+### Historical case studies
+
+- [Norm + quant preparation for scaled GEMM (upstream-reported)](case_studies/fused_norm_quant_win.md)
 
 ## GEAK reference material
 

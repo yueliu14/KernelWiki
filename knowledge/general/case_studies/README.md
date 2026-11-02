@@ -1,62 +1,47 @@
----
-title: Case studies — real measured / sourced AMD MI-GPU kernel optimization runs
-kind: case_study
-gens: [gfx942, gfx950]
-regimes: [prefill, decode, both]
-status: sota
-updated: 2026-06-08
-sources:
-  - GEAK/e2e_workflow/knowledge/gemm_tuning/aiter_gemm_tuning.md
-  - GEAK/e2e_workflow/knowledge/gemm_attention_backends.md
----
+# General case studies
 
-# Case studies
+Whole-model serving reports and worked examples of reusable optimization methods. Operator-specific
+results live with their operator; use their recorded model, stack, shapes, baseline and date when
+interpreting the outcome. Imported measurements were reported by GEAK or upstream authors, not
+newly reproduced by KernelWiki.
 
-End-to-end and per-kernel optimization runs on AMD Instinct GPUs, written up the way they
-actually happened — **including the attempts that failed**. Every number here is either
-**measured-by-us** (a same-session A/B from a real eval dir, labelled with the stack/date) or
-**vendor-reported** (AMD blog / vLLM blog, labelled as such). Nothing is invented or
-extrapolated past its source. Where a figure differs between runs (box drift across sessions),
-both are shown with their provenance.
+The reusable procedures remain in [end-to-end optimization](../workflows/optimize_e2e_model.md),
+[single-kernel optimization](../workflows/optimize_single_kernel.md) and
+[GEMM tuning](../workflows/gemm_tuning_workflow.md). A tuning skill explains how to run an experiment;
+a case records what happened in one environment.
 
-The methodology these follow is in [`../workflows/optimize_e2e_model.md`](../workflows/optimize_e2e_model.md)
-(e2e flow), [`../workflows/optimize_single_kernel.md`](../workflows/optimize_single_kernel.md)
-(inner loop), and [`../workflows/gemm_tuning_workflow.md`](../workflows/gemm_tuning_workflow.md)
-(the GEMM recipe). Read those for the *how*; these case studies are the *what happened*.
+## Whole-model reports
 
-## How to read a case study
-Each file follows: **Context → Baseline → What we tried → What worked / what didn't (both kept)
-→ Final result (numbers) → Lessons → Sources**. The accept gate everywhere is the project
-standard: `delta% > 0.5% noise band AND cand_min > ref_max` on a tight same-session A/B, plus
-**engagement proof** on the live path and **output parity** (see
-[`../workflows/optimize_e2e_model.md`](../workflows/optimize_e2e_model.md)).
+| Report | Context |
+| --- | --- |
+| [Qwen3.5-27B](by_model/qwen3.5-27b_sglang_e2e.md) | SGLang attention and GEMM changes, including rejected attempts |
+| [DeepSeek MLA](by_model/deepseek_mla_mi300x.md) | Upstream-reported MLA serving results |
+| [DeepSeek V3/V4 attention](by_model/deepseek_v3v4_attention.md) | Model and attention-backend context |
+| [Kimi K2.6 INT4 MoE](by_model/kimi_k2.6_int4_moe_mi300x.md) | Model deployment and MoE precision context |
+| [Llama FP8 serving](by_model/llama_fp8_serving.md) | Quantized serving and integration |
 
-## by_model/  — full e2e serving runs
+## Reusable method examples
 
-| case | model / stack | headline | kind |
-|---|---|---|---|
-| [`by_model/qwen3.5-27b_sglang_e2e.md`](by_model/qwen3.5-27b_sglang_e2e.md) | Qwen3.5-27B / sglang 0.5.11 / MI300X | **triton attn + GEMM tune ≈ +6% cumulative** (measured) | flagship |
-| [`by_model/deepseek_mla_mi300x.md`](by_model/deepseek_mla_mi300x.md) | DeepSeek (MLA) / aiter / MI300X | **17× MLA decode**, 1.2–1.6× TPOT (vendor) | MLA serving |
-| [`by_model/llama_fp8_serving.md`](by_model/llama_fp8_serving.md) | Llama-class fp8 / vLLM+sglang / MI300X | fp8 recipe + AITER fused kernels (vendor) | quant serving |
+- [MFMA tile selection](by_kernel/mfma_tile_selection.md): a historical worked example of instruction
+  shape, register pressure and occupancy. Its GEMM examples illustrate a method; compare candidates
+  for the actual workload instead of treating its old default as a universal ranking.
 
-## by_kernel/  — single-kernel / single-lever wins
+## Operator case records
 
-| case | lever | headline | kind |
-|---|---|---|---|
-| [`by_kernel/gemm_aiter_db_tuning.md`](by_kernel/gemm_aiter_db_tuning.md) | aiter per-shape GEMM DB tune | **+2.23% e2e** (measured), 246 engagement hits | GEMM tune |
-| [`by_kernel/gated_delta_backend_swap.md`](by_kernel/gated_delta_backend_swap.md) | `--attention-backend triton` | **+4.15–4.96% e2e** (measured/KB) | backend swap |
-| [`by_kernel/fused_norm_quant_win.md`](by_kernel/fused_norm_quant_win.md) | RMSNorm+fp8-quant fusion | 1–6% e2e latency (vendor, sglang #18466) | fusion |
-| [`by_kernel/mfma_tile_selection.md`](by_kernel/mfma_tile_selection.md) | 16×16 vs 32×32 MFMA tile | 16×16 default on MI300X (vendor) | tile choice |
+- [Dense GEMM DB tuning](../../operator/dense_gemm/case_studies/gemm_aiter_db_tuning.md): captured
+  lookup keys, a bias mismatch and the measured Qwen3.5-27B outcome.
+- [Hybrid attention backend swap](../../operator/linear_attention_gated_delta/case_studies/gated_delta_backend_swap.md):
+  Qwen3.5-27B's full-attention path within a gated-delta model.
+- [Norm + quant preparation for scaled GEMM](../../operator/scaled_quant_gemm/case_studies/fused_norm_quant_win.md):
+  consumer scale contracts and upstream-reported fusion results.
 
-## Cross-links
-- Workflows: [`../workflows/`](../workflows/README.md) · Operators: [`../operators/`](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/operators)
-- aiter backend: [`../backends/aiter/`](../libraries/aiter/overview.md) · Quantization: [`../quantization/`](../quantization/README.md)
-- Optimization techniques: [`../optimization/`](../optimization/README.md) · SOTA matrix: [`../index/sota_matrix.md`](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/index/sota_matrix.md)
+## Evidence and protocol
 
-## Sources
-- Provenance ledger for the GEMM/attention levers: `GEAK/e2e_workflow/knowledge/{gemm_tuning/aiter_gemm_tuning.md,gemm_attention_backends.md}`.
-
-<!-- MANIFEST: case_studies index — routes to by_model/{qwen3.5-27b_sglang_e2e,deepseek_mla_mi300x,llama_fp8_serving} and by_kernel/{gemm_aiter_db_tuning,gated_delta_backend_swap,fused_norm_quant_win,mfma_tile_selection}; every number labelled measured-by-us vs vendor-reported. -->
+Keep measured results, vendor reports and source-only observations distinct. A case should record
+context, baseline, attempted changes, unsuccessful attempts, results, limitations and source evidence.
+The imported GEAK cases often used a 0.5% band and non-overlapping repeat ranges; those are historical
+protocol choices. A new experiment must report its own variability and justified acceptance rule,
+with correctness and engagement checked for its actual TP/EP configuration.
 
 ## Migration provenance
 

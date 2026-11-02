@@ -114,7 +114,7 @@ use plain `topk_softmax` instead.
 ## Alternatives / cross-links
 [moe_routing_topk](../README.md) · [hip.md](hip.md) (raw kernels) · [triton.md](triton.md) ·
 [vllm_kernels.md](vllm_kernels.md) · [fused_moe_grouped_gemm](../../fused_moe_grouped_gemm/README.md) (consumer) · [moe_dispatch_combine](../../moe_dispatch_combine/README.md) (shares
-`moe_sorting`) · [`backends/aiter/fmoe.md`](../../../general/libraries/aiter/fmoe.md) · [overview.md](../README.md) ·
+`moe_sorting`) · [`backends/aiter/fmoe.md`](../../grouped_gemm_moe/backend/aiter.md) · [overview.md](../README.md) ·
 [numerics.md](../numerics.md).
 
 ## Sources

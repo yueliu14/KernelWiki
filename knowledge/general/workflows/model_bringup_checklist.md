@@ -79,7 +79,7 @@ ROCM_ATTN on models with unsupported KV head dims (silent Triton fallback → bi
   MXFP4 w4a4). Tune via `AITER_CONFIG_FMOE`. Watch the **AITER-gating bug** (expert mask
   gated on global AITER-on vs the actual matmul backend → wrong-expert routing when MXFP4
   falls through to emulation). [`../operators/fused_moe_grouped_gemm/`](../../operator/fused_moe_grouped_gemm/README.md),
-  [`../backends/aiter/fmoe.md`](../libraries/aiter/fmoe.md).
+  [`../backends/aiter/fmoe.md`](../../operator/grouped_gemm_moe/backend/aiter.md).
 
 ## 6. ACCURACY SMOKE TEST (do this BEFORE perf tuning)
 Run gsm8k / lm_eval / a translation probe (greedy/temp=0, ≥10 prompts). This catches silent

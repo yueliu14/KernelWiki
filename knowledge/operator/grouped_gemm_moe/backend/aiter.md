@@ -22,8 +22,8 @@ sources:
 # grouped_gemm_moe × aiter
 
 ## TL;DR
-> On sglang/vllm, **aiter's `fused_moe` is the live MoE GEMM path** and the SOTA on AMD: a single fused
-> asm/CK kernel does grouped gate/up → activation → grouped down → routing-weight combine, accelerating MoE
+> In the cited sglang/vllm stack, **aiter's `fused_moe` dispatches the MoE expert path**. It can select
+> one-stage or two-stage implementations for grouped gate/up → activation → grouped down → routing-weight combine, accelerating MoE
 > **up to 3×** (DeepSeek-V3, MI300X) vs naive per-expert launches; the align&sort redesign cut the **sort
 > step 10×** and **MoRI** fuses cross-GPU EP dispatch/combine into the kernel. Use it unless you hit a
 > shape/dtype it doesn't cover (then fall back
@@ -100,6 +100,23 @@ grep -c 'is tuned' server.log                        # MoE tuned-config engageme
 [operators/dense_gemm/backends/flydsl](../../dense_gemm/backend/flydsl.md) (FlyDSL MoE backend) ·
 [operators/skinny_gemv_decode/backends/aiter](../../skinny_gemv_decode/backend/aiter.md) (small per-group M) · [quantization/block_scaling_mxfp](../../../general/quantization/block_scaling_mxfp.md) ·
 [operators/grouped_gemm_moe/overview](../README.md)
+
+## Historical dispatch and configuration details
+
+At the cited AITER `a6bb4993` snapshot, sorting produces `sorted_token_ids`, `sorted_expert_ids` and
+padded expert blocks. In a two-stage path, stage 1 performs gate/up projection and activation; stage 2
+performs down projection and the configured routing-weight operation. A `fused_moe` wrapper call does
+not by itself establish that all these operations share one device launch.
+
+The historical `tuned_fmoe.csv` key includes `cu_num, token, model_dim, inter_dim, expert, topk,
+act_type, dtype, q_dtype_a, q_dtype_w, q_type, use_g1u1, doweight_stage1`; recorded choices include
+`block_m`, `ksplit`, `kernelName1`, `kernelName2` and `run_1stage`. Deploy through `AITER_CONFIG_FMOE`
+and the [shared configuration merge rules](../../../general/libraries/aiter/configs_db.md), not the
+dense GEMM CSV. Keep the configured scale formats and routing-weight placement consistent across
+both stages. For later source contracts, use [the pinned AITER reference](aiter_aiter.md) and
+[operator corpus](../corpus/decisions.md).
+
+Consolidated from the duplicate [GEAK AITER fmoe overview](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/backends/aiter/fmoe.md).
 
 ## Sources
 - On-box: `/sgl-workspace/aiter/aiter/fused_moe.py` (signature + dispatch table), `aiter/jit/core.py`

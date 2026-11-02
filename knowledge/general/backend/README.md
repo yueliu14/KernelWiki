@@ -26,7 +26,6 @@ Cross-operator reference material. Source revisions and evidence remain attached
 - [FlyDSL tile programming](flydsl/authoring_tile_programming.md)
 - [Debug a FlyDSL kernel](flydsl/debugging.md)
 - [FlyDSL — deep dive](flydsl/deep.md)
-- [FlyDSL — kernel families](flydsl/kernel_families.md)
 - [FlyDSL — knobs](flydsl/knobs.md)
 - [FlyDSL — overview](flydsl/overview.md)
 - [FlyDSL — usage patterns](flydsl/patterns.md)

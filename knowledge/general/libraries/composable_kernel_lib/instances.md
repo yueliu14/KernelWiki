@@ -76,7 +76,7 @@ clamp GEMM epilogue.
   keep the dtypes/ops you actually serve.
 
 ## Cross-links
-[api.md](api.md) · [ckprofiler.md](ckprofiler.md) · [../aiter/fmoe.md](../aiter/fmoe.md) (CK stage-2 MoE) ·
+[api.md](api.md) · [ckprofiler.md](ckprofiler.md) · [../aiter/fmoe.md](../../../operator/grouped_gemm_moe/backend/aiter.md) (CK stage-2 MoE) ·
 [../aiter/flydsl_path.md](../aiter/flydsl_path.md) (A4W4 → CK fallback).
 
 ## Sources

@@ -51,7 +51,7 @@ asserts `scale_a/scale_b/scale_c is None`; bias is fused only when dtype/otype a
 (`moe_kernels.py`) are two-stage (`flydsl_moe1_*` stage-1 gate/up, `flydsl_moe2_*` stage-2 down) with
 their own name encoding and a `sort_block_m` knob. **When FlyDSL is absent, A4W4 fused MoE falls back to
 CK** grouped-GEMM instances — the same coverage caveats apply (an uncovered shape raises the CK
-"does not support this GEMM problem" error). See [fmoe.md](fmoe.md).
+"does not support this GEMM problem" error). See [fmoe.md](../../../operator/grouped_gemm_moe/backend/aiter.md).
 
 ## The levers
 - **Tile/split-K**: `tile_m/n/k`, `split_k` — `gemm_kernels.py` enumerates split-K options subject to
@@ -78,7 +78,7 @@ If you expect FlyDSL but see `hipblaslt`/`torch`, check `python -c "import flyds
 kernel exists for the shape.
 
 ## Alternatives / cross-links
-[tuned_gemm.md](tuned_gemm.md) (dispatch + tuner) · [fmoe.md](fmoe.md) (A4W4 MoE) ·
+[tuned_gemm.md](tuned_gemm.md) (dispatch + tuner) · [fmoe.md](../../../operator/grouped_gemm_moe/backend/aiter.md) (A4W4 MoE) ·
 [`languages/flydsl/`](../../backend/flydsl/overview.md) (authoring FlyDSL) ·
 [`operators/dense_gemm/backends/flydsl.md`](../../../operator/dense_gemm/backend/flydsl.md).
 

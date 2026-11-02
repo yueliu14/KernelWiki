@@ -78,7 +78,7 @@ recipe.
 
 ## Cross-links
 [ckprofiler.md](ckprofiler.md) · [instances.md](instances.md) · [`languages/composable_kernel/`](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/languages/composable_kernel)
-· [../aiter/fmoe.md](../aiter/fmoe.md) (CK stage-2 MoE).
+· [../aiter/fmoe.md](../../../operator/grouped_gemm_moe/backend/aiter.md) (CK stage-2 MoE).
 
 ## Sources
 - CK repo (deprecated → rocm-libraries; instances, examples): https://github.com/ROCm/composable_kernel

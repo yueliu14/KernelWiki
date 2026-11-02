@@ -31,6 +31,10 @@ Each page pins its source revision. Source references describe implementations a
 
 [Learned knowledge](learned_knowledge/README.md) — applicability, outcomes and original evidence.
 
+### Historical case studies
+
+- [AITER DB tuning: Qwen3.5-27B and the bias-key mismatch](case_studies/gemm_aiter_db_tuning.md)
+
 ## GEAK reference material
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.

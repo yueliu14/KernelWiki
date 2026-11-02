@@ -85,7 +85,7 @@ cards:
   references:
   - knowledge/general/hardware/cdna3_mi300/memory_hierarchy.md
   - knowledge/general/backend/flydsl/knobs.md:71-75
-  - knowledge/general/backend/flydsl/kernel_families.md:19-32
+  - knowledge/operator/dense_gemm/backend/flydsl_aiter.md
   measurement_evidence: []
   limitations:
   - These are the gates that name an architecture literally. A path can also be effectively closed by something

@@ -69,7 +69,7 @@ python3 -m sglang.launch_server --model-path meta-llama/Meta-Llama-3.1-8B-Instru
 fp8 dense GEMM still flows through the aiter dispatch; reach the fp8 (a8w8) GEMM and FlyDSL-fp8
 path via the same DB tune (`libtype=flydsl`) — see
 [`../../workflows/gemm_tuning_workflow.md`](../../workflows/gemm_tuning_workflow.md) (the fp8/CDNA4
-note) and [`../by_kernel/gemm_aiter_db_tuning.md`](../by_kernel/gemm_aiter_db_tuning.md).
+note) and [`../by_kernel/gemm_aiter_db_tuning.md`](../../../operator/dense_gemm/case_studies/gemm_aiter_db_tuning.md).
 
 ## What didn't / the traps (kept honestly)
 - **OCP checkpoint on MI300 without FNUZ conversion → silent 2× error.** The most common fp8
@@ -91,7 +91,7 @@ note) and [`../by_kernel/gemm_aiter_db_tuning.md`](../by_kernel/gemm_aiter_db_tu
 |---|---|---|
 | AITER fused block-scale MoE | **~3×** (MI300X) | **vendor** — vLLM ROCm optimization doc |
 | AITER MLA decode (DeepSeek-class) | **~17×** (MI300X) | **vendor** — same doc / aiter-mla blog |
-| RMSNorm + fp8 dynamic-quant fusion | 1–6% e2e latency | **vendor** — sglang #18466 (see [`../by_kernel/fused_norm_quant_win.md`](../by_kernel/fused_norm_quant_win.md)) |
+| RMSNorm + fp8 dynamic-quant fusion | 1–6% e2e latency | **vendor** — sglang #18466 (see [`../by_kernel/fused_norm_quant_win.md`](../../../operator/scaled_quant_gemm/case_studies/fused_norm_quant_win.md)) |
 | fp8 weight/activation + fp8 KV | ½ GEMM input bytes, ½ KV traffic | structural (the recipe's mechanism) |
 
 **Our own e2e measurement on this exact recipe for a Llama-class model is not in the eval dirs**
@@ -112,7 +112,7 @@ accuracy gate**. Treat the multipliers above as the vendor floor to beat, and ga
 - Deployment wiring (the source of this recipe): [`../../quantization/deployment_recipes.md`](../../quantization/deployment_recipes.md)
 - fp8 dialect: [`../../quantization/fnuz_vs_ocp.md`](../../quantization/fnuz_vs_ocp.md) · checkpoints: [`../../quantization/calibration_and_quark.md`](../../quantization/calibration_and_quark.md)
 - Accuracy gate: [`../../quantization/accuracy_evaluation.md`](../../quantization/accuracy_evaluation.md) · KV: [`../../quantization/kv_cache_quantization.md`](../../quantization/kv_cache_quantization.md)
-- fp8 GEMM: [`../../operators/scaled_quant_gemm/`](../../../operator/scaled_quant_gemm/README.md) · [`../by_kernel/gemm_aiter_db_tuning.md`](../by_kernel/gemm_aiter_db_tuning.md)
+- fp8 GEMM: [`../../operators/scaled_quant_gemm/`](../../../operator/scaled_quant_gemm/README.md) · [`../by_kernel/gemm_aiter_db_tuning.md`](../../../operator/dense_gemm/case_studies/gemm_aiter_db_tuning.md)
 - aiter backend: [`../../backends/aiter/overview.md`](../../libraries/aiter/overview.md)
 
 ## Sources

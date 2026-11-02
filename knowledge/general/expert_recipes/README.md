@@ -1,4 +1,12 @@
-# expert_skills — human-authored, e2e-validated optimization recipes
+# Reusable expert recipes
+
+This collection belongs in `general/` because it contains reusable procedures, including GEMM
+tuning and backend authoring. An operator/scenario selector scopes a recipe's applicability; it does
+not turn the recipe into a record of one operator's result. The specific evidence and limitations
+remain attached to each recipe.
+
+These are imported GEAK resources. The selection and validation behavior described below belongs
+to the original GEAK workflows; KernelWiki does not automatically execute it or refresh its status.
 
 > **Contract (read this first).** An expert skill is an **advisory prior**, not a mandate. It packages a
 > human expert's *proven, reusable optimization recipe* (the regulated steps + knobs + pitfalls) for a
@@ -106,8 +114,11 @@ bash   _contribute/make_pr.sh <slug>                                            
 
 ## Canonical copy
 
-This directory is maintained ONLY in this canonical GEAK repository. Other downstream snapshots are
-copies — do not edit skills there; they sync from here.
+KernelWiki maintains this imported copy with Git. Preserve its upstream attribution and distinguish
+local changes from the imported version. The vendored `tuning/` subtree remains pinned by
+[`tuning_skillset.manifest.sha256`](../workflows/geak/tuning_skillset.manifest.sha256); the selector
+metadata and validation reports describe their recorded revisions. This repository has no automatic
+sync or automatic validation-status refresh.
 
 ## Sources
 - Design discussion 2026-06-17 (this repo).
