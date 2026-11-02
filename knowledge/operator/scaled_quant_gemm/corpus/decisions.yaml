@@ -266,8 +266,10 @@ cards:
     b) * a_scale[:, None] * b_scale[None, :]`; Gluon as `acc += mfma_out * cur_a_scale[:, None] * cur_b_scale[None,
     :]`.'
   - Make one K tile exactly one scale block. The Triton kernel takes GROUP_K and BLOCK_SIZE_K as separate parameters,
-    its docstring requires them equal, and every gfx942 configuration AITER ships sets BLOCK_SIZE_K = GROUP_K
-    = GROUP_N = 128 — on gfx942 that is four 16x16x32 fp8 MFMA K-steps between scale multiplies.
+    its docstring requires them equal. For this 128x128 scale contract, resolve BLOCK_SIZE_K = GROUP_K
+    = GROUP_N = 128 at the selected caller — on gfx942 that is four 16x16x32 fp8 MFMA K-steps between scale
+    multiplies. Some shipped configs omit GROUP_K or GROUP_N; their effective values must be checked in
+    the wrapper rather than inferred from the configuration-group summary.
   - 'Index the scales per K block: X''s scale is [M, ceil(K/128)] and advances one column per K tile; W''s
     holds one value per 128x128 block, so each output column reads the scale of its 128-wide group for the
     current K block (Triton gathers it as `offs_bn // GROUP_N`).'

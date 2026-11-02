@@ -19,6 +19,8 @@ python3 tools/corpus/validate.py
 python3 tools/corpus/validate.py --verify-source /path/to/aiter
 python3 tools/corpus/extract.py --operator attention_indexer --aiter /path/to/aiter --check
 python3 tools/corpus/extract.py --operator attention_indexer --aiter /path/to/aiter --emit
+python3 tools/corpus/seeds.py --aiter /path/to/aiter --check
+python3 tools/corpus/seeds.py --operator dense_gemm --aiter /path/to/aiter --emit
 python3 -m pytest tests/corpus -q
 ```
 
@@ -32,10 +34,11 @@ or `--family` limits the selected pages or source audit. Source extraction reads
 objects declared by the scope: the checkout must hold those revisions, but its HEAD and working
 files need not match them. No GPU, GEAK checkout or live workflow is required.
 
-Extraction writes source evidence only. Curated cards, axes, upstream-test references and the
-preserved shipped configuration inventories are separate inputs. Source refresh is not a benchmark
-run or a re-tuning of those inventories. Private underscore modules contain shared parsing,
-normalization and schema helpers; the three scripts above are the maintenance entry points.
+`extract.py` writes source evidence. `seeds.py` separately rebuilds shipped configuration groups,
+file inventories and extraction gaps from `scope.yaml`'s `tuning_sources`. Both read fixed Git objects.
+Curated cards, axes and upstream-test references remain reviewed inputs. Source refresh is not a
+benchmark run or re-tuning. Private underscore modules contain shared parsing, normalization and
+schema helpers.
 
 ## Ownership and references
 
@@ -59,6 +62,23 @@ normalization and schema helpers; the three scripts above are the maintenance en
 - `tuned_configs.yaml`, where present, owns upstream configuration groups and backend selections.
   They retain source revisions and configuration IDs, exclude timing columns, and generate a local
   `seeds.md`. Counts are source selections, not speedups or a ranking of kernels.
+  Inventory schema 3 separates `same_across_configs` (an explicit equal value in every member),
+  `varies_by_shape` (every member specifies a value, with variation) and `partially_specified`
+  (typed values plus presence/absence counts). An absent parameter is not a default; JSON null is
+  distinct from an absent field or the string `"None"`.
+
+## Shipped configuration inputs
+
+An operator with shipped groups declares `tuning_sources` in `scope.yaml`. Each entry names a
+snapshot and the inputs for that snapshot: `tuned_json.dir` for Triton JSON configurations and/or
+`tuned_db` with `dirs`, a `name_pattern` containing a named `kind` group, and `context_columns`.
+See the dense and quantized GEMM scopes for concrete examples. Group membership is rebuilt from
+these scoped inputs, so editing or dropping a generated record cannot silently change the audit set.
+
+Run `seeds.py --emit` after changing the inputs, then review the conclusions citing those groups.
+IDs identify the grouping key within a snapshot; they are not checksums of the summarized values.
+`seeds.py --check` recomputes and compares every value, count, source list, inventory entry and gap.
+Add a new snapshot to retain historically cited groups when refreshing upstream.
 
 ## Adding or extending an operator
 
@@ -77,7 +97,8 @@ normalization and schema helpers; the three scripts above are the maintenance en
    review affected references when moving upstream revisions.
 
 `build.py --check` verifies the published pages. `validate.py --verify-source` additionally checks
-quoted lines, source extents, upstream-test paths and seed-source paths through `git show`. Offline
+quoted lines, source extents and upstream-test paths through `git show`, and recomputes the complete
+shipped configuration inventory with `seeds.py`. Offline
 CI validates IDs, ownership, schemas, dependencies, references, links and generated artifacts.
 No knowledge-production command executes an upstream correctness test or records GPU timings.
 

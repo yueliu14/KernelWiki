@@ -691,6 +691,27 @@ def tuned_configs(scope, aiter):
     return out, gap
 
 
+def summarize_knobs(members):
+    """Separate complete agreement, complete variation and missing declarations."""
+    spread = collections.defaultdict(collections.Counter)
+    for knobs in members:
+        for key, value in knobs.items():
+            spread[key][json.dumps(value, sort_keys=True)] += 1
+    fixed, varies, partial = {}, {}, {}
+    for key, counter in sorted(spread.items()):
+        present = sum(counter.values())
+        if present < len(members):
+            partial[key] = {"present": present, "missing": len(members) - present,
+                            "values": [{"value": json.loads(v), "count": n}
+                                       for v, n in counter.most_common()]}
+        elif len(counter) == 1:
+            fixed[key] = json.loads(next(iter(counter)))
+        else:
+            varies[key] = ", ".join(f"{_value_text(json.loads(v))}: {n}"
+                                    for v, n in counter.most_common())
+    return fixed, varies, partial
+
+
 def summarize_tuned(rows):
     """Group the shipped knob sets by (gfx, tags, M bucket) and report each knob's value spread.
 
@@ -710,18 +731,7 @@ def summarize_tuned(rows):
         groups[(r["gfx"], " ".join(r["tags"]), r["m_bucket"])].append(r)
     out = []
     for (gfx, tags, bucket), members in sorted(groups.items()):
-        spread = collections.defaultdict(collections.Counter)
-        for mem in members:
-            for k, v in mem["knobs"].items():
-                spread[k][json.dumps(v)] += 1
-        fixed, varies = {}, {}
-        for k, counter in sorted(spread.items()):
-            if len(counter) == 1:
-                fixed[k] = json.loads(next(iter(counter)))
-            else:
-                # `value: count`, not `valueXcount` — `.cgx23` reads as a cache modifier named
-                # `.cgx23` rather than `.cg` seen 23 times, and `32x20` as a tile shape.
-                varies[k] = ", ".join(f"{json.loads(val)}: {n}" for val, n in counter.most_common())
+        fixed, varies, partial = summarize_knobs([mem["knobs"] for mem in members])
         rec = {
             "config_id": "cfg_" + hashlib.sha256(
                 json.dumps([gfx, tags, bucket], separators=(",", ":")).encode()
@@ -742,6 +752,8 @@ def summarize_tuned(rows):
             # proof of a constraint — the source does not preserve alternatives or benchmark results.
             rec["same_across_configs"] = fixed
             rec["varies_by_shape"] = varies
+        if partial:
+            rec["partially_specified"] = partial
         out.append(rec)
     return out
 
@@ -886,7 +898,7 @@ def _short_id(prefix, parts):
 
 
 def _value_text(value):
-    return "true" if value is True else "false" if value is False else str(value)
+    return "null" if value is None else "true" if value is True else "false" if value is False else str(value)
 
 
 def summarize_flydsl_tuned(rows):
@@ -912,17 +924,7 @@ def summarize_flydsl_tuned(rows):
     for key in sorted(groups, key=lambda t: (t[0], t[1], t[2], t[3], t[4], M_BUCKET_ORDER[t[5]])):
         gfx, cu, kind, family, dtype, bucket = key
         members = groups[key]
-        spread = collections.defaultdict(collections.Counter)
-        for _, knobs in members:
-            for knob, value in knobs.items():
-                spread[knob][json.dumps(value)] += 1
-        fixed, varies = {}, {}
-        for knob, counter in sorted(spread.items()):
-            if len(counter) == 1 and sum(counter.values()) == len(members):
-                fixed[knob] = json.loads(next(iter(counter)))
-            else:
-                varies[knob] = ", ".join(f"{_value_text(json.loads(v))}: {n}"
-                                         for v, n in counter.most_common())
+        fixed, varies, partial = summarize_knobs([knobs for _, knobs in members])
         rec = {
             "config_id": _short_id("cfg_", ["aiter_tuned_db", gfx, cu, kind, family, dtype, bucket]),
             "gfx": gfx, "cu_num": cu, "db_kind": kind, "family": family, "dtype": dtype,
@@ -934,6 +936,8 @@ def summarize_flydsl_tuned(rows):
         else:
             rec["same_across_configs"] = fixed
             rec["varies_by_shape"] = varies
+        if partial:
+            rec["partially_specified"] = partial
         out.append(rec)
     gaps = [{"language": "aiter_tuned_db", "subtree": path,
              "why": f"{n} flydsl kernelName(s) in neither shipped naming form; skipped, not guessed"}

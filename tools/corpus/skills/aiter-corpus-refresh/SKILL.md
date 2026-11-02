@@ -46,7 +46,13 @@ all kernels at that snapshot were already reviewed. Later passes use the private
 helper reads git objects only and never fetches, changes scopes, regenerates evidence or executes
 kernels. If required objects are absent, fetch them and retry; do not silently compare working files.
 
-Review both `changes` and, when requested, `unscoped_inventory`. The report links changed files to
+Review `changes`, `pinned_differences` and, when requested, `unscoped_inventory`. On a first pass
+(no `--since`), or any `--full-inventory` pass, the helper also compares every existing binding with
+the target. This includes older snapshots whose changes predate the newest catalog snapshot.
+Differences are review candidates: retain historical evidence deliberately, rather than assuming
+every old binding must migrate. Later incremental passes use the completed private checkpoint;
+historical bindings already reviewed and retained do not make every invocation repeat the same work.
+The report links changed files to
 source owners, test/configuration owners, cited cards and shared/dependency consumers. It detects
 exact renames; edited renames can appear as deletion plus addition. Family and training-name hints
 are triage aids, not classifications to accept blindly. Review unrecognized paths and shared helpers
@@ -87,16 +93,21 @@ From the KernelWiki root, use its existing tools:
 
 ```bash
 python3 tools/corpus/extract.py --aiter /path/to/aiter --operator <owner> --emit
+python3 tools/corpus/seeds.py --aiter /path/to/aiter --operator <owner> --emit
 python3 tools/corpus/build.py --emit
 python3 tools/corpus/validate.py
 python3 tools/corpus/extract.py --aiter /path/to/aiter --check
+python3 tools/corpus/seeds.py --aiter /path/to/aiter --check
 python3 tools/corpus/validate.py --verify-source /path/to/aiter
 python3 tools/corpus/build.py --check
 python3 -m pytest -q
 git diff --check
 ```
 
-Repeat extraction for each affected owner, or omit `--operator` when refreshing all scopes. Include
+Repeat extraction for each affected owner, or omit `--operator` when refreshing all scopes. Run
+`seeds.py --emit` for changed tuning scopes; it rebuilds groups, file inventory and gaps from their
+pinned inputs. On older checkouts without this command, use that checkout's maintenance procedure
+and report any missing configuration-value audit. Include
 borrowed references and configuration/test paths in the citation audit. Check changed local links,
 new source licenses and the final diff; stage new generated files before the final whitespace check.
 These checks do not run upstream correctness tests or GPU benchmarks, and must not be reported as

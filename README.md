@@ -56,6 +56,7 @@ knowledge/
     ...
 tools/corpus/
   extract.py
+  seeds.py
   validate.py
   build.py
   skills/aiter-corpus-refresh/

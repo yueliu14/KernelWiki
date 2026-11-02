@@ -13,6 +13,7 @@ import yaml
 import _extract_impl_facts as extractor
 import _normalize_performance_decisions as normalizer
 import _render_decisions as card_schema
+import seeds as seed_schema
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_REF = re.compile(r"([a-z0-9_]+):(src_[0-9a-f]{16})")
@@ -160,6 +161,7 @@ class Catalog:
             self._upstream_path(row["file"])
         for ref, row in self.seeds.items():
             self.snapshot(row["snapshot"])
+            seed_schema.validate_record(row)
             if not SEED_REF.fullmatch(ref) or row["kind"] not in {"triton", "flydsl", "selection"}:
                 raise ValueError(f"{ref}: invalid shipped seed")
             if set(row) & {"us", "ms", "tflops", "speedup", "bw", "errRatio"}:
@@ -172,6 +174,13 @@ class Catalog:
             if bundle["family"] != family_owners[op]:
                 raise ValueError(f"{op}: family mismatch")
             scope, evidence, decisions, axes = [bundle[k] for k in ("scope", "evidence", "decisions", "axes")]
+            seed_schema.validate_scopes(scope.get("tuning_sources", []), self.snapshots)
+            if bundle["tuning"]["records"] or scope.get("tuning_sources"):
+                if bundle["tuning"].get("schema_version") != 3 or bundle["tuning"].get("operator") != op:
+                    raise ValueError(f"{op}: invalid tuning inventory schema or owner")
+                pins = {s["snapshot"] for s in scope.get("tuning_sources", [])}
+                if {r["snapshot"] for r in bundle["tuning"]["records"]} - pins:
+                    raise ValueError(f"{op}: shipped group without a tuning source scope")
             if decisions.get("provenance", {}).get("schema_version") != card_schema.SCHEMA_VERSION:
                 raise ValueError(f"{op}: unsupported decision schema")
             if scope.get("operator") != op or evidence.get("operator") != op or axes.get("family") != op:
@@ -276,6 +285,8 @@ class Catalog:
             for row in self.operators[op]["tuning"]["records"]:
                 for file in row["source_files"]:
                     blob(row["snapshot"], file)
+            if self.operators[op]["scope"].get("tuning_sources") or self.operators[op]["tuning"]["records"]:
+                seed_schema.check_operator(self, op, checkout)
         return len(wanted)
 
 

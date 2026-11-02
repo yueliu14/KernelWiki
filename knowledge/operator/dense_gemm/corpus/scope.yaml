@@ -197,3 +197,19 @@ coverage_gaps:
   subtree: aiter/ops/triton/_triton_kernels/gemm
   why: "no @triton.autotune in the GEMM family \u2014 tuning is shipped as per-shape JSON under aiter/ops/triton/configs/gemm\
     \ (see evidence/gemm_tuned_configs.yaml, 1304 rows)"
+tuning_sources:
+- snapshot: aiter_a6bb4993
+  tuned_json:
+    dir: aiter/ops/triton/configs/gemm
+  tuned_db:
+    dirs:
+    - aiter/configs
+    - aiter/configs/model_configs
+    name_pattern: (?P<kind>bf16_tuned_(?:batched_)?gemm)
+    context_columns:
+    - bias
+    - bpreshuffle
+    - dtype
+    - outdtype
+    - q_dtype_w
+    - scaleAB

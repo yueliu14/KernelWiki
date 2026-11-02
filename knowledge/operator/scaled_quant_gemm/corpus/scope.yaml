@@ -293,3 +293,17 @@ validation_sources:
 coverage_notes:
 - Source observations and conditioned candidates for scaled quant gemm; source presence is not a measured winner.
 - No new GPU measurements or binary disassembly are included.
+tuning_sources:
+- snapshot: aiter_a6bb4993
+  tuned_db:
+    dirs:
+    - aiter/configs
+    - aiter/configs/model_configs
+    name_pattern: (?P<kind>(?:a8w8|a4w4)(?:_blockscale)?(?:_bpreshuffle)?_tuned_(?:batched_)?gemm)
+    context_columns:
+    - bias
+    - bpreshuffle
+    - dtype
+    - outdtype
+    - q_dtype_w
+    - scaleAB
