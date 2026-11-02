@@ -17,6 +17,11 @@ python3 tools/corpus/extract.py --operator attention_indexer --aiter /path/to/ai
 python3 -m pytest tests/corpus -q
 ```
 
+For manual or recurring upstream maintenance, use the
+[AITER corpus refresh skill](skills/aiter-corpus-refresh/SKILL.md). Its portable read-only planner
+finds new unscoped kernels and maps source/test/configuration changes to affected corpus consumers;
+the skill then guides source review, citation migration and a validated knowledge update.
+
 The build validates the whole reference graph and renders all operators by default. `--operator`
 or `--family` limits the selected pages or source audit. Source extraction reads the exact git
 objects declared by the scope: the checkout must hold those revisions, but its HEAD and working

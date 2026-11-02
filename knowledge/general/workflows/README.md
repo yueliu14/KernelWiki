@@ -43,6 +43,7 @@ single-kernel playbook is the inner loop of the e2e playbook.
 | [`authoring_a_kernel_with_geak.md`](authoring_a_kernel_with_geak.md) | No editable backend impl exists | unittest passes + beats `best_known_ms` |
 | [`choosing_a_backend.md`](choosing_a_backend.md) | "Which backend for operator family X?" | per-family decision table |
 | [`model_bringup_checklist.md`](model_bringup_checklist.md) | New model, first time on MI300X/MI350X | model runs + each lever banked |
+| [AITER corpus refresh](../../../tools/corpus/skills/aiter-corpus-refresh/SKILL.md) | Maintain knowledge as upstream inference kernels change | pinned source audit + corpus validation |
 
 ## How to read a workflow
 Each file: **TL;DR → preconditions → numbered steps (with the exact env/flags/commands)
