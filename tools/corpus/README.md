@@ -8,6 +8,10 @@ cards live in `knowledge/general/corpus/`; both use decision schema version 5.
 
 ## Commands
 
+Run from the repository root with Python 3.10+ and Git. Install maintenance and test dependencies
+with `python3 -m pip install -r requirements-dev.txt` in a virtual environment; see the
+[development setup](../../README.md#development-checks).
+
 ```bash
 python3 tools/corpus/build.py --emit
 python3 tools/corpus/build.py --check
