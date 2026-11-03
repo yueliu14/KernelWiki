@@ -1,9 +1,9 @@
 # index.yaml — expert_skills selector (AUTO-MAINTAINED by _contribute/scaffold.py + validate_skill.py).
 # Regenerate with:  python _contribute/scaffold.py --reindex
 # NOT a ranking. Filter by (operator, gen, arch_class, [from->to], status==validated) -> MEASURE.
-# scope: kernel | e2e | dependency | tuning. 'tuning' entries describe the VENDORED tree under
-# tuning/ and are declared in tuning_index.yaml (the tree is hash-pinned, so its metadata is
-# outside it); their status comes from tuning/validate/claims.py, not from a hand-typed field.
+# scope: kernel | e2e | dependency | tuning. Tuning metadata is declared in tuning_index.yaml.
+# Local methods are maintained through Git; the upstream checksum manifest is historical.
+# Status comes from recorded tuning/validate/claims.py reports; check their environment and revision.
 # Only 'validated' skills are auto-applied by the workflows (advisory priors, never override A/B).
 
 schema: {id, file, scope, match, expects, validation_status}

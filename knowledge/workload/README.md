@@ -67,10 +67,21 @@ Use these descriptions precisely:
 
 ## Adding knowledge
 
-Create `workload/<semantic_chain>/README.md` with the model-independent contract, topic navigation and constituent operator links. Add focused `cases/` pages using the [workload case template](_templates/workload_case.md); use the [fusion supplement](_templates/fusion_case.md) when appropriate. Index each case in its chain README. Keep model-specific constraints and measured results in the case. Shared run context and source digests can live under `_sources/` so several cases can cite the same evidence without duplicating it. Link new semantic chains here and keep documents in English.
+Create `workload/<semantic_chain>/README.md` with the model-independent contract, topic navigation and constituent operator links. Add focused `cases/` pages using the [workload case template](_templates/workload_case.md); use the [fusion supplement](_templates/fusion_case.md) when appropriate. Index each case in its chain README. Keep model-specific constraints and reviewed outcome summaries in the case. Shared public comparison context and evidence availability can live under `_sources/` so several cases can cite the same source IDs. Link new semantic chains here and keep documents in English.
 
 Each case should identify the model/stack revision, phase, shapes, dtypes, TP/EP, graph mode, caller and actual device entry points. Show the semantic chain and implementation boundaries separately. Include materialized intermediates, numerical rounding, mutation/aliasing and synchronization requirements, plus the dispatch branches the evidence does not cover.
 
-Label source inspection, reported measurements and measurements reproduced for the entry separately. For local-only artifacts, record their location and content digest, and state that readers need access to those artifacts. Prefer pinned public source links when available. An optimization run against an already-fused baseline does not measure the benefit of introducing that fusion.
+Label source inspection, reported measurements and measurements reproduced for the entry separately.
+For privately inspected sources, publish an evidence ID, its role, availability and verification status.
+Keep internal paths, file digests, raw reports and the mapping from IDs to run artifacts in a private
+ledger. A private-source ID attributes an inspection; it does not let public readers reproduce it.
+Prefer pinned public source links when available. An optimization run against an already-fused baseline
+does not measure the benefit of introducing that fusion.
+
+The `_sources/*.yaml` index uses `schema_version: 1`, `reviewed_on`, `evidence_kind`, `access` and
+`sources`. Each source has `id`, `kind`, `availability`, `verification` and `supports`; a public source
+also has a `reference` URL pinned to a full Git commit. Use `availability: private` with
+`verification: curator_inspected` for existing private inspections, or `public` with `source_linked`
+for a public source citation. Neither status certifies a benchmark or a performance winner.
 
 Performance claims require the [repository evidence contract](../README.md#performance-evidence). Report latency for the complete chain as well as any relevant kernel breakdown, and use an end-to-end A/B before claiming a serving gain. Track shared kernels by call site so the same time is not counted twice.

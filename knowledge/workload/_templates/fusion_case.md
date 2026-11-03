@@ -13,3 +13,7 @@ Explain ownership of the fused data and any tradeoff in parallelism, resource pr
 When measurements exist, identify baseline/candidate revisions, complete-chain latency, observed launch counts, intermediate footprint/traffic, correctness, repetition/noise and workload weights. Label logical bytes separately from measured traffic. Separate introducing fusion from tuning an already-fused implementation, and report serving engagement and end-to-end results independently.
 
 Record negative results and remaining limitations with the same evidence standard. Source inspection alone supports implementation structure, not a speedup claim.
+
+Publish the comparison context and conditioned conclusion. Keep per-run logs, traces, internal file
+locations and artifact mappings private; the public source index records availability and inspection
+status instead.

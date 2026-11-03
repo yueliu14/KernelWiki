@@ -1,5 +1,5 @@
 """The vendored tuning skillset is registered in the ONE selector, on the same terms as every other
-expert skill — without a byte of GEAK metadata landing inside the hash-pinned tree.
+expert skill — with selector metadata maintained separately from the imported procedures.
 
 Those two requirements pull against each other, and the whole design is the resolution: the selector
 metadata lives in ``tuning_index.yaml``, next to ``index.yaml`` rather than inside ``tuning/``, and
@@ -70,9 +70,9 @@ class TestTuningSkillsAreInTheSelector(unittest.TestCase):
             self.assertTrue(s["file"].startswith(self.desc["tree"] + "/"),
                             f"{s['id']} points outside the vendored tree")
 
-    def test_no_geak_metadata_leaked_into_the_pinned_tree(self):
-        # If someone "fixes" this by adding frontmatter upstream-side, the manifest breaks on the next
-        # re-sync and the vendoring quietly becomes a fork. Catch it here instead, where it is legible.
+    def test_selector_metadata_has_one_canonical_home(self):
+        # Selector fields live in tuning_index.yaml; avoid a second conflicting declaration
+        # in the method frontmatter. This does not prohibit reviewed edits to the methods.
         for s in self.tuning:
             with open(os.path.join(ROOT, s["file"])) as f:
                 head = f.read(400)

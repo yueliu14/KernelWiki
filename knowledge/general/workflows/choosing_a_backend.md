@@ -57,9 +57,9 @@ same-session A/B on the immutable oracle are the judge
 | **allgather / reduce_scatter** | RCCL/aiter → MoRI | [`../operators/allgather/`](https://github.com/yueliu14/KernelWiki/blob/45cd3f5b51d16322db8dc301fa783148d323d27b/knowledge/operator/allgather/README.md) |
 
 ## The cross-family heuristics (from the decision trees)
-- **Serving stack routes through aiter (sglang/vLLM)?** → tune the aiter DB FIRST (it's the
-  only lever that engages the live path); also author a Triton/FlyDSL impl and e2e-gate the
-  best. ⚠ TunableOp / `HIPBLASLT_TUNING_FILE` do **not** engage the aiter path.
+- **Serving caller consumes an AITER database?** → consider tuning that database or changing the
+  active implementation, then verify engagement and end-to-end behavior. TunableOp and library
+  settings apply only if the selected call path consults them; inspect that path first.
 - **Raw torch/F.linear (no aiter)?** → hipBLASLt offline tune or TunableOp.
 - **Beat the library matmul itself?** → hand-asm or FlyDSL; pure Triton usually loses.
 - **Editable custom kernels** → Triton first (fastest to iterate).

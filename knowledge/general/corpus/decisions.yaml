@@ -53,6 +53,10 @@ cards:
     rule instead of inheriting a historical fixed percentage.
   - Check correctness independently of the edited implementation, and separate a counter change from a latency
     change.
+  - Re-establish the noise floor on the actual host and wait for stable warmup after each restart; do not inherit
+    a fixed number of warmup rounds from another run.
+  - Compare serving-accuracy changes and gate margins with the accuracy harness's repeatability; an apparent
+    pass near the threshold may need additional validation.
   why:
   - Historical experiments found order bias, power/clock drift and timing-bracket effects large enough to reverse
     small apparent wins.
@@ -78,6 +82,18 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/gate-a-tiny-kernel-win-on-a-median-or-a-paired-a-b-method-gfx950-launch-bound.md
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/measure-a-tiny-op-with-the-harness-s-own-protocol-rotated-ag-method-gfx950-both.md
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/per-rep-geomean-plus-a-two-sided-negative-control-method-gfx950-n-a.md
+      artifacts: not_published
+      verification: not_reproduced
+  - outcome: constraint
+    conditions:
+    - Historical multi-model serving-tuning reports on gfx950; conclusions depend on the recorded workload,
+      stack and measurement protocol.
+    summary: Reported serving campaigns found host-dependent restart scatter, cold-run effects and accuracy
+      margins that required fresh controls on the actual environment.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/expert_skills/tuning/tuning-kb/README.md
       artifacts: not_published
       verification: not_reproduced
 - id: method-live-binary-and-integration
@@ -107,6 +123,10 @@ cards:
     and verify that the changed binary was loaded.
   - Validate graph capture, stream handling, dynamic inputs and repeated calls on the real integration path
     before measuring end-to-end behavior.
+  - Record the effective process environment privately and verify positive selection markers plus expected
+    negative/fallback markers on every relevant rank.
+  - Restart processes and recapture graphs after configuration changes when the runtime caches the old selection;
+    a file changed on disk does not establish deployment.
   why:
   - Historical summaries repeatedly reported unchanged or stale binaries and unpatched importing call sites
     being mistaken for optimization results.
@@ -129,6 +149,18 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/method-verify-engagement.md
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/force-the-rebuild-pair-the-blocks-dump-the-registers-before--method-gfx950-n-a.md
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/prove-the-edit-built-and-prove-the-win-separately-from-the-h-method-gfx950-n-a.md
+      artifacts: not_published
+      verification: not_reproduced
+  - outcome: constraint
+    conditions:
+    - Historical multi-model serving-tuning reports on gfx950; conclusions depend on the recorded workload,
+      stack and measurement protocol.
+    summary: Historical campaigns reported configuration changes remaining inert under process or graph caches,
+      and partial rank engagement despite plausible benchmark output.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/expert_skills/tuning/tuning-kb/README.md
       artifacts: not_published
       verification: not_reproduced
 - id: method-conditional-negative-results
@@ -155,6 +187,8 @@ cards:
     cache footprint, compiler or timing protocol changes.
   - Test a proposed combination against the same baseline and against its strongest component; individually
     positive changes can interfere or become unreachable after dispatch changes.
+  - Keep corrected or withdrawn explanations with their scoped conclusion; a historical gain, an artifact-integrity
+    check and an independently reproduced deployment are different evidence claims.
   why:
   - Several discarded directions became useful after the limiting resource or selected implementation changed;
     other combinations erased an earlier gain.
@@ -177,6 +211,18 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/re-measure-shelved-partials-after-the-bound-class-moves-method-gfx950-n-a.md
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/re-price-the-dead-list-when-the-operating-point-moves-method-gfx950-compute-bound.md
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/scope-a-closure-a-gate-and-a-stack-by-case-regime-method-gfx950-n-a.md
+      artifacts: not_published
+      verification: not_reproduced
+  - outcome: constraint
+    conditions:
+    - Historical multi-model serving-tuning reports on gfx950; conclusions depend on the recorded workload,
+      stack and measurement protocol.
+    summary: The imported campaign summary distinguishes measured gains from deployment reproduction and records
+      withdrawn explanations and negative experiments; its per-model artifacts are not included in KernelWiki.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/expert_skills/tuning/tuning-kb/README.md
       artifacts: not_published
       verification: not_reproduced
 - id: method-host-and-replay-floor
@@ -350,6 +396,10 @@ cards:
   - Report a combined improvement as a combined result unless independent ablations isolate component effects.
   - Retain correct modest improvements only when the final combination passes the full correctness and performance
     gate.
+  - Choose the deployment phase and operating point explicitly; estimate startup, warmup and repetition costs
+    before deciding whether the expected end-to-end gain can be resolved within the available time.
+  - 'Re-time the selected change on the serving path: isolated kernel rankings and phase-specific improvements
+    can change under the deployment workload.'
   why:
   - Historical serving summaries found that individually small kernels and phase-specific gains did not translate
     proportionally to whole-model throughput.
@@ -369,6 +419,18 @@ cards:
       kind: historical_summary
       references:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/editable-triton-cluster-amdahl.md
+      artifacts: not_published
+      verification: not_reproduced
+  - outcome: constraint
+    conditions:
+    - Historical multi-model serving-tuning reports on gfx950; conclusions depend on the recorded workload,
+      stack and measurement protocol.
+    summary: Reported campaigns found isolated kernel wins with negligible serving impact, ranking reversals
+      after deployment, and experiment costs large enough to determine which gains were measurable.
+    provenance:
+      kind: historical_summary
+      references:
+      - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/expert_skills/tuning/tuning-kb/README.md
       artifacts: not_published
       verification: not_reproduced
 - id: method-grid-and-lifetime-contract

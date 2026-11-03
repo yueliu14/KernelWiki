@@ -44,6 +44,8 @@ Reusable methods distilled from historical reports. Reported outcomes have not b
 - Interleave paired baseline/candidate blocks in both orders and include an A/A control. Keep warmup, allocations, clocks, power limits and contention comparable.
 - Report per-case results and uncertainty with the intended workload weights. Choose a justified acceptance rule instead of inheriting a historical fixed percentage.
 - Check correctness independently of the edited implementation, and separate a counter change from a latency change.
+- Re-establish the noise floor on the actual host and wait for stable warmup after each restart; do not inherit a fixed number of warmup rounds from another run.
+- Compare serving-accuracy changes and gate margins with the accuracy harness's repeatability; an apparent pass near the threshold may need additional validation.
 
 #### Rationale
 
@@ -61,6 +63,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
   Conditions: The candidate and baseline implement the same contract and are timed under the actual execution protocol.
   Verification: <code>not_reproduced</code>.
   Sources: [Historical summary 1](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/method-e2e-ab-harness.md), [Historical summary 2](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/a-b-in-the-graded-case-mix-and-price-a-direction-against-the-method-gfx950-n-a.md), [Historical summary 3](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/a-b-protocol-and-oracle-confounds-on-a-power-capped-gpu-method-gfx950-n-a.md), [Historical summary 4](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/a-fixed-order-a-a-control-measures-order-bias-and-then-hides-method-gfx950-n-a.md), [Historical summary 5](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/gate-a-tiny-kernel-win-on-a-median-or-a-paired-a-b-method-gfx950-launch-bound.md), [Historical summary 6](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/measure-a-tiny-op-with-the-harness-s-own-protocol-rotated-ag-method-gfx950-both.md), [Historical summary 7](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/per-rep-geomean-plus-a-two-sided-negative-control-method-gfx950-n-a.md)
+
+- **constraint** — Reported serving campaigns found host-dependent restart scatter, cold-run effects and accuracy margins that required fresh controls on the actual environment.
+  Conditions: Historical multi-model serving-tuning reports on gfx950; conclusions depend on the recorded workload, stack and measurement protocol.
+  Verification: <code>not_reproduced</code>.
+  Sources: [Historical summary 1](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/expert_skills/tuning/tuning-kb/README.md)
 
 
 #### Limits
@@ -88,6 +95,8 @@ Raw run artifacts are not published here. Historical reports have not been repro
 - Record source and binary identities privately; inspect the compiled artifact and prove the intended callable executes in every relevant worker.
 - After changing module-level flags or included headers, invalidate or isolate the relevant compilation cache and verify that the changed binary was loaded.
 - Validate graph capture, stream handling, dynamic inputs and repeated calls on the real integration path before measuring end-to-end behavior.
+- Record the effective process environment privately and verify positive selection markers plus expected negative/fallback markers on every relevant rank.
+- Restart processes and recapture graphs after configuration changes when the runtime caches the old selection; a file changed on disk does not establish deployment.
 
 #### Rationale
 
@@ -105,6 +114,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
   Conditions: Compilation caches, imported aliases or serving workers can resolve a different implementation from the edited source.
   Verification: <code>not_reproduced</code>.
   Sources: [Historical summary 1](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/method-cudagraph-safe-integration.md), [Historical summary 2](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/method-verify-engagement.md), [Historical summary 3](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/force-the-rebuild-pair-the-blocks-dump-the-registers-before--method-gfx950-n-a.md), [Historical summary 4](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/prove-the-edit-built-and-prove-the-win-separately-from-the-h-method-gfx950-n-a.md)
+
+- **constraint** — Historical campaigns reported configuration changes remaining inert under process or graph caches, and partial rank engagement despite plausible benchmark output.
+  Conditions: Historical multi-model serving-tuning reports on gfx950; conclusions depend on the recorded workload, stack and measurement protocol.
+  Verification: <code>not_reproduced</code>.
+  Sources: [Historical summary 1](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/expert_skills/tuning/tuning-kb/README.md)
 
 
 #### Limits
@@ -131,6 +145,7 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Preserve the mechanism and tested conditions of a negative result, then revisit it when dtype, tile, accumulation, cache footprint, compiler or timing protocol changes.
 - Test a proposed combination against the same baseline and against its strongest component; individually positive changes can interfere or become unreachable after dispatch changes.
+- Keep corrected or withdrawn explanations with their scoped conclusion; a historical gain, an artifact-integrity check and an independently reproduced deployment are different evidence claims.
 
 #### Rationale
 
@@ -148,6 +163,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
   Conditions: A negative result was obtained for a particular implementation, operating regime and baseline.
   Verification: <code>not_reproduced</code>.
   Sources: [Historical summary 1](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/a-closure-is-conditional-on-the-body-that-measured-it-method-gfx950-n-a.md), [Historical summary 2](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/re-measure-shelved-partials-after-the-bound-class-moves-method-gfx950-n-a.md), [Historical summary 3](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/re-price-the-dead-list-when-the-operating-point-moves-method-gfx950-compute-bound.md), [Historical summary 4](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/scope-a-closure-a-gate-and-a-stack-by-case-regime-method-gfx950-n-a.md)
+
+- **constraint** — The imported campaign summary distinguishes measured gains from deployment reproduction and records withdrawn explanations and negative experiments; its per-model artifacts are not included in KernelWiki.
+  Conditions: Historical multi-model serving-tuning reports on gfx950; conclusions depend on the recorded workload, stack and measurement protocol.
+  Verification: <code>not_reproduced</code>.
+  Sources: [Historical summary 1](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/expert_skills/tuning/tuning-kb/README.md)
 
 
 #### Limits
@@ -306,6 +326,8 @@ Raw run artifacts are not published here. Historical reports have not been repro
 - Screen a candidate using its time share within a clearly stated boundary, then measure the full workload with the intended phase mix and topology.
 - Report a combined improvement as a combined result unless independent ablations isolate component effects.
 - Retain correct modest improvements only when the final combination passes the full correctness and performance gate.
+- Choose the deployment phase and operating point explicitly; estimate startup, warmup and repetition costs before deciding whether the expected end-to-end gain can be resolved within the available time.
+- Re-time the selected change on the serving path: isolated kernel rankings and phase-specific improvements can change under the deployment workload.
 
 #### Rationale
 
@@ -323,6 +345,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
   Conditions: The workload contains multiple kernels or phases, potentially with host work and communication overlap.
   Verification: <code>not_reproduced</code>.
   Sources: [Historical summary 1](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/editable-triton-cluster-amdahl.md)
+
+- **constraint** — Reported campaigns found isolated kernel wins with negligible serving impact, ranking reversals after deployment, and experiment costs large enough to determine which gains were measurable.
+  Conditions: Historical multi-model serving-tuning reports on gfx950; conclusions depend on the recorded workload, stack and measurement protocol.
+  Verification: <code>not_reproduced</code>.
+  Sources: [Historical summary 1](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/expert_skills/tuning/tuning-kb/README.md)
 
 
 #### Limits
