@@ -219,3 +219,49 @@ def test_escaping_scope_path_is_rejected(repository):
     write_yaml(p, {"sources": [{"snapshot": "aiter_test", "file": "../outside.py"}]})
     with pytest.raises(ValueError, match="invalid upstream path"):
         planner.plan(wiki, upstream, target)
+
+
+def test_initial_review_finds_older_pins_before_the_newest_snapshot(repository):
+    wiki, upstream, base, target, *_ = repository
+    path = wiki / "knowledge/operator/catalog.yaml"
+    data = planner.read_yaml(path)
+    data["snapshots"]["aiter_newest"] = {"repository": planner.AITER, "commit": target}
+    write_yaml(path, data)
+    report = planner.plan(wiki, upstream, target, full_inventory=True)
+    assert report["changes"] == []
+    rows = {r["path"]: r for r in report["pinned_differences"]}
+    shared = rows["aiter/ops/shared.py"]
+    assert shared["affected_consumers"] == ["dense_gemm", "grouped_gemm_moe"]
+    assert shared["scoped_bindings"][0]["commit"] == base
+    assert rows["aiter/configs/gemm.csv"]["cited_cards"] == ["tune-card"]
+    assert rows["op_tests/test_gemm.py"]["scoped_bindings"][0]["kind"] == "validation"
+    assert rows["aiter/ops/gone.py"]["status"] == "D"
+    assert rows["aiter/ops/gemm.py"]["status"] == "D"
+    assert "aiter/ops/old_unscoped.py" not in rows
+    assert report["summary"]["pinned_different_files"] == len(rows)
+
+
+def test_retained_historical_pins_do_not_repeat_after_completed_checkpoint(repository):
+    wiki, upstream, _, target, *_ = repository
+    report = planner.plan(wiki, upstream, target, since=target)
+    assert report["changes"] == report["pinned_differences"] == []
+    assert report["summary"]["affected_consumers"] == []
+    # A deliberate full review can reopen differences to retained historic evidence.
+    assert planner.plan(wiki, upstream, target, since=target, full_inventory=True)["pinned_differences"]
+
+
+def test_full_inventory_keeps_new_unscoped_changes_and_unselected_configs(repository):
+    wiki, upstream, base, target, *_ = repository
+    path = wiki / "knowledge/operator/dense_gemm/corpus/tuned_configs.yaml"
+    data = planner.read_yaml(path)
+    data["records"] = []
+    data["inventory"] = [{"snapshot": "aiter_test", "file": "aiter/configs/gemm.csv"}]
+    write_yaml(path, data)
+    cards_path = path.with_name("decisions.yaml")
+    cards = planner.read_yaml(cards_path)
+    cards["cards"][1]["shipped_evidence"] = []
+    write_yaml(cards_path, cards)
+    report = planner.plan(wiki, upstream, target, full_inventory=True)
+    assert "aiter/ops/unknown_helper.py" in {r["path"] for r in report["unscoped_inventory"]}
+    assert any(r["path"] == "aiter/configs/gemm.csv" and r["affected_consumers"] == ["dense_gemm"]
+               for r in report["pinned_differences"])

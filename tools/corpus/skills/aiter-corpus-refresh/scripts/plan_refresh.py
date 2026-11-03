@@ -161,11 +161,14 @@ def load_inputs(root):
             for ref in dep.get("decision_refs", []):
                 consumers[ref].add(op)
         if (directory / "tuned_configs.yaml").exists():
-            for row in read_yaml(directory / "tuned_configs.yaml")["records"]:
+            tuning = read_yaml(directory / "tuned_configs.yaml")
+            for row in tuning["records"]:
                 ref = row["snapshot"] + ":" + row.get("config_id", row.get("selection_id", ""))
                 seed_files[ref] = [upstream_path(x) for x in row["source_files"]]
                 for file in row["source_files"]:
                     watch(file, row["snapshot"], op, "shipped_configuration")
+            for row in tuning.get("inventory", []):
+                watch(row["file"], row["snapshot"], op, "shipped_configuration")
     if catalog.get("general_corpus"):
         card_input("general", read_yaml(inside(root, catalog["general_corpus"]) / "decisions.yaml"))
     missing = consumers.keys() - cards.keys()
@@ -209,10 +212,10 @@ def plan(kernelwiki, aiter, target_ref, since=None, full_inventory=False):
     affected = set()
     for change in git.changes(base, target):
         names = {change["path"], change["old_path"]} - {None}
-        refs = sorted({ref for name in names for ref in cards_by_file[name]})
+        refs = sorted({ref for name in names for ref in cards_by_file.get(name, [])})
         watched = []
         for name in sorted(names):
-            for row in watches[name]:
+            for row in watches.get(name, []):
                 commit = commits[row["snapshot"]]
                 old_object = git.tree(commit).get(name)
                 current_object = target_tree.get(change["path"])
@@ -229,6 +232,24 @@ def plan(kernelwiki, aiter, target_ref, since=None, full_inventory=False):
             mode, object_type, oid = target_tree[change["path"]]
             entry["target_object"] = {"mode": mode, "type": object_type, "id": oid}
         result.append(entry)
+    pinned_differences = []
+    # A newest catalog snapshot is not a checkpoint for older owned bindings.
+    # Audit them on the first pass and whenever a full review is explicitly requested.
+    if since is None or full_inventory:
+        for path, bindings in sorted(watches.items()):
+            different = []
+            current = target_tree.get(path)
+            for row in bindings:
+                commit = commits[row["snapshot"]]
+                if git.tree(commit).get(path) != current:
+                    different.append(dict(row, file=path, commit=commit, differs_from_pin=True))
+            if not different:
+                continue
+            refs = sorted(cards_by_file.get(path, []))
+            impacted = sorted({row["owner"] for row in different} | {op for ref in refs for op in consumers[ref]})
+            affected.update(impacted)
+            pinned_differences.append(dict(path=path, status="M" if current else "D", kind=classify(path),
+                                          scoped_bindings=different, cited_cards=refs, affected_consumers=impacted))
     inventory = []
     if full_inventory:
         for path in sorted(target_tree):
@@ -236,15 +257,16 @@ def plan(kernelwiki, aiter, target_ref, since=None, full_inventory=False):
             if path not in watches and kind in {"implementation_or_helper", "configuration", "binary", "test_or_benchmark"}:
                 inventory.append({"path": path, "kind": kind, "family_hints": family_hints(path),
                                   "training_name_hint": bool(re.search(r"(?:_bwd|backward|_wgrad|_train)", path.lower()))})
-    return {"schema_version": 1, "repository": AITER, "catalog_schema": catalog["schema_version"],
+    return {"schema_version": 2, "repository": AITER, "catalog_schema": catalog["schema_version"],
             "discovery_base": base, "target_commit": target,
             "summary": {"changed_files": len(result),
                         "changed_files_by_kind": dict(sorted(Counter(r["kind"] for r in result).items())),
                         "unscoped_candidates": sum(r["unscoped_candidate"] for r in result),
                         "inventory_candidates": len(inventory),
                         "inventory_by_kind": dict(sorted(Counter(r["kind"] for r in inventory).items())),
+                        "pinned_different_files": len(pinned_differences),
                         "affected_consumers": sorted(affected)},
-            "changes": result, "unscoped_inventory": inventory,
+            "changes": result, "pinned_differences": pinned_differences, "unscoped_inventory": inventory,
             "limits": ["Family/training hints are lexical review aids, not ownership or eligibility decisions.",
                        "Only exact renames are detected; edited renames may appear as deletion plus addition.",
                        "The discovery window does not declare all older pinned sources obsolete or migrated.",

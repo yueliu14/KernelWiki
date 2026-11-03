@@ -1,4 +1,4 @@
-schema_version: 2
+schema_version: 3
 operator: scaled_quant_gemm
 records:
 - snapshot: aiter_a6bb4993
@@ -753,4 +753,24 @@ inventory:
   backend_column: true
   gfx:
   - gfx950
-missing: []
+missing:
+- snapshot: aiter_a6bb4993
+  language: aiter_tuned_db
+  subtree: aiter/configs/a4w4_blockscale_tuned_gemm.csv
+  why: 'no `libtype` column: the selected backend is not recorded, so these rows are inventoried but not counted
+    as a selection'
+- snapshot: aiter_a6bb4993
+  language: aiter_tuned_db
+  subtree: aiter/configs/a8w8_tuned_batched_gemm.csv
+  why: 'no `libtype` column: the selected backend is not recorded, so these rows are inventoried but not counted
+    as a selection'
+- snapshot: aiter_a6bb4993
+  language: aiter_tuned_db
+  subtree: aiter/configs/a8w8_tuned_gemm.csv
+  why: 'no `libtype` column: the selected backend is not recorded, so these rows are inventoried but not counted
+    as a selection'
+- snapshot: aiter_a6bb4993
+  language: aiter_tuned_db
+  subtree: aiter/configs/model_configs/dsv3_a4w4_blockscale_tuned_gemm.csv
+  why: 'no `libtype` column: the selected backend is not recorded, so these rows are inventoried but not counted
+    as a selection'

@@ -863,7 +863,9 @@ cards:
     what fills the machine.
   - 'Under block scale keep tile_n a search axis, with 128 as ASM''s point: every block-scale ASM kernel uses
     tile_n = 128 on both architectures (one N tile, one W scale per K block), while Triton''s gfx942 block-scale
-    configs fix GROUP_N = 128 but ship BLOCK_SIZE_N 16 or 64 at M <= 8 and mostly 128 at M 1025-2048 (gemm-blockscale-k-loop-scale-application).'
+    precedents use 128-wide scale groups with BLOCK_SIZE_N 16 or 64 at M <= 8 and mostly 128 at M 1025-2048
+    (gemm-blockscale-k-loop-scale-application). Check the selected wrapper when GROUP_N is absent from a config;
+    an omitted field does not establish agreement across the shipped rows.'
   alternatives:
   - A single fixed tile for every case — the control arm, and what an untuned Triton baseline does.
   why:

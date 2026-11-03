@@ -58,7 +58,8 @@ cards:
     its stated tolerance.'
   - 'Seed from where AITER shipped split-K: FlyDSL bf16 on gfx950 selects split_k > 1 in 83 of 86 rows at M<=16
     and 38 of 45 at M 17-64, and split_k = 1 in every row above M = 256; Triton''s gfx942 fp8 block-scale configs
-    vary NUM_KSPLIT (1 to 16) only in the buckets up to M<=512 and fix it at 1 from M<=1024 on.'
+    explicitly declaring NUM_KSPLIT vary it (1 to 16) only in the buckets up to M<=512 and set it to 1 from
+    M<=1024 on. Resolve omitted values through the selected caller before applying this as a seed.'
   - Re-tune the body after enabling split-K and include partial-output/reduction costs; test shallow splits
     before deeper partitioning.
   alternatives:

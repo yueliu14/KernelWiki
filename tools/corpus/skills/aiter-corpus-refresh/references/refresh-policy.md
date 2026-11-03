@@ -70,10 +70,13 @@ Do not add a card for every regex observation or every new file.
 
 ## Shipped configurations and performance experience
 
-The source extractor does **not** rebuild `tuned_configs.yaml`. If configuration files changed,
-inspect the existing parsers in `tools/corpus/_extract_impl_facts.py` and the local seed schema before
-regenerating reviewed groups. Preserve source filenames, grouping/ID rules, inventory and stated
-gaps. Do not copy a new snapshot prefix onto an old group or overwrite a historically cited group.
+The source extractor does **not** rebuild `tuned_configs.yaml`. On current KernelWiki, maintain
+`scope.yaml`'s `tuning_sources` and run `tools/corpus/seeds.py --aiter <cache> --emit`; `--check`
+and `validate.py --verify-source` compare the complete inventory against pinned Git objects.
+On older checkouts, inspect the available parsers and seed schema before regenerating reviewed groups.
+Preserve source filenames, grouping/ID rules, inventory and stated gaps. Missing parameter declarations
+are not defaults or agreement: keep them in `partially_specified` with presence and absence counts.
+Do not copy a new snapshot prefix onto an old group or overwrite a historically cited group.
 Configuration counts and selected backend rows are starting points; do not import timing columns as
 source evidence or call a shipped selection a measured winner.
 
@@ -92,7 +95,11 @@ upstream. Re-test triggers include a changed dtype, compiler, tile, scale contra
 
 The incremental report uses `--since` to enumerate all changed paths, including unscoped additions,
 deletions, exact renames, helpers, tests and configuration files. On a first review, `--full-inventory`
-also exposes candidates already present at the latest catalog snapshot. Lexical family/training hints
+also exposes candidates already present at the latest catalog snapshot. On a first pass or full review,
+`pinned_differences` additionally exposes existing bindings that differ from the target, even when
+their last change predates the newest catalog snapshot. Review those gaps before establishing the
+first checkpoint; record an intentional historical retention in the private review state.
+Lexical family/training hints
 never justify silently excluding an otherwise relevant forward implementation. For edited renames,
 compare the paired additions/deletions and callers manually.
 
