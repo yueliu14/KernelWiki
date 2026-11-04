@@ -23,13 +23,13 @@ A required trait must be established for the actual design before the card appli
 | card | type | PR review | question |
 |---|---|---|---|
 | [flydsl-a8-legality](#flydsl-a8-legality) | constraint | unreviewed | Which FlyDSL A8 / FP4 preshuffle-GEMM configurations are rejected before they can be slow? |
-| [flydsl-a8-mfma-selection](#flydsl-a8-mfma-selection) | semantic | unreviewed | Which MFMA does a FlyDSL quantized GEMM issue per dtype and architecture, and what does that fix about tile_k? |
-| [flydsl-a8-scale-granularity-contract](#flydsl-a8-scale-granularity-contract) | constraint | unreviewed | Which scale granularity does the FlyDSL A8 kernel implement, and what changes for a 128x128 block-scale contract? |
+| [flydsl-a8-mfma-selection](#flydsl-a8-mfma-selection) | semantic | reviewed | Which MFMA does a FlyDSL quantized GEMM issue per dtype and architecture, and what does that fix about tile_k? |
+| [flydsl-a8-scale-granularity-contract](#flydsl-a8-scale-granularity-contract) | constraint | reviewed | Which scale granularity does the FlyDSL A8 kernel implement, and what changes for a 128x128 block-scale contract? |
 | [gemm-blockscale-k-loop-scale-application](#gemm-blockscale-k-loop-scale-application) | semantic | unreviewed | How does a 128x128 block-scale GEMM apply its scales inside the K loop, and what does that fix about tile_k and the scale indexing? |
-| [flydsl-a8-preshuffle-config-space](#flydsl-a8-preshuffle-config-space) | performance_candidate | unreviewed | Which tile, LDS-stage, epilogue, async and occupancy combinations will the FlyDSL A8 (fp8/int8) preshuffle GEMM build, and how do they differ by architecture? |
+| [flydsl-a8-preshuffle-config-space](#flydsl-a8-preshuffle-config-space) | performance_candidate | reviewed | Which tile, LDS-stage, epilogue, async and occupancy combinations will the FlyDSL A8 (fp8/int8) preshuffle GEMM build, and how do they differ by architecture? |
 | [gemm-blockscale-shipped-bucket-structure](#gemm-blockscale-shipped-bucket-structure) | performance_candidate | unreviewed | Which configuration does the Triton block-scale baseline run for each case, and what does AITER ship instead where it tuned small and large M separately? |
-| [flydsl-a8-interleaved-schedule](#flydsl-a8-interleaved-schedule) | performance_candidate | unreviewed | How does the FlyDSL A8 kernel interleave LDS reads, global loads and MFMAs, and how does that differ between gfx942 and gfx950? |
-| [flydsl-a8-data-movement-helpers](#flydsl-a8-data-movement-helpers) | performance_candidate | unreviewed | Which global-to-LDS and LDS-to-register helpers do the FlyDSL A8 and MoE GEMMs share, and which access widths do they fix? |
+| [flydsl-a8-interleaved-schedule](#flydsl-a8-interleaved-schedule) | performance_candidate | reviewed | How does the FlyDSL A8 kernel interleave LDS reads, global loads and MFMAs, and how does that differ between gfx942 and gfx950? |
+| [flydsl-a8-data-movement-helpers](#flydsl-a8-data-movement-helpers) | performance_candidate | reviewed | Which global-to-LDS and LDS-to-register helpers do the FlyDSL A8 and MoE GEMMs share, and which access widths do they fix? |
 | [quant-gemm-format-reinterpretation](#quant-gemm-format-reinterpretation) | performance_candidate | unreviewed | When can a legacy FP8 representation use the native matrix instruction without a conversion pass? |
 | [quant-gemm-engaged-tuning-surface](#quant-gemm-engaged-tuning-surface) | performance_candidate | unreviewed | Which configuration or source edit controls the live FP8 blockscale GEMM? |
 | [mxfp8-shape-specific-native-path](#mxfp8-shape-specific-native-path) | performance_candidate | unreviewed | How should a native per-32 E8M0 GEMM be tuned across prefill and decode? |
@@ -156,8 +156,19 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2546](https://github.com/ROCm/aiter/pull/2546) · merged · not_reported** — PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the individual mechanism is reported.
+  Conditions: FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update other families or later configurations.
+  Direction: flydsl; compute_instruction, architecture_capability
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [8d30ef53a0a6](https://github.com/ROCm/aiter/commit/8d30ef53a0a6e12d70894a973f4df127d298f620) — Select the gfx950 scaled MFMA path by input type and tile-K compatibility.
+  [Result: unquantified_knobs](../../../_sources/aiter/pull_requests/2546.md#unquantified_knobs) — **unknown**; The reviewed PR introduces the A8 compiler and tuning choices but supplies no quantitative performance comparison for these mechanisms.
+  **Effect confidence: unknown** — The body and reviewed discussion cover implementation/correctness and qualitative rationale, not a measured speedup for the exposed knobs; missing: hardware, gfx, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Background
 
@@ -220,8 +231,19 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2546](https://github.com/ROCm/aiter/pull/2546) · merged · not_reported** — PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the individual mechanism is reported.
+  Conditions: FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update other families or later configurations.
+  Direction: flydsl; runtime_contract, epilogue
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [8d30ef53a0a6](https://github.com/ROCm/aiter/commit/8d30ef53a0a6e12d70894a973f4df127d298f620) — Load column and row scales for the non-FP4 preshuffle path.
+  [Result: unquantified_knobs](../../../_sources/aiter/pull_requests/2546.md#unquantified_knobs) — **unknown**; The reviewed PR introduces the A8 compiler and tuning choices but supplies no quantitative performance comparison for these mechanisms.
+  **Effect confidence: unknown** — The body and reviewed discussion cover implementation/correctness and qualitative rationale, not a measured speedup for the exposed knobs; missing: hardware, gfx, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Background
 
@@ -367,8 +389,19 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2546](https://github.com/ROCm/aiter/pull/2546) · merged · not_reported** — PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the individual mechanism is reported.
+  Conditions: FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update other families or later configurations.
+  Direction: flydsl; tunable_surface, pipeline_schedule, epilogue, execution_geometry
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [8d30ef53a0a6](https://github.com/ROCm/aiter/commit/8d30ef53a0a6e12d70894a973f4df127d298f620) — Introduce the coupled LDS/CShuffle/async/waves sweep and VGPR-based candidate filtering.
+  [Result: unquantified_knobs](../../../_sources/aiter/pull_requests/2546.md#unquantified_knobs) — **unknown**; The reviewed PR introduces the A8 compiler and tuning choices but supplies no quantitative performance comparison for these mechanisms.
+  **Effect confidence: unknown** — The body and reviewed discussion cover implementation/correctness and qualitative rationale, not a measured speedup for the exposed knobs; missing: hardware, gfx, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Background
 
@@ -507,8 +540,19 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2546](https://github.com/ROCm/aiter/pull/2546) · merged · not_reported** — PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the individual mechanism is reported.
+  Conditions: FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update other families or later configurations.
+  Direction: flydsl; pipeline_schedule, memory_access
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [8d30ef53a0a6](https://github.com/ROCm/aiter/commit/8d30ef53a0a6e12d70894a973f4df127d298f620) — Use tile-dependent preload counts to interleave VMEM and LDS work in the gfx950 path.
+  [Result: unquantified_knobs](../../../_sources/aiter/pull_requests/2546.md#unquantified_knobs) — **unknown**; The reviewed PR introduces the A8 compiler and tuning choices but supplies no quantitative performance comparison for these mechanisms.
+  **Effect confidence: unknown** — The body and reviewed discussion cover implementation/correctness and qualitative rationale, not a measured speedup for the exposed knobs; missing: hardware, gfx, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Background
 
@@ -574,8 +618,19 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2546](https://github.com/ROCm/aiter/pull/2546) · merged · not_reported** — PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the individual mechanism is reported.
+  Conditions: FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update other families or later configurations.
+  Direction: flydsl; memory_access, pipeline_schedule
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [8d30ef53a0a6](https://github.com/ROCm/aiter/commit/8d30ef53a0a6e12d70894a973f4df127d298f620) — Select A-copy width by architecture in the newly integrated preshuffle family.
+  [Result: unquantified_knobs](../../../_sources/aiter/pull_requests/2546.md#unquantified_knobs) — **unknown**; The reviewed PR introduces the A8 compiler and tuning choices but supplies no quantitative performance comparison for these mechanisms.
+  **Effect confidence: unknown** — The body and reviewed discussion cover implementation/correctness and qualitative rationale, not a measured speedup for the exposed knobs; missing: hardware, gfx, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Background
 

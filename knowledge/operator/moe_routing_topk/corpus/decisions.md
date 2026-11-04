@@ -20,8 +20,8 @@ A required trait must be established for the actual design before the card appli
 
 | card | type | PR review | question |
 |---|---|---|---|
-| [moe-herd-routing-profile](#moe-herd-routing-profile) | constraint | unreviewed | When is the specialized HERD routing path a valid candidate? |
-| [moe-sort-padding-sentinels](#moe-sort-padding-sentinels) | constraint | unreviewed | Which outputs of expert sorting are part of the downstream GEMM ABI? |
+| [moe-herd-routing-profile](#moe-herd-routing-profile) | constraint | reviewed | When is the specialized HERD routing path a valid candidate? |
+| [moe-sort-padding-sentinels](#moe-sort-padding-sentinels) | constraint | reviewed | Which outputs of expert sorting are part of the downstream GEMM ABI? |
 | [router-launch-and-selection-cost](#router-launch-and-selection-cost) | performance_candidate | unreviewed | Is router top-k limited by launch preparation or by the selection network? |
 | [moe-sigmoid-dpp-selection](#moe-sigmoid-dpp-selection) | performance_candidate | reviewed | Can DPP-based selection improve sigmoid top-k for a fixed expert count? |
 
@@ -63,8 +63,19 @@ A required trait must be established for the actual design before the card appli
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #5693](https://github.com/ROCm/aiter/pull/5693) · merged · beneficial** — The Kimi-K3 report supports a conditional HERD candidate; realistic bias and the supported profile matter, and no numeric speedup is encoded.
+  Conditions: HERD supported sigmoid routing profile; Kimi-K3 gate bias with std approximately 0.025; do not substitute unit-variance random bias for the production comparison.
+  Direction: flydsl; routing_semantics, implementation_contract
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: low** — The report concerns the implementation or validity change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [ab20344c453d](https://github.com/ROCm/aiter/commit/ab20344c453da3b35b33f6f422447021d318f949) — Select HERD only for its supported score-function, expert-count and top-k profiles.
+  [Result: kimi_qualitative_benefit](../../../_sources/aiter/pull_requests/5693.md#kimi_qualitative_benefit) — **end_to_end**; The author reports Kimi-K3 performance benefit and acceptable accuracy with HERD enabled; numerical speedups are in image attachments and are not encoded here.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, software, baseline_commit, candidate_commit, protocol, transcribed_image_benchmarks, independent_reproduction, dtype.
+  Quantitative effect: **not encoded here**; the qualitative report and its limits remain recorded.
 
 #### Background
 
@@ -113,8 +124,31 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #3266](https://github.com/ROCm/aiter/pull/3266) · merged · mixed** — The sorting replacement has reported serving gains and mixed per-shape operator results; these do not isolate the benefit of padding or a particular ABI field.
+  Conditions: Preserve sorted IDs, weights, expert IDs, valid-count, unit-size and workspace contracts; choose the exact reported model/shape and timing mode.
+  Direction: flydsl; expert_layout, implementation_contract
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: low** — The report concerns the implementation or validity change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [d5727af56667](https://github.com/ROCm/aiter/commit/d5727af566672a148aa0decc96d5b03ca05548ee) — Add the FlyDSL sorting interface with explicit sorted IDs/weights/experts, valid count, workspace and unit size.
+  [Result: fp8_serving](../../../_sources/aiter/pull_requests/3266.md#fp8_serving) — **end_to_end**; The PR reports higher average output throughput over three serving runs with FlyDSL sorting.
+  **Effect confidence: medium** — The report states hardware, serving setup, repeated-run averages and model accuracy; exact software and measured commits remain unspecified; missing: software, baseline_commit, candidate_commit, independent_reproduction.
+  throughput: 329.15 → 336.7 tokens/s (mean); normalized speedup 1.023×
+  [Result: mxfp4_serving](../../../_sources/aiter/pull_requests/3266.md#mxfp4_serving) — **end_to_end**; The PR reports higher average output throughput over three serving runs with FlyDSL sorting.
+  **Effect confidence: medium** — The report states hardware, serving setup, repeated-run averages and model accuracy; exact software and measured commits remain unspecified; missing: software, baseline_commit, candidate_commit, independent_reproduction.
+  throughput: 414.76 → 428.25 tokens/s (mean); normalized speedup 1.033×
+  [Result: graph_small_gain](../../../_sources/aiter/pull_requests/3266.md#graph_small_gain) — **operator**; The later kernel table reports a benefit at this token count.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, software, baseline_commit, candidate_commit, correctness, independent_reproduction, dtype.
+  latency: 15.4 → 10.1 us (single_case); normalized speedup 1.525×
+  [Result: graph_mid_regression](../../../_sources/aiter/pull_requests/3266.md#graph_mid_regression) — **operator**; The later kernel table reports a small regression at this token count.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, software, baseline_commit, candidate_commit, correctness, independent_reproduction, dtype.
+  latency: 13.9 → 14.2 us (single_case); normalized speedup 0.9789×
+  [Result: graph_equal](../../../_sources/aiter/pull_requests/3266.md#graph_equal) — **operator**; The later kernel table reports equal displayed latencies at this token count.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, software, baseline_commit, candidate_commit, correctness, independent_reproduction, dtype.
+  latency: 14.1 → 14.1 us (single_case); normalized speedup 1×
 
 #### Background
 

@@ -1,0 +1,94 @@
+schema_version: 1
+id: aiter_pr_2732
+number: 2732
+repository: https://github.com/ROCm/aiter
+title: Make FlyDSL LDS checks architecture-aware and reduce tuner failure noise
+state: merged
+base_commit: d098ae5a91e422f0a95900107d0a20df3765b4a3
+head_commit: 866e94c34fc4486157442eede9ed91c7d3e9720d
+merge_commit: daa8e94a491af9e3933e95d96b130f58407bcb73
+captured_at: '2026-11-04T16:48:59.450435+00:00'
+updated_at: '2026-04-15T07:50:29Z'
+sources:
+- id: body
+  url: https://github.com/ROCm/aiter/pull/2732
+  excerpt: |-
+    ## Motivation
+
+    <!-- Explain the purpose of this PR and the goals it aims to achieve. -->
+
+    ## Technical Details
+    - Use device shared-memory/LDS limits for FlyDSL GEMM filtering and split-k kernel validation instead of relying on a fixed LDS cap.
+    - Surface FlyDSL candidate compile/LDS failures as concise runtime warnings so tuning can continue without noisy tracebacks.
+    - Keep tuner `topk` selection local to each shape to avoid leaking a reduced candidate limit into later shape groups.
+
+    ## Test Plan
+
+    - Verified failing candidates now log a single concise warning with kernel/context information and no extra traceback noise.
+    - Verified tuning still completes and produces a valid best kernel result.
+
+    ## Test Result
+
+    <!-- Briefly summarize test outcomes. -->
+  sha256: 6166286106a63a5aa5879e2a6819cdbb981ddc7e85e375b4158363cb4507486a
+  captured_at: '2026-11-04T16:48:59.450435+00:00'
+  updated_at: '2026-04-15T07:50:29Z'
+changes:
+- id: host_lds_limit
+  commit: daa8e94a491af9e3933e95d96b130f58407bcb73
+  parent_commit: f326553f0046a0196b213ec7cefa66584a88dd86
+  file: aiter/ops/flydsl/gemm_kernels.py
+  before: '    if lds_bytes > MAX_LDS_BYTES:'
+  after: |2-
+        lds_limit = get_shared_memory_per_block(fallback_gfx=get_gfx())
+        if lds_bytes > lds_limit:
+  summary: Filter host GEMM candidates using the active device LDS limit rather than a fixed global cap.
+- id: kernel_lds_limit
+  commit: daa8e94a491af9e3933e95d96b130f58407bcb73
+  parent_commit: f326553f0046a0196b213ec7cefa66584a88dd86
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  before: '    assert SMEM_USE <= 163840'
+  after: |2-
+        smem_limit = get_shared_memory_per_block(fallback_gfx=GPU_ARCH)
+        if SMEM_USE > smem_limit:
+  summary: Check the split-K kernel staging allocation against the device limit and report candidate context.
+results:
+- id: architecture_aware_validity
+  outcome: constraint
+  summary: LDS capacity checks become architecture-aware, and candidate failures no longer prevent the tuning
+    pass from continuing.
+  source_refs:
+  - body
+  context:
+    hardware: null
+    gfx: null
+    dtype: null
+    shape_layout: null
+    software: null
+    baseline: Fixed 163840-byte cap
+    candidate: Device-aware FlyDSL host and split-K LDS validation
+    baseline_commit: null
+    candidate_commit: null
+    scope: unknown
+    protocol: null
+    correctness: Author reports concise candidate failures and successful completion of tuning; no kernel correctness
+      results are specified
+  metrics: []
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - hardware
+    - gfx
+    - dtype
+    - shape_layout
+    - software
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - independent_reproduction
+  limitations:
+  - No kernel latency or tuner wall-time improvement is quantified.
+  - The fix changes legality/error handling; it does not select an optimal pipeline depth.

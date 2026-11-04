@@ -34,7 +34,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -102,6 +105,49 @@ cards:
   - The option sets are what the shipped registry enumerates; they are candidates to search, and nothing here
     says which member wins.
   - The family is bf16-only and its LDS budget is its own; do not carry its constants into the generic kernel.
+  experience:
+  - outcome: constraint
+    conditions:
+    - BF16, 1 <= M < 17; gfx942 is excluded by the cited source; distinguish generic and small_m compiler arguments.
+    summary: 'PR #2775 introduces the dedicated small-M family and its dispatch/configuration contract; performance
+      image values are not encoded.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2775
+      change_refs:
+      - small_m_geometry
+      - family_dispatch
+      result_refs:
+      - small_m_contract
+      - configuration_identity
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - implementation_variant
+          - workgroup_tile
+          - work_partition
+          - execution_geometry
+          backend: flydsl
 - id: gemm-skinny-decode-wave-split
   type: performance_candidate
   axes:

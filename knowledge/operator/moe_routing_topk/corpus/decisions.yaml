@@ -19,7 +19,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - A candidate intends to reuse the FlyDSL HERD sigmoid routing implementation.
   actions:
@@ -43,6 +46,46 @@ cards:
   - Do not substitute sigmoid routing for a softmax or grouped-routing contract.
   references:
   - knowledge/operator/moe_routing_topk/README.md
+  experience:
+  - outcome: beneficial
+    conditions:
+    - HERD supported sigmoid routing profile; Kimi-K3 gate bias with std approximately 0.025; do not substitute
+      unit-variance random bias for the production comparison.
+    summary: The Kimi-K3 report supports a conditional HERD candidate; realistic bias and the supported profile
+      matter, and no numeric speedup is encoded.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_5693
+      change_refs:
+      - profile_gate
+      result_refs:
+      - kimi_qualitative_benefit
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - routing_semantics
+          - implementation_contract
+          backend: flydsl
 - id: moe-sort-padding-sentinels
   type: constraint
   axes:
@@ -59,7 +102,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - Token/expert routes are sorted and padded into expert-aligned work blocks.
   actions:
@@ -84,6 +130,50 @@ cards:
   - knowledge/operator/moe_routing_topk/README.md
   - knowledge/operator/grouped_gemm_moe/README.md
   - knowledge/operator/fused_moe_grouped_gemm/README.md
+  experience:
+  - outcome: mixed
+    conditions:
+    - Preserve sorted IDs, weights, expert IDs, valid-count, unit-size and workspace contracts; choose the
+      exact reported model/shape and timing mode.
+    summary: The sorting replacement has reported serving gains and mixed per-shape operator results; these
+      do not isolate the benefit of padding or a particular ABI field.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_3266
+      change_refs:
+      - sorting_interface
+      result_refs:
+      - fp8_serving
+      - mxfp4_serving
+      - graph_small_gain
+      - graph_mid_regression
+      - graph_equal
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - expert_layout
+          - implementation_contract
+          backend: flydsl
 - id: router-launch-and-selection-cost
   type: performance_candidate
   axes:

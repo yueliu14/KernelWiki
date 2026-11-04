@@ -29,7 +29,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - the output store path (layout, vector width, atomics) is being chosen
@@ -82,6 +85,45 @@ cards:
   - Legality is the helper's; the LDS cost interacts with the A staging budget, so re-run the LDS estimate
     for the combined configuration.
   - Selection shares are where AITER chose each arm, not how much either arm helped.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - lds_epilogue_budget
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - epilogue
+          - configuration_constraints
+          backend: flydsl
 - id: gemm-gated-feed-forward-atomic-output
   type: constraint
   axes:

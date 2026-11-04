@@ -22,7 +22,7 @@ A required trait must be established for the actual design before the card appli
 
 | card | type | PR review | question |
 |---|---|---|---|
-| [flydsl-cshuffle-epilogue](#flydsl-cshuffle-epilogue) | performance_candidate | unreviewed | When can a FlyDSL GEMM route its accumulators through an LDS CShuffle epilogue, and what does it cost? |
+| [flydsl-cshuffle-epilogue](#flydsl-cshuffle-epilogue) | performance_candidate | reviewed | When can a FlyDSL GEMM route its accumulators through an LDS CShuffle epilogue, and what does it cost? |
 | [gemm-gated-feed-forward-atomic-output](#gemm-gated-feed-forward-atomic-output) | constraint | unreviewed | What does the fused gated feed-forward body require of its output buffer? |
 | [gemm-blockscale-fused-affine-split](#gemm-blockscale-fused-affine-split) | semantic | unreviewed | Where does an affine epilogue belong when the GEMM is split over K? |
 | [fused-gemm-regime-specific-chain](#fused-gemm-regime-specific-chain) | performance_candidate | unreviewed | Which fusion boundary helps each regime of a normalization/GEMM chain? |
@@ -82,8 +82,19 @@ A required trait must be established for the actual design before the card appli
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2546](https://github.com/ROCm/aiter/pull/2546) · merged · not_reported** — PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the individual mechanism is reported.
+  Conditions: FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update other families or later configurations.
+  Direction: flydsl; epilogue, configuration_constraints
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [8d30ef53a0a6](https://github.com/ROCm/aiter/commit/8d30ef53a0a6e12d70894a973f4df127d298f620) — Budget LDS staging jointly with the optional CShuffle output buffer.
+  [Result: unquantified_knobs](../../../_sources/aiter/pull_requests/2546.md#unquantified_knobs) — **unknown**; The reviewed PR introduces the A8 compiler and tuning choices but supplies no quantitative performance comparison for these mechanisms.
+  **Effect confidence: unknown** — The body and reviewed discussion cover implementation/correctness and qualitative rationale, not a measured speedup for the exposed knobs; missing: hardware, gfx, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Background
 

@@ -22,7 +22,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - The operation is scaled dot-product forward attention, with an explicit causal or noncausal contract.
   actions:
@@ -46,6 +49,47 @@ cards:
   references:
   - knowledge/operator/attention_prefill_fmha/README.md
   - knowledge/operator/gqa_mqa_attention/README.md
+  experience:
+  - outcome: beneficial
+    conditions:
+    - gfx950 FP8-Q/FP8-KV unified-attention prefill, head size 128, query length >=256, no sliding window or
+      shuffled cache; retain all remaining masks and online-softmax state.
+    summary: The final optimization elides masks only on fully visible prefill tiles; benchmark and revalidation
+      revisions are separately recorded.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_4761
+      change_refs:
+      - visible_tile_loop
+      result_refs:
+      - tp1_long_original
+      - tp1_long_revalidation
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - attention_semantics
+          - numerical_contract
+          backend: triton
 - id: attention-query-kv-tile-pipeline
   type: performance_candidate
   axes:
@@ -112,8 +156,11 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id001
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
+  conditions:
   - A framework routes full attention separately from decode or recurrent-attention layers.
   actions:
   - Identify the actual full-attention callable and importing call sites in every worker; compare eligible
@@ -136,7 +183,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id001
+    conditions:
+    - A framework routes full attention separately from decode or recurrent-attention layers.
     summary: Historical reports found backend flags or short-chunk specialization useful on particular stacks,
       while isolated prefill gains translated weakly to a decode-heavy workload.
     provenance:
@@ -146,6 +194,47 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/prefill-attn-prefix-triton-gfx950-vllm.md
       artifacts: not_published
       verification: not_reproduced
+  - outcome: mixed
+    conditions:
+    - Use the exact frozen baseline/image and workload-specific crossover conditions; do not transfer the prefill
+      gain to decode-only traffic.
+    summary: Serving results are tied to the instrumented eligible prefill path; the final PR does not alter
+      decode routing, and one non-repeating negative trial is retained.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_4761
+      change_refs:
+      - visible_tile_loop
+      result_refs:
+      - tp1_long_revalidation
+      - tp2_short_revalidation
+      - tp2_negative_trial
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - implementation_contract
+          - attention_semantics
+          backend: triton
 shared_cards:
 - triton-dot-accumulator-form
 - attention-window-prefix-boundaries

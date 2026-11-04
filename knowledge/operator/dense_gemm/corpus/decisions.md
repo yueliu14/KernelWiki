@@ -22,22 +22,22 @@ A required trait must be established for the actual design before the card appli
 
 | card | type | PR review | question |
 |---|---|---|---|
-| [flydsl-gfx942-path-gates](#flydsl-gfx942-path-gates) | constraint | unreviewed | Which FlyDSL GEMM paths does gfx942 (MI300X) actually give you, and which does it silently switch or refuse? |
-| [flydsl-hgemm-tiling-validity](#flydsl-hgemm-tiling-validity) | constraint | unreviewed | Which FlyDSL HGEMM configurations will fail to build at all, before any of them can be slow? |
+| [flydsl-gfx942-path-gates](#flydsl-gfx942-path-gates) | constraint | reviewed | Which FlyDSL GEMM paths does gfx942 (MI300X) actually give you, and which does it silently switch or refuse? |
+| [flydsl-hgemm-tiling-validity](#flydsl-hgemm-tiling-validity) | constraint | reviewed | Which FlyDSL HGEMM configurations will fail to build at all, before any of them can be slow? |
 | [flydsl-half-mfma-call-forms](#flydsl-half-mfma-call-forms) | performance_candidate | unreviewed | Which legal MFMA call forms can seed a FlyDSL f16/bf16 GEMM? |
-| [flydsl-async-copy-by-family](#flydsl-async-copy-by-family) | performance_candidate | unreviewed | Is global-to-LDS async copy a knob, a fixed fact, or unavailable — per FlyDSL kernel family and architecture? |
+| [flydsl-async-copy-by-family](#flydsl-async-copy-by-family) | performance_candidate | reviewed | Is global-to-LDS async copy a knob, a fixed fact, or unavailable — per FlyDSL kernel family and architecture? |
 | [gemm-workgroup-xcd-mapping](#gemm-workgroup-xcd-mapping) | performance_candidate | unreviewed | How should a FlyDSL GEMM map workgroup IDs onto output tiles and XCDs, and where does AITER already do it? |
 | [flydsl-hgemm-config-space](#flydsl-hgemm-config-space) | performance_candidate | unreviewed | Which tile, warp and split-K values will the FlyDSL HGEMM family actually accept, and how does a shape narrow them? |
 | [flydsl-xor16-lds-layout-consistency](#flydsl-xor16-lds-layout-consistency) | performance_candidate | unreviewed | How should a FlyDSL GEMM apply an XOR16 LDS layout without making stores and loads disagree? |
 | [flydsl-preshuffle-b-layout-contract](#flydsl-preshuffle-b-layout-contract) | performance_candidate | unreviewed | What does enabling B preshuffle on a FlyDSL HGEMM actually require? |
-| [gemm-shape-regime-routing](#gemm-shape-regime-routing) | performance_candidate | unreviewed | For each shape bucket, which backend did AITER&#x27;s own tuner ship, and what does that imply for a FlyDSL kernel? |
-| [gemm-default-backend-routing](#gemm-default-backend-routing) | performance_candidate | unreviewed | Which backend does AITER&#x27;s own dispatch pick when no tuned row exists, and how does that differ between gfx942 and gfx950? |
+| [gemm-shape-regime-routing](#gemm-shape-regime-routing) | performance_candidate | reviewed | For each shape bucket, which backend did AITER&#x27;s own tuner ship, and what does that imply for a FlyDSL kernel? |
+| [gemm-default-backend-routing](#gemm-default-backend-routing) | performance_candidate | reviewed | Which backend does AITER&#x27;s own dispatch pick when no tuned row exists, and how does that differ between gfx942 and gfx950? |
 | [gemm-asm-tile-inventory-and-selection](#gemm-asm-tile-inventory-and-selection) | performance_candidate | unreviewed | Which tiles and split-K capabilities does AITER&#x27;s hand-written ASM ship per architecture, and how does its launcher choose among them for a shape? |
 | [flydsl-mfma-fragment-lane-layout](#flydsl-mfma-fragment-lane-layout) | semantic | unreviewed | Which lane holds which row and column of a 16x16 MFMA fragment in AITER&#x27;s FlyDSL kernels, and what does that fix for loads, in-register scaling and stores? |
-| [flydsl-host-launch-contract](#flydsl-host-launch-contract) | constraint | unreviewed | What does the host side of a FlyDSL GEMM have to provide in AITER — compile cache, launch grid, per-stream state and kernel name? |
+| [flydsl-host-launch-contract](#flydsl-host-launch-contract) | constraint | reviewed | What does the host side of a FlyDSL GEMM have to provide in AITER — compile cache, launch grid, per-stream state and kernel name? |
 | [flydsl-test-parity-gate](#flydsl-test-parity-gate) | constraint | unreviewed | Which parity does AITER&#x27;s own FlyDSL GEMM test demand, where does it relax it, and what does that say about validating an authored kernel? |
 | [gemm-streamed-operand-cache-policy](#gemm-streamed-operand-cache-policy) | performance_candidate | unreviewed | Which operand loads and output stores should carry a streaming (non-temporal) cache policy, and which should keep the default? |
-| [flydsl-lds-pipeline-depth](#flydsl-lds-pipeline-depth) | performance_candidate | unreviewed | How many LDS stages should the K loop keep in flight, and what does each one cost? |
+| [flydsl-lds-pipeline-depth](#flydsl-lds-pipeline-depth) | performance_candidate | reviewed | How many LDS stages should the K loop keep in flight, and what does each one cost? |
 | [gemm-host-plan-cache](#gemm-host-plan-cache) | performance_candidate | unreviewed | When should a GEMM wrapper cache launch plans or temporary storage? |
 | [gemm-compiler-schedule-and-register-budget](#gemm-compiler-schedule-and-register-budget) | performance_candidate | unreviewed | When is an explicit GEMM pipeline worth replacing the compiler-selected loop? |
 | [triton-dot-accumulator-form](#triton-dot-accumulator-form) | performance_candidate | reviewed | Should the dot product receive the existing accumulator directly? |
@@ -96,8 +96,19 @@ A required trait must be established for the actual design before the card appli
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2775](https://github.com/ROCm/aiter/pull/2775) · merged · constraint** — PR #2775 introduces the dedicated small-M family and its dispatch/configuration contract; performance image values are not encoded.
+  Conditions: BF16, 1 &lt;= M &lt; 17; gfx942 is excluded by the cited source; distinguish generic and small_m compiler arguments.
+  Direction: flydsl; architecture_capability, implementation_variant
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: low** — The report concerns the implementation or validity change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [ca33757e4f65](https://github.com/ROCm/aiter/commit/ca33757e4f652e45d7812e5506bdd42b49196bc7) — Exclude gfx942 and out-of-profile M values from small-M configuration generation.
+  [Result: small_m_contract](../../../_sources/aiter/pull_requests/2775.md#small_m_contract) — **unknown**; Small-M BF16 GEMMs gain a separate kernel/configuration family with N/K-oriented work partitioning and an explicit architecture gate.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, software, baseline_commit, candidate_commit, protocol, correctness, transcribed_image_benchmarks, independent_reproduction.
+  Effect: **implementation or correctness constraint**; no speedup is assigned.
 
 #### Background
 
@@ -170,8 +181,20 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2732](https://github.com/ROCm/aiter/pull/2732) · merged · constraint** — The upstream fix replaces a fixed LDS limit with a device-aware legality check; it supplies no preferred stage count or measured speedup.
+  Conditions: FlyDSL HGEMM/split-K candidate validation; preserve the actual family allocation formula and device LDS budget.
+  Direction: flydsl; configuration_constraints, workgroup_tile
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: low** — The report concerns the implementation or validity change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [daa8e94a491a](https://github.com/ROCm/aiter/commit/daa8e94a491af9e3933e95d96b130f58407bcb73) — Filter host GEMM candidates using the active device LDS limit rather than a fixed global cap.
+  Change: [daa8e94a491a](https://github.com/ROCm/aiter/commit/daa8e94a491af9e3933e95d96b130f58407bcb73) — Check the split-K kernel staging allocation against the device limit and report candidate context.
+  [Result: architecture_aware_validity](../../../_sources/aiter/pull_requests/2732.md#architecture_aware_validity) — **unknown**; LDS capacity checks become architecture-aware, and candidate failures no longer prevent the tuning pass from continuing.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, dtype, shape_layout, software, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  Effect: **implementation or correctness constraint**; no speedup is assigned.
 
 #### Background
 
@@ -303,8 +326,19 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2546](https://github.com/ROCm/aiter/pull/2546) · merged · not_reported** — PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the individual mechanism is reported.
+  Conditions: FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update other families or later configurations.
+  Direction: flydsl; memory_access, architecture_capability
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [8d30ef53a0a6](https://github.com/ROCm/aiter/commit/8d30ef53a0a6e12d70894a973f4df127d298f620) — Select A-copy width by architecture in the newly integrated preshuffle family.
+  [Result: unquantified_knobs](../../../_sources/aiter/pull_requests/2546.md#unquantified_knobs) — **unknown**; The reviewed PR introduces the A8 compiler and tuning choices but supplies no quantitative performance comparison for these mechanisms.
+  **Effect confidence: unknown** — The body and reviewed discussion cover implementation/correctness and qualitative rationale, not a measured speedup for the exposed knobs; missing: hardware, gfx, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Background
 
@@ -672,8 +706,19 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2775](https://github.com/ROCm/aiter/pull/2775) · merged · constraint** — PR #2775 introduces the dedicated small-M family and its dispatch/configuration contract; performance image values are not encoded.
+  Conditions: BF16, 1 &lt;= M &lt; 17; gfx942 is excluded by the cited source; distinguish generic and small_m compiler arguments.
+  Direction: flydsl; implementation_variant
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: low** — The report concerns the implementation or validity change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [ca33757e4f65](https://github.com/ROCm/aiter/commit/ca33757e4f652e45d7812e5506bdd42b49196bc7) — Dispatch small-M configurations with N-repeat, persistent-N, occupancy, unroll and bias arguments.
+  [Result: small_m_contract](../../../_sources/aiter/pull_requests/2775.md#small_m_contract) — **unknown**; Small-M BF16 GEMMs gain a separate kernel/configuration family with N/K-oriented work partitioning and an explicit architecture gate.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, software, baseline_commit, candidate_commit, protocol, correctness, transcribed_image_benchmarks, independent_reproduction.
+  Effect: **implementation or correctness constraint**; no speedup is assigned.
 
 #### Reported experience
 
@@ -749,8 +794,19 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2546](https://github.com/ROCm/aiter/pull/2546) · merged · not_reported** — PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the individual mechanism is reported.
+  Conditions: FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update other families or later configurations.
+  Direction: flydsl; implementation_variant, runtime_contract
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [8d30ef53a0a6](https://github.com/ROCm/aiter/commit/8d30ef53a0a6e12d70894a973f4df127d298f620) — Wire a tuned FlyDSL per-token A8 preshuffle selection into the existing backend dispatch.
+  [Result: unquantified_knobs](../../../_sources/aiter/pull_requests/2546.md#unquantified_knobs) — **unknown**; The reviewed PR introduces the A8 compiler and tuning choices but supplies no quantitative performance comparison for these mechanisms.
+  **Effect confidence: unknown** — The body and reviewed discussion cover implementation/correctness and qualitative rationale, not a measured speedup for the exposed knobs; missing: hardware, gfx, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Background
 
@@ -935,8 +991,22 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2775](https://github.com/ROCm/aiter/pull/2775) · merged · constraint** — PR #2775 introduces the dedicated small-M family and its dispatch/configuration contract; performance image values are not encoded.
+  Conditions: BF16, 1 &lt;= M &lt; 17; gfx942 is excluded by the cited source; distinguish generic and small_m compiler arguments.
+  Direction: flydsl; runtime_contract, implementation_variant
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: low** — The report concerns the implementation or validity change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [ca33757e4f65](https://github.com/ROCm/aiter/commit/ca33757e4f652e45d7812e5506bdd42b49196bc7) — Dispatch small-M configurations with N-repeat, persistent-N, occupancy, unroll and bias arguments.
+  [Result: small_m_contract](../../../_sources/aiter/pull_requests/2775.md#small_m_contract) — **unknown**; Small-M BF16 GEMMs gain a separate kernel/configuration family with N/K-oriented work partitioning and an explicit architecture gate.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, software, baseline_commit, candidate_commit, protocol, correctness, transcribed_image_benchmarks, independent_reproduction.
+  Effect: **implementation or correctness constraint**; no speedup is assigned.
+  [Result: configuration_identity](../../../_sources/aiter/pull_requests/2775.md#configuration_identity) — **unknown**; Wide-N B_TO_LDS candidates that compile to the same effective configuration are deduplicated without deleting waves_per_eu=0 globally.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, software, baseline, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  Effect: **implementation or correctness constraint**; no speedup is assigned.
 
 #### Background
 
@@ -1104,8 +1174,19 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2732](https://github.com/ROCm/aiter/pull/2732) · merged · constraint** — The upstream fix replaces a fixed LDS limit with a device-aware legality check; it supplies no preferred stage count or measured speedup.
+  Conditions: FlyDSL HGEMM/split-K candidate validation; preserve the actual family allocation formula and device LDS budget.
+  Direction: flydsl; pipeline_schedule, configuration_constraints
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: low** — The report concerns the implementation or validity change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [daa8e94a491a](https://github.com/ROCm/aiter/commit/daa8e94a491af9e3933e95d96b130f58407bcb73) — Check the split-K kernel staging allocation against the device limit and report candidate context.
+  [Result: architecture_aware_validity](../../../_sources/aiter/pull_requests/2732.md#architecture_aware_validity) — **unknown**; LDS capacity checks become architecture-aware, and candidate failures no longer prevent the tuning pass from continuing.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, dtype, shape_layout, software, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  Effect: **implementation or correctness constraint**; no speedup is assigned.
 
 #### Background
 
@@ -1270,7 +1351,7 @@ Reviewed the named PR, its committed changes and available discussion; this does
   Change: [7f613da83720](https://github.com/ROCm/aiter/commit/7f613da837208886c1d9a958550f1ad50bd0ef7e) — Use the accumulator form for the attention value dot product.
   [Result: no_performance_report](../../../_sources/aiter/pull_requests/3231.md#no_performance_report) — **unknown**; The PR describes eliminating the separate add but publishes no quantitative speedup in its body or reviewed discussion.
   **Effect confidence: unknown** — Implementation change is explicit; reviewed PR body and discussion contain no performance comparison; missing: hardware, gfx, dtype, shape_layout, software, baseline_commit, candidate_commit, protocol, correctness.
-  Quantitative effect: **not reported**.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Background
 

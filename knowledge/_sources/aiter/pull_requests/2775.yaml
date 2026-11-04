@@ -1,0 +1,170 @@
+schema_version: 1
+id: aiter_pr_2775
+number: 2775
+repository: https://github.com/ROCm/aiter
+title: Xiaobing/gptoss small m
+state: merged
+base_commit: fb770f7e54ab4bb2edeb474b36282d2b54fc7217
+head_commit: ef19b066634c7aca43ca96c9c149ec070682a2bd
+merge_commit: ca33757e4f652e45d7812e5506bdd42b49196bc7
+captured_at: '2026-11-04T16:48:59.470298+00:00'
+updated_at: '2026-04-22T01:24:52Z'
+sources:
+- id: design
+  url: https://github.com/ROCm/aiter/pull/2775
+  excerpt: |-
+    ## Motivation
+
+    This PR adds a dedicated FlyDSL small-M HGEMM path for decode-like BF16 GEMMs where `M` is tiny while `N/K` remain large.
+
+    ## Technical Details
+
+    - Add a dedicated FlyDSL `small_m` HGEMM family for decode-like BF16 GEMMs with `1 <= M < 17`, instead of treating them as just another tuning point of generic `hgemm`.
+    - Collapse M-side parallelism (`TILE_M=16`, `BLOCK_M_WARPS=1`) so wave budget is spent on the heavier N/K directions rather than the tiny M dimension.
+    - Change warp mapping to an N-centric layout (`warp_m_idx=0`, `warp_n_idx=wid * WARP_N`), so one block works on one small-M slice with more N-side workers.
+    - Add `N_TILE_REPEAT` to reuse loaded A fragments across multiple N tiles in the non-`B_TO_LDS` path, improving arithmetic intensity for small-M / wide-N shapes.
+    - Add `PERSISTENT_N_TILES` plus dedicated `B_TO_LDS_UNROLL` / `waves_per_eu` tuning knobs for the `B_TO_LDS` path, so wide-N scheduling and load/compute overlap are tuned specifically for this regime.
+  sha256: 9a9219e3f8f652a59037b16d6b4bf4b7f02dad62c5e5f52906f244329b1a41f8
+  captured_at: '2026-11-04T16:48:59.470298+00:00'
+  updated_at: '2026-04-22T01:24:52Z'
+- id: canonicalization
+  url: https://github.com/ROCm/aiter/pull/2775#discussion_r3109293365
+  excerpt: |-
+    Updated. The compiler only normalizes waves_per_eu=0 to 2 for the wide-N B_TO_LDS subset. For non-wide-N B_TO_LDS configs, 0 is still a real tuning candidate. We already have tuned entries that rely on this. For example, in gptoss_bf16_tuned_gemm.csv, the M=8, N=2880, K=4096 small-M kernel has no _WPE suffix in the kernel name, which corresponds to waves_per_eu=0, and this path also passes runtime validation.
+
+    So the safer fix is not to remove 0 globally, but to:
+
+    keep SMALL_M_B_TO_LDS_WAVES_PER_EU_OPTIONS = (0, 2, 4)
+    canonicalize / deduplicate only the wide-N B_TO_LDS cases that collapse to the same effective compiled kernel
+    I updated it that way, and also verified both the registry dedup behavior and a runtime smoke case.
+  sha256: 9e40274e7f5d42f9cc4cfc840d4bae8a78d330aae5f4a5c7bc7079d59d3f03a9
+  captured_at: '2026-11-04T16:48:59.470298+00:00'
+  updated_at: '2026-04-20T08:47:58Z'
+changes:
+- id: small_m_geometry
+  commit: ca33757e4f652e45d7812e5506bdd42b49196bc7
+  parent_commit: 7890e4be789ac362d3033437d09920ddd5f2891a
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  before: ''
+  after: |-
+    SMALL_M_KERNEL_MAX = 17
+    TILE_M = 16
+    BLOCK_M_WARPS = 1
+    STAGES = 2
+    WARP_SIZE = 64
+    DTYPE_BYTES = 2
+  summary: Introduce a dedicated M<17 kernel with TILE_M=16, one M warp and two LDS stages.
+- id: architecture_gate
+  commit: ca33757e4f652e45d7812e5506bdd42b49196bc7
+  parent_commit: 7890e4be789ac362d3033437d09920ddd5f2891a
+  file: aiter/ops/flydsl/kernels/small_m_hgemm.py
+  before: ''
+  after: |2-
+            return
+
+        gpu_arch = get_rocm_arch()
+        if gpu_arch == "gfx942" or not (1 <= m < SMALL_M_KERNEL_MAX):
+            return
+
+        seen_configs = set()
+        for tile_n in SMALL_M_TILE_N_OPTIONS:
+  summary: Exclude gfx942 and out-of-profile M values from small-M configuration generation.
+- id: family_dispatch
+  commit: ca33757e4f652e45d7812e5506bdd42b49196bc7
+  parent_commit: 7890e4be789ac362d3033437d09920ddd5f2891a
+  file: aiter/ops/flydsl/kernels/hgemm_dispatch.py
+  before: ''
+  after: |2-
+        if kernel_family == KERNEL_FAMILY_SMALL_M:
+            return compile_small_m_hgemm_kernel(
+                dtype,
+                n,
+                k,
+                TILE_N=tile_n,
+                TILE_K=tile_k,
+                SPLIT_K=split_k,
+                BLOCK_N_WARPS=block_n_warps,
+                N_TILE_REPEAT=n_tile_repeat,
+                PERSISTENT_N_TILES=persistent_n_tiles,
+                WAVES_PER_EU_HINT=waves_per_eu,
+                B_TO_LDS_UNROLL=b_to_lds_unroll,
+                B_TO_LDS=b_to_lds,
+                HAS_BIAS=has_bias,
+            )
+  summary: Dispatch small-M configurations with N-repeat, persistent-N, occupancy, unroll and bias arguments.
+results:
+- id: small_m_contract
+  outcome: constraint
+  summary: Small-M BF16 GEMMs gain a separate kernel/configuration family with N/K-oriented work partitioning
+    and an explicit architecture gate.
+  source_refs:
+  - design
+  context:
+    hardware: null
+    gfx: null
+    dtype: bf16
+    shape_layout: 1 <= M < 17 with large N/K; family fixes TILE_M=16 and BLOCK_M_WARPS=1
+    software: null
+    baseline: Generic hgemm family
+    candidate: Dedicated small_m FlyDSL HGEMM family
+    baseline_commit: null
+    candidate_commit: null
+    scope: unknown
+    protocol: null
+    correctness: null
+  metrics: []
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - hardware
+    - gfx
+    - software
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - correctness
+    - transcribed_image_benchmarks
+    - independent_reproduction
+  limitations:
+  - The PR includes image attachments for performance results; their numeric contents are not encoded here.
+  - The stated design does not establish a measured gain over a tuned generic kernel on a new case.
+  - The source gate excludes gfx942; source presence does not prove broad architecture support.
+- id: configuration_identity
+  outcome: constraint
+  summary: Wide-N B_TO_LDS candidates that compile to the same effective configuration are deduplicated without
+    deleting waves_per_eu=0 globally.
+  source_refs:
+  - canonicalization
+  context:
+    hardware: null
+    gfx: null
+    dtype: bf16
+    shape_layout: Wide-N B_TO_LDS subset; counterexample M=8,N=2880,K=4096 retains waves_per_eu=0
+    software: null
+    baseline: null
+    candidate: Subset-specific registry canonicalization
+    baseline_commit: null
+    candidate_commit: null
+    scope: unknown
+    protocol: null
+    correctness: Author reports registry dedup verification and a runtime smoke case
+  metrics: []
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - hardware
+    - gfx
+    - software
+    - baseline
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - independent_reproduction
+  limitations:
+  - This is a configuration identity/validity result, not a latency comparison.

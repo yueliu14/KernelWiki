@@ -28,6 +28,14 @@ def grade(label, confidence):
     return f"**{label}: {confidence['level']}** — " + " ".join(safe(x) for x in confidence["reasons"]).rstrip(".") + missing + "."
 
 
+def unquantified_text(result):
+    if result["outcome"] == "not_reported":
+        return "Quantitative effect: **not reported**; this does not mean zero gain."
+    if result["outcome"] == "constraint":
+        return "Effect: **implementation or correctness constraint**; no speedup is assigned."
+    return "Quantitative effect: **not encoded here**; the qualitative report and its limits remain recorded."
+
+
 def card_section(catalog, card, page):
     review = card["upstream_review"]
     out = ["", "#### Upstream PR effects", "", f"**Review: {review['status']}**."]
@@ -62,7 +70,7 @@ def card_section(catalog, card, page):
                     "  " + grade("Effect confidence", result["confidence"])]
             out += ["  " + metric_text(m) for m in result["metrics"]]
             if not result["metrics"]:
-                out.append("  Quantitative effect: **not reported**.")
+                out.append("  " + unquantified_text(result))
     return out
 
 
@@ -92,7 +100,7 @@ def render_record(root, pr):
         out += [""] + ["- " + metric_text(m) for m in result["metrics"]]
         out += ["  Reported row/claim: " + safe(m["source"]["quote"]) for m in result["metrics"]]
         if not result["metrics"]:
-            out += ["Quantitative effect: **not reported**; this does not mean zero gain."]
+            out += [unquantified_text(result)]
         out += ["", "Sources: " + ", ".join(f"[{s}](#source-{s})" for s in result["source_refs"]), ""]
         out += ["- " + safe(x) for x in result["limitations"]] + [""]
     out += ["## Captured source excerpts", "",

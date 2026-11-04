@@ -20,14 +20,22 @@ The [operator catalog](catalog.yaml) and this generated navigation page live alo
 
 ## Upstream PR review coverage
 
-4 canonical PR reports. reviewed: 4, unreviewed: 105, unresolved: 0, blocked: 0.
+12 canonical PR reports. reviewed: 25, unreviewed: 84, unresolved: 0, blocked: 0.
 
 Counts describe review coverage, not successful optimizations. Reports with missing measurements remain explicit; shared references do not duplicate results.
 
 - [AITER PR #1909 (closed)](../_sources/aiter/pull_requests/1909.md)
+- [AITER PR #2546 (merged)](../_sources/aiter/pull_requests/2546.md)
+- [AITER PR #2732 (merged)](../_sources/aiter/pull_requests/2732.md)
+- [AITER PR #2775 (merged)](../_sources/aiter/pull_requests/2775.md)
 - [AITER PR #3231 (merged)](../_sources/aiter/pull_requests/3231.md)
+- [AITER PR #3266 (merged)](../_sources/aiter/pull_requests/3266.md)
+- [AITER PR #3901 (merged)](../_sources/aiter/pull_requests/3901.md)
 - [AITER PR #4538 (merged)](../_sources/aiter/pull_requests/4538.md)
+- [AITER PR #4761 (merged)](../_sources/aiter/pull_requests/4761.md)
 - [AITER PR #4963 (merged)](../_sources/aiter/pull_requests/4963.md)
+- [AITER PR #5123 (merged)](../_sources/aiter/pull_requests/5123.md)
+- [AITER PR #5693 (merged)](../_sources/aiter/pull_requests/5693.md)
 
 ## GEMM and projection fusions
 

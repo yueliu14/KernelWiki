@@ -35,7 +35,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -97,6 +100,45 @@ cards:
   - Gates move between releases. Every citation carries its file and line; re-read them against the checkout
     you are building on before trusting the list.
   - That a path is open says nothing about whether it is fast.
+  experience:
+  - outcome: constraint
+    conditions:
+    - BF16, 1 <= M < 17; gfx942 is excluded by the cited source; distinguish generic and small_m compiler arguments.
+    summary: 'PR #2775 introduces the dedicated small-M family and its dispatch/configuration contract; performance
+      image values are not encoded.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2775
+      change_refs:
+      - architecture_gate
+      result_refs:
+      - small_m_contract
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - architecture_capability
+          - implementation_variant
+          backend: flydsl
 - id: flydsl-hgemm-tiling-validity
   type: constraint
   axes:
@@ -119,7 +161,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -174,6 +219,47 @@ cards:
     it and the estimate stops applying.
   - Passing every check means the configuration builds, not that it is fast, and not that it is correct in
     a modified kernel.
+  experience:
+  - outcome: constraint
+    conditions:
+    - FlyDSL HGEMM/split-K candidate validation; preserve the actual family allocation formula and device LDS
+      budget.
+    summary: The upstream fix replaces a fixed LDS limit with a device-aware legality check; it supplies no
+      preferred stage count or measured speedup.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2732
+      change_refs:
+      - host_lds_limit
+      - kernel_lds_limit
+      result_refs:
+      - architecture_aware_validity
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - configuration_constraints
+          - workgroup_tile
+          backend: flydsl
 - id: flydsl-half-mfma-call-forms
   type: performance_candidate
   axes:
@@ -277,7 +363,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - an operand tile is staged through LDS
@@ -324,6 +413,45 @@ cards:
   limitations:
   - Selection shares show where AITER's tuner chose async copy, not by how much it helped.
   - The HGEMM rule is tied to the current kernel; an authored HGEMM can stage however the hardware allows.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - async_geometry
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - memory_access
+          - architecture_capability
+          backend: flydsl
 - id: gemm-workgroup-xcd-mapping
   type: performance_candidate
   axes:
@@ -704,7 +832,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - a workload with one or more (M, N, K) cases, with gfx and dtype known
@@ -779,6 +910,43 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/own-the-dispatch-layer-then-race-backends-behind-it-dense-gemm-gfx950-compute-bound.md
       artifacts: not_published
       verification: not_reproduced
+  - outcome: constraint
+    conditions:
+    - BF16, 1 <= M < 17; gfx942 is excluded by the cited source; distinguish generic and small_m compiler arguments.
+    summary: 'PR #2775 introduces the dedicated small-M family and its dispatch/configuration contract; performance
+      image values are not encoded.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2775
+      change_refs:
+      - family_dispatch
+      result_refs:
+      - small_m_contract
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - implementation_variant
+          backend: flydsl
 - id: gemm-default-backend-routing
   type: performance_candidate
   axes:
@@ -797,7 +965,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - a case whose production path, or whose frozen baseline, is AITER's dispatch rather than a fixed kernel
@@ -847,6 +1018,45 @@ cards:
     `tuned_gemm.py` and `ops/gemm_op_a8w8.py` after an AITER bump.
   - A route says which backend runs, not how fast it is; hipblaslt and torch routes are libraries this corpus
     does not index.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - flydsl_route
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - implementation_variant
+          - runtime_contract
+          backend: flydsl
 - id: gemm-asm-tile-inventory-and-selection
   type: performance_candidate
   axes:
@@ -1002,7 +1212,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - a FlyDSL kernel is being launched, cached or registered for dispatch
@@ -1045,6 +1258,46 @@ cards:
   limitations:
   - This is AITER's host contract at the pinned commit; an authored kernel launched outside AITER's wrappers
     must provide the same pieces itself.
+  experience:
+  - outcome: constraint
+    conditions:
+    - BF16, 1 <= M < 17; gfx942 is excluded by the cited source; distinguish generic and small_m compiler arguments.
+    summary: 'PR #2775 introduces the dedicated small-M family and its dispatch/configuration contract; performance
+      image values are not encoded.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2775
+      change_refs:
+      - family_dispatch
+      result_refs:
+      - small_m_contract
+      - configuration_identity
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - runtime_contract
+          - implementation_variant
+          backend: flydsl
 - id: flydsl-test-parity-gate
   type: constraint
   axes:
@@ -1186,7 +1439,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - the design stages operand tiles through LDS (trait lds_staging)
@@ -1221,6 +1477,46 @@ cards:
     passing a parameter.
   - 'Deeper is not monotonically better: once global latency is hidden, further stages only take LDS away from
     occupancy.'
+  experience:
+  - outcome: constraint
+    conditions:
+    - FlyDSL HGEMM/split-K candidate validation; preserve the actual family allocation formula and device LDS
+      budget.
+    summary: The upstream fix replaces a fixed LDS limit with a device-aware legality check; it supplies no
+      preferred stage count or measured speedup.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2732
+      change_refs:
+      - kernel_lds_limit
+      result_refs:
+      - architecture_aware_validity
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - pipeline_schedule
+          - configuration_constraints
+          backend: flydsl
 - id: gemm-host-plan-cache
   type: performance_candidate
   axes:

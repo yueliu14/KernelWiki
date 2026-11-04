@@ -11,6 +11,11 @@ or count its results twice. The first reviewed examples cover PRs #1909, #3231, 
 and #4963. Other cards explicitly start as `unreviewed`; this migration is not a claim
 that their upstream histories have been searched.
 
+The next backfill covers A8 GEMM incorporation (#2546), architecture-aware LDS checks
+(#2732), the small-M GEMM family (#2775), MoE sorting (#3266), MLA reduce (#3901), guarded
+prefill mask elision (#4761), DCP top-k merge (#5123), and HERD routing (#5693). See the
+[generated coverage index](../../knowledge/operator/CORPUS.md) for current counts.
+
 ## Three independent questions
 
 1. **Association:** Does the cited change implement this particular direction? Verify
@@ -46,6 +51,10 @@ Use the checked-in examples as complete templates:
 - [Different baselines and contrary outcomes](../../knowledge/_sources/aiter/pull_requests/4538.yaml)
 - [Implementation change without a performance report](../../knowledge/_sources/aiter/pull_requests/3231.yaml)
 - [Closed, unmerged proposal and conflicting reported extrema](../../knowledge/_sources/aiter/pull_requests/1909.yaml)
+- [A validity change with no assigned speedup](../../knowledge/_sources/aiter/pull_requests/2732.yaml)
+- [Serving gains and per-shape gains, regressions and equal displayed timings](../../knowledge/_sources/aiter/pull_requests/3266.yaml)
+- [Measured candidate revisions distinct from PR metadata](../../knowledge/_sources/aiter/pull_requests/4761.yaml)
+- [A qualitative report with image-only numerical results left unencoded](../../knowledge/_sources/aiter/pull_requests/5693.yaml)
 
 Each report contains:
 
@@ -73,6 +82,13 @@ Outcomes are `beneficial`, `no_gain`, `regressed`, `mixed`, `constraint`, and
 `not_reported`. The last requires no metrics and unknown effect confidence. Capability
 extensions and correctness fixes need not carry speedup numbers. An invalid baseline
 (for example, a dtype it does not support correctly) cannot support a performance comparison.
+
+An empty metric list is not synonymous with an absent report. `constraint` records can
+describe a validity or interface change without assigning speedup. A qualitative
+`beneficial`, `regressed` or `mixed` report can remain low-confidence with no encoded
+metrics, including when its numeric results are only in untranscribed image attachments.
+State that gap explicitly; do not relabel existing image results as `not_reported`,
+invent numbers from a PR title, or treat equal rounded timings as statistical equivalence.
 
 ### Metrics
 

@@ -1,0 +1,91 @@
+schema_version: 1
+id: aiter_pr_5693
+number: 5693
+repository: https://github.com/ROCm/aiter
+title: '[FlyDSL] [MoE] Add herd_fused_topk drop-in selector for fused_moe 2-stage'
+state: merged
+base_commit: b7f2fcab96066ec06ce504f9de8e851e7dab637d
+head_commit: 6d3bb7f7a25f10aadc6830bd80ac3d2d2ecb03b9
+merge_commit: ab20344c453da3b35b33f6f422447021d318f949
+captured_at: '2026-11-04T16:48:59.425071+00:00'
+updated_at: '2026-10-13T09:30:50Z'
+sources:
+- id: bias_context
+  url: https://github.com/ROCm/aiter/pull/5693
+  excerpt: Kimi-K3's real gate bias has std 0.024, so 0.025 reproduces production routing (uniq 714 vs the
+    real tensor's 766 at token=128) -- use it for any MoE perf number.
+  sha256: 085d11b3b504c9142e0305a7de1599affb6694b9f12c5b81e67baa475facc7e2
+  captured_at: '2026-11-04T16:48:59.425071+00:00'
+  updated_at: '2026-10-13T09:30:50Z'
+- id: reported_benefit
+  url: https://github.com/ROCm/aiter/pull/5693#issuecomment-6137253450
+  excerpt: |-
+    HERD optimization on Kimi-K3:
+    1. Accuracy is acceptable, 0.95 (HERD ON) vs 0.953 (HERD OFF)
+    2. Performance benefit on 1k/1k w.r.t. conc:
+  sha256: fdc307b84704daef31eb07cad7240060a41516f5f93375351c79f769dc06f585
+  captured_at: '2026-11-04T16:48:59.425071+00:00'
+  updated_at: '2026-10-13T03:02:22Z'
+changes:
+- id: profile_gate
+  commit: ab20344c453da3b35b33f6f422447021d318f949
+  parent_commit: 4f925b7d1a9c61403a148d446cdefe4137bb4e49
+  file: aiter/ops/flydsl/herd_topk.py
+  before: ''
+  after: |-
+    def _profile(score_func: str, experts: int, topk: int) -> str | None:
+        if (score_func, experts, topk) == (
+            "sigmoid",
+            _KIMI_K3_EXPERTS,
+            _KIMI_K3_TOPK,
+        ):
+            return "kimi_k3"
+        if (score_func, experts, topk) == (
+            "sigmoid",
+            _MINIMAX_M3_EXPERTS,
+            _MINIMAX_M3_TOPK,
+        ):
+            return "minimax_m3"
+        return None
+  summary: Select HERD only for its supported score-function, expert-count and top-k profiles.
+results:
+- id: kimi_qualitative_benefit
+  outcome: beneficial
+  summary: The author reports Kimi-K3 performance benefit and acceptable accuracy with HERD enabled; numerical
+    speedups are in image attachments and are not encoded here.
+  source_refs:
+  - bias_context
+  - reported_benefit
+  context:
+    hardware: null
+    gfx: null
+    dtype: null
+    shape_layout: Kimi-K3, 1k input/1k output; vary concurrency; realistic gate bias std approximately 0.025
+    software: null
+    baseline: HERD disabled
+    candidate: HERD enabled
+    baseline_commit: null
+    candidate_commit: null
+    scope: end_to_end
+    protocol: null
+    correctness: Author reports accuracy 0.95 with HERD on versus 0.953 off
+  metrics: []
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - hardware
+    - gfx
+    - software
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - transcribed_image_benchmarks
+    - independent_reproduction
+    - dtype
+  limitations:
+  - Hardware, software and measured revisions are not specified in the cited report.
+  - Do not apply results from unit-variance random bias to production routing with much smaller bias variance.
+  - Image-only numerical results remain untranscribed; no speedup value is inferred.

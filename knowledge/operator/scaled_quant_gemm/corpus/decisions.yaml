@@ -105,7 +105,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - quantized GEMM (fp8, int8/int4, fp4)
@@ -160,6 +163,45 @@ cards:
   - This is instruction selection in AITER's vendored kernel; it says nothing about which instruction is faster
     for a shape.
   - The FNUZ/OCP statement comes from the background hardware docs, not from this source.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - mfma_selection
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - compute_instruction
+          - architecture_capability
+          backend: flydsl
 - id: flydsl-a8-scale-granularity-contract
   type: constraint
   axes:
@@ -184,7 +226,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - fp8/int8 GEMM whose math contract names its scale granularity (per-tensor, per-token/per-channel, or [128,128]
@@ -241,6 +286,45 @@ cards:
   - The per-K-block promote is the arithmetic a block-scale contract requires; its cost on a given shape is
     a measurement, and measured recipes live behind the expert-skill switch.
   - The E8M0 limitation is a hardware fact from the background docs, not from this source.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - scale_operands
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - runtime_contract
+          - epilogue
+          backend: flydsl
 - id: gemm-blockscale-k-loop-scale-application
   type: semantic
   axes:
@@ -367,7 +451,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - fp8 or int8 GEMM with a preshuffled B (the A8 preshuffle family, or an authored kernel modelled on it)
@@ -430,6 +517,47 @@ cards:
     staging scheme needs its own estimate.
   - Shipped FlyDSL selections exist only for gfx950 per-token fp8; there is none for gfx942 and none for block-scaled
     fp8.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - tuning_sweep
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - tunable_surface
+          - pipeline_schedule
+          - epilogue
+          - execution_geometry
+          backend: flydsl
 - id: gemm-blockscale-shipped-bucket-structure
   type: performance_candidate
   axes:
@@ -536,7 +664,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - a K loop whose A tile goes through LDS and whose B is read straight from global memory
@@ -587,6 +718,45 @@ cards:
   limitations:
   - The table values are AITER's per-tile choices for gfx950 fp8/int8; they are seeds for that geometry only.
   - Scheduling is the most build-specific knowledge here; settle the tile and staging first.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - schedule_preload
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - pipeline_schedule
+          - memory_access
+          backend: flydsl
 - id: flydsl-a8-data-movement-helpers
   type: performance_candidate
   axes:
@@ -608,7 +778,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - an operand is staged through LDS and the other is read preshuffled from global memory, as in the A8 and
@@ -656,6 +829,45 @@ cards:
   - The helpers are the A8/MoE family's; the HGEMM stages its operands with its own code, and a block-scale
     kernel adds scale loads these helpers do not cover.
   - Which width is fastest for a tile is a measurement; the helpers state which widths are legal.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - async_geometry
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - memory_access
+          - pipeline_schedule
+          backend: flydsl
 - id: quant-gemm-format-reinterpretation
   type: performance_candidate
   axes:

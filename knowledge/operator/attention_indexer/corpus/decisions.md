@@ -28,7 +28,7 @@ A required trait must be established for the actual design before the card appli
 | [indexer-minimax-page-max-score](#indexer-minimax-page-max-score) | semantic | unreviewed | How does MiniMax block scoring differ from per-token MQA logits? |
 | [indexer-score-work-partition](#indexer-score-work-partition) | performance_candidate | reviewed | How should scoring work be partitioned across short decode and long prefill rows? |
 | [indexer-topk-row-index-contract](#indexer-topk-row-index-contract) | constraint | unreviewed | What must a top-k implementation preserve beyond score values? |
-| [indexer-dcp-merge-ownership](#indexer-dcp-merge-ownership) | constraint | unreviewed | How does DCP top-k merge preserve rank ownership and physical KV slots? |
+| [indexer-dcp-merge-ownership](#indexer-dcp-merge-ownership) | constraint | reviewed | How does DCP top-k merge preserve rank ownership and physical KV slots? |
 | [indexer-single-query-vector-path](#indexer-single-query-vector-path) | performance_candidate | unreviewed | When can a single-query index score use a vector reduction instead of a degenerate matrix product? |
 
 <a id="indexer-mqa-score-semantics"></a>
@@ -467,8 +467,22 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #5123](https://github.com/ROCm/aiter/pull/5123) · merged · beneficial** — The fused owned-slot DCP merge has a reported single-operator benefit; real multi-GPU all-gather and full-decode attribution remain unvalidated.
+  Conditions: Rank-major scores, W=8, k_loc=topk=2048, qlen=1, losing -inf padding, and valid physical-slot maps; the all-gather itself is outside the measurement.
+  Direction: flydsl; distributed_merge, selection_contract, cache_layout
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: low** — The report concerns the implementation or validity change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [ce788f58feb4](https://github.com/ROCm/aiter/commit/ce788f58feb47c66c23bfde5d39fab8e5db76606) — Introduce rank-positional ownership, losing padding scores and physical-slot emission for DCP top-k merge.
+  [Result: one_row](../../../_sources/aiter/pull_requests/5123.md#one_row) — **operator**; The fused owned-slot merge is reported faster than the equivalent six-operation sequence.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  latency: 166.5 → 33.9 us (single_case); normalized speedup 4.912×
+  [Result: many_rows](../../../_sources/aiter/pull_requests/5123.md#many_rows) — **operator**; The fused owned-slot merge is reported faster than the equivalent six-operation sequence.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  latency: 167.4 → 34 us (single_case); normalized speedup 4.924×
 
 #### Background
 

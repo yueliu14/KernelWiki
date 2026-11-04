@@ -89,6 +89,13 @@ def test_absent_report_is_not_zero_gain(catalog):
         upstream.validate_record(data)
 
 
+def test_qualitative_and_constraint_reports_are_not_labeled_missing():
+    assert "not reported" in render.unquantified_text({"outcome": "not_reported"})
+    assert "not encoded here" in render.unquantified_text({"outcome": "beneficial"})
+    assert "constraint" in render.unquantified_text({"outcome": "constraint"})
+    assert "not reported" not in render.unquantified_text({"outcome": "beneficial"})
+
+
 def test_bundle_gain_cannot_be_assigned_to_an_individual_axis(catalog):
     data = entry(catalog)
     data["upstream"]["assessment"]["attribution"]["confidence"]["level"] = "high"

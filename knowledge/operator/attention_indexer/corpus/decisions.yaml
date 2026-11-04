@@ -452,7 +452,10 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - The selected implementation merges rank-major candidate scores for qlen=1 decode.
   actions:
@@ -476,6 +479,48 @@ cards:
   - The decode-only row/indptr contract cannot be assumed valid for arbitrary prefill queries.
   references:
   - knowledge/operator/attention_indexer/README.md
+  experience:
+  - outcome: beneficial
+    conditions:
+    - Rank-major scores, W=8, k_loc=topk=2048, qlen=1, losing -inf padding, and valid physical-slot maps; the
+      all-gather itself is outside the measurement.
+    summary: The fused owned-slot DCP merge has a reported single-operator benefit; real multi-GPU all-gather
+      and full-decode attribution remain unvalidated.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_5123
+      change_refs:
+      - owned_kv_slots
+      result_refs:
+      - one_row
+      - many_rows
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - distributed_merge
+          - selection_contract
+          - cache_layout
+          backend: flydsl
 - id: indexer-single-query-vector-path
   type: performance_candidate
   axes:
