@@ -18,14 +18,14 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [attention-gated-delta-state-contract](#attention-gated-delta-state-contract) | constraint | What state and index contracts distinguish gated-delta decode from softmax attention? |
-| [gated-delta-prefill-state-and-snapshots](#gated-delta-prefill-state-and-snapshots) | constraint | How are persistent states and per-chunk snapshots distinguished in gated-delta prefill? |
-| [gated-delta-mtp-parent-snapshots](#gated-delta-mtp-parent-snapshots) | constraint | What state semantics change for multi-token prediction over a draft tree? |
-| [gated-delta-launch-ownership](#gated-delta-launch-ownership) | performance_candidate | Does the recurrent-attention launch assign each output tile exactly once? |
-| [gated-delta-write-policy](#gated-delta-write-policy) | performance_candidate | When is streaming output useful for a gated-delta preparation stage? |
-| [gated-delta-factorable-scale-and-head-reuse](#gated-delta-factorable-scale-and-head-reuse) | performance_candidate | Can a gated-delta contraction share head work or hoist a scale? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [attention-gated-delta-state-contract](#attention-gated-delta-state-contract) | constraint | unreviewed | What state and index contracts distinguish gated-delta decode from softmax attention? |
+| [gated-delta-prefill-state-and-snapshots](#gated-delta-prefill-state-and-snapshots) | constraint | unreviewed | How are persistent states and per-chunk snapshots distinguished in gated-delta prefill? |
+| [gated-delta-mtp-parent-snapshots](#gated-delta-mtp-parent-snapshots) | constraint | unreviewed | What state semantics change for multi-token prediction over a draft tree? |
+| [gated-delta-launch-ownership](#gated-delta-launch-ownership) | performance_candidate | unreviewed | Does the recurrent-attention launch assign each output tile exactly once? |
+| [gated-delta-write-policy](#gated-delta-write-policy) | performance_candidate | unreviewed | When is streaming output useful for a gated-delta preparation stage? |
+| [gated-delta-factorable-scale-and-head-reuse](#gated-delta-factorable-scale-and-head-reuse) | performance_candidate | unreviewed | Can a gated-delta contraction share head work or hoist a scale? |
 
 <a id="attention-gated-delta-state-contract"></a>
 ### What state and index contracts distinguish gated-delta decode from softmax attention?
@@ -60,6 +60,11 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_c67a55e3e97ebe90](source_evidence.md#aiter_b3ad6c46-src_c67a55e3e97ebe90) — [aiter/ops/flydsl/linear_attention_kernels.py:327-441](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/linear_attention_kernels.py#L327-L441).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -104,6 +109,11 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_fa1931cd4a8e61ea](source_evidence.md#aiter_b3ad6c46-src_fa1931cd4a8e61ea) — [aiter/ops/flydsl/linear_attention_prefill_kernels.py:484-915](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/linear_attention_prefill_kernels.py#L484-L915).
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/operator/linear_attention_gated_delta/README.md](../README.md)
@@ -147,6 +157,11 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_c90d6f1a5c4c63f3](source_evidence.md#aiter_b3ad6c46-src_c90d6f1a5c4c63f3) — [aiter/ops/flydsl/linear_attention_kernels.py:956-1069](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/linear_attention_kernels.py#L956-L1069).
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/operator/linear_attention_gated_delta/README.md](../README.md)
@@ -184,6 +199,11 @@ A required trait must be established for the actual design before the card appli
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 
@@ -233,6 +253,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -281,6 +306,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 

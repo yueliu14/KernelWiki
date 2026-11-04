@@ -18,12 +18,12 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [moe-route-map-capacity](#moe-route-map-capacity) | constraint | What is the mapping between token routes and grouped expert rows? |
-| [moe-route-quant-scatter-fusion](#moe-route-quant-scatter-fusion) | performance_candidate | What does fusing route mapping, MX quantization and scatter commit the consumer to? |
-| [moe-weighted-gather-dropped-routes](#moe-weighted-gather-dropped-routes) | semantic | Where are route weights applied, and how are dropped routes excluded? |
-| [moe-communication-arena-lifetime](#moe-communication-arena-lifetime) | constraint | Which host and synchronization invariants accompany device-side MoE communication? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [moe-route-map-capacity](#moe-route-map-capacity) | constraint | unreviewed | What is the mapping between token routes and grouped expert rows? |
+| [moe-route-quant-scatter-fusion](#moe-route-quant-scatter-fusion) | performance_candidate | unreviewed | What does fusing route mapping, MX quantization and scatter commit the consumer to? |
+| [moe-weighted-gather-dropped-routes](#moe-weighted-gather-dropped-routes) | semantic | unreviewed | Where are route weights applied, and how are dropped routes excluded? |
+| [moe-communication-arena-lifetime](#moe-communication-arena-lifetime) | constraint | unreviewed | Which host and synchronization invariants accompany device-side MoE communication? |
 
 <a id="moe-route-map-capacity"></a>
 ### What is the mapping between token routes and grouped expert rows?
@@ -59,6 +59,11 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_0a4dbe911d66b11f](source_evidence.md#aiter_b3ad6c46-src_0a4dbe911d66b11f) — [aiter/ops/flydsl/kernels/moe_route_maps.py:70-128](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/moe_route_maps.py#L70-L128).
 - [aiter_b3ad6c46:src_52948ddec2419f82](source_evidence.md#aiter_b3ad6c46-src_52948ddec2419f82) — [aiter/ops/flydsl/kernels/moe_route_maps.py:181-300](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/moe_route_maps.py#L181-L300).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -104,6 +109,11 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_2bdcc297cb94f6d6](source_evidence.md#aiter_b3ad6c46-src_2bdcc297cb94f6d6) — [aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py:792-1116](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py#L792-L1116).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -153,6 +163,11 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_e689390c22f73f0d](source_evidence.md#aiter_b3ad6c46-src_e689390c22f73f0d) — [aiter/ops/flydsl/kernels/moe_gather_reduce.py:100-315](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/moe_gather_reduce.py#L100-L315).
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/operator/moe_dispatch_combine/README.md](../README.md)
@@ -198,6 +213,11 @@ A required trait must be established for the actual design before the card appli
 - [aiter_b3ad6c46:src_b3a94e1850387cbe](../../fused_moe_grouped_gemm/corpus/source_evidence.md#aiter_b3ad6c46-src_b3a94e1850387cbe) — [aiter/ops/flydsl/kernels/mega_moe_tp/mega_moe_tp.py:163-172](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/mega_moe_tp/mega_moe_tp.py#L163-L172).
 - [aiter_b3ad6c46:src_0cb51cc8eaf4375d](../../fused_moe_grouped_gemm/corpus/source_evidence.md#aiter_b3ad6c46-src_0cb51cc8eaf4375d) — [aiter/ops/flydsl/kernels/mega_moe_tp/mega_moe_tp.py:174-217](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/mega_moe_tp/mega_moe_tp.py#L174-L217).
 - [aiter_b3ad6c46:src_f80e3738642511c2](../../fused_moe_grouped_gemm/corpus/source_evidence.md#aiter_b3ad6c46-src_f80e3738642511c2) — [aiter/ops/flydsl/kernels/mega_moe_tp/communication.py:749-772](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/mega_moe_tp/communication.py#L749-L772).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 

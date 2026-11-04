@@ -18,10 +18,10 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [attention-split-kv-merge](#attention-split-kv-merge) | performance_candidate | When splitting KV work, what information must the merge preserve? |
-| [attention-mla-reduce-abi](#attention-mla-reduce-abi) | constraint | Which tensor and mapping invariants does the FlyDSL MLA reducer require? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [attention-split-kv-merge](#attention-split-kv-merge) | performance_candidate | unreviewed | When splitting KV work, what information must the merge preserve? |
+| [attention-mla-reduce-abi](#attention-mla-reduce-abi) | constraint | unreviewed | Which tensor and mapping invariants does the FlyDSL MLA reducer require? |
 
 <a id="attention-split-kv-merge"></a>
 ### When splitting KV work, what information must the merge preserve?
@@ -62,6 +62,11 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_a726e480b7d62ccf](source_evidence.md#aiter_b3ad6c46-src_a726e480b7d62ccf) — [aiter/ops/triton/_triton_kernels/attention/mla.py:669-762](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/mla.py#L669-L762).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 
@@ -119,6 +124,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - [aiter_b3ad6c46:src_a6768ea282169992](source_evidence.md#aiter_b3ad6c46-src_a6768ea282169992) — [aiter/ops/flydsl/mla_reduce_kernels.py:112-243](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/mla_reduce_kernels.py#L112-L243).
 - [aiter_b3ad6c46:src_6e49a7e29550a915](source_evidence.md#aiter_b3ad6c46-src_6e49a7e29550a915) — [aiter/ops/flydsl/mla_reduce_kernels.py:98-109](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/mla_reduce_kernels.py#L98-L109).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 

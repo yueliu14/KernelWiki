@@ -1,0 +1,244 @@
+schema_version: 1
+id: aiter_pr_4963
+number: 4963
+repository: https://github.com/ROCm/aiter
+title: '[FlyDSL] gfx942 fp8_mqa_logits: let _auto_variant choose rows_per_block'
+state: merged
+base_commit: bcb56d9c4d04bb4957a051911da69162cb21c3af
+head_commit: 19bd10d3c0aafa18890379bbb058b029f123f60c
+merge_commit: bbaccdfb1b8c2111adff30852777d868f764ef0b
+captured_at: '2026-11-04T15:43:37.815889+00:00'
+updated_at: '2026-09-28T13:43:58Z'
+sources:
+- id: body
+  url: https://github.com/ROCm/aiter/pull/4963
+  excerpt: |-
+    ## Motivation
+
+    On gfx942 `_auto_variant` returns `f"mfma_r2_w{wpb}"`, so `rows_per_block` is pinned at 2 and
+    seven of the nine registered variants — including the entire `r4` family — can never be
+    selected. At the shape vLLM actually issues for long-context indexer prefill (`seq_len` 1024,
+    `seq_len_kv` 131072) the pinned pick is the median of the nine by speed, with the best 1.65x
+    faster. vLLM chunks prefill to fit `VLLM_SPARSE_INDEXER_MAX_LOGITS_MB` (512 MB), which caps
+    `seq_len` at 1024 at that context, so the selector's own `seq_len >= 2048` branch can never
+    fire there. Since vllm-project/vllm#49544 routes gfx942 `fp8_mqa_logits` to this kernel by
+    default, every MI300X/MI325X user inherits it.
+
+    ## Technical Details
+
+    Sweeping all nine variants over 180 shapes surfaced two separable effects.
+
+    **RPB tracks the logits element count, not `seq_len`.** Over
+    `seq_len ∈ [1, 8192] × seq_len_kv ∈ [1024, 262144]` the boundaries land on the same value of
+    `seq_len * seq_len_kv` at all six contexts: `r1` below 2^19 (27/27 shapes), `r2` at 2^19 (6/6),
+    `r4` from 2^21 up (38/38), with 2^20 a transition band split 3/3.
+
+    **RPB must also divide `seq_len`.** When it does not, the launcher pads with four `torch.cat`
+    calls. That is a flat ~44 us of host-side overhead, independent of `seq_len_kv`: at `seq_len` 1,
+    `seq_len_kv` 131072, `r1` runs 23.1 us and `r2` 67.8 us, of which the four cats measure 44.1 us
+    (0.7 us unexplained), and pre-padding the input by hand recovers all of it. So the cost is not
+    proportional to the wasted rows — one padded row of two costs the same as three of four — and the
+    pinned `r2` walks into it on *every odd `seq_len`*, 37 of the 180 shapes swept, at a median 2.97x
+    penalty.
+
+    The step-down to a divisor has to be gated to small shapes, where the kernel is cheap relative to
+    44 us. Above the threshold the reuse wins even when padding: at `seq_len` 1025, `seq_len_kv`
+    131072, the dividing `r1` takes 3880 us against 2601 us for a padded `r2`.
+
+    ```python
+    elems = seq_len * seq_len_kv
+    if elems < 2**19:
+        rpb = 1
+    elif elems < 2**21:
+        rpb = 2 if seq_len % 2 == 0 else 1
+    else:
+        rpb = 4
+    wpb = 2 if (seq_len >= 2048 and seq_len_kv >= 8192) else 4
+    ```
+
+    `waves_per_block` is deliberately left unchanged. It is worth a few percent at most here, and
+    unlike RPB its optimum moves with the head count — at 64 heads the current rule costs 1.61x worst
+    case where a fixed `w4` costs 1.07x — so it warrants its own sweep rather than a change fitted to
+    one head count.
+
+    ## Test Plan
+
+    MI325X (gfx942), all nine variants timed at 180 shapes (1620 timings): a power-of-two
+    `seq_len × seq_len_kv` grid, plus three held-out sets the rule was not fitted on —
+    non-power-of-two shapes, a fine `seq_len` sweep through the divisibility cliff, and head counts
+    16 and 64. Selector changes were verified end to end through `flydsl_fp8_mqa_logits(variant=None)`
+    with no `FLYDSL_FP8_MQA_LOGITS_VARIANT` set, so the selector itself is under test. Every variant's
+    output was compared against a reference at every shape.
+
+    ## Test Result
+
+    Old pick vs new, no env override:
+
+    | seq_len | seq_len_kv | before | us | after | us | speedup |
+    | ---: | ---: | --- | ---: | --- | ---: | ---: |
+    | 1024 | 131072 | r2_w4 | 2598.7 | r4_w4 | 1623.5 | 1.60x |
+    | 1025 | 131072 | r2_w4 | 2609.3 | r4_w4 | 1594.0 | 1.64x |
+    | 700 | 50000 | r2_w4 | 661.6 | r4_w4 | 440.3 | 1.50x |
+    | 333 | 12000 | r2_w4 | 118.4 | r4_w4 | 97.1 | 1.22x |
+    | 3 | 131072 | r2_w4 | 66.4 | r1_w4 | 28.1 | 2.36x |
+    | 1 | 1024 | r2_w4 | 66.2 | r1_w4 | 22.2 | 2.98x |
+
+    No shape measured regresses; the smallest gain is 1.04x. Scored against the fastest of the nine
+    at each shape, pooled over the held-out data, the geometric mean cost falls from 1.45x to 1.03x
+    and the worst case from 3.17x to 1.41x.
+
+    Logits are bitwise identical across all nine variants at all 180 shapes, so this is purely a
+    blocking/occupancy change with no numerical trade-off.
+
+    End to end on 8x MI325X, TP8, GLM-5.2-FP8, 131072 in / 1024 out, concurrency 8: median TPOT
+    improves 7.22% and output throughput 6.60%. This kernel is 16.8% of GPU time at that point, the
+    largest single item in the profile.
+  sha256: 71f371e28fadc8a83a5d05774622a41557395e97d9aad3dc93faac4ee9406944
+  captured_at: '2026-11-04T15:43:37.815889+00:00'
+  updated_at: '2026-09-28T13:43:58Z'
+changes:
+- id: selector
+  commit: bbaccdfb1b8c2111adff30852777d868f764ef0b
+  parent_commit: 71a31be15ac18363d0f7e4786e25b460b79e44ad
+  file: aiter/ops/flydsl/fp8_mqa_logits_kernels.py
+  before: '        return f"mfma_r2_w{wpb}"'
+  after: |2-
+            rpb2_min_elems = 2**19
+            rpb4_min_elems = 2**21
+            elems = seq_len * seq_len_kv
+            if elems < rpb2_min_elems:
+                rpb = 1
+            elif elems < rpb4_min_elems:
+                rpb = 2 if seq_len % 2 == 0 else 1
+            else:
+                rpb = 4
+  summary: Select rows per block by logits element count and divisibility on gfx942; keep the waves rule unchanged.
+results:
+- id: long_prefill
+  outcome: beneficial
+  summary: Automatic row grouping improves the reported full operator latency for this case.
+  source_refs:
+  - body
+  context:
+    hardware: AMD MI325X
+    gfx: gfx942
+    dtype: FP8 Q/KV; exact byte formats not specified in the report
+    shape_layout: seq_len=1024, seq_len_kv=131072; head count for this row unspecified
+    software: null
+    baseline: Previous automatic selector; r2_w4 for these cases
+    candidate: New automatic selector with no environment override
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: Full flydsl_fp8_mqa_logits(variant=None) call; 180-shape sweep and held-out cases; timing statistic/repeats
+      unspecified
+    correctness: Author reports bitwise identical logits across all nine variants at all 180 shapes
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: single_case
+    before: 2598.7
+    after: 1623.5
+    source:
+      ref: body
+      quote: '| 1024 | 131072 | r2_w4 | 2598.7 | r4_w4 | 1623.5 | 1.60x |'
+  confidence:
+    level: medium
+    reasons:
+    - The PR gives paired latencies, hardware, shape, entry point and correctness results; exact measured revisions
+      and software versions are missing.
+    missing_evidence:
+    - software
+    - baseline_commit
+    - candidate_commit
+    - independent_reproduction
+  limitations:
+  - These are operator timings including host padding, not isolated GPU kernel timings.
+  - Timing repeats and statistic are unspecified; the selector and padding effects are not independent ablations.
+- id: small_query
+  outcome: beneficial
+  summary: Automatic row grouping improves the reported full operator latency for this case.
+  source_refs:
+  - body
+  context:
+    hardware: AMD MI325X
+    gfx: gfx942
+    dtype: FP8 Q/KV; exact byte formats not specified in the report
+    shape_layout: seq_len=1, seq_len_kv=1024; head count for this row unspecified
+    software: null
+    baseline: Previous automatic selector; r2_w4 for these cases
+    candidate: New automatic selector with no environment override
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: Full flydsl_fp8_mqa_logits(variant=None) call; 180-shape sweep and held-out cases; timing statistic/repeats
+      unspecified
+    correctness: Author reports bitwise identical logits across all nine variants at all 180 shapes
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: single_case
+    before: 66.2
+    after: 22.2
+    source:
+      ref: body
+      quote: '| 1 | 1024 | r2_w4 | 66.2 | r1_w4 | 22.2 | 2.98x |'
+  confidence:
+    level: medium
+    reasons:
+    - The PR gives paired latencies, hardware, shape, entry point and correctness results; exact measured revisions
+      and software versions are missing.
+    missing_evidence:
+    - software
+    - baseline_commit
+    - candidate_commit
+    - independent_reproduction
+  limitations:
+  - These are operator timings including host padding, not isolated GPU kernel timings.
+  - Timing repeats and statistic are unspecified; the selector and padding effects are not independent ablations.
+- id: serving
+  outcome: beneficial
+  summary: The PR separately reports median TPOT and output throughput improvements.
+  source_refs:
+  - body
+  context:
+    hardware: 8 x AMD MI325X
+    gfx: gfx942
+    dtype: GLM-5.2-FP8
+    shape_layout: TP8; input 131072, output 1024; concurrency 8
+    software: null
+    baseline: System using previous selector
+    candidate: System using new selector
+    baseline_commit: null
+    candidate_commit: null
+    scope: end_to_end
+    protocol: End-to-end serving comparison; median TPOT and output throughput
+    correctness: Operator logits checked bitwise; model-level correctness for this run not reported
+  metrics:
+  - kind: latency_reduction
+    unit: percent
+    statistic: median
+    value: 7.22
+    source:
+      ref: body
+      quote: improves 7.22% and output throughput 6.60%. This kernel is 16.8% of GPU time at that point, the
+  - kind: throughput_increase
+    unit: percent
+    statistic: unspecified
+    value: 6.6
+    source:
+      ref: body
+      quote: improves 7.22% and output throughput 6.60%. This kernel is 16.8% of GPU time at that point, the
+  confidence:
+    level: medium
+    reasons:
+    - Explicit serving setup and metrics are reported, without pinned measurement revisions or independent
+      reproduction.
+    missing_evidence:
+    - software
+    - baseline_commit
+    - candidate_commit
+    - independent_reproduction
+  limitations:
+  - Do not use the operator speedup as the end-to-end improvement.
+  - Model-level correctness and repetition counts were not reported.

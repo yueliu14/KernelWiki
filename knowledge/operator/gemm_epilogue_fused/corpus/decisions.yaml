@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: gemm_epilogue_fused
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -28,6 +28,8 @@ cards:
     cost?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - the output store path (layout, vector width, atomics) is being chosen
@@ -93,6 +95,8 @@ cards:
   question: What does the fused gated feed-forward body require of its output buffer?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:
@@ -126,6 +130,8 @@ cards:
   question: Where does an affine epilogue belong when the GEMM is split over K?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:
@@ -167,6 +173,8 @@ cards:
   question: Which fusion boundary helps each regime of a normalization/GEMM chain?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id001
   - The chain has distinct prefill and decode execution arms and explicit intermediate/output ownership.
   actions:

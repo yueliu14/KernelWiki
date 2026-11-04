@@ -18,16 +18,16 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [moe-two-stage-intermediate](#moe-two-stage-intermediate) | semantic | What must match at the gate/up to down-projection boundary? |
-| [moe-live-config-and-scale-domain](#moe-live-config-and-scale-domain) | performance_candidate | Which tuning surface controls the served expert GEMM contract? |
-| [moe-stage-instance-layout](#moe-stage-instance-layout) | performance_candidate | How should MFMA shape and pipeline instance be chosen for each MoE stage? |
-| [moe-dequant-reuse-and-chain](#moe-dequant-reuse-and-chain) | performance_candidate | Can expert-weight dequantization be reused or shortened on the critical path? |
-| [moe-per-bucket-binary-and-config](#moe-per-bucket-binary-and-config) | performance_candidate | When should expert token buckets use separate configurations or compiled entries? |
-| [moe-precision-and-scale-gates](#moe-precision-and-scale-gates) | performance_candidate | When does narrowing expert operands remain valid and deployable? |
-| [moe-epilogue-lds-stride](#moe-epilogue-lds-stride) | performance_candidate | When can padding an expert epilogue staging tile reduce its critical-path conflicts? |
-| [moe-per-buffer-cache-policy](#moe-per-buffer-cache-policy) | performance_candidate | Should expert input, weights, scratch and output use the same cache policy? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [moe-two-stage-intermediate](#moe-two-stage-intermediate) | semantic | unreviewed | What must match at the gate/up to down-projection boundary? |
+| [moe-live-config-and-scale-domain](#moe-live-config-and-scale-domain) | performance_candidate | unreviewed | Which tuning surface controls the served expert GEMM contract? |
+| [moe-stage-instance-layout](#moe-stage-instance-layout) | performance_candidate | unreviewed | How should MFMA shape and pipeline instance be chosen for each MoE stage? |
+| [moe-dequant-reuse-and-chain](#moe-dequant-reuse-and-chain) | performance_candidate | unreviewed | Can expert-weight dequantization be reused or shortened on the critical path? |
+| [moe-per-bucket-binary-and-config](#moe-per-bucket-binary-and-config) | performance_candidate | unreviewed | When should expert token buckets use separate configurations or compiled entries? |
+| [moe-precision-and-scale-gates](#moe-precision-and-scale-gates) | performance_candidate | unreviewed | When does narrowing expert operands remain valid and deployable? |
+| [moe-epilogue-lds-stride](#moe-epilogue-lds-stride) | performance_candidate | unreviewed | When can padding an expert epilogue staging tile reduce its critical-path conflicts? |
+| [moe-per-buffer-cache-policy](#moe-per-buffer-cache-policy) | performance_candidate | unreviewed | Should expert input, weights, scratch and output use the same cache policy? |
 
 <a id="moe-two-stage-intermediate"></a>
 ### What must match at the gate/up to down-projection boundary?
@@ -69,6 +69,11 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_716da92976cf21bc](source_evidence.md#aiter_b3ad6c46-src_716da92976cf21bc) — [aiter/ops/flydsl/kernels/moe_gemm_2stage/gfx9_fp8/gemm1.py:22-1068](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/moe_gemm_2stage/gfx9_fp8/gemm1.py#L22-L1068).
 - [aiter_b3ad6c46:src_fd19baacbd3c48ef](source_evidence.md#aiter_b3ad6c46-src_fd19baacbd3c48ef) — [aiter/ops/flydsl/kernels/moe_gemm_2stage/gfx9_fp8/gemm2.py:19-801](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/moe_gemm_2stage/gfx9_fp8/gemm2.py#L19-L801).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 
@@ -121,6 +126,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -169,6 +179,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 
@@ -219,6 +234,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -267,6 +287,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 
@@ -317,6 +342,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -365,6 +395,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -412,6 +447,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 

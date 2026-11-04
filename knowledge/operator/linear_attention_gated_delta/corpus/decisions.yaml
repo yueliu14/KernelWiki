@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: linear_attention_gated_delta
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -19,6 +19,8 @@ cards:
   question: What state and index contracts distinguish gated-delta decode from softmax attention?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The workload executes the recurrent gated-delta decode path.
   actions:
@@ -55,6 +57,8 @@ cards:
   question: How are persistent states and per-chunk snapshots distinguished in gated-delta prefill?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:
@@ -89,6 +93,8 @@ cards:
   question: What state semantics change for multi-token prediction over a draft tree?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:
@@ -126,6 +132,8 @@ cards:
   question: Does the recurrent-attention launch assign each output tile exactly once?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id001
   - A wrapper-derived grid can duplicate work or disagree with the kernel indexing.
   actions:
@@ -178,6 +186,8 @@ cards:
   question: When is streaming output useful for a gated-delta preparation stage?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id002
   - Store traffic is limiting and actual downstream consumers do not require near-term cache residency.
   actions:
@@ -228,6 +238,8 @@ cards:
   question: Can a gated-delta contraction share head work or hoist a scale?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id003
   - The scale is provably independent of the reduced axis and grouped heads share the same contracted operand.
   actions:

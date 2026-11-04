@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: general
   curator_contract: Reusable conditioned conclusions; private run artifacts are not published.
 traits: {}
@@ -44,6 +44,8 @@ cards:
   question: How can a small performance change be distinguished from measurement drift?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id001
   - The candidate and baseline implement the same contract and are timed under the actual execution protocol.
   actions:
@@ -113,6 +115,8 @@ cards:
   question: How can an optimization be tied to the code and call path that actually ran?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id003
   - Compilation caches, imported aliases or serving workers can resolve a different implementation from the
     edited source.
@@ -180,6 +184,8 @@ cards:
   question: When should an optimization direction that previously failed be tested again?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id004
   - A negative result was obtained for a particular implementation, operating regime and baseline.
   actions:
@@ -243,6 +249,8 @@ cards:
   question: Is launch or host work inside the metric being optimized?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id005
   - A small kernel may be dominated by allocation, argument binding, dispatch or graph replay rather than its
     device body.
@@ -294,6 +302,8 @@ cards:
   question: How should roofline and counter observations guide a concrete experiment?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id006
   - The deployed CU count, dtype, shape and execution boundaries are known.
   actions:
@@ -343,6 +353,8 @@ cards:
   question: What resource limits occupancy on a matrix-core kernel?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id007
   - Matrix instructions use architecture-specific vector and accumulator register allocation.
   actions:
@@ -388,6 +400,8 @@ cards:
   question: How should isolated improvements be evaluated as an end-to-end change?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id008
   - The workload contains multiple kernels or phases, potentially with host work and communication overlap.
   actions:
@@ -451,6 +465,8 @@ cards:
   question: When can a new grid axis improve a composed kernel chain?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id009
   - A stage partitions only tokens while another independent dimension can supply useful parallelism.
   actions:

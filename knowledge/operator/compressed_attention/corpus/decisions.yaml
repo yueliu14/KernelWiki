@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: compressed_attention
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -19,6 +19,8 @@ cards:
   question: Which compression-window and quantized-cache contracts must travel together?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The chosen source path is the fused compression/cache preparation kernel, not ordinary dense attention.
   actions:

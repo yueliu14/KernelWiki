@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: shared_expert_fusion
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -20,6 +20,8 @@ cards:
   question: When may a fused collective consume the shared-expert partial?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The fused runner is configured to add a shared-expert output produced on a potentially separate path.
   actions:
@@ -55,6 +57,8 @@ cards:
   question: How is a shared-expert partial adapted to the communication runner's row layout?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:

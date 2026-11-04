@@ -20,12 +20,12 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [flydsl-cshuffle-epilogue](#flydsl-cshuffle-epilogue) | performance_candidate | When can a FlyDSL GEMM route its accumulators through an LDS CShuffle epilogue, and what does it cost? |
-| [gemm-gated-feed-forward-atomic-output](#gemm-gated-feed-forward-atomic-output) | constraint | What does the fused gated feed-forward body require of its output buffer? |
-| [gemm-blockscale-fused-affine-split](#gemm-blockscale-fused-affine-split) | semantic | Where does an affine epilogue belong when the GEMM is split over K? |
-| [fused-gemm-regime-specific-chain](#fused-gemm-regime-specific-chain) | performance_candidate | Which fusion boundary helps each regime of a normalization/GEMM chain? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [flydsl-cshuffle-epilogue](#flydsl-cshuffle-epilogue) | performance_candidate | unreviewed | When can a FlyDSL GEMM route its accumulators through an LDS CShuffle epilogue, and what does it cost? |
+| [gemm-gated-feed-forward-atomic-output](#gemm-gated-feed-forward-atomic-output) | constraint | unreviewed | What does the fused gated feed-forward body require of its output buffer? |
+| [gemm-blockscale-fused-affine-split](#gemm-blockscale-fused-affine-split) | semantic | unreviewed | Where does an affine epilogue belong when the GEMM is split over K? |
+| [fused-gemm-regime-specific-chain](#fused-gemm-regime-specific-chain) | performance_candidate | unreviewed | Which fusion boundary helps each regime of a normalization/GEMM chain? |
 
 <a id="flydsl-cshuffle-epilogue"></a>
 ### When can a FlyDSL GEMM route its accumulators through an LDS CShuffle epilogue, and what does it cost?
@@ -80,6 +80,11 @@ A required trait must be established for the actual design before the card appli
 - Shipped selection: [aiter_a6bb4993:cfg_909edfc582fce0bd](../../scaled_quant_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_909edfc582fce0bd); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:cfg_496162f129968cb9](../../scaled_quant_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_496162f129968cb9); no measurement is inferred.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/operator/gemm_epilogue_fused/backend/flydsl.md:20-26](../backend/flydsl.md)
@@ -123,6 +128,11 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_cf2b5852b341da65](source_evidence.md#aiter_b3ad6c46-src_cf2b5852b341da65) — [aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py:37-210](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py#L37-L210).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -168,6 +178,11 @@ A required trait must be established for the actual design before the card appli
 - [aiter_b3ad6c46:src_cba1ac61dda37c05](source_evidence.md#aiter_b3ad6c46-src_cba1ac61dda37c05) — [aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py:37-240](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py#L37-L240).
 - [aiter_b3ad6c46:src_e91a864245298df4](source_evidence.md#aiter_b3ad6c46-src_e91a864245298df4) — [aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py:256-337](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py#L256-L337).
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/operator/gemm_epilogue_fused/README.md](../README.md)
@@ -205,6 +220,11 @@ A required trait must be established for the actual design before the card appli
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 

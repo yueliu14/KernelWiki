@@ -80,12 +80,17 @@ Do not copy a new snapshot prefix onto an old group or overwrite a historically 
 Configuration counts and selected backend rows are starting points; do not import timing columns as
 source evidence or call a shipped selection a measured winner.
 
-With schema 3 / decision schema 5, cards can contain `experience`. Preserve provenance and comparison
+With catalog schema 3 / decision schemas 5 and 6, cards can contain `experience`. Preserve provenance and comparison
 context. Imported historical summaries stay `not_reproduced`; an upstream code diff cannot turn them
 into internal validation. New private validation summaries require the public context accepted by
 `tools/corpus/experience.py`; private raw runs and their locations remain outside KernelWiki. Do not
 invent such a summary during a source-only refresh. For older schemas, follow the available contract
 and retain existing experience rather than silently converting the repository to a newer schema.
+
+On decision schema 6, follow the checkout's `tools/corpus/upstream-evidence.md` for upstream PR
+reports. Their canonical effects and card-local association/attribution assessments are distinct
+from private validation. A closed unmerged proposal, missing benchmark, or contrary later result
+must remain explicit. Snapshot commits, change commits and measured commits serve different roles.
 
 If the source suggests a promising optimization, express it as a candidate with explicit conditions
 and validation needs. A contrary old result is not disproven merely because the technique now appears

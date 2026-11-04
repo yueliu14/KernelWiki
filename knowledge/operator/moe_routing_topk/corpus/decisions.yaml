@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: moe_routing_topk
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -18,6 +18,8 @@ cards:
   question: When is the specialized HERD routing path a valid candidate?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - A candidate intends to reuse the FlyDSL HERD sigmoid routing implementation.
   actions:
@@ -56,6 +58,8 @@ cards:
   question: Which outputs of expert sorting are part of the downstream GEMM ABI?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - Token/expert routes are sorted and padded into expert-aligned work blocks.
   actions:
@@ -99,6 +103,8 @@ cards:
   question: Is router top-k limited by launch preparation or by the selection network?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id001
   - Small router rows expose a host/launch floor while larger rows may be selection-bound.
   actions:
@@ -134,4 +140,79 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/the-device-lane-on-a-small-router-top-k-is-close-to-closed-moe-router-topk-gfx950-both.md
       artifacts: not_published
       verification: not_reproduced
+- id: moe-sigmoid-dpp-selection
+  type: performance_candidate
+  axes:
+  - routing_semantics
+  - implementation_contract
+  match:
+    operator_families:
+    - moe_routing_topk
+    target_languages:
+    - hip
+  question: Can DPP-based selection improve sigmoid top-k for a fixed expert count?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T15:47:13.494575+00:00'
+    summary: Reviewed the named PR, its committed changes and available discussion; this does not establish
+      current deployment or target-workload performance.
+  conditions:
+  - Sigmoid routing, MI300X, fp16/bf16, 64/128 experts and the reported token/top-k cases; this is not softmax
+    routing.
+  actions:
+  - Evaluate a DPP selection network against a correct CK or other baseline on the same valid cases.
+  - Preserve sigmoid weighting, selection/tie semantics and output contracts; validate them independently.
+  alternatives:
+  - Keep the current correct implementation as the comparison baseline.
+  why:
+  - 'PR #1909 implements a gfx9 DPP path and reports a direct CK comparison.'
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - The proposal was closed without merging and must not be presented as shipped AITER code.
+  - Reported speedup extrema disagree within the PR; fp32 and 256-expert cases lack a valid CK performance
+    baseline.
+  references:
+  - knowledge/operator/moe_routing_topk/README.md
+  experience:
+  - outcome: beneficial
+    conditions:
+    - Sigmoid routing, MI300X, fp16/bf16, 64/128 experts and the reported token/top-k cases; this is not softmax
+      routing.
+    summary: An unmerged upstream proposal reports faster sigmoid top-k using DPP; its average and limitations
+      remain attributed to the author.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_1909
+      change_refs:
+      - dpp_selection
+      result_refs:
+      - reported_average
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed PR commit changes the named implementation and the quoted before/after construct.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The reported result belongs to a complete implementation/selector; individual contributions were
+              not isolated.
+            missing_evidence:
+            - independent_ablation
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - routing_semantics
+          - implementation_contract
+          backend: hip
 shared_cards: []

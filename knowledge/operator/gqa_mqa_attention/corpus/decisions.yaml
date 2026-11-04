@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: gqa_mqa_attention
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -21,6 +21,8 @@ cards:
   question: How should query heads share KV heads without changing GQA/MQA semantics?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The workload has more query heads than KV heads.
   actions:
@@ -61,6 +63,8 @@ cards:
   question: Can KV storage be narrowed while retaining the attention compute contract?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id001
   - KV traffic is limiting and the accepted accuracy contract permits a storage-precision experiment.
   actions:
@@ -113,6 +117,8 @@ cards:
   question: When can one program share gathered KV across more query heads?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id002
   - Grouped heads attend to compatible gathered KV, and output ownership remains separate for every query/head.
   actions:

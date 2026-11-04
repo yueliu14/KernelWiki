@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: chunked_prefill
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits: {}
@@ -17,6 +17,8 @@ cards:
   question: How are cached-prefix and current-chunk attention combined?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:

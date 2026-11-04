@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: batched_gemm
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits: {}
@@ -17,6 +17,8 @@ cards:
   question: Which batch and scale layouts does the MXFP8 BMM wrapper accept?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:
@@ -51,6 +53,8 @@ cards:
   question: How can batched GEMM tile, buffering and split choices be seeded legally?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:

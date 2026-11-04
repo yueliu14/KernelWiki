@@ -19,17 +19,17 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [indexer-mqa-score-semantics](#indexer-mqa-score-semantics) | semantic | What does the DeepSeek-style MQA indexer compute before top-k? |
-| [indexer-fp8-architecture-format](#indexer-fp8-architecture-format) | constraint | Which FP8 format conversions does the contiguous FlyDSL MQA logits path require? |
-| [indexer-window-and-clean-output](#indexer-window-and-clean-output) | constraint | Who initializes logits outside each query&#x27;s valid window? |
-| [indexer-paged-mxfp4-layout](#indexer-paged-mxfp4-layout) | constraint | Which packed payload, scale and tile constraints accompany paged MXFP4 scoring? |
-| [indexer-minimax-page-max-score](#indexer-minimax-page-max-score) | semantic | How does MiniMax block scoring differ from per-token MQA logits? |
-| [indexer-score-work-partition](#indexer-score-work-partition) | performance_candidate | How should scoring work be partitioned across short decode and long prefill rows? |
-| [indexer-topk-row-index-contract](#indexer-topk-row-index-contract) | constraint | What must a top-k implementation preserve beyond score values? |
-| [indexer-dcp-merge-ownership](#indexer-dcp-merge-ownership) | constraint | How does DCP top-k merge preserve rank ownership and physical KV slots? |
-| [indexer-single-query-vector-path](#indexer-single-query-vector-path) | performance_candidate | When can a single-query index score use a vector reduction instead of a degenerate matrix product? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [indexer-mqa-score-semantics](#indexer-mqa-score-semantics) | semantic | unreviewed | What does the DeepSeek-style MQA indexer compute before top-k? |
+| [indexer-fp8-architecture-format](#indexer-fp8-architecture-format) | constraint | unreviewed | Which FP8 format conversions does the contiguous FlyDSL MQA logits path require? |
+| [indexer-window-and-clean-output](#indexer-window-and-clean-output) | constraint | reviewed | Who initializes logits outside each query&#x27;s valid window? |
+| [indexer-paged-mxfp4-layout](#indexer-paged-mxfp4-layout) | constraint | unreviewed | Which packed payload, scale and tile constraints accompany paged MXFP4 scoring? |
+| [indexer-minimax-page-max-score](#indexer-minimax-page-max-score) | semantic | unreviewed | How does MiniMax block scoring differ from per-token MQA logits? |
+| [indexer-score-work-partition](#indexer-score-work-partition) | performance_candidate | reviewed | How should scoring work be partitioned across short decode and long prefill rows? |
+| [indexer-topk-row-index-contract](#indexer-topk-row-index-contract) | constraint | unreviewed | What must a top-k implementation preserve beyond score values? |
+| [indexer-dcp-merge-ownership](#indexer-dcp-merge-ownership) | constraint | unreviewed | How does DCP top-k merge preserve rank ownership and physical KV slots? |
+| [indexer-single-query-vector-path](#indexer-single-query-vector-path) | performance_candidate | unreviewed | When can a single-query index score use a vector reduction instead of a degenerate matrix product? |
 
 <a id="indexer-mqa-score-semantics"></a>
 ### What does the DeepSeek-style MQA indexer compute before top-k?
@@ -68,6 +68,11 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_e7b7a5ef2934fb22](source_evidence.md#aiter_b3ad6c46-src_e7b7a5ef2934fb22) — [aiter/ops/triton/_triton_kernels/attention/fp8_mqa_logits.py:17-124](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/fp8_mqa_logits.py#L17-L124).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -112,6 +117,11 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_744823ffb69cb339](source_evidence.md#aiter_b3ad6c46-src_744823ffb69cb339) — [aiter/ops/flydsl/fp8_mqa_logits_kernels.py:470-614](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/fp8_mqa_logits_kernels.py#L470-L614).
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/operator/attention_indexer/README.md](../README.md)
@@ -153,6 +163,22 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_744823ffb69cb339](source_evidence.md#aiter_b3ad6c46-src_744823ffb69cb339) — [aiter/ops/flydsl/fp8_mqa_logits_kernels.py:470-614](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/fp8_mqa_logits_kernels.py#L470-L614).
+
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PRs and cited results for the specified backend/axes; other implementations and shapes remain unreviewed. Checked 2026-11-04T15:47:13.494575+00:00.
+
+- **[PR #4538](https://github.com/ROCm/aiter/pull/4538) · merged · beneficial** — The PR reports lower operator latency after fusing invalid-logit initialization on gfx942.
+  Conditions: clean_logits=True with identical valid-window and negative-infinity semantics; H=64 and the cited shape.
+  Direction: flydsl; implementation_contract
+  **Association: high** — The reviewed PR commit changes the named implementation and the quoted before/after construct.
+  **Independent attribution: medium** — The report compares this isolated mechanism but has not been reproduced; missing: independent_ablation.; effect belongs to a **isolated** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [9402ade66cbd](https://github.com/ROCm/aiter/commit/9402ade66cbd8282270b1daee3b28ab6478d9485) — Move out-of-window negative-infinity initialization into the score kernel.
+  [Result: gfx942_clean](../../../_sources/aiter/pull_requests/4538.md#gfx942_clean) — **operator**; The original table reports a benefit from fused clean-logits initialization for the gfx942 implementation.
+  **Effect confidence: low** — Upstream report has incomplete comparison context; no reproduction was performed; missing: hardware, software, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  latency: 210.4 → 191.4 us (single_case); normalized speedup 1.099×
 
 #### Background
 
@@ -196,6 +222,11 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_e48c6dafa5c4e45b](source_evidence.md#aiter_b3ad6c46-src_e48c6dafa5c4e45b) — [aiter/ops/flydsl/kernels/mqa_logits/pa_mqa_logits_fp4.py:37-498](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/mqa_logits/pa_mqa_logits_fp4.py#L37-L498).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -242,6 +273,11 @@ A required trait must be established for the actual design before the card appli
 - [aiter_b3ad6c46:src_4822325ce3d92482](source_evidence.md#aiter_b3ad6c46-src_4822325ce3d92482) — [aiter/ops/flydsl/kernels/minimax_m3_index_score.py:407-861](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/minimax_m3_index_score.py#L407-L861).
 - [aiter_b3ad6c46:src_9b289ddfb1f104a8](source_evidence.md#aiter_b3ad6c46-src_9b289ddfb1f104a8) — [aiter/ops/flydsl/kernels/minimax_m3_index_score.py:1255-1328](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/minimax_m3_index_score.py#L1255-L1328).
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/operator/attention_indexer/README.md](../README.md)
@@ -286,6 +322,54 @@ A required trait must be established for the actual design before the card appli
 - [aiter_b3ad6c46:src_1477d451c719b073](source_evidence.md#aiter_b3ad6c46-src_1477d451c719b073) — [aiter/ops/flydsl/fp8_mqa_logits_kernels.py:347-394](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/fp8_mqa_logits_kernels.py#L347-L394).
 - [aiter_b3ad6c46:src_e4ca822ec3a190b3](source_evidence.md#aiter_b3ad6c46-src_e4ca822ec3a190b3) — [aiter/ops/flydsl/fp8_mqa_logits_kernels.py:125-148](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/fp8_mqa_logits_kernels.py#L125-L148).
 
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PRs and cited results for the specified backend/axes; other implementations and shapes remain unreviewed. Checked 2026-11-04T15:47:13.494575+00:00.
+
+- **[PR #4963](https://github.com/ROCm/aiter/pull/4963) · merged · beneficial** — The upstream selector chooses r1/r2/r4 from the logits size and divisibility; reported operator gains include changed host-padding cost.
+  Conditions: gfx942 automatic FlyDSL selector; match each reported query/KV shape and retain its FP8 numerical contract.
+  Direction: flydsl; work_partition, compute_schedule
+  **Association: high** — The reviewed PR commit changes the named implementation and the quoted before/after construct.
+  **Independent attribution: low** — The reported result belongs to a complete implementation/selector; individual contributions were not isolated; missing: independent_ablation.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [bbaccdfb1b8c](https://github.com/ROCm/aiter/commit/bbaccdfb1b8c2111adff30852777d868f764ef0b) — Select rows per block by logits element count and divisibility on gfx942; keep the waves rule unchanged.
+  [Result: long_prefill](../../../_sources/aiter/pull_requests/4963.md#long_prefill) — **operator**; Automatic row grouping improves the reported full operator latency for this case.
+  **Effect confidence: medium** — The PR gives paired latencies, hardware, shape, entry point and correctness results; exact measured revisions and software versions are missing; missing: software, baseline_commit, candidate_commit, independent_reproduction.
+  latency: 2598.7 → 1623.5 us (single_case); normalized speedup 1.601×
+  [Result: small_query](../../../_sources/aiter/pull_requests/4963.md#small_query) — **operator**; Automatic row grouping improves the reported full operator latency for this case.
+  **Effect confidence: medium** — The PR gives paired latencies, hardware, shape, entry point and correctness results; exact measured revisions and software versions are missing; missing: software, baseline_commit, candidate_commit, independent_reproduction.
+  latency: 66.2 → 22.2 us (single_case); normalized speedup 2.982×
+
+- **[PR #4963](https://github.com/ROCm/aiter/pull/4963) · merged · beneficial** — The same PR reports separate serving-level benefits; these are not the operator speedups.
+  Conditions: 8 x MI325X; GLM-5.2-FP8, TP8, input 131072/output 1024, concurrency 8.
+  Direction: flydsl; work_partition
+  **Association: high** — The reviewed PR commit changes the named implementation and the quoted before/after construct.
+  **Independent attribution: low** — The reported result belongs to a complete implementation/selector; individual contributions were not isolated; missing: independent_ablation.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [bbaccdfb1b8c](https://github.com/ROCm/aiter/commit/bbaccdfb1b8c2111adff30852777d868f764ef0b) — Select rows per block by logits element count and divisibility on gfx942; keep the waves rule unchanged.
+  [Result: serving](../../../_sources/aiter/pull_requests/4963.md#serving) — **end_to_end**; The PR separately reports median TPOT and output throughput improvements.
+  **Effect confidence: medium** — Explicit serving setup and metrics are reported, without pinned measurement revisions or independent reproduction; missing: software, baseline_commit, candidate_commit, independent_reproduction.
+  latency_reduction: 7.22 percent (median); normalized speedup 1.078×
+  throughput_increase: 6.6 percent (unspecified); normalized speedup 1.066×
+
+- **[PR #4538](https://github.com/ROCm/aiter/pull/4538) · merged · mixed** — The gfx950 implementation has mixed evidence across baseline versions and shapes, including a later reported regression.
+  Conditions: Match the original or later comparison context; do not combine their baseline versions.
+  Direction: flydsl; compute_schedule
+  **Association: high** — The reviewed PR commit changes the named implementation and the quoted before/after construct.
+  **Independent attribution: low** — The reported result belongs to a complete implementation/selector; individual contributions were not isolated; missing: independent_ablation.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [9402ade66cbd](https://github.com/ROCm/aiter/commit/9402ade66cbd8282270b1daee3b28ab6478d9485) — Introduce the gfx950 registry, including LDS-pipelined variants and shape-dependent selection.
+  [Result: gfx950_original](../../../_sources/aiter/pull_requests/4538.md#gfx950_original) — **operator**; The original PR table reports a large improvement over its existing Triton/Gluon baseline for one skinny prefill case.
+  **Effect confidence: low** — Upstream report has incomplete comparison context; no reproduction was performed; missing: hardware, software, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  throughput: 149.3 → 1584.4 TFLOP/s (single_case); normalized speedup 10.61×
+  [Result: later_regression](../../../_sources/aiter/pull_requests/4538.md#later_regression) — **operator**; A later author comment reports FlyDSL slower than the newer Gluon baseline for a square DSv4 case.
+  **Effect confidence: low** — Upstream report has incomplete comparison context; no reproduction was performed; missing: baseline_commit, candidate_commit, correctness, independent_reproduction.
+  latency: 100.1 → 104.6 us (single_case); normalized speedup 0.957×
+  [Result: later_gain](../../../_sources/aiter/pull_requests/4538.md#later_gain) — **operator**; The same later comparison reports a benefit on a GLM 5.2 case.
+  **Effect confidence: low** — Upstream report has incomplete comparison context; no reproduction was performed; missing: baseline_commit, candidate_commit, correctness, independent_reproduction.
+  latency: 413.2 → 365.7 us (single_case); normalized speedup 1.13×
+
 #### Background
 
 - [knowledge/operator/attention_indexer/README.md](../README.md)
@@ -329,6 +413,11 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_f484e96fd009362f](source_evidence.md#aiter_b3ad6c46-src_f484e96fd009362f) — [aiter/ops/flydsl/topk/topk_per_row.py:33-92](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/topk/topk_per_row.py#L33-L92).
 - [aiter_b3ad6c46:src_37b61d0cec250b59](source_evidence.md#aiter_b3ad6c46-src_37b61d0cec250b59) — [aiter/ops/flydsl/topk/topk_per_row.py:330-408](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/topk/topk_per_row.py#L330-L408).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -376,6 +465,11 @@ A required trait must be established for the actual design before the card appli
 - [aiter_b3ad6c46:src_6a4f259be2e3b17c](source_evidence.md#aiter_b3ad6c46-src_6a4f259be2e3b17c) — [aiter/ops/flydsl/dcp_topk_merge.py:23-88](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/dcp_topk_merge.py#L23-L88).
 - [aiter_b3ad6c46:src_ebe0c6b763af4201](source_evidence.md#aiter_b3ad6c46-src_ebe0c6b763af4201) — [aiter/ops/flydsl/dcp_topk_merge.py:91-162](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/dcp_topk_merge.py#L91-L162).
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/operator/attention_indexer/README.md](../README.md)
@@ -413,6 +507,11 @@ A required trait must be established for the actual design before the card appli
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 

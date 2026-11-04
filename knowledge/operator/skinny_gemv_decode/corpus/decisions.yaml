@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: skinny_gemv_decode
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -33,6 +33,8 @@ cards:
   question: What does AITER do differently when M is a handful of rows, and which knobs does that open?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -120,6 +122,8 @@ cards:
     decode kernel take from it?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - 'decode: M is a handful of rows (AITER''s skinny route covers M <= 16), so an MFMA tile along M is mostly

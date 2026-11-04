@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: fused_moe_grouped_gemm
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits: {}
@@ -18,6 +18,8 @@ cards:
   question: What work partition and initialization are required before the fused MoE kernel?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:

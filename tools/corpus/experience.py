@@ -1,6 +1,8 @@
 """Public conclusion summaries, deliberately separate from raw measurements and run history."""
 import re
 
+import upstream
+
 FIELDS = {"outcome", "conditions", "summary", "provenance"}
 CONTEXT_FIELDS = {"gfx", "software", "dtype", "shape_layout", "baseline", "protocol", "correctness"}
 PROVENANCE_FIELDS = {"kind", "references", "artifacts", "verification"}
@@ -14,6 +16,12 @@ def validate(label, entries):
         return [f"{label}: experience must be a list"]
     for i, entry in enumerate(entries):
         name = f"{label}.experience[{i}]"
+        if isinstance(entry, dict) and isinstance(entry.get("provenance"), dict) and entry["provenance"].get("kind") == "upstream_report":
+            try:
+                upstream.validate_entry(name, entry)
+            except ValueError as error:
+                errors.append(str(error))
+            continue
         if not isinstance(entry, dict) or not FIELDS <= set(entry) or set(entry) - FIELDS - {"context"}:
             errors.append(f"{name}: expected public summary fields {sorted(FIELDS)}")
             continue

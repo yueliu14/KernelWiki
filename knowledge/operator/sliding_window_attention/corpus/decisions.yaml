@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: sliding_window_attention
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -22,6 +22,8 @@ cards:
   question: How do cached prefixes and sliding windows change the causal boundary?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - Queries cover only a suffix/chunk, or the model restricts each query to a local attention window.
   actions:
@@ -58,6 +60,8 @@ cards:
   question: Which additional conditions must hold before selecting the gfx950 Gluon unified-attention path?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:
@@ -97,6 +101,8 @@ cards:
   question: Does decode use split metadata for the attended window or for the full context?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id001
   - A sliding-window decode path carries separate full-context and window-local KV metadata.
   actions:

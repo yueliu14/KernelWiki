@@ -14,6 +14,7 @@ import _extract_impl_facts as extractor
 import _normalize_performance_decisions as normalizer
 import _render_decisions as card_schema
 import seeds as seed_schema
+import upstream
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_REF = re.compile(r"([a-z0-9_]+):(src_[0-9a-f]{16})")
@@ -47,6 +48,7 @@ class Catalog:
         if self.data.get("schema_version") != 3:
             raise ValueError("expected operator-local catalog schema_version 3")
         self.snapshots = self.data["snapshots"]
+        self.upstream = upstream.load(self.root)
         self.operators = {}
         self.sources, self.cards, self.seeds = {}, {}, {}
         self.source_owners, self.card_owners, self.seed_owners = {}, {}, {}
@@ -250,6 +252,7 @@ class Catalog:
             errors.append("general: method corpus owns its decisions; operator references belong in their own corpus")
         if errors:
             raise ValueError("general: " + "\n".join(errors))
+        upstream.validate_cards(self.cards, self.upstream)
         return self
 
     @staticmethod
@@ -295,14 +298,18 @@ def main():
     parser.add_argument("--operator")
     parser.add_argument("--family")
     parser.add_argument("--verify-source", type=Path)
+    parser.add_argument("--verify-upstream", type=Path, help="audit PR change excerpts and parent commits using an AITER cache")
     args = parser.parse_args()
     catalog = Catalog().validate()
     selected = catalog.selected(args.operator, args.family)
     if args.verify_source:
         print(f"OK: {catalog.verify_source(args.verify_source, selected)} pinned source references")
-    else:
+    if args.verify_upstream:
+        print(f"OK: {upstream.verify_sources(catalog.upstream, args.verify_upstream)} PR change excerpts")
+    if not args.verify_source and not args.verify_upstream:
         print(f"OK: {len(catalog.operators)} operators, {len(catalog.cards)} canonical cards, "
-              f"{len(catalog.sources)} source observations, {len(catalog.seeds)} shipped groups")
+              f"{len(catalog.sources)} source observations, {len(catalog.seeds)} shipped groups, "
+              f"{len(catalog.upstream)} PR reports")
     return 0
 
 

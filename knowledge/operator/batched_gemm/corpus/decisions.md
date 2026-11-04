@@ -12,10 +12,10 @@ Source observations identify implementation precedents and constraints; they do 
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [batched-mxfp8-scale-layout](#batched-mxfp8-scale-layout) | constraint | Which batch and scale layouts does the MXFP8 BMM wrapper accept? |
-| [batched-mxfp8-fallback-configuration](#batched-mxfp8-fallback-configuration) | performance_candidate | How can batched GEMM tile, buffering and split choices be seeded legally? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [batched-mxfp8-scale-layout](#batched-mxfp8-scale-layout) | constraint | unreviewed | Which batch and scale layouts does the MXFP8 BMM wrapper accept? |
+| [batched-mxfp8-fallback-configuration](#batched-mxfp8-fallback-configuration) | performance_candidate | unreviewed | How can batched GEMM tile, buffering and split choices be seeded legally? |
 
 <a id="batched-mxfp8-scale-layout"></a>
 ### Which batch and scale layouts does the MXFP8 BMM wrapper accept?
@@ -51,6 +51,11 @@ Source observations identify implementation precedents and constraints; they do 
 
 - [aiter_b3ad6c46:src_0c6d9aed9bf8a1da](source_evidence.md#aiter_b3ad6c46-src_0c6d9aed9bf8a1da) — [aiter/ops/flydsl/batched_gemm_a8w8.py:56-78](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8.py#L56-L78).
 - [aiter_b3ad6c46:src_5fe68591fabd20e2](source_evidence.md#aiter_b3ad6c46-src_5fe68591fabd20e2) — [aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py:301-379](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py#L301-L379).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -95,6 +100,11 @@ Source observations identify implementation precedents and constraints; they do 
 - [aiter_b3ad6c46:src_48ce71b95815ba5a](source_evidence.md#aiter_b3ad6c46-src_48ce71b95815ba5a) — [aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py:166-200](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py#L166-L200).
 - [aiter_b3ad6c46:src_4036c46474899d75](source_evidence.md#aiter_b3ad6c46-src_4036c46474899d75) — [aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py:131-150](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py#L131-L150).
 - [aiter_b3ad6c46:src_0d0df7919d9edf67](source_evidence.md#aiter_b3ad6c46-src_0d0df7919d9edf67) — [aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py:153-162](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py#L153-L162).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 

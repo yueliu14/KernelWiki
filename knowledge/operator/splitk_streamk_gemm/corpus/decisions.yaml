@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: splitk_streamk_gemm
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -32,6 +32,8 @@ cards:
     of the kernel to?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - a case whose output tile count ceil(M/tile_m)*ceil(N/tile_n) is well below the CU count — 304 on MI300X,
@@ -160,6 +162,8 @@ cards:
   question: What explicit instruction-order bundle can seed a hand-scheduled FlyDSL split-K GEMM hot loop?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -225,6 +229,8 @@ cards:
   question: How does the FlyDSL split-K HGEMM combine partial results, and what does that impose on the launcher?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - split_k > 1 is a candidate, or a split-K kernel is being ported or written

@@ -18,10 +18,10 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [moe-shared-expert-readiness](#moe-shared-expert-readiness) | constraint | When may a fused collective consume the shared-expert partial? |
-| [shared-expert-padded-partial-layout](#shared-expert-padded-partial-layout) | constraint | How is a shared-expert partial adapted to the communication runner&#x27;s row layout? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [moe-shared-expert-readiness](#moe-shared-expert-readiness) | constraint | unreviewed | When may a fused collective consume the shared-expert partial? |
+| [shared-expert-padded-partial-layout](#shared-expert-padded-partial-layout) | constraint | unreviewed | How is a shared-expert partial adapted to the communication runner&#x27;s row layout? |
 
 <a id="moe-shared-expert-readiness"></a>
 ### When may a fused collective consume the shared-expert partial?
@@ -56,6 +56,11 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_655dabf7c3f76085](source_evidence.md#aiter_b3ad6c46-src_655dabf7c3f76085) — [aiter/ops/flydsl/comm_fused_moe_host.py:1206-1213](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/comm_fused_moe_host.py#L1206-L1213).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -101,6 +106,11 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_ca185a9d80571fcd](source_evidence.md#aiter_b3ad6c46-src_ca185a9d80571fcd) — [aiter/ops/flydsl/comm_fused_moe_host.py:774-801](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/comm_fused_moe_host.py#L774-L801).
 - [aiter_b3ad6c46:src_b4f6dd82b97d2c6c](source_evidence.md#aiter_b3ad6c46-src_b4f6dd82b97d2c6c) — [aiter/ops/flydsl/comm_fused_moe_host.py:1064-1078](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/comm_fused_moe_host.py#L1064-L1078).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 

@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: qk_norm_rope_cache
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -21,6 +21,8 @@ cards:
   question: What must a Q/K normalization, RoPE and cache-write fusion preserve?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - Q/K preparation produces data consumed by attention or an indexer cache.
   actions:
@@ -57,6 +59,8 @@ cards:
   question: What must remain intact when a batched projection is fused with RoPE and MLA cache writes?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:

@@ -18,9 +18,9 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [attention-compression-cache-contract](#attention-compression-cache-contract) | constraint | Which compression-window and quantized-cache contracts must travel together? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [attention-compression-cache-contract](#attention-compression-cache-contract) | constraint | unreviewed | Which compression-window and quantized-cache contracts must travel together? |
 
 <a id="attention-compression-cache-contract"></a>
 ### Which compression-window and quantized-cache contracts must travel together?
@@ -55,6 +55,11 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_24c98837f9940bb0](source_evidence.md#aiter_b3ad6c46-src_24c98837f9940bb0) — [aiter/ops/flydsl/kernels/fused_compress_attn.py:168-1235](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/fused_compress_attn.py#L168-L1235).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 

@@ -20,20 +20,20 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [flydsl-a8-legality](#flydsl-a8-legality) | constraint | Which FlyDSL A8 / FP4 preshuffle-GEMM configurations are rejected before they can be slow? |
-| [flydsl-a8-mfma-selection](#flydsl-a8-mfma-selection) | semantic | Which MFMA does a FlyDSL quantized GEMM issue per dtype and architecture, and what does that fix about tile_k? |
-| [flydsl-a8-scale-granularity-contract](#flydsl-a8-scale-granularity-contract) | constraint | Which scale granularity does the FlyDSL A8 kernel implement, and what changes for a 128x128 block-scale contract? |
-| [gemm-blockscale-k-loop-scale-application](#gemm-blockscale-k-loop-scale-application) | semantic | How does a 128x128 block-scale GEMM apply its scales inside the K loop, and what does that fix about tile_k and the scale indexing? |
-| [flydsl-a8-preshuffle-config-space](#flydsl-a8-preshuffle-config-space) | performance_candidate | Which tile, LDS-stage, epilogue, async and occupancy combinations will the FlyDSL A8 (fp8/int8) preshuffle GEMM build, and how do they differ by architecture? |
-| [gemm-blockscale-shipped-bucket-structure](#gemm-blockscale-shipped-bucket-structure) | performance_candidate | Which configuration does the Triton block-scale baseline run for each case, and what does AITER ship instead where it tuned small and large M separately? |
-| [flydsl-a8-interleaved-schedule](#flydsl-a8-interleaved-schedule) | performance_candidate | How does the FlyDSL A8 kernel interleave LDS reads, global loads and MFMAs, and how does that differ between gfx942 and gfx950? |
-| [flydsl-a8-data-movement-helpers](#flydsl-a8-data-movement-helpers) | performance_candidate | Which global-to-LDS and LDS-to-register helpers do the FlyDSL A8 and MoE GEMMs share, and which access widths do they fix? |
-| [quant-gemm-format-reinterpretation](#quant-gemm-format-reinterpretation) | performance_candidate | When can a legacy FP8 representation use the native matrix instruction without a conversion pass? |
-| [quant-gemm-engaged-tuning-surface](#quant-gemm-engaged-tuning-surface) | performance_candidate | Which configuration or source edit controls the live FP8 blockscale GEMM? |
-| [mxfp8-shape-specific-native-path](#mxfp8-shape-specific-native-path) | performance_candidate | How should a native per-32 E8M0 GEMM be tuned across prefill and decode? |
-| [quant-gemm-dequant-dependency-chain](#quant-gemm-dequant-dependency-chain) | performance_candidate | Which dequantization work is on the GEMM critical path? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [flydsl-a8-legality](#flydsl-a8-legality) | constraint | unreviewed | Which FlyDSL A8 / FP4 preshuffle-GEMM configurations are rejected before they can be slow? |
+| [flydsl-a8-mfma-selection](#flydsl-a8-mfma-selection) | semantic | unreviewed | Which MFMA does a FlyDSL quantized GEMM issue per dtype and architecture, and what does that fix about tile_k? |
+| [flydsl-a8-scale-granularity-contract](#flydsl-a8-scale-granularity-contract) | constraint | unreviewed | Which scale granularity does the FlyDSL A8 kernel implement, and what changes for a 128x128 block-scale contract? |
+| [gemm-blockscale-k-loop-scale-application](#gemm-blockscale-k-loop-scale-application) | semantic | unreviewed | How does a 128x128 block-scale GEMM apply its scales inside the K loop, and what does that fix about tile_k and the scale indexing? |
+| [flydsl-a8-preshuffle-config-space](#flydsl-a8-preshuffle-config-space) | performance_candidate | unreviewed | Which tile, LDS-stage, epilogue, async and occupancy combinations will the FlyDSL A8 (fp8/int8) preshuffle GEMM build, and how do they differ by architecture? |
+| [gemm-blockscale-shipped-bucket-structure](#gemm-blockscale-shipped-bucket-structure) | performance_candidate | unreviewed | Which configuration does the Triton block-scale baseline run for each case, and what does AITER ship instead where it tuned small and large M separately? |
+| [flydsl-a8-interleaved-schedule](#flydsl-a8-interleaved-schedule) | performance_candidate | unreviewed | How does the FlyDSL A8 kernel interleave LDS reads, global loads and MFMAs, and how does that differ between gfx942 and gfx950? |
+| [flydsl-a8-data-movement-helpers](#flydsl-a8-data-movement-helpers) | performance_candidate | unreviewed | Which global-to-LDS and LDS-to-register helpers do the FlyDSL A8 and MoE GEMMs share, and which access widths do they fix? |
+| [quant-gemm-format-reinterpretation](#quant-gemm-format-reinterpretation) | performance_candidate | unreviewed | When can a legacy FP8 representation use the native matrix instruction without a conversion pass? |
+| [quant-gemm-engaged-tuning-surface](#quant-gemm-engaged-tuning-surface) | performance_candidate | unreviewed | Which configuration or source edit controls the live FP8 blockscale GEMM? |
+| [mxfp8-shape-specific-native-path](#mxfp8-shape-specific-native-path) | performance_candidate | unreviewed | How should a native per-32 E8M0 GEMM be tuned across prefill and decode? |
+| [quant-gemm-dequant-dependency-chain](#quant-gemm-dequant-dependency-chain) | performance_candidate | unreviewed | Which dequantization work is on the GEMM critical path? |
 
 <a id="flydsl-a8-legality"></a>
 ### Which FlyDSL A8 / FP4 preshuffle-GEMM configurations are rejected before they can be slow?
@@ -84,6 +84,11 @@ A required trait must be established for the actual design before the card appli
 - [aiter_a6bb4993:src_f5c5e87d02b8a8e5](source_evidence.md#aiter_a6bb4993-src_f5c5e87d02b8a8e5) — [aiter/ops/flydsl/kernels/preshuffle_gemm.py:211](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/preshuffle_gemm.py#L211).
 - [aiter_a6bb4993:src_c9b3df8a49dab9d2](source_evidence.md#aiter_a6bb4993-src_c9b3df8a49dab9d2) — [aiter/ops/flydsl/kernels/preshuffle_gemm.py:205-209](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/preshuffle_gemm.py#L205-L209).
 - [aiter_a6bb4993:src_f9f2544162138ea2](source_evidence.md#aiter_a6bb4993-src_f9f2544162138ea2) — [aiter/ops/flydsl/kernels/preshuffle_gemm.py:215-217](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/preshuffle_gemm.py#L215-L217).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -149,6 +154,11 @@ A required trait must be established for the actual design before the card appli
 - [aiter_a6bb4993:src_011cf8d1222b7906](source_evidence.md#aiter_a6bb4993-src_011cf8d1222b7906) — [aiter/ops/flydsl/kernels/preshuffle_gemm.py:254](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/preshuffle_gemm.py#L254).
 - [aiter_a6bb4993:src_273e37ba3a8cefa8](source_evidence.md#aiter_a6bb4993-src_273e37ba3a8cefa8) — [aiter/ops/flydsl/gemm_tune/flydsl_gemm_a8w8_bpreshuffle_common.py:227-229](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/gemm_tune/flydsl_gemm_a8w8_bpreshuffle_common.py#L227-L229).
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/general/hardware/shared/dtype_numerics.md:40-49](../../../general/hardware/shared/dtype_numerics.md)
@@ -207,6 +217,11 @@ A required trait must be established for the actual design before the card appli
 - Shipped selection: [aiter_a6bb4993:sel_b7d6386940696a48](seeds.md#aiter_a6bb4993-sel_b7d6386940696a48); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:sel_8b543c4558078855](seeds.md#aiter_a6bb4993-sel_8b543c4558078855); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:sel_f1384cc1069c9823](seeds.md#aiter_a6bb4993-sel_f1384cc1069c9823); no measurement is inferred.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -272,6 +287,11 @@ A required trait must be established for the actual design before the card appli
 - Shipped selection: [aiter_a6bb4993:cfg_3eff28954f18b5fe](../../dense_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_3eff28954f18b5fe); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:sel_f7e394faa23e37e6](seeds.md#aiter_a6bb4993-sel_f7e394faa23e37e6); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:sel_f1384cc1069c9823](seeds.md#aiter_a6bb4993-sel_f1384cc1069c9823); no measurement is inferred.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -345,6 +365,11 @@ A required trait must be established for the actual design before the card appli
 - Shipped selection: [aiter_a6bb4993:cfg_496162f129968cb9](seeds.md#aiter_a6bb4993-cfg_496162f129968cb9); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:cfg_9636311ea3a3ce0d](seeds.md#aiter_a6bb4993-cfg_9636311ea3a3ce0d); no measurement is inferred.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/general/backend/flydsl/knobs.md:82-87](../../../general/backend/flydsl/knobs.md)
@@ -409,6 +434,11 @@ A required trait must be established for the actual design before the card appli
 - Shipped selection: [aiter_a6bb4993:cfg_3eff28954f18b5fe](../../dense_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_3eff28954f18b5fe); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:sel_f7e394faa23e37e6](seeds.md#aiter_a6bb4993-sel_f7e394faa23e37e6); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:sel_f1384cc1069c9823](seeds.md#aiter_a6bb4993-sel_f1384cc1069c9823); no measurement is inferred.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -475,6 +505,11 @@ A required trait must be established for the actual design before the card appli
 - Shipped selection: [aiter_a6bb4993:sel_7c8d8e410633ad1e](seeds.md#aiter_a6bb4993-sel_7c8d8e410633ad1e); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:sel_1b5489e6d41507a3](seeds.md#aiter_a6bb4993-sel_1b5489e6d41507a3); no measurement is inferred.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/general/optimization/mfma_scheduling.md](../../../general/optimization/mfma_scheduling.md)
@@ -537,6 +572,11 @@ A required trait must be established for the actual design before the card appli
 - [aiter_a6bb4993:src_6d43092520bc779c](../../grouped_gemm_moe/corpus/source_evidence.md#aiter_a6bb4993-src_6d43092520bc779c) — [aiter/ops/flydsl/kernels/moe_gemm_2stage.py:442-444](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/moe_gemm_2stage.py#L442-L444).
 - [aiter_a6bb4993:src_0e09838af93de4ba](../../grouped_gemm_moe/corpus/source_evidence.md#aiter_a6bb4993-src_0e09838af93de4ba) — [aiter/ops/flydsl/kernels/moe_gemm_2stage.py:454-456](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/moe_gemm_2stage.py#L454-L456).
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/general/backend/flydsl/authoring_gemm_levers.md:119-131](../../../general/backend/flydsl/authoring_gemm_levers.md)
@@ -576,6 +616,11 @@ A required trait must be established for the actual design before the card appli
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 
@@ -626,6 +671,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -675,6 +725,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -723,6 +778,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 

@@ -18,10 +18,10 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [attention-qk-rope-cache-fusion](#attention-qk-rope-cache-fusion) | performance_candidate | What must a Q/K normalization, RoPE and cache-write fusion preserve? |
-| [bmm-rope-cache-fused-write-contract](#bmm-rope-cache-fused-write-contract) | performance_candidate | What must remain intact when a batched projection is fused with RoPE and MLA cache writes? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [attention-qk-rope-cache-fusion](#attention-qk-rope-cache-fusion) | performance_candidate | unreviewed | What must a Q/K normalization, RoPE and cache-write fusion preserve? |
+| [bmm-rope-cache-fused-write-contract](#bmm-rope-cache-fused-write-contract) | performance_candidate | unreviewed | What must remain intact when a batched projection is fused with RoPE and MLA cache writes? |
 
 <a id="attention-qk-rope-cache-fusion"></a>
 ### What must a Q/K normalization, RoPE and cache-write fusion preserve?
@@ -57,6 +57,11 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_93c5bb1f38501f1d](source_evidence.md#aiter_b3ad6c46-src_93c5bb1f38501f1d) — [aiter/ops/flydsl/kernels/qk_norm_rope_quant.py:291-801](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/qk_norm_rope_quant.py#L291-L801).
 - [aiter_b3ad6c46:src_9069bff48d95f97b](source_evidence.md#aiter_b3ad6c46-src_9069bff48d95f97b) — [aiter/ops/flydsl/kernels/qk_norm_rope_quant.py:54-81](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/qk_norm_rope_quant.py#L54-L81).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -101,6 +106,11 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_03307b826f486d6f](source_evidence.md#aiter_b3ad6c46-src_03307b826f486d6f) — [aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py:110-556](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py#L110-L556).
 - [aiter_b3ad6c46:src_f1da93f2cb82843a](source_evidence.md#aiter_b3ad6c46-src_f1da93f2cb82843a) — [aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py:560-620](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py#L560-L620).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 

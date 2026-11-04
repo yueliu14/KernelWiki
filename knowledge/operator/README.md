@@ -20,7 +20,7 @@ All 23 workload families have pinned AITER implementation references. A single u
 
 | Operator | Inference focus | AITER references | Corpus decisions |
 | --- | --- | --- | ---: |
-| [dense_gemm](dense_gemm/README.md) | Dense attention and FFN projections; prefill versus decode tiling. | aiter, asm, ck, flydsl, gluon, hip, opus, triton | 18 |
+| [dense_gemm](dense_gemm/README.md) | Dense attention and FFN projections; prefill versus decode tiling. | aiter, asm, ck, flydsl, gluon, hip, opus, triton | 19 |
 | [scaled_quant_gemm](scaled_quant_gemm/README.md) | FP8, INT8, FP4 and microscaled projections, including packing and scale contracts. | aiter, asm, ck, flydsl, gluon, hip, opus, triton | 12 |
 | [batched_gemm](batched_gemm/README.md) | Batched matrix products and head-wise projection variants. | aiter, ck, flydsl, gluon, opus, triton | 2 |
 | [skinny_gemv_decode](skinny_gemv_decode/README.md) | Small-M decode projections and GEMV-like regimes. | hip | 2 |
@@ -33,7 +33,7 @@ All 23 workload families have pinned AITER implementation references. A single u
 | --- | --- | --- | ---: |
 | [grouped_gemm_moe](grouped_gemm_moe/README.md) | Expert grouped GEMMs, token imbalance and low-bit expert weights. | aiter, asm, ck, flydsl, gluon, hip, opus, triton | 8 |
 | [fused_moe_grouped_gemm](fused_moe_grouped_gemm/README.md) | Fused expert execution and compute/communication overlap. | aiter, flydsl | 1 |
-| [moe_routing_topk](moe_routing_topk/README.md) | Expert selection, routing weights, token sorting and alignment for MoE GEMMs. | aiter, flydsl, hip, opus, triton | 3 |
+| [moe_routing_topk](moe_routing_topk/README.md) | Expert selection, routing weights, token sorting and alignment for MoE GEMMs. | aiter, flydsl, hip, opus, triton | 4 |
 | [moe_dispatch_combine](moe_dispatch_combine/README.md) | Expert-parallel dispatch, gather, reduction and combine. | aiter, flydsl, hip | 4 |
 | [shared_expert_fusion](shared_expert_fusion/README.md) | Shared-expert computation and its overlap or fusion with routed experts. | flydsl | 2 |
 

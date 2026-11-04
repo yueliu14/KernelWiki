@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: scaled_quant_gemm
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -33,6 +33,8 @@ cards:
   question: Which FlyDSL A8 / FP4 preshuffle-GEMM configurations are rejected before they can be slow?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - quantized GEMM built on the A8 preshuffle family (fp8, int8/int4, or fp4 on gfx950)
@@ -102,6 +104,8 @@ cards:
     about tile_k?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - quantized GEMM (fp8, int8/int4, fp4)
@@ -179,6 +183,8 @@ cards:
     contract?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - fp8/int8 GEMM whose math contract names its scale granularity (per-tensor, per-token/per-channel, or [128,128]
@@ -255,6 +261,8 @@ cards:
     about tile_k and the scale indexing?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - the math contract is Y = (X*x_scale) @ (W*w_scale)^T with one fp32 scale per row of X per 128 elements
@@ -358,6 +366,8 @@ cards:
     preshuffle GEMM build, and how do they differ by architecture?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - fp8 or int8 GEMM with a preshuffled B (the A8 preshuffle family, or an authored kernel modelled on it)
@@ -442,6 +452,8 @@ cards:
     ship instead where it tuned small and large M separately?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - an fp8 128x128 block-scale workload measured against AITER's Triton kernel, especially one whose cases
@@ -523,6 +535,8 @@ cards:
     between gfx942 and gfx950?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - a K loop whose A tile goes through LDS and whose B is read straight from global memory
@@ -593,6 +607,8 @@ cards:
     access widths do they fix?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - an operand is staged through LDS and the other is read preshuffled from global memory, as in the A8 and
@@ -659,6 +675,8 @@ cards:
   question: When can a legacy FP8 representation use the native matrix instruction without a conversion pass?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id001
   - A specific pair of FP8 encodings differs by a proven scale relationship on the allowed input domain.
   actions:
@@ -713,6 +731,8 @@ cards:
   question: Which configuration or source edit controls the live FP8 blockscale GEMM?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id002
   - A framework selects among CK, preshuffled CK or authored blockscale implementations.
   actions:
@@ -767,6 +787,8 @@ cards:
   question: How should a native per-32 E8M0 GEMM be tuned across prefill and decode?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id003
   - The live kernel consumes MXFP8 payloads and per-32 E8M0 scales, rather than a dense BF16 or arbitrary-fp32-scale
     GEMM ABI.
@@ -823,6 +845,8 @@ cards:
   question: Which dequantization work is on the GEMM critical path?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id004
   - Conversion, scale lookup or repacking lies on the operand-to-MFMA dependency chain.
   actions:

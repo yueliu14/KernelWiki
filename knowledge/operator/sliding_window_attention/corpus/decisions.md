@@ -18,11 +18,11 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [attention-window-prefix-boundaries](#attention-window-prefix-boundaries) | constraint | How do cached prefixes and sliding windows change the causal boundary? |
-| [windowed-attention-backend-admission](#windowed-attention-backend-admission) | constraint | Which additional conditions must hold before selecting the gfx950 Gluon unified-attention path? |
-| [window-specific-split-metadata](#window-specific-split-metadata) | performance_candidate | Does decode use split metadata for the attended window or for the full context? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [attention-window-prefix-boundaries](#attention-window-prefix-boundaries) | constraint | unreviewed | How do cached prefixes and sliding windows change the causal boundary? |
+| [windowed-attention-backend-admission](#windowed-attention-backend-admission) | constraint | unreviewed | Which additional conditions must hold before selecting the gfx950 Gluon unified-attention path? |
+| [window-specific-split-metadata](#window-specific-split-metadata) | performance_candidate | unreviewed | Does decode use split metadata for the attended window or for the full context? |
 
 <a id="attention-window-prefix-boundaries"></a>
 ### How do cached prefixes and sliding windows change the causal boundary?
@@ -58,6 +58,11 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_77fdd041c1e25e15](../../chunked_prefill/corpus/source_evidence.md#aiter_b3ad6c46-src_77fdd041c1e25e15) — [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:54-317](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L54-L317).
 - [aiter_b3ad6c46:src_49cb5bdc816cb102](../../attention_decode_paged/corpus/source_evidence.md#aiter_b3ad6c46-src_49cb5bdc816cb102) — [aiter/ops/triton/_triton_kernels/attention/unified_attention.py:82-553](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/unified_attention.py#L82-L553).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -103,6 +108,11 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_1ae1d84244f6eca6](source_evidence.md#aiter_b3ad6c46-src_1ae1d84244f6eca6) — [aiter/ops/triton/attention/unified_attention.py:127-147](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L127-L147).
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/operator/sliding_window_attention/README.md](../README.md)
@@ -140,6 +150,11 @@ A required trait must be established for the actual design before the card appli
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 

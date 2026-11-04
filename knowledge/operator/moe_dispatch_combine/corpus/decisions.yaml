@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: moe_dispatch_combine
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -20,6 +20,8 @@ cards:
   question: What is the mapping between token routes and grouped expert rows?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - A route-map kernel assigns rows with per-expert atomic counters.
   actions:
@@ -60,6 +62,8 @@ cards:
   question: What does fusing route mapping, MX quantization and scatter commit the consumer to?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The candidate uses per-1x32 MX activation quantization and expert-grouped storage.
   actions:
@@ -98,6 +102,8 @@ cards:
   question: Where are route weights applied, and how are dropped routes excluded?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - Expert outputs must be combined back into each token's output row.
   actions:
@@ -140,6 +146,8 @@ cards:
   question: Which host and synchronization invariants accompany device-side MoE communication?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The candidate reuses the tensor-parallel MegaMoE device communication design.
   actions:

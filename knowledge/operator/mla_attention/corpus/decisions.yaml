@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: mla_attention
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -23,6 +23,8 @@ cards:
   question: When splitting KV work, what information must the merge preserve?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - A long KV sequence leaves too few independent query/head workgroups, or partial attention outputs already
     exist.
@@ -86,6 +88,8 @@ cards:
   question: Which tensor and mapping invariants does the FlyDSL MLA reducer require?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The selected path calls flydsl_mla_reduce_v1 with mapped partial outputs.
   actions:

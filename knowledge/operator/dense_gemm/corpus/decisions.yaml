@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: dense_gemm
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -34,6 +34,8 @@ cards:
     or refuse?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -116,6 +118,8 @@ cards:
   question: Which FlyDSL HGEMM configurations will fail to build at all, before any of them can be slow?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -191,6 +195,8 @@ cards:
   question: Which legal MFMA call forms can seed a FlyDSL f16/bf16 GEMM?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -270,6 +276,8 @@ cards:
     architecture?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - an operand tile is staged through LDS
@@ -336,6 +344,8 @@ cards:
     do it?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - 'a multi-XCD part (MI300X / MI355X: 8 XCDs, each with its own L2)'
@@ -423,6 +433,8 @@ cards:
     a shape narrow them?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -503,6 +515,8 @@ cards:
   question: How should a FlyDSL GEMM apply an XOR16 LDS layout without making stores and loads disagree?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -567,6 +581,8 @@ cards:
   question: What does enabling B preshuffle on a FlyDSL HGEMM actually require?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -687,6 +703,8 @@ cards:
     FlyDSL kernel?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - a workload with one or more (M, N, K) cases, with gfx and dtype known
@@ -778,6 +796,8 @@ cards:
     between gfx942 and gfx950?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - a case whose production path, or whose frozen baseline, is AITER's dispatch rather than a fixed kernel
@@ -845,6 +865,8 @@ cards:
     does its launcher choose among them for a shape?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - a tile and split are being chosen per case, and the vendor's own choices for the same dtype and architecture
@@ -917,6 +939,8 @@ cards:
     does that fix for loads, in-register scaling and stores?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - a kernel loads MFMA fragments, scales an accumulator per row or per column, or writes it back
@@ -977,6 +1001,8 @@ cards:
     per-stream state and kernel name?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - a FlyDSL kernel is being launched, cached or registered for dispatch
@@ -1037,6 +1063,8 @@ cards:
     say about validating an authored kernel?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - a FlyDSL GEMM — especially a split-K one — is being validated against a reference
@@ -1092,6 +1120,8 @@ cards:
     which should keep the default?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - one operand is read once per call while the other is reused across tiles — typically the weight B at decode,
@@ -1155,6 +1185,8 @@ cards:
   question: How many LDS stages should the K loop keep in flight, and what does each one cost?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - target_language=flydsl
   - the design stages operand tiles through LDS (trait lds_staging)
@@ -1207,6 +1239,8 @@ cards:
   question: When should a GEMM wrapper cache launch plans or temporary storage?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id001
   - Small-M GEMM is measured with exposed host or allocation work.
   actions:
@@ -1260,6 +1294,8 @@ cards:
   question: When is an explicit GEMM pipeline worth replacing the compiler-selected loop?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id002
   - A matrix-core GEMM has a measured schedule or resource limitation, and the intended compiler controls are
     available.
@@ -1295,6 +1331,78 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/occupancy-axis-closes-when-the-backend-pins-waves-per-eu-dense-gemm-gfx950-compute-bound.md
       artifacts: not_published
       verification: not_reproduced
+- id: triton-dot-accumulator-form
+  type: performance_candidate
+  axes:
+  - compute_instruction
+  match:
+    operator_families:
+    - dense_gemm
+    - attention_prefill_fmha
+    target_languages:
+    - triton
+  question: Should the dot product receive the existing accumulator directly?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T15:47:13.494575+00:00'
+    summary: Reviewed the named PR, its committed changes and available discussion; this does not establish
+      current deployment or target-workload performance.
+  conditions:
+  - The Triton kernel currently adds a dot result to its existing FP32 accumulator; preserve dtypes and numerical
+    tolerance.
+  actions:
+  - Compare acc = tl.dot(a, b, acc=acc) with a separate accumulator add.
+  - Check generated code, numerical parity and latency on the actual compiler and workload.
+  alternatives:
+  - Keep the current correct implementation as the comparison baseline.
+  why:
+  - 'AITER PR #3231 applies this transformation to the corresponding GEMM and attention loops.'
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Source syntax alone does not establish an instruction-count or performance reduction.
+  references:
+  - knowledge/operator/dense_gemm/README.md
+  experience:
+  - outcome: not_reported
+    conditions:
+    - The Triton kernel currently adds a dot result to its existing FP32 accumulator; preserve dtypes and numerical
+      tolerance.
+    summary: Upstream adopts the explicit dot accumulator form; no measured benefit was reported.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_3231
+      change_refs:
+      - gemm_acc
+      - attention_acc
+      result_refs:
+      - no_performance_report
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed PR commit changes the named implementation and the quoted before/after construct.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No performance comparison is available.
+            missing_evidence:
+            - benchmark
+            - ablation
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - compute_instruction
+          backend: triton
 shared_cards:
 - flydsl-a8-data-movement-helpers
 - flydsl-a8-interleaved-schedule

@@ -20,11 +20,11 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [gemm-split-k-when-grid-underfills](#gemm-split-k-when-grid-underfills) | performance_candidate | When does a GEMM case need split-K to fill the machine, and what does choosing it commit the rest of the kernel to? |
-| [flydsl-splitk-hot-loop-schedule-bundle](#flydsl-splitk-hot-loop-schedule-bundle) | performance_candidate | What explicit instruction-order bundle can seed a hand-scheduled FlyDSL split-K GEMM hot loop? |
-| [flydsl-splitk-reduction-contract](#flydsl-splitk-reduction-contract) | constraint | How does the FlyDSL split-K HGEMM combine partial results, and what does that impose on the launcher? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [gemm-split-k-when-grid-underfills](#gemm-split-k-when-grid-underfills) | performance_candidate | unreviewed | When does a GEMM case need split-K to fill the machine, and what does choosing it commit the rest of the kernel to? |
+| [flydsl-splitk-hot-loop-schedule-bundle](#flydsl-splitk-hot-loop-schedule-bundle) | performance_candidate | unreviewed | What explicit instruction-order bundle can seed a hand-scheduled FlyDSL split-K GEMM hot loop? |
+| [flydsl-splitk-reduction-contract](#flydsl-splitk-reduction-contract) | constraint | unreviewed | How does the FlyDSL split-K HGEMM combine partial results, and what does that impose on the launcher? |
 
 <a id="gemm-split-k-when-grid-underfills"></a>
 ### When does a GEMM case need split-K to fill the machine, and what does choosing it commit the rest of the kernel to?
@@ -83,6 +83,11 @@ A required trait must be established for the actual design before the card appli
 - Shipped selection: [aiter_a6bb4993:cfg_d2642e1347a53ea1](../../dense_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_d2642e1347a53ea1); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:cfg_c23460f537b313ac](../../dense_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_c23460f537b313ac); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:cfg_da4a49e152c50056](../../dense_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_da4a49e152c50056); no measurement is inferred.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 
@@ -156,6 +161,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 - [aiter_a6bb4993:src_0f18d7f50ce33cbb](source_evidence.md#aiter_a6bb4993-src_0f18d7f50ce33cbb) — [aiter/ops/flydsl/kernels/splitk_hgemm.py:702](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/splitk_hgemm.py#L702).
 - [aiter_a6bb4993:src_dca1b81d9d2b2edf](source_evidence.md#aiter_a6bb4993-src_dca1b81d9d2b2edf) — [aiter/ops/flydsl/kernels/splitk_hgemm.py:703](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/splitk_hgemm.py#L703).
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/general/optimization/mfma_scheduling.md](../../../general/optimization/mfma_scheduling.md)
@@ -227,6 +237,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 - [aiter_a6bb4993:src_67a72909c71307d1](source_evidence.md#aiter_a6bb4993-src_67a72909c71307d1) — [aiter/ops/flydsl/kernels/splitk_hgemm.py:24](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/splitk_hgemm.py#L24).
 - [aiter_a6bb4993:src_217562a4a9b879dc](source_evidence.md#aiter_a6bb4993-src_217562a4a9b879dc) — [aiter/ops/flydsl/test_flydsl_splitk_hgemm.py:85](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/test_flydsl_splitk_hgemm.py#L85).
 - [aiter_a6bb4993:src_636fbc44252bb90e](source_evidence.md#aiter_a6bb4993-src_636fbc44252bb90e) — [aiter/ops/flydsl/test_flydsl_splitk_hgemm.py:86](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/test_flydsl_splitk_hgemm.py#L86).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 

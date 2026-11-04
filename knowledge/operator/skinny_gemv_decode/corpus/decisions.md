@@ -20,10 +20,10 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [flydsl-small-m-hgemm-family](#flydsl-small-m-hgemm-family) | performance_candidate | What does AITER do differently when M is a handful of rows, and which knobs does that open? |
-| [gemm-skinny-decode-wave-split](#gemm-skinny-decode-wave-split) | performance_candidate | How does AITER&#x27;s hand-written HIP skinny GEMM organise work for M &lt;= 16, and what can a FlyDSL decode kernel take from it? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [flydsl-small-m-hgemm-family](#flydsl-small-m-hgemm-family) | performance_candidate | unreviewed | What does AITER do differently when M is a handful of rows, and which knobs does that open? |
+| [gemm-skinny-decode-wave-split](#gemm-skinny-decode-wave-split) | performance_candidate | unreviewed | How does AITER&#x27;s hand-written HIP skinny GEMM organise work for M &lt;= 16, and what can a FlyDSL decode kernel take from it? |
 
 <a id="flydsl-small-m-hgemm-family"></a>
 ### What does AITER do differently when M is a handful of rows, and which knobs does that open?
@@ -88,6 +88,11 @@ A required trait must be established for the actual design before the card appli
 - [aiter_a6bb4993:src_e04716b6d760605b](source_evidence.md#aiter_a6bb4993-src_e04716b6d760605b) — [aiter/ops/flydsl/kernels/small_m_hgemm.py:331-332](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/small_m_hgemm.py#L331-L332).
 - Shipped selection: [aiter_a6bb4993:cfg_973fe63f897809df](../../dense_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_973fe63f897809df); no measurement is inferred.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/general/backend/flydsl/knobs.md:77-80](../../../general/backend/flydsl/knobs.md)
@@ -149,6 +154,11 @@ A required trait must be established for the actual design before the card appli
 - [aiter_a6bb4993:src_d78de056f0337d85](source_evidence.md#aiter_a6bb4993-src_d78de056f0337d85) — [csrc/kernels/custom_kernels.cu:687](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/csrc/kernels/custom_kernels.cu#L687).
 - [aiter_a6bb4993:src_5147e7cddd350323](source_evidence.md#aiter_a6bb4993-src_5147e7cddd350323) — [csrc/kernels/custom_kernels.cu:1775](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/csrc/kernels/custom_kernels.cu#L1775).
 - [aiter_a6bb4993:src_2577a978dcbebafb](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_2577a978dcbebafb) — [aiter/tuned_gemm.py:76-97](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/tuned_gemm.py#L76-L97).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 

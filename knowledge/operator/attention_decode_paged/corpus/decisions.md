@@ -18,15 +18,15 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [attention-paged-kv-addressing](#attention-paged-kv-addressing) | constraint | What must remain consistent when loading a paged KV cache? |
-| [paged-attention-live-layout-dispatch](#paged-attention-live-layout-dispatch) | performance_candidate | How do page layout and compiled template contracts constrain paged-attention tuning? |
-| [decode-kv-cache-policy](#decode-kv-cache-policy) | performance_candidate | When should KV loads bypass cache or use explicit prefetch? |
-| [decode-tile-and-split-geometry](#decode-tile-and-split-geometry) | performance_candidate | How should a decode tile and its split grid be sized together? |
-| [decode-single-dispatch-merge](#decode-single-dispatch-merge) | performance_candidate | When can combining split-KV stages in one dispatch beat a separate reduction? |
-| [decode-wrapper-plan-lifetime](#decode-wrapper-plan-lifetime) | performance_candidate | What host state can a decode wrapper reuse safely? |
-| [decode-resource-counters-and-latency](#decode-resource-counters-and-latency) | performance_candidate | Does a high LDS or instruction counter identify removable decode latency? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [attention-paged-kv-addressing](#attention-paged-kv-addressing) | constraint | unreviewed | What must remain consistent when loading a paged KV cache? |
+| [paged-attention-live-layout-dispatch](#paged-attention-live-layout-dispatch) | performance_candidate | unreviewed | How do page layout and compiled template contracts constrain paged-attention tuning? |
+| [decode-kv-cache-policy](#decode-kv-cache-policy) | performance_candidate | unreviewed | When should KV loads bypass cache or use explicit prefetch? |
+| [decode-tile-and-split-geometry](#decode-tile-and-split-geometry) | performance_candidate | unreviewed | How should a decode tile and its split grid be sized together? |
+| [decode-single-dispatch-merge](#decode-single-dispatch-merge) | performance_candidate | unreviewed | When can combining split-KV stages in one dispatch beat a separate reduction? |
+| [decode-wrapper-plan-lifetime](#decode-wrapper-plan-lifetime) | performance_candidate | unreviewed | What host state can a decode wrapper reuse safely? |
+| [decode-resource-counters-and-latency](#decode-resource-counters-and-latency) | performance_candidate | unreviewed | Does a high LDS or instruction counter identify removable decode latency? |
 
 <a id="attention-paged-kv-addressing"></a>
 ### What must remain consistent when loading a paged KV cache?
@@ -62,6 +62,11 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_49cb5bdc816cb102](source_evidence.md#aiter_b3ad6c46-src_49cb5bdc816cb102) — [aiter/ops/triton/_triton_kernels/attention/unified_attention.py:82-553](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/unified_attention.py#L82-L553).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
@@ -103,6 +108,11 @@ A required trait must be established for the actual design before the card appli
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 
@@ -153,6 +163,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -201,6 +216,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 
@@ -251,6 +271,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -300,6 +325,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -347,6 +377,11 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 

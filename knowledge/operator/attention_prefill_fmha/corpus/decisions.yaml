@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: attention_prefill_fmha
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -21,6 +21,8 @@ cards:
   question: How must tiled forward attention preserve masking and online softmax normalization?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - The operation is scaled dot-product forward attention, with an explicit causal or noncausal contract.
   actions:
@@ -61,6 +63,8 @@ cards:
   question: Which coupled decisions should be explored when changing attention tile sizes?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - Correct forward attention already exists and the next candidate changes query/KV tile geometry or buffering.
   actions:
@@ -107,6 +111,8 @@ cards:
   question: Which prefill path and phase actually benefit from an attention change?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id001
   - A framework routes full attention separately from decode or recurrent-attention layers.
   actions:
@@ -141,4 +147,5 @@ cards:
       artifacts: not_published
       verification: not_reproduced
 shared_cards:
+- triton-dot-accumulator-form
 - attention-window-prefix-boundaries

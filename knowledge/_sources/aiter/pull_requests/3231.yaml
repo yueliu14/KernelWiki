@@ -1,0 +1,73 @@
+schema_version: 1
+id: aiter_pr_3231
+number: 3231
+repository: https://github.com/ROCm/aiter
+title: '[TRITON] Use tl.dot(..., acc=...) accumulator form'
+state: merged
+base_commit: 2ca49b1a0618662f57717ca083897c143e2174f2
+head_commit: 1a8948d95137afdd8983a6b3ae1b034d4eb23d94
+merge_commit: 7f613da837208886c1d9a958550f1ad50bd0ef7e
+captured_at: '2026-11-04T15:43:37.797652+00:00'
+updated_at: '2026-05-20T14:31:36Z'
+sources:
+- id: body
+  url: https://github.com/ROCm/aiter/pull/3231
+  excerpt: Convert `acc += tl.dot(...)` and `acc += tl.dot_scaled(...)` to `acc = tl.dot(..., acc=acc)` / `acc
+    = tl.dot_scaled(..., acc=acc)` so the matrix multiply accumulates directly into acc without a separate
+    add.
+  sha256: bbcd8f5526f1e36d4be3b2acdbbda6dee0bcaa5c43d1ebb9f7f9afb645be7428
+  captured_at: '2026-11-04T15:43:37.797652+00:00'
+  updated_at: '2026-05-20T14:31:36Z'
+changes:
+- id: gemm_acc
+  commit: 7f613da837208886c1d9a958550f1ad50bd0ef7e
+  parent_commit: f3d3809cfdfd6f363b0637658dc19efbbe8ec41d
+  file: aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py
+  before: '            accumulator += tl.dot(a, b)'
+  after: '            accumulator = tl.dot(a, b, acc=accumulator)'
+  summary: Pass the accumulator directly to tl.dot in the Triton GEMM loop.
+- id: attention_acc
+  commit: 7f613da837208886c1d9a958550f1ad50bd0ef7e
+  parent_commit: f3d3809cfdfd6f363b0637658dc19efbbe8ec41d
+  file: aiter/ops/triton/_triton_kernels/attention/prefill_attention.py
+  before: '        acc += tl.dot(p, v)'
+  after: '        acc = tl.dot(p, v, acc=acc)'
+  summary: Use the accumulator form for the attention value dot product.
+results:
+- id: no_performance_report
+  outcome: not_reported
+  summary: The PR describes eliminating the separate add but publishes no quantitative speedup in its body
+    or reviewed discussion.
+  source_refs:
+  - body
+  context:
+    hardware: null
+    gfx: null
+    dtype: null
+    shape_layout: null
+    software: null
+    baseline: acc += tl.dot(...)
+    candidate: acc = tl.dot(..., acc=acc)
+    baseline_commit: null
+    candidate_commit: null
+    scope: unknown
+    protocol: null
+    correctness: null
+  metrics: []
+  confidence:
+    level: unknown
+    reasons:
+    - Implementation change is explicit; reviewed PR body and discussion contain no performance comparison.
+    missing_evidence:
+    - hardware
+    - gfx
+    - dtype
+    - shape_layout
+    - software
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - correctness
+  limitations:
+  - A source-level removal of an add does not prove emitted ISA savings or a latency improvement.
+  - This is not evidence of zero gain.

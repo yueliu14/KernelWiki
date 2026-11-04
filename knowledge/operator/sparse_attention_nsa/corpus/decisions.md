@@ -18,10 +18,10 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [attention-sparse-selected-slots](#attention-sparse-selected-slots) | constraint | What distinguishes sparse selected-slot attention from dense paged attention? |
-| [sparse-prefill-block-subtiling](#sparse-prefill-block-subtiling) | performance_candidate | Which sparse-attention partition should be tuned without changing selected-slot semantics? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [attention-sparse-selected-slots](#attention-sparse-selected-slots) | constraint | unreviewed | What distinguishes sparse selected-slot attention from dense paged attention? |
+| [sparse-prefill-block-subtiling](#sparse-prefill-block-subtiling) | performance_candidate | unreviewed | Which sparse-attention partition should be tuned without changing selected-slot semantics? |
 
 <a id="attention-sparse-selected-slots"></a>
 ### What distinguishes sparse selected-slot attention from dense paged attention?
@@ -61,6 +61,11 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_ed78f2dc4c308f3e](source_evidence.md#aiter_b3ad6c46-src_ed78f2dc4c308f3e) — [aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py:60-270](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py#L60-L270).
 
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+
 #### Background
 
 - [knowledge/operator/sparse_attention_nsa/README.md](../README.md)
@@ -98,6 +103,11 @@ A required trait must be established for the actual design before the card appli
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Reported experience
 

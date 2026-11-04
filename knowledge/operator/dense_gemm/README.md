@@ -5,7 +5,7 @@
 
 Dense attention and FFN projections; prefill versus decode tiling.
 
-8 AITER implementation references; 18 owned corpus decisions.
+8 AITER implementation references; 19 owned corpus decisions.
 
 ## AITER implementations
 

@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: grouped_gemm_moe
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -21,6 +21,8 @@ cards:
   question: What must match at the gate/up to down-projection boundary?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - MoE execution uses two expert GEMMs with an activation or gate between them.
   actions:
@@ -87,6 +89,8 @@ cards:
   question: Which tuning surface controls the served expert GEMM contract?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id001
   - Expert GEMMs use a framework- and version-specific combination of dtype, quantization, layout, topology
     and dispatch keys.
@@ -146,6 +150,8 @@ cards:
   question: How should MFMA shape and pipeline instance be chosen for each MoE stage?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id002
   - The selected CK or similar grouped-GEMM instance has a matching weight shuffle and expert-sort granularity.
   actions:
@@ -199,6 +205,8 @@ cards:
   question: Can expert-weight dequantization be reused or shortened on the critical path?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id003
   - Packed expert weights or scale metadata are converted repeatedly while feeding grouped GEMM.
   actions:
@@ -257,6 +265,8 @@ cards:
   question: When should expert token buckets use separate configurations or compiled entries?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id004
   - Different token/width regimes have distinct compiler resource footprints and valid launch configurations.
   actions:
@@ -310,6 +320,8 @@ cards:
   question: When does narrowing expert operands remain valid and deployable?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id005
   - An explicitly permitted precision change targets streamed operand traffic or dequantization cost.
   actions:
@@ -365,6 +377,8 @@ cards:
   question: When can padding an expert epilogue staging tile reduce its critical-path conflicts?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id006
   - An LDS staging layout exhibits conflicts for the actual target bank geometry and access pattern.
   actions:
@@ -412,6 +426,8 @@ cards:
   question: Should expert input, weights, scratch and output use the same cache policy?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id007
   - The buffers have different reuse distances and token-bucket working sets.
   actions:

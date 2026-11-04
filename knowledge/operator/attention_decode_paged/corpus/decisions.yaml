@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: attention_decode_paged
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -24,6 +24,8 @@ cards:
   question: What must remain consistent when loading a paged KV cache?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions:
   - KV positions are logical sequence positions mapped through a per-request page table.
   actions:
@@ -67,6 +69,8 @@ cards:
   question: How do page layout and compiled template contracts constrain paged-attention tuning?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id001
   - The served path uses paged or ragged KV with a version-specific dispatch/template selector.
   actions:
@@ -123,6 +127,8 @@ cards:
   question: When should KV loads bypass cache or use explicit prefetch?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id002
   - The KV working set, reuse across heads/calls and load representation can be measured for each served regime.
   actions:
@@ -179,6 +185,8 @@ cards:
   question: How should a decode tile and its split grid be sized together?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id003
   - The kernel has head-width-dependent resource use, paged or windowed KV, and a legal split/reduce path.
   actions:
@@ -239,6 +247,8 @@ cards:
   question: When can combining split-KV stages in one dispatch beat a separate reduction?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id004
   - Partial results are shared across workgroups and the complete publish/signal/consume protocol can be implemented
     correctly.
@@ -293,6 +303,8 @@ cards:
   question: What host state can a decode wrapper reuse safely?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id005
   - The actual timing boundary exposes repeated allocation, argument preparation or binding overhead.
   actions:
@@ -348,6 +360,8 @@ cards:
   question: Does a high LDS or instruction counter identify removable decode latency?
   evidence_level: reported_experience
   status: candidate_only
+  upstream_review:
+    status: unreviewed
   conditions: &id006
   - The attention kernel has substantial overlap between memory, LDS traffic and computation.
   actions:

@@ -12,9 +12,9 @@ Source observations identify implementation precedents and constraints; they do 
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [chunked-prefill-prefix-and-extension](#chunked-prefill-prefix-and-extension) | semantic | How are cached-prefix and current-chunk attention combined? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [chunked-prefill-prefix-and-extension](#chunked-prefill-prefix-and-extension) | semantic | unreviewed | How are cached-prefix and current-chunk attention combined? |
 
 <a id="chunked-prefill-prefix-and-extension"></a>
 ### How are cached-prefix and current-chunk attention combined?
@@ -49,6 +49,11 @@ Source observations identify implementation precedents and constraints; they do 
 #### Source evidence
 
 - [aiter_b3ad6c46:src_77fdd041c1e25e15](source_evidence.md#aiter_b3ad6c46-src_77fdd041c1e25e15) — [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:54-317](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L54-L317).
+
+#### Upstream PR effects
+
+**Review: unreviewed**.
+PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
 
 #### Background
 
