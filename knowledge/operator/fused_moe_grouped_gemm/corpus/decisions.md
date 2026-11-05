@@ -12,9 +12,9 @@ Source observations identify implementation precedents and constraints; they do 
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [fused-moe-prepare-partition-contract](#fused-moe-prepare-partition-contract) | constraint | What work partition and initialization are required before the fused MoE kernel? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [fused-moe-prepare-partition-contract](#fused-moe-prepare-partition-contract) | constraint | blocked | What work partition and initialization are required before the fused MoE kernel? |
 
 <a id="fused-moe-prepare-partition-contract"></a>
 ### What work partition and initialization are required before the fused MoE kernel?
@@ -49,6 +49,12 @@ Source observations identify implementation precedents and constraints; they do 
 #### Source evidence
 
 - [aiter_b3ad6c46:src_ad97471fc6357f3b](source_evidence.md#aiter_b3ad6c46-src_ad97471fc6357f3b) — [aiter/ops/flydsl/kernels/mega_moe/mega_moe_prepare.py:21-276](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/mega_moe/mega_moe_prepare.py#L21-L276).
+
+#### Upstream PR effects
+
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #5001, #5346 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 

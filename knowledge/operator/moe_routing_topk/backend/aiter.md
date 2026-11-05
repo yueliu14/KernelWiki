@@ -18,6 +18,13 @@ sources:
 
 # moe_routing_topk × aiter
 
+**PR evidence correction (2026-11-04):** [PR #1909](https://github.com/ROCm/aiter/pull/1909)
+is a closed, unmerged proposal for plain `topk_sigmoid`. Its reported average 1.66x
+does not measure `biased_grouped_topk` and does not establish a shipped gfx9 dispatch.
+The imported material below conflates these implementations; do not transfer that
+performance or support claim to grouped routing. See the [reviewed report](../corpus/decisions.md#moe-sigmoid-dpp-selection)
+for its comparison conditions, inconsistent extrema and confidence.
+
 ## TL;DR
 > aiter owns the **fused router** on AMD serving stacks: `biased_grouped_topk` / `moe_fused_gate`
 > (sigmoid + bias + grouped select in one kernel) and `moe_sorting` (align&sort). On gfx9 it dispatches to a

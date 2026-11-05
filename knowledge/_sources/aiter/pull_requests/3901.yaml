@@ -1,0 +1,265 @@
+schema_version: 1
+id: aiter_pr_3901
+number: 3901
+repository: https://github.com/ROCm/aiter
+title: '[FLYDSL] add MLA reduce decode kernel for gfx942'
+state: merged
+base_commit: 026eac044851de98f05d1fd6d90a10fd8be8fe84
+head_commit: 1fe93ed088cddc3cbfbd88cb7c281fbc48a1e5c1
+merge_commit: bc54a24e3f9fe2d1d3afd76cb1c2159fad029a10
+captured_at: '2026-11-04T16:49:02.080474+00:00'
+updated_at: '2026-08-06T10:34:59Z'
+sources:
+- id: report
+  url: https://github.com/ROCm/aiter/pull/3901
+  excerpt: |-
+    ## Motivation
+
+    Split-KV MLA decode stage 2 **reduce/combine** merges per-split fp32 partial `O`/`LSE` values into the final bf16/fp16 output using an LSE-weighted online softmax (`kn_mla_reduce_v1` in `csrc/kernels/mla/reduce.cu`).
+
+    This PR adds a FlyDSL port for **gfx942 (MI300X)**, targeting the validated **GLM-5.2** sparse MLA decode configuration at TP8 (`H=16`, `Dv=512`).
+
+    ## Technical details
+
+    - **Kernel:** The default configuration uses 256 threads per block. `Tier.ALL`, the production kernel, selects one of four per-tile algorithm bodies on-device: `simple`, `m64`, `m256`, or `mlds`. It handles multi-token direct-wrapper calls and empty tiles safely.
+    - **Launch selection:** The wrapper first selects cooperative split-K (`plan_splitk_capture_safe`) for low-tile, high-split decode. Otherwise, it uses adaptive direct launch for eligible sparse multi-tile inputs. All other calls select conventional 3-D or persistent grid-stride launch from the total-work threshold. `low_direct_pmap_thr` is an adaptive-launch optimization that bypasses LDS staging for low split counts; it is not a separate launch mode.
+    - **Wiring:** `flydsl_mla_reduce_v1()` is a drop-in alternative enabled with `AITER_MLA_REDUCE_FLYDSL=1`. HIP remains the production default. Tier selection happens on-device, so per-tile split counts can vary within a fixed captured launch topology. Changes that select split-K, adaptive, or persistent dispatch require a separately captured topology.
+    - **Occupancy:** `waves_per_eu` is an explicit wrapper argument and is part of the FlyDSL launch-cache identity for both normal and split-K dispatch.
+
+    ## Test plan
+
+    Validation environment:
+
+    | Component | Value |
+    |---|---|
+    | GPU | MI300X (`gfx942`) |
+    | ROCm | 7.2.4 |
+    | PyTorch | 2.10.0+rocm7.2.4 |
+    | FlyDSL | 0.2.4 |
+
+    `op_tests/test_flydsl_mla_reduce.py` is a pytest-free, self-contained op test. The shared test helper was inlined into the test file; run the test directly with Python:
+
+    ```bash
+    python3 op_tests/test_flydsl_mla_reduce.py
+    ```
+
+    The suite compares production-shaped metadata against HIP and torch references across `H=8, Dv=256` torch-reference cases, `H=128, Dv=512` HIP-reference tier stress cases, and the production `H=16, Dv=512` serving fixtures. It covers variable splits, gapped indices, tier boundaries, empty tiles, split-K thresholds, adaptive launches, the `actual_max_splits` gate, serving OOB guards, and CUDA-graph capture/replay.
+
+    ## Performance benchmark
+
+    The following results are CUDA-graph replay latency on `H=16`, `Dv=512`, bf16. Values are the mean of two runs: one with fresh JIT and FlyDSL caches and one warm-cache repeat. `wrapper` denotes `flydsl_mla_reduce_v1()`. All wrapper and HIP correctness checks reported zero error.
+
+    | Active tiles | Splits | HIP (µs) | FlyDSL (µs) | FlyDSL / HIP | Speedup |
+    |---:|---:|---:|---:|---:|---:|
+    | 1 | 128 | 13.88 | **7.23** | **0.52×** | **1.92×** |
+    | 8 | 32 | 5.99 | **4.91** | **0.82×** | **1.22×** |
+    | 8 | 26 | 5.47 | **4.92** | **0.90×** | **1.11×** |
+    | 8 | 13 | 4.39 | **3.97** | **0.90×** | **1.11×** |
+    | 8 | 6 | 3.84 | **3.41** | **0.89×** | **1.13×** |
+    | 8 | 5 | 3.78 | **3.37** | **0.89×** | **1.12×** |
+    | 8 | 3 | 3.77 | **3.02** | **0.80×** | **1.25×** |
+    | 8 | 2 | 3.73 | **2.77** | **0.74×** | **1.35×** |
+
+    ### End-to-end serving
+
+    The kernel win above is small relative to a full decode step, so it was also measured end to end. Two vLLM servings of GLM-5.2-FP8 (TP8, fp8 KV cache, 131k context, `gpu_memory_utilization: 0.82`) were run over the same twelve request shapes, one with `AITER_MLA_REDUCE_FLYDSL=0` and one with `=1`.
+
+    | Input length | Shapes | Output throughput | TPOT (decode) |
+    |---:|---:|---:|---:|
+    | 1K | 4 | +0.8% | −1.4% |
+    | 8K | 4 | +3.0% | −3.2% |
+    | 128K | 4 | +1.3% | −2.3% |
+    | **All** | **12** | **+1.7%** | **−2.3%** |
+
+    Geometric means; negative TPOT is faster. Across the twelve shapes, decode TPOT improved 2.3%.
+
+    TPOT is the metric this PR should move since the gate only fires on decode and it improves on most shapes. Per-shape throughput suggests no regression. Measured TTFT differences are not attributable to this PR as prefill never reaches the reduce kernel.
+
+    All lengths cover concurrency 1/2/4/8. The 1K and 8K rows use nominal 1,024- and 8,192-token inputs, respectively, with 1,024 output tokens and 8/16/32/64 prompts; these retain the original `random-range-ratio: 0.8` randomized traffic. The 128K sweep instead uses fixed 128,000-token inputs and 1,024-token outputs (`random-range-ratio: 0.0`), so every request stays within the 131,072-token model context. It uses 4/8/16/24 prompts, and both HIP and FlyDSL completed all four points with zero failed requests.
+
+    ### Accuracy
+
+    The FlyDSL serving path completed the 5-shot GSM8K evaluation (1,319 samples, deterministic decoding, 32 client requests in flight). The saved result reports **95.07%** `flexible-extract` exact match and **95.00%** `strict-match` exact match, consistent with thereported 94.9% HIP score; with one run and roughly 0.6 percentage-point standard error.
+
+    ### Safety coverage
+
+    - **Split-K overwrite:** `reduce_indptr` reaches the combine kernel, which reads `reduce_final_map` and writes output/LSE only when `n_splits > 1`. Mixed `[0, 64]` and `[1, 64]` cases with a stale map are tested eagerly and under CUDA-graph replay.
+    - **Production dispatch:** FlyDSL is selected only for the validated target: gfx942, one-token decode, `H=16`, and `Dv=512`. Unsupported architectures, prefill or multi-token calls, and unsupported shapes remain on HIP without compiling FlyDSL.
+    - **Pointer ABI:** The direct FlyDSL API rejects invalid pointer dtypes, ranks, shapes, devices, contiguity, output strides, and split counts before JIT compilation.
+    - **Capture safety:** CUDA-graph capture requires a warmed CSR cache or an explicit `actual_max_splits` value; an unresolved capture does not launch.
+  sha256: 84229d3a8805e5e8977acbe81b3491ecce9b4931906b3aa871481fba76323552
+  captured_at: '2026-11-04T16:49:02.080474+00:00'
+  updated_at: '2026-08-06T10:34:59Z'
+changes:
+- id: reduce_abi
+  commit: bc54a24e3f9fe2d1d3afd76cb1c2159fad029a10
+  parent_commit: 445d8ef57f0f1e8d6ddc2cd94fd3549355c171c1
+  file: aiter/ops/flydsl/mla_reduce_kernels.py
+  before: ''
+  after: |-
+    def flydsl_mla_reduce_v1(
+        partial_output: torch.Tensor,  # fp32 [rows, H, Dv] contiguous
+        partial_lse: torch.Tensor,  # fp32 [rows, H] contiguous
+        reduce_indptr: torch.Tensor,  # i32  [num_reduce_tile + 1]
+        reduce_final_map: torch.Tensor | None,  # i32 [num_reduce_tile, 2] (optional)
+        reduce_partial_map: torch.Tensor,  # i32 [reduce_indptr[-1]]
+        max_seqlen_q: int,
+        final_output: torch.Tensor,  # bf16/fp16 [bs, H, Dv]
+        final_lse: torch.Tensor | None = None,  # fp32 [bs, H] (optional)
+        num_kv_splits: int = 0,  # HIP parity and split-K engagement budget
+        actual_max_splits: int | None = None,  # true max tile width; gates DA split-K
+        *,
+        stream: torch.cuda.Stream | None = None,
+        waves_per_eu: int = 4,
+    ) -> None:
+        """FlyDSL drop-in replacement for ``aiter.mla_reduce_v1`` (write-in-place).
+
+        Results land in ``final_output`` (and ``final_lse`` if provided); no return.
+
+        Args:
+            partial_output / partial_lse: fp32 per-split partials.
+            reduce_indptr / reduce_partial_map: CSR over splits (+ gather map).
+            reduce_final_map: optional [tile, 2] {q_start, q_end}; ``None`` derives the
+                q-range from the partial map (HIP ``use_reduce_final_map = false`` path).
+            max_seqlen_q: q-positions per decode token group; drives grid-y (NTG).
+            final_output: output tensor (bf16/fp16); strides read at runtime.
+            final_lse: optional merged LSE output (fp32).
+            num_kv_splits: HIP-signature parity and split-K engagement budget.
+            actual_max_splits: true ``max_t(n_splits)`` gating split-K + low-direct-pmap.
+                ``None`` auto-resolves from ``reduce_indptr`` eagerly or from its
+                warmup cache during capture; a cache miss must pass it explicitly.
+            stream: launch stream; defaults to the device's current stream.
+            waves_per_eu: compile-time occupancy hint for FlyDSL kernels.
+        """
+  summary: Add an LSE-weighted FlyDSL MLA reducer with mapped FP32 partials, BF16/FP16 output and capture-safe
+    split metadata.
+results:
+- id: low_tile_high_split
+  outcome: beneficial
+  summary: The reported graph-replay comparison favors the complete FlyDSL reducer for this configuration.
+  source_refs:
+  - report
+  context:
+    hardware: AMD MI300X
+    gfx: gfx942
+    dtype: bf16 output; FP32 partial output and LSE
+    shape_layout: H=16,Dv=512, active tiles=1, splits=128
+    software: ROCm 7.2.4; PyTorch 2.10.0+rocm7.2.4; FlyDSL 0.2.4
+    baseline: HIP kn_mla_reduce_v1
+    candidate: FlyDSL flydsl_mla_reduce_v1, production Tier.ALL dispatch
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: CUDA-graph replay; mean of two runs (fresh JIT/cache and warm-cache repeat)
+    correctness: Author reports zero error for all HIP and wrapper correctness checks
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: mean
+    before: 13.88
+    after: 7.23
+    source:
+      ref: report
+      quote: '| 1 | 128 | 13.88 | **7.23** | **0.52×** | **1.92×** |'
+  confidence:
+    level: medium
+    reasons:
+    - Paired graph-replay latencies, repetitions, software and correctness are specified; measured source revisions
+      and independent reproduction are absent.
+    missing_evidence:
+    - baseline_commit
+    - candidate_commit
+    - independent_reproduction
+  limitations:
+  - The port includes tier, split-K, adaptive and persistent dispatch; no single component receives the bundle
+    gain.
+  - HIP remains the default; the production FlyDSL gate is gfx942 one-token decode, H=16, Dv=512.
+- id: multi_tile_low_split
+  outcome: beneficial
+  summary: The reported graph-replay comparison favors the complete FlyDSL reducer for this configuration.
+  source_refs:
+  - report
+  context:
+    hardware: AMD MI300X
+    gfx: gfx942
+    dtype: bf16 output; FP32 partial output and LSE
+    shape_layout: H=16,Dv=512, active tiles=8, splits=2
+    software: ROCm 7.2.4; PyTorch 2.10.0+rocm7.2.4; FlyDSL 0.2.4
+    baseline: HIP kn_mla_reduce_v1
+    candidate: FlyDSL flydsl_mla_reduce_v1, production Tier.ALL dispatch
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: CUDA-graph replay; mean of two runs (fresh JIT/cache and warm-cache repeat)
+    correctness: Author reports zero error for all HIP and wrapper correctness checks
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: mean
+    before: 3.73
+    after: 2.77
+    source:
+      ref: report
+      quote: '| 8 | 2 | 3.73 | **2.77** | **0.74×** | **1.35×** |'
+  confidence:
+    level: medium
+    reasons:
+    - Paired graph-replay latencies, repetitions, software and correctness are specified; measured source revisions
+      and independent reproduction are absent.
+    missing_evidence:
+    - baseline_commit
+    - candidate_commit
+    - independent_reproduction
+  limitations:
+  - The port includes tier, split-K, adaptive and persistent dispatch; no single component receives the bundle
+    gain.
+  - HIP remains the default; the production FlyDSL gate is gfx942 one-token decode, H=16, Dv=512.
+- id: serving
+  outcome: beneficial
+  summary: Across twelve serving shapes the PR reports +1.7% geometric-mean output throughput and 2.3% lower
+    decode TPOT.
+  source_refs:
+  - report
+  context:
+    hardware: MI300X serving system; TP8
+    gfx: gfx942
+    dtype: GLM-5.2-FP8 with FP8 KV cache
+    shape_layout: TP8; twelve 1K/8K/128K input cases, output=1024, concurrency=1/2/4/8; 128K uses fixed 128000-token
+      inputs
+    software: ROCm 7.2.4; PyTorch 2.10.0+rocm7.2.4; FlyDSL 0.2.4; vLLM version unspecified
+    baseline: AITER_MLA_REDUCE_FLYDSL=0
+    candidate: AITER_MLA_REDUCE_FLYDSL=1
+    baseline_commit: null
+    candidate_commit: null
+    scope: end_to_end
+    protocol: Two vLLM servings over matched request shapes; geometric means; traffic randomization differs
+      between short and 128K groups
+    correctness: 'FlyDSL GSM8K 5-shot: 95.07% flexible-extract, 95.00% strict-match; reported HIP score 94.9%;
+      one run'
+  metrics:
+  - kind: throughput_increase
+    unit: percent
+    statistic: geomean
+    value: 1.7
+    source:
+      ref: report
+      quote: '| **All** | **12** | **+1.7%** | **−2.3%** |'
+  - kind: latency_reduction
+    unit: percent
+    statistic: geomean
+    value: 2.3
+    source:
+      ref: report
+      quote: Geometric means; negative TPOT is faster. Across the twelve shapes, decode TPOT improved 2.3%.
+  confidence:
+    level: medium
+    reasons:
+    - Serving conditions, aggregate definition and accuracy context are reported; exact measured source revisions
+      are absent.
+    missing_evidence:
+    - baseline_commit
+    - candidate_commit
+    - independent_reproduction
+  limitations:
+  - Prefill never reaches this reducer, so TTFT differences cannot be attributed to this change.
+  - The one-run accuracy comparison has sampling uncertainty and is not bitwise model equivalence.

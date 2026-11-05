@@ -127,4 +127,13 @@ axes:
     from an API name.
   source_mappings: []
   knob_aliases: {}
-dependencies: []
+dependencies:
+- id: dot_accumulator_preserves_attention_numerics
+  axes:
+  - compute_schedule
+  - numerical_contract
+  relation: end_to_end_contract
+  rule: Passing the attention value accumulator directly to tl.dot must preserve the accepted numerical
+    contract; source syntax does not prove a latency improvement.
+  decision_refs:
+  - triton-dot-accumulator-form

@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: gqa_mqa_attention
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -21,6 +21,13 @@ cards:
   question: How should query heads share KV heads without changing GQA/MQA semantics?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #1148 remain to be checked against the
+      exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - The workload has more query heads than KV heads.
   actions:
@@ -61,7 +68,15 @@ cards:
   question: Can KV storage be narrowed while retaining the attention compute contract?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id001
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.753207+00:00'
+    summary: Read all 2 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - KV traffic is limiting and the accepted accuracy contract permits a storage-precision experiment.
   actions:
   - Separate storage, conversion and dot/accumulation dtypes; derive packed K addressing from element size
@@ -84,7 +99,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id001
+    conditions:
+    - KV traffic is limiting and the accepted accuracy contract permits a storage-precision experiment.
     summary: Some historical attention cases benefited from FP8 KV storage with wider in-register computation,
       while narrowing a different dot or intermediate failed its accuracy gate.
     provenance:
@@ -113,7 +129,15 @@ cards:
   question: When can one program share gathered KV across more query heads?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id002
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.753270+00:00'
+    summary: Read all 2 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - Grouped heads attend to compatible gathered KV, and output ownership remains separate for every query/head.
   actions:
   - Widen the head tile to reduce repeated KV gathers, measuring accumulator pressure and occupancy together.
@@ -135,7 +159,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id002
+    conditions:
+    - Grouped heads attend to compatible gathered KV, and output ownership remains separate for every query/head.
     summary: Historical sparse/GQA reports benefited from head-group tiling, but instruction-count reductions
       and occupancy changes did not translate uniformly to latency.
     provenance:

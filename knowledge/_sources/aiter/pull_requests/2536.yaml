@@ -1,0 +1,356 @@
+schema_version: 1
+id: aiter_pr_2536
+number: 2536
+repository: https://github.com/ROCm/aiter
+title: add flydsl splitk gemm and update kimi-2 bf16 tunned config
+state: merged
+base_commit: ad47aab636074f246fa8c4e92e1dcaec72346f6b
+head_commit: fe095a5b2ceed81481393d9f969206fc9fbbf7ae
+merge_commit: fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd
+captured_at: '2026-11-05T02:01:48.058314+00:00'
+updated_at: '2026-03-31T13:02:36Z'
+sources:
+- id: report
+  url: https://github.com/ROCm/aiter/pull/2536
+  excerpt: |-
+    ## Motivation
+
+    This PR is about add flydsl splitk gemm and updating kimi-2 tuned config to improve kimi-2 performance/
+
+
+
+    ## Test Plan and Test Result
+
+    1. Performance:
+    <img width="1220" height="202" alt="image" src="https://github.com/user-attachments/assets/2709fc4f-359b-418e-95d8-63d0fba08175" />
+
+    2. Accuracy(TP4 for kimi-2 mxfp4)
+    <img width="854" height="127" alt="image" src="https://github.com/user-attachments/assets/562fb1f9-a807-4fa6-bcd1-71e17130e580" />
+  sha256: 6498df51460e4b64d7f225f0b53b8d11f635197655c560328b8d060bbaaf4321
+  captured_at: '2026-11-05T02:01:48.058314+00:00'
+  updated_at: '2026-03-31T13:02:36Z'
+changes:
+- id: half_mfma
+  commit: fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd
+  parent_commit: 357e60096b08291886b89c354a97f8fb20a64728
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  before: ''
+  after: |2
+                            # handle bf16
+                            if dtype == "bf16":
+                                a_v0 = vector.bitcast(T.vec(4, T.i16), a_v0)
+                                a_v1 = vector.bitcast(T.vec(4, T.i16), a_v1)
+                                b_v0 = vector.bitcast(T.vec(4, T.i16), b_v0)
+                                b_v1 = vector.bitcast(T.vec(4, T.i16), b_v1)
+                            # wmma
+                            c_idx = ii * WARP_N_STEPS + jj
+                            acc_in = c_frags[c_idx]
+                            acc_mid = mfma_fn(T.f32x4, [a_v0, b_v0, acc_in, 0, 0, 0])
+                            c_frags[c_idx] = mfma_fn(
+                                T.f32x4, [a_v1, b_v1, acc_mid, 0, 0, 0]
+                            )
+  summary: Introduce bf16/f16 fragment conversion and paired 16x16x16 MFMA calls in split-K HGEMM.
+- id: xor16_store
+  commit: fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd
+  parent_commit: 357e60096b08291886b89c354a97f8fb20a64728
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  before: ''
+  after: |2-
+            def sts_a(vecs, lds_stage):
+                for i in range_constexpr(LDG_REG_A_COUNT):
+                    global_tid = BLOCK_THREADS * i + tid
+                    m_local_idx = global_tid // LDG_A_X_THREADS
+                    k_local_idx = global_tid % LDG_A_X_THREADS * LDG_VEC_SIZE
+                    col_in_bytes = k_local_idx * DTYPE_BYTES
+                    col_in_bytes = swizzle_xor16(m_local_idx, col_in_bytes, k_blocks16)
+                    as_.vec_store(
+                        (fx.Index(lds_stage), m_local_idx, col_in_bytes // DTYPE_BYTES),
+                        vecs[i],
+                        LDG_VEC_SIZE,
+                    )
+  summary: Store A into LDS using the same XOR16 byte permutation required by fragment reads.
+- id: xor16_load
+  commit: fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd
+  parent_commit: 357e60096b08291886b89c354a97f8fb20a64728
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  before: ''
+  after: |2
+            def lds_matrix_a(lds_stage):
+                s = fx.Index(lds_stage)
+                a_frags = [0] * (WARP_K_STEPS * WARP_M_STEPS)
+                for ii in range_constexpr(WARP_M_STEPS):
+                    warp_atom_m_idx = warp_m_idx + ii * WARP_ATOM_M
+                    for kk in range_constexpr(WARP_K_STEPS):
+                        warp_atom_k_idx = kk * WARP_ATOM_K
+                        row = warp_atom_m_idx + ldmatrix_a_m_idx
+                        col_in_bytes = (
+                            warp_atom_k_idx + ldmatrix_a_k_vec_idx
+                        ) * DTYPE_BYTES
+                        col_in_bytes = swizzle_xor16(row, col_in_bytes, k_blocks16)
+                        vec = as_.vec_load(
+                            (s, row, col_in_bytes // DTYPE_BYTES),
+                            WMMA_FRAG_VALUES * MFMA_PER_WARP_K,
+                        )
+                        a_frags[kk * WARP_M_STEPS + ii] = vec
+                return a_frags
+  summary: Apply the matching XOR16 permutation when loading A fragments from LDS.
+- id: fragment_inputs
+  commit: fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd
+  parent_commit: 357e60096b08291886b89c354a97f8fb20a64728
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  before: ''
+  after: |2-
+            warp_m_idx = wid // BLOCK_N_WARPS * WARP_M
+            warp_n_idx = wid % BLOCK_N_WARPS * WARP_N
+            ldmatrix_a_m_idx = w_tid % WMMA_M
+            ldmatrix_a_k_vec_idx = w_tid // WMMA_M * WMMA_FRAG_VALUES * MFMA_PER_WARP_K
+            ldmatrix_b_n_idx = w_tid % WMMA_N
+            ldmatrix_b_k_vec_idx = w_tid // WMMA_N * WMMA_FRAG_VALUES * MFMA_PER_WARP_K
+            C_FRAGS_LEN = WARP_M_STEPS * WARP_N_STEPS
+            c_frags = [acc_init] * C_FRAGS_LEN
+  summary: Map wave lanes to A/B fragment coordinates in the new HGEMM kernel.
+- id: fragment_output
+  commit: fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd
+  parent_commit: 357e60096b08291886b89c354a97f8fb20a64728
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  before: ''
+  after: |2-
+            stmatrix_c_m_vec_idx = w_tid // WMMA_N * WMMA_FRAG_VALUES
+            stmatrix_c_n_idx = w_tid % WMMA_N
+            if not C_TO_LDS:
+                for ii in range_constexpr(WARP_M_STEPS):
+                    g_warp_atom_m_idx = m_offset + warp_m_idx + ii * WARP_ATOM_M
+                    for jj in range_constexpr(WARP_N_STEPS):
+                        g_warp_atom_n_idx = n_offset + warp_n_idx + jj * WARP_ATOM_N
+                        for kk in range_constexpr(WMMA_FRAG_VALUES):
+                            out_m_idx = g_warp_atom_m_idx + stmatrix_c_m_vec_idx + kk
+                            cond_boundary = arith.cmpi(
+                                arith.CmpIPredicate.ult, out_m_idx, fx.Index(m)
+                            )
+                            cond_boundary_if = scf.IfOp(
+                                cond_boundary, results_=[], has_else=False
+                            )
+  summary: Map accumulator lanes to output rows and columns before the direct-store epilogue.
+- id: hot_loop_schedule
+  commit: fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd
+  parent_commit: 357e60096b08291886b89c354a97f8fb20a64728
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  before: ''
+  after: |2-
+                    def hot_loop_scheduler():
+                        def _build_scheduler(numer: int, denom: int):
+                            if denom <= 0:
+                                return []
+                            if numer <= 0:
+                                return [0] * denom
+                            out = []
+                            prev = 0
+                            for i in range_constexpr(denom):
+                                cur = ((i + 1) * numer + (denom - 1)) // denom
+                                out.append(cur - prev)
+                                prev = cur
+                            return out
+
+                        if (gpu_arch == "gfx942") or (not ASYNC_COPY):
+                            mfma_group = WARP_N_STEPS
+                            mfma_total = (WARP_K_STEPS * 2) * WARP_M_STEPS * mfma_group
+                            mfma_per_iter = 2 * mfma_group
+                            sche_iters = (
+                                0 if mfma_per_iter == 0 else (mfma_total // mfma_per_iter)
+                            )
+                            rocdl.sched_dsrd(2)
+                            rocdl.sched_mfma(1)
+                            if TILE_M == 16:
+                                rocdl.sched_vmem(1)
+                            rocdl.sched_mfma(1)
+                            if TILE_M == 16:
+                                rocdl.sched_vmem(1)
+                            if mfma_group < 4:
+                                rocdl.sched_dsrd(1)
+                                rocdl.sched_mfma(1)
+                                if TILE_M == 16:
+                                    rocdl.sched_vmem(1)
+                                rocdl.sched_dsrd(1)
+                                rocdl.sched_mfma(1)
+                                if TILE_M == 16:
+                                    rocdl.sched_vmem(1)
+                                rocdl.sched_mfma(1)
+                            dswr_tail = LDG_REG_A_COUNT
+                            dstr_advance = 2
+                            if dswr_tail > sche_iters:
+                                dswr_tail = sche_iters
+                            dswr_start = max(sche_iters - dswr_tail - dstr_advance, 0)
+                            for sche_i in range_constexpr(sche_iters):
+                                rocdl.sched_vmem(1)
+                                rocdl.sched_mfma(mfma_group)
+                                rocdl.sched_dsrd(1)
+                                rocdl.sched_mfma(mfma_group)
+                                if sche_i >= dswr_start - 1:
+                                    rocdl.sched_dswr(1)
+                        rocdl.sched_barrier(0)
+  summary: Introduce a tile-derived DS-read, VMEM, MFMA and DS-write scheduling bundle.
+- id: split_zero
+  commit: fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd
+  parent_commit: 357e60096b08291886b89c354a97f8fb20a64728
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  before: ''
+  after: |2-
+            def zero_c():
+                # zero c
+                cond_ks0 = arith.cmpi(arith.CmpIPredicate.eq, ks_idx, fx.Index(0))
+                cond_ks0_if = scf.IfOp(cond_ks0, results_=[], has_else=False)
+                with ir.InsertionPoint(cond_ks0_if.then_block):
+                    zero_vec = vector.broadcast(T.vec(LDG_VEC_SIZE, dtype_), c_zero_d)
+                    for i in range_constexpr(LDG_REG_C_COUNT):
+                        global_tid = BLOCK_THREADS * i + tid
+                        m_local_idx = global_tid // LDG_C_X_THREADS
+                        n_local_idx = global_tid % LDG_C_X_THREADS * LDG_VEC_SIZE
+                        row_idx = m_offset + fx.Index(m_local_idx)
+                        cond_boundary = arith.cmpi(
+                            arith.CmpIPredicate.ult, row_idx, fx.Index(m)
+                        )
+                        cond_boundary_if = scf.IfOp(
+                            cond_boundary, results_=[], has_else=False
+                        )
+                        with ir.InsertionPoint(cond_boundary_if.then_block):
+                            C_.vec_store(
+                                (row_idx, n_offset + n_local_idx), zero_vec, LDG_VEC_SIZE
+                            )
+                            scf.YieldOp([])
+                    scf.YieldOp([])
+                rocdl.sched_barrier(0)
+  summary: Initialize the split-K output from split zero before the inter-split synchronization.
+- id: split_atomic
+  commit: fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd
+  parent_commit: 357e60096b08291886b89c354a97f8fb20a64728
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  before: ''
+  after: |2-
+                                pair_addr_i64 = llvm.AddOp(
+                                    out_base_int,
+                                    pair_byte_offset,
+                                    llvm.IntegerOverflowFlags(0),
+                                ).result
+                                pair_ptr = llvm.IntToPtrOp(_ptr_type, pair_addr_i64).result
+                                pair_ptr_v = (
+                                    pair_ptr._value
+                                    if hasattr(pair_ptr, "_value")
+                                    else pair_ptr
+                                )
+                                pair_v = pair._value if hasattr(pair, "_value") else pair
+                                llvm.AtomicRMWOp(
+                                    llvm.AtomicBinOp.fadd,
+                                    pair_ptr_v,
+                                    pair_v,
+                                    llvm.AtomicOrdering.monotonic,
+                                    syncscope="agent",
+                                    alignment=4,
+                                )
+                            scf.YieldOp([])
+  summary: Combine converted split partials with agent-scope vector atomic additions.
+- id: config_surface
+  commit: fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd
+  parent_commit: 357e60096b08291886b89c354a97f8fb20a64728
+  file: aiter/ops/flydsl/gemm_kernels.py
+  before: ''
+  after: |
+    def get_flydsl_splitk_hgemm_kernels(dtype: str, out_dtype: str) -> Dict[str, Dict]:
+        """Return {kernelName: params} for all supported configs."""
+        kernels = {}
+        tile_ns = [64, 128, 256]
+        tile_ks = [64, 128]
+        tile_ms = [16, 32, 48, 64, 96, 128]
+        split_ks = [1, 2, 4, 8]
+        stages = [1, 2]
+        block_m_warps = [1]
+        block_n_warps = [4]
+        async_copy = [True, False]
+        b_to_lds = [True, False]
+        b_preshuffle = [True, False]
+        c_to_lds = [True, False]
+  summary: Register the original HGEMM tile, split-K, stage and data-movement configuration product; later
+    snapshots extend it.
+- id: split_validity
+  commit: fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd
+  parent_commit: 357e60096b08291886b89c354a97f8fb20a64728
+  file: aiter/ops/flydsl/gemm_kernels.py
+  before: ''
+  after: |2
+        if k % split_k != 0:
+            raise ValueError(
+                f"Invalid split-K: K={k} must be divisible by split_k={split_k}"
+            )
+
+        ks = k // split_k
+        if ks < tile_k or ks % tile_k != 0:
+            raise ValueError(
+                f"Invalid K for this kernel: K/split_k={ks} must satisfy "
+                f">= tile_k={tile_k} and % tile_k == 0"
+            )
+  summary: Require K divisibility by split count and the per-split K tile before compilation.
+- id: preshuffle_gate
+  commit: fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd
+  parent_commit: 357e60096b08291886b89c354a97f8fb20a64728
+  file: aiter/ops/flydsl/gemm_kernels.py
+  before: ''
+  after: |2-
+        signal_state: int = 0,
+    ):
+        """Compile and cache a FlyDSL HGEMM kernel launcher."""
+
+        if dtype not in {"f16", "bf16"}:
+            raise ValueError(f"`dtype` must be 'f16' or 'bf16', got {dtype!r}")
+        if b_preshuffle and b_to_lds:
+            raise ValueError(
+                "Latest `hgemm.py` requires b_to_lds=False when b_preshuffle=True"
+            )
+
+        _validate_hgemm_tiling(
+            m,
+  summary: Reject the simultaneous B-preshuffle and B-to-LDS combination in the HGEMM compiler.
+results:
+- id: kimi_report
+  outcome: mixed
+  summary: The PR supplies a Kimi-2 serving performance image with higher output throughput across displayed
+    rows and mixed mean TTFT changes; image values are not encoded as metrics. The change bundles split-K GEMM
+    with tuned configurations.
+  source_refs:
+  - report
+  context:
+    hardware: null
+    gfx: null
+    dtype: null
+    shape_layout: Kimi-2 serving; detailed shape and performance topology are not stated in the text
+    software: null
+    baseline: null
+    candidate: FlyDSL split-K GEMM and updated Kimi-2 tuned configuration
+    baseline_commit: null
+    candidate_commit: null
+    scope: end_to_end
+    protocol: null
+    correctness: The PR includes a separate TP4 Kimi-2 MXFP4 accuracy image; its scores are not encoded here
+  metrics: []
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - hardware
+    - gfx
+    - dtype
+    - software
+    - baseline
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - image_metric_transcription
+    - performance_baseline_identity
+    - performance_topology
+    - independent_reproduction
+  limitations:
+  - Numerical performance and accuracy results are image attachments; no image-derived metric is promoted to
+    a quoted text measurement.
+  - The throughput gain cannot be assigned independently to MFMA, XOR16, scheduling, preshuffle or split-K.
+  - 'PR #2567 subsequently fixes split-K tail-row correctness; the original aggregate is not proof that every
+    configuration in this PR was correct.'

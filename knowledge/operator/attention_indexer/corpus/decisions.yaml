@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: attention_indexer
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -21,6 +21,12 @@ cards:
   question: What does the DeepSeek-style MQA indexer compute before top-k?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-05T02:11:46.064634+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - The workload uses weighted, rectified MQA logits over a per-query KV window.
   actions:
@@ -46,6 +52,50 @@ cards:
       kernel variants.
     source_evidence:
     - aiter_b3ad6c46:src_744823ffb69cb339
+  experience:
+  - outcome: mixed
+    conditions:
+    - Preserve weighted ReLU scoring, head weights and row windows; gfx950 requires native FN, while gfx942
+      conversion has its own scaling and negative-zero handling.
+    summary: 'The FlyDSL wrapper and format checks belong to the implementation reviewed in PR #4538; the mixed
+      reported comparisons do not isolate format conversion or score semantics.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_4538
+      change_refs:
+      - score_wrapper_contract
+      - fp8_architecture_contract
+      result_refs:
+      - gfx950_original
+      - gfx942_clean
+      - later_regression
+      - later_gain
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - score_semantics
+          - numerical_contract
+          backend: flydsl
 - id: indexer-fp8-architecture-format
   type: constraint
   axes:
@@ -62,6 +112,12 @@ cards:
   question: Which FP8 format conversions does the contiguous FlyDSL MQA logits path require?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-05T02:11:46.064634+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - The selected path is flydsl_fp8_mqa_logits on gfx942 or gfx950.
   actions:
@@ -83,6 +139,49 @@ cards:
     rule.
   references:
   - knowledge/operator/attention_indexer/README.md
+  experience:
+  - outcome: mixed
+    conditions:
+    - Preserve weighted ReLU scoring, head weights and row windows; gfx950 requires native FN, while gfx942
+      conversion has its own scaling and negative-zero handling.
+    summary: 'The FlyDSL wrapper and format checks belong to the implementation reviewed in PR #4538; the mixed
+      reported comparisons do not isolate format conversion or score semantics.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_4538
+      change_refs:
+      - fp8_architecture_contract
+      result_refs:
+      - gfx950_original
+      - gfx942_clean
+      - later_regression
+      - later_gain
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - numerical_contract
+          - implementation_contract
+          backend: flydsl
 - id: indexer-window-and-clean-output
   type: constraint
   axes:
@@ -98,6 +197,11 @@ cards:
   question: Who initializes logits outside each query's valid window?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T15:47:13.494575+00:00'
+    summary: Reviewed the linked PRs and cited results for the specified backend/axes; other implementations
+      and shapes remain unreviewed.
   conditions:
   - The score buffer may be consumed by top-k over a larger allocated row.
   actions:
@@ -118,6 +222,42 @@ cards:
   - Skipping output cleaning is only valid when the downstream validity contract excludes those positions.
   references:
   - knowledge/operator/attention_indexer/README.md
+  experience:
+  - outcome: beneficial
+    conditions:
+    - clean_logits=True with identical valid-window and negative-infinity semantics; H=64 and the cited shape.
+    summary: The PR reports lower operator latency after fusing invalid-logit initialization on gfx942.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_4538
+      change_refs:
+      - fused_clean
+      result_refs:
+      - gfx942_clean
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed PR commit changes the named implementation and the quoted before/after construct.
+          missing_evidence: []
+        attribution:
+          scope: isolated
+          confidence:
+            level: medium
+            reasons:
+            - The report compares this isolated mechanism but has not been reproduced.
+            missing_evidence:
+            - independent_ablation
+          isolation_source_refs:
+          - body
+        applies_to:
+          axes:
+          - implementation_contract
+          backend: flydsl
 - id: indexer-paged-mxfp4-layout
   type: constraint
   axes:
@@ -134,6 +274,13 @@ cards:
   question: Which packed payload, scale and tile constraints accompany paged MXFP4 scoring?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #6145, #6334 remain to be checked against
+      the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - The candidate targets build_pa_mqa_logits_fp4_module and its packed cache representation.
   actions:
@@ -172,6 +319,13 @@ cards:
   question: How does MiniMax block scoring differ from per-token MQA logits?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #5626 remain to be checked against the
+      exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - The task is the MiniMax-M3 decode page-score implementation on gfx950.
   actions:
@@ -209,6 +363,11 @@ cards:
   question: How should scoring work be partitioned across short decode and long prefill rows?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T15:47:13.494575+00:00'
+    summary: Reviewed the linked PRs and cited results for the specified backend/axes; other implementations
+      and shapes remain unreviewed.
   conditions:
   - Correct scoring exists but query-row count and valid KV window lengths leave an uneven grid.
   actions:
@@ -230,6 +389,118 @@ cards:
   - An upstream heuristic is not a measured winner for a new shape or GPU.
   references:
   - knowledge/operator/attention_indexer/README.md
+  experience:
+  - outcome: beneficial
+    conditions:
+    - gfx942 automatic FlyDSL selector; match each reported query/KV shape and retain its FP8 numerical contract.
+    summary: The upstream selector chooses r1/r2/r4 from the logits size and divisibility; reported operator
+      gains include changed host-padding cost.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_4963
+      change_refs:
+      - selector
+      result_refs:
+      - long_prefill
+      - small_query
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed PR commit changes the named implementation and the quoted before/after construct.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The reported result belongs to a complete implementation/selector; individual contributions were
+              not isolated.
+            missing_evidence:
+            - independent_ablation
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - work_partition
+          - compute_schedule
+          backend: flydsl
+  - outcome: beneficial
+    conditions:
+    - 8 x MI325X; GLM-5.2-FP8, TP8, input 131072/output 1024, concurrency 8.
+    summary: The same PR reports separate serving-level benefits; these are not the operator speedups.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_4963
+      change_refs:
+      - selector
+      result_refs:
+      - serving
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed PR commit changes the named implementation and the quoted before/after construct.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The reported result belongs to a complete implementation/selector; individual contributions were
+              not isolated.
+            missing_evidence:
+            - independent_ablation
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - work_partition
+          backend: flydsl
+  - outcome: mixed
+    conditions:
+    - Match the original or later comparison context; do not combine their baseline versions.
+    summary: The gfx950 implementation has mixed evidence across baseline versions and shapes, including a
+      later reported regression.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_4538
+      change_refs:
+      - gfx950_registry
+      result_refs:
+      - gfx950_original
+      - later_regression
+      - later_gain
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed PR commit changes the named implementation and the quoted before/after construct.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The reported result belongs to a complete implementation/selector; individual contributions were
+              not isolated.
+            missing_evidence:
+            - independent_ablation
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - compute_schedule
+          backend: flydsl
 - id: indexer-topk-row-index-contract
   type: constraint
   axes:
@@ -243,6 +514,13 @@ cards:
   question: What must a top-k implementation preserve beyond score values?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #5363, #6329 remain to be checked against
+      the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - A per-row selector converts scores into the indices consumed by sparse attention.
   actions:
@@ -283,6 +561,11 @@ cards:
   question: How does DCP top-k merge preserve rank ownership and physical KV slots?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - The selected implementation merges rank-major candidate scores for qlen=1 decode.
   actions:
@@ -306,6 +589,48 @@ cards:
   - The decode-only row/indptr contract cannot be assumed valid for arbitrary prefill queries.
   references:
   - knowledge/operator/attention_indexer/README.md
+  experience:
+  - outcome: beneficial
+    conditions:
+    - Rank-major scores, W=8, k_loc=topk=2048, qlen=1, losing -inf padding, and valid physical-slot maps; the
+      all-gather itself is outside the measurement.
+    summary: The fused owned-slot DCP merge has a reported single-operator benefit; real multi-GPU all-gather
+      and full-decode attribution remain unvalidated.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_5123
+      change_refs:
+      - owned_kv_slots
+      result_refs:
+      - one_row
+      - many_rows
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - distributed_merge
+          - selection_contract
+          - cache_layout
+          backend: flydsl
 - id: indexer-single-query-vector-path
   type: performance_candidate
   axes:
@@ -325,7 +650,14 @@ cards:
   question: When can a single-query index score use a vector reduction instead of a degenerate matrix product?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id001
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.752850+00:00'
+    summary: Read the pinned GEAK account of the single-query mul/reduce optimization. It explicitly attributes
+      the merged implementation to vLLM, not AITER, but supplies no identifying PR URL or implementation commit.
+      Its GEAK documentation pin is not an AITER change. Retain the reported vLLM context; AITER PR association
+      and effect confidence remain unknown.
+  conditions:
   - Exactly one query is scored and the reference operation is the corresponding dot product over the same
     keys/features.
   actions:
@@ -347,7 +679,9 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id001
+    conditions:
+    - Exactly one query is scored and the reference operation is the corresponding dot product over the same
+      keys/features.
     summary: A historical sparse-attention report included a separate decode index-score vector specialization
       alongside its prefill sub-tiling change.
     provenance:

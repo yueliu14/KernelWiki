@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: scaled_quant_gemm
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -33,6 +33,12 @@ cards:
   question: Which FlyDSL A8 / FP4 preshuffle-GEMM configurations are rejected before they can be slow?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-05T02:11:46.064634+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - target_language=flydsl
   - quantized GEMM built on the A8 preshuffle family (fp8, int8/int4, or fp4 on gfx950)
@@ -76,6 +82,47 @@ cards:
   - These are the checks in AITER's vendored kernel at the pinned commit; an authored kernel with its own staging
     has its own contract.
   - Passing every check means the configuration builds, not that it is fast.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - Check packed bytes, input format, LDS stages and thread divisibility together; passing a legality gate
+      is not evidence of speed.
+    summary: 'PR #2546 incorporates these early legality checks in the A8/FP4 preshuffle family without a per-check
+      performance claim.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - tile_k_legality
+      - tile_thread_divisibility
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - configuration_constraints
+          - architecture_capability
+          - workgroup_tile
+          backend: flydsl
 - id: flydsl-a8-mfma-selection
   type: semantic
   axes:
@@ -102,6 +149,11 @@ cards:
     about tile_k?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - quantized GEMM (fp8, int8/int4, fp4)
@@ -156,6 +208,45 @@ cards:
   - This is instruction selection in AITER's vendored kernel; it says nothing about which instruction is faster
     for a shape.
   - The FNUZ/OCP statement comes from the background hardware docs, not from this source.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - mfma_selection
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - compute_instruction
+          - architecture_capability
+          backend: flydsl
 - id: flydsl-a8-scale-granularity-contract
   type: constraint
   axes:
@@ -179,6 +270,11 @@ cards:
     contract?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - fp8/int8 GEMM whose math contract names its scale granularity (per-tensor, per-token/per-channel, or [128,128]
@@ -235,6 +331,45 @@ cards:
   - The per-K-block promote is the arithmetic a block-scale contract requires; its cost on a given shape is
     a measurement, and measured recipes live behind the expert-skill switch.
   - The E8M0 limitation is a hardware fact from the background docs, not from this source.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - scale_operands
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - runtime_contract
+          - epilogue
+          backend: flydsl
 - id: gemm-blockscale-k-loop-scale-application
   type: semantic
   axes:
@@ -255,6 +390,13 @@ cards:
     about tile_k and the scale indexing?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #709 remain to be checked against the
+      exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - target_language=flydsl
   - the math contract is Y = (X*x_scale) @ (W*w_scale)^T with one fp32 scale per row of X per 128 elements
@@ -266,10 +408,10 @@ cards:
     b) * a_scale[:, None] * b_scale[None, :]`; Gluon as `acc += mfma_out * cur_a_scale[:, None] * cur_b_scale[None,
     :]`.'
   - Make one K tile exactly one scale block. The Triton kernel takes GROUP_K and BLOCK_SIZE_K as separate parameters,
-    its docstring requires them equal. For this 128x128 scale contract, resolve BLOCK_SIZE_K = GROUP_K
-    = GROUP_N = 128 at the selected caller — on gfx942 that is four 16x16x32 fp8 MFMA K-steps between scale
-    multiplies. Some shipped configs omit GROUP_K or GROUP_N; their effective values must be checked in
-    the wrapper rather than inferred from the configuration-group summary.
+    its docstring requires them equal. For this 128x128 scale contract, resolve BLOCK_SIZE_K = GROUP_K = GROUP_N
+    = 128 at the selected caller — on gfx942 that is four 16x16x32 fp8 MFMA K-steps between scale multiplies.
+    Some shipped configs omit GROUP_K or GROUP_N; their effective values must be checked in the wrapper rather
+    than inferred from the configuration-group summary.
   - 'Index the scales per K block: X''s scale is [M, ceil(K/128)] and advances one column per K tile; W''s
     holds one value per 128x128 block, so each output column reads the scale of its 128-wide group for the
     current K block (Triton gathers it as `offs_bn // GROUP_N`).'
@@ -358,6 +500,11 @@ cards:
     preshuffle GEMM build, and how do they differ by architecture?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - fp8 or int8 GEMM with a preshuffled B (the A8 preshuffle family, or an authored kernel modelled on it)
@@ -420,6 +567,47 @@ cards:
     staging scheme needs its own estimate.
   - Shipped FlyDSL selections exist only for gfx950 per-token fp8; there is none for gfx942 and none for block-scaled
     fp8.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - tuning_sweep
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - tunable_surface
+          - pipeline_schedule
+          - epilogue
+          - execution_geometry
+          backend: flydsl
 - id: gemm-blockscale-shipped-bucket-structure
   type: performance_candidate
   axes:
@@ -442,6 +630,13 @@ cards:
     ship instead where it tuned small and large M separately?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #2661 remain to be checked against the
+      exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - target_language=flydsl
   - an fp8 128x128 block-scale workload measured against AITER's Triton kernel, especially one whose cases
@@ -523,6 +718,11 @@ cards:
     between gfx942 and gfx950?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - a K loop whose A tile goes through LDS and whose B is read straight from global memory
@@ -573,6 +773,45 @@ cards:
   limitations:
   - The table values are AITER's per-tile choices for gfx950 fp8/int8; they are seeds for that geometry only.
   - Scheduling is the most build-specific knowledge here; settle the tile and staging first.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - schedule_preload
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - pipeline_schedule
+          - memory_access
+          backend: flydsl
 - id: flydsl-a8-data-movement-helpers
   type: performance_candidate
   axes:
@@ -593,6 +832,11 @@ cards:
     access widths do they fix?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - an operand is staged through LDS and the other is read preshuffled from global memory, as in the A8 and
@@ -640,6 +884,45 @@ cards:
   - The helpers are the A8/MoE family's; the HGEMM stages its operands with its own code, and a block-scale
     kernel adds scale loads these helpers do not cover.
   - Which width is fastest for a tile is a measurement; the helpers state which widths are legal.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - async_geometry
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - memory_access
+          - pipeline_schedule
+          backend: flydsl
 - id: quant-gemm-format-reinterpretation
   type: performance_candidate
   axes:
@@ -659,7 +942,15 @@ cards:
   question: When can a legacy FP8 representation use the native matrix instruction without a conversion pass?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id001
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.754435+00:00'
+    summary: Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - A specific pair of FP8 encodings differs by a proven scale relationship on the allowed input domain.
   actions:
   - Derive the operand-wise scale relationship, including sign, subnormal, zero, NaN and saturation encodings;
@@ -683,7 +974,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id001
+    conditions:
+    - A specific pair of FP8 encodings differs by a proven scale relationship on the allowed input domain.
     summary: Some historical FP8 GEMMs replaced emulated conversions with native instructions, while incorrect
       scale direction or special-value encodings broke parity.
     provenance:
@@ -713,7 +1005,15 @@ cards:
   question: Which configuration or source edit controls the live FP8 blockscale GEMM?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id002
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.754554+00:00'
+    summary: Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - A framework selects among CK, preshuffled CK or authored blockscale implementations.
   actions:
   - Identify the called symbol and exact scale/layout contract before choosing a configuration database or
@@ -736,7 +1036,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id002
+    conditions:
+    - A framework selects among CK, preshuffled CK or authored blockscale implementations.
     summary: Historical FP8 reports used different valid levers on different stacks; a configuration file for
       a sibling path could be ignored despite a plausible isolated result.
     provenance:
@@ -767,7 +1068,15 @@ cards:
   question: How should a native per-32 E8M0 GEMM be tuned across prefill and decode?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id003
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.754690+00:00'
+    summary: Read all 4 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - The live kernel consumes MXFP8 payloads and per-32 E8M0 scales, rather than a dense BF16 or arbitrary-fp32-scale
     GEMM ABI.
   actions:
@@ -791,7 +1100,9 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id003
+    conditions:
+    - The live kernel consumes MXFP8 payloads and per-32 E8M0 scales, rather than a dense BF16 or arbitrary-fp32-scale
+      GEMM ABI.
     summary: Historical MXFP8 summaries reported shape-dependent tile and split-K gains, with substantially
       different serving effects at different concurrency regimes.
     provenance:
@@ -823,7 +1134,15 @@ cards:
   question: Which dequantization work is on the GEMM critical path?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id004
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.754913+00:00'
+    summary: Read all 7 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - Conversion, scale lookup or repacking lies on the operand-to-MFMA dependency chain.
   actions:
   - Separate scale gathering, conversion, repacking and arithmetic costs in the generated loop; target the
@@ -847,7 +1166,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id004
+    conditions:
+    - Conversion, scale lookup or repacking lies on the operand-to-MFMA dependency chain.
     summary: Historical reports found useful conversion/packing and two-dot overlap changes, alongside occupancy,
       prefetch and instruction-cut variants that were neutral or slower.
     provenance:

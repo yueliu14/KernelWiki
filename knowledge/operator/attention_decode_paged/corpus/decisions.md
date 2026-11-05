@@ -18,15 +18,15 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [attention-paged-kv-addressing](#attention-paged-kv-addressing) | constraint | What must remain consistent when loading a paged KV cache? |
-| [paged-attention-live-layout-dispatch](#paged-attention-live-layout-dispatch) | performance_candidate | How do page layout and compiled template contracts constrain paged-attention tuning? |
-| [decode-kv-cache-policy](#decode-kv-cache-policy) | performance_candidate | When should KV loads bypass cache or use explicit prefetch? |
-| [decode-tile-and-split-geometry](#decode-tile-and-split-geometry) | performance_candidate | How should a decode tile and its split grid be sized together? |
-| [decode-single-dispatch-merge](#decode-single-dispatch-merge) | performance_candidate | When can combining split-KV stages in one dispatch beat a separate reduction? |
-| [decode-wrapper-plan-lifetime](#decode-wrapper-plan-lifetime) | performance_candidate | What host state can a decode wrapper reuse safely? |
-| [decode-resource-counters-and-latency](#decode-resource-counters-and-latency) | performance_candidate | Does a high LDS or instruction counter identify removable decode latency? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [attention-paged-kv-addressing](#attention-paged-kv-addressing) | constraint | blocked | What must remain consistent when loading a paged KV cache? |
+| [paged-attention-live-layout-dispatch](#paged-attention-live-layout-dispatch) | performance_candidate | unresolved | How do page layout and compiled template contracts constrain paged-attention tuning? |
+| [decode-kv-cache-policy](#decode-kv-cache-policy) | performance_candidate | unresolved | When should KV loads bypass cache or use explicit prefetch? |
+| [decode-tile-and-split-geometry](#decode-tile-and-split-geometry) | performance_candidate | unresolved | How should a decode tile and its split grid be sized together? |
+| [decode-single-dispatch-merge](#decode-single-dispatch-merge) | performance_candidate | unresolved | When can combining split-KV stages in one dispatch beat a separate reduction? |
+| [decode-wrapper-plan-lifetime](#decode-wrapper-plan-lifetime) | performance_candidate | unresolved | What host state can a decode wrapper reuse safely? |
+| [decode-resource-counters-and-latency](#decode-resource-counters-and-latency) | performance_candidate | unresolved | Does a high LDS or instruction counter identify removable decode latency? |
 
 <a id="attention-paged-kv-addressing"></a>
 ### What must remain consistent when loading a paged KV cache?
@@ -62,6 +62,12 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_49cb5bdc816cb102](source_evidence.md#aiter_b3ad6c46-src_49cb5bdc816cb102) — [aiter/ops/triton/_triton_kernels/attention/unified_attention.py:82-553](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/unified_attention.py#L82-L553).
+
+#### Upstream PR effects
+
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #1148 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -103,6 +109,12 @@ A required trait must be established for the actual design before the card appli
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.751918+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -153,6 +165,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 5 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.752103+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -201,6 +219,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 8 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.752343+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -251,6 +275,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.752543+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -300,6 +330,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 5 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.752743+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -347,6 +383,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 2 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.752814+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 

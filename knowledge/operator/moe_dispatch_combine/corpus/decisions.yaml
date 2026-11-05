@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: moe_dispatch_combine
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -20,6 +20,12 @@ cards:
   question: What is the mapping between token routes and grouped expert rows?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-05T02:17:37.107586+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - A route-map kernel assigns rows with per-expert atomic counters.
   actions:
@@ -45,6 +51,45 @@ cards:
   - knowledge/operator/moe_dispatch_combine/README.md
   - knowledge/operator/grouped_gemm_moe/README.md
   - knowledge/operator/fused_moe_grouped_gemm/README.md
+  experience:
+  - outcome: not_reported
+    conditions:
+    - Grouped gfx1250 FlyDSL MoE; route row is expert*max_m + claimed slot; capacity and padding remain caller
+      obligations.
+    summary: 'PR #3460 introduces the route-to-grouped-row and inverse maps; it does not quantify a speedup
+      or establish all later capacity/drop behavior.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_3460
+      change_refs:
+      - forward_inverse_maps
+      result_refs:
+      - maps_and_gather_unmeasured
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - expert_layout
+          - implementation_contract
+          backend: flydsl
 - id: moe-route-quant-scatter-fusion
   type: performance_candidate
   axes:
@@ -60,6 +105,12 @@ cards:
   question: What does fusing route mapping, MX quantization and scatter commit the consumer to?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-05T02:10:32.112473+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - The candidate uses per-1x32 MX activation quantization and expert-grouped storage.
   actions:
@@ -81,6 +132,47 @@ cards:
   references:
   - knowledge/operator/moe_dispatch_combine/README.md
   - knowledge/operator/fused_moe_grouped_gemm/README.md
+  experience:
+  - outcome: not_reported
+    conditions:
+    - gfx1250 grouped-MoE fusion; preserve expert capacity, row ownership, MX payload and preshuffled scale
+      agreement.
+    summary: 'PR #3851 incorporates the fused route/quant/scatter path; no measured performance benefit is
+      reported in the reviewed discussion.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_3851
+      change_refs:
+      - fused_route_outputs
+      - expert_row
+      result_refs:
+      - fusion_unmeasured
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - expert_layout
+          - numerical_contract
+          - data_movement
+          backend: flydsl
 - id: moe-weighted-gather-dropped-routes
   type: semantic
   axes:
@@ -98,6 +190,12 @@ cards:
   question: Where are route weights applied, and how are dropped routes excluded?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-05T02:17:37.107586+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - Expert outputs must be combined back into each token's output row.
   actions:
@@ -126,6 +224,47 @@ cards:
     source_evidence:
     - aiter_b3ad6c46:src_8b4846cb32c13ce3
     - aiter_b3ad6c46:src_330eb5ef722c9789
+  experience:
+  - outcome: not_reported
+    conditions:
+    - Scope is weighted gather incorporation; do not apply this old reader to negative route IDs without the
+      later guards.
+    summary: 'PR #3460 establishes the weighted gather part of this contract. Its unused-slot convention differs
+      from the later pinned negative-row handling and supplies no measured gain.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_3460
+      change_refs:
+      - weighted_gather
+      - weighted_accumulation
+      result_refs:
+      - maps_and_gather_unmeasured
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - combine
+          - numerical_contract
+          - expert_layout
+          backend: flydsl
 - id: moe-communication-arena-lifetime
   type: constraint
   axes:
@@ -140,6 +279,13 @@ cards:
   question: Which host and synchronization invariants accompany device-side MoE communication?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #5937, #6514 remain to be checked against
+      the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - The candidate reuses the tensor-parallel MegaMoE device communication design.
   actions:

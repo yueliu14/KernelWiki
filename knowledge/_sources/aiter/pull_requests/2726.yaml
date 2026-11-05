@@ -1,0 +1,131 @@
+schema_version: 1
+id: aiter_pr_2726
+number: 2726
+repository: https://github.com/ROCm/aiter
+title: '[FlyDSL MOE] update a8w4 moe'
+state: merged
+base_commit: 0b69f6b6e62ef437c3fb1b34ce1cb18cd0ba239e
+head_commit: 4aa22860ecfe2416af43dce7847d4e874d46e7d2
+merge_commit: e991be1c437833c002f940dd854892037b19da7d
+captured_at: '2026-11-05T02:22:10.959841+00:00'
+updated_at: '2026-04-16T16:20:39Z'
+sources:
+- id: change_summary
+  url: https://github.com/ROCm/aiter/pull/2726
+  excerpt: |-
+    ## Motivation
+
+    <!-- Explain the purpose of this PR and the goals it aims to achieve. -->
+
+    ## Technical Details
+
+    1. add stage2 async load;
+    2. add xcd remapping feature;
+    3. adjust stage1 & stage2 pipeline;
+    4. enable a8w4 with original a4w4 kernel;
+    5. fix stage1 performance bug.
+
+    ## Test Plan
+
+    <!-- Explain any relevant testing done to verify this PR. -->
+
+    ## Test Result
+
+    as tune configs: kimik2_fp4_tuned_config.csv
+  sha256: d0ea40e782d4c98e132d2a7885375eace605bbeb0656a0d5b53038e6693bc764
+  captured_at: '2026-11-05T02:22:10.959841+00:00'
+  updated_at: '2026-04-16T16:20:39Z'
+changes:
+- id: xcd_workgroup_mapping
+  commit: e991be1c437833c002f940dd854892037b19da7d
+  parent_commit: ad68fe0949e697c069eb585190cb14cc98636365
+  file: aiter/ops/flydsl/kernels/mixed_moe_gemm_2stage.py
+  before: |2-
+                tx = gpu.thread_id("x")
+                by = gpu.block_id("x")  # tile along inter_dim (N)
+                bx_persist = gpu.block_id("y")  # persistent WG index
+                by_n = by * arith.constant(tile_n, index=True)
+  after: |2-
+                tx = gpu.thread_id("x")
+                by = gpu.block_id("x")  # tile along inter_dim (N)
+                bx_persist = gpu.block_id("y")  # persistent WG index
+
+                if xcd_swizzle > 0:
+                    _NUM_XCDS_S1 = 8
+                    _c1_sw = arith.constant(1, index=True)
+                    _c_tn_sw = arith.constant(tile_n, index=True)
+                    _c_idp_sw = arith.constant(2 * inter_dim_pad, index=True)
+                    if const_expr(mock_gate_only or gate_up_interleave):
+                        _gx = (n_in - _c_idp_sw + _c_tn_sw - _c1_sw) / _c_tn_sw
+                    else:
+                        _c2_sw = arith.constant(2, index=True)
+                        _gx = (
+                            (n_in - _c_idp_sw + _c2_sw * _c_tn_sw - _c1_sw)
+                            / _c_tn_sw
+                            / _c2_sw
+                        )
+                    _c_pm_sw = arith.constant(persist_m, index=True)
+                    _gy = (size_expert_ids_in + _c_pm_sw - _c1_sw) / _c_pm_sw
+
+                    _linear_id = bx_persist * _gx + by
+                    _num_wgs = _gx * _gy
+
+                    _c_xcds = arith.constant(_NUM_XCDS_S1, index=True)
+                    _wgs_per_xcd = _num_wgs / _c_xcds
+                    _wgid = (_linear_id % _c_xcds) * _wgs_per_xcd + (_linear_id / _c_xcds)
+
+                    _WGM_S1 = xcd_swizzle
+                    _c_wgm = arith.constant(_WGM_S1, index=True)
+                    _num_wgid_in_group = _c_wgm * _gx
+                    _group_id = _wgid / _num_wgid_in_group
+                    _first_pid_m = _group_id * _c_wgm
+                    _remaining_m = _gy - _first_pid_m
+                    _cmp_m = arith.cmpi(CmpIPredicate.ult, _remaining_m, _c_wgm)
+                    _group_size_m = arith.select(_cmp_m, _remaining_m, _c_wgm)
+
+                    _wgid_in_group = _wgid % _num_wgid_in_group
+                    bx_persist = _first_pid_m + (_wgid_in_group % _group_size_m)
+                    by = _wgid_in_group / _group_size_m
+
+                by_n = by * arith.constant(tile_n, index=True)
+  summary: Add an opt-in eight-XCD workgroup remapping followed by grouped-M tile ordering in the MoE GEMM
+    path.
+results:
+- id: remap_unmeasured
+  outcome: not_reported
+  summary: The PR adds XCD remapping alongside async loads, pipeline changes and A8W4 enablement; its test-result
+    section points to tuned configurations without a measured XCD comparison.
+  source_refs:
+  - change_summary
+  context:
+    hardware: null
+    gfx: null
+    dtype: null
+    shape_layout: null
+    software: null
+    baseline: null
+    candidate: FlyDSL MoE GEMM XCD remapping and grouped-M ordering
+    baseline_commit: null
+    candidate_commit: null
+    scope: unknown
+    protocol: null
+    correctness: null
+  metrics: []
+  confidence:
+    level: unknown
+    reasons:
+    - The reviewed body and discussion provide no quantitative effect or isolated XCD experiment.
+    missing_evidence:
+    - hardware
+    - gfx
+    - dtype
+    - shape_layout
+    - software
+    - baseline
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - correctness
+  limitations:
+  - A tuned configuration filename does not establish a speedup.
+  - The separately mentioned stage1 performance-bug fix is not an isolated XCD result.

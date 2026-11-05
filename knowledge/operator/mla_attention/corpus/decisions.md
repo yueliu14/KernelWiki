@@ -18,10 +18,10 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [attention-split-kv-merge](#attention-split-kv-merge) | performance_candidate | When splitting KV work, what information must the merge preserve? |
-| [attention-mla-reduce-abi](#attention-mla-reduce-abi) | constraint | Which tensor and mapping invariants does the FlyDSL MLA reducer require? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [attention-split-kv-merge](#attention-split-kv-merge) | performance_candidate | reviewed | When splitting KV work, what information must the merge preserve? |
+| [attention-mla-reduce-abi](#attention-mla-reduce-abi) | constraint | reviewed | Which tensor and mapping invariants does the FlyDSL MLA reducer require? |
 
 <a id="attention-split-kv-merge"></a>
 ### When splitting KV work, what information must the merge preserve?
@@ -62,6 +62,29 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_a726e480b7d62ccf](source_evidence.md#aiter_b3ad6c46-src_a726e480b7d62ccf) — [aiter/ops/triton/_triton_kernels/attention/mla.py:669-762](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/mla.py#L669-L762).
+
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #3901](https://github.com/ROCm/aiter/pull/3901) · merged · beneficial** — The complete FlyDSL mapped-LSE reducer has reported graph-replay and serving gains; the partial layout and normalization contract remain mandatory.
+  Conditions: Production gate is gfx942 one-token MLA decode with H=16,Dv=512; FP32 partial O/LSE and mapped BF16/FP16 output; opt in explicitly.
+  Direction: flydsl; kv_partition, numerical_contract
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: low** — The report concerns the implementation or validity change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [bc54a24e3f9f](https://github.com/ROCm/aiter/commit/bc54a24e3f9fe2d1d3afd76cb1c2159fad029a10) — Add an LSE-weighted FlyDSL MLA reducer with mapped FP32 partials, BF16/FP16 output and capture-safe split metadata.
+  [Result: low_tile_high_split](../../../_sources/aiter/pull_requests/3901.md#low_tile_high_split) — **operator**; The reported graph-replay comparison favors the complete FlyDSL reducer for this configuration.
+  **Effect confidence: medium** — Paired graph-replay latencies, repetitions, software and correctness are specified; measured source revisions and independent reproduction are absent; missing: baseline_commit, candidate_commit, independent_reproduction.
+  latency: 13.88 → 7.23 us (mean); normalized speedup 1.92×
+  [Result: multi_tile_low_split](../../../_sources/aiter/pull_requests/3901.md#multi_tile_low_split) — **operator**; The reported graph-replay comparison favors the complete FlyDSL reducer for this configuration.
+  **Effect confidence: medium** — Paired graph-replay latencies, repetitions, software and correctness are specified; measured source revisions and independent reproduction are absent; missing: baseline_commit, candidate_commit, independent_reproduction.
+  latency: 3.73 → 2.77 us (mean); normalized speedup 1.347×
+  [Result: serving](../../../_sources/aiter/pull_requests/3901.md#serving) — **end_to_end**; Across twelve serving shapes the PR reports +1.7% geometric-mean output throughput and 2.3% lower decode TPOT.
+  **Effect confidence: medium** — Serving conditions, aggregate definition and accuracy context are reported; exact measured source revisions are absent; missing: baseline_commit, candidate_commit, independent_reproduction.
+  throughput_increase: 1.7 percent (geomean); normalized speedup 1.017×
+  latency_reduction: 2.3 percent (geomean); normalized speedup 1.024×
 
 #### Reported experience
 
@@ -119,6 +142,29 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - [aiter_b3ad6c46:src_a6768ea282169992](source_evidence.md#aiter_b3ad6c46-src_a6768ea282169992) — [aiter/ops/flydsl/mla_reduce_kernels.py:112-243](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/mla_reduce_kernels.py#L112-L243).
 - [aiter_b3ad6c46:src_6e49a7e29550a915](source_evidence.md#aiter_b3ad6c46-src_6e49a7e29550a915) — [aiter/ops/flydsl/mla_reduce_kernels.py:98-109](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/mla_reduce_kernels.py#L98-L109).
+
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #3901](https://github.com/ROCm/aiter/pull/3901) · merged · beneficial** — The complete FlyDSL mapped-LSE reducer has reported graph-replay and serving gains; the partial layout and normalization contract remain mandatory.
+  Conditions: Production gate is gfx942 one-token MLA decode with H=16,Dv=512; FP32 partial O/LSE and mapped BF16/FP16 output; opt in explicitly.
+  Direction: flydsl; implementation_contract, kv_partition
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: low** — The report concerns the implementation or validity change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [bc54a24e3f9f](https://github.com/ROCm/aiter/commit/bc54a24e3f9fe2d1d3afd76cb1c2159fad029a10) — Add an LSE-weighted FlyDSL MLA reducer with mapped FP32 partials, BF16/FP16 output and capture-safe split metadata.
+  [Result: low_tile_high_split](../../../_sources/aiter/pull_requests/3901.md#low_tile_high_split) — **operator**; The reported graph-replay comparison favors the complete FlyDSL reducer for this configuration.
+  **Effect confidence: medium** — Paired graph-replay latencies, repetitions, software and correctness are specified; measured source revisions and independent reproduction are absent; missing: baseline_commit, candidate_commit, independent_reproduction.
+  latency: 13.88 → 7.23 us (mean); normalized speedup 1.92×
+  [Result: multi_tile_low_split](../../../_sources/aiter/pull_requests/3901.md#multi_tile_low_split) — **operator**; The reported graph-replay comparison favors the complete FlyDSL reducer for this configuration.
+  **Effect confidence: medium** — Paired graph-replay latencies, repetitions, software and correctness are specified; measured source revisions and independent reproduction are absent; missing: baseline_commit, candidate_commit, independent_reproduction.
+  latency: 3.73 → 2.77 us (mean); normalized speedup 1.347×
+  [Result: serving](../../../_sources/aiter/pull_requests/3901.md#serving) — **end_to_end**; Across twelve serving shapes the PR reports +1.7% geometric-mean output throughput and 2.3% lower decode TPOT.
+  **Effect confidence: medium** — Serving conditions, aggregate definition and accuracy context are reported; exact measured source revisions are absent; missing: baseline_commit, candidate_commit, independent_reproduction.
+  throughput_increase: 1.7 percent (geomean); normalized speedup 1.017×
+  latency_reduction: 2.3 percent (geomean); normalized speedup 1.024×
 
 #### Background
 

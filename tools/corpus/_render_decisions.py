@@ -42,12 +42,12 @@ PERFORMANCE_AXES = os.path.join(HERE, "performance_axes", "gemm.yaml")
 DOC = os.path.join(HERE, "gemm_decisions.md")
 TRITON_DOC = os.path.join(HERE, "gemm_triton_seeds.md")
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 REQUIRED = {
     "id", "type", "axes", "match", "question", "evidence_level", "status", "conditions",
     "actions", "alternatives", "why", "source_evidence", "measurement_evidence", "limitations",
 }
-OPTIONAL = {"solutions", "references", "shipped_evidence", "experience"}
+OPTIONAL = {"solutions", "references", "shipped_evidence", "experience", "upstream_review"}
 LEVELS = {"source_observed", "reported_experience"}
 CARD_TYPES = {"semantic", "constraint", "performance_candidate"}
 # Within a step, what must hold is read before what to try.

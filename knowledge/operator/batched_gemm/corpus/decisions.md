@@ -12,10 +12,10 @@ Source observations identify implementation precedents and constraints; they do 
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [batched-mxfp8-scale-layout](#batched-mxfp8-scale-layout) | constraint | Which batch and scale layouts does the MXFP8 BMM wrapper accept? |
-| [batched-mxfp8-fallback-configuration](#batched-mxfp8-fallback-configuration) | performance_candidate | How can batched GEMM tile, buffering and split choices be seeded legally? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [batched-mxfp8-scale-layout](#batched-mxfp8-scale-layout) | constraint | reviewed | Which batch and scale layouts does the MXFP8 BMM wrapper accept? |
+| [batched-mxfp8-fallback-configuration](#batched-mxfp8-fallback-configuration) | performance_candidate | reviewed | How can batched GEMM tile, buffering and split choices be seeded legally? |
 
 <a id="batched-mxfp8-scale-layout"></a>
 ### Which batch and scale layouts does the MXFP8 BMM wrapper accept?
@@ -51,6 +51,26 @@ Source observations identify implementation precedents and constraints; they do 
 
 - [aiter_b3ad6c46:src_0c6d9aed9bf8a1da](source_evidence.md#aiter_b3ad6c46-src_0c6d9aed9bf8a1da) — [aiter/ops/flydsl/batched_gemm_a8w8.py:56-78](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8.py#L56-L78).
 - [aiter_b3ad6c46:src_5fe68591fabd20e2](source_evidence.md#aiter_b3ad6c46-src_5fe68591fabd20e2) — [aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py:301-379](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py#L301-L379).
+
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #5896](https://github.com/ROCm/aiter/pull/5896) · merged · beneficial** — The shared MXFP8 implementation has reported tuned linear-GEMM gains; the PR gives no separate wo_a BMM speedup or ablation of this contract/heuristic.
+  Conditions: gfx950, e8m0 32x32 or 128x128 scales; keep the two tuned populations and their different baselines separate.
+  Direction: flydsl; runtime_contract, operand_layout
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [40d524b615af](https://github.com/ROCm/aiter/commit/40d524b615af873d18fc6d1c8f56502adcb58662) — Dispatch MXFP8 BMM by architecture, weight-scale block and activation-scale layout.
+  Change: [40d524b615af](https://github.com/ROCm/aiter/commit/40d524b615af873d18fc6d1c8f56502adcb58662) — Validate batched operand dimensions, contiguous storage, BF16 output and e8m0 scale geometry.
+  [Result: v4_block128](../../../_sources/aiter/pull_requests/5896.md#v4_block128) — **operator**; The upstream report gives a geometric-mean speedup for this tuned linear-GEMM population.
+  **Effect confidence: medium** — The report specifies the architecture, scale formats, comparison populations, alternate-baseline median protocol and correctness threshold; measured revisions and independent reproduction are missing; missing: software, baseline_commit, candidate_commit, independent_reproduction.
+  speedup: 1.3 x (geomean)
+  [Result: v41_group32](../../../_sources/aiter/pull_requests/5896.md#v41_group32) — **operator**; The upstream report gives a geometric-mean speedup for this tuned linear-GEMM population.
+  **Effect confidence: medium** — The report specifies the architecture, scale formats, comparison populations, alternate-baseline median protocol and correctness threshold; measured revisions and independent reproduction are missing; missing: software, baseline_commit, candidate_commit, independent_reproduction.
+  speedup: 1.22 x (geomean)
 
 #### Background
 
@@ -95,6 +115,26 @@ Source observations identify implementation precedents and constraints; they do 
 - [aiter_b3ad6c46:src_48ce71b95815ba5a](source_evidence.md#aiter_b3ad6c46-src_48ce71b95815ba5a) — [aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py:166-200](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py#L166-L200).
 - [aiter_b3ad6c46:src_4036c46474899d75](source_evidence.md#aiter_b3ad6c46-src_4036c46474899d75) — [aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py:131-150](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py#L131-L150).
 - [aiter_b3ad6c46:src_0d0df7919d9edf67](source_evidence.md#aiter_b3ad6c46-src_0d0df7919d9edf67) — [aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py:153-162](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/batched_gemm_a8w8_gfx950.py#L153-L162).
+
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #5896](https://github.com/ROCm/aiter/pull/5896) · merged · beneficial** — The shared MXFP8 implementation has reported tuned linear-GEMM gains; the PR gives no separate wo_a BMM speedup or ablation of this contract/heuristic.
+  Conditions: gfx950, e8m0 32x32 or 128x128 scales; keep the two tuned populations and their different baselines separate.
+  Direction: flydsl; workgroup_tile, work_partition, pipeline_schedule
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [40d524b615af](https://github.com/ROCm/aiter/commit/40d524b615af873d18fc6d1c8f56502adcb58662) — Use the kernel legality checker for every fallback configuration.
+  Change: [40d524b615af](https://github.com/ROCm/aiter/commit/40d524b615af873d18fc6d1c8f56502adcb58662) — Choose legal power-of-two splits around the 256-workgroup fallback target, excluding direct-B splitting.
+  [Result: v4_block128](../../../_sources/aiter/pull_requests/5896.md#v4_block128) — **operator**; The upstream report gives a geometric-mean speedup for this tuned linear-GEMM population.
+  **Effect confidence: medium** — The report specifies the architecture, scale formats, comparison populations, alternate-baseline median protocol and correctness threshold; measured revisions and independent reproduction are missing; missing: software, baseline_commit, candidate_commit, independent_reproduction.
+  speedup: 1.3 x (geomean)
+  [Result: v41_group32](../../../_sources/aiter/pull_requests/5896.md#v41_group32) — **operator**; The upstream report gives a geometric-mean speedup for this tuned linear-GEMM population.
+  **Effect confidence: medium** — The report specifies the architecture, scale formats, comparison populations, alternate-baseline median protocol and correctness threshold; measured revisions and independent reproduction are missing; missing: software, baseline_commit, candidate_commit, independent_reproduction.
+  speedup: 1.22 x (geomean)
 
 #### Background
 

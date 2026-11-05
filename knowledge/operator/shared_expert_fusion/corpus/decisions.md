@@ -18,10 +18,10 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [moe-shared-expert-readiness](#moe-shared-expert-readiness) | constraint | When may a fused collective consume the shared-expert partial? |
-| [shared-expert-padded-partial-layout](#shared-expert-padded-partial-layout) | constraint | How is a shared-expert partial adapted to the communication runner&#x27;s row layout? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [moe-shared-expert-readiness](#moe-shared-expert-readiness) | constraint | reviewed | When may a fused collective consume the shared-expert partial? |
+| [shared-expert-padded-partial-layout](#shared-expert-padded-partial-layout) | constraint | reviewed | How is a shared-expert partial adapted to the communication runner&#x27;s row layout? |
 
 <a id="moe-shared-expert-readiness"></a>
 ### When may a fused collective consume the shared-expert partial?
@@ -56,6 +56,49 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_655dabf7c3f76085](source_evidence.md#aiter_b3ad6c46-src_655dabf7c3f76085) — [aiter/ops/flydsl/comm_fused_moe_host.py:1206-1213](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/comm_fused_moe_host.py#L1206-L1213).
+
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:24:54.151357+00:00.
+
+- **[PR #5907](https://github.com/ROCm/aiter/pull/5907) · merged · mixed** — PR #5907 adds shared-partial readiness and layout contracts in a wider comm-fused runtime; operator and DPA serving gains remain bundle results with family-specific numerical and reuse constraints.
+  Conditions: gfx950 TP8 reported profile; BF16 shared partials, real local rows versus padded capacity, per-family collective semantics and consistent cross-rank reuse synchronization.
+  Direction: flydsl; shared_expert, communication, combine
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [825a0ce1a0df](https://github.com/ROCm/aiter/commit/825a0ce1a0df91e66e4fa9faa2a14a2473199936) — Add a once-only shared-producer callback before copying or consuming shared partials in the Mega runner.
+  [Result: mega_m1](../../../_sources/aiter/pull_requests/5907.md#mega_m1) — **operator**; The reported complete Stage2/collective/shared-add comparison improves latency for this family and token bucket.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, complete_measured_input_dtype, independent_reproduction.
+  latency: 20.6734 → 14.4418 us (single_case); normalized speedup 1.431×
+  [Result: direct_m512](../../../_sources/aiter/pull_requests/5907.md#direct_m512) — **operator**; The reported complete Stage2/collective/shared-add comparison improves latency for this family and token bucket.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: baseline_commit, candidate_commit, complete_measured_input_dtype, independent_reproduction.
+  latency: 137.325 → 134.492 us (mean); normalized speedup 1.021×
+  [Result: window_rs_m4096](../../../_sources/aiter/pull_requests/5907.md#window_rs_m4096) — **operator**; The reported complete Stage2/collective/shared-add comparison improves latency for this family and token bucket.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, complete_measured_input_dtype, independent_reproduction.
+  latency: 393.784 → 317.301 us (single_case); normalized speedup 1.241×
+  [Result: window_ar_m4096](../../../_sources/aiter/pull_requests/5907.md#window_ar_m4096) — **operator**; The reported complete Stage2/collective/shared-add comparison improves latency for this family and token bucket.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: baseline_commit, candidate_commit, complete_measured_input_dtype, independent_reproduction.
+  latency: 499.621 → 352.372 us (single_case); normalized speedup 1.418×
+  [Result: dpa_c64](../../../_sources/aiter/pull_requests/5907.md#dpa_c64) — **end_to_end**; The downstream DPA serving comparison reports increased total-token throughput with the comm-fused runtime.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, independent_reproduction.
+  throughput_increase: 6.39 percent (unspecified); normalized speedup 1.064×
+  [Result: dpa_c128](../../../_sources/aiter/pull_requests/5907.md#dpa_c128) — **end_to_end**; The downstream DPA serving comparison reports increased total-token throughput with the comm-fused runtime.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, independent_reproduction.
+  throughput_increase: 7.69 percent (unspecified); normalized speedup 1.077×
+  [Result: dpa_c256](../../../_sources/aiter/pull_requests/5907.md#dpa_c256) — **end_to_end**; The downstream DPA serving comparison reports increased total-token throughput with the comm-fused runtime.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, independent_reproduction.
+  throughput_increase: 7.89 percent (unspecified); normalized speedup 1.079×
+  [Result: dpa_c512](../../../_sources/aiter/pull_requests/5907.md#dpa_c512) — **end_to_end**; The downstream DPA serving comparison reports increased total-token throughput with the comm-fused runtime.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, independent_reproduction.
+  throughput_increase: 7.62 percent (unspecified); normalized speedup 1.076×
+  [Result: dpa_c1024](../../../_sources/aiter/pull_requests/5907.md#dpa_c1024) — **end_to_end**; The downstream DPA serving comparison reports increased total-token throughput with the comm-fused runtime.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, independent_reproduction.
+  throughput_increase: 10.18 percent (unspecified); normalized speedup 1.102×
+  [Result: reuse_synchronization_contract](../../../_sources/aiter/pull_requests/5907.md#reuse_synchronization_contract) — **operator**; Review identified a peer-read/overwrite hazard. The follow-up describes a pre-overwrite barrier for internal protection, a caller-provided collective proof for external protection, and wrap-safe epoch waits.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, dtype, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  Effect: **implementation or correctness constraint**; no speedup is assigned.
 
 #### Background
 
@@ -101,6 +144,49 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_ca185a9d80571fcd](source_evidence.md#aiter_b3ad6c46-src_ca185a9d80571fcd) — [aiter/ops/flydsl/comm_fused_moe_host.py:774-801](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/comm_fused_moe_host.py#L774-L801).
 - [aiter_b3ad6c46:src_b4f6dd82b97d2c6c](source_evidence.md#aiter_b3ad6c46-src_b4f6dd82b97d2c6c) — [aiter/ops/flydsl/comm_fused_moe_host.py:1064-1078](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/comm_fused_moe_host.py#L1064-L1078).
+
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:24:54.151357+00:00.
+
+- **[PR #5907](https://github.com/ROCm/aiter/pull/5907) · merged · mixed** — PR #5907 adds shared-partial readiness and layout contracts in a wider comm-fused runtime; operator and DPA serving gains remain bundle results with family-specific numerical and reuse constraints.
+  Conditions: gfx950 TP8 reported profile; BF16 shared partials, real local rows versus padded capacity, per-family collective semantics and consistent cross-rank reuse synchronization.
+  Direction: flydsl; shared_expert, communication, combine
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [825a0ce1a0df](https://github.com/ROCm/aiter/commit/825a0ce1a0df91e66e4fa9faa2a14a2473199936) — Replace implicit shared-output staging with validated BF16 layouts and a separate pad/zero-tail path for runtime buckets.
+  [Result: mega_m1](../../../_sources/aiter/pull_requests/5907.md#mega_m1) — **operator**; The reported complete Stage2/collective/shared-add comparison improves latency for this family and token bucket.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, complete_measured_input_dtype, independent_reproduction.
+  latency: 20.6734 → 14.4418 us (single_case); normalized speedup 1.431×
+  [Result: direct_m512](../../../_sources/aiter/pull_requests/5907.md#direct_m512) — **operator**; The reported complete Stage2/collective/shared-add comparison improves latency for this family and token bucket.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: baseline_commit, candidate_commit, complete_measured_input_dtype, independent_reproduction.
+  latency: 137.325 → 134.492 us (mean); normalized speedup 1.021×
+  [Result: window_rs_m4096](../../../_sources/aiter/pull_requests/5907.md#window_rs_m4096) — **operator**; The reported complete Stage2/collective/shared-add comparison improves latency for this family and token bucket.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, complete_measured_input_dtype, independent_reproduction.
+  latency: 393.784 → 317.301 us (single_case); normalized speedup 1.241×
+  [Result: window_ar_m4096](../../../_sources/aiter/pull_requests/5907.md#window_ar_m4096) — **operator**; The reported complete Stage2/collective/shared-add comparison improves latency for this family and token bucket.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: baseline_commit, candidate_commit, complete_measured_input_dtype, independent_reproduction.
+  latency: 499.621 → 352.372 us (single_case); normalized speedup 1.418×
+  [Result: dpa_c64](../../../_sources/aiter/pull_requests/5907.md#dpa_c64) — **end_to_end**; The downstream DPA serving comparison reports increased total-token throughput with the comm-fused runtime.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, independent_reproduction.
+  throughput_increase: 6.39 percent (unspecified); normalized speedup 1.064×
+  [Result: dpa_c128](../../../_sources/aiter/pull_requests/5907.md#dpa_c128) — **end_to_end**; The downstream DPA serving comparison reports increased total-token throughput with the comm-fused runtime.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, independent_reproduction.
+  throughput_increase: 7.69 percent (unspecified); normalized speedup 1.077×
+  [Result: dpa_c256](../../../_sources/aiter/pull_requests/5907.md#dpa_c256) — **end_to_end**; The downstream DPA serving comparison reports increased total-token throughput with the comm-fused runtime.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, independent_reproduction.
+  throughput_increase: 7.89 percent (unspecified); normalized speedup 1.079×
+  [Result: dpa_c512](../../../_sources/aiter/pull_requests/5907.md#dpa_c512) — **end_to_end**; The downstream DPA serving comparison reports increased total-token throughput with the comm-fused runtime.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, independent_reproduction.
+  throughput_increase: 7.62 percent (unspecified); normalized speedup 1.076×
+  [Result: dpa_c1024](../../../_sources/aiter/pull_requests/5907.md#dpa_c1024) — **end_to_end**; The downstream DPA serving comparison reports increased total-token throughput with the comm-fused runtime.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, baseline_commit, candidate_commit, independent_reproduction.
+  throughput_increase: 10.18 percent (unspecified); normalized speedup 1.102×
+  [Result: reuse_synchronization_contract](../../../_sources/aiter/pull_requests/5907.md#reuse_synchronization_contract) — **operator**; Review identified a peer-read/overwrite hazard. The follow-up describes a pre-overwrite barrier for internal protection, a caller-provided collective proof for external protection, and wrap-safe epoch waits.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, dtype, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  Effect: **implementation or correctness constraint**; no speedup is assigned.
 
 #### Background
 

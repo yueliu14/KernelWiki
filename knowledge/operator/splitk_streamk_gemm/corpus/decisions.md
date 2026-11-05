@@ -20,11 +20,11 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [gemm-split-k-when-grid-underfills](#gemm-split-k-when-grid-underfills) | performance_candidate | When does a GEMM case need split-K to fill the machine, and what does choosing it commit the rest of the kernel to? |
-| [flydsl-splitk-hot-loop-schedule-bundle](#flydsl-splitk-hot-loop-schedule-bundle) | performance_candidate | What explicit instruction-order bundle can seed a hand-scheduled FlyDSL split-K GEMM hot loop? |
-| [flydsl-splitk-reduction-contract](#flydsl-splitk-reduction-contract) | constraint | How does the FlyDSL split-K HGEMM combine partial results, and what does that impose on the launcher? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [gemm-split-k-when-grid-underfills](#gemm-split-k-when-grid-underfills) | performance_candidate | reviewed | When does a GEMM case need split-K to fill the machine, and what does choosing it commit the rest of the kernel to? |
+| [flydsl-splitk-hot-loop-schedule-bundle](#flydsl-splitk-hot-loop-schedule-bundle) | performance_candidate | reviewed | What explicit instruction-order bundle can seed a hand-scheduled FlyDSL split-K GEMM hot loop? |
+| [flydsl-splitk-reduction-contract](#flydsl-splitk-reduction-contract) | constraint | reviewed | How does the FlyDSL split-K HGEMM combine partial results, and what does that impose on the launcher? |
 
 <a id="gemm-split-k-when-grid-underfills"></a>
 ### When does a GEMM case need split-K to fill the machine, and what does choosing it commit the rest of the kernel to?
@@ -83,6 +83,23 @@ A required trait must be established for the actual design before the card appli
 - Shipped selection: [aiter_a6bb4993:cfg_d2642e1347a53ea1](../../dense_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_d2642e1347a53ea1); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:cfg_c23460f537b313ac](../../dense_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_c23460f537b313ac); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:cfg_da4a49e152c50056](../../dense_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_da4a49e152c50056); no measurement is inferred.
+
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #2536](https://github.com/ROCm/aiter/pull/2536) · merged · mixed** — PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results; no independent gain for this direction is established.
+  Conditions: Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later pinned configuration surface.
+  Direction: flydsl; work_partition, workgroup_tile
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [fdc40a06926e](https://github.com/ROCm/aiter/commit/fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd) — Register the original HGEMM tile, split-K, stage and data-movement configuration product; later snapshots extend it.
+  Change: [fdc40a06926e](https://github.com/ROCm/aiter/commit/fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd) — Require K divisibility by split count and the per-split K tile before compilation.
+  [Result: kimi_report](../../../_sources/aiter/pull_requests/2536.md#kimi_report) — **end_to_end**; The PR supplies a Kimi-2 serving performance image with higher output throughput across displayed rows and mixed mean TTFT changes; image values are not encoded as metrics. The change bundles split-K GEMM with tuned configurations.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, dtype, software, baseline, baseline_commit, candidate_commit, protocol, image_metric_transcription, performance_baseline_identity, performance_topology, independent_reproduction.
+  Quantitative effect: **not encoded here**; the qualitative report and its limits remain recorded.
 
 #### Reported experience
 
@@ -156,6 +173,22 @@ Raw run artifacts are not published here. Historical reports have not been repro
 - [aiter_a6bb4993:src_0f18d7f50ce33cbb](source_evidence.md#aiter_a6bb4993-src_0f18d7f50ce33cbb) — [aiter/ops/flydsl/kernels/splitk_hgemm.py:702](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/splitk_hgemm.py#L702).
 - [aiter_a6bb4993:src_dca1b81d9d2b2edf](source_evidence.md#aiter_a6bb4993-src_dca1b81d9d2b2edf) — [aiter/ops/flydsl/kernels/splitk_hgemm.py:703](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/splitk_hgemm.py#L703).
 
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #2536](https://github.com/ROCm/aiter/pull/2536) · merged · mixed** — PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results; no independent gain for this direction is established.
+  Conditions: Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later pinned configuration surface.
+  Direction: flydsl; pipeline_schedule
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [fdc40a06926e](https://github.com/ROCm/aiter/commit/fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd) — Introduce a tile-derived DS-read, VMEM, MFMA and DS-write scheduling bundle.
+  [Result: kimi_report](../../../_sources/aiter/pull_requests/2536.md#kimi_report) — **end_to_end**; The PR supplies a Kimi-2 serving performance image with higher output throughput across displayed rows and mixed mean TTFT changes; image values are not encoded as metrics. The change bundles split-K GEMM with tuned configurations.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, dtype, software, baseline, baseline_commit, candidate_commit, protocol, image_metric_transcription, performance_baseline_identity, performance_topology, independent_reproduction.
+  Quantitative effect: **not encoded here**; the qualitative report and its limits remain recorded.
+
 #### Background
 
 - [knowledge/general/optimization/mfma_scheduling.md](../../../general/optimization/mfma_scheduling.md)
@@ -227,6 +260,35 @@ Raw run artifacts are not published here. Historical reports have not been repro
 - [aiter_a6bb4993:src_67a72909c71307d1](source_evidence.md#aiter_a6bb4993-src_67a72909c71307d1) — [aiter/ops/flydsl/kernels/splitk_hgemm.py:24](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/splitk_hgemm.py#L24).
 - [aiter_a6bb4993:src_217562a4a9b879dc](source_evidence.md#aiter_a6bb4993-src_217562a4a9b879dc) — [aiter/ops/flydsl/test_flydsl_splitk_hgemm.py:85](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/test_flydsl_splitk_hgemm.py#L85).
 - [aiter_a6bb4993:src_636fbc44252bb90e](source_evidence.md#aiter_a6bb4993-src_636fbc44252bb90e) — [aiter/ops/flydsl/test_flydsl_splitk_hgemm.py:86](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/test_flydsl_splitk_hgemm.py#L86).
+
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #2536](https://github.com/ROCm/aiter/pull/2536) · merged · mixed** — PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results; no independent gain for this direction is established.
+  Conditions: Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later pinned configuration surface.
+  Direction: flydsl; work_partition, epilogue, runtime_contract
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [fdc40a06926e](https://github.com/ROCm/aiter/commit/fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd) — Initialize the split-K output from split zero before the inter-split synchronization.
+  Change: [fdc40a06926e](https://github.com/ROCm/aiter/commit/fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd) — Combine converted split partials with agent-scope vector atomic additions.
+  [Result: kimi_report](../../../_sources/aiter/pull_requests/2536.md#kimi_report) — **end_to_end**; The PR supplies a Kimi-2 serving performance image with higher output throughput across displayed rows and mixed mean TTFT changes; image values are not encoded as metrics. The change bundles split-K GEMM with tuned configurations.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, dtype, software, baseline, baseline_commit, candidate_commit, protocol, image_metric_transcription, performance_baseline_identity, performance_topology, independent_reproduction.
+  Quantitative effect: **not encoded here**; the qualitative report and its limits remain recorded.
+
+- **[PR #2567](https://github.com/ROCm/aiter/pull/2567) · merged · constraint** — The original split-K combine required a tail-row coverage fix; changing split count is subject to the complete output coverage and numerical contract.
+  Conditions: tile_m=48 and split_k&gt;1; include local tile bounds as well as runtime M bounds.
+  Direction: flydsl; work_partition, epilogue, runtime_contract
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [0a9acf4bc16d](https://github.com/ROCm/aiter/commit/0a9acf4bc16dabf27ed4d9568404b9a14054682b) — Replace floor division of C-vector work with ceil division so tile_m=48 tail rows are covered.
+  Change: [0a9acf4bc16d](https://github.com/ROCm/aiter/commit/0a9acf4bc16dabf27ed4d9568404b9a14054682b) — Guard local tile rows and runtime M before zeroing the split-K output.
+  [Result: tail_row_correctness](../../../_sources/aiter/pull_requests/2567.md#tail_row_correctness) — **operator**; The author reports that ceil-div C-tile coverage and bounds checks remove tile_m=48 split-K regressions and NaNs observed under Kimi-2 concurrency 65.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, software, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  Effect: **implementation or correctness constraint**; no speedup is assigned.
 
 #### Background
 

@@ -16,14 +16,43 @@ knowledge/operator/<operator>/corpus/
 
 The [operator catalog](catalog.yaml) and this generated navigation page live alongside the operator directories. The shared production and validation tools live under [tools/corpus](../../tools/corpus/README.md).
 
-**23 operators · 107 canonical cards · 4481 snapshot-qualified source observations · 359 shipped groups.** Shared references are not counted as additional knowledge records.
+**23 operators · 109 canonical cards · 4481 snapshot-qualified source observations · 359 shipped groups.** Shared references are not counted as additional knowledge records.
+
+## Upstream PR review coverage
+
+22 canonical PR reports. reviewed: 49, unreviewed: 0, unresolved: 37, blocked: 23.
+
+Counts describe review coverage, not successful optimizations. Reports with missing measurements remain explicit; shared references do not duplicate results.
+
+- [AITER PR #1909 (closed)](../_sources/aiter/pull_requests/1909.md)
+- [AITER PR #2536 (merged)](../_sources/aiter/pull_requests/2536.md)
+- [AITER PR #2546 (merged)](../_sources/aiter/pull_requests/2546.md)
+- [AITER PR #2567 (merged)](../_sources/aiter/pull_requests/2567.md)
+- [AITER PR #2581 (merged)](../_sources/aiter/pull_requests/2581.md)
+- [AITER PR #2726 (merged)](../_sources/aiter/pull_requests/2726.md)
+- [AITER PR #2732 (merged)](../_sources/aiter/pull_requests/2732.md)
+- [AITER PR #2775 (merged)](../_sources/aiter/pull_requests/2775.md)
+- [AITER PR #3231 (merged)](../_sources/aiter/pull_requests/3231.md)
+- [AITER PR #3266 (merged)](../_sources/aiter/pull_requests/3266.md)
+- [AITER PR #3357 (merged)](../_sources/aiter/pull_requests/3357.md)
+- [AITER PR #3460 (merged)](../_sources/aiter/pull_requests/3460.md)
+- [AITER PR #3851 (merged)](../_sources/aiter/pull_requests/3851.md)
+- [AITER PR #3901 (merged)](../_sources/aiter/pull_requests/3901.md)
+- [AITER PR #4538 (merged)](../_sources/aiter/pull_requests/4538.md)
+- [AITER PR #4761 (merged)](../_sources/aiter/pull_requests/4761.md)
+- [AITER PR #4907 (merged)](../_sources/aiter/pull_requests/4907.md)
+- [AITER PR #4963 (merged)](../_sources/aiter/pull_requests/4963.md)
+- [AITER PR #5123 (merged)](../_sources/aiter/pull_requests/5123.md)
+- [AITER PR #5693 (merged)](../_sources/aiter/pull_requests/5693.md)
+- [AITER PR #5896 (merged)](../_sources/aiter/pull_requests/5896.md)
+- [AITER PR #5907 (merged)](../_sources/aiter/pull_requests/5907.md)
 
 ## GEMM and projection fusions
 
 | operator | owned cards | shared cards | owned observations | reading |
 |---|---:|---:|---:|---|
 | [batched_gemm](batched_gemm/README.md) | 2 | 7 | 178 | [Decisions](batched_gemm/corpus/decisions.md) · [Evidence](batched_gemm/corpus/source_evidence.md) |
-| [dense_gemm](dense_gemm/README.md) | 18 | 14 | 303 | [Decisions](dense_gemm/corpus/decisions.md) · [Evidence](dense_gemm/corpus/source_evidence.md) |
+| [dense_gemm](dense_gemm/README.md) | 19 | 14 | 303 | [Decisions](dense_gemm/corpus/decisions.md) · [Evidence](dense_gemm/corpus/source_evidence.md) |
 | [gemm_epilogue_fused](gemm_epilogue_fused/README.md) | 4 | 26 | 304 | [Decisions](gemm_epilogue_fused/corpus/decisions.md) · [Evidence](gemm_epilogue_fused/corpus/source_evidence.md) |
 | [scaled_quant_gemm](scaled_quant_gemm/README.md) | 12 | 15 | 577 | [Decisions](scaled_quant_gemm/corpus/decisions.md) · [Evidence](scaled_quant_gemm/corpus/source_evidence.md) |
 | [skinny_gemv_decode](skinny_gemv_decode/README.md) | 2 | 18 | 143 | [Decisions](skinny_gemv_decode/corpus/decisions.md) · [Evidence](skinny_gemv_decode/corpus/source_evidence.md) |
@@ -34,7 +63,7 @@ The [operator catalog](catalog.yaml) and this generated navigation page live alo
 | operator | owned cards | shared cards | owned observations | reading |
 |---|---:|---:|---:|---|
 | [attention_decode_paged](attention_decode_paged/README.md) | 7 | 4 | 134 | [Decisions](attention_decode_paged/corpus/decisions.md) · [Evidence](attention_decode_paged/corpus/source_evidence.md) |
-| [attention_prefill_fmha](attention_prefill_fmha/README.md) | 3 | 1 | 64 | [Decisions](attention_prefill_fmha/corpus/decisions.md) · [Evidence](attention_prefill_fmha/corpus/source_evidence.md) |
+| [attention_prefill_fmha](attention_prefill_fmha/README.md) | 3 | 2 | 64 | [Decisions](attention_prefill_fmha/corpus/decisions.md) · [Evidence](attention_prefill_fmha/corpus/source_evidence.md) |
 | [chunked_prefill](chunked_prefill/README.md) | 1 | 2 | 25 | [Decisions](chunked_prefill/corpus/decisions.md) · [Evidence](chunked_prefill/corpus/source_evidence.md) |
 | [compressed_attention](compressed_attention/README.md) | 1 | 0 | 82 | [Decisions](compressed_attention/corpus/decisions.md) · [Evidence](compressed_attention/corpus/source_evidence.md) |
 | [context_parallel_attention](context_parallel_attention/README.md) | 1 | 1 | 64 | [Decisions](context_parallel_attention/corpus/decisions.md) · [Evidence](context_parallel_attention/corpus/source_evidence.md) |
@@ -52,7 +81,7 @@ The [operator catalog](catalog.yaml) and this generated navigation page live alo
 | [fused_moe_grouped_gemm](fused_moe_grouped_gemm/README.md) | 1 | 7 | 381 | [Decisions](fused_moe_grouped_gemm/corpus/decisions.md) · [Evidence](fused_moe_grouped_gemm/corpus/source_evidence.md) |
 | [grouped_gemm_moe](grouped_gemm_moe/README.md) | 8 | 17 | 553 | [Decisions](grouped_gemm_moe/corpus/decisions.md) · [Evidence](grouped_gemm_moe/corpus/source_evidence.md) |
 | [moe_dispatch_combine](moe_dispatch_combine/README.md) | 4 | 0 | 140 | [Decisions](moe_dispatch_combine/corpus/decisions.md) · [Evidence](moe_dispatch_combine/corpus/source_evidence.md) |
-| [moe_routing_topk](moe_routing_topk/README.md) | 3 | 0 | 84 | [Decisions](moe_routing_topk/corpus/decisions.md) · [Evidence](moe_routing_topk/corpus/source_evidence.md) |
+| [moe_routing_topk](moe_routing_topk/README.md) | 4 | 0 | 84 | [Decisions](moe_routing_topk/corpus/decisions.md) · [Evidence](moe_routing_topk/corpus/source_evidence.md) |
 | [shared_expert_fusion](shared_expert_fusion/README.md) | 2 | 0 | 94 | [Decisions](shared_expert_fusion/corpus/decisions.md) · [Evidence](shared_expert_fusion/corpus/source_evidence.md) |
 
 ## Attention index scoring and selection
@@ -69,7 +98,7 @@ The [operator catalog](catalog.yaml) and this generated navigation page live alo
 
 - Each decision card and each source observation has one owning operator. Other operators use IDs and links; they do not copy the body.
 - Source/config references include a snapshot: `aiter_b3ad6c46:src_…` or `aiter_a6bb4993:cfg_…`. Existing content-ID suffixes are preserved; a path move does not change identity.
-- The catalog uses schema version 3 and repository-relative paths. Decisions can carry source observations and scoped historical experience summaries.
+- The catalog uses schema version 3 and repository-relative paths. Decision schema 6 adds PR review status and scoped upstream reports alongside source observations and historical experience.
 - Historical reports are not reproduced validation. Each experience entry states its verification status; private runs and raw measurement artifacts stay outside the public repository.
 - Operator membership and source availability do not certify complete backend coverage, runtime engagement or a measured speedup.
 - Correctness-test links are pinned sources, not test results. No new GPU performance measurements or disassembly results are included.

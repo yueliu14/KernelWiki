@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: mla_attention
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -23,6 +23,11 @@ cards:
   question: When splitting KV work, what information must the merge preserve?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - A long KV sequence leaves too few independent query/head workgroups, or partial attention outputs already
     exist.
@@ -72,6 +77,47 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/reproduce-the-golden-s-own-rounding-before-costing-a-kv-reas-attention-decode-gfx950-decode.md
       artifacts: not_published
       verification: not_reproduced
+  - outcome: beneficial
+    conditions:
+    - Production gate is gfx942 one-token MLA decode with H=16,Dv=512; FP32 partial O/LSE and mapped BF16/FP16
+      output; opt in explicitly.
+    summary: The complete FlyDSL mapped-LSE reducer has reported graph-replay and serving gains; the partial
+      layout and normalization contract remain mandatory.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_3901
+      change_refs:
+      - reduce_abi
+      result_refs:
+      - low_tile_high_split
+      - multi_tile_low_split
+      - serving
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - kv_partition
+          - numerical_contract
+          backend: flydsl
 - id: attention-mla-reduce-abi
   type: constraint
   axes:
@@ -86,6 +132,11 @@ cards:
   question: Which tensor and mapping invariants does the FlyDSL MLA reducer require?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - The selected path calls flydsl_mla_reduce_v1 with mapped partial outputs.
   actions:
@@ -111,5 +162,47 @@ cards:
   references:
   - knowledge/operator/mla_attention/README.md
   - knowledge/operator/attention_decode_paged/README.md
+  experience:
+  - outcome: beneficial
+    conditions:
+    - Production gate is gfx942 one-token MLA decode with H=16,Dv=512; FP32 partial O/LSE and mapped BF16/FP16
+      output; opt in explicitly.
+    summary: The complete FlyDSL mapped-LSE reducer has reported graph-replay and serving gains; the partial
+      layout and normalization contract remain mandatory.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_3901
+      change_refs:
+      - reduce_abi
+      result_refs:
+      - low_tile_high_split
+      - multi_tile_low_split
+      - serving
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - implementation_contract
+          - kv_partition
+          backend: flydsl
 shared_cards:
 - attention-paged-kv-addressing

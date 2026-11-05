@@ -1,0 +1,362 @@
+schema_version: 1
+id: aiter_pr_4538
+number: 4538
+repository: https://github.com/ROCm/aiter
+title: '[FlyDSL] gfx950 FP8 MQA logits indexer kernel'
+state: merged
+base_commit: efc4b67484a4a9911dd45e7e9500520903e8e021
+head_commit: 975473a27df45ccced02d122d2bbce910d261e4b
+merge_commit: 9402ade66cbd8282270b1daee3b28ab6478d9485
+captured_at: '2026-11-04T15:43:37.756683+00:00'
+updated_at: '2026-09-21T12:04:09Z'
+sources:
+- id: body
+  url: https://github.com/ROCm/aiter/pull/4538
+  excerpt: "## Motivation\n\nThis PR introduces a FlyDSL kernel for computing DeepSeek-V4 sparse attention\
+    \ lightning indexer on `gfx950`. The new kernel is drop-in replacement for the existing Triton/Gluon kernel.\
+    \ For the DSv4 prefill shapes it generally faster than the existing Triton/Gluon kernel. The `gfx942` version\
+    \ was introduced in an earlier PR #3913.\n\n## Technical Details\n\nThere are two alternative implementation\
+    \ on `gfx950`\n\n- Direct load kernel similar `gfx942`: Data is streamed directly from DRAM to registers.\n\
+    - LDS staged kernel where KV slices are stored on LDS and shared among all wavefronts where each wavefront\
+    \ computes it's own disjoint set of query rows. Q fragments and per-row weights are preloaded into registers\
+    \ once per block (similar to the direct load kernel. The LDS staging uses gfx950 specific async global\
+    \ → LDS DMA which writes directly to LDS without passing through VGPRs. XOR swizzle is used for LDS writes\
+    \ and reads to reduce the rate of bank conflicts.\n\nThe LDS staged instance can have two or more LDS buffer\
+    \ combined with one or more prefetch stages. Allocation of one LDS buffer more than the prefetch depth\
+    \ (`PD`) enables to reduce the number of required barriers by one (barriers are required to ensure data\
+    \ is ready before running MFMA on it). In practice, the most performant combination is 3 LDS buffers with\
+    \ `PD=2` (only one barrier required).\n\nThere is instance auto-selection which selects the best kernel\
+    \ for a given shape. However, similarly to the existing implementation, the auto-selected instance can\
+    \ be overridden with an environment variable. \n\nThere's also one common optimization for both `gfx942`\
+    \ and `gfx950`: when `clean_logits=True`, the baseline implementation uses `torch.fill` to initialize the\
+    \ logits matrix with `-inf` values. Since half of the values are subsequently overwritten by the logits\
+    \ kernel, we have fused the \"clean logits\" initialization step into the logits kernel. This provides\
+    \ performance boost for small sequence lengths.\n\n## Test Plan\n\nAll tests added in PR #3913 are now\
+    \ enabled for `gfx950`. For performance, benchmarked the same DSv4 shapes in PR #3913\n\n## Test Result\n\
+    \nAll unit tests pass on both `gfx942` and `gfx950` (note: they are not enabled as part of the CI workflow)\n\
+    \nFor `gfx950`, the new kernel is compared against the existing Triton/Gluon kernel\n\nShape | Triton TFLOPs\
+    \ | FlyDSL TFLOPs | FlyDSL instance | Verification | Speedup\n-- | -- | -- | -- | -- | --\nbs1 4096x4096\
+    \ H64 D128 [fn/fn] | 1317.8 | 1612.9 | mfma32x32x64_bkv64_r1_w2_lds3 | PASS (rel=1.0e-02) | x1.22\nbs1\
+    \ 8192x8192 H64 D128 [fn/fn] | 1594.5 | 1949.3 | mfma32x32x64_bkv64_r2_w2_lds3 | PASS (rel=1.0e-02) | x1.22\n\
+    bs1 128x32768 H64 D128 [fn/fn] | 149.3 | 1584.4 | mfma32x32x64_bkv64_r2_w2_lds3 | PASS (rel=1.3e-02) |\
+    \ x10.61\nbs1 671x131072 H64 D128 [fn/fn] | 493.0 | 1598.5 | mfma32x32x64_bkv64_r2_w2_lds3 | PASS (rel=1.3e-02)\
+    \ | x3.24\n\nVerification is done against the existing Triton implementation. \n\nFor `gfx942`, the changes\
+    \ are compared against the baseline FlyDSL kernel\n\nShape (sq × skv) | Variant | Baseline µs | Fused clean\
+    \ logits µs | Δ% | Speedup\n-- | -- | -- | -- | -- | -- \n4096 × 4096 |  mfma_r2_w4 | 210.4 | 191.4 | −9.0%\
+    \ | 1.10×\n8192 × 8192 |  mfma_r2_w2 | 672.4 | 633.6 | −5.8% | 1.06×\n128 × 32768 |  mfma_r2_w4 | 114.0\
+    \ | 106.8 | −6.3% | 1.07×\n671 × 131072 | mfma_r2_w4 | 1899.4 | 1797.7 | −5.4% | 1.06×\n\nFor all cases\
+    \ the number of heads (H) is 64. Verification against the existing Triton kernel passes.\n\nA recent PR\
+    \ #4563 improved the Gluon kernel for the GLM -5 shapes where `H=32`. Here's a comparison of this FlyDSL\
+    \ results against the latest Gluon logits kernel the shapes are taken from PR #4563 \n\nISL=OSL | batch\
+    \ | rows | Triton (Gluon) | FlyDSL | speedup\n-- | -- | -- | -- | -- | --\n1,024 | 1 | 1,024 | 16.8 µs\
+    \ / 256 | 16.5 µs / 260 | 1.02x\n1,024 | 4 | 4,096 | 35.3 µs / 488 | 32.5 µs / 530 | 1.09x\n1,024 | 8 |\
+    \ 8,192 | 101.5 µs / 339 | 69.9 µs / 492 | 1.45x\n1,024 | 16 | 16,384 | 279.9 µs / 246 | 224.4 µs / 307\
+    \ | 1.25x\n2,048 | 1 | 2,048 | 27.7 µs / 621 | 25.6 µs / 671 | 1.08x\n2,048 | 2 | 4,096 | 46.0 µs / 748\
+    \ | 40.9 µs / 840 | 1.12x\n2,048 | 4 | 8,192 | 118.3 µs / 581 | 81.9 µs / 839 | 1.44x\n2,048 | 8 | 16,384\
+    \ | 311.5 µs / 441 | 273.5 µs / 503 | 1.14x\n4,096 | 1 | 4,096 | 68.2 µs / 1,008 | 54.0±3.2 µs / 1,273\
+    \ | 1.26x\n4,096 | 2 | 8,192 | 158.8 µs / 866 | 108.8 µs / 1,264 | 1.46x\n4,096 | 4 | 16,384 | 381.5 µs\
+    \ / 721 | 349.6 µs / 786 | 1.09x\n8,192 | 1 | 8,192 | 223.6 µs / 1,230 | 173.9 µs / 1,581 | 1.29x\n8,192\
+    \ | 2 | 16,384 | 517.8 µs / 1,062 | 461.7 µs / 1,191 | 1.12x\n  |   | geomean |   |   | 1.208x"
+  sha256: 3517d54608a9db6a27ba27c05780244bfd5dd9331f0d2de849fef2bbb51fa549
+  captured_at: '2026-11-04T15:43:37.756683+00:00'
+  updated_at: '2026-09-21T12:04:09Z'
+- id: later_comparison
+  url: https://github.com/ROCm/aiter/pull/4538#issuecomment-5697471418
+  excerpt: |-
+    @Dewei-Wang-sh, I added the DSv4 and GLM 5.2 shapes from #5216 and run the benchmarking script on MI355. This is what I got for Gluon/FlyDSL comparison
+
+    **clean_logits = False** (fair comparison)
+
+    | Model | Shape | Gluon µs | Gluon TF/s | FlyDSL µs | FlyDSL TF/s | Speedup | Change |
+    |---|---|---:|---:|---:|---:|---:|---:|
+    | DSv4 (64 h) | 1x4kx4k  | 100.1 | 1373 | 104.6 | 1314 | 0.957x | −4.5% |
+    | DSv4 (64 h) | 1x8kx8k  | 321.3 | 1711 | 333.2 | 1650 | 0.964x | −3.7% |
+    | DSv4 (64 h) | 2x8kx8k  | 661.5 | 1662 | 651.5 | 1688 | 1.015x | +1.5% |
+    | DSv4 (64 h) | 4x8kx8k  | 1383.2 | 1590 | 1283.1 | 1714 | 1.078x | +7.2% |
+    | DSv4 (64 h) | 1x8kx32k | 2359.3 | 1631 | 2385.1 | 1613 | 0.989x | −1.1% |
+    | DSv4 (64 h) | 2x8kx32k | 4647.9 | 1656 | 4591.1 | 1676 | 1.012x | +1.2% |
+    | GLM 5.2 (32 h) | 1x4kx4k  | 71.8 | 957 | 70.0 | 982 | 1.025x | +2.5% |
+    | GLM 5.2 (32 h) | 1x8kx8k  | 208.5 | 1319 | 189.6 | 1450 | 1.100x | +9.1% |
+    | GLM 5.2 (32 h) | 2x8kx8k  | 413.2 | 1331 | 365.7 | 1504 | 1.130x | +11.5% |
+    | GLM 5.2 (32 h) | 4x8kx8k  | 833.5 | 1319 | 743.8 | 1478 | 1.121x | +10.8% |
+    | GLM 5.2 (32 h) | 1x8kx32k | 1525.4 | 1261 | 1441.6 | 1335 | 1.058x | +5.5% |
+    | GLM 5.2 (32 h) | 2x8kx32k | 2933.9 | 1312 | 2725.4 | 1412 | 1.077x | +7.1% |
+    | | **geomean, all 12** | | | | | **1.042x** | **+4.1%** |
+    | | geomean, DSv4 | | | | | 1.002x | +0.2% |
+    | | geomean, GLM 5.2 | | | | | 1.084x | +7.8% |
+
+    **clean_logits = True** (FlyDSL has structural advantage because the pre-fill step is fused in the kernel)
+
+    | Model | Shape | Gluon µs | Gluon TF/s | FlyDSL µs | FlyDSL TF/s | Speedup | Change |
+    |---|---|---:|---:|---:|---:|---:|---:|
+    | DSv4 (64 h) | 1x4kx4k  | 112.4 | 1223 | 107.7 | 1277 | 1.044x | +4.2% |
+    | DSv4 (64 h) | 1x8kx8k  | 372.4 | 1476 | 353.6 | 1555 | 1.053x | +5.1% |
+    | DSv4 (64 h) | 2x8kx8k  | 843.6 | 1303 | 754.7 | 1457 | 1.118x | +10.5% |
+    | DSv4 (64 h) | 4x8kx8k  | 2043.4 | 1076 | 1942.1 | 1132 | 1.052x | +5.0% |
+    | DSv4 (64 h) | 1x8kx32k | 2577.0 | 1493 | 2440.6 | 1577 | 1.056x | +5.3% |
+    | DSv4 (64 h) | 2x8kx32k | 5490.4 | 1402 | 4911.8 | 1567 | 1.118x | +10.5% |
+    | GLM 5.2 (32 h) | 1x4kx4k  | 83.8 | 820 | 70.5 | 976 | 1.189x | +15.9% |
+    | GLM 5.2 (32 h) | 1x8kx8k  | 258.4 | 1064 | 213.0 | 1290 | 1.213x | +17.6% |
+    | GLM 5.2 (32 h) | 2x8kx8k  | 613.3 | 897 | 483.1 | 1138 | 1.269x | +21.2% |
+    | GLM 5.2 (32 h) | 4x8kx8k  | 1600.4 | 687 | 1279.7 | 859 | 1.251x | +20.0% |
+    | GLM 5.2 (32 h) | 1x8kx32k | 1787.3 | 1077 | 1547.1 | 1244 | 1.155x | +13.4% |
+    | GLM 5.2 (32 h) | 2x8kx32k | 3797.9 | 1013 | 3084.5 | 1248 | 1.231x | +18.8% |
+    | | **geomean, all 12** | | | | | **1.143x** | **+12.5%** |
+    | | geomean, DSv4 | | | | | 1.073x | +6.8% |
+    | | geomean, GLM 5.2 | | | | | 1.218x | +17.9% |
+
+    I could not reproduce the numbers from #5216 on this machine. Not sure if it is due to software versions or some missing tuning step. Here is the software I used
+
+    | Component | Version |
+    |---|---|
+    | ROCm | 7.2.2 |
+    | PyTorch | `2.10.0+rocm7.2.2.lw.git40d237bf` |
+    | Triton | `3.8.0+amd.rocm7.2.0.git111ff227` |
+    | FlyDSL | `0.3.2` |
+  sha256: 996e8cd8d9f5db320153d37d4c291fe646368e6618a470a35608fbabd51326c1
+  captured_at: '2026-11-04T15:43:37.756683+00:00'
+  updated_at: '2026-09-16T12:34:26Z'
+changes:
+- id: gfx950_registry
+  commit: 9402ade66cbd8282270b1daee3b28ab6478d9485
+  parent_commit: 28cbc38b00ec583d660758307c4b053347d4d209
+  file: aiter/ops/flydsl/fp8_mqa_logits_kernels.py
+  before: ''
+  after: |2-
+        # CDNA4 scaled MFMA atoms (K=128/64): gfx950-only, since those instructions
+        # require native FN operands and do not exist on gfx942.
+        _K64 = _MFMA32_K64
+        _K128 = _MFMA16_K128
+  summary: Introduce the gfx950 registry, including LDS-pipelined variants and shape-dependent selection.
+- id: fused_clean
+  commit: 9402ade66cbd8282270b1daee3b28ab6478d9485
+  parent_commit: 28cbc38b00ec583d660758307c4b053347d4d209
+  file: aiter/ops/flydsl/kernels/mqa_logits/fp8_mqa_logits.py
+  before: |2-
+        if clean_logits:
+            logits = torch.full(
+  after: |2-
+            # ---- Fused clean_logits prefill (must come after the tile loop) ----
+            if const_expr(clean_logits):
+                neg_inf = fx.Float32(float("-inf"))
+  summary: Move out-of-window negative-infinity initialization into the score kernel.
+- id: fp8_architecture_contract
+  commit: 9402ade66cbd8282270b1daee3b28ab6478d9485
+  parent_commit: 28cbc38b00ec583d660758307c4b053347d4d209
+  file: aiter/ops/flydsl/fp8_mqa_logits_kernels.py
+  before: ''
+  after: |2-
+        # The gfx942 fp8 MFMA reads operands as e4m3 FNUZ (bias 8). For an e4m3 FN
+        # operand (OCP, bias 7) the same byte encodes exactly 2x the FNUZ value (the
+        # only data byte that differs is FN -0 = 0x80, which is FNUZ NaN), so we pass
+        # the raw bytes through, let the kernel patch 0x80 -> +0, and undo the 2x per
+        # FN operand by scaling kv_scales -- ReLU is positive-homogeneous, so
+        # logits = sum_h ReLU(QK*scale)*w is preserved.
+        _fnuz = torch.float8_e4m3fnuz
+        _fn = torch.float8_e4m3fn
+        _arch = get_gfx()
+        if _arch == "gfx950":
+            # gfx950's scaled MFMA atoms (_MFMA16_K128 / _MFMA32_K64) require
+            # native FN operands and reject FNUZ outright.
+            assert (
+                Q.dtype == _fn and KV.dtype == _fn
+            ), f"gfx950 fp8_mqa_logits requires native e4m3fn Q/KV; got {Q.dtype}, {KV.dtype}"
+        else:
+            assert Q.dtype in (_fnuz, _fn) and KV.dtype in (
+                _fnuz,
+                _fn,
+            ), f"Q/KV must be e4m3 fp8 (fnuz or fn); got {Q.dtype}, {KV.dtype}"
+        # Only gfx942 needs that conversion; other fp8 archs read operands in their
+        # native dtype, so the FN->FNUZ recast there would corrupt them.
+        convert_q_fn = _arch == "gfx942" and Q.dtype != _fnuz
+        convert_kv_fn = _arch == "gfx942" and KV.dtype != _fnuz
+  summary: Require native e4m3fn on gfx950 and restrict FN/FNUZ conversion handling to gfx942 while preserving
+    weighted-ReLU score semantics.
+- id: score_wrapper_contract
+  commit: 9402ade66cbd8282270b1daee3b28ab6478d9485
+  parent_commit: 28cbc38b00ec583d660758307c4b053347d4d209
+  file: aiter/ops/flydsl/fp8_mqa_logits_kernels.py
+  before: ''
+  after: |2-
+        """FlyDSL gfx942/gfx950 FP8 MQA logits -- drop-in replacement for the Triton ``fp8_mqa_logits``.
+
+        Q:            [seq_len, NUM_HEADS, HEAD_SIZE], dtype float8
+        KV:           [seq_len_kv, HEAD_SIZE], dtype float8
+        kv_scales:    [seq_len_kv], dtype float32
+        weights:      [seq_len, NUM_HEADS], dtype float32
+        cu_starts:    [seq_len], dtype int32, per-row window start (inclusive)
+        cu_ends:      [seq_len], dtype int32, per-row window end (exclusive)
+        clean_logits: bool. If True, positions outside [cu_starts[i], cu_ends[i])
+                      in row i are written as -inf -- by the kernel itself, as part
+                      of the same launch; the output is never pre-filled. If False,
+                      the kernel skips those positions and the caller owns whatever
+                      is left there.
+  summary: Expose Q/KV, per-token scales, head weights and half-open row windows through the FlyDSL MQA score
+    wrapper.
+results:
+- id: gfx950_original
+  outcome: beneficial
+  summary: The original PR table reports a large improvement over its existing Triton/Gluon baseline for one
+    skinny prefill case.
+  source_refs:
+  - body
+  context:
+    hardware: null
+    gfx: gfx950
+    dtype: FP8 fn/fn
+    shape_layout: batch=1, Sq=128, Skv=32768, H=64, D=128
+    software: null
+    baseline: Existing Triton/Gluon kernel; revision unspecified
+    candidate: mfma32x32x64_bkv64_r2_w2_lds3
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: null
+    correctness: PASS, relative error 1.3e-02 against existing Triton implementation
+  metrics:
+  - kind: throughput
+    unit: TFLOP/s
+    statistic: single_case
+    before: 149.3
+    after: 1584.4
+    source:
+      ref: body
+      quote: bs1 128x32768 H64 D128 [fn/fn] | 149.3 | 1584.4 | mfma32x32x64_bkv64_r2_w2_lds3 | PASS (rel=1.3e-02)
+        | x10.61
+  confidence:
+    level: low
+    reasons:
+    - Upstream report has incomplete comparison context; no reproduction was performed.
+    missing_evidence:
+    - hardware
+    - software
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - independent_reproduction
+  limitations:
+  - Hardware SKU, software versions and timing protocol for the original table are unspecified.
+  - This compares complete implementations, not the isolated gain from LDS, swizzle or buffering.
+  - Later comments use a newer Gluon baseline and report much smaller gains and some regressions.
+- id: gfx942_clean
+  outcome: beneficial
+  summary: The original table reports a benefit from fused clean-logits initialization for the gfx942 implementation.
+  source_refs:
+  - body
+  context:
+    hardware: null
+    gfx: gfx942
+    dtype: FP8; exact Q/KV formats not specified in this table
+    shape_layout: Sq=4096, Skv=4096, H=64; mfma_r2_w4
+    software: null
+    baseline: FlyDSL with separate output initialization
+    candidate: FlyDSL with fused clean_logits initialization
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: null
+    correctness: Verification against existing Triton kernel passes
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: single_case
+    before: 210.4
+    after: 191.4
+    source:
+      ref: body
+      quote: 4096 × 4096 |  mfma_r2_w4 | 210.4 | 191.4 | −9.0% | 1.10×
+  confidence:
+    level: low
+    reasons:
+    - Upstream report has incomplete comparison context; no reproduction was performed.
+    missing_evidence:
+    - hardware
+    - software
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - independent_reproduction
+  limitations:
+  - Exact hardware SKU, measured commits, software and timing protocol are absent.
+  - Preserve the same valid-window and out-of-window output contract.
+- id: later_regression
+  outcome: regressed
+  summary: A later author comment reports FlyDSL slower than the newer Gluon baseline for a square DSv4 case.
+  source_refs:
+  - later_comparison
+  context:
+    hardware: AMD MI355 (as named in the comment)
+    gfx: gfx950
+    dtype: FP8; exact formats not specified in the comment
+    shape_layout: DSv4; batch=1, Sq=4096, Skv=4096, H=64; clean_logits=False
+    software: ROCm 7.2.2; PyTorch 2.10.0+rocm7.2.2.lw.git40d237bf; Triton 3.8.0+amd.rocm7.2.0.git111ff227;
+      FlyDSL 0.3.2
+    baseline: 'Newer Gluon comparison following #5048/#5216; exact revision not given'
+    candidate: FlyDSL PR implementation; exact revision not given
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: 'Author reports benchmarking script from #5216; both implementations use clean_logits=False;
+      repeats/statistic unspecified'
+    correctness: null
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: single_case
+    before: 100.1
+    after: 104.6
+    source:
+      ref: later_comparison
+      quote: '| DSv4 (64 h) | 1x4kx4k  | 100.1 | 1373 | 104.6 | 1314 | 0.957x | −4.5% |'
+  confidence:
+    level: low
+    reasons:
+    - Upstream report has incomplete comparison context; no reproduction was performed.
+    missing_evidence:
+    - baseline_commit
+    - candidate_commit
+    - correctness
+    - independent_reproduction
+  limitations:
+  - The comment does not state correctness results for this exact measurement.
+  - This does not invalidate the earlier different-baseline result; retain both contexts.
+- id: later_gain
+  outcome: beneficial
+  summary: The same later comparison reports a benefit on a GLM 5.2 case.
+  source_refs:
+  - later_comparison
+  context:
+    hardware: AMD MI355 (as named in the comment)
+    gfx: gfx950
+    dtype: FP8; exact formats not specified in the comment
+    shape_layout: GLM 5.2; batch=2, Sq=8192, Skv=8192, H=32; clean_logits=False
+    software: ROCm 7.2.2; PyTorch 2.10.0+rocm7.2.2.lw.git40d237bf; Triton 3.8.0+amd.rocm7.2.0.git111ff227;
+      FlyDSL 0.3.2
+    baseline: 'Newer Gluon comparison following #5048/#5216; exact revision not given'
+    candidate: FlyDSL PR implementation; exact revision not given
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: 'Author reports benchmarking script from #5216; both implementations use clean_logits=False;
+      repeats/statistic unspecified'
+    correctness: null
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: single_case
+    before: 413.2
+    after: 365.7
+    source:
+      ref: later_comparison
+      quote: '| GLM 5.2 (32 h) | 2x8kx8k  | 413.2 | 1331 | 365.7 | 1504 | 1.130x | +11.5% |'
+  confidence:
+    level: low
+    reasons:
+    - Upstream report has incomplete comparison context; no reproduction was performed.
+    missing_evidence:
+    - baseline_commit
+    - candidate_commit
+    - correctness
+    - independent_reproduction
+  limitations:
+  - The later table is mixed across shapes and cannot establish a universal backend ranking.

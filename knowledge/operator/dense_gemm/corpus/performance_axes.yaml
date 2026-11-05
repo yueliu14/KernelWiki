@@ -545,6 +545,15 @@ axes:
     max_delta:
     - max_delta_limit
 dependencies:
+- id: dot_accumulator_preserves_numerical_contract
+  axes:
+  - compute_instruction
+  - validation_contract
+  relation: end_to_end_contract
+  rule: Passing the existing accumulator to a dot operation is a compiler candidate; compare generated code,
+    correctness and latency under the same dtype, compiler and tolerance before assigning a benefit.
+  decision_refs:
+  - triton-dot-accumulator-form
 - id: lds_layout_is_bidirectional
   axes:
   - operand_layout

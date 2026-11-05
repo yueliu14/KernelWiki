@@ -12,9 +12,9 @@ Source observations identify implementation precedents and constraints; they do 
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [chunked-prefill-prefix-and-extension](#chunked-prefill-prefix-and-extension) | semantic | How are cached-prefix and current-chunk attention combined? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [chunked-prefill-prefix-and-extension](#chunked-prefill-prefix-and-extension) | semantic | blocked | How are cached-prefix and current-chunk attention combined? |
 
 <a id="chunked-prefill-prefix-and-extension"></a>
 ### How are cached-prefix and current-chunk attention combined?
@@ -49,6 +49,12 @@ Source observations identify implementation precedents and constraints; they do 
 #### Source evidence
 
 - [aiter_b3ad6c46:src_77fdd041c1e25e15](source_evidence.md#aiter_b3ad6c46-src_77fdd041c1e25e15) — [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:54-317](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L54-L317).
+
+#### Upstream PR effects
+
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #266 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 

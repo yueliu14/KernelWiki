@@ -83,6 +83,17 @@ It describes the multi-snapshot ownership and reference migration that makes thi
 - Keep historical experience scoped to its tested context. Source changes alone cannot promote it
   to internally validated, refresh its benchmark result or erase a contrary outcome.
 
+When the checkout supports decision schema 6, also read its `tools/corpus/upstream-evidence.md`.
+Trace the changed construct to its introducing/modifying commits and associated PRs; a corpus
+snapshot commit is not necessarily the optimization commit. Use `tools/corpus/collect_pr.py` to
+capture PR text, comments, reviews and commit/file inventories outside the public repository.
+Review the diff and comparison context before linking a PR to a card's specific backend/axes.
+Preserve merged versus closed/unmerged status, measured revisions versus PR metadata, separate
+operator and end-to-end results, and contrary reports. Record absent effects as `not_reported`;
+keep unresolved associations explicit. Do not distribute a bundle gain across individual axes.
+Importing an upstream report never establishes reproduction. Preserve the source/result IDs and
+capture timestamps of historically cited reports when adding new evidence.
+
 If a file moves or an implementation disappears, follow the call path and explain the resulting
 scope change. Old evidence remains true at its original commit; it must not masquerade as support
 for the new implementation. Do not delete a card solely because an upstream file was renamed.
@@ -115,6 +126,11 @@ such. Resolve failures introduced by the refresh. If missing objects or upstream
 prevents a valid result, retain the unfinished work and report the concrete blocker without advancing
 the checkpoint.
 
+For changed PR evidence, also check its quotations against the saved API capture with
+`collect_pr.py --check-evidence <report.yaml> --capture <private-capture.json>` and run
+`validate.py --verify-upstream /path/to/aiter`. The latter audits actual change-parent links and
+before/after code excerpts, not benchmark results. Update confidence only from reviewed evidence.
+
 Deliver the reviewed change on a branch and, when repository publication is authorized, update or
 create a draft PR. Follow session authorization for any merge; refreshing knowledge does not itself
 merge a PR or enable a scheduled job. Report the AITER commit/range, operator coverage, changed
@@ -133,3 +149,8 @@ are present in the branch that the next pass will read. For an unmerged PR, keep
 as pending work and resume it on the next invocation; do not skip its interval when reading `main`.
 Record remaining candidates as a private backlog. A partial review or failing validation is not a
 completed checkpoint. Repeated runs against the same reviewed state should be no-ops.
+
+Track PR evidence review separately from `reviewed_through`: comments, benchmark tables and PR
+lifecycle can change without a new source commit. Revisit pending or updated reports, preserving
+their older cited excerpts/results. A failed API capture is not proof that no report exists and
+must not advance that PR's evidence checkpoint.

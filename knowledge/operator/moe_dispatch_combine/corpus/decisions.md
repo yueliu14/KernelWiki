@@ -18,12 +18,12 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [moe-route-map-capacity](#moe-route-map-capacity) | constraint | What is the mapping between token routes and grouped expert rows? |
-| [moe-route-quant-scatter-fusion](#moe-route-quant-scatter-fusion) | performance_candidate | What does fusing route mapping, MX quantization and scatter commit the consumer to? |
-| [moe-weighted-gather-dropped-routes](#moe-weighted-gather-dropped-routes) | semantic | Where are route weights applied, and how are dropped routes excluded? |
-| [moe-communication-arena-lifetime](#moe-communication-arena-lifetime) | constraint | Which host and synchronization invariants accompany device-side MoE communication? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [moe-route-map-capacity](#moe-route-map-capacity) | constraint | reviewed | What is the mapping between token routes and grouped expert rows? |
+| [moe-route-quant-scatter-fusion](#moe-route-quant-scatter-fusion) | performance_candidate | reviewed | What does fusing route mapping, MX quantization and scatter commit the consumer to? |
+| [moe-weighted-gather-dropped-routes](#moe-weighted-gather-dropped-routes) | semantic | reviewed | Where are route weights applied, and how are dropped routes excluded? |
+| [moe-communication-arena-lifetime](#moe-communication-arena-lifetime) | constraint | blocked | Which host and synchronization invariants accompany device-side MoE communication? |
 
 <a id="moe-route-map-capacity"></a>
 ### What is the mapping between token routes and grouped expert rows?
@@ -59,6 +59,22 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_0a4dbe911d66b11f](source_evidence.md#aiter_b3ad6c46-src_0a4dbe911d66b11f) — [aiter/ops/flydsl/kernels/moe_route_maps.py:70-128](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/moe_route_maps.py#L70-L128).
 - [aiter_b3ad6c46:src_52948ddec2419f82](source_evidence.md#aiter_b3ad6c46-src_52948ddec2419f82) — [aiter/ops/flydsl/kernels/moe_route_maps.py:181-300](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/moe_route_maps.py#L181-L300).
+
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:17:37.107586+00:00.
+
+- **[PR #3460](https://github.com/ROCm/aiter/pull/3460) · merged · not_reported** — PR #3460 introduces the route-to-grouped-row and inverse maps; it does not quantify a speedup or establish all later capacity/drop behavior.
+  Conditions: Grouped gfx1250 FlyDSL MoE; route row is expert*max_m + claimed slot; capacity and padding remain caller obligations.
+  Direction: flydsl; expert_layout, implementation_contract
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [76ea4ac325dd](https://github.com/ROCm/aiter/commit/76ea4ac325ddde6c895b4e7ade4d42b592033828) — Claim a within-expert slot and write forward route-to-row and inverse row-to-token maps.
+  [Result: maps_and_gather_unmeasured](../../../_sources/aiter/pull_requests/3460.md#maps_and_gather_unmeasured) — **unknown**; The PR introduces the route-map and weighted gather-reduce implementation but supplies no quantitative comparison in its body or reviewed discussion.
+  **Effect confidence: unknown** — The author body is an empty template, and the reviewed discussion covers integration, code review and CI rather than measured effects; missing: hardware, gfx, dtype, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Background
 
@@ -104,6 +120,23 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_2bdcc297cb94f6d6](source_evidence.md#aiter_b3ad6c46-src_2bdcc297cb94f6d6) — [aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py:792-1116](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py#L792-L1116).
+
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #3851](https://github.com/ROCm/aiter/pull/3851) · merged · not_reported** — PR #3851 incorporates the fused route/quant/scatter path; no measured performance benefit is reported in the reviewed discussion.
+  Conditions: gfx1250 grouped-MoE fusion; preserve expert capacity, row ownership, MX payload and preshuffled scale agreement.
+  Direction: flydsl; expert_layout, numerical_contract, data_movement
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [3b161e226e8b](https://github.com/ROCm/aiter/commit/3b161e226e8b8e76382a196edef7adc493b58b5c) — Introduce a fused kernel producing token-route row maps, grouped quantized payload and preshuffled scales.
+  Change: [3b161e226e8b](https://github.com/ROCm/aiter/commit/3b161e226e8b8e76382a196edef7adc493b58b5c) — Compute each grouped destination from an expert base and claimed slot, then recover the source token from its route.
+  [Result: fusion_unmeasured](../../../_sources/aiter/pull_requests/3851.md#fusion_unmeasured) — **unknown**; The reviewed author template and discussion provide no measured effect for the route/quant/scatter fusion; the automated overview states an intended launch-count reduction.
+  **Effect confidence: unknown** — Code changes establish the mechanism; the saved automated summary and other reviewed discussion contain no quantitative comparison; missing: hardware, gfx, dtype, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Background
 
@@ -153,6 +186,23 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_e689390c22f73f0d](source_evidence.md#aiter_b3ad6c46-src_e689390c22f73f0d) — [aiter/ops/flydsl/kernels/moe_gather_reduce.py:100-315](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/moe_gather_reduce.py#L100-L315).
 
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:17:37.107586+00:00.
+
+- **[PR #3460](https://github.com/ROCm/aiter/pull/3460) · merged · not_reported** — PR #3460 establishes the weighted gather part of this contract. Its unused-slot convention differs from the later pinned negative-row handling and supplies no measured gain.
+  Conditions: Scope is weighted gather incorporation; do not apply this old reader to negative route IDs without the later guards.
+  Direction: flydsl; combine, numerical_contract, expert_layout
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [76ea4ac325dd](https://github.com/ROCm/aiter/commit/76ea4ac325ddde6c895b4e7ade4d42b592033828) — Load the mapped grouped row and native BF16/FP16 route weight, extending the weight to FP32 for reduction.
+  Change: [76ea4ac325dd](https://github.com/ROCm/aiter/commit/76ea4ac325ddde6c895b4e7ade4d42b592033828) — Accumulate weighted top-k contributions per output token without scatter atomics.
+  [Result: maps_and_gather_unmeasured](../../../_sources/aiter/pull_requests/3460.md#maps_and_gather_unmeasured) — **unknown**; The PR introduces the route-map and weighted gather-reduce implementation but supplies no quantitative comparison in its body or reviewed discussion.
+  **Effect confidence: unknown** — The author body is an empty template, and the reviewed discussion covers integration, code review and CI rather than measured effects; missing: hardware, gfx, dtype, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
+
 #### Background
 
 - [knowledge/operator/moe_dispatch_combine/README.md](../README.md)
@@ -198,6 +248,12 @@ A required trait must be established for the actual design before the card appli
 - [aiter_b3ad6c46:src_b3a94e1850387cbe](../../fused_moe_grouped_gemm/corpus/source_evidence.md#aiter_b3ad6c46-src_b3a94e1850387cbe) — [aiter/ops/flydsl/kernels/mega_moe_tp/mega_moe_tp.py:163-172](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/mega_moe_tp/mega_moe_tp.py#L163-L172).
 - [aiter_b3ad6c46:src_0cb51cc8eaf4375d](../../fused_moe_grouped_gemm/corpus/source_evidence.md#aiter_b3ad6c46-src_0cb51cc8eaf4375d) — [aiter/ops/flydsl/kernels/mega_moe_tp/mega_moe_tp.py:174-217](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/mega_moe_tp/mega_moe_tp.py#L174-L217).
 - [aiter_b3ad6c46:src_f80e3738642511c2](../../fused_moe_grouped_gemm/corpus/source_evidence.md#aiter_b3ad6c46-src_f80e3738642511c2) — [aiter/ops/flydsl/kernels/mega_moe_tp/communication.py:749-772](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/mega_moe_tp/communication.py#L749-L772).
+
+#### Upstream PR effects
+
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #5937, #6514 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 

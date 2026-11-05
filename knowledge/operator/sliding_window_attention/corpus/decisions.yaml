@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: sliding_window_attention
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -22,6 +22,13 @@ cards:
   question: How do cached prefixes and sliding windows change the causal boundary?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #266, #5771 remain to be checked against
+      the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - Queries cover only a suffix/chunk, or the model restricts each query to a local attention window.
   actions:
@@ -58,6 +65,13 @@ cards:
   question: Which additional conditions must hold before selecting the gfx950 Gluon unified-attention path?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #5771 remain to be checked against the
+      exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:
@@ -97,7 +111,13 @@ cards:
   question: Does decode use split metadata for the attended window or for the full context?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id001
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.754958+00:00'
+    summary: Read the pinned GEAK summary of an authored Triton kernel and SGLang launcher overlay. It describes
+      a stack-specific experiment but supplies no uniquely identified AITER change commit or PR for that outcome.
+      Retain the SGLang/local-experiment lineage; AITER PR association and effect confidence remain unknown.
+  conditions:
   - A sliding-window decode path carries separate full-context and window-local KV metadata.
   actions:
   - Trace the split-count tensor through eager initialization, graph updates and the final launch; select the
@@ -118,7 +138,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id001
+    conditions:
+    - A sliding-window decode path carries separate full-context and window-local KV metadata.
     summary: A historical serving report found window-local split metadata was prepared but not consumed by
       the decode launch; a global cap also harmed a different regime.
     provenance:

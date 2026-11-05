@@ -5,7 +5,7 @@
 
 Expert selection, routing weights, token sorting and alignment for MoE GEMMs.
 
-5 AITER implementation references; 3 owned corpus decisions.
+5 AITER implementation references; 4 owned corpus decisions.
 
 ## AITER implementations
 
@@ -22,6 +22,13 @@ Each page pins its source revision. Source references describe implementations a
 ## Development decisions
 
 [Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+
+**PR evidence correction (2026-11-04):** [PR #1909](https://github.com/ROCm/aiter/pull/1909)
+is a closed, unmerged proposal for plain `topk_sigmoid`. Its reported average 1.66x
+does not measure `biased_grouped_topk` and does not establish a shipped gfx9 dispatch.
+The imported material below conflates these implementations; do not transfer that
+performance or support claim to grouped routing. See the [reviewed report](corpus/decisions.md#moe-sigmoid-dpp-selection)
+for its comparison conditions, inconsistent extrema and confidence.
 
 ## GEAK reference material
 

@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: shared_expert_fusion
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -20,6 +20,12 @@ cards:
   question: When may a fused collective consume the shared-expert partial?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-05T02:24:54.151357+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - The fused runner is configured to add a shared-expert output produced on a potentially separate path.
   actions:
@@ -41,6 +47,56 @@ cards:
   references:
   - knowledge/operator/shared_expert_fusion/README.md
   - knowledge/operator/fused_moe_grouped_gemm/README.md
+  experience:
+  - outcome: mixed
+    conditions:
+    - gfx950 TP8 reported profile; BF16 shared partials, real local rows versus padded capacity, per-family
+      collective semantics and consistent cross-rank reuse synchronization.
+    summary: 'PR #5907 adds shared-partial readiness and layout contracts in a wider comm-fused runtime; operator
+      and DPA serving gains remain bundle results with family-specific numerical and reuse constraints.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_5907
+      change_refs:
+      - shared_readiness
+      result_refs:
+      - mega_m1
+      - direct_m512
+      - window_rs_m4096
+      - window_ar_m4096
+      - dpa_c64
+      - dpa_c128
+      - dpa_c256
+      - dpa_c512
+      - dpa_c1024
+      - reuse_synchronization_contract
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - shared_expert
+          - communication
+          - combine
+          backend: flydsl
 - id: shared-expert-padded-partial-layout
   type: constraint
   axes:
@@ -55,6 +111,12 @@ cards:
   question: How is a shared-expert partial adapted to the communication runner's row layout?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-05T02:24:54.151357+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:
@@ -74,4 +136,54 @@ cards:
   - This is an implementation precedent, not a measured performance preference on a new workload.
   references:
   - knowledge/operator/shared_expert_fusion/README.md
+  experience:
+  - outcome: mixed
+    conditions:
+    - gfx950 TP8 reported profile; BF16 shared partials, real local rows versus padded capacity, per-family
+      collective semantics and consistent cross-rank reuse synchronization.
+    summary: 'PR #5907 adds shared-partial readiness and layout contracts in a wider comm-fused runtime; operator
+      and DPA serving gains remain bundle results with family-specific numerical and reuse constraints.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_5907
+      change_refs:
+      - padded_shared_layout
+      result_refs:
+      - mega_m1
+      - direct_m512
+      - window_rs_m4096
+      - window_ar_m4096
+      - dpa_c64
+      - dpa_c128
+      - dpa_c256
+      - dpa_c512
+      - dpa_c1024
+      - reuse_synchronization_contract
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - shared_expert
+          - communication
+          - combine
+          backend: flydsl
 shared_cards: []

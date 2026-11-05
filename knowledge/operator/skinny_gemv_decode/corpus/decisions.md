@@ -20,10 +20,10 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [flydsl-small-m-hgemm-family](#flydsl-small-m-hgemm-family) | performance_candidate | What does AITER do differently when M is a handful of rows, and which knobs does that open? |
-| [gemm-skinny-decode-wave-split](#gemm-skinny-decode-wave-split) | performance_candidate | How does AITER&#x27;s hand-written HIP skinny GEMM organise work for M &lt;= 16, and what can a FlyDSL decode kernel take from it? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [flydsl-small-m-hgemm-family](#flydsl-small-m-hgemm-family) | performance_candidate | reviewed | What does AITER do differently when M is a handful of rows, and which knobs does that open? |
+| [gemm-skinny-decode-wave-split](#gemm-skinny-decode-wave-split) | performance_candidate | blocked | How does AITER&#x27;s hand-written HIP skinny GEMM organise work for M &lt;= 16, and what can a FlyDSL decode kernel take from it? |
 
 <a id="flydsl-small-m-hgemm-family"></a>
 ### What does AITER do differently when M is a handful of rows, and which knobs does that open?
@@ -88,6 +88,26 @@ A required trait must be established for the actual design before the card appli
 - [aiter_a6bb4993:src_e04716b6d760605b](source_evidence.md#aiter_a6bb4993-src_e04716b6d760605b) — [aiter/ops/flydsl/kernels/small_m_hgemm.py:331-332](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/ops/flydsl/kernels/small_m_hgemm.py#L331-L332).
 - Shipped selection: [aiter_a6bb4993:cfg_973fe63f897809df](../../dense_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_973fe63f897809df); no measurement is inferred.
 
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2775](https://github.com/ROCm/aiter/pull/2775) · merged · constraint** — PR #2775 introduces the dedicated small-M family and its dispatch/configuration contract; performance image values are not encoded.
+  Conditions: BF16, 1 &lt;= M &lt; 17; gfx942 is excluded by the cited source; distinguish generic and small_m compiler arguments.
+  Direction: flydsl; implementation_variant, workgroup_tile, work_partition, execution_geometry
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: low** — The report concerns the implementation or validity change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [ca33757e4f65](https://github.com/ROCm/aiter/commit/ca33757e4f652e45d7812e5506bdd42b49196bc7) — Introduce a dedicated M&lt;17 kernel with TILE_M=16, one M warp and two LDS stages.
+  Change: [ca33757e4f65](https://github.com/ROCm/aiter/commit/ca33757e4f652e45d7812e5506bdd42b49196bc7) — Dispatch small-M configurations with N-repeat, persistent-N, occupancy, unroll and bias arguments.
+  [Result: small_m_contract](../../../_sources/aiter/pull_requests/2775.md#small_m_contract) — **unknown**; Small-M BF16 GEMMs gain a separate kernel/configuration family with N/K-oriented work partitioning and an explicit architecture gate.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, software, baseline_commit, candidate_commit, protocol, correctness, transcribed_image_benchmarks, independent_reproduction.
+  Effect: **implementation or correctness constraint**; no speedup is assigned.
+  [Result: configuration_identity](../../../_sources/aiter/pull_requests/2775.md#configuration_identity) — **unknown**; Wide-N B_TO_LDS candidates that compile to the same effective configuration are deduplicated without deleting waves_per_eu=0 globally.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, software, baseline, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  Effect: **implementation or correctness constraint**; no speedup is assigned.
+
 #### Background
 
 - [knowledge/general/backend/flydsl/knobs.md:77-80](../../../general/backend/flydsl/knobs.md)
@@ -149,6 +169,12 @@ A required trait must be established for the actual design before the card appli
 - [aiter_a6bb4993:src_d78de056f0337d85](source_evidence.md#aiter_a6bb4993-src_d78de056f0337d85) — [csrc/kernels/custom_kernels.cu:687](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/csrc/kernels/custom_kernels.cu#L687).
 - [aiter_a6bb4993:src_5147e7cddd350323](source_evidence.md#aiter_a6bb4993-src_5147e7cddd350323) — [csrc/kernels/custom_kernels.cu:1775](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/csrc/kernels/custom_kernels.cu#L1775).
 - [aiter_a6bb4993:src_2577a978dcbebafb](../../dense_gemm/corpus/source_evidence.md#aiter_a6bb4993-src_2577a978dcbebafb) — [aiter/tuned_gemm.py:76-97](https://github.com/ROCm/aiter/blob/a6bb499375849eec45d68c5ccaebc8865fd422c0/aiter/tuned_gemm.py#L76-L97).
+
+#### Upstream PR effects
+
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #414 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 

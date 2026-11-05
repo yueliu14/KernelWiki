@@ -1,0 +1,167 @@
+schema_version: 1
+id: aiter_pr_2567
+number: 2567
+repository: https://github.com/ROCm/aiter
+title: Fix FlyDSL split-k HGEMM correctness and precision issues
+state: merged
+base_commit: c0e0701e6a674d5f1755c4024dd9b66565249a15
+head_commit: 1a13c6bb01b837bad20bcadfdc5d15330ce5abb5
+merge_commit: 0a9acf4bc16dabf27ed4d9568404b9a14054682b
+captured_at: '2026-11-05T02:01:48.068278+00:00'
+updated_at: '2026-04-01T11:25:36Z'
+sources:
+- id: fix_report
+  url: https://github.com/ROCm/aiter/pull/2567
+  excerpt: |-
+    Before, we only tested num_concurrent=16 GSMK accuracy. For num_concurrent=65, we observed accuracy regression for kimi2. This is caused by a split-k issue for some shapes.
+
+    This PR fixes correctness and numerical precision issues in the FlyDSL split-k HGEMM path when split_k > 1.
+
+    Previously, the split-k C tile zero/load/store coverage used floor division, which could skip tail rows for shapes such as tile_m=48, leading to NaNs and large output mismatches.
+
+    This change is:
+    using ceil-div plus explicit bounds checks for split-k C tile coverage
+    As a result, the tile_m=48 split-k regressions are removed, and the NaNs disappear.
+  sha256: aa62cfee7ac68bb5a6e34c1ca0366fa8ec47b01e2fbd6913efd92b88d469950f
+  captured_at: '2026-11-05T02:01:48.068278+00:00'
+  updated_at: '2026-04-01T11:25:36Z'
+changes:
+- id: ceil_c_vectors
+  commit: 0a9acf4bc16dabf27ed4d9568404b9a14054682b
+  parent_commit: 94a6edda3a2d6b3cf3b4a7d91dbd4f2bf764d328
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  before: |2-
+        LDG_REG_A_COUNT = BLOCK_MK_SIZE // LDG_VEC_SIZE // BLOCK_THREADS
+        LDG_REG_B_COUNT = BLOCK_NK_SIZE // LDG_VEC_SIZE // BLOCK_THREADS
+        LDG_REG_C_COUNT = BLOCK_M * BLOCK_N // LDG_VEC_SIZE // BLOCK_THREADS
+  after: |2-
+        C_TILE_VECS = BLOCK_M * LDG_C_X_THREADS
+        LDG_REG_A_COUNT = BLOCK_MK_SIZE // LDG_VEC_SIZE // BLOCK_THREADS
+        LDG_REG_B_COUNT = BLOCK_NK_SIZE // LDG_VEC_SIZE // BLOCK_THREADS
+        # Split-K stores C through LDS in LDG_VEC_SIZE-wide vectors. When BLOCK_M is
+        # not a multiple of the per-iteration row coverage, floor division drops the
+        # tail rows entirely (for example tile_m=48 only covers rows 0..31). Use
+        # ceil-div here and guard tail accesses explicitly in the C load/store paths.
+        LDG_REG_C_COUNT = (C_TILE_VECS + BLOCK_THREADS - 1) // BLOCK_THREADS
+  summary: Replace floor division of C-vector work with ceil division so tile_m=48 tail rows are covered.
+- id: bounded_zero
+  commit: 0a9acf4bc16dabf27ed4d9568404b9a14054682b
+  parent_commit: 94a6edda3a2d6b3cf3b4a7d91dbd4f2bf764d328
+  file: aiter/ops/flydsl/kernels/splitk_hgemm.py
+  before: |2-
+                    for i in range_constexpr(LDG_REG_C_COUNT):
+                        global_tid = BLOCK_THREADS * i + tid
+                        m_local_idx = global_tid // LDG_C_X_THREADS
+                        n_local_idx = global_tid % LDG_C_X_THREADS * LDG_VEC_SIZE
+                        row_idx = m_offset + fx.Index(m_local_idx)
+                        cond_boundary = arith.cmpi(
+                            arith.CmpIPredicate.ult, row_idx, fx.Index(m)
+                        )
+                        cond_boundary_if = scf.IfOp(
+                            cond_boundary, results_=[], has_else=False
+                        )
+                        with ir.InsertionPoint(cond_boundary_if.then_block):
+                            C_.vec_store(
+                                (row_idx, n_offset + n_local_idx), zero_vec, LDG_VEC_SIZE
+                            )
+                            scf.YieldOp([])
+                    scf.YieldOp([])
+  after: |2-
+                        global_tid = BLOCK_THREADS * i + tid
+                        m_local_idx = global_tid // LDG_C_X_THREADS
+                        n_local_idx = global_tid % LDG_C_X_THREADS * LDG_VEC_SIZE
+                        cond_in_tile = arith.cmpi(
+                            arith.CmpIPredicate.ult,
+                            fx.Index(m_local_idx),
+                            fx.Index(BLOCK_M),
+                        )
+                        cond_in_tile_if = scf.IfOp(
+                            cond_in_tile, results_=[], has_else=False
+                        )
+                        with ir.InsertionPoint(cond_in_tile_if.then_block):
+                            row_idx = m_offset + fx.Index(m_local_idx)
+                            cond_boundary = arith.cmpi(
+                                arith.CmpIPredicate.ult, row_idx, fx.Index(m)
+                            )
+                            cond_boundary_if = scf.IfOp(
+                                cond_boundary, results_=[], has_else=False
+                            )
+                            with ir.InsertionPoint(cond_boundary_if.then_block):
+                                C_.vec_store(
+                                    (row_idx, n_offset + n_local_idx),
+                                    zero_vec,
+                                    LDG_VEC_SIZE,
+                                )
+                                scf.YieldOp([])
+  summary: Guard local tile rows and runtime M before zeroing the split-K output.
+- id: precision_gate
+  commit: 0a9acf4bc16dabf27ed4d9568404b9a14054682b
+  parent_commit: 94a6edda3a2d6b3cf3b4a7d91dbd4f2bf764d328
+  file: aiter/ops/flydsl/test_flydsl_splitk_hgemm.py
+  before: |-
+    DEFAULT_BENCH_ITERS = 20
+    DEFAULT_BENCH_WARMUP = 3
+  after: |-
+    DEFAULT_ATOL = 1e-2
+    DEFAULT_RTOL = 1e-2
+    DEFAULT_PASS_PCT = 99.9
+    DEFAULT_INPUT_SEED = 20260401
+
+    SPLITK_PRECISION_CASES = [
+        {
+            "name": "splitk2_tile48_m136_n384_k7168",
+            "m": 136,
+            "n": 384,
+            "k": 7168,
+            "tile_k": 128,
+            "tile_m": 48,
+            "tile_n": 64,
+            "pack_n": 1,
+            "split_k": 2,
+            "b_preshuffle": False,
+        },
+        {
+            "name": "splitk8_tile48_m136_n384_k7168",
+  summary: Replace the prior benchmark defaults with explicit precision thresholds and a tile_m=48 split-K
+    regression case.
+results:
+- id: tail_row_correctness
+  outcome: constraint
+  summary: The author reports that ceil-div C-tile coverage and bounds checks remove tile_m=48 split-K regressions
+    and NaNs observed under Kimi-2 concurrency 65.
+  source_refs:
+  - fix_report
+  context:
+    hardware: null
+    gfx: null
+    dtype: FlyDSL split-K HGEMM; BF16 regression cases in the reviewed test
+    shape_layout: split_k > 1, especially tile_m=48; Kimi-2 accuracy at concurrency 65 versus earlier testing
+      at 16
+    software: null
+    baseline: Floor-divided C-vector coverage
+    candidate: Ceil-divided C-vector coverage with explicit bounds checks
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: null
+    correctness: Author reports removed NaNs and output mismatches; no independent rerun or encoded image accuracy
+      score
+  metrics: []
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - hardware
+    - gfx
+    - software
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - independent_reproduction
+  limitations:
+  - This is a correctness result, not a speedup.
+  - The reviewed test thresholds are implementation evidence; their presence is not evidence that a test was
+    run here.
+  - Later test revisions retain their own oracle and tolerance contracts.

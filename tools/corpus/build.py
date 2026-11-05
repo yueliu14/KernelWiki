@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 
 from validate import Catalog, qualified, source_refs
+import _render_upstream as pr_renderer
 
 
 def link(label, target, page, anchor=""):
@@ -102,9 +103,9 @@ def render_decisions(catalog, op):
                 "A required trait must be established for the actual design before the card applies.", ""]
         out += [f"- `{name}` — {text}" for name, text in bundle["decisions"]["traits"].items()]
         out.append("")
-    out += ["## Owned decisions", "", "| card | type | question |", "|---|---|---|"]
+    out += ["## Owned decisions", "", "| card | type | PR review | question |", "|---|---|---|---|"]
     for c in own:
-        out.append(f"| [{c['id']}](#{c['id']}) | {c['type']} | {cell(c['question'])} |")
+        out.append(f"| [{c['id']}](#{c['id']}) | {c['type']} | {c['upstream_review']['status']} | {cell(c['question'])} |")
     out.append("")
     for c in own:
         out += [f'<a id="{c["id"]}"></a>', f"### {c['question']}", "",
@@ -131,11 +132,13 @@ def render_decisions(catalog, op):
             out.append(f"- {source_link(catalog, ref, page)} — [{location}]({catalog.source_url(row)}).")
         for ref in c.get("shipped_evidence", []):
             out.append(f"- Shipped selection: {seed_link(catalog, ref, page)}; no measurement is inferred.")
-        if c.get("experience"):
+        out += pr_renderer.card_section(catalog, c, page)
+        historical = [e for e in c.get("experience", []) if e["provenance"]["kind"] != "upstream_report"]
+        if historical:
             out += ["", "#### Reported experience", "",
                     "Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. "
                     "Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.", ""]
-            for entry in c["experience"]:
+            for entry in historical:
                 out += [f"- **{entry['outcome']}** — {entry['summary']}",
                         "  Conditions: " + " ".join(entry["conditions"]),
                         "  Verification: " + code(entry["provenance"]["verification"]) + ".",
@@ -256,6 +259,14 @@ def render_index(catalog):
            f"**{len(catalog.operators)} operators · {len(catalog.cards)} canonical cards · "
            f"{len(catalog.sources)} snapshot-qualified source observations · {len(catalog.seeds)} shipped groups.** "
            "Shared references are not counted as additional knowledge records.", ""]
+    counts = Counter(c["upstream_review"]["status"] for c in catalog.cards.values())
+    out += ["## Upstream PR review coverage", "",
+            f"{len(catalog.upstream)} canonical PR reports. " + ", ".join(f"{key}: {counts[key]}" for key in ("reviewed", "unreviewed", "unresolved", "blocked")) + ".", "",
+            "Counts describe review coverage, not successful optimizations. Reports with missing measurements remain explicit; "
+            "shared references do not duplicate results.", ""]
+    for record in catalog.upstream.values():
+        out.append("- " + link(f"AITER PR #{record['number']} ({record['state']})", catalog.root / pr_renderer.upstream.DIRECTORY / f"{record['number']}.md", page))
+    out.append("")
     for family in catalog.data["families"]:
         out += [f"## {family['title']}", "", "| operator | owned cards | shared cards | owned observations | reading |", "|---|---:|---:|---:|---|"]
         for op in family["operators"]:
@@ -270,7 +281,7 @@ def render_index(catalog):
             "## Reference contract", "",
             "- Each decision card and each source observation has one owning operator. Other operators use IDs and links; they do not copy the body.",
             "- Source/config references include a snapshot: `aiter_b3ad6c46:src_…` or `aiter_a6bb4993:cfg_…`. Existing content-ID suffixes are preserved; a path move does not change identity.",
-            "- The catalog uses schema version 3 and repository-relative paths. Decisions can carry source observations and scoped historical experience summaries.",
+            "- The catalog uses schema version 3 and repository-relative paths. Decision schema 6 adds PR review status and scoped upstream reports alongside source observations and historical experience.",
             "- Historical reports are not reproduced validation. Each experience entry states its verification status; private runs and raw measurement artifacts stay outside the public repository.",
             "- Operator membership and source availability do not certify complete backend coverage, runtime engagement or a measured speedup.",
             "- Correctness-test links are pinned sources, not test results. No new GPU performance measurements or disassembly results are included.", "",
@@ -299,6 +310,9 @@ def pages(catalog, operators=None, include_index=True):
         path, text = render_decisions(catalog, "general")
         result[path] = text
         path, text = render_index(catalog)
+        result[path] = text
+    for record in catalog.upstream.values():
+        path, text = pr_renderer.render_record(catalog.root, record)
         result[path] = text
     return result
 

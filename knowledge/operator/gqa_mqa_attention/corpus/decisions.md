@@ -18,11 +18,11 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [attention-gqa-head-mapping](#attention-gqa-head-mapping) | semantic | How should query heads share KV heads without changing GQA/MQA semantics? |
-| [gqa-storage-precision-contract](#gqa-storage-precision-contract) | performance_candidate | Can KV storage be narrowed while retaining the attention compute contract? |
-| [gqa-head-tile-gather-reuse](#gqa-head-tile-gather-reuse) | performance_candidate | When can one program share gathered KV across more query heads? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [attention-gqa-head-mapping](#attention-gqa-head-mapping) | semantic | blocked | How should query heads share KV heads without changing GQA/MQA semantics? |
+| [gqa-storage-precision-contract](#gqa-storage-precision-contract) | performance_candidate | unresolved | Can KV storage be narrowed while retaining the attention compute contract? |
+| [gqa-head-tile-gather-reuse](#gqa-head-tile-gather-reuse) | performance_candidate | unresolved | When can one program share gathered KV across more query heads? |
 
 <a id="attention-gqa-head-mapping"></a>
 ### How should query heads share KV heads without changing GQA/MQA semantics?
@@ -57,6 +57,12 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_49cb5bdc816cb102](../../attention_decode_paged/corpus/source_evidence.md#aiter_b3ad6c46-src_49cb5bdc816cb102) — [aiter/ops/triton/_triton_kernels/attention/unified_attention.py:82-553](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/unified_attention.py#L82-L553).
+
+#### Upstream PR effects
+
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #1148 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -96,6 +102,12 @@ A required trait must be established for the actual design before the card appli
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 2 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.753207+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -145,6 +157,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 2 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.753270+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 

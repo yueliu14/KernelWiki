@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: gemm_epilogue_fused
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -28,6 +28,11 @@ cards:
     cost?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - target_language=flydsl
   - the output store path (layout, vector width, atomics) is being chosen
@@ -80,6 +85,45 @@ cards:
   - Legality is the helper's; the LDS cost interacts with the A staging budget, so re-run the LDS estimate
     for the combined configuration.
   - Selection shares are where AITER chose each arm, not how much either arm helped.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - 'FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update
+      other families or later configurations.'
+    summary: 'PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the
+      individual mechanism is reported.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - lds_epilogue_budget
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - epilogue
+          - configuration_constraints
+          backend: flydsl
 - id: gemm-gated-feed-forward-atomic-output
   type: constraint
   axes:
@@ -93,6 +137,13 @@ cards:
   question: What does the fused gated feed-forward body require of its output buffer?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #778 remain to be checked against the
+      exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:
@@ -126,6 +177,13 @@ cards:
   question: Where does an affine epilogue belong when the GEMM is split over K?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #4223 remain to be checked against the
+      exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:
@@ -167,7 +225,15 @@ cards:
   question: Which fusion boundary helps each regime of a normalization/GEMM chain?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id001
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.753148+00:00'
+    summary: Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - The chain has distinct prefill and decode execution arms and explicit intermediate/output ownership.
   actions:
   - Measure the full chain and each arm before selecting a fusion; preserve normalization, casts, residual
@@ -190,7 +256,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id001
+    conditions:
+    - The chain has distinct prefill and decode execution arms and explicit intermediate/output ownership.
     summary: Historical composed norm/GEMM reports combined dispatch reduction with prefill arithmetic changes;
       further overlap and cache-load hints could regress a roof-bound arm.
     provenance:

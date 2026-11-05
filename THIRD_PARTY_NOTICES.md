@@ -16,6 +16,15 @@ commits; operator-local evidence records identify their snapshot, and generated 
 source ranges. The extraction, curation and rendering
 changes do not confer any upstream benchmark or validation status on these excerpts.
 
+Reviewed PR provenance under `knowledge/_sources/aiter/pull_requests/` includes short
+before/after code excerpts at the full change and parent commits recorded in each YAML.
+The AITER MIT notice applies subject to each file's retained notices. The Triton prefill
+attention source additionally carries `Copyright (C) 2023-2026 SGLang Team` and the
+Apache License 2.0 notice, whose text is included in [LICENSE.md](LICENSE.md); both
+attributions are retained here. Attributed PR descriptions and comments are quoted with their source URLs,
+capture/update times and excerpt fingerprints. Reported performance remains attributed
+to its upstream author and is not presented as reproduced KernelWiki validation.
+
 Source references and selected documentation excerpts use ROCm/aiter, commit `e9995854abbd935f0190b19abebe9938b6b90cca`. Additional native-pipeline and workload-variant reviews reference commit `b3ad6c461703110dc36286265c16e453ef0e2dd2`. Each page or added section identifies its source revision. KernelWiki does not distribute AITER code objects or a full working copy of AITER.
 
 AITER's general MIT notice is reproduced below. Per-file SPDX notices take precedence for

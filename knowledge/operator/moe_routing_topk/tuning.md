@@ -14,6 +14,13 @@ sources:
 
 # moe_routing_topk — tuning
 
+**PR evidence correction (2026-11-04):** [PR #1909](https://github.com/ROCm/aiter/pull/1909)
+is a closed, unmerged proposal for plain `topk_sigmoid`. Its reported average 1.66x
+does not measure `biased_grouped_topk` and does not establish a shipped gfx9 dispatch.
+The imported material below conflates these implementations; do not transfer that
+performance or support claim to grouped routing. See the [reviewed report](corpus/decisions.md#moe-sigmoid-dpp-selection)
+for its comparison conditions, inconsistent extrema and confidence.
+
 ## What you actually tune
 The router is **memory-bound** and **latency-bound**; you are not chasing FLOPs, you are minimizing
 launch count, XCD-crossing synchronization, and LDS/bank conflicts. Two kernels matter: the **fused gate

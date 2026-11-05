@@ -20,12 +20,12 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [flydsl-cshuffle-epilogue](#flydsl-cshuffle-epilogue) | performance_candidate | When can a FlyDSL GEMM route its accumulators through an LDS CShuffle epilogue, and what does it cost? |
-| [gemm-gated-feed-forward-atomic-output](#gemm-gated-feed-forward-atomic-output) | constraint | What does the fused gated feed-forward body require of its output buffer? |
-| [gemm-blockscale-fused-affine-split](#gemm-blockscale-fused-affine-split) | semantic | Where does an affine epilogue belong when the GEMM is split over K? |
-| [fused-gemm-regime-specific-chain](#fused-gemm-regime-specific-chain) | performance_candidate | Which fusion boundary helps each regime of a normalization/GEMM chain? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [flydsl-cshuffle-epilogue](#flydsl-cshuffle-epilogue) | performance_candidate | reviewed | When can a FlyDSL GEMM route its accumulators through an LDS CShuffle epilogue, and what does it cost? |
+| [gemm-gated-feed-forward-atomic-output](#gemm-gated-feed-forward-atomic-output) | constraint | blocked | What does the fused gated feed-forward body require of its output buffer? |
+| [gemm-blockscale-fused-affine-split](#gemm-blockscale-fused-affine-split) | semantic | blocked | Where does an affine epilogue belong when the GEMM is split over K? |
+| [fused-gemm-regime-specific-chain](#fused-gemm-regime-specific-chain) | performance_candidate | unresolved | Which fusion boundary helps each regime of a normalization/GEMM chain? |
 
 <a id="flydsl-cshuffle-epilogue"></a>
 ### When can a FlyDSL GEMM route its accumulators through an LDS CShuffle epilogue, and what does it cost?
@@ -80,6 +80,22 @@ A required trait must be established for the actual design before the card appli
 - Shipped selection: [aiter_a6bb4993:cfg_909edfc582fce0bd](../../scaled_quant_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_909edfc582fce0bd); no measurement is inferred.
 - Shipped selection: [aiter_a6bb4993:cfg_496162f129968cb9](../../scaled_quant_gemm/corpus/seeds.md#aiter_a6bb4993-cfg_496162f129968cb9); no measurement is inferred.
 
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation/conditions. This is a scoped historical association, not a complete review of every backend or version. Checked 2026-11-04T16:56:44.784904+00:00.
+
+- **[PR #2546](https://github.com/ROCm/aiter/pull/2546) · merged · not_reported** — PR #2546 incorporates this choice into the A8 preshuffle path; no quantitative benefit for the individual mechanism is reported.
+  Conditions: FlyDSL A8 preshuffle implementation at PR #2546 and the retained a6bb4993 snapshot; this does not update other families or later configurations.
+  Direction: flydsl; epilogue, configuration_constraints
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [8d30ef53a0a6](https://github.com/ROCm/aiter/commit/8d30ef53a0a6e12d70894a973f4df127d298f620) — Budget LDS staging jointly with the optional CShuffle output buffer.
+  [Result: unquantified_knobs](../../../_sources/aiter/pull_requests/2546.md#unquantified_knobs) — **unknown**; The reviewed PR introduces the A8 compiler and tuning choices but supplies no quantitative performance comparison for these mechanisms.
+  **Effect confidence: unknown** — The body and reviewed discussion cover implementation/correctness and qualitative rationale, not a measured speedup for the exposed knobs; missing: hardware, gfx, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
+
 #### Background
 
 - [knowledge/operator/gemm_epilogue_fused/backend/flydsl.md:20-26](../backend/flydsl.md)
@@ -123,6 +139,12 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_cf2b5852b341da65](source_evidence.md#aiter_b3ad6c46-src_cf2b5852b341da65) — [aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py:37-210](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py#L37-L210).
+
+#### Upstream PR effects
+
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #778 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -168,6 +190,12 @@ A required trait must be established for the actual design before the card appli
 - [aiter_b3ad6c46:src_cba1ac61dda37c05](source_evidence.md#aiter_b3ad6c46-src_cba1ac61dda37c05) — [aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py:37-240](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py#L37-L240).
 - [aiter_b3ad6c46:src_e91a864245298df4](source_evidence.md#aiter_b3ad6c46-src_e91a864245298df4) — [aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py:256-337](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py#L256-L337).
 
+#### Upstream PR effects
+
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #4223 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
+
 #### Background
 
 - [knowledge/operator/gemm_epilogue_fused/README.md](../README.md)
@@ -205,6 +233,12 @@ A required trait must be established for the actual design before the card appli
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.753148+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 

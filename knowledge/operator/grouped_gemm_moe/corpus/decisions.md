@@ -18,16 +18,16 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [moe-two-stage-intermediate](#moe-two-stage-intermediate) | semantic | What must match at the gate/up to down-projection boundary? |
-| [moe-live-config-and-scale-domain](#moe-live-config-and-scale-domain) | performance_candidate | Which tuning surface controls the served expert GEMM contract? |
-| [moe-stage-instance-layout](#moe-stage-instance-layout) | performance_candidate | How should MFMA shape and pipeline instance be chosen for each MoE stage? |
-| [moe-dequant-reuse-and-chain](#moe-dequant-reuse-and-chain) | performance_candidate | Can expert-weight dequantization be reused or shortened on the critical path? |
-| [moe-per-bucket-binary-and-config](#moe-per-bucket-binary-and-config) | performance_candidate | When should expert token buckets use separate configurations or compiled entries? |
-| [moe-precision-and-scale-gates](#moe-precision-and-scale-gates) | performance_candidate | When does narrowing expert operands remain valid and deployable? |
-| [moe-epilogue-lds-stride](#moe-epilogue-lds-stride) | performance_candidate | When can padding an expert epilogue staging tile reduce its critical-path conflicts? |
-| [moe-per-buffer-cache-policy](#moe-per-buffer-cache-policy) | performance_candidate | Should expert input, weights, scratch and output use the same cache policy? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [moe-two-stage-intermediate](#moe-two-stage-intermediate) | semantic | blocked | What must match at the gate/up to down-projection boundary? |
+| [moe-live-config-and-scale-domain](#moe-live-config-and-scale-domain) | performance_candidate | unresolved | Which tuning surface controls the served expert GEMM contract? |
+| [moe-stage-instance-layout](#moe-stage-instance-layout) | performance_candidate | unresolved | How should MFMA shape and pipeline instance be chosen for each MoE stage? |
+| [moe-dequant-reuse-and-chain](#moe-dequant-reuse-and-chain) | performance_candidate | unresolved | Can expert-weight dequantization be reused or shortened on the critical path? |
+| [moe-per-bucket-binary-and-config](#moe-per-bucket-binary-and-config) | performance_candidate | unresolved | When should expert token buckets use separate configurations or compiled entries? |
+| [moe-precision-and-scale-gates](#moe-precision-and-scale-gates) | performance_candidate | unresolved | When does narrowing expert operands remain valid and deployable? |
+| [moe-epilogue-lds-stride](#moe-epilogue-lds-stride) | performance_candidate | unresolved | When can padding an expert epilogue staging tile reduce its critical-path conflicts? |
+| [moe-per-buffer-cache-policy](#moe-per-buffer-cache-policy) | performance_candidate | unresolved | Should expert input, weights, scratch and output use the same cache policy? |
 
 <a id="moe-two-stage-intermediate"></a>
 ### What must match at the gate/up to down-projection boundary?
@@ -69,6 +69,12 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_716da92976cf21bc](source_evidence.md#aiter_b3ad6c46-src_716da92976cf21bc) — [aiter/ops/flydsl/kernels/moe_gemm_2stage/gfx9_fp8/gemm1.py:22-1068](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/moe_gemm_2stage/gfx9_fp8/gemm1.py#L22-L1068).
 - [aiter_b3ad6c46:src_fd19baacbd3c48ef](source_evidence.md#aiter_b3ad6c46-src_fd19baacbd3c48ef) — [aiter/ops/flydsl/kernels/moe_gemm_2stage/gfx9_fp8/gemm2.py:19-801](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/moe_gemm_2stage/gfx9_fp8/gemm2.py#L19-L801).
+
+#### Upstream PR effects
+
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #5795, #5932 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -121,6 +127,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 6 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.753460+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -169,6 +181,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.753549+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -219,6 +237,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 8 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.753793+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -267,6 +291,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.753879+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -317,6 +347,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 4 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.753998+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -365,6 +401,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 1 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.754031+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -412,6 +454,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 1 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.754062+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 

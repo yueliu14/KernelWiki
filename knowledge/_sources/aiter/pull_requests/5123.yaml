@@ -1,0 +1,277 @@
+schema_version: 1
+id: aiter_pr_5123
+number: 5123
+repository: https://github.com/ROCm/aiter
+title: '[HIP] [FlyDSL] dcp topk merge'
+state: merged
+base_commit: 7bc243773da7fe5f95c68bcbf9c99f8e754b7b7c
+head_commit: 450a9e58fc1767ee970d5b77361d74ca3473f15e
+merge_commit: ce788f58feb47c66c23bfde5d39fab8e5db76606
+captured_at: '2026-11-04T16:49:02.390147+00:00'
+updated_at: '2026-09-02T00:31:55Z'
+sources:
+- id: report
+  url: https://github.com/ROCm/aiter/pull/5123
+  excerpt: |-
+    Three related changes for the Decode Context Parallel path of the DeepSeek-V3.2-style
+    sparse indexer. The first two are what GLM-5.2 DCP decode needs; the third is an
+    independent crash fix found while bringing that path up, and is useful on its own.
+
+    ---
+    ## 1. `[FlyDSL] Add DCP decode TopK merge kernel`
+
+    Under DCP each rank holds `1/W` of the KV and takes a local top-k, so the ranks must
+    agree on a global top-k before attention. The existing sequence reconstructs that
+    global set on **every** rank and then drops the `~(W-1)/W` of it the rank does not
+    own — W times the work, most of it discarded.
+
+    This op emits only the rank's **owned** physical KV slots, already localized and
+    compacted, plus the `kv_indptr` attention needs. Two kernels: a per-row radix
+    select for the global threshold, then a per-row pack that also computes the
+    cross-row prefix sum.
+
+    Two properties make the fusion possible:
+
+    - **Ownership is positional.** Candidate column `c` came from rank `c // k_loc`, so
+      global ids never have to travel and the caller can exchange scores alone.
+    - **The slot formula collapses.** For local index `j` the physical slot is
+      `block_table[j // page] * page + (j % page)` — independent of `W` and of the
+      interleave size `S`. Verified by exhaustive enumeration over 50400 combinations
+      of `(W, S, page, j)`, 0 mismatches. So the localize folds into the emit loop
+      instead of needing a separate pass.
+
+    Allocates no device scratch (the caller owns `staging`), so it is safe inside a
+    captured CUDAGraph.
+
+    ### Why the prefix sum lives inside `pack`
+
+    It started as its own `grid=(1,)` kernel walking the rows on a single thread. That
+    is O(rows) serial work sandwiched between two parallel kernels, and it showed —
+    **37% of the op's runtime at rows=128** (15.7 of 42.3 µs) to prefix-sum 128
+    integers.
+
+    Each `pack` block now recomputes the prefix it needs, in parallel. The redundancy
+    is real (rows blocks each scanning rows counts) but a block scan over a few hundred
+    values is a handful of barriers: `pack` went 3.3 → 3.5 µs while a whole kernel
+    launch disappeared. The loop is chunked, so `rows > 256` stays correct — verified at
+    rows ∈ {1, 128, 256, **257**, 512}.
+
+    That is also why `select` and `pack` cannot merge further: `pack` needs
+    `kv_indptr[row]`, which depends on every *other* row's count. Closing that gap needs
+    either a cross-block barrier (unsafe — block scheduling order is not guaranteed, so
+    a block spinning on a not-yet-scheduled block deadlocks) or `grid=(1,)`, which would
+    serialise `select` by a factor of rows.
+
+    ### Performance
+
+    Against the equivalent six-op sequence, at the production shape `W=8`,
+    `k_loc = topk = 2048`:
+
+    | bs | six-op | fused | speedup |
+    |---:|-------:|------:|--------:|
+    | 1 | 166.5 µs | 33.9 µs | 4.91× |
+    | 4 | 173.6 µs | 33.8 µs | 5.14× |
+    | 16 | 165.2 µs | 34.3 µs | 4.82× |
+    | 32 | 167.3 µs | 33.6 µs | 4.98× |
+    | 64 | 174.6 µs | 34.3 µs | 5.09× |
+    | 128 | 167.4 µs | 34.0 µs | 4.92× |
+
+    The curve is **flat** — 33.6-34.3 µs regardless of bs — where the six-op path grows
+    with rows. Plus half the all-gather payload (`[rows, k_loc]` instead of
+    `[2, rows, k_loc]`) and 2 kernels instead of ~16.
+
+    This is a **single-op** measurement. It has not been attributed against a full decode
+    step, so the wall-clock share depends on how often the indexer runs per forward.
+
+    ### Correctness
+
+    `op_tests/flydsl_tests/test_flydsl_dcp_topk_merge.py` — **45 passed**. Covers a
+    differential test against the six-op reference, edge cases (`topk > n_cand`, empty
+    rows, all-padding rows), a shape sweep, and tie-heavy inputs where the equal-to-
+    threshold admission rule is what decides the partition.
+
+    Two GPU races were found and fixed during development, each with a reproducible
+    before/after:
+
+    - **Bucket-hit test.** Every thread reads `remaining_k` from LDS but only the thread
+      owning the k-th element writes it. Without a barrier between the two, a fast writer
+      updates it while a slow thread is still reading, the slow thread then satisfies the
+      hit condition against the *new* value and writes a second bucket — a corrupted
+      threshold.
+    - **Block scan.** A fast wave entering the *next* `block_exclusive_prefix_i32` call
+      would overwrite `scan[warp]` while a slow wave was still reading the current call's
+      totals. Fixed with a trailing barrier.
+
+    The second one I initially dismissed as a non-race based on 40 clean iterations of a
+    single shape. It reproduced later under a different shape. A race is structural, not
+    a property of one observed schedule — recording that here because the first ruling
+    was wrong.
+
+    ---
+
+    ## 2. `[HIP] Add optional score output to top_k_per_row_decode`
+
+    `top_k_per_row_decode` now takes an optional `values` tensor and writes each selected
+    index's logit alongside it, mirroring `top_k_per_row_prefill`. The one-block kernel
+    already supported this (`WRITE_TOPK_VALUES` is a template parameter of
+    `dispatch_topk_oneblock`); the decode entry point hardcoded it to false with
+    `/*out=*/nullptr`. Wiring it through the header, the pybind arg list and the Python
+    wrapper is the whole change — **the default path compiles to the same instantiation
+    as before**.
+
+    This lets a DCP decode indexer drop the separate gather whose only job was to read
+    these same scores back out of the logits.
+
+    ### Also: a padding-value fix
+
+    Where the index is padded with `-1`, the score was padded with `0.0`. A `0.0` pad does
+    **not** sort below real scores — logits are routinely negative, so the padding
+    outranks them, and a consumer that ranks these scores (a DCP merge across ranks) lets
+    padding steal real candidates' slots. Pad with `-inf` instead.
+
+    Measured impact before the fix: at `W=8` the disjoint owned-partition collapsed from
+    256 entries to 30.
+
+    The changed line is shared with prefill, but **every in-tree prefill caller passes
+    `values=None`** (checked all 5), so `WRITE_TOPK_VALUES` is false there and the store
+    never executes.
+
+    ---
+
+    ## Validation
+
+    - `op_tests/flydsl_tests/test_flydsl_dcp_topk_merge.py`: **45 passed**
+    - HIP `values`: padding `== -inf`, score `==` gathered logit, `values=None`
+      bit-identical to before, non-stable path — all pass
+    - Gluon fix: 3 previously-aborting shapes compile; reverting the patch reproduces the
+      abort on `main`, so the fix is not a no-op
+    - End-to-end: GLM-5.2, TP=8, DCP=8, 65536-token inputs, **8/8 requests succeeded**,
+      32 prefill batches including the `done=[16384]` chunk that previously aborted. Zero
+      `iota_range` / `proc died` / `exitcode=-6` in the log.
+
+    ## Not covered
+
+    - **The DCP merge has not been validated on real multi-GPU DCP.** The all-gather
+      itself is untested; the consumer keeps it behind a default-off flag.
+    - Tested on one gfx950 machine with Triton 3.7.0.
+    - The `waves_per_eu` timings are 10-iteration wall-clock, not a rigorous benchmark.
+  sha256: 78db254b2cafd5d5305e5ab658a8df1b81104553948401f0c5158b58541359f5
+  captured_at: '2026-11-04T16:49:02.390147+00:00'
+  updated_at: '2026-09-02T00:31:55Z'
+changes:
+- id: owned_kv_slots
+  commit: ce788f58feb47c66c23bfde5d39fab8e5db76606
+  parent_commit: d58537b705269f3179c3ba62fa34c108360a0aa2
+  file: aiter/ops/flydsl/dcp_topk_merge.py
+  before: ''
+  after: |2-
+        """Select this DCP rank's share of the global top-k and emit packed KV slots.
+
+        `gathered_scores[:, c]` MUST come from rank `c // k_loc` at that rank's local
+        top-k position `c % k_loc` -- the natural all_gather(dim=0) order. Ownership
+        is positional, so a permuted layout silently produces wrong KV.
+
+        PRECONDITION: unused candidate slots in `gathered_scores` must be -inf, not
+        0.0. Padding is detected via `local_idx < 0` for THIS rank's plane only; the
+        other W-1 planes carry no liveness signal, so their padding has to lose the
+        global threshold comparison on score alone. Logits are routinely negative,
+        so a 0.0 pad outranks real candidates and this rank silently under-emits.
+        `top_k_per_row_decode(values=...)` pads with -inf for exactly this reason --
+        an aiter predating that fix cannot feed this op.
+
+
+        First call for a new (n_cand, k_loc, topk, page_size, world_size) JIT-compiles
+        the kernels, so warm up each shape before capturing a CUDAGraph.
+  summary: Introduce rank-positional ownership, losing padding scores and physical-slot emission for DCP top-k
+    merge.
+results:
+- id: one_row
+  outcome: beneficial
+  summary: The fused owned-slot merge is reported faster than the equivalent six-operation sequence.
+  source_refs:
+  - report
+  context:
+    hardware: null
+    gfx: gfx950
+    dtype: FP32 gathered scores and int32 indices/maps
+    shape_layout: W=8, k_loc=topk=2048, bs=1; qlen=1 decode
+    software: Triton 3.7.0; other software unspecified
+    baseline: Equivalent six-op global selection/localization/packing sequence
+    candidate: Two-kernel select and pack with caller-owned staging
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: null
+    correctness: Author reports differential and edge-case tests; final test path is op_tests/test_flydsl_dcp_topk_merge.py
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: single_case
+    before: 166.5
+    after: 33.9
+    source:
+      ref: report
+      quote: '| 1 | 166.5 µs | 33.9 µs | 4.91× |'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - hardware
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - independent_reproduction
+  limitations:
+  - The all-gather itself and real multi-GPU DCP were not validated; the consumer keeps the path behind a default-off
+    flag.
+  - The PR explicitly does not attribute this single-op result to full decode latency.
+  - Timing protocol and hardware SKU are unspecified for this comparison.
+  - The PR text also discusses a Gluon fix absent from the final changed-file set; no effect from that section
+    is attributed here.
+- id: many_rows
+  outcome: beneficial
+  summary: The fused owned-slot merge is reported faster than the equivalent six-operation sequence.
+  source_refs:
+  - report
+  context:
+    hardware: null
+    gfx: gfx950
+    dtype: FP32 gathered scores and int32 indices/maps
+    shape_layout: W=8, k_loc=topk=2048, bs=128; qlen=1 decode
+    software: Triton 3.7.0; other software unspecified
+    baseline: Equivalent six-op global selection/localization/packing sequence
+    candidate: Two-kernel select and pack with caller-owned staging
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: null
+    correctness: Author reports differential and edge-case tests; final test path is op_tests/test_flydsl_dcp_topk_merge.py
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: single_case
+    before: 167.4
+    after: 34.0
+    source:
+      ref: report
+      quote: '| 128 | 167.4 µs | 34.0 µs | 4.92× |'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - hardware
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - independent_reproduction
+  limitations:
+  - The all-gather itself and real multi-GPU DCP were not validated; the consumer keeps the path behind a default-off
+    flag.
+  - The PR explicitly does not attribute this single-op result to full decode latency.
+  - Timing protocol and hardware SKU are unspecified for this comparison.
+  - The PR text also discusses a Gluon fix absent from the final changed-file set; no effect from that section
+    is attributed here.

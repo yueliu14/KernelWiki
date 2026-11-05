@@ -18,14 +18,14 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [attention-gated-delta-state-contract](#attention-gated-delta-state-contract) | constraint | What state and index contracts distinguish gated-delta decode from softmax attention? |
-| [gated-delta-prefill-state-and-snapshots](#gated-delta-prefill-state-and-snapshots) | constraint | How are persistent states and per-chunk snapshots distinguished in gated-delta prefill? |
-| [gated-delta-mtp-parent-snapshots](#gated-delta-mtp-parent-snapshots) | constraint | What state semantics change for multi-token prediction over a draft tree? |
-| [gated-delta-launch-ownership](#gated-delta-launch-ownership) | performance_candidate | Does the recurrent-attention launch assign each output tile exactly once? |
-| [gated-delta-write-policy](#gated-delta-write-policy) | performance_candidate | When is streaming output useful for a gated-delta preparation stage? |
-| [gated-delta-factorable-scale-and-head-reuse](#gated-delta-factorable-scale-and-head-reuse) | performance_candidate | Can a gated-delta contraction share head work or hoist a scale? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [attention-gated-delta-state-contract](#attention-gated-delta-state-contract) | constraint | reviewed | What state and index contracts distinguish gated-delta decode from softmax attention? |
+| [gated-delta-prefill-state-and-snapshots](#gated-delta-prefill-state-and-snapshots) | constraint | blocked | How are persistent states and per-chunk snapshots distinguished in gated-delta prefill? |
+| [gated-delta-mtp-parent-snapshots](#gated-delta-mtp-parent-snapshots) | constraint | reviewed | What state semantics change for multi-token prediction over a draft tree? |
+| [gated-delta-launch-ownership](#gated-delta-launch-ownership) | performance_candidate | unresolved | Does the recurrent-attention launch assign each output tile exactly once? |
+| [gated-delta-write-policy](#gated-delta-write-policy) | performance_candidate | unresolved | When is streaming output useful for a gated-delta preparation stage? |
+| [gated-delta-factorable-scale-and-head-reuse](#gated-delta-factorable-scale-and-head-reuse) | performance_candidate | unresolved | Can a gated-delta contraction share head work or hoist a scale? |
 
 <a id="attention-gated-delta-state-contract"></a>
 ### What state and index contracts distinguish gated-delta decode from softmax attention?
@@ -60,6 +60,34 @@ A required trait must be established for the actual design before the card appli
 #### Source evidence
 
 - [aiter_b3ad6c46:src_c67a55e3e97ebe90](source_evidence.md#aiter_b3ad6c46-src_c67a55e3e97ebe90) — [aiter/ops/flydsl/linear_attention_kernels.py:327-441](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/linear_attention_kernels.py#L327-L441).
+
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:17:37.107586+00:00.
+
+- **[PR #4907](https://github.com/ROCm/aiter/pull/4907) · merged · mixed** — PR #4907 extends GDN state updates to MTP chains and draft trees. Kernel aggregates, the early synchronization regression and the later public-entry improvement have separate evidence.
+  Conditions: Scope is the MTP extension: preserve rollback, slot-zero conventions, parent snapshots, state dtype, output layout and stream device; opt-in routing falls back to Triton during graph capture.
+  Direction: flydsl; recurrent_state, implementation_contract
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [8f5cb975fd12](https://github.com/ROCm/aiter/commit/8f5cb975fd12ff22a2a9640598e663009adf5174) — Extend the public linear-attention API with vLLM-chain and SGLang chain/tree MTP state-update entry points.
+  Change: [8f5cb975fd12](https://github.com/ROCm/aiter/commit/8f5cb975fd12ff22a2a9640598e663009adf5174) — Wire distinct chain and snapshot MTP modes into the linear-attention wrapper.
+  [Result: gfx950_mtp_aggregate](../../../_sources/aiter/pull_requests/4907.md#gfx950_mtp_aggregate) — **kernel**; The upstream full MTP sweep reports a speedup aggregate over its contract-specific baselines.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: software, baseline_commit, candidate_commit, measured_qkv_dtype, per_launch_timing_estimator, independent_reproduction.
+  speedup: 1.442 x (geomean)
+  speedup: 1.36 x (median)
+  [Result: gfx942_mtp_aggregate](../../../_sources/aiter/pull_requests/4907.md#gfx942_mtp_aggregate) — **kernel**; The upstream full MTP sweep reports a speedup aggregate over its contract-specific baselines.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: software, baseline_commit, candidate_commit, measured_qkv_dtype, per_launch_timing_estimator, independent_reproduction.
+  speedup: 1.371 x (geomean)
+  speedup: 1.211 x (median)
+  [Result: early_public_sync_regression](../../../_sources/aiter/pull_requests/4907.md#early_public_sync_regression) — **operator**; A reviewer reports that the earlier public dispatch synchronizes GPU metadata to the CPU and is slower despite the kernel-level gains.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, software, baseline_commit, candidate_commit, correctness, independent_reproduction.
+  latency: 35.9 → 69.5 us (median); normalized speedup 0.5165×
+  [Result: public_metadata_fix](../../../_sources/aiter/pull_requests/4907.md#public_metadata_fix) — **operator**; After passing the draft window as host metadata and avoiding duplicate validation, the author reports a 3.87 us public-entry improvement in their environment.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, software, baseline_commit, candidate_commit, independent_reproduction.
+  latency: 53.861 → 49.995 us (median); normalized speedup 1.077×
 
 #### Background
 
@@ -104,6 +132,12 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_fa1931cd4a8e61ea](source_evidence.md#aiter_b3ad6c46-src_fa1931cd4a8e61ea) — [aiter/ops/flydsl/linear_attention_prefill_kernels.py:484-915](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/linear_attention_prefill_kernels.py#L484-L915).
 
+#### Upstream PR effects
+
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #2854, #4732 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
+
 #### Background
 
 - [knowledge/operator/linear_attention_gated_delta/README.md](../README.md)
@@ -147,6 +181,34 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_c90d6f1a5c4c63f3](source_evidence.md#aiter_b3ad6c46-src_c90d6f1a5c4c63f3) — [aiter/ops/flydsl/linear_attention_kernels.py:956-1069](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/linear_attention_kernels.py#L956-L1069).
 
+#### Upstream PR effects
+
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:17:37.107586+00:00.
+
+- **[PR #4907](https://github.com/ROCm/aiter/pull/4907) · merged · mixed** — PR #4907 extends GDN state updates to MTP chains and draft trees. Kernel aggregates, the early synchronization regression and the later public-entry improvement have separate evidence.
+  Conditions: Scope is the MTP extension: preserve rollback, slot-zero conventions, parent snapshots, state dtype, output layout and stream device; opt-in routing falls back to Triton during graph capture.
+  Direction: flydsl; recurrent_state, implementation_contract
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [8f5cb975fd12](https://github.com/ROCm/aiter/commit/8f5cb975fd12ff22a2a9640598e663009adf5174) — Extend the public linear-attention API with vLLM-chain and SGLang chain/tree MTP state-update entry points.
+  Change: [8f5cb975fd12](https://github.com/ROCm/aiter/commit/8f5cb975fd12ff22a2a9640598e663009adf5174) — Wire distinct chain and snapshot MTP modes into the linear-attention wrapper.
+  [Result: gfx950_mtp_aggregate](../../../_sources/aiter/pull_requests/4907.md#gfx950_mtp_aggregate) — **kernel**; The upstream full MTP sweep reports a speedup aggregate over its contract-specific baselines.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: software, baseline_commit, candidate_commit, measured_qkv_dtype, per_launch_timing_estimator, independent_reproduction.
+  speedup: 1.442 x (geomean)
+  speedup: 1.36 x (median)
+  [Result: gfx942_mtp_aggregate](../../../_sources/aiter/pull_requests/4907.md#gfx942_mtp_aggregate) — **kernel**; The upstream full MTP sweep reports a speedup aggregate over its contract-specific baselines.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: software, baseline_commit, candidate_commit, measured_qkv_dtype, per_launch_timing_estimator, independent_reproduction.
+  speedup: 1.371 x (geomean)
+  speedup: 1.211 x (median)
+  [Result: early_public_sync_regression](../../../_sources/aiter/pull_requests/4907.md#early_public_sync_regression) — **operator**; A reviewer reports that the earlier public dispatch synchronizes GPU metadata to the CPU and is slower despite the kernel-level gains.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, software, baseline_commit, candidate_commit, correctness, independent_reproduction.
+  latency: 35.9 → 69.5 us (median); normalized speedup 0.5165×
+  [Result: public_metadata_fix](../../../_sources/aiter/pull_requests/4907.md#public_metadata_fix) — **operator**; After passing the draft window as host metadata and avoiding duplicate validation, the author reports a 3.87 us public-entry improvement in their environment.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: dtype, software, baseline_commit, candidate_commit, independent_reproduction.
+  latency: 53.861 → 49.995 us (median); normalized speedup 1.077×
+
 #### Background
 
 - [knowledge/operator/linear_attention_gated_delta/README.md](../README.md)
@@ -184,6 +246,12 @@ A required trait must be established for the actual design before the card appli
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.754147+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -233,6 +301,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
 
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 2 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.754206+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
+
 #### Reported experience
 
 Raw run artifacts are not published here. Historical reports have not been reproduced for this corpus. Outcomes are scoped to the conditions below; a combined result does not isolate each action's effect.
@@ -281,6 +355,12 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Keep as alternatives
 
 - Keep the existing correct implementation as the baseline and fallback; compare changes on the same workload.
+
+#### Upstream PR effects
+
+**Review: unresolved**.
+Read all 1 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.754238+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 

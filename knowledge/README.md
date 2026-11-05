@@ -15,6 +15,12 @@
 
 Keep independently measured results, upstream-reported results and source-only observations distinct. A source change or a tuned configuration does not itself establish a speedup. Every new performance result should name hardware, software/source revisions, workload, layouts/dtypes, timing protocol, baseline, correctness check and evidence location. Rank implementations only for compatible cases.
 
+Corpus decisions expose their upstream PR review status and can cite scoped
+[PR effect reports](../tools/corpus/upstream-evidence.md), including explicit unknown
+fields and separate association, effect and attribution confidence. Reviewed public
+excerpts live in `_sources/aiter/pull_requests/`; these are shared provenance records,
+not another operator collection or a table of measured winners.
+
 ## Contributing knowledge
 
 Keep new operator entries within GEMM, MoE, attention or attention indexers and their variants/fusions. Document small supporting operations with the main workload: packing and quantization with GEMM, routing and dispatch with MoE, cache writes and positional encoding with attention, and causal state mixing with gated-delta attention. Do not add separate collections for generic small operators, vision convolutions or training-only kernels.

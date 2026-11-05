@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: fused_moe_grouped_gemm
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits: {}
@@ -18,6 +18,13 @@ cards:
   question: What work partition and initialization are required before the fused MoE kernel?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #5001, #5346 remain to be checked against
+      the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:

@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: general
   curator_contract: Reusable conditioned conclusions; private run artifacts are not published.
 traits: {}
@@ -9,7 +9,7 @@ cards:
   axes:
   - measurement
   match:
-    operator_families: &id002
+    operator_families:
     - attention_decode_paged
     - attention_indexer
     - attention_prefill_fmha
@@ -44,7 +44,15 @@ cards:
   question: How can a small performance change be distinguished from measurement drift?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id001
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.755262+00:00'
+    summary: Read all 8 pinned GEAK summaries already cited by this card. They attribute methodological conclusions
+      across historical experiments, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - The candidate and baseline implement the same contract and are timed under the actual execution protocol.
   actions:
   - Interleave paired baseline/candidate blocks in both orders and include an A/A control. Keep warmup, allocations,
@@ -69,7 +77,8 @@ cards:
     private.
   experience:
   - outcome: constraint
-    conditions: *id001
+    conditions:
+    - The candidate and baseline implement the same contract and are timed under the actual execution protocol.
     summary: Historical experiments found order bias, power/clock drift and timing-bracket effects large enough
       to reverse small apparent wins.
     provenance:
@@ -101,7 +110,30 @@ cards:
   axes:
   - integration
   match:
-    operator_families: *id002
+    operator_families:
+    - attention_decode_paged
+    - attention_indexer
+    - attention_prefill_fmha
+    - batched_gemm
+    - chunked_prefill
+    - compressed_attention
+    - context_parallel_attention
+    - dense_gemm
+    - fused_moe_grouped_gemm
+    - gemm_epilogue_fused
+    - gqa_mqa_attention
+    - grouped_gemm_moe
+    - linear_attention_gated_delta
+    - mla_attention
+    - moe_dispatch_combine
+    - moe_routing_topk
+    - qk_norm_rope_cache
+    - scaled_quant_gemm
+    - shared_expert_fusion
+    - skinny_gemv_decode
+    - sliding_window_attention
+    - sparse_attention_nsa
+    - splitk_streamk_gemm
     target_languages:
     - triton
     - gluon
@@ -113,7 +145,15 @@ cards:
   question: How can an optimization be tied to the code and call path that actually ran?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id003
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.755466+00:00'
+    summary: Read all 5 pinned GEAK summaries already cited by this card. They attribute methodological conclusions
+      across historical experiments, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - Compilation caches, imported aliases or serving workers can resolve a different implementation from the
     edited source.
   actions:
@@ -139,7 +179,9 @@ cards:
     not establish successful serving integration.
   experience:
   - outcome: constraint
-    conditions: *id003
+    conditions:
+    - Compilation caches, imported aliases or serving workers can resolve a different implementation from the
+      edited source.
     summary: Historical summaries repeatedly reported unchanged or stale binaries and unpatched importing call
       sites being mistaken for optimization results.
     provenance:
@@ -168,7 +210,30 @@ cards:
   axes:
   - experiment_design
   match:
-    operator_families: *id002
+    operator_families:
+    - attention_decode_paged
+    - attention_indexer
+    - attention_prefill_fmha
+    - batched_gemm
+    - chunked_prefill
+    - compressed_attention
+    - context_parallel_attention
+    - dense_gemm
+    - fused_moe_grouped_gemm
+    - gemm_epilogue_fused
+    - gqa_mqa_attention
+    - grouped_gemm_moe
+    - linear_attention_gated_delta
+    - mla_attention
+    - moe_dispatch_combine
+    - moe_routing_topk
+    - qk_norm_rope_cache
+    - scaled_quant_gemm
+    - shared_expert_fusion
+    - skinny_gemv_decode
+    - sliding_window_attention
+    - sparse_attention_nsa
+    - splitk_streamk_gemm
     target_languages:
     - triton
     - gluon
@@ -180,7 +245,15 @@ cards:
   question: When should an optimization direction that previously failed be tested again?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id004
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.755645+00:00'
+    summary: Read all 5 pinned GEAK summaries already cited by this card. They attribute methodological conclusions
+      across historical experiments, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - A negative result was obtained for a particular implementation, operating regime and baseline.
   actions:
   - Preserve the mechanism and tested conditions of a negative result, then revisit it when dtype, tile, accumulation,
@@ -201,7 +274,8 @@ cards:
     a permanent prohibition.
   experience:
   - outcome: mixed
-    conditions: *id004
+    conditions:
+    - A negative result was obtained for a particular implementation, operating regime and baseline.
     summary: Several discarded directions became useful after the limiting resource or selected implementation
       changed; other combinations erased an earlier gain.
     provenance:
@@ -231,7 +305,30 @@ cards:
   - measurement
   - integration
   match:
-    operator_families: *id002
+    operator_families:
+    - attention_decode_paged
+    - attention_indexer
+    - attention_prefill_fmha
+    - batched_gemm
+    - chunked_prefill
+    - compressed_attention
+    - context_parallel_attention
+    - dense_gemm
+    - fused_moe_grouped_gemm
+    - gemm_epilogue_fused
+    - gqa_mqa_attention
+    - grouped_gemm_moe
+    - linear_attention_gated_delta
+    - mla_attention
+    - moe_dispatch_combine
+    - moe_routing_topk
+    - qk_norm_rope_cache
+    - scaled_quant_gemm
+    - shared_expert_fusion
+    - skinny_gemv_decode
+    - sliding_window_attention
+    - sparse_attention_nsa
+    - splitk_streamk_gemm
     target_languages:
     - triton
     - gluon
@@ -243,7 +340,15 @@ cards:
   question: Is launch or host work inside the metric being optimized?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id005
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.755732+00:00'
+    summary: Read all 3 pinned GEAK summaries already cited by this card. They attribute methodological conclusions
+      across historical experiments, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - A small kernel may be dominated by allocation, argument binding, dispatch or graph replay rather than its
     device body.
   actions:
@@ -265,7 +370,9 @@ cards:
     overhead. Empty controls bound possibilities; they are not deployable implementations.
   experience:
   - outcome: mixed
-    conditions: *id005
+    conditions:
+    - A small kernel may be dominated by allocation, argument binding, dispatch or graph replay rather than
+      its device body.
     summary: Some reports benefited from reducing host work while others timed only captured device execution
       or paid more for graph replay than for a direct launch.
     provenance:
@@ -282,7 +389,30 @@ cards:
   - resource_model
   - experiment_design
   match:
-    operator_families: *id002
+    operator_families:
+    - attention_decode_paged
+    - attention_indexer
+    - attention_prefill_fmha
+    - batched_gemm
+    - chunked_prefill
+    - compressed_attention
+    - context_parallel_attention
+    - dense_gemm
+    - fused_moe_grouped_gemm
+    - gemm_epilogue_fused
+    - gqa_mqa_attention
+    - grouped_gemm_moe
+    - linear_attention_gated_delta
+    - mla_attention
+    - moe_dispatch_combine
+    - moe_routing_topk
+    - qk_norm_rope_cache
+    - scaled_quant_gemm
+    - shared_expert_fusion
+    - skinny_gemv_decode
+    - sliding_window_attention
+    - sparse_attention_nsa
+    - splitk_streamk_gemm
     target_languages:
     - triton
     - gluon
@@ -294,7 +424,15 @@ cards:
   question: How should roofline and counter observations guide a concrete experiment?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id006
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.755816+00:00'
+    summary: Read all 3 pinned GEAK summaries already cited by this card. They attribute methodological conclusions
+      across historical experiments, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - The deployed CU count, dtype, shape and execution boundaries are known.
   actions:
   - Count required bytes and FLOPs for the actual semantics, including sparse gathers, partial buffers and
@@ -315,7 +453,8 @@ cards:
     performance are separate claims.
   experience:
   - outcome: constraint
-    conditions: *id006
+    conditions:
+    - The deployed CU count, dtype, shape and execution boundaries are known.
     summary: Historical reports found inflated peak denominators, removable scratch traffic and misleading
       instruction/counter proxies behind apparently exhausted kernels.
     provenance:
@@ -331,7 +470,30 @@ cards:
   axes:
   - resource_model
   match:
-    operator_families: *id002
+    operator_families:
+    - attention_decode_paged
+    - attention_indexer
+    - attention_prefill_fmha
+    - batched_gemm
+    - chunked_prefill
+    - compressed_attention
+    - context_parallel_attention
+    - dense_gemm
+    - fused_moe_grouped_gemm
+    - gemm_epilogue_fused
+    - gqa_mqa_attention
+    - grouped_gemm_moe
+    - linear_attention_gated_delta
+    - mla_attention
+    - moe_dispatch_combine
+    - moe_routing_topk
+    - qk_norm_rope_cache
+    - scaled_quant_gemm
+    - shared_expert_fusion
+    - skinny_gemv_decode
+    - sliding_window_attention
+    - sparse_attention_nsa
+    - splitk_streamk_gemm
     target_languages:
     - triton
     - gluon
@@ -343,7 +505,15 @@ cards:
   question: What resource limits occupancy on a matrix-core kernel?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id007
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.755846+00:00'
+    summary: Read all 1 pinned GEAK summaries already cited by this card. They attribute methodological conclusions
+      across historical experiments, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - Matrix instructions use architecture-specific vector and accumulator register allocation.
   actions:
   - Use the code object and the target architecture allocation rules to account for VGPRs, AGPRs, LDS, waves
@@ -361,7 +531,8 @@ cards:
     applies to every device.
   experience:
   - outcome: constraint
-    conditions: *id007
+    conditions:
+    - Matrix instructions use architecture-specific vector and accumulator register allocation.
     summary: A historical CDNA4 analysis found that counting only one register class overestimated available
       occupancy.
     provenance:
@@ -376,7 +547,30 @@ cards:
   - measurement
   - experiment_design
   match:
-    operator_families: *id002
+    operator_families:
+    - attention_decode_paged
+    - attention_indexer
+    - attention_prefill_fmha
+    - batched_gemm
+    - chunked_prefill
+    - compressed_attention
+    - context_parallel_attention
+    - dense_gemm
+    - fused_moe_grouped_gemm
+    - gemm_epilogue_fused
+    - gqa_mqa_attention
+    - grouped_gemm_moe
+    - linear_attention_gated_delta
+    - mla_attention
+    - moe_dispatch_combine
+    - moe_routing_topk
+    - qk_norm_rope_cache
+    - scaled_quant_gemm
+    - shared_expert_fusion
+    - skinny_gemv_decode
+    - sliding_window_attention
+    - sparse_attention_nsa
+    - splitk_streamk_gemm
     target_languages:
     - triton
     - gluon
@@ -388,7 +582,15 @@ cards:
   question: How should isolated improvements be evaluated as an end-to-end change?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id008
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.755925+00:00'
+    summary: Read all 2 pinned GEAK summaries already cited by this card. They attribute methodological conclusions
+      across historical experiments, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - The workload contains multiple kernels or phases, potentially with host work and communication overlap.
   actions:
   - Screen a candidate using its time share within a clearly stated boundary, then measure the full workload
@@ -412,7 +614,8 @@ cards:
     phase weighting. An Amdahl estimate is a model, not a measured serving gain.
   experience:
   - outcome: mixed
-    conditions: *id008
+    conditions:
+    - The workload contains multiple kernels or phases, potentially with host work and communication overlap.
     summary: Historical serving summaries found that individually small kernels and phase-specific gains did
       not translate proportionally to whole-model throughput.
     provenance:
@@ -439,7 +642,30 @@ cards:
   - resource_model
   - integration
   match:
-    operator_families: *id002
+    operator_families:
+    - attention_decode_paged
+    - attention_indexer
+    - attention_prefill_fmha
+    - batched_gemm
+    - chunked_prefill
+    - compressed_attention
+    - context_parallel_attention
+    - dense_gemm
+    - fused_moe_grouped_gemm
+    - gemm_epilogue_fused
+    - gqa_mqa_attention
+    - grouped_gemm_moe
+    - linear_attention_gated_delta
+    - mla_attention
+    - moe_dispatch_combine
+    - moe_routing_topk
+    - qk_norm_rope_cache
+    - scaled_quant_gemm
+    - shared_expert_fusion
+    - skinny_gemv_decode
+    - sliding_window_attention
+    - sparse_attention_nsa
+    - splitk_streamk_gemm
     target_languages:
     - triton
     - gluon
@@ -451,7 +677,15 @@ cards:
   question: When can a new grid axis improve a composed kernel chain?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id009
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.755963+00:00'
+    summary: Read all 1 pinned GEAK summaries already cited by this card. They attribute methodological conclusions
+      across historical experiments, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - A stage partitions only tokens while another independent dimension can supply useful parallelism.
   actions:
   - Check useful workgroups against available CUs, then partition the independent dimension while preserving
@@ -471,7 +705,8 @@ cards:
     memory traffic or change the limiting resource.
   experience:
   - outcome: mixed
-    conditions: *id009
+    conditions:
+    - A stage partitions only tokens while another independent dimension can supply useful parallelism.
     summary: A historical composed TileLang chain benefited from exposing hidden-dimension parallelism and
       removing invariant loop work; further fusion did not automatically improve the result.
     provenance:

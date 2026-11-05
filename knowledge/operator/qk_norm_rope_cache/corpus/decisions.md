@@ -18,10 +18,10 @@ A required trait must be established for the actual design before the card appli
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [attention-qk-rope-cache-fusion](#attention-qk-rope-cache-fusion) | performance_candidate | What must a Q/K normalization, RoPE and cache-write fusion preserve? |
-| [bmm-rope-cache-fused-write-contract](#bmm-rope-cache-fused-write-contract) | performance_candidate | What must remain intact when a batched projection is fused with RoPE and MLA cache writes? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [attention-qk-rope-cache-fusion](#attention-qk-rope-cache-fusion) | performance_candidate | blocked | What must a Q/K normalization, RoPE and cache-write fusion preserve? |
+| [bmm-rope-cache-fused-write-contract](#bmm-rope-cache-fused-write-contract) | performance_candidate | blocked | What must remain intact when a batched projection is fused with RoPE and MLA cache writes? |
 
 <a id="attention-qk-rope-cache-fusion"></a>
 ### What must a Q/K normalization, RoPE and cache-write fusion preserve?
@@ -57,6 +57,12 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_93c5bb1f38501f1d](source_evidence.md#aiter_b3ad6c46-src_93c5bb1f38501f1d) — [aiter/ops/flydsl/kernels/qk_norm_rope_quant.py:291-801](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/qk_norm_rope_quant.py#L291-L801).
 - [aiter_b3ad6c46:src_9069bff48d95f97b](source_evidence.md#aiter_b3ad6c46-src_9069bff48d95f97b) — [aiter/ops/flydsl/kernels/qk_norm_rope_quant.py:54-81](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/flydsl/kernels/qk_norm_rope_quant.py#L54-L81).
+
+#### Upstream PR effects
+
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #3320 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -101,6 +107,12 @@ A required trait must be established for the actual design before the card appli
 
 - [aiter_b3ad6c46:src_03307b826f486d6f](source_evidence.md#aiter_b3ad6c46-src_03307b826f486d6f) — [aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py:110-556](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py#L110-L556).
 - [aiter_b3ad6c46:src_f1da93f2cb82843a](source_evidence.md#aiter_b3ad6c46-src_f1da93f2cb82843a) — [aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py:560-620](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/fusions/fused_bmm_rope_kv_cache.py#L560-L620).
+
+#### Upstream PR effects
+
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #1847, #6501 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 

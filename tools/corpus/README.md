@@ -4,7 +4,7 @@ Knowledge lives in `knowledge/operator/<operator>/corpus/`. The
 [`catalog`](../../knowledge/operator/catalog.yaml) declares operator directories, aliases, workload
 groups and source snapshots; the generated [corpus index](../../knowledge/operator/CORPUS.md)
 lives beside it. The catalog uses schema version 3 and repository-relative paths. Reusable method
-cards live in `knowledge/general/corpus/`; both use decision schema version 5.
+cards live in `knowledge/general/corpus/`; both use decision schema version 6.
 
 ## Commands
 
@@ -17,6 +17,7 @@ python3 tools/corpus/build.py --emit
 python3 tools/corpus/build.py --check
 python3 tools/corpus/validate.py
 python3 tools/corpus/validate.py --verify-source /path/to/aiter
+python3 tools/corpus/validate.py --verify-upstream /path/to/aiter
 python3 tools/corpus/extract.py --operator attention_indexer --aiter /path/to/aiter --check
 python3 tools/corpus/extract.py --operator attention_indexer --aiter /path/to/aiter --emit
 python3 tools/corpus/seeds.py --aiter /path/to/aiter --check
@@ -28,6 +29,12 @@ For manual or recurring upstream maintenance, use the
 [AITER corpus refresh skill](skills/aiter-corpus-refresh/SKILL.md). Its portable read-only planner
 finds new unscoped kernels and maps source/test/configuration changes to affected corpus consumers;
 the skill then guides source review, citation migration and a validated knowledge update.
+
+For commit-to-PR provenance, reported effects and confidence, follow the
+[PR evidence guide](upstream-evidence.md). Every decision declares its review status;
+reviewed PR reports are stored once under `knowledge/_sources/aiter/pull_requests/` and
+referenced through `experience`. The initial examples are a partial backfill, and all
+other directions remain explicitly unreviewed. PR reports never imply local reproduction.
 
 The build validates the whole reference graph and renders all operators by default. `--operator`
 or `--family` limits the selected pages or source audit. Source extraction reads the exact git

@@ -1,0 +1,230 @@
+schema_version: 1
+id: aiter_pr_1909
+number: 1909
+repository: https://github.com/ROCm/aiter
+title: 'topk_sigmoid: 1.66x faster DPP kernel with 256-expert and FP32 support'
+state: closed
+base_commit: 584e490b748479816136158075c2b20fd5f6c03a
+head_commit: 1aa29687d8cbb1205b1a18e00f7ad7cec0e9e45a
+merge_commit: null
+captured_at: '2026-11-04T15:43:37.737805+00:00'
+updated_at: '2026-06-26T08:18:39Z'
+sources:
+- id: body
+  url: https://github.com/ROCm/aiter/pull/1909
+  excerpt: |-
+    # topk_sigmoid: 1.66x faster DPP kernel with 256-expert and FP32 support
+
+    ## Summary
+
+    This PR adds a GFX9-optimized `topk_sigmoid` kernel using DPP intrinsics while preserving the CK implementation as a fallback for other architectures.
+
+    ## Performance Highlights
+
+    | Metric | CK Baseline | DPP Kernel | Improvement |
+    |--------|-------------|------------|-------------|
+    | Avg speedup (vs PyTorch) | 4.32x | 9.81x | +127% |
+    | Best case (vs PyTorch) | 6.40x | 15.81x | +147% |
+    | Worst case (vs PyTorch) | 2.86x | 5.99x | +109% |
+    | 256 Experts | UNSUPPORTED | Works | SUPPORTED |
+    | FP32 Support | UNSUPPORTED | Works | SUPPORTED |
+
+    DPP vs CK direct comparison: avg 1.66x, median 1.65x, range 1.42x - 1.94x
+
+    ## Motivation
+
+    The existing CK-based implementation of topk_sigmoid has room for performance enhancements through the use of DPP intrinsics. This PR also adds support for 256 experts and FP32 dtype - the CK implementation silently returns garbage for these cases because `topk_softmax_api.cpp` has no matching branch.
+
+    ## Technical Approach
+
+    ### Architecture-Aware Dispatch
+
+    Runtime detection automatically routes to the optimal kernel:
+
+    ```cpp
+    void topk_sigmoid(...) {
+        if (isGPUArch({"gfx9"})) {
+            topk_sigmoid_gfx9(...);  // DPP-optimized
+        } else {
+            topk_sigmoid_ck(...);    // CK fallback
+        }
+    }
+    ```
+
+    ## Benchmark Results
+
+    ### Full Side-by-Side Comparison (40 configs, fp16/bf16, 64/128 experts)
+
+    #### 64 Experts
+
+    | Tokens | TopK | DType | CK (μs) | DPP (μs) | Speedup | Status |
+    |--------|------|-------|---------|----------|---------|--------|
+    | 256 | 4 | fp16 | 4.19 | 2.57 | 1.63x | PASS |
+    | 256 | 4 | bf16 | 3.80 | 2.41 | 1.58x | PASS |
+    | 256 | 8 | fp16 | 5.74 | 3.17 | 1.81x | PASS |
+    | 256 | 8 | bf16 | 5.44 | 3.03 | 1.80x | PASS |
+    | 512 | 4 | fp16 | 3.98 | 2.52 | 1.58x | PASS |
+    | 512 | 4 | bf16 | 3.85 | 2.38 | 1.62x | PASS |
+    | 512 | 8 | fp16 | 5.65 | 3.21 | 1.76x | PASS |
+    | 512 | 8 | bf16 | 5.79 | 2.93 | 1.98x | PASS |
+    | 1024 | 4 | fp16 | 4.01 | 2.55 | 1.57x | PASS |
+    | 1024 | 4 | bf16 | 4.04 | 2.54 | 1.59x | PASS |
+    | 1024 | 8 | fp16 | 5.81 | 3.34 | 1.74x | PASS |
+    | 1024 | 8 | bf16 | 5.71 | 2.97 | 1.92x | PASS |
+    | 2048 | 4 | fp16 | 3.93 | 3.01 | 1.31x | PASS |
+    | 2048 | 4 | bf16 | 4.10 | 2.59 | 1.58x | PASS |
+    | 2048 | 8 | fp16 | 5.79 | 3.43 | 1.69x | PASS |
+    | 2048 | 8 | bf16 | 5.67 | 3.64 | 1.56x | PASS |
+    | 4096 | 4 | fp16 | 4.79 | 3.32 | 1.44x | PASS |
+    | 4096 | 4 | bf16 | 4.77 | 3.19 | 1.50x | PASS |
+    | 4096 | 8 | fp16 | 7.26 | 4.65 | 1.56x | PASS |
+    | 4096 | 8 | bf16 | 7.33 | 4.61 | 1.59x | PASS |
+
+    #### 128 Experts
+
+    | Tokens | TopK | DType | CK (μs) | DPP (μs) | Speedup | Status |
+    |--------|------|-------|---------|----------|---------|--------|
+    | 256 | 4 | fp16 | 5.04 | 2.80 | 1.80x | PASS |
+    | 256 | 4 | bf16 | 4.84 | 2.86 | 1.69x | PASS |
+    | 256 | 8 | fp16 | 6.62 | 3.45 | 1.92x | PASS |
+    | 256 | 8 | bf16 | 6.62 | 3.59 | 1.84x | PASS |
+    | 512 | 4 | fp16 | 4.64 | 2.73 | 1.70x | PASS |
+    | 512 | 4 | bf16 | 4.82 | 2.96 | 1.63x | PASS |
+    | 512 | 8 | fp16 | 6.58 | 3.75 | 1.75x | PASS |
+    | 512 | 8 | bf16 | 6.66 | 3.67 | 1.81x | PASS |
+    | 1024 | 4 | fp16 | 4.78 | 2.90 | 1.65x | PASS |
+    | 1024 | 4 | bf16 | 4.93 | 3.05 | 1.62x | PASS |
+    | 1024 | 8 | fp16 | 6.60 | 3.48 | 1.90x | PASS |
+    | 1024 | 8 | bf16 | 6.66 | 3.80 | 1.75x | PASS |
+    | 2048 | 4 | fp16 | 4.93 | 2.96 | 1.67x | PASS |
+    | 2048 | 4 | bf16 | 4.76 | 3.10 | 1.54x | PASS |
+    | 2048 | 8 | fp16 | 6.65 | 4.03 | 1.65x | PASS |
+    | 2048 | 8 | bf16 | 6.60 | 3.93 | 1.68x | PASS |
+    | 4096 | 4 | fp16 | 5.92 | 3.69 | 1.60x | PASS |
+    | 4096 | 4 | bf16 | 5.85 | 3.89 | 1.50x | PASS |
+    | 4096 | 8 | fp16 | 8.48 | 5.53 | 1.53x | PASS |
+    | 4096 | 8 | bf16 | 8.28 | 5.57 | 1.49x | PASS |
+
+    Summary: 40/40 PASS | Avg: 1.66x | Median: 1.65x | Best: 1.98x | Worst: 1.31x
+
+    ## Test Plan
+
+    Used internal op test: `op_tests/test_moe_topk_sigmoid.py`
+
+    ### Reproduce Benchmarks
+
+    **This PR:**
+
+    ```bash
+    docker run --rm \
+        --device=/dev/kfd --device=/dev/dri \
+        --group-add video --shm-size=16G \
+        -v /path/to/aiter:/aiter \
+        rocm/pytorch:latest \
+        bash -c "
+            cd /aiter
+            rm -rf aiter/jit/*.so aiter/jit/build
+            pip install -e .
+            python op_tests/test_moe_topk_sigmoid.py \
+                --num-experts 64,128,256 \
+                --num-tokens 256,512,1024,2048,4096 \
+                --topk 4,8 \
+                --dtype fp16,bf16,fp32
+        "
+    ```
+
+    **Baseline (upstream aiter, CK kernel):**
+
+    ```bash
+    # Note: Use 64,128 experts and fp16,bf16 only - CK silently fails on 256 experts and fp32
+    docker run --rm \
+        --device=/dev/kfd --device=/dev/dri \
+        --group-add video --shm-size=16G \
+        -v /path/to/upstream-aiter:/aiter \
+        rocm/pytorch:latest \
+        bash -c "
+            cd /aiter
+            rm -rf aiter/jit/*.so aiter/jit/build
+            pip install -e .
+            python op_tests/test_moe_topk_sigmoid.py \
+                --num-experts 64,128 \
+                --num-tokens 256,512,1024,2048,4096 \
+                --topk 4,8 \
+                --dtype fp16,bf16
+        "
+    ```
+  sha256: af0600cf15df5b02a088b867522457294efbff1b403ad982469f06abd6abfd31
+  captured_at: '2026-11-04T15:43:37.737805+00:00'
+  updated_at: '2026-06-26T08:18:39Z'
+- id: environment
+  url: https://github.com/ROCm/aiter/pull/1909
+  excerpt: |-
+    ## Environment
+
+    Hardware: AMD MI300X (gfx942), ROCm 7.2.0, `rocm/pytorch:latest`
+  sha256: 3ec0e9c63e722a18df3862373de14e49a6d299d85839cbf812428e32f1469945
+  captured_at: '2026-11-04T15:43:37.737805+00:00'
+  updated_at: '2026-06-26T08:18:39Z'
+- id: closure
+  url: https://github.com/ROCm/aiter/pull/1909#issuecomment-4807688365
+  excerpt: |-
+    Hi, thank you for your contribution!
+
+    Over the past six months, ROCm/aiter has undergone significant updates and improvements. We're closing this PR for now to keep the backlog manageable — if you're still able to reproduce the issue or the feature is still relevant, we'd love to hear from you! Please give the latest version of the repo a try and feel free to reopen this PR or submit a new one if the problem persists. Looking forward to your continued contributions!
+  sha256: 1ab60cae137349253d021f0e44a352835a9a1e7920faa6d683100b3175da163c
+  captured_at: '2026-11-04T15:43:37.737805+00:00'
+  updated_at: '2026-06-26T08:18:37Z'
+changes:
+- id: dpp_selection
+  commit: 62abe7c1cc83518586e7a79f78fcf78ac7244c73
+  parent_commit: 9a469a608b2c10b7157df573a38d31e5bf4038b4
+  file: csrc/py_itfs_ck/topk_sigmoid_kernels.cu
+  before: void topk_sigmoid(torch::Tensor topk_weights,   // [tokens, topk]
+  after: |2-
+        if(is_gfx9_arch())
+        {
+            TORCH_CHECK(num_experts <= 512, "topk_sigmoid supports up to 512 experts");
+  summary: Add a gfx9 DPP sigmoid top-k implementation with a CK fallback in an unmerged proposal.
+results:
+- id: reported_average
+  outcome: beneficial
+  summary: The author reports an average 1.66x speedup for 40 valid CK-vs-DPP comparisons.
+  source_refs:
+  - body
+  - environment
+  - closure
+  context:
+    hardware: AMD MI300X
+    gfx: gfx942
+    dtype: fp16/bf16
+    shape_layout: '40 cases: 64/128 experts; tokens 256/512/1024/2048/4096; topk 4/8'
+    software: ROCm 7.2.0; rocm/pytorch:latest (mutable image)
+    baseline: CK topk_sigmoid implementation
+    candidate: Proposed DPP topk_sigmoid implementation
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: op_tests/test_moe_topk_sigmoid.py; direct CK-vs-DPP table; repetition count unspecified
+    correctness: PR table reports 40/40 PASS; not independently reproduced
+  metrics:
+  - kind: speedup
+    unit: x
+    statistic: mean
+    value: 1.66
+    source:
+      ref: body
+      quote: 'Summary: 40/40 PASS | Avg: 1.66x | Median: 1.65x | Best: 1.98x | Worst: 1.31x'
+  confidence:
+    level: low
+    reasons:
+    - The PR contains paired data but internally inconsistent extrema and no pinned benchmark revisions; retain
+      the author-reported mean without endorsing it.
+    missing_evidence:
+    - baseline_commit
+    - candidate_commit
+    - independent_reproduction
+  limitations:
+  - The introduction says range 1.42x-1.94x; the detailed table and summary say 1.31x-1.98x.
+  - The table against PyTorch uses a different baseline and is not the CK-vs-DPP comparison.
+  - The PR was closed without merging; it is a historical proposal, not a shipped default.
+  - The unsupported CK fp32/256-expert cases are capability claims, not valid speedup comparisons.

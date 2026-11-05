@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: moe_routing_topk
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -18,6 +18,11 @@ cards:
   question: When is the specialized HERD routing path a valid candidate?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - A candidate intends to reuse the FlyDSL HERD sigmoid routing implementation.
   actions:
@@ -41,6 +46,46 @@ cards:
   - Do not substitute sigmoid routing for a softmax or grouped-routing contract.
   references:
   - knowledge/operator/moe_routing_topk/README.md
+  experience:
+  - outcome: beneficial
+    conditions:
+    - HERD supported sigmoid routing profile; Kimi-K3 gate bias with std approximately 0.025; do not substitute
+      unit-variance random bias for the production comparison.
+    summary: The Kimi-K3 report supports a conditional HERD candidate; realistic bias and the supported profile
+      matter, and no numeric speedup is encoded.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_5693
+      change_refs:
+      - profile_gate
+      result_refs:
+      - kimi_qualitative_benefit
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - routing_semantics
+          - implementation_contract
+          backend: flydsl
 - id: moe-sort-padding-sentinels
   type: constraint
   axes:
@@ -56,6 +101,11 @@ cards:
   question: Which outputs of expert sorting are part of the downstream GEMM ABI?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T16:56:44.784904+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation/conditions.
+      This is a scoped historical association, not a complete review of every backend or version.
   conditions:
   - Token/expert routes are sorted and padded into expert-aligned work blocks.
   actions:
@@ -80,6 +130,50 @@ cards:
   - knowledge/operator/moe_routing_topk/README.md
   - knowledge/operator/grouped_gemm_moe/README.md
   - knowledge/operator/fused_moe_grouped_gemm/README.md
+  experience:
+  - outcome: mixed
+    conditions:
+    - Preserve sorted IDs, weights, expert IDs, valid-count, unit-size and workspace contracts; choose the
+      exact reported model/shape and timing mode.
+    summary: The sorting replacement has reported serving gains and mixed per-shape operator results; these
+      do not isolate the benefit of padding or a particular ABI field.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_3266
+      change_refs:
+      - sorting_interface
+      result_refs:
+      - fp8_serving
+      - mxfp4_serving
+      - graph_small_gain
+      - graph_mid_regression
+      - graph_equal
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or validity change as a whole; it does not isolate the
+              contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - expert_layout
+          - implementation_contract
+          backend: flydsl
 - id: router-launch-and-selection-cost
   type: performance_candidate
   axes:
@@ -99,7 +193,15 @@ cards:
   question: Is router top-k limited by launch preparation or by the selection network?
   evidence_level: reported_experience
   status: candidate_only
-  conditions: &id001
+  upstream_review:
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.754350+00:00'
+    summary: Read all 4 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - Small router rows expose a host/launch floor while larger rows may be selection-bound.
   actions:
   - Measure both regions separately and compare direct compiled launches with graph replay using the same contract.
@@ -122,7 +224,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id001
+    conditions:
+    - Small router rows expose a host/launch floor while larger rows may be selection-bound.
     summary: Historical router reports found substantial host-path effects for small cases and narrower device
       benefits for larger ones; replay and blindly combined device changes could regress.
     provenance:
@@ -134,4 +237,79 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/the-device-lane-on-a-small-router-top-k-is-close-to-closed-moe-router-topk-gfx950-both.md
       artifacts: not_published
       verification: not_reproduced
+- id: moe-sigmoid-dpp-selection
+  type: performance_candidate
+  axes:
+  - routing_semantics
+  - implementation_contract
+  match:
+    operator_families:
+    - moe_routing_topk
+    target_languages:
+    - hip
+  question: Can DPP-based selection improve sigmoid top-k for a fixed expert count?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-04T15:47:13.494575+00:00'
+    summary: Reviewed the named PR, its committed changes and available discussion; this does not establish
+      current deployment or target-workload performance.
+  conditions:
+  - Sigmoid routing, MI300X, fp16/bf16, 64/128 experts and the reported token/top-k cases; this is not softmax
+    routing.
+  actions:
+  - Evaluate a DPP selection network against a correct CK or other baseline on the same valid cases.
+  - Preserve sigmoid weighting, selection/tie semantics and output contracts; validate them independently.
+  alternatives:
+  - Keep the current correct implementation as the comparison baseline.
+  why:
+  - 'PR #1909 implements a gfx9 DPP path and reports a direct CK comparison.'
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - The proposal was closed without merging and must not be presented as shipped AITER code.
+  - Reported speedup extrema disagree within the PR; fp32 and 256-expert cases lack a valid CK performance
+    baseline.
+  references:
+  - knowledge/operator/moe_routing_topk/README.md
+  experience:
+  - outcome: beneficial
+    conditions:
+    - Sigmoid routing, MI300X, fp16/bf16, 64/128 experts and the reported token/top-k cases; this is not softmax
+      routing.
+    summary: An unmerged upstream proposal reports faster sigmoid top-k using DPP; its average and limitations
+      remain attributed to the author.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_1909
+      change_refs:
+      - dpp_selection
+      result_refs:
+      - reported_average
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed PR commit changes the named implementation and the quoted before/after construct.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The reported result belongs to a complete implementation/selector; individual contributions were
+              not isolated.
+            missing_evidence:
+            - independent_ablation
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - routing_semantics
+          - implementation_contract
+          backend: hip
 shared_cards: []

@@ -12,9 +12,9 @@ Source observations identify implementation precedents and constraints; they do 
 
 ## Owned decisions
 
-| card | type | question |
-|---|---|---|
-| [context-parallel-rank-and-layout-gates](#context-parallel-rank-and-layout-gates) | constraint | Which context-parallel ownership parameters and layout restrictions does the MLA launcher publish? |
+| card | type | PR review | question |
+|---|---|---|---|
+| [context-parallel-rank-and-layout-gates](#context-parallel-rank-and-layout-gates) | constraint | blocked | Which context-parallel ownership parameters and layout restrictions does the MLA launcher publish? |
 
 <a id="context-parallel-rank-and-layout-gates"></a>
 ### Which context-parallel ownership parameters and layout restrictions does the MLA launcher publish?
@@ -57,6 +57,12 @@ Source observations identify implementation precedents and constraints; they do 
 - [aiter_b3ad6c46:src_96d3ef37cc7abb9a](source_evidence.md#aiter_b3ad6c46-src_96d3ef37cc7abb9a) — [csrc/py_itfs_cu/asm_mla.cu:836](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/csrc/py_itfs_cu/asm_mla.cu#L836).
 - [aiter_b3ad6c46:src_269c29e28daa8a9d](source_evidence.md#aiter_b3ad6c46-src_269c29e28daa8a9d) — [csrc/py_itfs_cu/asm_mla.cu:755](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/csrc/py_itfs_cu/asm_mla.cu#L755).
 - [aiter_b3ad6c46:src_71e496e5bd0067fa](source_evidence.md#aiter_b3ad6c46-src_71e496e5bd0067fa) — [csrc/py_itfs_cu/asm_mla.cu:829](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/csrc/py_itfs_cu/asm_mla.cu#L829).
+
+#### Upstream PR effects
+
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #3750 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 

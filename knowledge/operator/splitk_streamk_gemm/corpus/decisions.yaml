@@ -1,5 +1,5 @@
 provenance:
-  schema_version: 5
+  schema_version: 6
   operator_family: splitk_streamk_gemm
   curator_contract: Conditioned source precedents; target-workload validation decides correctness and performance.
 traits:
@@ -32,6 +32,12 @@ cards:
     of the kernel to?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-05T02:10:32.112473+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - target_language=flydsl
   - a case whose output tile count ceil(M/tile_m)*ceil(N/tile_n) is well below the CU count — 304 on MI300X,
@@ -137,6 +143,46 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/split-k-by-2-to-fill-the-grid-on-the-tiny-m-case-quantized-gemm-gfx950-small-batch.md
       artifacts: not_published
       verification: not_reproduced
+  - outcome: mixed
+    conditions:
+    - 'Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later
+      pinned configuration surface.'
+    summary: 'PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results;
+      no independent gain for this direction is established.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2536
+      change_refs:
+      - config_surface
+      - split_validity
+      result_refs:
+      - kimi_report
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - work_partition
+          - workgroup_tile
+          backend: flydsl
 - id: flydsl-splitk-hot-loop-schedule-bundle
   type: performance_candidate
   axes:
@@ -160,6 +206,12 @@ cards:
   question: What explicit instruction-order bundle can seed a hand-scheduled FlyDSL split-K GEMM hot loop?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-05T02:10:32.112473+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -207,6 +259,45 @@ cards:
   - Instruction scheduling is the most build-specific thing in this corpus; treat it as a candidate to try
     late, after tiling and split-K are settled.
   - Changing tile geometry, LDS stages or access width changes the schedule that must be re-measured.
+  experience:
+  - outcome: mixed
+    conditions:
+    - 'Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later
+      pinned configuration surface.'
+    summary: 'PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results;
+      no independent gain for this direction is established.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2536
+      change_refs:
+      - hot_loop_schedule
+      result_refs:
+      - kimi_report
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - pipeline_schedule
+          backend: flydsl
 - id: flydsl-splitk-reduction-contract
   type: constraint
   axes:
@@ -225,6 +316,12 @@ cards:
   question: How does the FlyDSL split-K HGEMM combine partial results, and what does that impose on the launcher?
   evidence_level: source_observed
   status: candidate_only
+  upstream_review:
+    status: reviewed
+    checked_at: '2026-11-05T02:10:32.112473+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - target_language=flydsl
   - split_k > 1 is a candidate, or a split-K kernel is being ported or written
@@ -304,6 +401,88 @@ cards:
   - The counter capacity is a property of the current kernel; an authored split-K with a different combine
     has its own bound.
   - Whether split-K pays for a shape is a measurement; this card only states what a legal split-K launch requires.
+  experience:
+  - outcome: mixed
+    conditions:
+    - 'Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later
+      pinned configuration surface.'
+    summary: 'PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results;
+      no independent gain for this direction is established.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2536
+      change_refs:
+      - split_zero
+      - split_atomic
+      result_refs:
+      - kimi_report
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - work_partition
+          - epilogue
+          - runtime_contract
+          backend: flydsl
+  - outcome: constraint
+    conditions:
+    - tile_m=48 and split_k>1; include local tile bounds as well as runtime M bounds.
+    summary: The original split-K combine required a tail-row coverage fix; changing split count is subject
+      to the complete output coverage and numerical contract.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2567
+      change_refs:
+      - ceil_c_vectors
+      - bounded_zero
+      result_refs:
+      - tail_row_correctness
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - work_partition
+          - epilogue
+          - runtime_contract
+          backend: flydsl
 shared_cards:
 - flydsl-async-copy-by-family
 - flydsl-gfx942-path-gates
