@@ -145,11 +145,26 @@ def test_serving_operator_and_conflicting_results_remain_separate(catalog):
     assert "end_to_end" in text and "later_regression" in text
 
 
-def test_closed_unmerged_proposal_and_unreviewed_cards_are_visible(catalog):
+def test_closed_unmerged_proposal_is_visible(catalog):
     pr = catalog.upstream["aiter_pr_1909"]
     assert pr["state"] == "closed" and pr["merge_commit"] is None
     _, text = build.render_decisions(catalog, "moe_routing_topk")
-    assert "closed" in text and "not reproduced" in text and "Review: unreviewed" in text
+    assert "closed" in text and "not reproduced" in text
+
+
+@pytest.mark.parametrize("status", ["unreviewed", "unresolved", "blocked"])
+def test_missing_association_keeps_effect_confidence_unknown(catalog, status):
+    card = deepcopy(catalog.cards["indexer-score-work-partition"])
+    card["experience"] = []
+    card["upstream_review"] = {"status": status}
+    if status != "unreviewed":
+        card["upstream_review"].update(
+            checked_at="2026-11-05T02:00:00Z", summary="The scoped search has not established a PR relationship."
+        )
+    upstream.validate_cards({card["id"]: card}, catalog.upstream)
+    text = "\n".join(render.card_section(catalog, card, catalog.root / "reading.md"))
+    assert f"Review: {status}" in text and "confidence" in text and "unknown" in text
+    assert "normalized speedup" not in text
 
 
 def test_shared_decision_does_not_duplicate_pr_effects(catalog):

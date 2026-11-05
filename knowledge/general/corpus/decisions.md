@@ -14,14 +14,14 @@ Reusable methods distilled from historical reports. Reported outcomes have not b
 
 | card | type | PR review | question |
 |---|---|---|---|
-| [method-paired-measurement-controls](#method-paired-measurement-controls) | performance_candidate | unreviewed | How can a small performance change be distinguished from measurement drift? |
-| [method-live-binary-and-integration](#method-live-binary-and-integration) | performance_candidate | unreviewed | How can an optimization be tied to the code and call path that actually ran? |
-| [method-conditional-negative-results](#method-conditional-negative-results) | performance_candidate | unreviewed | When should an optimization direction that previously failed be tested again? |
-| [method-host-and-replay-floor](#method-host-and-replay-floor) | performance_candidate | unreviewed | Is launch or host work inside the metric being optimized? |
-| [method-causal-resource-model](#method-causal-resource-model) | performance_candidate | unreviewed | How should roofline and counter observations guide a concrete experiment? |
-| [method-register-limited-occupancy](#method-register-limited-occupancy) | performance_candidate | unreviewed | What resource limits occupancy on a matrix-core kernel? |
-| [method-end-to-end-attribution](#method-end-to-end-attribution) | performance_candidate | unreviewed | How should isolated improvements be evaluated as an end-to-end change? |
-| [method-grid-and-lifetime-contract](#method-grid-and-lifetime-contract) | performance_candidate | unreviewed | When can a new grid axis improve a composed kernel chain? |
+| [method-paired-measurement-controls](#method-paired-measurement-controls) | performance_candidate | unresolved | How can a small performance change be distinguished from measurement drift? |
+| [method-live-binary-and-integration](#method-live-binary-and-integration) | performance_candidate | unresolved | How can an optimization be tied to the code and call path that actually ran? |
+| [method-conditional-negative-results](#method-conditional-negative-results) | performance_candidate | unresolved | When should an optimization direction that previously failed be tested again? |
+| [method-host-and-replay-floor](#method-host-and-replay-floor) | performance_candidate | unresolved | Is launch or host work inside the metric being optimized? |
+| [method-causal-resource-model](#method-causal-resource-model) | performance_candidate | unresolved | How should roofline and counter observations guide a concrete experiment? |
+| [method-register-limited-occupancy](#method-register-limited-occupancy) | performance_candidate | unresolved | What resource limits occupancy on a matrix-core kernel? |
+| [method-end-to-end-attribution](#method-end-to-end-attribution) | performance_candidate | unresolved | How should isolated improvements be evaluated as an end-to-end change? |
+| [method-grid-and-lifetime-contract](#method-grid-and-lifetime-contract) | performance_candidate | unresolved | When can a new grid axis improve a composed kernel chain? |
 
 <a id="method-paired-measurement-controls"></a>
 ### How can a small performance change be distinguished from measurement drift?
@@ -57,8 +57,9 @@ Reusable methods distilled from historical reports. Reported outcomes have not b
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 8 pinned GEAK summaries already cited by this card. They attribute methodological conclusions across historical experiments, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.755262+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -113,8 +114,9 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 5 pinned GEAK summaries already cited by this card. They attribute methodological conclusions across historical experiments, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.755466+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -167,8 +169,9 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 5 pinned GEAK summaries already cited by this card. They attribute methodological conclusions across historical experiments, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.755645+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -221,8 +224,9 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 3 pinned GEAK summaries already cited by this card. They attribute methodological conclusions across historical experiments, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.755732+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -270,8 +274,9 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 3 pinned GEAK summaries already cited by this card. They attribute methodological conclusions across historical experiments, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.755816+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -318,8 +323,9 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 1 pinned GEAK summaries already cited by this card. They attribute methodological conclusions across historical experiments, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.755846+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -369,8 +375,9 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 2 pinned GEAK summaries already cited by this card. They attribute methodological conclusions across historical experiments, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.755925+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -423,8 +430,9 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 1 pinned GEAK summaries already cited by this card. They attribute methodological conclusions across historical experiments, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.755963+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 

@@ -282,7 +282,11 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-05T02:10:32.112473+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -338,6 +342,46 @@ cards:
   limitations:
   - No latency or occupancy comparison is attached; treat both K shapes as candidates and re-measure.
   - API spelling is version-sensitive; consult languages/flydsl/version_map.md before copying.
+  experience:
+  - outcome: mixed
+    conditions:
+    - 'Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later
+      pinned configuration surface.'
+    summary: 'PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results;
+      no independent gain for this direction is established.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2536
+      change_refs:
+      - half_mfma
+      result_refs:
+      - kimi_report
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - compute_instruction
+          - architecture_capability
+          backend: flydsl
 - id: flydsl-async-copy-by-family
   type: performance_candidate
   axes:
@@ -473,7 +517,11 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-05T02:24:54.151357+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - target_language=flydsl
   - 'a multi-XCD part (MI300X / MI355X: 8 XCDs, each with its own L2)'
@@ -539,6 +587,44 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/host-dispatch-and-backend-swap-closed-on-a-saturated-grouped-moe-grouped-gemm-gfx950-prefill.md
       artifacts: not_published
       verification: not_reproduced
+  - outcome: not_reported
+    conditions:
+    - Eight-XCD source path; validate divisibility, incomplete groups and actual device topology before reuse.
+    summary: 'PR #2726 introduces the XCD/grouped-M remapping used by the pinned FlyDSL MoE precedent; there
+      is no measured mapping-only gain.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2726
+      change_refs:
+      - xcd_workgroup_mapping
+      result_refs:
+      - remap_unmeasured
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - work_partition
+          - memory_access
+          - execution_geometry
+          backend: flydsl
 - id: flydsl-hgemm-config-space
   type: performance_candidate
   axes:
@@ -562,7 +648,11 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-05T02:10:32.112473+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -622,6 +712,49 @@ cards:
     flydsl-small-m-hgemm-family.
   - A candidate that is inside the space can still be rejected at compile time by the tiling and LDS rules
     — see flydsl-hgemm-tiling-validity.
+  experience:
+  - outcome: mixed
+    conditions:
+    - 'Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later
+      pinned configuration surface.'
+    summary: 'PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results;
+      no independent gain for this direction is established.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2536
+      change_refs:
+      - config_surface
+      - split_validity
+      result_refs:
+      - kimi_report
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - workgroup_tile
+          - work_partition
+          - execution_geometry
+          - tunable_surface
+          backend: flydsl
 - id: flydsl-xor16-lds-layout-consistency
   type: performance_candidate
   axes:
@@ -644,7 +777,11 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-05T02:10:32.112473+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -689,6 +826,47 @@ cards:
   limitations:
   - The citations prove address consistency, not that XOR16 reduces bank conflicts on every tile.
   - Retain the unswizzled implementation and choose by target-box measurement.
+  experience:
+  - outcome: mixed
+    conditions:
+    - 'Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later
+      pinned configuration surface.'
+    summary: 'PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results;
+      no independent gain for this direction is established.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2536
+      change_refs:
+      - xor16_store
+      - xor16_load
+      result_refs:
+      - kimi_report
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - operand_layout
+          - configuration_constraints
+          backend: flydsl
 - id: flydsl-preshuffle-b-layout-contract
   type: performance_candidate
   axes:
@@ -710,7 +888,11 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-05T02:10:32.112473+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - operator_family=gemm
   - target_language=flydsl
@@ -810,6 +992,47 @@ cards:
     state which one you are reporting.
   - The card is grounded in the vendored library's contract. A kernel copy that has been edited may have moved
     these checks.
+  experience:
+  - outcome: mixed
+    conditions:
+    - 'Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later
+      pinned configuration surface.'
+    summary: 'PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results;
+      no independent gain for this direction is established.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2536
+      change_refs:
+      - preshuffle_gate
+      result_refs:
+      - kimi_report
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - operand_layout
+          - runtime_contract
+          - configuration_constraints
+          backend: flydsl
 - id: gemm-shape-regime-routing
   type: performance_candidate
   axes:
@@ -1076,7 +1299,12 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #1048 remain to be checked against the
+      exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - target_language=flydsl
   - a tile and split are being chosen per case, and the vendor's own choices for the same dtype and architecture
@@ -1150,7 +1378,11 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-05T02:10:32.112473+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - target_language=flydsl
   - a kernel loads MFMA fragments, scales an accumulator per row or per column, or writes it back
@@ -1191,6 +1423,48 @@ cards:
   - The mapping is for the 16x16 MFMA atom these kernels use; a 32x32 instruction has a different lane layout.
   - K per lane depends on the instruction (four bf16 or eight fp8 elements per lane for the 16x16 forms), which
     the frag-value constants carry.
+  experience:
+  - outcome: mixed
+    conditions:
+    - 'Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later
+      pinned configuration surface.'
+    summary: 'PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results;
+      no independent gain for this direction is established.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2536
+      change_refs:
+      - fragment_inputs
+      - fragment_output
+      result_refs:
+      - kimi_report
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - operand_layout
+          - epilogue
+          - compute_instruction
+          backend: flydsl
 - id: flydsl-host-launch-contract
   type: constraint
   axes:
@@ -1317,7 +1591,11 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-05T02:10:32.112473+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - target_language=flydsl
   - a FlyDSL GEMM — especially a split-K one — is being validated against a reference
@@ -1353,6 +1631,47 @@ cards:
   limitations:
   - These are AITER's regression cases for its own kernel; an authored kernel is judged by the task's oracle,
     not by this test.
+  experience:
+  - outcome: constraint
+    conditions:
+    - Kimi-2 concurrency 65 exposed an issue missed at 16; inspect the actual tolerance and split layout of
+      the target test.
+    summary: The upstream regression demonstrates why the output oracle must cover split-K tail rows; it does
+      not replace the later pinned test policy.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2567
+      change_refs:
+      - precision_gate
+      result_refs:
+      - tail_row_correctness
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - validation_contract
+          - work_partition
+          - epilogue
+          backend: flydsl
 - id: gemm-streamed-operand-cache-policy
   type: performance_candidate
   axes:
@@ -1374,7 +1693,11 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-05T02:24:54.151357+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - target_language=flydsl
   - one operand is read once per call while the other is reused across tiles — typically the weight B at decode,
@@ -1418,6 +1741,45 @@ cards:
     `nontemporal` store flag — and the corpus does not map one onto another; read what the target API accepts.
   - 'Whether streaming helps depends on the reuse the benchmark reproduces: a timing loop that re-reads the
     same weight from a warm cache measures a different reuse than serving, where each layer reads its own weight.'
+  experience:
+  - outcome: not_reported
+    conditions:
+    - Scope is the FlyDSL helper and its B-load use; later per-family stores and Triton policies retain separate
+      source evidence.
+    summary: 'PR #2581 adds the cache-policy parameter to the shared preshuffle load helper; it reports no
+      measured benefit for the individual cache choice.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2581
+      change_refs:
+      - load_cache_policy
+      result_refs:
+      - cache_policy_unmeasured
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - memory_access
+          - tunable_surface
+          backend: flydsl
 - id: flydsl-lds-pipeline-depth
   type: performance_candidate
   axes:
@@ -1536,8 +1898,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id001
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.752972+00:00'
+    summary: Read all 4 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - Small-M GEMM is measured with exposed host or allocation work.
   actions:
   - Measure the raw wrapper, device dispatch and candidate replay under the same protocol before adding a cache.
@@ -1559,7 +1927,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id001
+    conditions:
+    - Small-M GEMM is measured with exposed host or allocation work.
     summary: Host allocation/lookup caching helped some tiny GEMMs, whereas one-node replay and additional
       signature wrappers regressed other cases.
     provenance:
@@ -1591,8 +1960,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id002
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.753060+00:00'
+    summary: Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - A matrix-core GEMM has a measured schedule or resource limitation, and the intended compiler controls are
     available.
   actions:
@@ -1616,7 +1991,9 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id002
+    conditions:
+    - A matrix-core GEMM has a measured schedule or resource limitation, and the intended compiler controls
+      are available.
     summary: Historical FP16 experiments reported gains from explicit register staging, but larger accumulators
       spilled and hand-written loops could lose to the compiler schedule.
     provenance:

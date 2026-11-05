@@ -20,9 +20,9 @@ A required trait must be established for the actual design before the card appli
 
 | card | type | PR review | question |
 |---|---|---|---|
-| [attention-window-prefix-boundaries](#attention-window-prefix-boundaries) | constraint | unreviewed | How do cached prefixes and sliding windows change the causal boundary? |
-| [windowed-attention-backend-admission](#windowed-attention-backend-admission) | constraint | unreviewed | Which additional conditions must hold before selecting the gfx950 Gluon unified-attention path? |
-| [window-specific-split-metadata](#window-specific-split-metadata) | performance_candidate | unreviewed | Does decode use split metadata for the attended window or for the full context? |
+| [attention-window-prefix-boundaries](#attention-window-prefix-boundaries) | constraint | blocked | How do cached prefixes and sliding windows change the causal boundary? |
+| [windowed-attention-backend-admission](#windowed-attention-backend-admission) | constraint | blocked | Which additional conditions must hold before selecting the gfx950 Gluon unified-attention path? |
+| [window-specific-split-metadata](#window-specific-split-metadata) | performance_candidate | unresolved | Does decode use split metadata for the attended window or for the full context? |
 
 <a id="attention-window-prefix-boundaries"></a>
 ### How do cached prefixes and sliding windows change the causal boundary?
@@ -61,8 +61,9 @@ A required trait must be established for the actual design before the card appli
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #266, #5771 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -110,8 +111,9 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #5771 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -153,8 +155,9 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read the pinned GEAK summary of an authored Triton kernel and SGLang launcher overlay. It describes a stack-specific experiment but supplies no uniquely identified AITER change commit or PR for that outcome. Retain the SGLang/local-experiment lineage; AITER PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.754958+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 

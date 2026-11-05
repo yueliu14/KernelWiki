@@ -22,7 +22,7 @@ A required trait must be established for the actual design before the card appli
 |---|---|---|---|
 | [moe-herd-routing-profile](#moe-herd-routing-profile) | constraint | reviewed | When is the specialized HERD routing path a valid candidate? |
 | [moe-sort-padding-sentinels](#moe-sort-padding-sentinels) | constraint | reviewed | Which outputs of expert sorting are part of the downstream GEMM ABI? |
-| [router-launch-and-selection-cost](#router-launch-and-selection-cost) | performance_candidate | unreviewed | Is router top-k limited by launch preparation or by the selection network? |
+| [router-launch-and-selection-cost](#router-launch-and-selection-cost) | performance_candidate | unresolved | Is router top-k limited by launch preparation or by the selection network? |
 | [moe-sigmoid-dpp-selection](#moe-sigmoid-dpp-selection) | performance_candidate | reviewed | Can DPP-based selection improve sigmoid top-k for a fixed expert count? |
 
 <a id="moe-herd-routing-profile"></a>
@@ -193,8 +193,9 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 4 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.754350+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 

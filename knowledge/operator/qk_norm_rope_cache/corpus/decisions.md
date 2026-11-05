@@ -20,8 +20,8 @@ A required trait must be established for the actual design before the card appli
 
 | card | type | PR review | question |
 |---|---|---|---|
-| [attention-qk-rope-cache-fusion](#attention-qk-rope-cache-fusion) | performance_candidate | unreviewed | What must a Q/K normalization, RoPE and cache-write fusion preserve? |
-| [bmm-rope-cache-fused-write-contract](#bmm-rope-cache-fused-write-contract) | performance_candidate | unreviewed | What must remain intact when a batched projection is fused with RoPE and MLA cache writes? |
+| [attention-qk-rope-cache-fusion](#attention-qk-rope-cache-fusion) | performance_candidate | blocked | What must a Q/K normalization, RoPE and cache-write fusion preserve? |
+| [bmm-rope-cache-fused-write-contract](#bmm-rope-cache-fused-write-contract) | performance_candidate | blocked | What must remain intact when a batched projection is fused with RoPE and MLA cache writes? |
 
 <a id="attention-qk-rope-cache-fusion"></a>
 ### What must a Q/K normalization, RoPE and cache-write fusion preserve?
@@ -60,8 +60,9 @@ A required trait must be established for the actual design before the card appli
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #3320 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -109,8 +110,9 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #1847, #6501 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 

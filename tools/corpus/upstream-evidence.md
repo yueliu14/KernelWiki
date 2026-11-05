@@ -16,11 +16,24 @@ The next backfill covers A8 GEMM incorporation (#2546), architecture-aware LDS c
 prefill mask elision (#4761), DCP top-k merge (#5123), and HERD routing (#5693). See the
 [generated coverage index](../../knowledge/operator/CORPUS.md) for current counts.
 
+Further backfill covers the split-K HGEMM introduction and tail-row correctness fix
+(#2536/#2567), MXFP8 GEMM comparison populations (#5896), compressor constraints
+(#3357), route-map and quant/scatter incorporation (#3460/#3851), and GDN MTP kernel
+results alongside an early public-entry regression and its later fix (#4907).
+The later operand cache-policy and XCD additions are traced to #2581 and #2726;
+shared-expert readiness and padded-layout handling are traced to #5907, with its
+operator/serving comparisons and cross-rank reuse constraints kept separate.
+Historical GEAK summaries without a uniquely identified AITER change remain
+`unresolved`, including accounts explicitly attributed to vLLM or SGLang. Their
+documentation pins and existing run conclusions are retained.
+
 ## Three independent questions
 
 1. **Association:** Does the cited change implement this particular direction? Verify
    the changed construct, its callers and the selected backend, not just a filename or
    PR title. GitHub commit associations and `git blame` produce candidates.
+   A file-creation PR need not introduce a later optimization in that file. Follow the
+   specific construct through subsequent commits before associating its effect.
 2. **Effect:** What did the upstream source actually report, with what comparison
    context? Each result belongs to one kernel, operator or end-to-end comparison.
 3. **Independent attribution:** Does the comparison isolate this direction? A PR
@@ -55,6 +68,8 @@ Use the checked-in examples as complete templates:
 - [Serving gains and per-shape gains, regressions and equal displayed timings](../../knowledge/_sources/aiter/pull_requests/3266.yaml)
 - [Measured candidate revisions distinct from PR metadata](../../knowledge/_sources/aiter/pull_requests/4761.yaml)
 - [A qualitative report with image-only numerical results left unencoded](../../knowledge/_sources/aiter/pull_requests/5693.yaml)
+- [Kernel gains, an early public-entry regression and its subsequent fix](../../knowledge/_sources/aiter/pull_requests/4907.yaml)
+- [Shared-expert contracts within a communication-fusion bundle](../../knowledge/_sources/aiter/pull_requests/5907.yaml)
 
 Each report contains:
 

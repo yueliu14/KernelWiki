@@ -18,7 +18,11 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-05T02:10:32.112473+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:
@@ -39,6 +43,47 @@ cards:
   - This is an implementation precedent, not a measured performance preference on a new workload.
   references:
   - knowledge/operator/batched_gemm/README.md
+  experience:
+  - outcome: beneficial
+    conditions:
+    - gfx950, e8m0 32x32 or 128x128 scales; keep the two tuned populations and their different baselines separate.
+    summary: The shared MXFP8 implementation has reported tuned linear-GEMM gains; the PR gives no separate
+      wo_a BMM speedup or ablation of this contract/heuristic.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_5896
+      change_refs:
+      - arch_scale_dispatch
+      - operand_layout
+      result_refs:
+      - v4_block128
+      - v41_group32
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - runtime_contract
+          - operand_layout
+          backend: flydsl
 - id: batched-mxfp8-fallback-configuration
   type: performance_candidate
   axes:
@@ -54,7 +99,11 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-05T02:10:32.112473+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - The selected implementation matches the cited path and its input contract.
   actions:
@@ -77,6 +126,48 @@ cards:
   - This is an implementation precedent, not a measured performance preference on a new workload.
   references:
   - knowledge/operator/batched_gemm/README.md
+  experience:
+  - outcome: beneficial
+    conditions:
+    - gfx950, e8m0 32x32 or 128x128 scales; keep the two tuned populations and their different baselines separate.
+    summary: The shared MXFP8 implementation has reported tuned linear-GEMM gains; the PR gives no separate
+      wo_a BMM speedup or ablation of this contract/heuristic.
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_5896
+      change_refs:
+      - fallback_legality
+      - fallback_split
+      result_refs:
+      - v4_block128
+      - v41_group32
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - workgroup_tile
+          - work_partition
+          - pipeline_schedule
+          backend: flydsl
 shared_cards:
 - flydsl-async-copy-by-family
 - flydsl-gfx942-path-gates

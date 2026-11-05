@@ -23,9 +23,9 @@ A required trait must be established for the actual design before the card appli
 | card | type | PR review | question |
 |---|---|---|---|
 | [flydsl-cshuffle-epilogue](#flydsl-cshuffle-epilogue) | performance_candidate | reviewed | When can a FlyDSL GEMM route its accumulators through an LDS CShuffle epilogue, and what does it cost? |
-| [gemm-gated-feed-forward-atomic-output](#gemm-gated-feed-forward-atomic-output) | constraint | unreviewed | What does the fused gated feed-forward body require of its output buffer? |
-| [gemm-blockscale-fused-affine-split](#gemm-blockscale-fused-affine-split) | semantic | unreviewed | Where does an affine epilogue belong when the GEMM is split over K? |
-| [fused-gemm-regime-specific-chain](#fused-gemm-regime-specific-chain) | performance_candidate | unreviewed | Which fusion boundary helps each regime of a normalization/GEMM chain? |
+| [gemm-gated-feed-forward-atomic-output](#gemm-gated-feed-forward-atomic-output) | constraint | blocked | What does the fused gated feed-forward body require of its output buffer? |
+| [gemm-blockscale-fused-affine-split](#gemm-blockscale-fused-affine-split) | semantic | blocked | Where does an affine epilogue belong when the GEMM is split over K? |
+| [fused-gemm-regime-specific-chain](#fused-gemm-regime-specific-chain) | performance_candidate | unresolved | Which fusion boundary helps each regime of a normalization/GEMM chain? |
 
 <a id="flydsl-cshuffle-epilogue"></a>
 ### When can a FlyDSL GEMM route its accumulators through an LDS CShuffle epilogue, and what does it cost?
@@ -142,8 +142,9 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #778 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -191,8 +192,9 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #4223 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -234,8 +236,9 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.753148+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 

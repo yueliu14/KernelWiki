@@ -194,8 +194,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id001
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.754350+00:00'
+    summary: Read all 4 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - Small router rows expose a host/launch floor while larger rows may be selection-bound.
   actions:
   - Measure both regions separately and compare direct compiled launches with graph replay using the same contract.
@@ -218,7 +224,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id001
+    conditions:
+    - Small router rows expose a host/launch floor while larger rows may be selection-bound.
     summary: Historical router reports found substantial host-path effects for small cases and narrower device
       benefits for larger ones; replay and blindly combined device changes could regress.
     provenance:

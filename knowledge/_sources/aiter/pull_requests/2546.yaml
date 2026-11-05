@@ -268,6 +268,44 @@ changes:
                 return gemm_a8w8_bpreshuffle_flydsl(XQ, WQ, x_scale, w_scale, Y, config)
         else:
   summary: Wire a tuned FlyDSL per-token A8 preshuffle selection into the existing backend dispatch.
+- id: tile_k_legality
+  commit: 8d30ef53a0a6e12d70894a973f4df127d298f620
+  parent_commit: 0ea82a8ee545661a27dda2c66f6e978c07fa2abb
+  file: aiter/ops/flydsl/kernels/preshuffle_gemm.py
+  before: ''
+  after: |2-
+        tile_k_bytes = int(tile_k) * int(elem_bytes)
+
+        if (tile_k_bytes % 64) != 0:
+            raise ValueError(
+                f"tile_k_bytes must be divisible by 64, got tile_k_bytes={tile_k_bytes} "
+                f"(tile_k={tile_k}, elem_bytes={elem_bytes})"
+            )
+
+        _min_k_unroll = tile_k_bytes // a_elem_vec_pack // 64
+        if is_fp4 and _min_k_unroll < 2 and int(tile_k) != 128:
+            raise ValueError(
+                f"FP4 requires tile_k=128 or tile_k >= {64 * 2 * a_elem_vec_pack} "
+                f"(mfma_scale_f32_16x16x128 needs k_unroll >= 1), "
+                f"got tile_k={tile_k} (k_unroll={_min_k_unroll})"
+            )
+        if is_fp4 and int(tile_k) == 128 and lds_stage != 2:
+            raise NotImplementedError("FP4 tile_k=128 currently only supports lds_stage=2")
+  summary: Validate packed tile-K alignment and restrict FP4 tile_k=128 to the two-stage path.
+- id: tile_thread_divisibility
+  commit: 8d30ef53a0a6e12d70894a973f4df127d298f620
+  parent_commit: 0ea82a8ee545661a27dda2c66f6e978c07fa2abb
+  file: aiter/ops/flydsl/kernels/preshuffle_gemm.py
+  before: ''
+  after: |2-
+        total_threads = 256
+        bytes_a_per_tile = int(tile_m) * int(tile_k) * int(elem_bytes) // a_elem_vec_pack
+        if bytes_a_per_tile % total_threads != 0:
+            raise ValueError(
+                "tile_m*tile_k*elem_bytes/a_elem_vec_pack must be divisible by "
+                f"{total_threads}: tile_m={tile_m}, tile_k={tile_k}, elem_bytes={elem_bytes}, pack={a_elem_vec_pack}"
+            )
+  summary: Reject an A tile whose packed byte count cannot be divided across the 256 threads.
 results:
 - id: unquantified_knobs
   outcome: not_reported

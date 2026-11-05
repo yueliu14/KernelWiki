@@ -34,7 +34,11 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-05T02:11:46.064634+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - target_language=flydsl
   - quantized GEMM built on the A8 preshuffle family (fp8, int8/int4, or fp4 on gfx950)
@@ -78,6 +82,47 @@ cards:
   - These are the checks in AITER's vendored kernel at the pinned commit; an authored kernel with its own staging
     has its own contract.
   - Passing every check means the configuration builds, not that it is fast.
+  experience:
+  - outcome: not_reported
+    conditions:
+    - Check packed bytes, input format, LDS stages and thread divisibility together; passing a legality gate
+      is not evidence of speed.
+    summary: 'PR #2546 incorporates these early legality checks in the A8/FP4 preshuffle family without a per-check
+      performance claim.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_2546
+      change_refs:
+      - tile_k_legality
+      - tile_thread_divisibility
+      result_refs:
+      - unquantified_knobs
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: unclear
+          confidence:
+            level: unknown
+            reasons:
+            - No measured effect is available to attribute.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - configuration_constraints
+          - architecture_capability
+          - workgroup_tile
+          backend: flydsl
 - id: flydsl-a8-mfma-selection
   type: semantic
   axes:
@@ -346,7 +391,12 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #709 remain to be checked against the
+      exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - target_language=flydsl
   - the math contract is Y = (X*x_scale) @ (W*w_scale)^T with one fp32 scale per row of X per 128 elements
@@ -358,10 +408,10 @@ cards:
     b) * a_scale[:, None] * b_scale[None, :]`; Gluon as `acc += mfma_out * cur_a_scale[:, None] * cur_b_scale[None,
     :]`.'
   - Make one K tile exactly one scale block. The Triton kernel takes GROUP_K and BLOCK_SIZE_K as separate parameters,
-    its docstring requires them equal. For this 128x128 scale contract, resolve BLOCK_SIZE_K = GROUP_K
-    = GROUP_N = 128 at the selected caller — on gfx942 that is four 16x16x32 fp8 MFMA K-steps between scale
-    multiplies. Some shipped configs omit GROUP_K or GROUP_N; their effective values must be checked in
-    the wrapper rather than inferred from the configuration-group summary.
+    its docstring requires them equal. For this 128x128 scale contract, resolve BLOCK_SIZE_K = GROUP_K = GROUP_N
+    = 128 at the selected caller — on gfx942 that is four 16x16x32 fp8 MFMA K-steps between scale multiplies.
+    Some shipped configs omit GROUP_K or GROUP_N; their effective values must be checked in the wrapper rather
+    than inferred from the configuration-group summary.
   - 'Index the scales per K block: X''s scale is [M, ceil(K/128)] and advances one column per K tile; W''s
     holds one value per 128x128 block, so each output column reads the scale of its 128-wide group for the
     current K block (Triton gathers it as `offs_bn // GROUP_N`).'
@@ -581,7 +631,12 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #2661 remain to be checked against the
+      exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - target_language=flydsl
   - an fp8 128x128 block-scale workload measured against AITER's Triton kernel, especially one whose cases
@@ -888,8 +943,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id001
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.754435+00:00'
+    summary: Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - A specific pair of FP8 encodings differs by a proven scale relationship on the allowed input domain.
   actions:
   - Derive the operand-wise scale relationship, including sign, subnormal, zero, NaN and saturation encodings;
@@ -913,7 +974,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id001
+    conditions:
+    - A specific pair of FP8 encodings differs by a proven scale relationship on the allowed input domain.
     summary: Some historical FP8 GEMMs replaced emulated conversions with native instructions, while incorrect
       scale direction or special-value encodings broke parity.
     provenance:
@@ -944,8 +1006,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id002
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.754554+00:00'
+    summary: Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - A framework selects among CK, preshuffled CK or authored blockscale implementations.
   actions:
   - Identify the called symbol and exact scale/layout contract before choosing a configuration database or
@@ -968,7 +1036,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id002
+    conditions:
+    - A framework selects among CK, preshuffled CK or authored blockscale implementations.
     summary: Historical FP8 reports used different valid levers on different stacks; a configuration file for
       a sibling path could be ignored despite a plausible isolated result.
     provenance:
@@ -1000,8 +1069,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id003
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.754690+00:00'
+    summary: Read all 4 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - The live kernel consumes MXFP8 payloads and per-32 E8M0 scales, rather than a dense BF16 or arbitrary-fp32-scale
     GEMM ABI.
   actions:
@@ -1025,7 +1100,9 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id003
+    conditions:
+    - The live kernel consumes MXFP8 payloads and per-32 E8M0 scales, rather than a dense BF16 or arbitrary-fp32-scale
+      GEMM ABI.
     summary: Historical MXFP8 summaries reported shape-dependent tile and split-K gains, with substantially
       different serving effects at different concurrency regimes.
     provenance:
@@ -1058,8 +1135,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id004
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.754913+00:00'
+    summary: Read all 7 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - Conversion, scale lookup or repacking lies on the operand-to-MFMA dependency chain.
   actions:
   - Separate scale gathering, conversion, repacking and arithmetic costs in the generated loop; target the
@@ -1083,7 +1166,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id004
+    conditions:
+    - Conversion, scale lookup or repacking lies on the operand-to-MFMA dependency chain.
     summary: Historical reports found useful conversion/packing and two-dot overlap changes, alongside occupancy,
       prefetch and instruction-cut variants that were neutral or slower.
     provenance:

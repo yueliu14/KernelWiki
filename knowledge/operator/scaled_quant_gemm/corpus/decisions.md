@@ -22,18 +22,18 @@ A required trait must be established for the actual design before the card appli
 
 | card | type | PR review | question |
 |---|---|---|---|
-| [flydsl-a8-legality](#flydsl-a8-legality) | constraint | unreviewed | Which FlyDSL A8 / FP4 preshuffle-GEMM configurations are rejected before they can be slow? |
+| [flydsl-a8-legality](#flydsl-a8-legality) | constraint | reviewed | Which FlyDSL A8 / FP4 preshuffle-GEMM configurations are rejected before they can be slow? |
 | [flydsl-a8-mfma-selection](#flydsl-a8-mfma-selection) | semantic | reviewed | Which MFMA does a FlyDSL quantized GEMM issue per dtype and architecture, and what does that fix about tile_k? |
 | [flydsl-a8-scale-granularity-contract](#flydsl-a8-scale-granularity-contract) | constraint | reviewed | Which scale granularity does the FlyDSL A8 kernel implement, and what changes for a 128x128 block-scale contract? |
-| [gemm-blockscale-k-loop-scale-application](#gemm-blockscale-k-loop-scale-application) | semantic | unreviewed | How does a 128x128 block-scale GEMM apply its scales inside the K loop, and what does that fix about tile_k and the scale indexing? |
+| [gemm-blockscale-k-loop-scale-application](#gemm-blockscale-k-loop-scale-application) | semantic | blocked | How does a 128x128 block-scale GEMM apply its scales inside the K loop, and what does that fix about tile_k and the scale indexing? |
 | [flydsl-a8-preshuffle-config-space](#flydsl-a8-preshuffle-config-space) | performance_candidate | reviewed | Which tile, LDS-stage, epilogue, async and occupancy combinations will the FlyDSL A8 (fp8/int8) preshuffle GEMM build, and how do they differ by architecture? |
-| [gemm-blockscale-shipped-bucket-structure](#gemm-blockscale-shipped-bucket-structure) | performance_candidate | unreviewed | Which configuration does the Triton block-scale baseline run for each case, and what does AITER ship instead where it tuned small and large M separately? |
+| [gemm-blockscale-shipped-bucket-structure](#gemm-blockscale-shipped-bucket-structure) | performance_candidate | blocked | Which configuration does the Triton block-scale baseline run for each case, and what does AITER ship instead where it tuned small and large M separately? |
 | [flydsl-a8-interleaved-schedule](#flydsl-a8-interleaved-schedule) | performance_candidate | reviewed | How does the FlyDSL A8 kernel interleave LDS reads, global loads and MFMAs, and how does that differ between gfx942 and gfx950? |
 | [flydsl-a8-data-movement-helpers](#flydsl-a8-data-movement-helpers) | performance_candidate | reviewed | Which global-to-LDS and LDS-to-register helpers do the FlyDSL A8 and MoE GEMMs share, and which access widths do they fix? |
-| [quant-gemm-format-reinterpretation](#quant-gemm-format-reinterpretation) | performance_candidate | unreviewed | When can a legacy FP8 representation use the native matrix instruction without a conversion pass? |
-| [quant-gemm-engaged-tuning-surface](#quant-gemm-engaged-tuning-surface) | performance_candidate | unreviewed | Which configuration or source edit controls the live FP8 blockscale GEMM? |
-| [mxfp8-shape-specific-native-path](#mxfp8-shape-specific-native-path) | performance_candidate | unreviewed | How should a native per-32 E8M0 GEMM be tuned across prefill and decode? |
-| [quant-gemm-dequant-dependency-chain](#quant-gemm-dequant-dependency-chain) | performance_candidate | unreviewed | Which dequantization work is on the GEMM critical path? |
+| [quant-gemm-format-reinterpretation](#quant-gemm-format-reinterpretation) | performance_candidate | unresolved | When can a legacy FP8 representation use the native matrix instruction without a conversion pass? |
+| [quant-gemm-engaged-tuning-surface](#quant-gemm-engaged-tuning-surface) | performance_candidate | unresolved | Which configuration or source edit controls the live FP8 blockscale GEMM? |
+| [mxfp8-shape-specific-native-path](#mxfp8-shape-specific-native-path) | performance_candidate | unresolved | How should a native per-32 E8M0 GEMM be tuned across prefill and decode? |
+| [quant-gemm-dequant-dependency-chain](#quant-gemm-dequant-dependency-chain) | performance_candidate | unresolved | Which dequantization work is on the GEMM critical path? |
 
 <a id="flydsl-a8-legality"></a>
 ### Which FlyDSL A8 / FP4 preshuffle-GEMM configurations are rejected before they can be slow?
@@ -87,8 +87,20 @@ A required trait must be established for the actual design before the card appli
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:11:46.064634+00:00.
+
+- **[PR #2546](https://github.com/ROCm/aiter/pull/2546) · merged · not_reported** — PR #2546 incorporates these early legality checks in the A8/FP4 preshuffle family without a per-check performance claim.
+  Conditions: Check packed bytes, input format, LDS stages and thread divisibility together; passing a legality gate is not evidence of speed.
+  Direction: flydsl; configuration_constraints, architecture_capability, workgroup_tile
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [8d30ef53a0a6](https://github.com/ROCm/aiter/commit/8d30ef53a0a6e12d70894a973f4df127d298f620) — Validate packed tile-K alignment and restrict FP4 tile_k=128 to the two-stage path.
+  Change: [8d30ef53a0a6](https://github.com/ROCm/aiter/commit/8d30ef53a0a6e12d70894a973f4df127d298f620) — Reject an A tile whose packed byte count cannot be divided across the 256 threads.
+  [Result: unquantified_knobs](../../../_sources/aiter/pull_requests/2546.md#unquantified_knobs) — **unknown**; The reviewed PR introduces the A8 compiler and tuning choices but supplies no quantitative performance comparison for these mechanisms.
+  **Effect confidence: unknown** — The body and reviewed discussion cover implementation/correctness and qualitative rationale, not a measured speedup for the exposed knobs; missing: hardware, gfx, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Background
 
@@ -312,8 +324,9 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #709 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -470,8 +483,9 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #2661 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -674,8 +688,9 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.754435+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -728,8 +743,9 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.754554+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -782,8 +798,9 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 4 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.754690+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -836,8 +853,9 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 7 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.754913+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 

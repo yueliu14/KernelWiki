@@ -21,7 +21,7 @@ A required trait must be established for the actual design before the card appli
 | card | type | PR review | question |
 |---|---|---|---|
 | [attention-online-softmax-mask](#attention-online-softmax-mask) | semantic | reviewed | How must tiled forward attention preserve masking and online softmax normalization? |
-| [attention-query-kv-tile-pipeline](#attention-query-kv-tile-pipeline) | performance_candidate | unreviewed | Which coupled decisions should be explored when changing attention tile sizes? |
+| [attention-query-kv-tile-pipeline](#attention-query-kv-tile-pipeline) | performance_candidate | blocked | Which coupled decisions should be explored when changing attention tile sizes? |
 | [prefill-live-path-and-phase](#prefill-live-path-and-phase) | performance_candidate | reviewed | Which prefill path and phase actually benefit from an attention change? |
 
 <a id="attention-online-softmax-mask"></a>
@@ -127,8 +127,9 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #4614, #6336 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 

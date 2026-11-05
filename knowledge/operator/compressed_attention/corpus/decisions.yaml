@@ -20,7 +20,11 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: reviewed
+    checked_at: '2026-11-05T02:10:32.112473+00:00'
+    summary: Reviewed the linked PR changes, body and discussion for the specified implementation and conditions.
+      Historical source incorporation is distinguished from measured effects; other backends and later versions
+      are outside this scoped association.
   conditions:
   - The chosen source path is the fused compression/cache preparation kernel, not ordinary dense attention.
   actions:
@@ -43,4 +47,46 @@ cards:
   - FP4 and FP8 scale contracts are not interchangeable.
   references:
   - knowledge/operator/compressed_attention/README.md
+  experience:
+  - outcome: beneficial
+    conditions:
+    - HCA gain is BF16 ratio=128 without overlap; CSA Main and CSA Indexer retain their own ratio, quantization
+      and preshuffle contracts.
+    summary: 'PR #3357 introduces the compressor contracts and reports a range of HCA split-path gains; the
+      performance claim does not cover every CSA/FP8 variant.'
+    provenance:
+      kind: upstream_report
+      references: []
+      artifacts: not_published
+      verification: not_reproduced
+    upstream:
+      pr: aiter_pr_3357
+      change_refs:
+      - pool_state
+      - quant_cache
+      result_refs:
+      - hca_split_report
+      assessment:
+        association:
+          level: high
+          reasons:
+          - The reviewed commit incorporates or changes the named construct in the cited implementation; the
+            assessment is limited to this backend and historical version.
+          missing_evidence: []
+        attribution:
+          scope: bundle
+          confidence:
+            level: low
+            reasons:
+            - The report concerns the implementation or correctness change as a whole; it does not isolate
+              the contribution of this individual direction.
+            missing_evidence:
+            - isolated_comparison
+          isolation_source_refs: []
+        applies_to:
+          axes:
+          - compression
+          - cache_layout
+          - numerical_contract
+          backend: flydsl
 shared_cards: []

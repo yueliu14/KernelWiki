@@ -14,8 +14,8 @@ Source observations identify implementation precedents and constraints; they do 
 
 | card | type | PR review | question |
 |---|---|---|---|
-| [batched-mxfp8-scale-layout](#batched-mxfp8-scale-layout) | constraint | unreviewed | Which batch and scale layouts does the MXFP8 BMM wrapper accept? |
-| [batched-mxfp8-fallback-configuration](#batched-mxfp8-fallback-configuration) | performance_candidate | unreviewed | How can batched GEMM tile, buffering and split choices be seeded legally? |
+| [batched-mxfp8-scale-layout](#batched-mxfp8-scale-layout) | constraint | reviewed | Which batch and scale layouts does the MXFP8 BMM wrapper accept? |
+| [batched-mxfp8-fallback-configuration](#batched-mxfp8-fallback-configuration) | performance_candidate | reviewed | How can batched GEMM tile, buffering and split choices be seeded legally? |
 
 <a id="batched-mxfp8-scale-layout"></a>
 ### Which batch and scale layouts does the MXFP8 BMM wrapper accept?
@@ -54,8 +54,23 @@ Source observations identify implementation precedents and constraints; they do 
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #5896](https://github.com/ROCm/aiter/pull/5896) · merged · beneficial** — The shared MXFP8 implementation has reported tuned linear-GEMM gains; the PR gives no separate wo_a BMM speedup or ablation of this contract/heuristic.
+  Conditions: gfx950, e8m0 32x32 or 128x128 scales; keep the two tuned populations and their different baselines separate.
+  Direction: flydsl; runtime_contract, operand_layout
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [40d524b615af](https://github.com/ROCm/aiter/commit/40d524b615af873d18fc6d1c8f56502adcb58662) — Dispatch MXFP8 BMM by architecture, weight-scale block and activation-scale layout.
+  Change: [40d524b615af](https://github.com/ROCm/aiter/commit/40d524b615af873d18fc6d1c8f56502adcb58662) — Validate batched operand dimensions, contiguous storage, BF16 output and e8m0 scale geometry.
+  [Result: v4_block128](../../../_sources/aiter/pull_requests/5896.md#v4_block128) — **operator**; The upstream report gives a geometric-mean speedup for this tuned linear-GEMM population.
+  **Effect confidence: medium** — The report specifies the architecture, scale formats, comparison populations, alternate-baseline median protocol and correctness threshold; measured revisions and independent reproduction are missing; missing: software, baseline_commit, candidate_commit, independent_reproduction.
+  speedup: 1.3 x (geomean)
+  [Result: v41_group32](../../../_sources/aiter/pull_requests/5896.md#v41_group32) — **operator**; The upstream report gives a geometric-mean speedup for this tuned linear-GEMM population.
+  **Effect confidence: medium** — The report specifies the architecture, scale formats, comparison populations, alternate-baseline median protocol and correctness threshold; measured revisions and independent reproduction are missing; missing: software, baseline_commit, candidate_commit, independent_reproduction.
+  speedup: 1.22 x (geomean)
 
 #### Background
 
@@ -103,8 +118,23 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #5896](https://github.com/ROCm/aiter/pull/5896) · merged · beneficial** — The shared MXFP8 implementation has reported tuned linear-GEMM gains; the PR gives no separate wo_a BMM speedup or ablation of this contract/heuristic.
+  Conditions: gfx950, e8m0 32x32 or 128x128 scales; keep the two tuned populations and their different baselines separate.
+  Direction: flydsl; workgroup_tile, work_partition, pipeline_schedule
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [40d524b615af](https://github.com/ROCm/aiter/commit/40d524b615af873d18fc6d1c8f56502adcb58662) — Use the kernel legality checker for every fallback configuration.
+  Change: [40d524b615af](https://github.com/ROCm/aiter/commit/40d524b615af873d18fc6d1c8f56502adcb58662) — Choose legal power-of-two splits around the 256-workgroup fallback target, excluding direct-B splitting.
+  [Result: v4_block128](../../../_sources/aiter/pull_requests/5896.md#v4_block128) — **operator**; The upstream report gives a geometric-mean speedup for this tuned linear-GEMM population.
+  **Effect confidence: medium** — The report specifies the architecture, scale formats, comparison populations, alternate-baseline median protocol and correctness threshold; measured revisions and independent reproduction are missing; missing: software, baseline_commit, candidate_commit, independent_reproduction.
+  speedup: 1.3 x (geomean)
+  [Result: v41_group32](../../../_sources/aiter/pull_requests/5896.md#v41_group32) — **operator**; The upstream report gives a geometric-mean speedup for this tuned linear-GEMM population.
+  **Effect confidence: medium** — The report specifies the architecture, scale formats, comparison populations, alternate-baseline median protocol and correctness threshold; measured revisions and independent reproduction are missing; missing: software, baseline_commit, candidate_commit, independent_reproduction.
+  speedup: 1.22 x (geomean)
 
 #### Background
 

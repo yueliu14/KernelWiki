@@ -1,0 +1,113 @@
+schema_version: 1
+id: aiter_pr_3851
+number: 3851
+repository: https://github.com/ROCm/aiter
+title: '[gfx1250][FlyDSL] Add fused MoE route+psum+quant+scatter kernel for grouped MoE'
+state: merged
+base_commit: 0f5fa0f10a52ee1e81da9ef048f51474a80054a7
+head_commit: 1e3b1848b84f9f6b80d12a7b40934370defb6784
+merge_commit: 3b161e226e8b8e76382a196edef7adc493b58b5c
+captured_at: '2026-11-05T02:01:50.533462+00:00'
+updated_at: '2026-06-26T12:33:29Z'
+sources:
+- id: automated_change_summary
+  url: https://github.com/ROCm/aiter/pull/3851#pullrequestreview-4543718091
+  excerpt: |-
+    ## Pull request overview
+
+    This PR adds new FlyDSL fused kernels and integrates them into the gfx1250 grouped MoE path, aiming to reduce kernel launch count by fusing routing + MX quant + scatter + scale preshuffle (stage1) and fusing grouped quant + scale preshuffle (stage2). It also extends the gfx1250 grouped GEMM/gather-reduce stack to better support split-K and small-token performance, and updates tuning/config and tests accordingly.
+
+    **Changes:**
+    - Add fused FlyDSL kernels for (1) route+quant+scatter+scale-preshuffle and (2) grouped quant+scale-preshuffle, with Python wrappers exposed in `moe_kernels.py`.
+    - Update gfx1250 grouped MoE pipeline to use the fused kernels on the fast path; extend gather-reduce to support split-K and configurable vector width.
+    - Update warp-size detection for gfx1250, adjust split-K handling in mxscale GEMM, and refresh tuned grouped-MoE CSV entries; add a new correctness test.
+  sha256: b1aa98db99fe0a0048808d474d7d097f37c75c14d964f5cf34251ed4dae70bbf
+  captured_at: '2026-11-05T02:01:50.533462+00:00'
+  updated_at: '2026-06-22T11:49:50Z'
+changes:
+- id: fused_route_outputs
+  commit: 3b161e226e8b8e76382a196edef7adc493b58b5c
+  parent_commit: c2f68ab382d0a579f0444150168a2246875f2d3a
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  before: ''
+  after: |2-
+            topk_ids: fx.Tensor,  # (numel,) int32
+            counter: fx.Tensor,  # (E,) int32, init 0
+            topids_to_rows: fx.Tensor,  # (numel,) int32 out
+            hidden: fx.Tensor,  # (token_num*model_dim,) bf16
+            grouped_payload: fx.Tensor,  # (n_rows*payload_bytes_per_row,) uint8 out
+            grouped_scale: fx.Tensor,  # preshuffled e8m0 out
+            expert_row_base: fx.Tensor,  # (E,) int32 per-expert dst row base
+            numel: Int32,
+        ):
+            i32 = T.i32
+            f32 = T.f32
+  summary: Introduce a fused kernel producing token-route row maps, grouped quantized payload and preshuffled
+    scales.
+- id: expert_row
+  commit: 3b161e226e8b8e76382a196edef7adc493b58b5c
+  parent_commit: c2f68ab382d0a579f0444150168a2246875f2d3a
+  file: aiter/ops/flydsl/kernels/moe_fused_route_quant_scatter.py
+  before: ''
+  after: |2
+
+                # Destination row = per-expert base + within-expert slot. Masked
+                # layout fuses the former Python-side arange(E)*max_m into this
+                # kernel; contiguous-M still loads starts[e] from expert_row_base.
+                if const_expr(use_expert_row_base):
+                    erb_rsrc = buffer_ops.create_buffer_resource(
+                        expert_row_base, max_size=True
+                    )
+                    row_base = ArithValue(
+                        buffer_ops.buffer_load(erb_rsrc, expert, vec_width=1, dtype=i32)
+                    )
+                else:
+                    row_base = expert * c_max_m
+                grouped_row = slot + row_base
+                if const_expr(topk_is_pow2):
+                    token = route >> c_topk_shift
+                else:
+                    token = arith.divui(route, c_topk)
+  summary: Compute each grouped destination from an expert base and claimed slot, then recover the source token
+    from its route.
+results:
+- id: fusion_unmeasured
+  outcome: not_reported
+  summary: The reviewed author template and discussion provide no measured effect for the route/quant/scatter
+    fusion; the automated overview states an intended launch-count reduction.
+  source_refs:
+  - automated_change_summary
+  context:
+    hardware: null
+    gfx: null
+    dtype: null
+    shape_layout: null
+    software: null
+    baseline: null
+    candidate: gfx1250 fused routing, MX quantization, grouped scatter and scale preshuffle
+    baseline_commit: null
+    candidate_commit: null
+    scope: unknown
+    protocol: null
+    correctness: null
+  metrics: []
+  confidence:
+    level: unknown
+    reasons:
+    - Code changes establish the mechanism; the saved automated summary and other reviewed discussion contain
+      no quantitative comparison.
+    missing_evidence:
+    - hardware
+    - gfx
+    - dtype
+    - shape_layout
+    - software
+    - baseline
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - correctness
+  limitations:
+  - An automated review overview is not a performance measurement or independent validation.
+  - The PR also changes split-K, grouped layout and tuning; reduced launch count alone does not establish latency
+    improvement.

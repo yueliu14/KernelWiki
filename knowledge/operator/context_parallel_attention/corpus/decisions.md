@@ -14,7 +14,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 | card | type | PR review | question |
 |---|---|---|---|
-| [context-parallel-rank-and-layout-gates](#context-parallel-rank-and-layout-gates) | constraint | unreviewed | Which context-parallel ownership parameters and layout restrictions does the MLA launcher publish? |
+| [context-parallel-rank-and-layout-gates](#context-parallel-rank-and-layout-gates) | constraint | blocked | Which context-parallel ownership parameters and layout restrictions does the MLA launcher publish? |
 
 <a id="context-parallel-rank-and-layout-gates"></a>
 ### Which context-parallel ownership parameters and layout restrictions does the MLA launcher publish?
@@ -60,8 +60,9 @@ Source observations identify implementation precedents and constraints; they do 
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #3750 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 

@@ -22,7 +22,12 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #5795, #5932 remain to be checked against
+      the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - MoE execution uses two expert GEMMs with an activation or gate between them.
   actions:
@@ -90,8 +95,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id001
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.753460+00:00'
+    summary: Read all 6 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - Expert GEMMs use a framework- and version-specific combination of dtype, quantization, layout, topology
     and dispatch keys.
   actions:
@@ -116,7 +127,9 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id001
+    conditions:
+    - Expert GEMMs use a framework- and version-specific combination of dtype, quantization, layout, topology
+      and dispatch keys.
     summary: Historical MoE reports found useful configuration tuning and native-kernel rewrites on different
       paths, plus zero engagement when a dense or incompatible quantization selector was targeted.
     provenance:
@@ -151,8 +164,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id002
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.753549+00:00'
+    summary: Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - The selected CK or similar grouped-GEMM instance has a matching weight shuffle and expert-sort granularity.
   actions:
   - Tune gate/up and down projection using their own N extents; update host preshuffle and device instance
@@ -174,7 +193,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id002
+    conditions:
+    - The selected CK or similar grouped-GEMM instance has a matching weight shuffle and expert-sort granularity.
     summary: Historical blockscale reports found stage-specific MFMA/pipeline changes useful, but reusing an
       incompatible shuffle or letting a tile span expert groups broke correctness.
     provenance:
@@ -206,8 +226,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id003
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.753793+00:00'
+    summary: Read all 8 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - Packed expert weights or scale metadata are converted repeatedly while feeding grouped GEMM.
   actions:
   - Load a packed value once when extracting multiple components; consider reusing a dequantized weight tile
@@ -230,7 +256,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id003
+    conditions:
+    - Packed expert weights or scale metadata are converted repeatedly while feeding grouped GEMM.
     summary: Historical reports found useful packed extraction, shared dequantized tiles and shorter scale/convert
       chains; nominal instruction savings could be off the critical path or disappear after retiling.
     provenance:
@@ -266,8 +293,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id004
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.753879+00:00'
+    summary: Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - Different token/width regimes have distinct compiler resource footprints and valid launch configurations.
   actions:
   - Select configurations by runtime shape with a complete fallback; isolate compiled entries when a shared
@@ -290,7 +323,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id004
+    conditions:
+    - Different token/width regimes have distinct compiler resource footprints and valid launch configurations.
     summary: Historical reports found per-bucket routing useful where global settings canceled opposing gains;
       separate entries could reduce register or code-size costs.
     provenance:
@@ -321,8 +355,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id005
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.753998+00:00'
+    summary: Read all 4 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - An explicitly permitted precision change targets streamed operand traffic or dequantization cost.
   actions:
   - Validate scale-group indexing, quantizer range, rounding and the complete expert output before comparing
@@ -346,7 +386,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id005
+    conditions:
+    - An explicitly permitted precision change targets streamed operand traffic or dequantization cost.
     summary: Historical reports contained both useful narrow-weight representations and failed numeric or memory
       gates; the accepted scale contract determined which transformations were available.
     provenance:
@@ -378,8 +419,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id006
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.754031+00:00'
+    summary: Read all 1 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - An LDS staging layout exhibits conflicts for the actual target bank geometry and access pattern.
   actions:
   - Change row stride and allocated group-segment size together, preserving the read/write mapping and vector
@@ -399,7 +446,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id006
+    conditions:
+    - An LDS staging layout exhibits conflicts for the actual target bank geometry and access pattern.
     summary: A historical epilogue-pad change helped, but incomplete allocation updates broke correctness and
       further counter reductions brought little additional latency benefit.
     provenance:
@@ -427,8 +475,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id007
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.754062+00:00'
+    summary: Read all 1 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - The buffers have different reuse distances and token-bucket working sets.
   actions:
   - Measure policy changes per buffer and regime with representative reuse; inspect emitted modifiers and the
@@ -449,7 +503,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id007
+    conditions:
+    - The buffers have different reuse distances and token-bucket working sets.
     summary: A historical BF16 expert path required different cache choices by buffer and token bucket rather
       than one kernel-wide hint.
     provenance:

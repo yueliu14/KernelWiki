@@ -43,6 +43,11 @@ def card_section(catalog, card, page):
         out += ["PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown."]
     else:
         out += [safe(review["summary"]) + f" Checked {safe(review['checked_at'])}."]
+        if review["status"] in {"unresolved", "blocked"} and not any(
+            entry["provenance"]["kind"] == "upstream_report" for entry in card.get("experience", [])
+        ):
+            out += ["PR association and effect confidence are **unknown** for this reviewed scope; "
+                    "this does not establish the absence of an upstream PR or a performance gain."]
     for entry in card.get("experience", []):
         if entry["provenance"]["kind"] != "upstream_report":
             continue

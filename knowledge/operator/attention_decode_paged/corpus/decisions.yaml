@@ -25,7 +25,12 @@ cards:
   evidence_level: source_observed
   status: candidate_only
   upstream_review:
-    status: unreviewed
+    status: blocked
+    checked_at: '2026-11-05T02:26:25.564445+00:00'
+    summary: 'Examined the pinned source-file history; candidate PRs #1148 remain to be checked against the
+      exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable
+      in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted
+      association; PR effect confidence remains unknown.'
   conditions:
   - KV positions are logical sequence positions mapped through a per-request page table.
   actions:
@@ -70,8 +75,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id001
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.751918+00:00'
+    summary: Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - The served path uses paged or ragged KV with a version-specific dispatch/template selector.
   actions:
   - Inspect the actual page size, cache dtype, head width and called entry before selecting a rewrite or library
@@ -96,7 +107,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id001
+    conditions:
+    - The served path uses paged or ragged KV with a version-specific dispatch/template selector.
     summary: Historical reports found that non-power-of-two and one-token pages changed the usable path; an
       experimental BF16/head-width-specific template existed despite an earlier no-knob claim. Incompatible
       partition sizes produced invalid fast results.
@@ -128,8 +140,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id002
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.752103+00:00'
+    summary: Read all 5 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - The KV working set, reuse across heads/calls and load representation can be measured for each served regime.
   actions:
   - First remove avoidable scratch or repeated gathers; compare cache policy separately for each operand and
@@ -153,7 +171,9 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id002
+    conditions:
+    - The KV working set, reuse across heads/calls and load representation can be measured for each served
+      regime.
     summary: Historical decode reports found both positive and negative non-temporal results; footprint changes
       reversed the preferred policy. A DMA instruction alone did not establish a gain.
     provenance:
@@ -186,8 +206,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id003
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.752343+00:00'
+    summary: Read all 8 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - The kernel has head-width-dependent resource use, paged or windowed KV, and a legal split/reduce path.
   actions:
   - Inspect the real launched grid before tuning; decouple logical KV tile size from storage page size only
@@ -211,7 +237,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id003
+    conditions:
+    - The kernel has head-width-dependent resource use, paged or windowed KV, and a legal split/reduce path.
     summary: Historical reports improved underfilled or oversplit launches through coupled geometry changes;
       their optimal workgroups-per-CU targets differed, and a previously helpful memory change could regress
       after retiling.
@@ -248,8 +275,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id004
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.752543+00:00'
+    summary: Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - Partial results are shared across workgroups and the complete publish/signal/consume protocol can be implemented
     correctly.
   actions:
@@ -274,7 +307,9 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id004
+    conditions:
+    - Partial results are shared across workgroups and the complete publish/signal/consume protocol can be
+      implemented correctly.
     summary: Historical summaries reported both useful fused merges and large regressions caused by synchronization
       or residency cost; fewer launches did not consistently mean lower latency.
     provenance:
@@ -304,8 +339,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id005
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.752743+00:00'
+    summary: Read all 5 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - The actual timing boundary exposes repeated allocation, argument preparation or binding overhead.
   actions:
   - Compare direct launch, reusable plans and capture using the same input/stream contract and benchmark protocol.
@@ -328,7 +369,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id005
+    conditions:
+    - The actual timing boundary exposes repeated allocation, argument preparation or binding overhead.
     summary: Historical reports benefited from host-plan/scratch reuse in some regimes, but stale pointer memoization
       corrupted results and one-node replay often cost more than direct dispatch.
     provenance:
@@ -361,8 +403,14 @@ cards:
   evidence_level: reported_experience
   status: candidate_only
   upstream_review:
-    status: unreviewed
-  conditions: &id006
+    status: unresolved
+    checked_at: '2026-11-05T02:04:28.752814+00:00'
+    summary: Read all 2 pinned GEAK summaries already cited by this card. They attribute experiment-specific
+      implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those
+      outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization
+      commit. Existing historical experience is retained; upstream PR association and effect confidence remain
+      unknown.
+  conditions:
   - The attention kernel has substantial overlap between memory, LDS traffic and computation.
   actions:
   - Attribute elapsed time to the actual dependent chain and test a targeted change, rather than promoting
@@ -383,7 +431,8 @@ cards:
   - knowledge/general/README.md
   experience:
   - outcome: mixed
-    conditions: *id006
+    conditions:
+    - The attention kernel has substantial overlap between memory, LDS traffic and computation.
     summary: Reported decode variants with fewer instructions or registers could lose because the removed work
       was overlapped; some footprint changes helped only underfilled cases.
     provenance:

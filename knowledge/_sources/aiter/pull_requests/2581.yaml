@@ -1,0 +1,82 @@
+schema_version: 1
+id: aiter_pr_2581
+number: 2581
+repository: https://github.com/ROCm/aiter
+title: '[FlyDSL] Optimize a4w4 MOE kernels'
+state: merged
+base_commit: 6c2813ac13649d37de9bf0cd7eef9090834c03db
+head_commit: 7a8f41c7c186abb3b05430847991d631d735ee3b
+merge_commit: deefb11e4846bfd96fa4da25e758337c59de010f
+captured_at: '2026-11-05T02:22:08.257742+00:00'
+updated_at: '2026-04-04T13:53:45Z'
+sources:
+- id: change_summary
+  url: https://github.com/ROCm/aiter/pull/2581
+  excerpt: |-
+    enable moe split-K, fuse quant, flyc.compile fast dispatch
+
+    - Refactor stage1/stage2 to use flyc.compile for fast kernel dispatch (~5us)
+    - Add split-K support with fused silu_and_mul + mxfp4 quant + scale-sort
+    - Add persistent round-robin mode for stage2
+    - L2 cache optimization for preshuffle pipeline
+    - Update tuner for new kernel configurations
+  sha256: 73a43748d964e7042111bb933f02136a2092ba206a958766ba83835b89b49b26
+  captured_at: '2026-11-05T02:22:08.257742+00:00'
+  updated_at: '2026-04-04T13:53:45Z'
+changes:
+- id: load_cache_policy
+  commit: deefb11e4846bfd96fa4da25e758337c59de010f
+  parent_commit: 9cc132a689cd8ed7c624c94bf96338640843913b
+  file: aiter/ops/flydsl/kernels/mfma_preshuffle_pipeline.py
+  before: '    i32_val = buffer_ops.buffer_load(rsrc, idx_i32, vec_width=vec_width, dtype=T.i32)'
+  after: |2-
+
+        i32_val = buffer_ops.buffer_load(
+            rsrc,
+            idx_i32,
+            vec_width=vec_width,
+            dtype=T.i32,
+            cache_modifier=cache_modifier,
+        )
+  summary: Thread an explicit cache modifier through the shared preshuffle buffer-load helper.
+results:
+- id: cache_policy_unmeasured
+  outcome: not_reported
+  summary: The PR describes an L2-cache optimization inside a split-K/quantization/dispatch bundle, but provides
+    no comparison that measures the operand cache-policy effect.
+  source_refs:
+  - change_summary
+  context:
+    hardware: null
+    gfx: null
+    dtype: null
+    shape_layout: null
+    software: null
+    baseline: null
+    candidate: Preshuffle load helper with configurable cache modifier
+    baseline_commit: null
+    candidate_commit: null
+    scope: unknown
+    protocol: null
+    correctness: null
+  metrics: []
+  confidence:
+    level: unknown
+    reasons:
+    - The only timing in the description is an approximate absolute dispatch cost; it supplies no baseline
+      or measured cache-policy benefit.
+    missing_evidence:
+    - hardware
+    - gfx
+    - dtype
+    - shape_layout
+    - software
+    - baseline
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - correctness
+  limitations:
+  - The approximately 5 us dispatch statement is not a before/after cache-policy measurement.
+  - Split-K, fused quantization, persistent scheduling and tuning also change; no independent cache-policy
+    gain is assigned.

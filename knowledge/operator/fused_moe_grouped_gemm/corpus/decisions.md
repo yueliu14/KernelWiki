@@ -14,7 +14,7 @@ Source observations identify implementation precedents and constraints; they do 
 
 | card | type | PR review | question |
 |---|---|---|---|
-| [fused-moe-prepare-partition-contract](#fused-moe-prepare-partition-contract) | constraint | unreviewed | What work partition and initialization are required before the fused MoE kernel? |
+| [fused-moe-prepare-partition-contract](#fused-moe-prepare-partition-contract) | constraint | blocked | What work partition and initialization are required before the fused MoE kernel? |
 
 <a id="fused-moe-prepare-partition-contract"></a>
 ### What work partition and initialization are required before the fused MoE kernel?
@@ -52,8 +52,9 @@ Source observations identify implementation precedents and constraints; they do 
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #5001, #5346 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 

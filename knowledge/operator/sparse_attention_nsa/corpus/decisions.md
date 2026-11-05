@@ -20,8 +20,8 @@ A required trait must be established for the actual design before the card appli
 
 | card | type | PR review | question |
 |---|---|---|---|
-| [attention-sparse-selected-slots](#attention-sparse-selected-slots) | constraint | unreviewed | What distinguishes sparse selected-slot attention from dense paged attention? |
-| [sparse-prefill-block-subtiling](#sparse-prefill-block-subtiling) | performance_candidate | unreviewed | Which sparse-attention partition should be tuned without changing selected-slot semantics? |
+| [attention-sparse-selected-slots](#attention-sparse-selected-slots) | constraint | blocked | What distinguishes sparse selected-slot attention from dense paged attention? |
+| [sparse-prefill-block-subtiling](#sparse-prefill-block-subtiling) | performance_candidate | unresolved | Which sparse-attention partition should be tuned without changing selected-slot semantics? |
 
 <a id="attention-sparse-selected-slots"></a>
 ### What distinguishes sparse selected-slot attention from dense paged attention?
@@ -63,8 +63,9 @@ A required trait must be established for the actual design before the card appli
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #1296 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -106,8 +107,9 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read both pinned GEAK summaries. The block-sparse SUB_K account explicitly attributes the merged optimization to vLLM and its gfx942/gfx950 path, without an identifying PR URL or implementation commit. Neither summary establishes an AITER PR for the reported run. Preserve the external-upstream and historical experiment contexts; AITER association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.755021+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 

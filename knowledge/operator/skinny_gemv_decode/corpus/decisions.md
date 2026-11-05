@@ -23,7 +23,7 @@ A required trait must be established for the actual design before the card appli
 | card | type | PR review | question |
 |---|---|---|---|
 | [flydsl-small-m-hgemm-family](#flydsl-small-m-hgemm-family) | performance_candidate | reviewed | What does AITER do differently when M is a handful of rows, and which knobs does that open? |
-| [gemm-skinny-decode-wave-split](#gemm-skinny-decode-wave-split) | performance_candidate | unreviewed | How does AITER&#x27;s hand-written HIP skinny GEMM organise work for M &lt;= 16, and what can a FlyDSL decode kernel take from it? |
+| [gemm-skinny-decode-wave-split](#gemm-skinny-decode-wave-split) | performance_candidate | blocked | How does AITER&#x27;s hand-written HIP skinny GEMM organise work for M &lt;= 16, and what can a FlyDSL decode kernel take from it? |
 
 <a id="flydsl-small-m-hgemm-family"></a>
 ### What does AITER do differently when M is a handful of rows, and which knobs does that open?
@@ -172,8 +172,9 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #414 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 

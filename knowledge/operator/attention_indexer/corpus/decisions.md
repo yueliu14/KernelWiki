@@ -21,15 +21,15 @@ A required trait must be established for the actual design before the card appli
 
 | card | type | PR review | question |
 |---|---|---|---|
-| [indexer-mqa-score-semantics](#indexer-mqa-score-semantics) | semantic | unreviewed | What does the DeepSeek-style MQA indexer compute before top-k? |
-| [indexer-fp8-architecture-format](#indexer-fp8-architecture-format) | constraint | unreviewed | Which FP8 format conversions does the contiguous FlyDSL MQA logits path require? |
+| [indexer-mqa-score-semantics](#indexer-mqa-score-semantics) | semantic | reviewed | What does the DeepSeek-style MQA indexer compute before top-k? |
+| [indexer-fp8-architecture-format](#indexer-fp8-architecture-format) | constraint | reviewed | Which FP8 format conversions does the contiguous FlyDSL MQA logits path require? |
 | [indexer-window-and-clean-output](#indexer-window-and-clean-output) | constraint | reviewed | Who initializes logits outside each query&#x27;s valid window? |
-| [indexer-paged-mxfp4-layout](#indexer-paged-mxfp4-layout) | constraint | unreviewed | Which packed payload, scale and tile constraints accompany paged MXFP4 scoring? |
-| [indexer-minimax-page-max-score](#indexer-minimax-page-max-score) | semantic | unreviewed | How does MiniMax block scoring differ from per-token MQA logits? |
+| [indexer-paged-mxfp4-layout](#indexer-paged-mxfp4-layout) | constraint | blocked | Which packed payload, scale and tile constraints accompany paged MXFP4 scoring? |
+| [indexer-minimax-page-max-score](#indexer-minimax-page-max-score) | semantic | blocked | How does MiniMax block scoring differ from per-token MQA logits? |
 | [indexer-score-work-partition](#indexer-score-work-partition) | performance_candidate | reviewed | How should scoring work be partitioned across short decode and long prefill rows? |
-| [indexer-topk-row-index-contract](#indexer-topk-row-index-contract) | constraint | unreviewed | What must a top-k implementation preserve beyond score values? |
+| [indexer-topk-row-index-contract](#indexer-topk-row-index-contract) | constraint | blocked | What must a top-k implementation preserve beyond score values? |
 | [indexer-dcp-merge-ownership](#indexer-dcp-merge-ownership) | constraint | reviewed | How does DCP top-k merge preserve rank ownership and physical KV slots? |
-| [indexer-single-query-vector-path](#indexer-single-query-vector-path) | performance_candidate | unreviewed | When can a single-query index score use a vector reduction instead of a degenerate matrix product? |
+| [indexer-single-query-vector-path](#indexer-single-query-vector-path) | performance_candidate | unresolved | When can a single-query index score use a vector reduction instead of a degenerate matrix product? |
 
 <a id="indexer-mqa-score-semantics"></a>
 ### What does the DeepSeek-style MQA indexer compute before top-k?
@@ -71,8 +71,29 @@ A required trait must be established for the actual design before the card appli
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:11:46.064634+00:00.
+
+- **[PR #4538](https://github.com/ROCm/aiter/pull/4538) · merged · mixed** — The FlyDSL wrapper and format checks belong to the implementation reviewed in PR #4538; the mixed reported comparisons do not isolate format conversion or score semantics.
+  Conditions: Preserve weighted ReLU scoring, head weights and row windows; gfx950 requires native FN, while gfx942 conversion has its own scaling and negative-zero handling.
+  Direction: flydsl; score_semantics, numerical_contract
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [9402ade66cbd](https://github.com/ROCm/aiter/commit/9402ade66cbd8282270b1daee3b28ab6478d9485) — Expose Q/KV, per-token scales, head weights and half-open row windows through the FlyDSL MQA score wrapper.
+  Change: [9402ade66cbd](https://github.com/ROCm/aiter/commit/9402ade66cbd8282270b1daee3b28ab6478d9485) — Require native e4m3fn on gfx950 and restrict FN/FNUZ conversion handling to gfx942 while preserving weighted-ReLU score semantics.
+  [Result: gfx950_original](../../../_sources/aiter/pull_requests/4538.md#gfx950_original) — **operator**; The original PR table reports a large improvement over its existing Triton/Gluon baseline for one skinny prefill case.
+  **Effect confidence: low** — Upstream report has incomplete comparison context; no reproduction was performed; missing: hardware, software, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  throughput: 149.3 → 1584.4 TFLOP/s (single_case); normalized speedup 10.61×
+  [Result: gfx942_clean](../../../_sources/aiter/pull_requests/4538.md#gfx942_clean) — **operator**; The original table reports a benefit from fused clean-logits initialization for the gfx942 implementation.
+  **Effect confidence: low** — Upstream report has incomplete comparison context; no reproduction was performed; missing: hardware, software, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  latency: 210.4 → 191.4 us (single_case); normalized speedup 1.099×
+  [Result: later_regression](../../../_sources/aiter/pull_requests/4538.md#later_regression) — **operator**; A later author comment reports FlyDSL slower than the newer Gluon baseline for a square DSv4 case.
+  **Effect confidence: low** — Upstream report has incomplete comparison context; no reproduction was performed; missing: baseline_commit, candidate_commit, correctness, independent_reproduction.
+  latency: 100.1 → 104.6 us (single_case); normalized speedup 0.957×
+  [Result: later_gain](../../../_sources/aiter/pull_requests/4538.md#later_gain) — **operator**; The same later comparison reports a benefit on a GLM 5.2 case.
+  **Effect confidence: low** — Upstream report has incomplete comparison context; no reproduction was performed; missing: baseline_commit, candidate_commit, correctness, independent_reproduction.
+  latency: 413.2 → 365.7 us (single_case); normalized speedup 1.13×
 
 #### Background
 
@@ -119,8 +140,28 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:11:46.064634+00:00.
+
+- **[PR #4538](https://github.com/ROCm/aiter/pull/4538) · merged · mixed** — The FlyDSL wrapper and format checks belong to the implementation reviewed in PR #4538; the mixed reported comparisons do not isolate format conversion or score semantics.
+  Conditions: Preserve weighted ReLU scoring, head weights and row windows; gfx950 requires native FN, while gfx942 conversion has its own scaling and negative-zero handling.
+  Direction: flydsl; numerical_contract, implementation_contract
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [9402ade66cbd](https://github.com/ROCm/aiter/commit/9402ade66cbd8282270b1daee3b28ab6478d9485) — Require native e4m3fn on gfx950 and restrict FN/FNUZ conversion handling to gfx942 while preserving weighted-ReLU score semantics.
+  [Result: gfx950_original](../../../_sources/aiter/pull_requests/4538.md#gfx950_original) — **operator**; The original PR table reports a large improvement over its existing Triton/Gluon baseline for one skinny prefill case.
+  **Effect confidence: low** — Upstream report has incomplete comparison context; no reproduction was performed; missing: hardware, software, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  throughput: 149.3 → 1584.4 TFLOP/s (single_case); normalized speedup 10.61×
+  [Result: gfx942_clean](../../../_sources/aiter/pull_requests/4538.md#gfx942_clean) — **operator**; The original table reports a benefit from fused clean-logits initialization for the gfx942 implementation.
+  **Effect confidence: low** — Upstream report has incomplete comparison context; no reproduction was performed; missing: hardware, software, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  latency: 210.4 → 191.4 us (single_case); normalized speedup 1.099×
+  [Result: later_regression](../../../_sources/aiter/pull_requests/4538.md#later_regression) — **operator**; A later author comment reports FlyDSL slower than the newer Gluon baseline for a square DSv4 case.
+  **Effect confidence: low** — Upstream report has incomplete comparison context; no reproduction was performed; missing: baseline_commit, candidate_commit, correctness, independent_reproduction.
+  latency: 100.1 → 104.6 us (single_case); normalized speedup 0.957×
+  [Result: later_gain](../../../_sources/aiter/pull_requests/4538.md#later_gain) — **operator**; The same later comparison reports a benefit on a GLM 5.2 case.
+  **Effect confidence: low** — Upstream report has incomplete comparison context; no reproduction was performed; missing: baseline_commit, candidate_commit, correctness, independent_reproduction.
+  latency: 413.2 → 365.7 us (single_case); normalized speedup 1.13×
 
 #### Background
 
@@ -225,8 +266,9 @@ Reviewed the linked PRs and cited results for the specified backend/axes; other 
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #6145, #6334 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -275,8 +317,9 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #5626 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -416,8 +459,9 @@ Reviewed the linked PRs and cited results for the specified backend/axes; other 
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #5363, #6329 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -524,8 +568,9 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read the pinned GEAK account of the single-query mul/reduce optimization. It explicitly attributes the merged implementation to vLLM, not AITER, but supplies no identifying PR URL or implementation commit. Its GEAK documentation pin is not an AITER change. Retain the reported vLLM context; AITER PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.752850+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 

@@ -24,22 +24,22 @@ A required trait must be established for the actual design before the card appli
 |---|---|---|---|
 | [flydsl-gfx942-path-gates](#flydsl-gfx942-path-gates) | constraint | reviewed | Which FlyDSL GEMM paths does gfx942 (MI300X) actually give you, and which does it silently switch or refuse? |
 | [flydsl-hgemm-tiling-validity](#flydsl-hgemm-tiling-validity) | constraint | reviewed | Which FlyDSL HGEMM configurations will fail to build at all, before any of them can be slow? |
-| [flydsl-half-mfma-call-forms](#flydsl-half-mfma-call-forms) | performance_candidate | unreviewed | Which legal MFMA call forms can seed a FlyDSL f16/bf16 GEMM? |
+| [flydsl-half-mfma-call-forms](#flydsl-half-mfma-call-forms) | performance_candidate | reviewed | Which legal MFMA call forms can seed a FlyDSL f16/bf16 GEMM? |
 | [flydsl-async-copy-by-family](#flydsl-async-copy-by-family) | performance_candidate | reviewed | Is global-to-LDS async copy a knob, a fixed fact, or unavailable — per FlyDSL kernel family and architecture? |
-| [gemm-workgroup-xcd-mapping](#gemm-workgroup-xcd-mapping) | performance_candidate | unreviewed | How should a FlyDSL GEMM map workgroup IDs onto output tiles and XCDs, and where does AITER already do it? |
-| [flydsl-hgemm-config-space](#flydsl-hgemm-config-space) | performance_candidate | unreviewed | Which tile, warp and split-K values will the FlyDSL HGEMM family actually accept, and how does a shape narrow them? |
-| [flydsl-xor16-lds-layout-consistency](#flydsl-xor16-lds-layout-consistency) | performance_candidate | unreviewed | How should a FlyDSL GEMM apply an XOR16 LDS layout without making stores and loads disagree? |
-| [flydsl-preshuffle-b-layout-contract](#flydsl-preshuffle-b-layout-contract) | performance_candidate | unreviewed | What does enabling B preshuffle on a FlyDSL HGEMM actually require? |
+| [gemm-workgroup-xcd-mapping](#gemm-workgroup-xcd-mapping) | performance_candidate | reviewed | How should a FlyDSL GEMM map workgroup IDs onto output tiles and XCDs, and where does AITER already do it? |
+| [flydsl-hgemm-config-space](#flydsl-hgemm-config-space) | performance_candidate | reviewed | Which tile, warp and split-K values will the FlyDSL HGEMM family actually accept, and how does a shape narrow them? |
+| [flydsl-xor16-lds-layout-consistency](#flydsl-xor16-lds-layout-consistency) | performance_candidate | reviewed | How should a FlyDSL GEMM apply an XOR16 LDS layout without making stores and loads disagree? |
+| [flydsl-preshuffle-b-layout-contract](#flydsl-preshuffle-b-layout-contract) | performance_candidate | reviewed | What does enabling B preshuffle on a FlyDSL HGEMM actually require? |
 | [gemm-shape-regime-routing](#gemm-shape-regime-routing) | performance_candidate | reviewed | For each shape bucket, which backend did AITER&#x27;s own tuner ship, and what does that imply for a FlyDSL kernel? |
 | [gemm-default-backend-routing](#gemm-default-backend-routing) | performance_candidate | reviewed | Which backend does AITER&#x27;s own dispatch pick when no tuned row exists, and how does that differ between gfx942 and gfx950? |
-| [gemm-asm-tile-inventory-and-selection](#gemm-asm-tile-inventory-and-selection) | performance_candidate | unreviewed | Which tiles and split-K capabilities does AITER&#x27;s hand-written ASM ship per architecture, and how does its launcher choose among them for a shape? |
-| [flydsl-mfma-fragment-lane-layout](#flydsl-mfma-fragment-lane-layout) | semantic | unreviewed | Which lane holds which row and column of a 16x16 MFMA fragment in AITER&#x27;s FlyDSL kernels, and what does that fix for loads, in-register scaling and stores? |
+| [gemm-asm-tile-inventory-and-selection](#gemm-asm-tile-inventory-and-selection) | performance_candidate | blocked | Which tiles and split-K capabilities does AITER&#x27;s hand-written ASM ship per architecture, and how does its launcher choose among them for a shape? |
+| [flydsl-mfma-fragment-lane-layout](#flydsl-mfma-fragment-lane-layout) | semantic | reviewed | Which lane holds which row and column of a 16x16 MFMA fragment in AITER&#x27;s FlyDSL kernels, and what does that fix for loads, in-register scaling and stores? |
 | [flydsl-host-launch-contract](#flydsl-host-launch-contract) | constraint | reviewed | What does the host side of a FlyDSL GEMM have to provide in AITER — compile cache, launch grid, per-stream state and kernel name? |
-| [flydsl-test-parity-gate](#flydsl-test-parity-gate) | constraint | unreviewed | Which parity does AITER&#x27;s own FlyDSL GEMM test demand, where does it relax it, and what does that say about validating an authored kernel? |
-| [gemm-streamed-operand-cache-policy](#gemm-streamed-operand-cache-policy) | performance_candidate | unreviewed | Which operand loads and output stores should carry a streaming (non-temporal) cache policy, and which should keep the default? |
+| [flydsl-test-parity-gate](#flydsl-test-parity-gate) | constraint | reviewed | Which parity does AITER&#x27;s own FlyDSL GEMM test demand, where does it relax it, and what does that say about validating an authored kernel? |
+| [gemm-streamed-operand-cache-policy](#gemm-streamed-operand-cache-policy) | performance_candidate | reviewed | Which operand loads and output stores should carry a streaming (non-temporal) cache policy, and which should keep the default? |
 | [flydsl-lds-pipeline-depth](#flydsl-lds-pipeline-depth) | performance_candidate | reviewed | How many LDS stages should the K loop keep in flight, and what does each one cost? |
-| [gemm-host-plan-cache](#gemm-host-plan-cache) | performance_candidate | unreviewed | When should a GEMM wrapper cache launch plans or temporary storage? |
-| [gemm-compiler-schedule-and-register-budget](#gemm-compiler-schedule-and-register-budget) | performance_candidate | unreviewed | When is an explicit GEMM pipeline worth replacing the compiler-selected loop? |
+| [gemm-host-plan-cache](#gemm-host-plan-cache) | performance_candidate | unresolved | When should a GEMM wrapper cache launch plans or temporary storage? |
+| [gemm-compiler-schedule-and-register-budget](#gemm-compiler-schedule-and-register-budget) | performance_candidate | unresolved | When is an explicit GEMM pipeline worth replacing the compiler-selected loop? |
 | [triton-dot-accumulator-form](#triton-dot-accumulator-form) | performance_candidate | reviewed | Should the dot product receive the existing accumulator directly? |
 
 <a id="flydsl-gfx942-path-gates"></a>
@@ -260,8 +260,19 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #2536](https://github.com/ROCm/aiter/pull/2536) · merged · mixed** — PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results; no independent gain for this direction is established.
+  Conditions: Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later pinned configuration surface.
+  Direction: flydsl; compute_instruction, architecture_capability
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [fdc40a06926e](https://github.com/ROCm/aiter/commit/fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd) — Introduce bf16/f16 fragment conversion and paired 16x16x16 MFMA calls in split-K HGEMM.
+  [Result: kimi_report](../../../_sources/aiter/pull_requests/2536.md#kimi_report) — **end_to_end**; The PR supplies a Kimi-2 serving performance image with higher output throughput across displayed rows and mixed mean TTFT changes; image values are not encoded as metrics. The change bundles split-K GEMM with tuned configurations.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, dtype, software, baseline, baseline_commit, candidate_commit, protocol, image_metric_transcription, performance_baseline_identity, performance_topology, independent_reproduction.
+  Quantitative effect: **not encoded here**; the qualitative report and its limits remain recorded.
 
 #### Background
 
@@ -403,8 +414,19 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:24:54.151357+00:00.
+
+- **[PR #2726](https://github.com/ROCm/aiter/pull/2726) · merged · not_reported** — PR #2726 introduces the XCD/grouped-M remapping used by the pinned FlyDSL MoE precedent; there is no measured mapping-only gain.
+  Conditions: Eight-XCD source path; validate divisibility, incomplete groups and actual device topology before reuse.
+  Direction: flydsl; work_partition, memory_access, execution_geometry
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [e991be1c4378](https://github.com/ROCm/aiter/commit/e991be1c437833c002f940dd854892037b19da7d) — Add an opt-in eight-XCD workgroup remapping followed by grouped-M tile ordering in the MoE GEMM path.
+  [Result: remap_unmeasured](../../../_sources/aiter/pull_requests/2726.md#remap_unmeasured) — **unknown**; The PR adds XCD remapping alongside async loads, pipeline changes and A8W4 enablement; its test-result section points to tuned configurations without a measured XCD comparison.
+  **Effect confidence: unknown** — The reviewed body and discussion provide no quantitative effect or isolated XCD experiment; missing: hardware, gfx, dtype, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Reported experience
 
@@ -483,8 +505,20 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #2536](https://github.com/ROCm/aiter/pull/2536) · merged · mixed** — PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results; no independent gain for this direction is established.
+  Conditions: Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later pinned configuration surface.
+  Direction: flydsl; workgroup_tile, work_partition, execution_geometry, tunable_surface
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [fdc40a06926e](https://github.com/ROCm/aiter/commit/fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd) — Register the original HGEMM tile, split-K, stage and data-movement configuration product; later snapshots extend it.
+  Change: [fdc40a06926e](https://github.com/ROCm/aiter/commit/fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd) — Require K divisibility by split count and the per-split K tile before compilation.
+  [Result: kimi_report](../../../_sources/aiter/pull_requests/2536.md#kimi_report) — **end_to_end**; The PR supplies a Kimi-2 serving performance image with higher output throughput across displayed rows and mixed mean TTFT changes; image values are not encoded as metrics. The change bundles split-K GEMM with tuned configurations.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, dtype, software, baseline, baseline_commit, candidate_commit, protocol, image_metric_transcription, performance_baseline_identity, performance_topology, independent_reproduction.
+  Quantitative effect: **not encoded here**; the qualitative report and its limits remain recorded.
 
 #### Background
 
@@ -552,8 +586,20 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #2536](https://github.com/ROCm/aiter/pull/2536) · merged · mixed** — PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results; no independent gain for this direction is established.
+  Conditions: Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later pinned configuration surface.
+  Direction: flydsl; operand_layout, configuration_constraints
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [fdc40a06926e](https://github.com/ROCm/aiter/commit/fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd) — Store A into LDS using the same XOR16 byte permutation required by fragment reads.
+  Change: [fdc40a06926e](https://github.com/ROCm/aiter/commit/fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd) — Apply the matching XOR16 permutation when loading A fragments from LDS.
+  [Result: kimi_report](../../../_sources/aiter/pull_requests/2536.md#kimi_report) — **end_to_end**; The PR supplies a Kimi-2 serving performance image with higher output throughput across displayed rows and mixed mean TTFT changes; image values are not encoded as metrics. The change bundles split-K GEMM with tuned configurations.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, dtype, software, baseline, baseline_commit, candidate_commit, protocol, image_metric_transcription, performance_baseline_identity, performance_topology, independent_reproduction.
+  Quantitative effect: **not encoded here**; the qualitative report and its limits remain recorded.
 
 #### Background
 
@@ -636,8 +682,19 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #2536](https://github.com/ROCm/aiter/pull/2536) · merged · mixed** — PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results; no independent gain for this direction is established.
+  Conditions: Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later pinned configuration surface.
+  Direction: flydsl; operand_layout, runtime_contract, configuration_constraints
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [fdc40a06926e](https://github.com/ROCm/aiter/commit/fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd) — Reject the simultaneous B-preshuffle and B-to-LDS combination in the HGEMM compiler.
+  [Result: kimi_report](../../../_sources/aiter/pull_requests/2536.md#kimi_report) — **end_to_end**; The PR supplies a Kimi-2 serving performance image with higher output throughput across displayed rows and mixed mean TTFT changes; image values are not encoded as metrics. The change bundles split-K GEMM with tuned configurations.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, dtype, software, baseline, baseline_commit, candidate_commit, protocol, image_metric_transcription, performance_baseline_identity, performance_topology, independent_reproduction.
+  Quantitative effect: **not encoded here**; the qualitative report and its limits remain recorded.
 
 #### Background
 
@@ -870,8 +927,9 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: blocked**.
+Examined the pinned source-file history; candidate PRs #1048 remain to be checked against the exact construct and their reported results. Complete PR metadata/body/discussion captures are unavailable in this pass after GitHub API rate limiting. A file origin or title is only a candidate, not an accepted association; PR effect confidence remains unknown. Checked 2026-11-05T02:26:25.564445+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Background
 
@@ -929,8 +987,20 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #2536](https://github.com/ROCm/aiter/pull/2536) · merged · mixed** — PR #2536 introduces this HGEMM mechanism in a GEMM/configuration bundle with serving results; no independent gain for this direction is established.
+  Conditions: Historical FlyDSL split-K HGEMM introduction; retain subsequent PR #2567 correctness fixes and the later pinned configuration surface.
+  Direction: flydsl; operand_layout, epilogue, compute_instruction
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [fdc40a06926e](https://github.com/ROCm/aiter/commit/fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd) — Map wave lanes to A/B fragment coordinates in the new HGEMM kernel.
+  Change: [fdc40a06926e](https://github.com/ROCm/aiter/commit/fdc40a06926eff49e4c1a5d29ad0c615d0a62cdd) — Map accumulator lanes to output rows and columns before the direct-store epilogue.
+  [Result: kimi_report](../../../_sources/aiter/pull_requests/2536.md#kimi_report) — **end_to_end**; The PR supplies a Kimi-2 serving performance image with higher output throughput across displayed rows and mixed mean TTFT changes; image values are not encoded as metrics. The change bundles split-K GEMM with tuned configurations.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, dtype, software, baseline, baseline_commit, candidate_commit, protocol, image_metric_transcription, performance_baseline_identity, performance_topology, independent_reproduction.
+  Quantitative effect: **not encoded here**; the qualitative report and its limits remain recorded.
 
 #### Background
 
@@ -1063,8 +1133,19 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #2567](https://github.com/ROCm/aiter/pull/2567) · merged · constraint** — The upstream regression demonstrates why the output oracle must cover split-K tail rows; it does not replace the later pinned test policy.
+  Conditions: Kimi-2 concurrency 65 exposed an issue missed at 16; inspect the actual tolerance and split layout of the target test.
+  Direction: flydsl; validation_contract, work_partition, epilogue
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [0a9acf4bc16d](https://github.com/ROCm/aiter/commit/0a9acf4bc16dabf27ed4d9568404b9a14054682b) — Replace the prior benchmark defaults with explicit precision thresholds and a tile_m=48 split-K regression case.
+  [Result: tail_row_correctness](../../../_sources/aiter/pull_requests/2567.md#tail_row_correctness) — **operator**; The author reports that ceil-div C-tile coverage and bounds checks remove tile_m=48 split-K regressions and NaNs observed under Kimi-2 concurrency 65.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, software, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  Effect: **implementation or correctness constraint**; no speedup is assigned.
 
 #### Background
 
@@ -1120,8 +1201,19 @@ PR provenance and reported effects have not been reviewed for this direction; ef
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:24:54.151357+00:00.
+
+- **[PR #2581](https://github.com/ROCm/aiter/pull/2581) · merged · not_reported** — PR #2581 adds the cache-policy parameter to the shared preshuffle load helper; it reports no measured benefit for the individual cache choice.
+  Conditions: Scope is the FlyDSL helper and its B-load use; later per-family stores and Triton policies retain separate source evidence.
+  Direction: flydsl; memory_access, tunable_surface
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: unknown** — No measured effect is available to attribute; missing: isolated_comparison.; effect belongs to a **unclear** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [deefb11e4846](https://github.com/ROCm/aiter/commit/deefb11e4846bfd96fa4da25e758337c59de010f) — Thread an explicit cache modifier through the shared preshuffle buffer-load helper.
+  [Result: cache_policy_unmeasured](../../../_sources/aiter/pull_requests/2581.md#cache_policy_unmeasured) — **unknown**; The PR describes an L2-cache optimization inside a split-K/quantization/dispatch bundle, but provides no comparison that measures the operand cache-policy effect.
+  **Effect confidence: unknown** — The only timing in the description is an approximate absolute dispatch cost; it supplies no baseline or measured cache-policy benefit; missing: hardware, gfx, dtype, shape_layout, software, baseline, baseline_commit, candidate_commit, protocol, correctness.
+  Quantitative effect: **not reported**; this does not mean zero gain.
 
 #### Background
 
@@ -1231,8 +1323,9 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 4 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.752972+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 
@@ -1285,8 +1378,9 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: unresolved**.
+Read all 3 pinned GEAK summaries already cited by this card. They attribute experiment-specific implementation or tuning outcomes, but provide no uniquely identified AITER change commit or PR for those outcomes. The GEAK documentation commit identifies the published summaries, not an AITER optimization commit. Existing historical experience is retained; upstream PR association and effect confidence remain unknown. Checked 2026-11-05T02:04:28.753060+00:00.
+PR association and effect confidence are **unknown** for this reviewed scope; this does not establish the absence of an upstream PR or a performance gain.
 
 #### Reported experience
 

@@ -20,7 +20,7 @@ A required trait must be established for the actual design before the card appli
 
 | card | type | PR review | question |
 |---|---|---|---|
-| [attention-compression-cache-contract](#attention-compression-cache-contract) | constraint | unreviewed | Which compression-window and quantized-cache contracts must travel together? |
+| [attention-compression-cache-contract](#attention-compression-cache-contract) | constraint | reviewed | Which compression-window and quantized-cache contracts must travel together? |
 
 <a id="attention-compression-cache-contract"></a>
 ### Which compression-window and quantized-cache contracts must travel together?
@@ -58,8 +58,21 @@ A required trait must be established for the actual design before the card appli
 
 #### Upstream PR effects
 
-**Review: unreviewed**.
-PR provenance and reported effects have not been reviewed for this direction; effect confidence is unknown.
+**Review: reviewed**.
+Reviewed the linked PR changes, body and discussion for the specified implementation and conditions. Historical source incorporation is distinguished from measured effects; other backends and later versions are outside this scoped association. Checked 2026-11-05T02:10:32.112473+00:00.
+
+- **[PR #3357](https://github.com/ROCm/aiter/pull/3357) · merged · beneficial** — PR #3357 introduces the compressor contracts and reports a range of HCA split-path gains; the performance claim does not cover every CSA/FP8 variant.
+  Conditions: HCA gain is BF16 ratio=128 without overlap; CSA Main and CSA Indexer retain their own ratio, quantization and preshuffle contracts.
+  Direction: flydsl; compression, cache_layout, numerical_contract
+  **Association: high** — The reviewed commit incorporates or changes the named construct in the cited implementation; the assessment is limited to this backend and historical version.
+  **Independent attribution: low** — The report concerns the implementation or correctness change as a whole; it does not isolate the contribution of this individual direction; missing: isolated_comparison.; effect belongs to a **bundle** change.
+  Verification: **upstream report, not reproduced**. Applicability to a new workload remains unvalidated.
+  Change: [8c0c5220bf01](https://github.com/ROCm/aiter/commit/8c0c5220bf0164783771a10b6d7ae93cf25f81e1) — Validate compression-window state capacity, shape, FP32 storage and contiguity.
+  Change: [8c0c5220bf01](https://github.com/ROCm/aiter/commit/8c0c5220bf0164783771a10b6d7ae93cf25f81e1) — Require paged cache/scale operands and 16-aligned head/block geometry for quantized preshuffle.
+  [Result: hca_split_report](../../../_sources/aiter/pull_requests/3357.md#hca_split_report) — **operator**; The HCA-only two-kernel compressor is reported to beat the single-kernel path by 1.06–3.7x after a slice-size and VEC=8 refactor.
+  **Effect confidence: low** — The source reports an effect or constraint, but comparison details are incomplete and no independent reproduction was performed; missing: hardware, gfx, software, baseline_commit, candidate_commit, protocol, independent_reproduction.
+  speedup: 1.06 x (min)
+  speedup: 3.7 x (max)
 
 #### Background
 

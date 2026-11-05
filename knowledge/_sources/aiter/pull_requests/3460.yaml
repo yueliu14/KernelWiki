@@ -1,0 +1,144 @@
+schema_version: 1
+id: aiter_pr_3460
+number: 3460
+repository: https://github.com/ROCm/aiter
+title: '[gfx1250][FlyDSL] moe kernel 2mode'
+state: merged
+base_commit: 9151cd694f4725a041878127b9931f8595bc6401
+head_commit: 4baa0ff8924bd083997b17ab3c74d4b640b5a9c7
+merge_commit: 76ea4ac325ddde6c895b4e7ade4d42b592033828
+captured_at: '2026-11-05T02:13:45.544261+00:00'
+updated_at: '2026-06-15T12:57:19Z'
+sources:
+- id: automated_overview
+  url: https://github.com/ROCm/aiter/pull/3460#pullrequestreview-4400491992
+  excerpt: |-
+    ## Pull request overview
+
+    This PR extends AITer’s MoE path to support gfx1250 via FlyDSL “2-mode” kernels (mxscale/wmma), and updates the MoE test harness to better match gfx1250 quantization/precision behavior and to add grouped-GEMM-focused test modes.
+
+    **Changes:**
+    - Add/adjust gfx1250/FlyDSL dispatch logic in fused MoE, including gfx1250 fallbacks for unsupported kernels and optional grouped-GEMM routing.
+    - Introduce gfx1250 MXScale padding/alignment helpers (with caching) to handle non-tile-aligned model dimensions efficiently.
+    - Update `op_tests/test_moe_2stage.py` with gfx1250-specific reference adjustments, grouped-GEMM debug/fast paths, and revised test controls.
+  sha256: 920bd90f6a0a43f1fa8a818e43fad19483b2cdbf47de36c96af2624aefd98870
+  captured_at: '2026-11-05T02:13:45.544261+00:00'
+  updated_at: '2026-06-01T10:47:31Z'
+changes:
+- id: forward_inverse_maps
+  commit: 76ea4ac325ddde6c895b4e7ade4d42b592033828
+  parent_commit: 40b342715500e54d6afca4720d3f404a8a662061
+  file: aiter/ops/flydsl/kernels/moe_route_maps.py
+  before: ''
+  after: |2
+                # atomicAdd(&atomic_buffer[e], 1) -> within-expert slot (buffer init 0)
+                slot = llvm.AtomicRMWOp(
+                    llvm.AtomicBinOp.add,
+                    ptr,
+                    arith.constant(1, type=i32),
+                    llvm.AtomicOrdering.monotonic,
+                    syncscope="agent",
+                    alignment=4,
+                ).result
+
+                # grouped row = slot + e*max_m (offset applied here, not host-side)
+                row = ArithValue(slot) + ArithValue(e) * ArithValue(max_m)
+
+                # topids_to_rows[route] = grouped row;  rows_to_tokens[grouped row] = token (= route//topk)
+                buffer_ops.buffer_store(row, c_rsrc, route)
+                token = arith.divui(route, ArithValue(topk))
+                buffer_ops.buffer_store(token, a_rsrc, row)
+                scf.YieldOp([])
+  summary: Claim a within-expert slot and write forward route-to-row and inverse row-to-token maps.
+- id: weighted_gather
+  commit: 76ea4ac325ddde6c895b4e7ade4d42b592033828
+  parent_commit: 40b342715500e54d6afca4720d3f404a8a662061
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  before: ''
+  after: |2-
+                def _load_row_weight(k):
+                    """Load (source grouped row, route weight as f32) for slot k."""
+                    map_off = map_base + arith.constant(k, type=i32)
+                    row_i32 = ArithValue(
+                        buffer_ops.buffer_load(rows_rsrc, map_off, vec_width=1, dtype=i32)
+                    )
+                    # weight is bf16/f16 (its native dtype); extend to f32
+                    w_f32 = ArithValue(
+                        arith.extf(
+                            f32,
+                            buffer_ops.buffer_load(
+                                w_rsrc, map_off, vec_width=1, dtype=w_dt
+                            ),
+                        )
+                    )
+                    return row_i32, w_f32
+  summary: Load the mapped grouped row and native BF16/FP16 route weight, extending the weight to FP32 for
+    reduction.
+- id: weighted_accumulation
+  commit: 76ea4ac325ddde6c895b4e7ade4d42b592033828
+  parent_commit: 40b342715500e54d6afca4720d3f404a8a662061
+  file: aiter/ops/flydsl/kernels/moe_gather_reduce.py
+  before: ''
+  after: |2-
+                                row_i32, w_f32 = _load_row_weight(k)
+                                src_dw = row_i32 * row_dwords_i32 + dw_base
+                                raw_vec = buffer_ops.buffer_load(
+                                    in_rsrc, src_dw, vec_width=VEC, dtype=i32
+                                )
+                                for lane in range_constexpr(VEC):
+                                    raw_dw = ArithValue(
+                                        vector.extract(
+                                            raw_vec,
+                                            static_position=[lane],
+                                            dynamic_position=[],
+                                        )
+                                    )
+                                    lo_f32, hi_f32 = _unpack_pair_to_f32(
+                                        raw_dw, out_dtype, f32=f32, i32=i32
+                                    )
+                                    acc[2 * lane] = acc[2 * lane] + w_f32 * lo_f32
+                                    acc[2 * lane + 1] = acc[2 * lane + 1] + w_f32 * hi_f32
+
+                            packed = [
+  summary: Accumulate weighted top-k contributions per output token without scatter atomics.
+results:
+- id: maps_and_gather_unmeasured
+  outcome: not_reported
+  summary: The PR introduces the route-map and weighted gather-reduce implementation but supplies no quantitative
+    comparison in its body or reviewed discussion.
+  source_refs:
+  - automated_overview
+  context:
+    hardware: null
+    gfx: null
+    dtype: null
+    shape_layout: null
+    software: null
+    baseline: null
+    candidate: gfx1250 grouped-MoE route maps and weighted gather-reduce
+    baseline_commit: null
+    candidate_commit: null
+    scope: unknown
+    protocol: null
+    correctness: null
+  metrics: []
+  confidence:
+    level: unknown
+    reasons:
+    - The author body is an empty template, and the reviewed discussion covers integration, code review and
+      CI rather than measured effects.
+    missing_evidence:
+    - hardware
+    - gfx
+    - dtype
+    - shape_layout
+    - software
+    - baseline
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - correctness
+  limitations:
+  - The automated overview is a change summary, not measured validation.
+  - This introduction uses a row-zero/weight-zero convention for unused slots; later negative-row and split-K
+    handling require their own source lineage.

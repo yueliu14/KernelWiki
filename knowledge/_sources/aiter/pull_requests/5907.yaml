@@ -1,0 +1,785 @@
+schema_version: 1
+id: aiter_pr_5907
+number: 5907
+repository: https://github.com/ROCm/aiter
+title: '[FlyDSL] [JIT] comm fused moe stage2 reducescatter for dsv4 dpa'
+state: merged
+base_commit: 095b84dc86b2811169a2192a7af9d3be1a6dc8c9
+head_commit: 8528e03ac2480860b006a56e7ff9e2e05729f152
+merge_commit: 825a0ce1a0df91e66e4fa9faa2a14a2473199936
+captured_at: '2026-11-05T02:22:13.781430+00:00'
+updated_at: '2026-10-13T03:53:28Z'
+sources:
+- id: report
+  url: https://github.com/ROCm/aiter/pull/5907
+  excerpt: |-
+    ## Motivation
+
+    The second MoE GEMM and its following collective form a critical serving path
+    for DeepSeek-V4. Executing GEMM2, all-reduce/reduce-scatter, and the
+    shared-expert add independently leaves avoidable launch, memory-traffic, and
+    synchronization overhead, while production DPA introduces ragged per-rank token
+    counts that fixed-layout kernels cannot represent efficiently.
+
+    This PR turns the comm-fused MoE Stage2 path into a production-ready Aiter
+    runtime. It provides tuned Mega, Direct, and Window collective families across
+    the serving token range; supports compact ragged reduce-scatter; unifies tuning
+    and runtime configuration; makes synchronization and backend capabilities
+    explicit; and preserves the existing Stage2 callback ABI for downstream users.
+
+    For the production DeepSeek-V4 shape, a clean-cache, skew-routing TP8 re-run
+    shows **19.88%–77.47%** speedup for low-token Mega all-reduce,
+    **41.79%–119.66%** for Window all-reduce, and **24.10%–86.77%** for Window
+    reduce-scatter. Direct reduce-scatter measured through the production-equivalent
+    external-reuse synchronization path improves M128, M512, and M1024 by
+    **1.33%**, **2.11%**, and **6.30%**, respectively. Downstream DPA serving
+    improves throughput by **6.39%–10.18%** across concurrency 64–1024 with GSM8K
+    accuracy preserved.
+
+    ## Technical Details
+
+    ### Tuned Stage2 collective families
+
+    - Integrate and tune three complementary kernel families:
+      - **Mega** for low-token all-reduce buckets.
+      - **Direct** for latency-sensitive BF16 reduce-scatter plus shared-expert add.
+      - **Window** for larger all-reduce and reduce-scatter workloads.
+    - Improve Window producer scheduling, collective ordering, cache policy, local
+      worker assignment, and drain behavior.
+    - Support dynamic route scaling and native compact MXFP4 communication payloads
+      for validated configurations.
+    - Keep eager and CUDA graph execution on the same runtime selection path with
+      graph-safe workspace ownership and lifetimes.
+
+    ### Unified configuration and runtime selection
+
+    - Make the standard model tuned FMoE CSV the single source of truth for both
+      ordinary and comm-fused winners.
+    - Extend `ShapeKey` and the tuner schema with collective type, shared-add, and
+      backend configuration metadata.
+    - Align tuner output with production lookup so a tuned row can be consumed
+      directly by the runtime.
+    - Expose the shared `bucket_for()` helper and explicit runtime capabilities such
+      as `supports_ragged_m` and `supports_external_reuse_sync`.
+    - Remove superseded standalone comm-fused winner/untuned CSVs, legacy JIT config
+      alias plumbing, and obsolete atomic/output-shard experiments.
+
+    ### Compact ragged reduce-scatter
+
+    - Accept `reduce_scatter_sizes` and compute each rank's real `local_rows` and
+      `rank_offset`.
+    - Select the kernel bucket from the maximum loaded rank while keeping the actual
+      input compact.
+    - Return only the calling rank's real rows instead of a padded shard.
+    - Advertise layout support through an explicit capability contract so callers
+      can select compact or fixed-layout collection without implementation-specific
+      probing.
+
+    ### Synchronization and callback compatibility
+
+    - Add explicit external reuse synchronization for Direct kernels. An enclosing
+      DPA input gather can prove that every peer consumed the previous partial
+      buffer, allowing the production path to skip a redundant standalone wait.
+    - Retain the internal fallback synchronization for callers that cannot provide
+      that proof.
+    - Separate producer/consumer synchronization for the Stage2 input and
+      shared-expert add, and simplify the Direct reduction/add path.
+    - Preserve the legacy zero-argument `before_stage2()` callback and add the
+      explicit row-aware `before_stage2_for_rows(rows)` callback. Supplying both is
+      rejected to keep behavior unambiguous.
+
+    ## Commit Breakdown
+
+    | Commit | Purpose |
+    |---|---|
+    | `9b5921ad` — `refactor(comm-fused-moe): load winners from tuned fmoe configs` | Establishes one configuration source of truth. It moves comm-fused winner metadata into the standard tuned FMoE rows, extends the shape/tuner schema with collective metadata, aligns tuning output with runtime lookup, and removes the separate winner/untuned CSV plus legacy JIT config alias plumbing. |
+    | `144cf44f` — `feat(comm-fused-moe): optimize Stage2 collective fusion` | Implements the main production kernel/runtime optimization. It integrates tuned Mega, Direct, and Window AR/RS paths; adds BF16 Direct RS + shared add; optimizes Window scheduling, ordering, cache behavior, synchronization, route scaling, and graph-safe workspaces; supports validated compact MXFP4 payloads; and removes superseded atomic/output-shard experiments. |
+    | `f3fff4c1` — `feat(comm-fused-moe): support ragged reduce-scatter layouts` | Adds compact ragged RS semantics through `reduce_scatter_sizes`, per-rank row/offset calculation, max-loaded-rank bucket selection, and exact local-row output. It also introduces the explicit ragged-layout capability used by downstream integrations. |
+    | `82d101a8` — `perf(comm-fused-moe): streamline direct reuse synchronization` | Adds the external reuse-synchronization contract for Direct kernels. Production callers can reuse an enclosing gather as the cross-rank consumption proof and remove the redundant wait, while other callers retain the safe internal synchronization path. |
+    | `90268259` — `fix(comm-fused-moe): preserve Stage2 callback ABI` | Restores the legacy zero-argument callback unchanged and adds `before_stage2_for_rows(rows)` for consumers that need the exact output size. It rejects simultaneous callback forms and guarantees that current ATOM remains compatible while the row-aware ATOM integration lands. |
+
+    ## Test Plan
+
+    - Run TP8 comm-fused MoE correctness across representative Mega, Direct, and
+      Window buckets, including uneven and skewed rank distributions.
+    - Cover eager and CUDA graph execution, repeated graph replay, shared-expert
+      addition, compact ragged RS, fixed-layout fallback, and synchronization reuse.
+    - Run the tuning/lookup flow against the unified model FMoE CSV.
+    - Compare ordinary GEMM2 + collective + shared add with every positive tuned
+      production winner and focused production synchronization paths.
+    - Validate downstream DeepSeek-V4-Pro DPA serving with dashboard-aligned
+      A/B/A/B/A/B performance and full GSM8K.
+    - Validate legacy and row-aware callback contracts, including current ATOM main
+      against the new Aiter runtime.
+
+    ## Test Result
+
+    ### Single-operator performance
+
+    The table below replaces the earlier CSV-derived figures with measured results
+    from the current branch. The common shape is `gfx950`, 256 CUs, hidden size
+    7168, local intermediate size 384, 384 experts, top-k 6, TP8. Mega and Window
+    were re-run with a clean Aiter/FlyDSL cache and skewed routing. Direct uses the
+    external-reuse synchronization contract exercised by DPA production. Each
+    number covers Stage2 + collective + shared-expert add; speedup is
+    `ordinary / comm-fused - 1`.
+
+    | Tokens (M) | Collective | Family | Ordinary | Comm-fused | Speedup |
+    |---:|:---:|:---:|---:|---:|---:|
+    | 1 | AR | Mega | 20.6734 us | 14.4418 us | **+43.15%** |
+    | 2 | AR | Mega | 26.3707 us | 14.8594 us | **+77.47%** |
+    | 4 | AR | Mega | 22.2335 us | 14.7302 us | **+50.94%** |
+    | 8 | AR | Mega | 21.2186 us | 14.7854 us | **+43.51%** |
+    | 16 | AR | Mega | 25.0727 us | 20.9146 us | **+19.88%** |
+    | 128 | RS | Direct | 68.3820 us | 67.4816 us | **+1.33%** |
+    | 512 | RS | Direct | 137.3245 us | 134.4922 us | **+2.11%** |
+    | 1024 | RS | Direct | 195.5465 us | 183.9565 us | **+6.30%** |
+    | 4096 | AR | Window | 499.6208 us | 352.3720 us | **+41.79%** |
+    | 4096 | RS | Window | 393.7843 us | 317.3006 us | **+24.10%** |
+    | 8192 | AR | Window | 973.0854 us | 559.0888 us | **+74.05%** |
+    | 8192 | RS | Window | 682.4939 us | 480.6690 us | **+41.99%** |
+    | 16384 | AR | Window | 1937.4477 us | 948.7749 us | **+104.21%** |
+    | 16384 | RS | Window | 1331.6551 us | 822.0266 us | **+62.00%** |
+    | 32768 | AR | Window | 3792.5641 us | 1726.6000 us | **+119.66%** |
+    | 32768 | RS | Window | 2544.2404 us | 1494.3613 us | **+70.26%** |
+    | 131072 | RS | Window | 10258.4778 us | 5492.6495 us | **+86.77%** |
+
+    M512 Direct is the average of three production-path runs. Direct numerical
+    error stayed at `max_abs=0.0625` and `rel_l2=0.0046–0.0047`; Mega stayed at
+    `rel_l2=0.0134–0.0150`; Window RS stayed at `rel_l2=0.0264–0.0267`. Window AR
+    uses the existing FP4 aggregate validation policy (`max_abs <= 3`,
+    `rel_l2 <= 0.13`) and measured `rel_l2=0.1224–0.1225`.
+
+    ### Downstream DPA serving performance
+
+    DeepSeek-V4-Pro, DPA/TP8, ISL/OSL `8192/1024`, random range ratio `0.8`,
+    concurrency 64–1024, `concurrency x 10` requests per leg, A/B/A/B/A/B:
+
+    | Concurrency | Ordinary total tok/s | Comm-fused total tok/s | Throughput | TTFT improvement | TPOT improvement |
+    |---:|---:|---:|---:|---:|---:|
+    | 64 | 15,080.81 | 16,044.58 | **+6.39%** | **16.56% lower** | **5.20% lower** |
+    | 128 | 23,331.48 | 25,125.15 | **+7.69%** | **10.03% lower** | **6.97% lower** |
+    | 256 | 32,808.34 | 35,395.31 | **+7.89%** | **11.68% lower** | **6.88% lower** |
+    | 512 | 41,456.72 | 44,613.91 | **+7.62%** | **9.75% lower** | **7.24% lower** |
+    | 1024 | 48,415.08 | 53,341.71 | **+10.18%** | **11.01% lower** | **9.20% lower** |
+
+    Every point completed all requested requests in all six legs. Logs confirmed
+    comm-fused activation on all eight ranks and Window RS selection under high
+    load, demonstrating that the operator gains carry through to serving.
+
+    ### Accuracy, correctness, and graph safety
+
+    - Full 1319-sample, 3-shot GSM8K:
+      - Ordinary: flexible `0.9431 +/- 0.0064`, strict `0.9447 +/- 0.0063`.
+      - Comm-fused: flexible `0.9522 +/- 0.0059`, strict `0.9530 +/- 0.0058`.
+      - Both pass the `0.94` CI threshold; the comm-fused run recorded seven bucket
+        activations and selected the tuned M16384 Window AR path.
+    - TP8 correctness passed for M64, M1024, and M4096 in eager and CUDA graph modes.
+    - M1024 completed 10 consecutive CUDA graph replays.
+    - The M512 production graph path remained within the FP4 aggregate tolerance.
+    - Black, Ruff, `py_compile`/`compileall`, and diff checks passed.
+
+    ### Downstream compatibility validation
+
+    Current ATOM main (`8820e482`) with new Aiter (`90268259`) completed full GSM8K
+    and two `8192/1024`, concurrency-16 serving runs without runtime errors. Both
+    runs activated the comm-fused M16384 Window AR path. Against the recorded
+    ordinary mean, the combination delivered:
+
+    - Throughput: `6650.58 -> 6887.73 tok/s` (**+3.57%**).
+    - Mean TTFT: `537.07 -> 489.89 ms` (**8.79% lower**).
+    - Mean TPOT: `20.73 -> 20.05 ms` (**3.28% lower**).
+    - GSM8K flexible/strict: `0.9492 +/- 0.0060` / `0.9500 +/- 0.0060`.
+
+    The callback contract was also validated directly: legacy zero-argument calls
+    pass, row-aware calls pass, and providing both callbacks raises the intended
+    error.
+
+    ## Compatibility and Merge Order
+
+    | Combination | Result |
+    |---|---|
+    | Current/old ATOM + new Aiter | Compatible and end-to-end validated |
+    | New ATOM + new Aiter | Compatible |
+    | New ATOM + old Aiter | Not supported |
+    | Old ATOM + old Aiter | Unchanged |
+
+    Merge **Aiter first, then ATOM**. The Aiter package declares `flydsl==0.3.4.1`;
+    the validation environment used that declared dependency.
+  sha256: d68d08a4e4f679ac9d3e3fe2d91dfb8cac165a1b2cd30a5c417edce8b79a9acc
+  captured_at: '2026-11-05T02:22:13.781430+00:00'
+  updated_at: '2026-10-13T03:53:28Z'
+- id: reuse_overwrite_report
+  url: https://github.com/ROCm/aiter/pull/5907#issuecomment-6092953856
+  excerpt: The reuse protection of direct RS did not prevent sorting from zeroing out; the peer read a partial
+    data that had been zeroed out or overwritten in the next round.
+  sha256: 1e427f2c686ae469c468a0c8a7bc356979642f3ebcc86a9fd1563d5a2f4ec291
+  captured_at: '2026-11-05T02:22:13.781430+00:00'
+  updated_at: '2026-10-10T02:46:47Z'
+- id: epoch_wrap_fix
+  url: https://github.com/ROCm/aiter/pull/5907#discussion_r4245919403
+  excerpt: Fixed with wrap-safe modular uint32 comparisons for both system-visible and agent-local epoch waits.
+    Forced-wrap tests passed for Direct and Mega, including multiple service groups.
+  sha256: da546cc7cc20694d8a916051af4a6b170e9fff2d6dbb9800ed3b2e8d245f106c
+  captured_at: '2026-11-05T02:22:13.781430+00:00'
+  updated_at: '2026-10-12T08:15:43Z'
+- id: reuse_barrier_contract
+  url: https://github.com/ROCm/aiter/pull/5907#discussion_r4245922474
+  excerpt: Removed the protect_reuse-dependent completion handshake. Internal protection now uses a separate
+    pre-overwrite barrier, while the external path relies on the caller’s collective synchronization. reuse_is_synchronized
+    remains a TP-wide contract and must be consistent across ranks.
+  sha256: 7ef6b98c47f4badf4968569b076e2d39536f79af349849b27340af4f3bf98cd4
+  captured_at: '2026-11-05T02:22:13.781430+00:00'
+  updated_at: '2026-10-12T08:16:06Z'
+changes:
+- id: shared_readiness
+  commit: 825a0ce1a0df91e66e4fa9faa2a14a2473199936
+  parent_commit: cc709933512a056e04c596877086f92be9067df8
+  file: aiter/ops/flydsl/comm_fused_moe_host.py
+  before: |2-
+        def __call__(
+            self,
+            *,
+            stage2_args: tuple,
+            stage2_kwargs: dict,
+            shared_partial,
+            ordinary_stage2,
+        ):
+            _bind_inter_layout(self, ordinary_stage2)
+            stream = torch.cuda.current_stream(self.device)
+            if (
+  after: |2-
+            stream = torch.cuda.current_stream(self.device)
+            shared_waited = before_shared_add is None or not self.config.shape.add_shared
+
+            def wait_for_shared():
+                nonlocal shared_waited
+                if not shared_waited:
+                    before_shared_add()
+                    shared_waited = True
+
+            if not self.config.shape.add_shared:
+                shared_partial = self.output
+            elif self.config.shared_bf16_partials:
+                wait_for_shared()
+                if shared_partial.data_ptr() != self.output.data_ptr():
+                    self.output.copy_(shared_partial)
+                shared_partial = self.output
+            wait_for_shared()
+            _run_compiled(
+                megakernel.compile_megakernel(self.config, self.rank),
+                ptr_arg(self.workspace),
+                ptr_arg(shared_partial),
+                fx.Int64(self.shared_partial_flat_base),
+  summary: Add a once-only shared-producer callback before copying or consuming shared partials in the Mega
+    runner.
+- id: padded_shared_layout
+  commit: 825a0ce1a0df91e66e4fa9faa2a14a2473199936
+  parent_commit: cc709933512a056e04c596877086f92be9067df8
+  file: aiter/ops/flydsl/comm_fused_moe_host.py
+  before: |2-
+        def prepare_shared_partial(self, shared_partial: torch.Tensor) -> torch.Tensor:
+            """Stage a normal shared contribution in the registered output window."""
+
+            if not self.config.shared_bf16_partials:
+                return shared_partial
+            if self.config.producer_mode == "atomic_shared":
+                return shared_partial
+            if shared_partial.data_ptr() != self.output.data_ptr():
+                self.output.copy_(shared_partial)
+            return self.output
+  after: |2-
+        def prepare_padded_shared_partial(
+            self, shared_partial: torch.Tensor, input_rows: int
+        ) -> torch.Tensor:
+            """Pad a full-layout shared contribution for this runner's bucket."""
+
+            expected = (input_rows, self.config.shape.model_dim)
+            if (
+                tuple(shared_partial.shape) != expected
+                or shared_partial.dtype != torch.bfloat16
+                or shared_partial.device != self.device
+                or not shared_partial.is_contiguous()
+            ):
+                raise ValueError(
+                    f"unpadded shared output must be contiguous BF16 {expected} "
+                    f"on {self.device}"
+                )
+            if self.output.shape[0] == self.config.m:
+                padded = self.output
+            else:
+                padded = self._runtime_shared_stage
+                if padded is None:
+                    padded = shared_partial.new_empty(
+                        (self.config.m, *shared_partial.shape[1:])
+                    )
+                    self._runtime_shared_stage = padded
+            padded[:input_rows].copy_(shared_partial)
+            padded[input_rows:].zero_()
+            return padded
+
+        def prepare_shared_partial(self, shared_partial: torch.Tensor) -> torch.Tensor:
+            expected = (self.config.output_rows, self.config.shape.model_dim)
+            if (
+                tuple(shared_partial.shape) != expected
+                or shared_partial.dtype != torch.bfloat16
+                or shared_partial.device != self.device
+                or not shared_partial.is_contiguous()
+            ):
+                raise ValueError(
+                    f"shared output must be contiguous BF16 {expected} on {self.device}"
+                )
+            return shared_partial
+  summary: Replace implicit shared-output staging with validated BF16 layouts and a separate pad/zero-tail
+    path for runtime buckets.
+results:
+- id: mega_m1
+  outcome: beneficial
+  summary: The reported complete Stage2/collective/shared-add comparison improves latency for this family and
+    token bucket.
+  source_refs:
+  - report
+  context:
+    hardware: gfx950 GPU, 256 CUs, TP8
+    gfx: gfx950
+    dtype: null
+    shape_layout: M=1, AR, Mega; hidden=7168, local intermediate=384, experts=384, top-k=6
+    software: Declared FlyDSL 0.3.4.1 used by the reported validation; full ROCm/AITER benchmark revisions
+      unspecified
+    baseline: Ordinary GEMM2 + collective + shared-expert add
+    candidate: Tuned comm-fused Stage2 + collective + shared-expert add
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: Clean AITER/FlyDSL cache, skew routing; per-case timing statistic and repetition count unspecified
+    correctness: Reported Mega relative L2 0.0134–0.0150
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: single_case
+    before: 20.6734
+    after: 14.4418
+    source:
+      ref: report
+      quote: '| 1 | AR | Mega | 20.6734 us | 14.4418 us | **+43.15%** |'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - dtype
+    - baseline_commit
+    - candidate_commit
+    - complete_measured_input_dtype
+    - independent_reproduction
+  limitations:
+  - Representative row retained with its full comparison context; the source excerpt preserves the complete
+    table.
+  - The PR defines its speedup percentage as ordinary/comm-fused - 1, not percent latency reduction.
+  - The comparison changes the full kernel/runtime bundle and does not isolate the shared-expert callback or
+    padding.
+  - Per-family numerical policies differ; the Window AR tolerance is substantially looser than the Direct path.
+- id: direct_m512
+  outcome: beneficial
+  summary: The reported complete Stage2/collective/shared-add comparison improves latency for this family and
+    token bucket.
+  source_refs:
+  - report
+  context:
+    hardware: gfx950 GPU, 256 CUs, TP8
+    gfx: gfx950
+    dtype: BF16 reduce-scatter partials and shared-expert add; GEMM input dtype not specified in this table
+    shape_layout: M=512, RS, Direct; hidden=7168, local intermediate=384, experts=384, top-k=6
+    software: Declared FlyDSL 0.3.4.1 used by the reported validation; full ROCm/AITER benchmark revisions
+      unspecified
+    baseline: Ordinary GEMM2 + collective + shared-expert add
+    candidate: Tuned comm-fused Stage2 + collective + shared-expert add
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: Average of three production-path runs using the external-reuse synchronization contract
+    correctness: Reported max_abs=0.0625 and relative L2 0.0046–0.0047
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: mean
+    before: 137.3245
+    after: 134.4922
+    source:
+      ref: report
+      quote: '| 512 | RS | Direct | 137.3245 us | 134.4922 us | **+2.11%** |'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - baseline_commit
+    - candidate_commit
+    - complete_measured_input_dtype
+    - independent_reproduction
+  limitations:
+  - Representative row retained with its full comparison context; the source excerpt preserves the complete
+    table.
+  - The PR defines its speedup percentage as ordinary/comm-fused - 1, not percent latency reduction.
+  - The comparison changes the full kernel/runtime bundle and does not isolate the shared-expert callback or
+    padding.
+  - Per-family numerical policies differ; the Window AR tolerance is substantially looser than the Direct path.
+- id: window_rs_m4096
+  outcome: beneficial
+  summary: The reported complete Stage2/collective/shared-add comparison improves latency for this family and
+    token bucket.
+  source_refs:
+  - report
+  context:
+    hardware: gfx950 GPU, 256 CUs, TP8
+    gfx: gfx950
+    dtype: null
+    shape_layout: M=4096, RS, Window; hidden=7168, local intermediate=384, experts=384, top-k=6
+    software: Declared FlyDSL 0.3.4.1 used by the reported validation; full ROCm/AITER benchmark revisions
+      unspecified
+    baseline: Ordinary GEMM2 + collective + shared-expert add
+    candidate: Tuned comm-fused Stage2 + collective + shared-expert add
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: Clean AITER/FlyDSL cache, skew routing; per-case timing statistic and repetition count unspecified
+    correctness: Reported Window RS relative L2 0.0264–0.0267
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: single_case
+    before: 393.7843
+    after: 317.3006
+    source:
+      ref: report
+      quote: '| 4096 | RS | Window | 393.7843 us | 317.3006 us | **+24.10%** |'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - dtype
+    - baseline_commit
+    - candidate_commit
+    - complete_measured_input_dtype
+    - independent_reproduction
+  limitations:
+  - Representative row retained with its full comparison context; the source excerpt preserves the complete
+    table.
+  - The PR defines its speedup percentage as ordinary/comm-fused - 1, not percent latency reduction.
+  - The comparison changes the full kernel/runtime bundle and does not isolate the shared-expert callback or
+    padding.
+  - Per-family numerical policies differ; the Window AR tolerance is substantially looser than the Direct path.
+- id: window_ar_m4096
+  outcome: beneficial
+  summary: The reported complete Stage2/collective/shared-add comparison improves latency for this family and
+    token bucket.
+  source_refs:
+  - report
+  context:
+    hardware: gfx950 GPU, 256 CUs, TP8
+    gfx: gfx950
+    dtype: FP4 aggregate communication validation; complete GEMM input dtype not specified in this table
+    shape_layout: M=4096, AR, Window; hidden=7168, local intermediate=384, experts=384, top-k=6
+    software: Declared FlyDSL 0.3.4.1 used by the reported validation; full ROCm/AITER benchmark revisions
+      unspecified
+    baseline: Ordinary GEMM2 + collective + shared-expert add
+    candidate: Tuned comm-fused Stage2 + collective + shared-expert add
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: Clean AITER/FlyDSL cache, skew routing; per-case timing statistic and repetition count unspecified
+    correctness: FP4 aggregate threshold max_abs<=3, relative L2<=0.13; measured relative L2 0.1224–0.1225
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: single_case
+    before: 499.6208
+    after: 352.372
+    source:
+      ref: report
+      quote: '| 4096 | AR | Window | 499.6208 us | 352.3720 us | **+41.79%** |'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - baseline_commit
+    - candidate_commit
+    - complete_measured_input_dtype
+    - independent_reproduction
+  limitations:
+  - Representative row retained with its full comparison context; the source excerpt preserves the complete
+    table.
+  - The PR defines its speedup percentage as ordinary/comm-fused - 1, not percent latency reduction.
+  - The comparison changes the full kernel/runtime bundle and does not isolate the shared-expert callback or
+    padding.
+  - Per-family numerical policies differ; the Window AR tolerance is substantially looser than the Direct path.
+- id: dpa_c64
+  outcome: beneficial
+  summary: The downstream DPA serving comparison reports increased total-token throughput with the comm-fused
+    runtime.
+  source_refs:
+  - report
+  context:
+    hardware: gfx950 TP8 deployment; product model unspecified
+    gfx: gfx950
+    dtype: null
+    shape_layout: DeepSeek-V4-Pro DPA/TP8; ISL/OSL=8192/1024; random range ratio=0.8; concurrency=64
+    software: Declared FlyDSL 0.3.4.1 used by the reported validation; full ROCm/AITER benchmark revisions
+      unspecified
+    baseline: Ordinary serving runtime
+    candidate: Comm-fused Stage2 runtime with compact ragged DPA and tuned collectives
+    baseline_commit: null
+    candidate_commit: null
+    scope: end_to_end
+    protocol: A/B/A/B/A/B; concurrency*10 requests per leg; aggregation of the six legs unspecified
+    correctness: All requests completed; activation logged on all eight ranks; full 1319-sample three-shot
+      GSM8K results both above the 0.94 CI threshold
+  metrics:
+  - kind: throughput_increase
+    unit: percent
+    statistic: unspecified
+    value: 6.39
+    source:
+      ref: report
+      quote: '| 64 | 15,080.81 | 16,044.58 | **+6.39%** | **16.56% lower** | **5.20% lower** |'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - dtype
+    - baseline_commit
+    - candidate_commit
+    - independent_reproduction
+  limitations:
+  - Serving effects include the production runtime and its selected collective; they are not shared-expert-only
+    speedups.
+  - Do not infer an accuracy gain from the two single-run GSM8K estimates.
+  - Input precision details and aggregation method are not fully specified for these serving numbers.
+- id: dpa_c128
+  outcome: beneficial
+  summary: The downstream DPA serving comparison reports increased total-token throughput with the comm-fused
+    runtime.
+  source_refs:
+  - report
+  context:
+    hardware: gfx950 TP8 deployment; product model unspecified
+    gfx: gfx950
+    dtype: null
+    shape_layout: DeepSeek-V4-Pro DPA/TP8; ISL/OSL=8192/1024; random range ratio=0.8; concurrency=128
+    software: Declared FlyDSL 0.3.4.1 used by the reported validation; full ROCm/AITER benchmark revisions
+      unspecified
+    baseline: Ordinary serving runtime
+    candidate: Comm-fused Stage2 runtime with compact ragged DPA and tuned collectives
+    baseline_commit: null
+    candidate_commit: null
+    scope: end_to_end
+    protocol: A/B/A/B/A/B; concurrency*10 requests per leg; aggregation of the six legs unspecified
+    correctness: All requests completed; activation logged on all eight ranks; full 1319-sample three-shot
+      GSM8K results both above the 0.94 CI threshold
+  metrics:
+  - kind: throughput_increase
+    unit: percent
+    statistic: unspecified
+    value: 7.69
+    source:
+      ref: report
+      quote: '| 128 | 23,331.48 | 25,125.15 | **+7.69%** | **10.03% lower** | **6.97% lower** |'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - dtype
+    - baseline_commit
+    - candidate_commit
+    - independent_reproduction
+  limitations:
+  - Serving effects include the production runtime and its selected collective; they are not shared-expert-only
+    speedups.
+  - Do not infer an accuracy gain from the two single-run GSM8K estimates.
+  - Input precision details and aggregation method are not fully specified for these serving numbers.
+- id: dpa_c256
+  outcome: beneficial
+  summary: The downstream DPA serving comparison reports increased total-token throughput with the comm-fused
+    runtime.
+  source_refs:
+  - report
+  context:
+    hardware: gfx950 TP8 deployment; product model unspecified
+    gfx: gfx950
+    dtype: null
+    shape_layout: DeepSeek-V4-Pro DPA/TP8; ISL/OSL=8192/1024; random range ratio=0.8; concurrency=256
+    software: Declared FlyDSL 0.3.4.1 used by the reported validation; full ROCm/AITER benchmark revisions
+      unspecified
+    baseline: Ordinary serving runtime
+    candidate: Comm-fused Stage2 runtime with compact ragged DPA and tuned collectives
+    baseline_commit: null
+    candidate_commit: null
+    scope: end_to_end
+    protocol: A/B/A/B/A/B; concurrency*10 requests per leg; aggregation of the six legs unspecified
+    correctness: All requests completed; activation logged on all eight ranks; full 1319-sample three-shot
+      GSM8K results both above the 0.94 CI threshold
+  metrics:
+  - kind: throughput_increase
+    unit: percent
+    statistic: unspecified
+    value: 7.89
+    source:
+      ref: report
+      quote: '| 256 | 32,808.34 | 35,395.31 | **+7.89%** | **11.68% lower** | **6.88% lower** |'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - dtype
+    - baseline_commit
+    - candidate_commit
+    - independent_reproduction
+  limitations:
+  - Serving effects include the production runtime and its selected collective; they are not shared-expert-only
+    speedups.
+  - Do not infer an accuracy gain from the two single-run GSM8K estimates.
+  - Input precision details and aggregation method are not fully specified for these serving numbers.
+- id: dpa_c512
+  outcome: beneficial
+  summary: The downstream DPA serving comparison reports increased total-token throughput with the comm-fused
+    runtime.
+  source_refs:
+  - report
+  context:
+    hardware: gfx950 TP8 deployment; product model unspecified
+    gfx: gfx950
+    dtype: null
+    shape_layout: DeepSeek-V4-Pro DPA/TP8; ISL/OSL=8192/1024; random range ratio=0.8; concurrency=512
+    software: Declared FlyDSL 0.3.4.1 used by the reported validation; full ROCm/AITER benchmark revisions
+      unspecified
+    baseline: Ordinary serving runtime
+    candidate: Comm-fused Stage2 runtime with compact ragged DPA and tuned collectives
+    baseline_commit: null
+    candidate_commit: null
+    scope: end_to_end
+    protocol: A/B/A/B/A/B; concurrency*10 requests per leg; aggregation of the six legs unspecified
+    correctness: All requests completed; activation logged on all eight ranks; full 1319-sample three-shot
+      GSM8K results both above the 0.94 CI threshold
+  metrics:
+  - kind: throughput_increase
+    unit: percent
+    statistic: unspecified
+    value: 7.62
+    source:
+      ref: report
+      quote: '| 512 | 41,456.72 | 44,613.91 | **+7.62%** | **9.75% lower** | **7.24% lower** |'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - dtype
+    - baseline_commit
+    - candidate_commit
+    - independent_reproduction
+  limitations:
+  - Serving effects include the production runtime and its selected collective; they are not shared-expert-only
+    speedups.
+  - Do not infer an accuracy gain from the two single-run GSM8K estimates.
+  - Input precision details and aggregation method are not fully specified for these serving numbers.
+- id: dpa_c1024
+  outcome: beneficial
+  summary: The downstream DPA serving comparison reports increased total-token throughput with the comm-fused
+    runtime.
+  source_refs:
+  - report
+  context:
+    hardware: gfx950 TP8 deployment; product model unspecified
+    gfx: gfx950
+    dtype: null
+    shape_layout: DeepSeek-V4-Pro DPA/TP8; ISL/OSL=8192/1024; random range ratio=0.8; concurrency=1024
+    software: Declared FlyDSL 0.3.4.1 used by the reported validation; full ROCm/AITER benchmark revisions
+      unspecified
+    baseline: Ordinary serving runtime
+    candidate: Comm-fused Stage2 runtime with compact ragged DPA and tuned collectives
+    baseline_commit: null
+    candidate_commit: null
+    scope: end_to_end
+    protocol: A/B/A/B/A/B; concurrency*10 requests per leg; aggregation of the six legs unspecified
+    correctness: All requests completed; activation logged on all eight ranks; full 1319-sample three-shot
+      GSM8K results both above the 0.94 CI threshold
+  metrics:
+  - kind: throughput_increase
+    unit: percent
+    statistic: unspecified
+    value: 10.18
+    source:
+      ref: report
+      quote: '| 1024 | 48,415.08 | 53,341.71 | **+10.18%** | **11.01% lower** | **9.20% lower** |'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - dtype
+    - baseline_commit
+    - candidate_commit
+    - independent_reproduction
+  limitations:
+  - Serving effects include the production runtime and its selected collective; they are not shared-expert-only
+    speedups.
+  - Do not infer an accuracy gain from the two single-run GSM8K estimates.
+  - Input precision details and aggregation method are not fully specified for these serving numbers.
+- id: reuse_synchronization_contract
+  outcome: constraint
+  summary: Review identified a peer-read/overwrite hazard. The follow-up describes a pre-overwrite barrier
+    for internal protection, a caller-provided collective proof for external protection, and wrap-safe epoch
+    waits.
+  source_refs:
+  - reuse_overwrite_report
+  - epoch_wrap_fix
+  - reuse_barrier_contract
+  context:
+    hardware: null
+    gfx: null
+    dtype: null
+    shape_layout: null
+    software: null
+    baseline: null
+    candidate: Comm-fused Direct/Mega reuse and epoch synchronization
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: null
+    correctness: Author reports forced-wrap tests passing for Direct and Mega, including multiple service groups
+  metrics: []
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - hardware
+    - gfx
+    - dtype
+    - shape_layout
+    - software
+    - baseline
+    - baseline_commit
+    - candidate_commit
+    - protocol
+    - independent_reproduction
+  limitations:
+  - reuse_is_synchronized is a TP-wide contract and must agree across ranks.
+  - The report of a fix is not an independent GPU validation in this corpus.
+  - Shared readiness and permission to overwrite the previous communication buffer are different dependencies;
+    both must hold.

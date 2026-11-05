@@ -1,0 +1,444 @@
+schema_version: 1
+id: aiter_pr_4907
+number: 4907
+repository: https://github.com/ROCm/aiter
+title: '[Triton/Gluon] [FlyDSL] [CI] Add GDN MTP kernels: causal conv1d update and gated delta rule'
+state: merged
+base_commit: c3caa55b8d3fd69eec194d931b3c15e520f003d4
+head_commit: 6e402a581f185042fd38578773fd84e2f8ba969b
+merge_commit: 8f5cb975fd12ff22a2a9640598e663009adf5174
+captured_at: '2026-11-05T02:13:48.774203+00:00'
+updated_at: '2026-09-11T13:40:34Z'
+sources:
+- id: mtp_contract
+  url: https://github.com/ROCm/aiter/pull/4907
+  excerpt: "Gated delta rule:\n\n* New FlyDSL gated delta rule: `flydsl_gdr_decode`, plus `flydsl_gdr_mtp`\
+    \ (vLLM) and\n  `flydsl_gdr_mtp_sglang` (SGLang) for the verify step.\n* All three MTP contracts: vLLM's\
+    \ chain, SGLang's chain with per-token snapshots, and\n  SGLang's EAGLE tree, which reloads each arm's\
+    \ parent state.\n* Opt-in via `AITER_GDR_FLYDSL=1`; the default Triton path is unchanged.\n* Sigmoid gating,\
+    \ the q/k L2 norm and the recurrence are one launch, with the state\n  resident in registers for the whole\
+    \ token loop.\n* Per-token checkpointing, so a rejected draft token rolls the state back in place\n  rather\
+    \ than by re-running the step.\n* The snapshot store is non-temporal wherever nothing reads it back: every\
+    \ contract but\n  the tree, and the tree's own last step. It is write-once traffic either way, and at the\n\
+    \  footprints where the state pool still fits in LLC it was evicting the pool that the\n  next token reads.\n\
+    * On the tree, token 1's parent state stays in registers at either snapshot dtype. A\n  narrower snapshot\
+    \ owes a rounding, but a store followed by its reload is a `truncf`\n  then an `extf`, so the round trip\
+    \ is exact without going to memory.\n* bf16/fp16 q/k/v with an fp32 or bf16 state pool, GQA, validated\
+    \ at 128x128 head dims,\n  gfx942/gfx950; anything else is refused.\n* Pool and snapshot terms sit in 64-bit\
+    \ descriptor bases, for the reason the conv does.\n* Tiling is derived on the host from the launch grid:\
+    \ decode splits the value dimension\n  until `batch_size * num_v_heads` covers the part, and the MTP ladder\
+    \ does the same\n  before branching on the contract and the draft length, since the three contracts want\n\
+    \  different splits at the same shape. `WAVES_PER_EU` rides with the one tiling that wants\n  it. `gdr_decode_tuned.csv`\
+    \ and the lookup that read it are deleted here: a row was keyed\n  on the shape and the batch, and the\
+    \ batch is half of the grid the rule already reads.\n* The public MTP dispatch accepts `draft_window` as\
+    \ host-side metadata, avoiding the \n   GPU-to-CPU synchronization previously needed to infer it from `cu_seqlens`.\
+    \ Calls \n   without this metadata fall back to Triton.\n* The default stream is selected from the input\
+    \ device, explicit streams are checked \n   against it, and non-contiguous output buffers are rejected.\n\
+    * CUDA Graph capture currently skips the FlyDSL route and falls back to Triton.\n* A validated private\
+    \ launch path avoids repeating wrapper validation in the public dispatch."
+  sha256: f49decc8b9f7c03755bb369efd1aae675e6654378b691b7aeb5a82106cf050f6
+  captured_at: '2026-11-05T02:13:48.774203+00:00'
+  updated_at: '2026-09-11T13:40:34Z'
+- id: correctness
+  url: https://github.com/ROCm/aiter/pull/4907
+  excerpt: |-
+    Both ports numerically agree with the vendored vLLM (`63a9a5010`) and SGLang
+    (`18107e38d2`) kernels within the configured tolerances. Exact-equality checks are
+    limited to copied state, untouched storage, rollback state, and routed-versus-direct
+    execution of the same implementation. The current suite collects 41 conv cases and
+    19 gated-delta-rule MTP cases.
+  sha256: 1fce635a709d2c1755e8c9f4a527930c89566b3168cb09cc7656a2864e30d64a
+  captured_at: '2026-11-05T02:13:48.774203+00:00'
+  updated_at: '2026-09-11T13:40:34Z'
+- id: mtp_results
+  url: https://github.com/ROCm/aiter/pull/4907
+  excerpt: |-
+    ### Gated delta rule, MTP verify
+
+    Full 144-cell sweep (3 contracts x 4 TP settings x 2 state dtypes x 2 draft lengths x
+    3 batch sizes), averaged over two independent runs.
+
+    #### gfx950
+
+    The two runs returned a geomean of 1.451x and 1.431x. All 144 cells are at or above
+    parity, the lowest at 1.034x.
+
+    | contract | base kernel | geomean | median |
+    | ------------- | ---------------------------------------------- | ------- | ------ |
+    | vllm_chain | vLLM fused_recurrent_gated_delta_rule | 1.522x | 1.466x |
+    | sglang_tree | SGLang, tree/EAGLE arms | 1.446x | 1.319x |
+    | sglang_chain | SGLang fused_sigmoid_gating_delta_rule_update | 1.363x | 1.309x |
+    | all 144 cells | | 1.442x | 1.360x |
+
+    On `vllm_chain` FlyDSL is also 1.168x over aiter's own Triton kernel, over those 48 cells.
+
+    Geomean speedup by shape parameter:
+
+    | parameter | | | | |
+    | ----------- | ----------- | ----------- | ----------- | ---------- |
+    | batch | b1 1.905x | b32 1.341x | b128 1.175x | |
+    | TP | tp1 1.354x | tp2 1.414x | tp4 1.464x | tp8 1.545x |
+    | state dtype | fp32 1.551x | bf16 1.341x | | |
+
+    The gain is largest where a verify step actually runs -- small batch, high TP -- since
+    both leave less work per launch.
+
+    Latency in us at tp1 (32 v-heads), fp32 state, seqlen 4, batch 1 / 32 / 128:
+
+    | contract | FlyDSL | upstream base | aiter Triton |
+    | ------------- | --------------------- | ---------------------- | ---------------------- |
+    | vllm_chain | 8.13 / 55.13 / 262.09 | 19.36 / 65.50 / 281.66 | 11.22 / 55.46 / 260.21 |
+    | sglang_chain | 8.09 / 63.33 / 253.22 | 16.61 / 73.39 / 312.18 | n/a |
+    | sglang_tree | 7.85 / 80.91 / 325.04 | 17.13 / 98.52 / 359.02 | n/a |
+
+    Per-cell speedups agree between the two runs to 0.91% at the median. Two cells move by
+    more than half, both `vllm_chain` at 16 v-heads with a bf16 state, and the movement is
+    upstream's: FlyDSL holds to 8% across the two runs there while the vLLM baseline swings
+    by 70%. Read the aggregates rather than individual cells.
+
+    #### gfx942
+
+    The two runs returned a geomean of 1.374x and 1.370x.
+
+    | contract | base kernel | geomean | median |
+    | ------------- | ---------------------------------------------- | ------- | ------ |
+    | vllm_chain | vLLM fused_recurrent_gated_delta_rule | 1.414x | 1.200x |
+    | sglang_tree | SGLang, tree/EAGLE arms | 1.428x | 1.262x |
+    | sglang_chain | SGLang fused_sigmoid_gating_delta_rule_update | 1.278x | 1.128x |
+    | all 144 cells | | 1.371x | 1.211x |
+
+    On `vllm_chain` FlyDSL is also 1.233x over aiter's own Triton kernel, over those 48 cells.
+
+    Geomean speedup by shape parameter:
+
+    | parameter | | | | |
+    | ----------- | ----------- | ----------- | ----------- | ---------- |
+    | batch | b1 2.046x | b32 1.142x | b128 1.103x | |
+    | TP | tp1 1.215x | tp2 1.347x | tp4 1.473x | tp8 1.466x |
+    | state dtype | fp32 1.463x | bf16 1.285x | | |
+
+    The gain is largest where a verify step actually runs -- small batch, high TP -- since
+    both leave less work per launch.
+
+    Latency in us at tp1 (32 v-heads), fp32 state, seqlen 4, batch 1 / 32 / 128:
+
+    | contract | FlyDSL | upstream base | aiter Triton |
+    | ------------- | --------------------- | ---------------------- | ---------------------- |
+    | vllm_chain | 16.21 / 158.11 / 684.92 | 30.96 / 182.22 / 734.09 | 18.76 / 193.92 / 741.64 |
+    | sglang_chain | 17.52 / 181.90 / 710.60 | 30.06 / 190.33 / 712.32 | n/a |
+    | sglang_tree | 22.65 / 194.38 / 811.42 | 34.44 / 220.44 / 862.08 | n/a |
+
+    Per-cell speedups agree between the two runs to 0.83% at the median. Read the
+    aggregates rather than individual cells.
+
+    `aiter Triton` is n/a where it cannot express the call: it implements the chain contract
+    only, and neither upstream implements the other's.
+  sha256: 8021c1eaffd73f1ae74e8ccc63428e80ab3ff3f250a36b13e5d0be9ba7e9e756
+  captured_at: '2026-11-05T02:13:48.774203+00:00'
+  updated_at: '2026-09-11T13:40:34Z'
+- id: early_public_regression
+  url: https://github.com/ROCm/aiter/pull/4907#issuecomment-5613341779
+  excerpt: |-
+    ### Measure public-entry-point latency, including the dispatch synchronization
+
+    **Location:** [`aiter/ops/triton/gated_delta_net/fused_rearrange_sigmoid_gdr.py:29–48`](https://github.com/ROCm/aiter/blob/041211b7ec423aee851eb3099a2460aafbd36dc0/aiter/ops/triton/gated_delta_net/fused_rearrange_sigmoid_gdr.py#L29-L48)
+
+    `_uniform_draft_window()` performs a GPU-to-CPU copy and synchronization on every eligible dispatch. This overhead can outweigh the kernel-level improvement for small batches.
+
+    In a warmed-up gfx950 wall-clock microbenchmark of the public entry point with `B=1`, `T=4`, and `HV=32`, I measured:
+
+    | Configuration | Median time per call |
+    |---|---:|
+    | FlyDSL disabled | 35.9 µs |
+    | FlyDSL enabled | 69.5 µs |
+
+    This is one local microbenchmark, not a model-level performance result, but it demonstrates why kernel-only speedups should be reported separately from public-API latency.
+
+    Please add a benchmark that includes dispatch overhead and consider accepting the draft window through host-side metadata to avoid synchronization in the hot path. Also document that the current dispatch falls back to Triton during CUDA Graph capture.
+
+    ---
+  sha256: bb983077157ad83e4094ff00ae09e7a37d6892a70b31a9382e57a2b417a9abc1
+  captured_at: '2026-11-05T02:13:48.774203+00:00'
+  updated_at: '2026-09-10T04:48:49Z'
+- id: public_fix
+  url: https://github.com/ROCm/aiter/pull/4907#issuecomment-5614948978
+  excerpt: |-
+    ### 5. Measure public-entry-point latency, including dispatch synchronization
+
+    Addressed.
+
+    The public dispatch now accepts `draft_window` as host-side metadata. It no longer reads `cu_seqlens` back to the CPU to determine the window.
+
+    The resulting behavior is:
+
+    - valid host `draft_window` in eager mode: dispatch to FlyDSL;
+    - missing or unsupported metadata: fall back to Triton;
+    - CUDA Graph capture: fall back to Triton.
+
+    The CUDA Graph fallback is now documented.
+
+    We also removed duplicated validation between the support predicate and the public FlyDSL wrapper by adding a private validated launch path, and cached the architecture check.
+
+    The benchmark now measures the complete `fused_rearrange_sigmoid_gated_delta_rule()` public entry with a warmed-up per-call wall-clock median. Environment-variable changes are performed outside the timed call.
+
+    On gfx950 for the requested `B=1`, `T=4`, `HV=32` case, using three runs with 101 measured calls per run:
+
+    - Direct FlyDSL: **36.034 µs**
+    - Public entry → FlyDSL: **49.995 µs**
+    - Public entry → Triton: **53.861 µs**
+    - Vendored vLLM reference: **87.211 µs**
+
+    The current public FlyDSL route is therefore **3.87 µs / 7.2% faster** than the same public entry with FlyDSL disabled.
+
+    The absolute values differ from the reported 35.9/69.5 µs because the benchmark harness and software environment are not identical. However, the synchronization gap is consistent:
+
+    - Reported regression: `69.5 - 35.9 = 33.6 µs`
+    - Previous synchronized dispatch in our environment: `86.24 - 53.53 = 32.71 µs`
+    - Current metadata dispatch: `49.995 - 53.861 = -3.87 µs`
+
+    Thus, the previous synchronization regression is reproduced by the gap and is removed by the metadata-based dispatch.
+
+    The direct and public FlyDSL results are reported separately because their input layouts differ. The direct benchmark uses separate contiguous Q/K/V tensors. The production public entry receives packed 2-D QKV; Triton consumes it directly, while FlyDSL currently constructs 4-D strided Q/K/V views. Consequently, the direct result is a kernel baseline, while the public-entry result represents the production dispatch benefit.
+  sha256: 781b9497239455cedb6bb37dd1b7e71cb41ec91fbab6c38ec6fbeebfcdd07b82
+  captured_at: '2026-11-05T02:13:48.774203+00:00'
+  updated_at: '2026-09-10T07:40:50Z'
+changes:
+- id: mtp_api
+  commit: 8f5cb975fd12ff22a2a9640598e663009adf5174
+  parent_commit: 7bb44998274fa679ece0a37bf8426ab780b1837d
+  file: aiter/ops/flydsl/linear_attention_kernels.py
+  before: |-
+    __all__ = [
+        "flydsl_gdr_decode",
+    ]
+  after: |-
+    __all__ = [
+        "flydsl_gdr_decode",
+        "flydsl_gdr_mtp",
+        "flydsl_gdr_mtp_sglang",
+    ]
+  summary: Extend the public linear-attention API with vLLM-chain and SGLang chain/tree MTP state-update entry
+    points.
+- id: state_modes
+  commit: 8f5cb975fd12ff22a2a9640598e663009adf5174
+  parent_commit: 7bb44998274fa679ece0a37bf8426ab780b1837d
+  file: aiter/ops/flydsl/linear_attention_kernels.py
+  before: from .kernels.gdr_decode import create_vk_gdr_decode_kernel
+  after: |-
+    from .kernels.gdr_decode import (
+        MTP_MODE_CHAIN,
+        MTP_MODE_SNAPSHOT,
+        create_vk_gdr_decode_kernel,
+        create_vk_gdr_mtp_kernel,
+    )
+  summary: Wire distinct chain and snapshot MTP modes into the linear-attention wrapper.
+results:
+- id: gfx950_mtp_aggregate
+  outcome: beneficial
+  summary: The upstream full MTP sweep reports a speedup aggregate over its contract-specific baselines.
+  source_refs:
+  - mtp_results
+  - correctness
+  - mtp_contract
+  context:
+    hardware: gfx950 GPU; product model unspecified
+    gfx: gfx950
+    dtype: FP32/BF16 state sweep; BF16/FP16 Q/K/V supported, exact measured Q/K/V dtype unspecified
+    shape_layout: '144 cells: 3 contracts, 4 TP settings, 2 state dtypes, 2 draft lengths, 3 batch sizes; validated
+      128x128 head dimensions'
+    software: null
+    baseline: Each contract uses its corresponding vendored vLLM or SGLang kernel
+    candidate: FlyDSL GDN MTP implementation
+    baseline_commit: null
+    candidate_commit: null
+    scope: kernel
+    protocol: 144-cell sweep averaged over two independent runs; per-launch timing estimator unspecified
+    correctness: Reported agreement within configured tolerances with vendored vLLM 63a9a5010 and SGLang 18107e38d2;
+      bit-exact claims limited to copied/untouched/rollback storage and same-implementation dispatch
+  metrics:
+  - kind: speedup
+    unit: x
+    statistic: geomean
+    value: 1.442
+    source:
+      ref: mtp_results
+      quote: '| all 144 cells | | 1.442x | 1.360x |'
+  - kind: speedup
+    unit: x
+    statistic: median
+    value: 1.36
+    source:
+      ref: mtp_results
+      quote: '| all 144 cells | | 1.442x | 1.360x |'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - software
+    - baseline_commit
+    - candidate_commit
+    - measured_qkv_dtype
+    - per_launch_timing_estimator
+    - independent_reproduction
+  limitations:
+  - The baseline differs by contract; neither upstream supports all the others contracts.
+  - These kernel aggregates do not include public-dispatch synchronization overhead or measure serving performance.
+  - The measured Q/K/V dtype, exact timing estimator and measured implementation revisions are not explicitly
+    specified.
+  - For gfx950 the author reports unstable vLLM baseline timing in two cells; preserve the aggregate and do
+    not generalize individual extremes.
+- id: gfx942_mtp_aggregate
+  outcome: beneficial
+  summary: The upstream full MTP sweep reports a speedup aggregate over its contract-specific baselines.
+  source_refs:
+  - mtp_results
+  - correctness
+  - mtp_contract
+  context:
+    hardware: gfx942 GPU; product model unspecified
+    gfx: gfx942
+    dtype: FP32/BF16 state sweep; BF16/FP16 Q/K/V supported, exact measured Q/K/V dtype unspecified
+    shape_layout: '144 cells: 3 contracts, 4 TP settings, 2 state dtypes, 2 draft lengths, 3 batch sizes; validated
+      128x128 head dimensions'
+    software: null
+    baseline: Each contract uses its corresponding vendored vLLM or SGLang kernel
+    candidate: FlyDSL GDN MTP implementation
+    baseline_commit: null
+    candidate_commit: null
+    scope: kernel
+    protocol: 144-cell sweep averaged over two independent runs; per-launch timing estimator unspecified
+    correctness: Reported agreement within configured tolerances with vendored vLLM 63a9a5010 and SGLang 18107e38d2;
+      bit-exact claims limited to copied/untouched/rollback storage and same-implementation dispatch
+  metrics:
+  - kind: speedup
+    unit: x
+    statistic: geomean
+    value: 1.371
+    source:
+      ref: mtp_results
+      quote: '| all 144 cells | | 1.371x | 1.211x |'
+  - kind: speedup
+    unit: x
+    statistic: median
+    value: 1.211
+    source:
+      ref: mtp_results
+      quote: '| all 144 cells | | 1.371x | 1.211x |'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - software
+    - baseline_commit
+    - candidate_commit
+    - measured_qkv_dtype
+    - per_launch_timing_estimator
+    - independent_reproduction
+  limitations:
+  - The baseline differs by contract; neither upstream supports all the others contracts.
+  - These kernel aggregates do not include public-dispatch synchronization overhead or measure serving performance.
+  - The measured Q/K/V dtype, exact timing estimator and measured implementation revisions are not explicitly
+    specified.
+  - For gfx950 the author reports unstable vLLM baseline timing in two cells; preserve the aggregate and do
+    not generalize individual extremes.
+- id: early_public_sync_regression
+  outcome: regressed
+  summary: A reviewer reports that the earlier public dispatch synchronizes GPU metadata to the CPU and is
+    slower despite the kernel-level gains.
+  source_refs:
+  - early_public_regression
+  context:
+    hardware: gfx950 GPU; host CPU unspecified
+    gfx: gfx950
+    dtype: null
+    shape_layout: B=1, T=4, HV=32; public fused GDR entry
+    software: null
+    baseline: Public entry with FlyDSL disabled
+    candidate: Public entry with FlyDSL enabled
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: Warmed-up wall-clock public-entry microbenchmark; repetitions unspecified
+    correctness: null
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: median
+    before: 35.9
+    after: 69.5
+    source:
+      ref: early_public_regression
+      quote: |-
+        | Configuration | Median time per call |
+        |---|---:|
+        | FlyDSL disabled | 35.9 µs |
+        | FlyDSL enabled | 69.5 µs |
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - dtype
+    - software
+    - baseline_commit
+    - candidate_commit
+    - correctness
+    - independent_reproduction
+  limitations:
+  - Historical pre-fix dispatch; do not label this as the final merged behavior.
+  - The review points to source 041211b7ec423aee851eb3099a2460aafbd36dc0, but the timing paragraph does not
+    explicitly pin the measured revision.
+  - The later author comparison uses a different environment and cannot be compared by absolute latency across
+    runs.
+- id: public_metadata_fix
+  outcome: beneficial
+  summary: After passing the draft window as host metadata and avoiding duplicate validation, the author reports
+    a 3.87 us public-entry improvement in their environment.
+  source_refs:
+  - public_fix
+  - mtp_contract
+  context:
+    hardware: gfx950 GPU; host CPU unspecified
+    gfx: gfx950
+    dtype: null
+    shape_layout: B=1, T=4, HV=32; public fused GDR entry
+    software: null
+    baseline: Public entry with FlyDSL disabled
+    candidate: Public entry with FlyDSL enabled
+    baseline_commit: null
+    candidate_commit: null
+    scope: operator
+    protocol: Warmed-up wall-clock median; three runs with 101 calls each; environment flag changes outside
+      the timed call
+    correctness: Author reports focused suites and public-entry regression tests passing; not independently
+      rerun
+  metrics:
+  - kind: latency
+    unit: us
+    statistic: median
+    before: 53.861
+    after: 49.995
+    source:
+      ref: public_fix
+      quote: '- Current metadata dispatch: `49.995 - 53.861 = -3.87 µs`'
+  confidence:
+    level: low
+    reasons:
+    - The source reports an effect or constraint, but comparison details are incomplete and no independent
+      reproduction was performed.
+    missing_evidence:
+    - dtype
+    - software
+    - baseline_commit
+    - candidate_commit
+    - independent_reproduction
+  limitations:
+  - Public packed-QKV views differ from the direct contiguous-Q/K/V benchmark, so direct/public timings are
+    not an isolated wrapper-overhead comparison.
+  - Earlier reviewer and later author timings use different harness/software environments.
+  - CUDA graph capture and calls lacking host draft_window metadata retain the Triton fallback.
