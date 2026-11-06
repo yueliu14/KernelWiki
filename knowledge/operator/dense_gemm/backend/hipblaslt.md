@@ -14,7 +14,6 @@ sources:
   - https://rocm.blogs.amd.com/software-tools-optimization/measuring-max-achievable-flops-part2/README.html
   - ROCm/aiter@a6bb4993:aiter/tuned_gemm.py
 ---
-
 # dense_gemm × hipBLASLt
 
 ## TL;DR
@@ -23,6 +22,8 @@ dense bf16/fp16/fp8 GEMM on Instinct — directly under PyTorch, and indirectly 
 (`hipb_gemm → hipb_mm`). For raw-torch paths, tune it **offline** (dump shapes → `hipblaslt-bench` search →
 override file). On sglang/vllm it runs under aiter's dispatcher, so the override file is **not consulted** —
 deploy the win through aiter's DB instead ([operators/dense_gemm/backends/aiter](aiter.md)).
+In recorded bf16 runs on gfx950, per-M `solidx` pins paid off only where the gain held under the benchmark's
+own timer (see *Per-shape solidx pinning* below).
 
 ## SOTA implementation
 aiter wraps hipBLASLt directly; the chosen solution index travels in the tuned CSV (`solidx`). From
@@ -78,9 +79,32 @@ flips possible but rare). fp8 paths need a downstream accuracy gate ([../numeric
 - **sglang/vllm**: hipBLASLt runs *under aiter*; the override file is NOT read on the live aiter path. The
   rebind seam is aiter's CSV (`solidx` per shape) — deploy via [operators/dense_gemm/backends/aiter](aiter.md).
 
+## Per-shape solidx pinning (recorded runs)
+- **Where it held:** on bf16 GEMM with N=2624, K=6144 on gfx950 (256 CU), pinning raced indices helped three prefill
+  sizes. Measured in the harness:
+  - M=5916: about 1.17×.
+  - M=16955: about 1.12×.
+  - M=30519: about 1.06×.
+  The gains held on re-measure. A rocprofv3 kernel trace showed the macro tile changed (e.g. M5916 MT192x192 →
+  MT224x320). The pin was keyed on the exact signature (gfx, CU count, N, K, dtypes, bias, preshuffle), and every
+  other shape stayed on the heuristic.
+- **Where race winners did not transfer:** on the same GEMM, M=1936 and M=32768 were left on the heuristic.
+  - At M=1936, a hot-cache race winner was ~10% faster back-to-back but 13% slower in the harness.
+  - L2-flushed microbench winners (+3.7% at M=1936, +3.0% at M=32768) landed at 0.92–0.94 and 0.97–1.01 in the
+    harness.
+  - Confirm a pin under the benchmark's own timer before keeping it.
+- **Timing regime decided another race:** in a different bf16 GEMM at M=1936, no index beat F.linear under eager,
+  flushed single-call timing (57.9 vs 63.6 us). One index edged ahead only under 20-call graph replay (45.6 vs
+  47.9 us). The engineer suggested, untested, that torch may call hipBLASLt with M and N swapped.
+- **Heuristic beat other backends:** at bf16 M=1936, N=2624, K=6144 on gfx950, the hipBLASLt heuristic
+  (~760 TFLOPS) was the fastest route tried. The best FlyDSL config ran at 0.73× its speed and the best triton
+  `gemm_a16w16` config at 0.62×.
+
 ## Pitfalls & anti-patterns
 - Solution indices are **ROCm/hipBLASLt-version-locked** — re-tune on every upgrade; a stale index can map
   to a different or removed kernel.
+- Guard pinned indices against that drift. One recorded run checked membership via `hipb_findallsols`, cached
+  per (M, solidx), and fell back to the default path when the index was missing from the installed hipBLASLt.
 - `hipblaslt-bench` CLI is **absent in some images** — then aiter/gradlib (which races the same solution
   pool) is your only tuner.
 - On sglang, tuning the override file alone does nothing (aiter dispatch) — a known dead-end; verify

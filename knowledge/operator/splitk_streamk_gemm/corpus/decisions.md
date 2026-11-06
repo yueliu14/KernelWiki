@@ -110,6 +110,13 @@ Raw run artifacts are not published here. Historical reports have not been repro
   Verification: <code>not_reproduced</code>.
   Sources: [Historical summary 1](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/split-k-by-2-to-fill-the-grid-on-the-tiny-m-case-quantized-gemm-gfx950-small-batch.md)
 
+- **beneficial** — On the 48-row decode tier, the step split K 3 ways across CTAs on a narrower N tile (82 N-tiles x 3 = 246 CTAs), with 4 K-warps per CTA reduced in-CTA through fp32 LDS and a divisibility-based epilogue vector width. This was associated with a small gain over its parent. In a candidate-only multi-process re-run (no seed controls), compared with previously recorded seed numbers, the engineer reported the improvement concentrated in dec_bs6 and dec_bs7, with other decode buckets at parity with the seed. The patch also bundled pinned prefill solutions, so whole-patch speedups are not attributable to the tier-48 change alone.
+  Conditions: bf16 dense GEMM, N=2624 K=6144 row-major, decode regime, on gfx950 (MI355X) with the FlyDSL HGEMM path. Applied only to the decode tier that ran a 48-row M tile; prefill rows used separately pinned solutions that were bundled in the same patch. The 48x64x128 split-K 4 with 2 K-warps was replaced by 48x32x128 split-K 3 with 4 K-warps. The 3 K-splits run in separate CTAs (code comment: 82 N-tiles x 3 = 246 CTAs, 80 KB LDS). The 4 K-warps inside each CTA are reduced in-CTA through fp32 LDS. The narrow-N tile needed the B-to-LDS gate widened to accept BLOCK_N=32 with BLOCK_M=48. The C-epilogue vector width rule changed from a >= threshold to divisibility (widest of 8/4/2 whose per-CTA vector count divides the C tile). With 256 threads on a 48x32 tile this falls to 2-wide stores.
+  Verification: <code>internally_validated</code>.
+  Sources: Private validation; raw artifacts are not published.
+
+  Comparison context: <code>{&quot;baseline&quot;: &quot;the parent source of the same recorded GEAK optimization step&quot;, &quot;correctness&quot;: &quot;the GEAK task&#x27;s correctness check passed for every counted step&quot;, &quot;dtype&quot;: &quot;bf16&quot;, &quot;gfx&quot;: &quot;gfx950&quot;, &quot;protocol&quot;: &quot;GEAK task benchmark, measured independently of the engineer for each step against its parent; 1 recorded step; not re-run for KernelWiki&quot;, &quot;shape_layout&quot;: &quot;N=2624 K=6144 row-major; decode M=1-64, prefill M=1936-32768&quot;, &quot;software&quot;: &quot;torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X&quot;}</code>
+
 
 #### Background
 

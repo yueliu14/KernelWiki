@@ -11,7 +11,6 @@ sources:
   - /opt/venv/lib/python3.10/site-packages/flydsl/autotune.py
   - /sgl-workspace/aiter/aiter/ops/flydsl/kernels/splitk_hgemm.py
 ---
-
 # FlyDSL — knobs
 
 The `flydsl_hgemm` signature is the authoritative knob set. Every name below is from
@@ -49,6 +48,14 @@ The `flydsl_hgemm` signature is the authoritative knob set. Every name below is 
 Note non-power-of-2 tiles (160, 192, 48, 80, 112) — FLIR layouts make these legal, unlike Triton's
 pow2-biased space. This is a real expressivity advantage for odd N (e.g. N=160 GEMMs).
 
+Recorded decode sweeps (bf16 GEMM, N=2624, K=6144, M≤42, gfx950) put single-knob moves around the
+shipped tuned row at or below noise. In one build, `tile_n=32` failed the kernel's vector-load
+divisibility check with the W1x2x2 and W1x1x4 warp layouts. It built only with W1x1x2, where it was
+2–3% faster at M=6 and 1–2% slower at M=30. `tile_k` 64→128 at a constant 246 CTAs was a null. Equal
+CTA count and traffic did not mean equal speed: t48x64x64 and t16x64x64 at split_k 6 both launch
+246 CTAs and move 32.24 MB, yet they sustained 2.55–2.91 vs 3.54–3.87 TB/s. The engineer attributes
+this to per-thread accumulator footprint (24 vs 8 at 128 threads/WG) rather than to grid fill.
+
 ## 2. `split_k` — skinny/decode parallelism
 Same role as Triton SPLIT_K, combined in the kernel rather than by a second pass: split 0
 initialises the output tile (zero or bias) and raises a per-tile counter; every other split waits on
@@ -58,6 +65,11 @@ orders that initialisation; the sum itself is atomic, so the result is not bit-r
 rounding grows with `split_k`. `split_k` must divide K with `K/split_k` a multiple of `tile_k`;
 1, 2, 4, 8 and 16 need nothing more, and other divisors up to 32 also need 2–8 block-K loops per
 split. Capacity guard: `ceil(M/tile_m)·(N/tile_n) ≤ 128` for split_k>1.
+
+More splits is not a free fill lever once the tuned row is already split. In one bf16 decode run
+(M=6/12/30, gfx950) with a split_k 4 tuned row, split_k 6 or 8 was 11–35% slower in the engineer's
+microbenchmark. The bf16 error against an fp32 reference roughly doubled at split_k 8. split_k 2/3
+did not help either.
 
 ## 3. `b_preshuffle` vs `b_to_lds`
 - **`b_preshuffle=True`** (the default): weight pre-laid-out to MFMA fragment order
@@ -78,6 +90,13 @@ current build — the codegen variants were collapsed into the kernel.
 `n_tile_repeat`, `persistent_n_tiles`, `waves_per_eu`, `b_to_lds_unroll` only apply to the small-M
 family (`kernel_family="small_m"`, bf16, `tile_m=16`, `block_m_warps=1`, `b_preshuffle=False`). These
 are the decode-GEMV occupancy/persistence levers.
+
+The FlyDSL ROCm backend appends `--amdgpu-waves-per-eu` only when the hint is non-zero, so 0 really
+leaves occupancy to the compiler. In one bf16 decode GEMM run on gfx950, pinning `waves_per_eu=2`
+scored below leaving it unset on 7 of 8 decode buckets (single process, provisional). Another run's
+sweep of `waves_per_eu` 1/2 and `b_to_lds_unroll` 1/2 gave nothing. Attaching
+`flat_work_group_size` launch metadata was a null; the engineer attributes this to `known_block_size`
+already specializing the kernel.
 
 ## 6. preshuffle-a8 (scaled fp8/int8) knobs
 `flydsl_preshuffle_gemm_a8(..., lds_stage=2, use_cshuffle_epilog=0, use_async_copy=0, waves_per_eu=0)`:
@@ -103,6 +122,10 @@ disk). In aiter, GEMM tuning instead uses an offline sweep that writes the per-s
 - Passing `async_copy`/`stages`/`c_to_lds` off their arch-fixed values → `ValueError`.
 - `flydsl_hgemm` takes no scale arguments; scaled (fp8/int8) GEMMs go through `flydsl_preshuffle_gemm_a8`.
 - Tuned config CSV is build-specific — re-tune per ROCm/aiter version.
+- aiter merges per-model tuned CSVs into the bf16 tuned table, so a shape with no row in the base CSV
+  may still be tuned. Read the merged table before assuming it is untuned.
+- A knob null can be a stale binary. Before reading a result, confirm that a new kernel name or IR
+  hash appears in the FlyDSL cache (the kernel name is part of the cache key).
 
 ## Sources
 - flydsl_hgemm signature, constraints, defaults, FIXED_STAGE/async/c_to_lds: ROCm/aiter@/sgl-workspace/aiter:aiter/ops/flydsl/gemm_kernels.py

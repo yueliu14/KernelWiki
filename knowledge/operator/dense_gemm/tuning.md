@@ -15,7 +15,6 @@ sources:
   - https://rocm.blogs.amd.com/software-tools-optimization/gluon-gemm-tutorial/README.html
   - https://arxiv.org/abs/2511.08083
 ---
-
 # dense_gemm — tuning
 
 ## TL;DR
@@ -23,6 +22,7 @@ The only tuning lever that engages the **live** sglang/vllm GEMM path is **aiter
 (see [backends/aiter.md](backend/aiter.md)); everything below is the knob space that aiter/CK/triton
 search over. Defaults worth burning into any hand kernel: **`mfma_16x16` over `32x32`**, **≥1024
 workgroups**, **8-multiple tiles** (XCD/L2 friendliness), `OPTIMIZE_EPILOGUE=1` to dodge the 512B Tagram hotspot.
+For skinny bf16 decode, see the split-K and stages caveats below.
 
 ## What dominates time
 Prefill GEMMs (large M) are compute-bound; the win is keeping all 304 CUs busy at high MFMA occupancy.
@@ -52,17 +52,26 @@ The 8-wave ping-pong and 4-wave interleave scheduling patterns both **originate 
 - **MFMA instruction**: `mfma_16x16x16` usually beats `mfma_32x32x8` on MI300X for LLM N/K (better
   occupancy / less register pressure). In triton this is `matrix_instr_nonkdim=16`.
 - **Tile (BLOCK_M/N/K)**: keep N/M tiles **multiples of 8**; common winners 128×128×64, 256×128×64,
-  256×256×64. Decode (skinny M) → small BLOCK_M (16/32) + larger SPLIT_K.
+  256×256×64. Decode (skinny M) → small BLOCK_M (16/32) + larger SPLIT_K (see caveat below).
 - **Workgroup count ≥1024**: ensures every XCD/CU is fed; sub-1024 leaves CUs idle on prefill shapes.
 - **XCD/L2 placement**: distribute workgroups that share data onto the **same XCD** to cut cross-die
   L2 traffic and stabilize timing.
 - **SPLIT_K / Stream-K**: essential for skinny decode M and tall-K reduction shapes →
   see [operators/splitk_streamk_gemm/overview.md](../splitk_streamk_gemm/README.md).
+  *Measured exception:* bf16 decode M=3–42, N=6144, K=2048 (256 CUs): split-K 2/4 to exactly 3 waves
+  regressed with both an atomic and a deterministic workspace reduce (the latter ~1.13× at M=3/6 but
+  ~0.57× at M=36/42). With short K, do not assume device fill is the bottleneck.
 - **waves_per_eu / num_stages / num_warps** (triton): raise stages for K-deep prefill; lower
-  waves_per_eu if register-spilling.
+  waves_per_eu if register-spilling. Short K loops differ: a FlyDSL bf16 decode kernel (gfx950, 12 K
+  iterations per split) lost 4–8% at STAGES=3/5/6 vs 4; fully unrolling its K loop gained about 3.0%.
+- **Constexpr K trip count** (with pid decomposition specialized for one M tile and 32-bit C addressing):
+  associated with +13.7% on triton bf16 decode (N=6144, K=2048); the engineer suspected the unroll it
+  enables, but per-component attribution was not measured.
 - **b_preshuffle**: pre-permute B to the MFMA-native layout to kill the LDS shuffle on the hot path
   (part of aiter's lookup key as `bpreshuffle`).
 - **`OPTIMIZE_EPILOGUE=1`**: routes the C write-out away from the 512B Tagram hotspot (CShuffle path).
+- **Cache modifiers** (triton, same decode shapes): `.wt` on C and dropping `.cg` on B both lost;
+  `eviction_policy` was not expressible on the AMD backend in that toolchain.
 
 ## How to tune (the live lever)
 1. Capture real shapes with `AITER_TUNE_GEMM=1` on a warm server (bias must match live calls).
@@ -70,10 +79,18 @@ The 8-wave ping-pong and 4-wave interleave scheduling patterns both **originate 
 3. Deploy by env `AITER_CONFIG_GEMM_BF16=<tuned.csv>`, verify `grep -c 'is tuned on cu_num'`.
 Full recipe in [backends/aiter.md](backend/aiter.md). Validated **+2.23% e2e** on Qwen3.5-27B/sglang.
 
+Race backends before hand-writing: at bf16 M=1936, N=2624, K=6144 (gfx950) the hipBLASLt heuristic
+(0.0818 ms) beat the best FlyDSL (0.1130) and triton (0.1320) configs. Per-M hipBLASLt solution pins
+gave 1.17×/1.12×/1.06× at M=5916/16955/30519 on that N/K, but are tied to the hipBLASLt version.
+
 ## Pitfalls
 - Tuning synthesized `bias=true` shapes when live is `bias=false` → 100% lookup miss, 0 engagement.
 - PyTorch TunableOp / `HIPBLASLT_TUNING_FILE` hook a dispatch aiter bypasses → 0 engagement.
 - Racing ~1365 hipBLASLt solutions/shape is slow and can fork-storm the host; bucket-reduce M.
+- Hot-cache races can mislead: at M=1936 a winner ~10% faster back-to-back was 13% slower in the
+  harness (the engineer suspected hot inputs); re-verify pins in the harness.
+- Per-M routing tables can have gaps: m=12 matched no row and silently hit the fallback path; one
+  added row moved it 1.0001 → 1.0227. Check that every live M maps to a row.
 - Presenting theoretical peak as a target; the real bar is the best tuned library kernel.
 
 ## Sources

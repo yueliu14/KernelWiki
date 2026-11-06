@@ -7,7 +7,6 @@ source_commit: AMD-AGI/GEAK@c0a1f937
 sources:
   - AMD-AGI/GEAK@c0a1f937:src/minisweagent/skills/flydsl/docs/flydsl_gemm_optimization.md
 ---
-
 > **Reference (how-to), not a verdict.** Ingested from the FlyDSL authoring skill. GEMM-specific
 > follow-on to [`authoring_optimization.md`](authoring_optimization.md). For the SOTA backend decision
 > for dense GEMM (which path to pick, library vs author) see the operator card
@@ -123,6 +122,14 @@ real limit.
 When shapes are irregular, prefer a tile choice that remains robust across the
 benchmarked range instead of overfitting to one hotspot shape.
 
+When you change waves per CTA or the tile, re-check thread/output divisibility.
+In recorded bf16 decode GEMM runs (N=2624, K=6144, gfx950), 512 threads on a
+32x64 or 32x32 output tile, and a 256-thread slice-K layout on a 48x64 tile,
+failed the kernel's output-write asserts or the host-side tiling check.
+Narrowing the output store width in both the kernel and the host-side validator
+made the 512-thread layouts legal. Going from 4 to 8 waves per CTA there helped
+mid decode M (M=24, 30) and was flat at M=6 and M=12.
+
 ### LDS staging
 
 For GEMM kernels, ask whether one of these is true:
@@ -136,6 +143,13 @@ If the kernel already uses LDS, inspect whether the problem is:
 - **capacity**: too much LDS per workgroup
 - **layout**: bank conflicts from stride or access pattern
 - **timing**: `ds_write` too close to dependent `ds_read` / wait
+
+Stage count depends on the regime. On that decode GEMM, a 32x64x128 split-K
+kernel with 12 K iterations per split was slower with 3 stages and with 5 or 6
+stages than with 4. The engineer's reading was that more stages shorten the
+main loop and lengthen the drain. A later 32x32x128 tile measured better at 5
+stages than at 4. Count the K iterations per split and measure each tile before
+changing the depth.
 
 ### Swizzle and bank conflicts
 
@@ -170,6 +184,16 @@ occupancy. Prefetch that causes spills often loses more than it wins.
 For scheduler hints, match them to the real loop body instead of copying fixed
 numbers from another kernel. The MFMA count, LDS-read count, and VMEM count per
 iteration should come from the current kernel's loop structure.
+
+For short K loops, fully unrolling the main loop and drain at trace time, so
+that LDS stage indices are compile-time constants, was associated with about
++5% at the smallest decode M on the 32x64x128 kernel above. VGPRs went 58 -> 62
+with no spills, and the gain shrank toward larger M. A split-K tail reorder
+that removed one barrier measured flat (within run-to-run noise over 5
+alternating pairs). The ISA showed the compiler still waited on the semaphore
+result immediately. The engineer suspected this limited the gain; a manually
+deferred wait was not tested. Confirm in the ISA that the wait you meant to
+move did move.
 
 ### Epilogue choice
 
@@ -216,6 +240,7 @@ Performance changes must preserve these constraints:
 - starting from scheduler constants before proving the bottleneck
 - copying tile sizes from another kernel without checking work decomposition
 - adding multi-stage LDS buffering that destroys occupancy
+- changing stage count or waves per CTA without re-checking K iterations per split and output-store divisibility
 - treating every LDS issue as a swizzle problem instead of checking wait distance
 - comparing only one benchmark shape and overfitting to it
 - assuming a trace or ISA pattern from another repository matches the current kernel
