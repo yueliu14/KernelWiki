@@ -11,7 +11,6 @@ sources:
   - https://github.com/ROCm/gfx950-gluon-tutorials
   - https://rocm.blogs.amd.com/software-tools-optimization/cdna4-gemm-kernels/README.html
 ---
-
 # Gluon on AMD — overview
 
 ## TL;DR
@@ -23,6 +22,7 @@ used to reach **near-peak GEMM in a Python DSL** on MI355X (gfx950): FP16 **1489
 eff**, BF8 **3257 TFLOPS @ 99.72%**, MXFP4 **5255 TFLOPS @ 92.41%** — vs a naive Gluon baseline of
 **520 TFLOPS @ 25%** (~3× to peak). Reach for Gluon when Triton's autoscheduler leaves the last 20–75% on
 the table and you are willing to hand-place the pipeline; stay on Triton for portability and fast iteration.
+Gluon variants lost to the existing kernel in several recorded small-M decode runs (below); race them per regime.
 
 ## What Gluon is (vs Triton)
 - **Same model, lower level.** AMD's tutorial calls Gluon *"a block-level programming model in Triton."*
@@ -62,6 +62,27 @@ of warp-specialization as the route to peak.
 | You need explicit ping-pong/interleave wave scheduling | Rapid prototyping / shape exploration |
 | You need CDNA4 native scaled-MFMA (MXFP4 a4w4) | Fused epilogue/attention the library can't express |
 | You can budget time for hand layout + pipeline tuning | `torch.compile` / Inductor codegen path |
+| It wins a race against Triton in that shape regime | A small-M decode kernel is occupancy-bound and Gluon has not won a race |
+
+## What recorded optimization runs showed
+- **Gluon was not a free win in small-M decode.** bf16 decode GEMM (M=12, K=2048, N=6144): an X-resident
+  persistent Gluon tier was slower than the seed kernel in every variant, best 0.888x. The engineer
+  attributes this to occupancy: the 64 KB padded X tile plus W ring allowed 1 CTA per CU.
+  An unmodified Gluon `mfma_scaled` MLA absorb batched GEMM (small N tiles, 2 warps) lost on both arms
+  (0.912x at K=192, 0.802x at K=512); other tiles untested.
+- **Check async-copy wait counts in the ISA.** In a gfx950 sparse-attention indexer decode, depth-2 K-tile
+  prefetch through the global-to-LDS DMA (`async_copy.buffer_load_to_shared`) failed parity; the engineer
+  traced it to Triton lowering `wait_group(1)` to `vmcnt(3)`. With inline-asm `s_waitcnt vmcnt(6)` it
+  passed but ran 0.9% slower.
+- **Retune per regime.** MXFP4 MoE decode at M=32–56: retuning the per-regime Gluon configs gave +0.8–1.05%
+  geomean, but the weighted change was noise-level. Down stayed on Triton at M=40/48, where every Gluon
+  down variant lost 0.3–3 us.
+- **Read the ISA before targeting a layout conversion.** In a gfx950 sparse-attention prefill kernel a
+  `gl.convert_layout` to a SliceLayout of the MFMA layout compiled to zero instructions.
+- **Host launch cost matters on eager paths.** For sparse MLA, one change set (None constexpr placeholders,
+  dropping a bf16 `.view()`, `do_not_specialize` on pointer args whose alignment did not change the amdgcn,
+  positional constexpr args) cut host time per eager call from 67.3 to 51.8 us on the T18 SK1+NS8 lane
+  (median of 400 calls). `do_not_specialize` on q/out/cache pointers changed the amdgcn.
 
 ## Deep-dive map
 - [programming_model.md](programming_model.md) — the abstraction: warp/wave-level control, manual

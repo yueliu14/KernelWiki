@@ -16,11 +16,11 @@ knowledge/operator/<operator>/corpus/
 
 The [operator catalog](catalog.yaml) and this generated navigation page live alongside the operator directories. The shared production and validation tools live under [tools/corpus](../../tools/corpus/README.md).
 
-**23 operators · 119 canonical cards · 4481 snapshot-qualified source observations · 359 shipped groups.** Shared references are not counted as additional knowledge records.
+**23 operators · 120 canonical cards · 4481 snapshot-qualified source observations · 359 shipped groups.** Shared references are not counted as additional knowledge records.
 
 ## Upstream PR review coverage
 
-22 canonical PR reports. reviewed: 49, unreviewed: 10, unresolved: 37, blocked: 23.
+22 canonical PR reports. reviewed: 49, unreviewed: 11, unresolved: 37, blocked: 23.
 
 Counts describe review coverage, not successful optimizations. Reports with missing measurements remain explicit; shared references do not duplicate results.
 
@@ -72,7 +72,7 @@ Counts describe review coverage, not successful optimizations. Reports with miss
 | [mla_attention](mla_attention/README.md) | 2 | 1 | 180 | [Decisions](mla_attention/corpus/decisions.md) · [Evidence](mla_attention/corpus/source_evidence.md) |
 | [qk_norm_rope_cache](qk_norm_rope_cache/README.md) | 2 | 0 | 175 | [Decisions](qk_norm_rope_cache/corpus/decisions.md) · [Evidence](qk_norm_rope_cache/corpus/source_evidence.md) |
 | [sliding_window_attention](sliding_window_attention/README.md) | 3 | 0 | 24 | [Decisions](sliding_window_attention/corpus/decisions.md) · [Evidence](sliding_window_attention/corpus/source_evidence.md) |
-| [sparse_attention_nsa](sparse_attention_nsa/README.md) | 4 | 0 | 82 | [Decisions](sparse_attention_nsa/corpus/decisions.md) · [Evidence](sparse_attention_nsa/corpus/source_evidence.md) |
+| [sparse_attention_nsa](sparse_attention_nsa/README.md) | 5 | 0 | 82 | [Decisions](sparse_attention_nsa/corpus/decisions.md) · [Evidence](sparse_attention_nsa/corpus/source_evidence.md) |
 
 ## MoE routing, expert GEMMs and combine
 

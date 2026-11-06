@@ -274,4 +274,81 @@ cards:
       protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
         1 recorded step; not re-run for KernelWiki
       correctness: the GEAK task's correctness check passed for every counted step
+- id: one-trip-prologue-issue-gather-before-q-converts
+  type: performance_candidate
+  axes:
+  - data_movement
+  - compute_schedule
+  - sparse_selection
+  match:
+    operator_families:
+    - sparse_attention_nsa
+    target_languages:
+    - triton
+    gfx:
+    - gfx950
+  question: In a single-tile sparse-gather attention prologue, should the index-dependent KV gather be issued
+    before the q dtype conversions?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: unreviewed
+  conditions:
+  - The path processes exactly one KV tile per split (all selected slots of the split fit one tile), so there
+    is no loop to pipeline across
+  - The KV gather address depends on an index vector loaded in the same prologue
+  - The q loads and their dtype converts do not depend on the gather
+  - Memory waits on the target retire in issue order, so a convert placed after a later-issued load can wait
+    on that load too
+  actions:
+  - Issue the index load first, then the raw q loads without converting, then the index-dependent KV gather,
+    and only then convert q
+  - Put the single-tile path in a constexpr branch selected by the launcher and write it as straight-line code
+    that keeps the loop's tile math
+  - Keep the multi-trip pipelined path's order separate and A/B any reorder there on its own buckets
+  - Compare VGPR, AGPR, scratch and occupancy of the compiled kernel before and after the change
+  alternatives:
+  - Keep each q load fused with its convert, in the original order
+  - 'For multi-trip segments, use a manual register pipeline: issue the next tile''s gather and the following
+    tile''s index load before the current tile''s compute'
+  - Compute QK and PV as full head-width dots on the single-tile path
+  why:
+  - 'The engineer''s account: q converts then wait only on the q loads, so they overlap the gather latency
+    instead of sitting in front of it'
+  - In the engineer's compile check, the straight-line one-trip branch also used fewer registers (244 VGPRs
+    vs 280 including AGPRs) and occupancy rose from 1 to 2
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - The engineer measured that hoisting the gather above the q converts on the multi-trip pipelined path cost
+    3-8% on larger decode batches in that run
+  - The engineer reports the gain concentrated at batch size 1 (+4.4%); other buckets moved by 1.1% or less
+  - No profile separated the issue-order effect from the register and occupancy change
+  - 'One recorded step: fp8_e4m3 KV, decode, Triton on gfx950'
+  experience:
+  - outcome: beneficial
+    conditions:
+    - Sparse MLA decode with fp8_e4m3 KV gathered by int32 top-k indices and bf16 q, Triton on gfx950
+    - 'Only the one-trip split-K path was reordered: each split''s selected slots fit in a single tile (topk
+      <= KV_SPLITS * BLOCK_K)'
+    - The engineer reports that most of the gain was at batch size 1 decode; the batch-size-2 change was within
+      noise
+    - Multi-trip buckets kept their original prologue order in the measured step
+    summary: Issuing the index load, then the raw q loads, then the index-dependent KV gather, and only then
+      the q fp8 converts on the one-trip path beat the parent. The engineer could not separate this from a
+      register drop (occupancy 1 to 2) that came with the same change.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: fp8_e4m3
+      shape_layout: decode M=3-42
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
 shared_cards: []

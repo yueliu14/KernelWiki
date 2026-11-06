@@ -11,13 +11,13 @@ sources:
   - https://blog.vllm.ai/2025/02/24/ptpc-fp8-rocm.html
   - ROCm/aiter@HEAD:gradlib/gradlib/gemm_tuner.py
 ---
-
 # dense_gemm — numerics
 
 ## TL;DR
 bf16/fp16 GEMM with **fp32 accumulate** is the parity baseline; swapping library *solutions*
 (hipBLASLt/CK/asm) is same-math → byte-comparable within `err_ratio<0.05`. Quantized variants
-(fp8/mxfp4) change the math and must be gated on **task accuracy**, never byte parity.
+(fp8/mxfp4) change the math and must be gated on **task accuracy**, never byte parity. Parity safety
+says nothing about speed: pick among parity-safe options by timing.
 
 ## Accumulation & dtype contract
 - In: bf16/fp16. Accumulate: **fp32** (MFMA accumulators are fp32). Out: bf16 (sglang `nn.Linear`).
@@ -28,6 +28,10 @@ bf16/fp16 GEMM with **fp32 accumulate** is the parity baseline; swapping library
 ## Parity bands
 - **Same-dtype solution swap (the aiter tune)**: parity-safe. gradlib gates each candidate on
   `err_ratio < 0.05` vs a reference GEMM; accepted swaps move no task metric.
+- Recorded runs agree for bf16 decode GEMM (M=3..42, K=6144, N=2624). Routing every decode bucket from
+  FlyDSL to the torch/hipBLASLt path passed correctness/parity with the tolerance untouched. The same
+  parity-safe swap was 5–36% slower per bucket on that skinny-M regime, so a parity pass is a
+  precondition, not a reason to switch.
 - **fp8 quant**: not byte-comparable. PTPC-FP8 (per-token-activation, per-channel-weight) on vLLM/ROCm
   recovers near-bf16 accuracy and is the recommended fp8 recipe; per-tensor fp8 is faster but lossier.
 - **mxfp4 (CDNA4)**: per-32-element E8M0 block scale. Naive MXFP4 loses accuracy; online-rotation +
@@ -55,12 +59,20 @@ gfx950 hits a *representational* trap:
 - Plain dense GEMM has no argmax/tie-break; output order is deterministic per solution. Split-K /
   Stream-K introduce a different fp32 reduction order → tiny ULP drift (still within band), so pin the
   solution if exact reproducibility across runs is required.
+- Recorded runs on bf16 decode GEMM (M up to 30, K=6144, N=2624) match this. Moving FlyDSL split_k from
+  split_k4 to split_k6 or split_k3, or setting tile_k=64 at fixed split_k4, passed parity at the
+  unchanged tolerance. Timing decided those knobs: each variant lost to the shipped split_k4 config
+  on the targeted buckets in those runs. Numerics did not constrain the choice in that regime.
 
 ## How to gate
 - Same-math swap: `max_reldiff < 0.05` vs untuned reference on the live shape (gradlib does this).
 - Quant: run the task eval (e.g. accuracy on the serving workload) A/B; accept only if no regression.
 - Watch the input-distribution effect: GEMM perf varies >20% by input values, but accuracy gating must
   use representative (not all-zero) tensors or you under-detect quant error.
+- Prove the candidate actually dispatched before counting its parity PASS. A candidate that silently
+  falls back to the baseline passes parity trivially. In the recorded bf16 decode GEMM runs, the engineers
+  logged one named warning per applied override and required zero fallback events. They report that this
+  separated a real backend loss from a silent fallback.
 
 ## Sources
 - fp8 GEMM on CDNA4 (E4M3FN, bf16 out, fp32 accum): ROCm CDNA4 GEMM blog.

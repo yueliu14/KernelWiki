@@ -12,7 +12,6 @@ sources:
   - https://rocm.blogs.amd.com/software-tools-optimization/cdna4-gemm-kernels/README.html
   - https://rocm.blogs.amd.com/software-tools-optimization/4wave-fp8gemm/README.html
 ---
-
 # Gluon GEMM cookbook (CDNA4, gfx950)
 
 ## TL;DR
@@ -70,9 +69,17 @@ FP16/BF8/FP4 operands, **FP32 accumulate**. MXFP4 = two 4-bit values per byte + 
 - The ceilings are **gfx950 headline** — CDNA3 (gfx942) lacks native scaled-MFMA, so the MXFP4 5255 number
   does not transfer. FP16/BF8 manual pipelines do run on gfx942.
 - These are **large-K, square-ish shapes** (K=8192/16384/32768). Skinny/decode GEMM is a different regime —
-  the near-peak ceilings assume compute-bound dimensions.
+  the near-peak ceilings assume compute-bound dimensions; the decode runs below are a different regime with mixed results.
 - Manual scheduling is the cost: you author the layout, pipeline, register budget, and schedule by hand —
   far more effort than Triton's autoscheduler for the last ~20–75% of peak.
+
+## Recorded gfx950 runs outside large-K GEMM
+Directions that consulted this cookbook on decode, indexer and MoE kernels gained about as often as they lost; each note is one run.
+- **LDS-DMA rings did not gain in the recorded decode cases.** A 2-stage `buffer_load_to_shared` K prefetch in a sparse-attention indexer decode ran 0.9% slower than its parent. An LDS-DMA W ring in an MXFP4 MoE decode GEMM at bs2 (HBM-bound per its engineer) lost 0.6 to 3us. An X-resident persistent tier for a latency-bound bf16 GEMM (M=12, K=2048, N=6144) peaked at 0.888x; its engineer attributed it to occupancy (1 CTA per CU; more slabs per CTA was slower). In the indexer decode, `async_copy.wait_group` lowered to a vmcnt that broke parity until replaced by inline-asm `s_waitcnt`.
+- **NUM_CHAINS 4→2 gained in one indexer prefill; the engineer attributed it to liveness.** It cut instructions 1.1% and measured 1.0553x; `NUM_CHAINS=1` spilled (79→203).
+- **Indexer prefill store relayout stayed scalar.** VGPRs rose 233→243 but the ISA kept `buffer_store_dword`; per the engineer, Triton could not prove 4-column alignment of a per-row causal start.
+- **MFMA priority hints, indexer prefill split arm (BLOCK_M=4, 2 warps).** Per the engineer, Gluon (Triton 3.7) has no `s_setprio`/`sched_barrier`/`sched_group_barrier` call; inline-asm `s_setprio` ended with no MFMA in its window (the compiler had spread MFMAs among the VALU fold), and `schedule_hint="memory-bound-attention"` raised scratch 80→600 B.
+- **A Gluon twin that staged KV once for both QK and PV gained.** In an fp8 sparse-MLA decode split-K body (bs1/bs2) it read one LDS KV tile as the B operand of QK (scaled MFMA 16x16x128) and PV (MFMA 16x16x32), among other layout changes: +3.9% call-weighted (bs1 8.7%, bs2 10.8%).
 
 ## Cross-links
 [languages/gluon](overview.md) · [languages/triton_amd](../triton_amd/overview.md) · [optimization/mfma_scheduling](../../optimization/mfma_scheduling.md) ·

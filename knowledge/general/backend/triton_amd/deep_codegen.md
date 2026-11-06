@@ -11,7 +11,6 @@ sources:
   - https://rocm.blogs.amd.com/software-tools-optimization/matrix-cores-cdna/README.html
   - https://medium.com/@nzhangnju/a-deep-dive-into-amd-triton-compilation-912d96e68e45
 ---
-
 # Triton on AMD — codegen deep dive
 
 How `@triton.jit` becomes `v_mfma_*` + `ds_*_b128` + `global_load_dwordx4`. This is the model you need
@@ -32,6 +31,11 @@ then to a sequence of `v_mfma_f32_*` instructions. The chosen MFMA shape is gove
 
 On **gfx950 (CDNA4)** the dtype set widens to OCP fp8/bf8 and block-scaled `mfma_scale_f32_*_f8f6f4`
 (MXFP8/6/4); see [pitfalls.md](pitfalls.md) for the FNUZ↔OCP split.
+
+**gfx950 fp8 K/instr (recorded run):** in an fp8 e4m3 batched GEMM on gfx950 (bf16 activations quantized
+per 128-element K group), `tl.dot` lowered to `v_mfma_f32_16x16x128_f8f6f4`: one MFMA per 128-element
+group, not the gfx942 fp8 K/instr in the table; the engineer judged the fp8 rows stale for gfx950. Dump
+the ISA before planning "fewer, wider dots".
 
 Each MFMA is **wavefront-wide**: the 64 lanes collectively hold the A/B/C tiles. You never write the
 instruction by hand in Triton, but the layout it picks dictates VGPR/AGPR pressure (→ occupancy). The
@@ -69,6 +73,9 @@ prefetch the next K-tile's global loads into LDS while the current tile feeds th
 groups alternate so one issues MFMA while the other issues VMEM/DS. Defaults: `HIPOptions.num_stages`
 is **2** upstream.
 
+**Check that a loop exists first.** In that gfx950 fp8 decode batched GEMM, neither dispatched kernel
+contained a backward branch, so `num_stages` had no loop to pipeline. Look for one in the ISA first.
+
 ## 4. Global loads: `global_load_dwordx4`, buffer loads, async-copy
 - **Wide loads:** a well-formed kernel emits **128-bit** `global_load_dwordx4` in the K-loop (4 fp32 /
   8 fp16 per lane). Narrow `global_load_dword` means poor vectorization — bump tile/`kpack`,
@@ -82,6 +89,9 @@ is **2** upstream.
   `buffer_load ... lds` (skip VGPR staging → frees registers). **Default on gfx950**, experimental on
   gfx942. Lowers to `s_wait_asynccnt`-gated loads. See HIP [lds_async.md](../hip_cpp/lds_async.md) for
   the underlying ISA.
+- **Cache modifiers (one sparse-MLA decode kernel, gfx950):** `.cs` on KV loads compiled byte-identical
+  to `.cg`, `.cv` de-vectorized the `global_load_dwordx4` gather into `global_load_ubyte`, and `.cs` on
+  partial stores measured slightly slower. Diff the ISA before timing a modifier.
 
 ## 5. LDS swizzle & `kpack`
 Triton inserts a **swizzled** shared layout so 64-lane waves hit distinct LDS banks (32 banks × 4 B,
@@ -111,6 +121,15 @@ c = acc.to(c_ptr.dtype.element_ty)                   # OPTIMIZE_EPILOGUE=1 -> no
 With `matrix_instr_nonkdim=16, kpack=2, num_stages=2, OPTIMIZE_EPILOGUE=1` you should see, in the inner
 loop: `global_load_dwordx4` (×N), `ds_read_b128`, dense `v_mfma_f32_16x16x16`, no `v_accvgpr_*`, and
 `.private_segment_fixed_size: 0`. Anything else → retune (see [isa_verify.md](isa_verify.md)).
+
+## 8. VALU preambles around `tl.dot` (in-kernel fp8 activation quant)
+When activations are quantized in-kernel (amax → scale → cast → dot), the VALU chain can matter in a small
+decode GEMM. In bf16→fp8 e4m3 batched GEMM decode on gfx950, two edits went with measured gains that later
+rounds built on: dropping a `tl.clamp` the scale already bounds (the engineer reports the fp32→fp8e4m3
+convert saturates), and replacing IEEE `1.0 / s` with `tl.extra.hip.libdevice.fast_dividef` (`v_rcp_f32`).
+Re-check numerics. Fewer instructions did not mean faster: folding `fabs` into VOP3 `|src|` modifiers
+(VALU 201→189, bit-exact) and a two-chain reorder of the quant chain both measured below the seed. Use the
+ISA census as a gate, then time the change.
 
 ## Sources
 - Triton AMD backend `HIPOptions` / stream-pipeliner / knobs.amd.*: https://github.com/triton-lang/triton/blob/main/third_party/amd/backend/compiler.py

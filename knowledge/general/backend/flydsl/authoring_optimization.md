@@ -7,7 +7,6 @@ source_commit: AMD-AGI/GEAK@c0a1f937
 sources:
   - AMD-AGI/GEAK@c0a1f937:src/minisweagent/skills/flydsl/docs/flydsl_optimization.md
 ---
-
 > **Reference (how-to), not a verdict.** Ingested from the FlyDSL authoring skill. It gives a
 > prioritization workflow for optimizing an *authored* `@flyc.kernel`; the winner is still decided by
 > on-box measurement against the kernel's own oracle. For *using* aiter's built-in flydsl GEMM library
@@ -34,6 +33,7 @@ Parameter tuning alone yields marginal gains. **Prioritize structural optimizati
 - **Latency-bound** (small shapes) → reduce kernel launch count (fusion)
 - **Already-fused kernel** (kernel name contains `fused_`, or the source already combines multiple ops in one `@flyc.kernel`) → the structural optimum is likely already reached; prioritize Tier 2 (vectorization, coalescing) and Tier 3 (MFMA, scheduling) instead of further fusion or loop restructuring
 - **GEMM-like kernel** → if the next optimization question is mainly about `tile_m` / `tile_n` / `tile_k`, GEMM-specific LDS staging, epilogue strategy, or MFMA-loop ISA counts, use this guide for generic prioritization and then switch to [`authoring_gemm_levers.md`](authoring_gemm_levers.md)
+- **Before an occupancy lever** (shrinking LDS or registers, pinning `waves_per_eu`), check that occupancy is actually resource-limited and what fills LDS. In one recorded mxfp4 fused-MoE decode gemm1 (BM=16), the grid gave ≤2.07 WG/CU, so the LDS cap was never reached. The measured LDS footprint was an epilogue accumulator slab that the A-staging ring aliased into, so shrinking the ring freed no bytes. Pinning `waves_per_eu=1` there also measured −1.26%.
 
 ## Step 3: Optimize — high impact first
 
@@ -43,7 +43,7 @@ Parameter tuning alone yields marginal gains. **Prioritize structural optimizati
 
 - **Kernel fusion**: if the `@flyc.jit` wrapper launches 2+ kernels that share input data, merge them into a single `@flyc.kernel`. Eliminates launch overhead and redundant HBM reads. Do not attempt further fusion on a kernel that is already named `fused_*` or already combines all relevant ops.
 - **Fast-path relaxation**: look for overly-restrictive conditions guarding optimized code paths (e.g. disabled branches, alignment checks stricter than necessary). Relaxing these lets more shapes use the fast path
-- **Loop restructuring**: if the kernel uses constexpr loop unrolling that causes measurable code bloat or register pressure for large iteration counts, convert to `scf.for` with loop-carried state. Do not convert when unrolling is the primary source of ILP or the iteration count is small and fixed — converting then adds overhead rather than saving it.
+- **Loop restructuring**: if the kernel uses constexpr loop unrolling that causes measurable code bloat or register pressure for large iteration counts, convert to `scf.for` with loop-carried state. Do not convert when unrolling is the primary source of ILP or the iteration count is small and fixed — converting then adds overhead rather than saving it. The reverse also held in one recorded dense GEMM decode kernel with 12 K iterations per split. Fully unrolling the main loop and its drain at trace time made every LDS stage index a compile-time constant. That run measured about 3.0% faster weighted, with VGPRs going 58 → 62 and no spills.
 - **Redundant work elimination**: identify repeated loads, recomputed indices, or overlapping branches, and hoist/cache them
 - **Algorithm replacement**: if the current algorithm has unnecessary passes over data, restructure to reduce pass count (e.g. online softmax vs two-pass, fused attention vs separate Q×K then softmax then ×V). For single-pass elementwise kernels, the algorithm is already optimal at the pass level; do not add passes or stages.
 
@@ -71,6 +71,9 @@ Parameter tuning alone yields marginal gains. **Prioritize structural optimizati
 - Keep the swap/prefetch path simple: unpack from `state`, issue the next loads as early as legality allows, and leave the load-to-consume distance for compute or barrier wait to hide.
 - If a later phase already spends time in `gpu.barrier()` or reduce synchronization, hoist the next phase's global loads into that region when legality allows; barrier wait is often the easiest place to hide VMEM latency.
 - Re-check register budget before adding prefetch buffers. Prefetch only helps when the extra carried state does not cause spills or unacceptable occupancy loss.
+- **Sweep prefetch depth per shape bucket; deeper is not monotone.**
+  - Dense GEMM decode, 12 K iterations per split: STAGES=5 and 6 measured 4–6% slower than 4, and STAGES=3 measured 6–8% slower. The engineer attributed this to a shorter main loop and a longer drain.
+  - mxfp4 fused-MoE decode gemm1 (BM=16): going `kStages` 2→3 measured −0.98% weighted. It helped bs1 but cost bs3 and bs4.
 
 #### Diagnose LDS bottlenecks before rewriting
 
@@ -177,6 +180,9 @@ After an LDS-focused rewrite, verify all of these:
 - **MFMA instruction selection**: use the most efficient variant available on the target arch (via `flydsl.expr.rocdl`)
 - **Software pipelining**: overlap LDS reads/writes with MFMA compute using ping-pong buffers and scheduler barriers
 - **Scheduler tuning**: match `sched_mfma` group counts to actual MFMA ops per iteration; verify `sched_dswr`/`sched_dsrd` timing
+- **Treat existing hand-placed fences as load-bearing until ablated.** On one mxfp4 fused-MoE decode loop (BM=16, inline dequant→MFMA), relaxing the per-step `sched_barrier`/`s_setprio` fences regressed.
+  - Dropping all of them measured −1.75% weighted, concentrated on the smallest batch buckets.
+  - Dropping only the load fences while keeping `s_setprio` measured −0.55%.
 - **Loop unrolling**: unroll inner loops to expose ILP; merge loops that iterate over the same range
 
 ### Tier 4: Parameter tuning (low impact)
@@ -215,6 +221,7 @@ Always verify after each patch — violations often cause silent corruption:
 5. Verify the specific effect you wanted: `scf.for` survives tracing/lowering, wide loads/stores stay vectorized, the MFMA variant matches the target dtype/arch, and the final loop shape reflects the intended schedule
 6. If the generated form did not change, assume the optimization did not land yet, even if the Python source looks right
 7. If speedup is marginal or absolute time regresses, move to the next structural strategy rather than re-tuning the same approach
+8. When an A/B varies a knob inside a JIT-cached kernel, propagate the knob into the kernel symbol name so the runtime cache cannot serve the seed binary. Measure an in-workspace seed control interleaved with the arms.
 
 ### The register-allocation gate (run this at every step, not at the end)
 

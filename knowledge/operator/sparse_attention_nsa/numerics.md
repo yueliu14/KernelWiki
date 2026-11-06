@@ -11,7 +11,6 @@ sources:
   - https://arxiv.org/abs/2502.11089
   - https://fergusfinn.com/blog/deepseek-v4-flash-mi300x/
 ---
-
 # sparse_attention_nsa — numerics
 
 ## Three sources of numerical divergence
@@ -26,7 +25,8 @@ sources:
    routed through a "fnuz-aware fused quantise-and-insert helper" so cache bytes matched.
 3. **Three-branch gated sum.** `o = g_cmp·o_cmp + g_slc·o_slc + g_swa·o_swa`. The gates and the per-branch
    online-softmax must all accumulate in fp32; mixing branch dtypes or normalizing the combined output
-   wrong changes scale.
+   wrong changes scale. One sparse MLA prefill port fed bf16 `p` to the PV MFMA and kept `l` as the fp32
+   row sum of that same bf16 `p`; the port passed its correctness gate.
 
 ## Parity gate
 - Oracle: dense attention **masked to the same selected blocks + window + compressed** the kernel chose
@@ -34,9 +34,25 @@ sources:
   selection error.
 - Separately gate: **selection agreement** — fraction of queries whose top-k set matches the reference
   indexer. A drop here is a selection bug (often fp8 dialect), not a softmax bug.
+- Include **ragged and causal** cases in the fp32-oracle edge set.
+- Decide what the logits hold **past each row's context**. In one fp8 indexer decode run, the candidate
+  wrote -inf there while the reference left the buffer untouched. The valid-region test still passed.
+  Confirm that the downstream top-k never reads those columns.
 - Greedy temp=0, ≥10 prompts, several **longer than `top_k·block_size + window`** so sparsity actually
   drops tokens. End-to-end eval (gsm8k-style) is the real gate — AITER sparse/MLA paths have shown eval
   regressions; benign bf16 argmax flips must be distinguished from a real selection regression.
+
+## Reduction order and precision (recorded fp8 indexer runs, gfx950)
+- **An unchanged error is a codegen signal.** Reassociating the prefill head reduction (more FMA chains)
+  gave max_rel_err=0.0 on every timed bucket. The engineer read this as backend normalisation, and the
+  timing was null. Check the ISA before benchmarking such an edit.
+- **Bit-identical edits keep parity free.** A decode store-epilogue change that used a select (no
+  reassociation) kept the f32 values bit-identical and was associated with a gain.
+- **A lower-precision matrix-core head reduce needs a proven range.** relu(S)ᵀ·w was moved onto a second
+  fp16 MFMA in decode, with a 2^-9 E8M0 Q prescale and a per-CTA power-of-two w scale undone in the
+  kv-scale multiply. It passed parity (max_rel_err 6.9e-4 vs tol 1e-2). The fp16 bound (50176 < 65504)
+  was analytic only, so probe large-magnitude fp8 inputs before relying on it. In decode the change tied
+  the seed. A prefill variant using bf16 hi/lo weight rows was a dead end.
 
 ## Correctness traps specific to AMD
 - HIP-graph capture corrupting ragged metadata → wrong indices silently → wrong selected set. Use static

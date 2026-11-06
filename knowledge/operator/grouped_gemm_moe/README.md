@@ -31,6 +31,27 @@ Each page pins its source revision. Source references describe implementations a
 
 [Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
 
+## Reviewed AITER result: upstream sort/align kernel choice
+
+This section records an AITER PR result reviewed by KernelWiki. It is not part of the imported GEAK material below.
+
+The sort/align kernel that builds the padded, expert-ordered layout is swappable. The reviewed AITER result compared FlyDSL sorting against the default OPUS sorting.
+
+- **End to end**: explicitly selecting FlyDSL sorting was associated with higher mean output throughput.
+  - Setup: DeepSeek-R1-0528, FP8 KV cache, 8 x MI350X (gfx950), TP8, ISL=8192, OSL=1024, concurrency=4, 40 prompts, three runs per implementation.
+  - FP8 weights: 329.15 → 336.7 tok/s.
+  - MXFP4 weights: 414.76 → 428.25 tok/s.
+  - Reported flexible-extract accuracy stayed close: 0.9560 vs 0.9575 (FP8) and 0.9484 vs 0.9492 (MXFP4).
+  - This gain was measured only at that low concurrency. Do not assume it for high-concurrency prefill.
+- **Operator level**: the reported difference varied across token counts.
+  - Setup: DeepSeek-V4 routing, E=385, topk=7, graph path. Each entry is a single case, the estimator and repetitions are unspecified, and confidence is low.
+  - tokens=1: 15.4 → 10.1 us, a large gain for FlyDSL.
+  - tokens=32: 13.9 → 14.2 us.
+  - tokens=128: 14.1 us for both.
+  - Within this single-case table, latency was roughly equal at 32 and 128.
+- A replacement sort kernel must emit the padded layout, `expert_ids` and `num_tokens_post_pad` that the grouped GEMM consumes. Treat these outputs as part of the GEMM's input contract (see [Corpus decisions](corpus/decisions.md)).
+- When changing the sort/align kernel, sweep several decode token counts (for example 1, 32 and 128) rather than one. The upstream single-case table showed a large difference only at tokens=1. Confirm with an end-to-end serving run and an accuracy check.
+
 ## GEAK reference material
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.
@@ -95,7 +116,7 @@ sources:
 
 ## Fusion neighbors
 - Upstream: [../moe_routing_topk/overview.md](../moe_routing_topk/README.md) (topk + sort/align),
-  [../moe_dispatch_combine/overview.md](../moe_dispatch_combine/README.md).
+  [../moe_dispatch_combine/overview.md](../moe_dispatch_combine/README.md). For a reviewed AITER result on the sort/align kernel choice, see the section above this GEAK material.
 - Inline: act-and-mul, per-token/per-block quant epilogue → [fusion.md](fusion.md).
 - Downstream: weighted combine/scatter back to token order. See also
   [../shared_expert_fusion/overview.md](../shared_expert_fusion/README.md).

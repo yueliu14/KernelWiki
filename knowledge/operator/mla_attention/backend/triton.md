@@ -13,7 +13,6 @@ sources:
   - https://github.com/triton-lang/triton/blob/main/third_party/amd/backend/compiler.py
   - https://vllm.ai/blog/2026-02-27-rocm-attention-backend
 ---
-
 # mla_attention × Triton
 
 ## TL;DR (one-line decision)
@@ -58,7 +57,7 @@ kv_len_per_split = tl.cdiv(cur_batch_seq_len, NUM_KV_SPLITS)
 | `num_warps` | **1 on HIP** when grouped | wave64; avoid spill | 1 |
 | `num_stages` | 1 | fused decode pipeline | 1 |
 | `matrix_instr_nonkdim` | 16 | MFMA 16×16 | 16 |
-| `waves_per_eu` | 2–4 | memory-bound → occupancy | 2 |
+| `waves_per_eu` | 2–4 | memory-bound → occupancy (helps only if the grid fills the extra slots; see recorded results) | 2 |
 
 See `languages/triton_amd/knobs.md` and [../tuning.md](../tuning.md).
 
@@ -82,6 +81,25 @@ This is the **oracle** for the asm path — greedy temp=0 parity vs `mla_decode_
   (wave64 spill otherwise).
 - Slower than asm MLA on most shapes (except the gfx942 +2–3% case) — don't ship as serving SOTA without
   measuring.
+
+## Recorded optimization results (fp8 top-k sparse MLA, split-K decode)
+From GEAK runs on a Triton split-K sparse MLA decode (512 latent + 64 rope, `BLOCK_H=16`, 64-row KV tile,
+decode batch 1–7, OCP fp8) — geometry unlike the dense defaults above; associations, not rules. Fewer than a
+third of the directions citing this page beat their parent, and on average they matched siblings that did not.
+- **Occupancy pays only if the grid fills it.** A 32-row KV tile cut VGPR from 254+16 AGPR to 204 (occupancy
+  1→2) but alone was slower (grid ≈ one workgroup per CU). With 2× splits (2 workgroups per CU) it gave 1.074×
+  call-weighted over the seed; bs1, already one tile per split, kept the 64-row launch (32 rows: 1.30×→1.01×).
+- **Full-width dots cut LDS barriers.** One 512-wide QK and PV dot per trip instead of four 128-wide ones took
+  loop `s_barrier` 18→6 and `lgkmcnt(0)` 19→7 at equal MFMA count; bs2–bs7 gained 2.9–5.9%. The engineer traced
+  the barriers to trips through one shared LDS buffer, not to softmax reductions.
+- **Gluon single-tile path:** staging the gathered KV tile in LDS once as the B operand of both QK and PV gave
+  +3.9% call-weighted (bs1 +8.7%, bs2 +10.8%); a direct global→LDS variant failed the ISA gate.
+- **Did not pay there:** a 128-row tile where it cut serial depth (0.9916×); `.cs` partial stores (slower);
+  `.cv` KV loads (gather de-vectorized to `global_load_ubyte`) — `.cg` stayed best; pipeline depth 2 at bs2;
+  epilogue LDS-hop removal (none existed).
+- **Split-K + reduce fusion:** one arrival-counter form (`scope="gpu"` release) cost 5458–7725 ns/call vs a
+  1790 ns dispatch floor; other forms unmeasured. A faster bf16 reduce on gfx950 (4.2→3.4 µs microbench) did
+  not move the ~33–38 µs graph-timed decode beyond noise.
 
 ## Worked example
 gfx942 DeepSeek decode where you want to try the Triton MLA edge:

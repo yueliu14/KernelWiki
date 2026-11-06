@@ -11,7 +11,6 @@ sources:
   - ROCm/aiter@a6bb499375849eec45d68c5ccaebc8865fd422c0:aiter/configs/tuned_fmoe.csv
   - https://rocm.blogs.amd.com/software-tools-optimization/wide-ep-deepseek/README.html
 ---
-
 # fused_moe_grouped_gemm — fusion
 
 The whole point of this operator is that it is **already a mega-fusion**: sort → grouped GEMM (gate+up) →
@@ -45,6 +44,23 @@ Under EP the grouped GEMM consumes MoRI-EP's **3D packed layout** (`packed_recv_
   zero-copy buffers approach it but no single fused combine+GEMM kernel ships on AMD ([moe_dispatch_combine](../moe_dispatch_combine/README.md)).
 - **stage-1 → stage-2 without a global round-trip of the intermediate** — the `[M,inter]` activation is
   materialized between stages (it's large); keeping it in LDS/registers across both GEMMs is not done.
+- **sort → stage-1** — removing the sort node at decode did not pay off in the measured shapes (below).
+
+## What recorded attempts found (mxfp4 fused MoE, decode)
+Recorded runs on an mxfp4 fused MoE (257 experts, top-k 9, 16-row blocks, decode M=6..42) tried to fold more
+into the two stages. Of 16 directions that followed this page, a quarter beat their parent, and on average they
+trailed same-round siblings that did not use it. Size the work a fold removes before building it.
+- **Dropping the sort node did not pay for itself.**
+  - At M=18, a sort-free identity route cut graph nodes from 3 to 2 but slowed that decode case by about 10%.
+    In the engineer's eager per-kernel split, gemm1 grew 8.1 µs and gemm2 5.4 µs, while only 4.7 µs of sort was saved.
+  - At M=6/12, a leader-dedup variant was correct but its speed stayed within noise.
+- **Size the folded work first.** The engineer's microbenchmark put the `moe_buf` zero-fill inside the sort at
+  0.1–0.26 µs per sort node, capping the saving under ~0.5% decode-weighted; the engineer closed it as a standalone lever.
+- **Warming w2 from extra gemm1 CTAs lost at bs1 and was flat at bs2.** At bs1, w2 plus its scales was about 44 MB,
+  more than the 32 MB of L2; even a 2.6 MB scale-only warm cost 1.3 µs at bs1.
+- **Cache policy:** in a separate fused MoE kernel, caching (instead of non-temporal) shared-expert gate/up weight
+  loads and down-proj e8m0 scale loads was associated with +1.29% / +1.22% (forward / reversed A/B); caching the
+  w13 expert weights instead lost 1.9% / 2.2%.
 
 ## Cross-links
 [moe_routing_topk](../moe_routing_topk/README.md) (feeds sort) · [moe_dispatch_combine](../moe_dispatch_combine/README.md) (EP feed) · [shared_expert_fusion](../shared_expert_fusion/README.md) ·
