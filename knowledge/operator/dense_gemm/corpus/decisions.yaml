@@ -2110,6 +2110,275 @@ cards:
           axes:
           - compute_instruction
           backend: triton
+- id: flydsl-hgemm-decode-slice-k-warps-fp32-partials
+  type: performance_candidate
+  axes:
+  - execution_geometry
+  - work_partition
+  - epilogue
+  - validation_contract
+  match:
+    operator_families:
+    - dense_gemm
+    target_languages:
+    - flydsl
+    gfx:
+    - gfx950
+  question: When should a small-M FlyDSL HGEMM tile trade N-warps for in-CTA K-warps (slice-K), and how must
+    the k-warp partials be reduced?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: unreviewed
+  conditions:
+  - The case is a decode-regime bf16 GEMM whose small tile_m tile already splits K across CTAs and lays all
+    its warps along N.
+  - The kernel family supports block_k_warps > 1 with an LDS C scratch of one tile_m x tile_n slab per k-warp,
+    reduced in the epilogue.
+  - The LDS budget can hold a block_k_warps x tile_m x tile_n fp32 C scratch next to the pipeline stages.
+  actions:
+  - Re-shape the warp grid at a fixed warp count, for example block_n_warps x block_k_warps from 4x1 to 2x2.
+  - Keep tile, split_k and stages fixed so only the warp geometry changes.
+  - Store each k-warp accumulator to LDS in fp32, sum the slices in fp32, and round to the output dtype once
+    before the store or the per-slice split-K atomic.
+  - 'Leave the single-k-warp path as it was: it rounds to the output dtype before its LDS store, so its LDS
+    footprint and numerics do not change.'
+  - Update every LDS-size estimator and validator to count 4 bytes per C element when block_k_warps > 1.
+  - Gate the override on the exact config row and weight shape it was measured on; leave other M tiers and
+    prefill dispatch untouched.
+  - Re-run a paired parity soak (alternating candidate and seed in fresh processes), because the reduction
+    order and rounding change.
+  alternatives:
+  - Keep the all-N warp layout where the in-CTA K split shows no gain or the LDS budget is tight.
+  - Raise split_k across CTAs instead of adding in-CTA k-warps, accepting more partial-combine traffic.
+  - Reduce k-warp partials in bf16 in LDS for a smaller scratch only if the task's parity gate still holds
+    with the extra roundings.
+  why:
+  - The engineer's rationale is that two k-warps per CTA give more in-CTA memory-level parallelism to a decode
+    tile that has few rows to compute.
+  - Rounding each k-warp partial to bf16 and then adding the partials in bf16 adds two extra roundings per
+    element.
+  - The engineer attributed the seed's intermittent parity noise to those extra roundings, not to the split-K
+    atomic.
+  - An fp32 slice reduction rounds once, which matches the numerics of the single-k-warp path.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - This comes from one recorded step on one bf16 shape (N=2624, K=6144) on gfx950; gains were reported only
+    for decode cases routed to the tile_m=32 row.
+  - No ISA dump was taken, so VGPR use and occupancy of the 1x2x2 variant are unverified.
+  - The fp32 C scratch takes 4 bytes per element instead of the bf16 size, which can push a stage/tile bundle
+    past the LDS validator.
+  - Decode tiers with larger M and all prefill cases were not exercised by the change.
+  - The engineer's per-case speedups are against a seed control in the same window, not KernelWiki re-measurements.
+  experience:
+  - outcome: beneficial
+    conditions:
+    - bf16 dense GEMM, N=2624, K=6144, row-major, on gfx950 (MI355X).
+    - Only decode cases routed to the FlyDSL tile_m=32 row changed (32x64x128, split_k 4, 4 stages, padded
+      M up to 32).
+    - The warp grid went from 1x4x1 to 1x2x2 (block_n_warps 2, block_k_warps 2); tile, split_k and stages were
+      unchanged.
+    - Slice-K partials were kept and summed in fp32 in LDS, then rounded to bf16 once before the per-slice
+      bf16 atomic.
+    - The engineer reported 8 pass / 0 fail parity in both arms of an alternating candidate/seed soak with
+      fresh processes.
+    - Decode cases served by other tiers and all prefill cases did not use the changed kernel.
+    summary: The decode tier-32 tile ran with two in-CTA k-warps and fp32 slice-K reduction instead of four
+      N-warps, and it beat its parent. The engineer reported per-case decode gains above each bucket's noise
+      floor and no parity failures.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: bf16
+      shape_layout: N=2624 K=6144 row-major; decode M=1-64, prefill M=1936-32768
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
+- id: gemm-k-fold-into-mfma-n-for-tiny-m-decode
+  type: performance_candidate
+  axes:
+  - work_partition
+  - compute_instruction
+  - execution_geometry
+  - workgroup_tile
+  match:
+    operator_families:
+    - dense_gemm
+    target_languages:
+    - triton
+    gfx:
+    - gfx950
+  question: For a memory-bound decode GEMM with only a handful of rows, can folding K into the MFMA's N operand
+    raise the CTA count without a split-K reduction?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: unreviewed
+  conditions:
+  - M fits in one half-height activation slab (M <= BMH) and the call streams the whole weight once, so the
+    kernel is memory-bound.
+  - The baseline tile already feeds a 16-wide MFMA N operand, so simply narrowing N per CTA would underfill
+    the instruction.
+  - K divides by FOLD*BLOCK_SIZE_K and both operands are contiguous along K.
+  - N divides by the per-CTA column count BNH = 16/FOLD.
+  actions:
+  - 'Give each CTA BNH = 16/FOLD output columns and build the 16-wide B operand from FOLD K-slices of those
+    columns: B''[h*BNH+j, k''] = W[n0+j, h*K/FOLD+k''].'
+  - 'Stack FOLD K-slices of the activation rows along M the same way: A''[h*BMH+m, k''] = X[m, h*K/FOLD+k''],
+    using direct pointer arithmetic so every row stays contiguous in k''.'
+  - Run one dot loop over K/FOLD into a (FOLD*BMH)x(FOLD*BNH) fp32 accumulator, zero the off-diagonal blocks
+    (h != g), and sum the diagonal blocks to form C[m, n0+j].
+  - Mask padded activation rows (m >= M) on load and drop them with the store mask.
+  - Route only the M buckets where the fold measured faster; keep the previous kernel for larger M and as a
+    logged, sticky fallback if the fold launch fails.
+  - Compare it paired against the previous decode kernel for each M bucket, and check that untouched buckets
+    stay within their spread.
+  alternatives:
+  - Split K across CTAs or warps and combine the partials through a workspace or atomics (see gemm-split-k-when-grid-underfills).
+  - A wave-split skinny kernel in the style of AITER's HIP skinny GEMM (see gemm-skinny-decode-wave-split).
+  - Keep the 16x16 tile and tune only cache policy and workgroup-to-XCD mapping.
+  why:
+  - At FOLD=2 each CTA owns 8 columns, so N=6144 launches 768 CTAs instead of half as many, while the weight
+    bytes read stay unchanged.
+  - The K-slice partial sums land on diagonal blocks of one accumulator, so no cross-warp or cross-CTA reduction
+    is needed and no partial is rounded to the output dtype before combining.
+  - The engineer's account is that the discarded off-diagonal MFMA work costs nothing on this memory-bound
+    shape; this was not isolated by a separate measurement.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Measured only for bf16, N=6144, K=2048, on gfx950, in Triton, with FOLD=2 and BLOCK_SIZE_K=256.
+  - In the engineer's earlier screen, M=12 (BMH=16, a 32-row folded activation tile) lost 7-45% in every arm,
+    so the fold was routed only for M<=8.
+  - Only 1/FOLD of the accumulator blocks are kept, so wasted MFMA work and accumulator registers grow with
+    FOLD; other FOLD values were not measured here.
+  - The final reshape-and-sum epilogue goes through a layout conversion Triton inserts itself (an LDS round-trip),
+    which the engineer did not try to remove.
+  - The per-bucket gains are the engineer's paired measurements; the independent measurement covers only the
+    step against its parent.
+  experience:
+  - outcome: beneficial
+    conditions:
+    - bf16 dense GEMM (Triton) with N=6144, K=2048, row-major operands, on gfx950 (MI355X).
+    - Decode buckets with M<=8 (M=3 and M=6) took the K-fold route; larger decode M kept the previous 16x16
+      kernel unchanged.
+    - FOLD=2, BLOCK_SIZE_K=256, 2 warps, 2 stages, 16-wide MFMA, with an XCD workgroup remap and streaming
+      cache policy on the weight loads.
+    - Prefill buckets (M=1936-32768) were untouched by the change.
+    summary: On bf16 N=6144 K=2048 decode at gfx950, a FOLD=2 K-fold into the MFMA N operand for M<=8 improved
+      on its parent. In the engineer's paired runs, M=3 and M=6 gained (+8.49% and +9.84%) while other buckets
+      stayed within their spread; M=12 had been excluded after losing in the engineer's earlier screen.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: bf16
+      shape_layout: N=6144 K=2048 row-major; decode M=1-64, prefill M=1936-32768
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
+- id: small-tile-waves-per-workgroup-duplicate-mfma-audit
+  type: performance_candidate
+  axes:
+  - execution_geometry
+  - workgroup_tile
+  - compute_instruction
+  - pipeline_schedule
+  match:
+    operator_families:
+    - dense_gemm
+    target_languages:
+    - triton
+    gfx:
+    - gfx950
+  question: When a small-M GEMM tile needs only one wave's MFMA chain, do extra waves per workgroup add parallelism
+    or just duplicate the same work?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: unreviewed
+  conditions:
+  - Decode-regime GEMM whose output tile is a single MFMA fragment (e.g. 16x16) and whose K loop is not split
+    across the waves of a workgroup
+  - The tier's named or assumed wave count differs from the one launched, and num_warps has not been checked
+    against the tile's MFMA count; in the recorded step the config was named nw4 and 4 waves were assumed,
+    but 2 were launched
+  - The wave count actually launched has not been confirmed from the compiled kernel
+  - Measured on bf16 at gfx950 for M<=8; other dtypes, tiles and gfx are unmeasured
+  actions:
+  - Read the launched wave count and the per-wave MFMA count from the ISA, not from the config name
+  - Compute total MFMA as workgroups x waves x MFMA per wave and compare it with workgroups x the MFMA chain
+    one tile needs
+  - If the total is a whole multiple of that minimum while MFMA per wave is unchanged, lower num_warps until
+    the total reaches the minimum
+  - After changing the wave count, re-sweep num_stages and waves_per_eu together, since fewer waves change
+    latency hiding
+  - Check VGPR and scratch in the new ISA, and gate bit-identical or tolerance-equal output on every routed
+    M
+  - Confirm the gain with paired, interleaved runs against an anchor, because the expected gain is small
+  alternatives:
+  - Keep several waves but give each a distinct share of the work, e.g. split K across waves inside the workgroup
+    and reduce the partials
+  - Grow the tile so each wave owns its own output fragment
+  - Leave num_warps unchanged and tune occupancy via waves_per_eu only
+  why:
+  - Per the engineer's audit, both waves on the 16x16 tile ran the same 32-MFMA chain, so total MFMA was exactly
+    twice the minimum
+  - One wave keeps the same 32 MFMA per wave and halves MFMA and LDS-read issue per workgroup (engineer's explanation)
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Evidence is one recorded step on one kernel; its benefit over the parent was small
+  - The engineer judged the M=6 gain only just over his kill threshold and asked for more multi-process paired
+    runs
+  - Whether extra waves duplicate work depends on the compiler's layout for the tile; verify it in the ISA
+    for each compiler version
+  - 'With fewer waves the best stage count changed: 2 waves with 3 stages lost in the engineer''s screen while
+    1 wave with 3 stages gained'
+  - Says nothing about prefill-size or larger decode tiles, where each wave normally owns distinct output
+  experience:
+  - outcome: beneficial
+    conditions:
+    - bf16 dense GEMM, N=6144 K=2048 row-major, gfx950 (MI355X); Triton small-M K-fold tier routed only for
+      decode M<=8 (cases M=3 and M=6)
+    - 16x16 output tile with BK=256; the engineer's ISA audit found 2 waves per workgroup, each issuing the
+      same 32-MFMA chain
+    - Launch-config-only change from 2 waves and 2 stages to 1 wave and 3 stages, waves_per_eu 0; per the engineer's
+      report, 88 VGPR and 0 scratch per wave
+    - 'In the engineer''s paired screen: +2.9% at M=3 and +1.75% at M=6 with bit-identical output; 1 wave with
+      2 stages also gained; 2 waves with 3 stages lost'
+    - Larger decode M and prefill cases do not use this tier; the engineer read their movement in the benchmark
+      as noise
+    summary: Dropping a 16x16 small-M Triton GEMM tier from two waves to one per workgroup (with 3 stages)
+      removed what the engineer's ISA audit showed was duplicated MFMA work. It was associated with a small
+      gain over its parent for bf16 decode M<=8 on gfx950. The engineer flagged the M=6 margin as only just
+      above his kill threshold and in need of more paired runs.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: bf16
+      shape_layout: N=6144 K=2048 row-major; decode M=1-64, prefill M=1936-32768
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
 shared_cards:
 - flydsl-a8-data-movement-helpers
 - flydsl-a8-interleaved-schedule

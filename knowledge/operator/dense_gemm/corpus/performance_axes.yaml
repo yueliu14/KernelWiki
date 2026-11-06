@@ -589,6 +589,8 @@ dependencies:
   decision_refs:
   - flydsl-hgemm-config-space
   - flydsl-hgemm-tiling-validity
+  - flydsl-hgemm-decode-slice-k-warps-fp32-partials
+  - small-tile-waves-per-workgroup-duplicate-mfma-audit
 - id: split_k_depends_on_tile_k
   axes:
   - work_partition
@@ -628,6 +630,7 @@ dependencies:
   - flydsl-hgemm-config-space
   - gemm-blockscale-shipped-bucket-structure
   - gemm-asm-tile-inventory-and-selection
+  - gemm-k-fold-into-mfma-n-for-tiny-m-decode
 - id: async_copy_is_family_and_arch_specific
   axes:
   - memory_access

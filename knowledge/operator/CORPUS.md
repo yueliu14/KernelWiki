@@ -16,11 +16,11 @@ knowledge/operator/<operator>/corpus/
 
 The [operator catalog](catalog.yaml) and this generated navigation page live alongside the operator directories. The shared production and validation tools live under [tools/corpus](../../tools/corpus/README.md).
 
-**23 operators · 109 canonical cards · 4481 snapshot-qualified source observations · 359 shipped groups.** Shared references are not counted as additional knowledge records.
+**23 operators · 112 canonical cards · 4481 snapshot-qualified source observations · 359 shipped groups.** Shared references are not counted as additional knowledge records.
 
 ## Upstream PR review coverage
 
-22 canonical PR reports. reviewed: 49, unreviewed: 0, unresolved: 37, blocked: 23.
+22 canonical PR reports. reviewed: 49, unreviewed: 3, unresolved: 37, blocked: 23.
 
 Counts describe review coverage, not successful optimizations. Reports with missing measurements remain explicit; shared references do not duplicate results.
 
@@ -52,7 +52,7 @@ Counts describe review coverage, not successful optimizations. Reports with miss
 | operator | owned cards | shared cards | owned observations | reading |
 |---|---:|---:|---:|---|
 | [batched_gemm](batched_gemm/README.md) | 2 | 7 | 178 | [Decisions](batched_gemm/corpus/decisions.md) · [Evidence](batched_gemm/corpus/source_evidence.md) |
-| [dense_gemm](dense_gemm/README.md) | 19 | 14 | 303 | [Decisions](dense_gemm/corpus/decisions.md) · [Evidence](dense_gemm/corpus/source_evidence.md) |
+| [dense_gemm](dense_gemm/README.md) | 22 | 14 | 303 | [Decisions](dense_gemm/corpus/decisions.md) · [Evidence](dense_gemm/corpus/source_evidence.md) |
 | [gemm_epilogue_fused](gemm_epilogue_fused/README.md) | 4 | 26 | 304 | [Decisions](gemm_epilogue_fused/corpus/decisions.md) · [Evidence](gemm_epilogue_fused/corpus/source_evidence.md) |
 | [scaled_quant_gemm](scaled_quant_gemm/README.md) | 12 | 15 | 577 | [Decisions](scaled_quant_gemm/corpus/decisions.md) · [Evidence](scaled_quant_gemm/corpus/source_evidence.md) |
 | [skinny_gemv_decode](skinny_gemv_decode/README.md) | 2 | 18 | 143 | [Decisions](skinny_gemv_decode/corpus/decisions.md) · [Evidence](skinny_gemv_decode/corpus/source_evidence.md) |
