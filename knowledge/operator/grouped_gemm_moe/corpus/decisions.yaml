@@ -75,6 +75,33 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/delete-the-satellite-dispatches-once-both-moe-gemms-sit-at-t-moe-grouped-gemm-gfx950-both.md
       artifacts: not_published
       verification: not_reproduced
+  - outcome: mixed
+    conditions:
+    - MXFP4 two-stage MoE on gfx950 (MI355X) where a separate routing-sort node feeds gemm2's sorted-route
+      metadata and zeroes its output buffer.
+    - Routing with 257 experts, top-k 9 and 16-row sorted blocks; decode M=1-42 was the targeted regime.
+    - 'Candidate changes: folding the sort or the output zero-fill into the stage-1 grid, switching the sort
+      backend route, or remapping stage-1 workgroups across XCDs.'
+    - No step kept a change; each kernel was left unchanged or reverted, so the recorded deltas against the
+      parent are not attributable to a boundary rewrite.
+    summary: 'No boundary change survived: by the engineers'' reports, a sort-into-gemm1 fold must reproduce
+      all of gemm2''s sorted-route metadata (per-block expert ids, padded sorted ids, reverse map, zeroed padding
+      weights) and take over zeroing gemm2''s output, their microbenchmark sized the zero-fill fold at 0.1–0.26
+      µs per sort node (too small to pursue), and an alternative sort route regressed and was reverted.'
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: mxfp4
+      shape_layout: decode M=1-42; prefill M=256-32768
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        4 recorded steps; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
 - id: moe-live-config-and-scale-domain
   type: performance_candidate
   axes:

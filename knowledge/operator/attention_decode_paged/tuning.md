@@ -12,7 +12,6 @@ sources:
   - https://rocm.docs.amd.com/en/latest/how-to/rocm-for-ai/inference-optimization/workload.html
   - https://vllm.ai/blog/2026-02-27-rocm-attention-backend
 ---
-
 # attention_decode_paged — tuning
 
 Paged decode is **memory-bandwidth + launch-latency bound**, not FLOP-bound (the query is one token).
@@ -35,6 +34,15 @@ into chunks across CUs, compute partial `(O, m, ℓ)` per chunk, then a **reduce
 - Triton flash-decoding: `NUM_KV_SPLITS` constexpr; combine in a stage-2 reduce kernel.
 - **Rule**: more splits when batch×heads is small (fill CUs); fewer when batch is already large (avoid
   reduce overhead). The auto heuristics encode this — trust them first.
+- **Recorded (sliding-window paged decode, split-K, gfx950):** the best split count fell as batch grew:
+  64 at bs1-2, 32 at bs3-4, 16 at bs5-8. Keeping 64 at bs5+ regressed by up to 10%; 16 → 64 at bs1
+  gained about 10%. Keying the table on batch only kept it graph-safe. The reduce needed a power-of-2
+  SPLITS where it sizes `tl.arange` by it.
+- **Fusing the reduce into the split kernel did not pay in recorded runs.** In a sparse-MLA decode run
+  the engineer measured a last-CTA arrival handshake alone (gpu-scope release atomic) at 5458–7725
+  ns/call vs a 1790 ns dispatch floor. In a split-K decode chain, acq_rel atomics added 14.6 us at the
+  smallest case and a polling sentinel protocol cost about as much as the launch it removed; the
+  engineer reported normal and `.cs` stores were not coherent across XCDs. Only these forms were measured.
 
 ## Lever 2 — KV-cache layout & coalescing
 - **NHD vs HND**: pick the layout the kernel reads coalesced. vLLM's custom path reshapes to
@@ -44,6 +52,8 @@ into chunks across CUs, compute partial `(O, m, ℓ)` per chunk, then a **reduce
 - **block_size / page_size**: 16 common; larger pages reduce block-table indirection but coarsen memory.
   Tune `--page-size N` per model.
 - Verify coalescing in ISA: want `global_load_dwordx4` / `buffer_load_dwordx4` on the KV reads.
+- Two kept split-K rewrites replaced masked KV loads (compiled to exec-mask branches) with unmasked
+  clamped-index loads, issuing block-table and K/V loads before the first wait.
 
 ## Lever 3 — MFMA path vs small-head path
 vLLM custom paged-attn has two kernels:
@@ -52,12 +62,17 @@ vLLM custom paged-attn has two kernels:
 Plus `paged_attention_ll4mi_reduce_kernel` for the cross-split softmax reduce. Templated on `BLOCK_SIZE`,
 KV dtype, fp8 KV. Use `matrix_instr_nonkdim=16`, `waves_per_eu` to trim VGPRs (decode is memory-bound →
 favor occupancy 3-4).
+- Recorded sweep (Triton split-K decode, gfx950): `num_warps=1` for partials and reduce gained 2-3% /
+  2-4%; `num_stages=1` lost 13% at bs1; `waves_per_eu=1` lost 6-7%, 2/4 were neutral; `kpack` is a
+  no-op on gfx950.
 
 ## Lever 4 — launch overhead (small batch)
 Decode at small batch is launch-bound. Levers: HIP-graph capture (CUDA-graph equiv), persistent kernels
 (`SGLANG_AITER_MLA_PERSIST=1`), and **unified attention** (one kernel for chunked-prefill+decode, avoids
 two launches — see [../chunked_prefill/overview.md](../chunked_prefill/README.md)). `HSA_NO_SCRATCH_RECLAIM=1` is near-mandatory on
 MI300X (stops scratch-reclaim idle gaps).
+One graph-timed harness charged about 3 us per empty launched kernel, but removing the reduce
+launch via in-kernel sync did not pay (Lever 1).
 
 ## Head-dim / GQA specifics
 - Supported head sizes (aiter custom paged-attn): **64, 80, 96, 112, 120, 128, 192, 256** — 192/256 are
@@ -67,6 +82,9 @@ MI300X (stops scratch-reclaim idle gaps).
   head across its query-head group in-register (no KV replication in HBM) — see
   [../gqa_mqa_attention/overview.md](../gqa_mqa_attention/README.md).
 - `max_seq_len ≤ 65536` for the custom paged-attn fast path.
+- Packing query tokens × heads of one KV head into M (each KV page gathered once per request) was kept
+  in two recorded Triton split-K rewrites, with `matrix_instr_nonkdim=16` (the default 32x32 MFMA was
+  slower). Raising BM through launch meta alone, body unchanged, regressed (BM=64: -16% at bs1).
 
 ## fp8 KV-cache
 Store K/V as fp8 (half the KV bandwidth = directly faster decode), dequant on read. FNUZ on gfx942, OCP

@@ -156,12 +156,14 @@ PR association and effect confidence are **unknown** for this reviewed scope; th
 #### Use when
 
 - A framework routes full attention separately from decode or recurrent-attention layers.
+- Serving traffic includes prefill on the changed full-attention path; recorded end-to-end gains are from gfx950 (MI355X) at TP1 and TP2 with FP8 Q and FP8 KV prefill on an MXFP4 model.
 
 #### Try
 
 - Identify the actual full-attention callable and importing call sites in every worker; compare eligible backend flags without assuming the historical winner transfers.
 - Specialize a zero-prefix path only behind its real prefix-length contract, preserving nonzero-prefix fallback and per-row causal masking.
-- Measure serving with its actual prefill/decode mix and unchanged numerical contract.
+- Measure serving with its actual prefill/decode mix and unchanged numerical contract, using same-GPU or same-pair crossover rounds over more than one seed instead of a single pair/seed.
+- Report long-input and short-input/high-concurrency regimes separately: the recorded median output-throughput gain was +8.45% at 60k/600, TP1, concurrency 32 but +1.98% at 8k/1k, TP2, concurrency 256.
 
 #### Rationale
 
@@ -211,6 +213,9 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Limits
 
 - Do not infer a full-model speedup from an isolated prefill ratio. Small numerical changes can affect greedy token selection even when a loose local tolerance passes.
+- Single pair/seed comparisons are unreliable at small gains: one TP2 8k/1k trial measured -1.61% output throughput and did not repeat on that pair, while the combined median across seeds 16 and 24 was +1.98%.
+- Recorded serving results cover one MXFP4 model with FP8 Q/KV prefill on gfx950 at TP1 and TP2; other models, dtypes, parallel layouts and gfx targets are unmeasured.
+- Correctness evidence was the author's attention correctness suite and successful serving requests; no model-level accuracy comparison was reported.
 
 ## Shared decisions
 

@@ -257,12 +257,16 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Use when
 
 - The deployed CU count, dtype, shape and execution boundaries are known.
+- Compiled ISA of the dispatched configuration can be inspected per region.
 
 #### Try
 
 - Count required bytes and FLOPs for the actual semantics, including sparse gathers, partial buffers and scale metadata; use the resources actually available to the process.
 - Attribute instructions and dependencies to the hot region, and compare plausible traffic/compute bounds to a matching measurement.
+- Census prologue, loop body and epilogue separately (insts, MFMA, LDS ops, full vs partial waits); fixed cost can rival a loop trip, and a kernel may have no loop.
+- Re-derive inherited premises (VGPR/spill counts, MFMA shape per gfx) from the current compiled object; a stale table can make a direction look fundable.
 - Use a controlled ablation to test the proposed cause. A deliberately incomplete control must stay separate from correctness-gated candidate results.
+- If the census disproves the mechanism, record a null result without GPU budget; if a numerics-changing edit shows zero error, check for compiler normalisation before pricing.
 
 #### Rationale
 
@@ -291,6 +295,9 @@ Raw run artifacts are not published here. Historical reports have not been repro
 #### Limits
 
 - A high counter or fraction of peak does not prove that reducing it will improve latency. Bounds and measured performance are separate claims.
+- In the recorded steps (sparse-attention prefill, paged-attention decode, fp8 batched GEMM on gfx950) it yielded diagnoses and null results, none built on; it narrows search but does not by itself deliver speedup.
+- A census closes a candidate only for the region and dispatched configuration it was taken on.
+- Reading zero numerical error as backend normalisation is one engineer's interpretation (sparse-attention prefill), not a verified compiler property.
 
 <a id="method-register-limited-occupancy"></a>
 ### What resource limits occupancy on a matrix-core kernel?
@@ -335,6 +342,13 @@ Raw run artifacts are not published here. Historical reports have not been repro
   Conditions: Matrix instructions use architecture-specific vector and accumulator register allocation.
   Verification: <code>not_reproduced</code>.
   Sources: [Historical summary 1](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/cdna4-sums-archvgpr-and-agpr-for-occupancy-method-gfx950-n-a.md)
+
+- **beneficial** — On this gfx950 Gluon paged FP8 MQA-logits decode kernel, occupancy was capped by the waves_per_eu hint rather than register pressure. Per the engineer's ISA reading, the inflated VGPR count was compiler padding. Raising the hint so the whole grid became resident beat the parent, and raising it past that point gave no further gain in the engineer's runs.
+  Conditions: Paged FP8 (e4m3) MQA logits scoring for the attention indexer, Gluon preshuffle kernel, on gfx950 (MI355X), Triton 3.7.0 / ROCm 7.2. Decode regime M=6-18, with a fixed split grid that the engineer reports needed only one extra resident wave per EU to become fully resident. Change limited to the waves_per_eu launch hint (2 to 3); kernel body, tiling and grid unchanged. Engineer's ISA dumps: real use about 120 VGPRs and no AGPRs. The 169 next_free_vgpr at the old setting was, per the engineer, compiler padding that enforced the hint. At 3 it dropped to 129, with no spills and no scratch. Engineer's own A/B: waves_per_eu=4 compiled to occupancy 4 but did not beat 3, which the engineer attributes to the grid already fitting at occupancy 3. Correctness, parity and graph replay passed in the engineer's runs.
+  Verification: <code>internally_validated</code>.
+  Sources: Private validation; raw artifacts are not published.
+
+  Comparison context: <code>{&quot;baseline&quot;: &quot;the parent source of the same recorded GEAK optimization step&quot;, &quot;correctness&quot;: &quot;the GEAK task&#x27;s correctness check passed for every counted step&quot;, &quot;dtype&quot;: &quot;fp8_e4m3&quot;, &quot;gfx&quot;: &quot;gfx950&quot;, &quot;protocol&quot;: &quot;GEAK task benchmark, measured independently of the engineer for each step against its parent; 1 recorded step; not re-run for KernelWiki&quot;, &quot;shape_layout&quot;: &quot;decode M=6-18&quot;, &quot;software&quot;: &quot;torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X&quot;}</code>
 
 
 #### Limits

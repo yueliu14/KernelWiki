@@ -101,12 +101,14 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 #### Use when
 
 - Token/expert routes are sorted and padded into expert-aligned work blocks.
+- Also applies when one sorting implementation is swapped for another behind the same output contract (sorted IDs, weights, expert IDs, valid-count, unit_size, workspace), e.g. OPUS versus FlyDSL sorting on gfx950.
 
 #### Try
 
 - Carry sorted token IDs, sorted route weights, sorted expert IDs and valid-count metadata together.
 - Use the same unit_size for sorting/padding and downstream compute; preserve sentinel slots rather than interpreting padding as real routes.
 - Size and initialize the sorting workspace according to token count, experts, top-k and alignment.
+- When replacing the sorting kernel behind the same contract, check downstream model accuracy and time the operator separately at each relevant token count. Do not extrapolate from a single token count.
 
 #### Rationale
 
@@ -160,6 +162,8 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 - A padding factor selected for one GEMM tile is not automatically legal for another.
 - The cached wrapper workspace is not by itself evidence of arbitrary concurrent-stream safety.
+- In one reported graph-path operator table, a replacement sorting kernel's latency was token-count dependent (DeepSeek-V4, E=385, topk=7, timing estimator unspecified). It gained at tokens=1, regressed slightly at tokens=32 and tied at tokens=128.
+- Reported serving throughput gains for a sorting replacement do not attribute the benefit to any specific output field or padding choice. Those runs used DeepSeek-R1-0528 FP8 and MXFP4, TP8, gfx950, ISL=8192, OSL=1024 and concurrency=4. Other models, concurrencies and gfx targets were not measured.
 
 <a id="router-launch-and-selection-cost"></a>
 ### Is router top-k limited by launch preparation or by the selection network?

@@ -114,4 +114,164 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/sparse-attn-triton2triton-opt-gfx942-gfx950.md
       artifacts: not_published
       verification: not_reproduced
+- id: single-trip-full-width-qk-pv-dots
+  type: performance_candidate
+  axes:
+  - compute_schedule
+  - data_movement
+  match:
+    operator_families:
+    - sparse_attention_nsa
+    target_languages:
+    - triton
+    gfx:
+    - gfx950
+  question: On an attention path that processes all selected KV slots in one tile, should QK and PV be computed
+    as one full head-width dot instead of several head-dim-group dots?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: unreviewed
+  conditions:
+  - The kernel has a code path where the KV loop runs exactly one trip (all selected slots for a split fit
+    one tile), e.g. small-batch sparse MLA decode
+  - That path splits the value head dimension into groups, each with its own KV gather, QK dot and PV dot accumulator
+  - Another path of the same kernel already uses full-width operands, which suggests the tile fits; confirm
+    no scratch in the single-trip path's ISA after the change
+  - Recorded on fp8_e4m3 sparse MLA decode, Triton, gfx950
+  actions:
+  - Load the full q tile once and gather each selected KV row once at full D_V width, keeping the rope tail
+    as a separate small load
+  - Compute one full-width QK dot plus the tail dot, and one PV dot into a single full-width accumulator
+  - On a strictly single-trip path, drop the online-softmax alpha rescale, since the accumulator starts at
+    zero
+  - Store the full-width accumulator directly in the epilogue and remove the now-dead per-group loads and accumulators
+  - Check the compiled ISA for VGPR count, scratch and barrier count before benchmarking, and re-run a same-slot
+    control of the parent
+  alternatives:
+  - Keep the per-group split when the full-width tile spills or lowers occupancy for the given D_V and BLOCK_H
+  - Apply full-width operands only on multi-trip paths and leave the single-trip path grouped
+  - Retune BLOCK_H or the split count instead of changing the contraction shape
+  why:
+  - Fewer, larger dots were associated with fewer layout conversions, LDS allocations and barriers in the engineer's
+    ISA and TTGIR counts
+  - One contiguous full-width gather per KV row replaces several narrower strided gathers
+  - On a single trip, the rescale multiply on every accumulator is redundant work
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Supported by one recorded step on one kernel; other gfx targets, dtypes and head dims were not measured
+  - The engineer reported the benefit only in the batch-1 case; the other decode batch cases were neutral within
+    noise
+  - The engineer inferred an occupancy of 2 from the VGPR count and did not profile it; no occupancy gain was
+    reported, so the VGPR drop from 244 to 228 should not be read as an occupancy improvement
+  - Removing the alpha rescale is exact only when the path is guaranteed to run a single KV trip
+  - A full-width tile raises the peak register footprint per dot; it may spill under larger BLOCK_H or D_V
+  experience:
+  - outcome: beneficial
+    conditions:
+    - fp8_e4m3 sparse MLA decode with split-K over selected KV slots, Triton on gfx950 (MI355X), decode M=3-42
+    - Changed only the single-KV-trip path, where all selected slots for a split fit in one tile; the multi-trip
+      pipelined path already used full-width operands and was left unchanged
+    - The engineer reported the gain concentrated in the batch-1 decode case; the other batch cases read within
+      noise in the engineer's runs
+    - Correctness, including a gather check with byte offsets past 2^31, matched the parent's error against
+      the fp32 reference, per the engineer
+    summary: On the single-trip decode path, one D_V-wide KV gather with one QK dot (plus rope tail) and one
+      PV dot, with no alpha rescale, beat the four-group split parent. The engineer associated this with fewer
+      VGPRs (244 to 228), fewer barriers and fewer lgkmcnt waits; occupancy was inferred from the VGPR count,
+      not profiled.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: fp8_e4m3
+      shape_layout: decode M=3-42
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
+- id: fold-constant-dequant-scale-into-epilogue-normalization
+  type: performance_candidate
+  axes:
+  - compute_schedule
+  - implementation_contract
+  match:
+    operator_families:
+    - sparse_attention_nsa
+    target_languages:
+    - triton
+    - gluon
+    - hip
+    - flydsl
+    gfx:
+    - gfx950
+  question: Should a constant dequant scale on the softmax P operand be applied per inner-loop dot or once
+    in the epilogue normalization?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: unreviewed
+  conditions:
+  - Online-softmax attention (dense or sparse selected-slot) whose P tile is quantized to a low-precision dot
+    dtype with a single scale shared by all tiles and rows
+  - The accumulator update is linear in the dot result (acc = acc * alpha + dot(P, V) * scale), so a constant
+    factor commutes with the alpha rescale
+  - The final normalization already multiplies acc by a reciprocal of the softmax denominator l
+  actions:
+  - Drop the per-iteration multiply of each dot(P, V) result by the P dequant scale for every accumulator group
+  - Multiply the scale into the epilogue reciprocal (scale / l instead of 1 / l), keeping the l == 0 guard
+    that yields zero output
+  - Check the runtime ISA for register count and scratch after the change, since the saving can be a few VGPRs
+    rather than an occupancy step
+  - Measure seed and candidate alternately in the same GPU slot, because the expected gain is small
+  alternatives:
+  - Keep the per-iteration scale multiply when the scale varies per tile, per block or per row of P
+  - If the quantization multiplier is already a power of two, moving the scale should be bit-identical; changing
+    the multiplier alters fp8 rounding of P and needs its own correctness and accuracy check (untested)
+  why:
+  - A constant factor can be pulled through the sum and through the alpha rescale of online softmax, so applying
+    it once at the end is algebraically equivalent
+  - It removes one multiply per accumulator element per iteration; in the one recorded kernel the measured
+    effect was 254 vs 256 VGPRs and a small timing gain
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Valid only for a scale that is uniform across all iterations; per-block or per-token scales must still
+    be applied inside the loop
+  - With fp8 e4m3 (fp8_max 448, not a power of two) the result is not bit-identical; rerun the correctness
+    tolerance check
+  - Recorded once, on a gfx950 sparse MLA decode kernel at occupancy 1; the engineer-reported gain was small
+    and nearly flat in the highest-count bucket (bs2)
+  - Did not remove spills under waves_per_eu=2 in that kernel; the combination was rejected as slower than
+    the seed
+  experience:
+  - outcome: beneficial
+    conditions:
+    - Sparse MLA decode attention, split-K Triton kernel, fp8_e4m3 P operand quantized with one constant scale
+      (P multiplied by fp8_max before the cast), gfx950
+    - Decode regime M=3-42; the kernel ran at occupancy 1 with zero scratch before and after the change
+    - Applied alone; the engineer reported that combining it with waves_per_eu=2 still spilled registers and
+      was slower than the seed
+    summary: Applying the constant fp8 P dequant scale once in the epilogue normalization was beneficial over
+      the parent. The engineer reported same-slot A/B gains in every decode bucket, nearly flat in the highest-count
+      bucket (bs2), with 254 vs 256 VGPRs and no scratch. The fp8 output was not bit-identical but passed correctness.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: fp8_e4m3
+      shape_layout: decode M=3-42
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
 shared_cards: []

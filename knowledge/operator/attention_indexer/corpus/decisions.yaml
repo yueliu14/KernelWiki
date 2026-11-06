@@ -126,6 +126,8 @@ cards:
     together; each FN operand contributes a factor of two.
   - Retain the wrapper's contiguous Q/KV materialization and logical-rank restoration for single-token scales
     and weights.
+  - Treat these format steps as correctness requirements, not a speed lever; benchmark against the current
+    Gluon baseline per shape.
   alternatives:
   - Use a native-format path or an explicit higher-precision reference before attempting a byte reinterpretation.
   why:
@@ -137,6 +139,11 @@ cards:
   limitations:
   - The conversion is specific to the stated e4m3 formats and implementation; it is not a generic FP8 cast
     rule.
+  - 'Reported comparisons do not isolate format conversion: on gfx950 with clean_logits=False, FlyDSL was slower
+    than a newer Gluon baseline at batch=1, Sq=Skv=4096, H=64 but faster at batch=2, Sq=Skv=8192, H=32.'
+  - The large gfx950 gain is one fn/fn skinny prefill case (Sq=128, Skv=32768) against an older Triton/Gluon
+    baseline; the gfx942 gain was attributed to fused clean_logits initialization; all are low-confidence single
+    cases.
   references:
   - knowledge/operator/attention_indexer/README.md
   experience:
@@ -501,6 +508,36 @@ cards:
           axes:
           - compute_schedule
           backend: flydsl
+  - outcome: beneficial
+    conditions:
+    - Paged FP8 (fp8_e4m3) MQA indexer logits, decode M=6-18, on gfx950 (MI355X); scope limited to that recorded
+      regime.
+    - Only the 3-row fused query body changed; split-KV CTAs per CU went from 3 to 2 (768 to 512 CTAs) and
+      other fuse widths kept the old value.
+    - The split count was a host constant computed from CU count and query-tile count only, never from context
+      length, so a CUDA graph captured at one context stays valid at another.
+    - Engineer's own A/B covered long decode contexts of about 104k to 418k tokens at batch 2 to 3. Most buckets
+      gained; the 261k bucket regressed about 3.4%, which the engineer attributed to 128-token stage-unit rounding
+      at the new split count.
+    - Correctness and graph-replay checks passed in the engineer's runs, with worst max_rel_err 0.00069 in
+      both arms.
+    summary: For the 3-row fused decode body, fewer but longer split-KV CTAs (2 per CU instead of 3) beat the
+      parent. The engineer's A/B reported a weighted 1.0200 gain and attributed it to spreading the per-CTA
+      prologue cost over more loop iterations, with one context bucket regressing from split-rounding.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: fp8_e4m3
+      shape_layout: decode M=6-18
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
 - id: indexer-topk-row-index-contract
   type: constraint
   axes:
@@ -690,4 +727,247 @@ cards:
       - https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/sparse-attn-triton2triton-opt-gfx942-gfx950.md
       artifacts: not_published
       verification: not_reproduced
+- id: gfx950-fp8-k128-scaled-mfma-unit-scales
+  type: performance_candidate
+  axes:
+  - compute_schedule
+  - implementation_contract
+  - numerical_contract
+  match:
+    operator_families:
+    - attention_indexer
+    target_languages:
+    - gluon
+    gfx:
+    - gfx950
+  question: On gfx950, should an FP8 score dot with reduction length 128 use one unit-scale 16x16x128 scaled
+    MFMA instead of four 16x16x32 FP8 MFMAs?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: unreviewed
+  conditions:
+  - Target is gfx950 (CDNA4), where the 16x16x128 f8f6f4 scaled MFMA exists
+  - Both operands are FP8 e4m3 and the per-MFMA reduction length is exactly 128 (e.g. index head dim 128)
+  - Dequantization scales are applied outside the MFMA (after accumulation), so the instruction can run with
+    unit scales
+  - 'Measured setting: decode (M=6-18) with one score MFMA group per KV chunk'
+  actions:
+  - Gate on CDNA version 4 and call the scaled MFMA (gl.amd.cdna4.mfma_scaled) with e4m3 operands and None
+    (unit) scales
+  - Build the MFMA layout with instr_shape [16,16,128] and set both dot-operand layouts to k_width=32
+  - Keep the 16x16x32 FP8 MFMA path, its layout and k_width=16 for non-CDNA4 targets
+  - Route every MFMA call site (main loop, pipelined stages, tail, fused extra query rows) through one helper
+    so all paths use the same instruction and layout
+  - Re-run score correctness and top-k index parity, because the 128-wide scaled instruction may accumulate
+    in a different order than four chained 16x16x32 MFMAs
+  - Re-dump the ISA to confirm the MFMA count, VGPR use and occupancy after the change
+  alternatives:
+  - Keep four 16x16x32 FP8 MFMAs per 128-wide dot, which also works on CDNA3
+  - Pass real scales to the scaled MFMA instead of applying them afterwards (not tested in this step)
+  - Use a different MFMA tile shape or layout for the score dot
+  why:
+  - One instruction covers the whole 128-wide reduction, so fewer MFMA instructions are issued per chunk
+  - With unit scales the scaled MFMA computes the same e4m3 products as the unscaled FP8 MFMA
+  - The gain is associated with replacing four MFMAs by one per 128-wide dot; the mechanism was not profiled
+    in the measured step
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Evidence is one recorded step on one gfx950 FP8 decode indexer kernel; prefill and other shapes were not
+    measured
+  - Reduction lengths other than 128 and other FP8 formats were not tested
+  - Not available on CDNA3 (gfx942); that target keeps the 16x16x32 path
+  - The ISA, VGPR and occupancy claims were inherited from an earlier round and not re-verified in the measured
+    step
+  - A changed accumulation order can change score bits and therefore top-k selections; parity must be checked
+    rather than assumed
+  experience:
+  - outcome: beneficial
+    conditions:
+    - Gluon paged MQA indexer logits kernel in decode (M=6-18) on gfx950 (MI355X), FP8 e4m3 Q and K
+    - Score reduction (head) dimension of 128 per MFMA call; the K scale and per-head weights are applied after
+      the MFMA, so the scaled MFMA ran with unit scales
+    - 'Every MFMA site was switched together through one helper: main loop, pipelined stages, tail, and the
+      fused extra draft query rows that reuse the same K operand'
+    - The task's correctness checks passed; the engineer's interleaved same-slot rerun reported a consistent
+      gain over the parent on every decode case, but did not re-dump the ISA
+    summary: On gfx950 FP8 paged MQA decode logits, issuing one unit-scale 16x16x128 scaled MFMA per 128-wide
+      dot instead of four 16x16x32 FP8 MFMAs improved the step over its parent, and later rounds built on it.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: fp8_e4m3
+      shape_layout: decode M=6-18
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
+- id: indexer-decode-query-row-fusion-per-k-tile
+  type: performance_candidate
+  axes:
+  - work_partition
+  - data_movement
+  - compute_schedule
+  match:
+    operator_families:
+    - attention_indexer
+    target_languages:
+    - gluon
+    gfx:
+    - gfx950
+  question: How many decode query rows should share each loaded K tile in paged MQA-logits scoring, and when
+    should a deeper fusion be selected?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: unreviewed
+  conditions:
+  - Paged MQA-logits decode where several next-n/draft rows of a row group read the same KV pages
+  - The kernel already fuses rows and loads each K tile once per workgroup
+  - Row-group count is divisible by the candidate fusion factor and row groups do not straddle sequences
+  - Long contexts, where per-row K-tile loads and layout conversions are repeated work
+  actions:
+  - Add the fusion factor as a constexpr and compile a separate specialization in which each K tile feeds one
+    MFMA per fused row
+  - Give every fused row its own Q load, weight load, context length, -inf window/causal mask and output-row
+    store; share only the K tile
+  - Re-derive SplitKV so the total number of workgroups is kept when fusion reduces the row-group count
+  - Select the fusion factor on the host from a Python-int shape parameter, so a captured graph freezes the
+    choice
+  - Before timing, check the ISA for VGPR count, occupancy, scratch and spills in both the old and the new
+    specialization
+  - Measure short-context and long-context cases separately and gate the deeper fusion to the regime where
+    it wins
+  alternatives:
+  - Keep the shallower (2-row) fused body for all shapes
+  - Gate on each call's actual context length instead of the pool-wide max_model_len
+  - Recover parallelism through a larger split-KV instead of deeper row fusion
+  why:
+  - Each K tile load and its layout conversion is amortized over more query rows
+  - More MFMA work is issued per loaded K tile, raising arithmetic per byte of KV read
+  - Keeping per-row lengths and masks preserves each row's scores, so top-k selection is unchanged
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - One recorded step on gfx950, preshuffled-KV path only; variable-context, non-preshuffled and gfx1250 paths
+    were not changed
+  - The engineer reported that the ungated 3-row body was slower (-3..-7%) at the 104k and 173k context cases,
+    so the gain is regime-specific
+  - In serving, max_model_len is pool-wide, so a gate on it does not track the context length of each call
+  - The gate assumes row groups never straddle sequences
+  - 'Register use rises with fusion depth: the engineer reported 146 VGPRs for the 3-row variant versus 122
+    for the 2-row variant, at the same occupancy; deeper fusion may cross an occupancy limit'
+  experience:
+  - outcome: beneficial
+    conditions:
+    - Paged FP8 MQA-logits indexer decode in Gluon, preshuffled-KV path, excluding the variable-context and
+      gfx1250 variants
+    - Row-group count divisible by 3, upgrading an existing 2-row fused body to 3 rows
+    - Applied only when the host-side max_model_len is at least 200k; shorter calls stayed on the 2-row body
+    - SplitKV re-derived so the total workgroup count did not drop when fusion reduced the number of row groups
+    summary: Fusing a third decode query row onto each shared K tile, gated to long max_model_len, beat its
+      2-row parent. The engineer associated the gain with the long-context cases and reported the shorter-context
+      cases as roughly neutral because the gate kept them on the 2-row body.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: fp8_e4m3
+      shape_layout: decode M=6-18
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
+- id: relu-on-mfma-accumulator-integer-max
+  type: performance_candidate
+  axes:
+  - compute_schedule
+  - numerical_contract
+  match:
+    operator_families:
+    - attention_indexer
+    target_languages:
+    - gluon
+    - triton
+    gfx:
+    - gfx950
+  question: Can a ReLU on f32 MFMA accumulator output be lowered to one integer max instead of a canonicalize
+    plus a float max?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: unreviewed
+  conditions:
+  - The kernel applies max(x, 0) to f32 matrix-core (MFMA) output before scaling or reduction
+  - 'The ISA shows two v_max_f32 per element after the MFMA: LLVM does not treat MFMA results as canonical,
+    so it inserts a canonicalize before the real max'
+  - Epilogue VALU work sits in the main loop alongside MFMA, so removing VALU instructions can shorten the
+    iteration
+  - Only finite accumulator values need correct ReLU semantics (no NaN propagation contract)
+  actions:
+  - Inspect the compiled ISA around each ReLU for a canonicalize v_max_f32 followed by the real max
+  - Bitcast the f32 value to int32, take an integer max with 0, and bitcast back to f32 (one v_max_i32)
+  - Apply the rewrite at every ReLU site of the path (prologue, main loop, tail and any fused extra rows),
+    not only the steady-state loop
+  - Recount main-loop VALU, VGPRs, occupancy and spills from the ISA after the change
+  - Re-run correctness and selected-index parity, since scores feed top-k
+  alternatives:
+  - Keep the float max where the compiler already emits a single max or the epilogue is off the critical path
+  - Fold the ReLU into the weight scale as sign(w) * max(o*|w|, 0); in the recorded attempt the engineer reported
+    it de-packed the multiplies, raised VALU and VGPRs, and left speed flat
+  why:
+  - A negative IEEE f32 has its sign bit set, so it is a negative int32 and an integer max with 0 maps it to
+    +0.0
+  - Non-negative f32 values order the same as their int32 bit patterns, so non-negative inputs pass through
+    unchanged
+  - One v_max_i32 replaces a canonicalize v_max_f32 plus the max, freeing VALU issue slots in an MFMA-interleaved
+    loop
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - NaN handling differs from the float max; use the rewrite only where accumulator output is known finite
+  - -0.0 becomes +0.0, which matches max(-0.0, 0.0) only up to the sign of zero
+  - Recorded on one fp8_e4m3 indexer decode step on gfx950; the gain depends on epilogue VALU being on the
+    critical path
+  - Rewrites that remove the canonicalize by reshaping the math can break packed multiplies and raise VGPRs,
+    so recheck the ISA
+  experience:
+  - outcome: beneficial
+    conditions:
+    - fp8_e4m3 paged MQA-logits indexer decode on gfx950 (MI355X), Gluon kernel with ReLU, per-head weight
+      scale and row reduction on MFMA f32 output, including fused second query rows
+    - decode M=6-18; the engineer's buckets were batch 2-3 at contexts from 104k to 418k tokens and all improved
+    - the rewrite was applied at every ReLU site (prologue, main loop, tail) of one gfx950 preshuffle code
+      path
+    - the engineer's ISA count reported main-loop VALU 276 -> 221 with MFMA count, VGPRs (129), occupancy (3)
+      and spills (0) unchanged
+    - MFMA output in this kernel is finite, so the NaN difference of the integer max did not apply; correctness,
+      parity and graph replay passed
+    summary: Replacing the float ReLU on MFMA output with an int32 max on its bits removed the extra canonicalize
+      max per element. The step beat its parent at unchanged register use and occupancy, and was built on in
+      later rounds.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: fp8_e4m3
+      shape_layout: decode M=6-18
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
 shared_cards: []

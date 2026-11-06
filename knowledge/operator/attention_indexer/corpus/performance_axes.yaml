@@ -187,6 +187,9 @@ dependencies:
   decision_refs:
   - indexer-mqa-score-semantics
   - indexer-topk-row-index-contract
+  - gfx950-fp8-k128-scaled-mfma-unit-scales
+  - indexer-decode-query-row-fusion-per-k-tile
+  - relu-on-mfma-accumulator-integer-max
 - id: packed-scales
   axes:
   - cache_layout

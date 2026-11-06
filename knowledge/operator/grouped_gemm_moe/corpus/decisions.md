@@ -85,6 +85,13 @@ Raw run artifacts are not published here. Historical reports have not been repro
   Verification: <code>not_reproduced</code>.
   Sources: [Historical summary 1](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/e2e_workflow/knowledge/learned/moe-mxfp4-grouped-authored-gfx950-vllm.md), [Historical summary 2](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/axes-that-stayed-closed-on-a-bf16-fused-moe-with-a-decode-we-moe-grouped-gemm-gfx950-both.md), [Historical summary 3](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/kernel_workflow/knowledge/learned/delete-the-satellite-dispatches-once-both-moe-gemms-sit-at-t-moe-grouped-gemm-gfx950-both.md)
 
+- **mixed** — No boundary change survived: by the engineers' reports, a sort-into-gemm1 fold must reproduce all of gemm2's sorted-route metadata (per-block expert ids, padded sorted ids, reverse map, zeroed padding weights) and take over zeroing gemm2's output, their microbenchmark sized the zero-fill fold at 0.1–0.26 µs per sort node (too small to pursue), and an alternative sort route regressed and was reverted.
+  Conditions: MXFP4 two-stage MoE on gfx950 (MI355X) where a separate routing-sort node feeds gemm2's sorted-route metadata and zeroes its output buffer. Routing with 257 experts, top-k 9 and 16-row sorted blocks; decode M=1-42 was the targeted regime. Candidate changes: folding the sort or the output zero-fill into the stage-1 grid, switching the sort backend route, or remapping stage-1 workgroups across XCDs. No step kept a change; each kernel was left unchanged or reverted, so the recorded deltas against the parent are not attributable to a boundary rewrite.
+  Verification: <code>internally_validated</code>.
+  Sources: Private validation; raw artifacts are not published.
+
+  Comparison context: <code>{&quot;baseline&quot;: &quot;the parent source of the same recorded GEAK optimization step&quot;, &quot;correctness&quot;: &quot;the GEAK task&#x27;s correctness check passed for every counted step&quot;, &quot;dtype&quot;: &quot;mxfp4&quot;, &quot;gfx&quot;: &quot;gfx950&quot;, &quot;protocol&quot;: &quot;GEAK task benchmark, measured independently of the engineer for each step against its parent; 4 recorded steps; not re-run for KernelWiki&quot;, &quot;shape_layout&quot;: &quot;decode M=1-42; prefill M=256-32768&quot;, &quot;software&quot;: &quot;torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X&quot;}</code>
+
 
 #### Background
 

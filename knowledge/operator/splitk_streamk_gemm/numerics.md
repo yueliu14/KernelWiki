@@ -10,7 +10,6 @@ sources:
   - https://arxiv.org/abs/2301.03598
   - https://triton-lang.org/main/getting-started/tutorials/09-persistent-matmul.html
 ---
-
 # splitk_streamk_gemm — numerics
 
 ## TL;DR
@@ -30,9 +29,31 @@ sources:
 - For fp8/mxfp inputs, scales apply per dense rules before the cross-partition reduction →
   [../scaled_quant_gemm/numerics.md](../scaled_quant_gemm/numerics.md).
 
+### Keeping bitwise parity when changing the split (recorded: small-M decode GEMMs)
+- **fp32 is not enough; the combine tree must match.** In a bf16 decode GEMM whose reference used 4-way
+  split-K, full-K tiles stayed bit-exact (M=1, 3, 8, 16, 17, 33, 64) only when each workgroup kept 4
+  accumulators over the same K/4 slices and summed them as (p0+p1)+(p2+p3), the reference's order.
+  A sequential p0+p1+p2+p3 sum, a contiguous full-K loop (0.68x of the tolerance) and a batched 3D
+  `tl.dot` over the slices were not bit-exact.
+- **Re-tiling is safe if each tile's K chain is unchanged.** BN/BK/warps/stages and grid-order changes
+  (e.g. XCD-contiguous tile order) stayed bitwise identical in these runs; each output tile still ran
+  its MFMA chain over K in ascending order.
+
+### Deterministic single-launch reduction: correct, not automatically faster
+- A fixed-order in-kernel reduction (the last CTA to take an atomic ticket reduces the fp32 partials in
+  slice order) was bitwise-exact, but in decode-sized batched/skinny GEMMs it was slower than the
+  baseline in every variant tried.
+- The engineers attribute the loss to the serialized tail (partial stores, ticket atomic, partial
+  loads): about 1–1.7 µs more than the K-work saved in one decode BMM, about 1.3–1.5 µs in another
+  decode GEMM. acq_rel ticket ordering was slowest (an L2 writeback and invalidate per CTA); the relaxed
+  variant was correct only by hardware behaviour, not by the memory model.
+- Scope: microsecond kernels at small M; larger shapes were not measured here.
+
 ## Parity gate
 - Oracle = single-pass dense fp32 reference. Expect agreement within fp accumulation tolerance; for the
   deterministic gate, use workspace reduction and require bitwise/near-bitwise match across repeats.
+- If the reference is itself a split-K kernel, bitwise parity against it requires matching its K-slice
+  boundaries and its partial-combine order (see above), not just fp32 accumulation.
 
 ## Sources
 - Stream-K (reduction/fix-up semantics): https://arxiv.org/abs/2301.03598

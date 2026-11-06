@@ -14,7 +14,6 @@ sources:
   - https://fergusfinn.com/blog/deepseek-v4-flash-mi300x/
   - ROCm/aiter@a6bb499375849eec45d68c5ccaebc8865fd422c0
 ---
-
 # sparse_attention_nsa × Triton
 
 ## TL;DR
@@ -39,6 +38,8 @@ AITER's tuned path is missing or broken.
 - `block_size=64` (selected/compressed), `window_size`, `top_k` — match the model config.
 - AMD Triton: `BLOCK_N == block_size`, `matrix_instr_nonkdim=16`, `num_warps=4`, `num_stages=1`,
   `waves_per_eu=2–3`, `schedule_hint=attention`, `knobs.amd.use_buffer_ops=ON` (indexed gather).
+- gfx950 Gluon fp8 indexer prefill (recorded runs): the split arm ran `num_warps=2`, `BLOCK_M=4`,
+  `BLOCK_KV=128`, `NUM_BUFFERS=2`. Treat the generic set above as a starting point, not as what this arm used.
 - fp8 indexer: **fnuz** on gfx942. See [tuning.md](../tuning.md).
 
 ## Numerics / parity
@@ -50,6 +51,26 @@ gated sum. See [numerics.md](../numerics.md).
   indexer. `nsa_backend.py` import block is the "which kernel ran" surface.
 - The `@triton.jit` selected/indexer kernels are clean Python rebind seams — overlay a tuned config and
   verify via `TRITON_PRINT_AUTOTUNING=1`.
+
+## Recorded optimization results (gfx950)
+Scope: the fp8 (e4m3) MQA-logits indexer prefill in Gluon (32 heads × 128, M 626–10129, KV 40k–857k), the
+paged MQA-logits decode, and sparse-MLA split-K decode (512 + rope tail, bs1–bs7). Most recorded steps that
+read this page did not beat their parent.
+- **Gate on ISA/counters before rewriting.** On the indexer prefill, engineers found that a targeted
+  `gl.convert_layout` compiled to zero instructions. They also measured an LDS bank-conflict ratio of 49.5%
+  that cost only 0.64–0.73% of CU-busy cycles; the live layout was already `PaddedSharedLayout`. Both axes
+  were closed without an edit.
+- **Prefill split arm: plan-time register knobs held, loop restructuring did not.** Two changes improved and
+  were built on: lowering the fold `NUM_CHAINS` 4→2, and gating the head-bit assignment per arm
+  (`block_kv>=128`). The engineer attributes the first to lower accumulator liveness (NC=1 spilled). The
+  engineer also reports that gfx950 has packed f32 FMA but no packed f32 max, so the ReLU stays scalar.
+  Sub-tiling the BLOCK_KV=128 loop into N_TILE=64 chunks to confine the fp32 accumulator regressed against
+  its parent.
+- **Sparse-MLA decode: fewer, wider dots per trip.** One 512-wide QK dot and one 512-wide PV dot per trip,
+  instead of four 128-wide dots each, was associated with a gain. By the engineer's ISA count it cut loop
+  barriers 18→6. Raising BLOCK_K 64→128, coupled to the split count, lost against its seed in these cases.
+- Paged-decode instruction trimming (`v_mul_u32_u24` address math, dropping an always-true mask) did not
+  beat its parent.
 
 ## Pitfalls & anti-patterns
 - **gfx942 fallback cliff:** AITER prefill/sparse MQA-logits broken on CDNA3 → dispatch refused → generic

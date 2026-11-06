@@ -46,6 +46,188 @@ cards:
   - The assertions in this builder do not establish support for every TP/EP topology.
   references:
   - knowledge/operator/fused_moe_grouped_gemm/README.md
+- id: moe-small-m-identity-routing-skip-sort
+  type: performance_candidate
+  axes:
+  - expert_layout
+  - compute_schedule
+  - implementation_contract
+  match:
+    operator_families:
+    - fused_moe_grouped_gemm
+    target_languages:
+    - flydsl
+    gfx:
+    - gfx950
+  question: At small decode M, can expert sorting be replaced by a fixed identity route-to-block mapping so
+    the sort launch disappears?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: unreviewed
+  conditions:
+  - 'Decode with few routed pairs: M*topk does not exceed the expert count, so each routed pair can own one
+    M-block.'
+  - Launch or graph-node cost is a visible share of decode latency, for example a captured graph replayed per
+    step.
+  - The downstream GEMMs consume the sort ABI (sorted token ids, sorted expert ids, valid-count, sorted weights)
+    and accumulate into the output with atomics.
+  - Route ids and weights already have the dtype and layout the GEMM reads, so per-block expert ids can be
+    a view of the flattened route ids.
+  actions:
+  - Map routed pair p to M-block p; the per-block expert id is then the flattened route id, with no sort.
+  - Build the token-id, m-index and valid-count metadata on host once per M and cache the device copies; never
+    build them during graph capture, and fall back to the sort path instead.
+  - Reproduce the sort's padding sentinel (pad token rows with the value M) so the consumer's row masking is
+    unchanged.
+  - Move the sort node's side effects (zero-fill of the atomic output buffer, scatter of route weights into
+    sorted weights) into the first GEMM's prologue, relying on stream order before the second GEMM.
+  - Assert on host that the first GEMM's grid times threads covers both the zero-fill and the weight scatter.
+  - Gate the path on M values that were measured, check the captured graph's node count dropped, and keep other
+    M and prefill on the sort path.
+  alternatives:
+  - Keep the sort node for every M (the general path).
+  - For larger decode M, use a grouped shared-expert block plus skipping empty blocks (the engineer's proposed
+    next step, not measured).
+  - Fuse the sort's work into a different neighbouring kernel instead of deleting it (not tried or measured
+    in the evidence).
+  why:
+  - It removes one launch or graph node from a latency-bound decode graph.
+  - With identity routing the metadata depends only on M, so it is constant across replays and can be precomputed.
+  - The zero-fill and the weight scatter are small and can run on threads of a kernel that already launches.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - 'Evidence is one recorded step: mxfp4 fused MoE on gfx950, beneficial at two gated decode M values only.'
+  - At M=18 the engineer's warm-cache graph microbench measured the identity path slower (64.4 us vs 58.4 us);
+    the engineer attributes this to one-block-per-pair routing re-reading the shared expert per token (not
+    profiled).
+  - It depends on an epilogue that stores only rows with token_id < M; padding rows of sorted weights are left
+    uninitialised.
+  - The engineer measured a slightly higher relative norm against baseline on the identity path (0.0039-0.0044)
+    than on the sort path (0.0022-0.0040), though all correctness checks passed.
+  - It adds a compile variant of the first GEMM and a host-side gate on M; an M not cached before capture falls
+    back to the sort path.
+  experience:
+  - outcome: beneficial
+    conditions:
+    - Two-stage mxfp4 (a4w4) fused MoE on gfx950 (MI355X), decode replayed as a captured graph; prefill was
+      left on the unchanged sort path.
+    - Applied only at two small decode token counts where M*topk does not exceed the expert count, so every
+      routed pair gets its own BM=16 M-block.
+    - Required contiguous int32 route ids and fp32 route weights, an atomic-accumulating output epilogue, and
+      the inline-quant first GEMM.
+    - The engineer confirmed the captured decode graph went from 3 nodes to 2 at the gated M values; all other
+      decode M kept the 3-node sort path.
+    - At M=18 the engineer's warm-cache graph microbench measured the identity path slower than the sort path
+      (64.4 us vs 58.4 us), so that M was not gated in; the engineer attributes this to the shared expert being
+      re-read per token.
+    summary: At two small decode M values on gfx950 mxfp4 fused MoE, cached identity pair routing replaced
+      the sort node, with the zero-fill and weight scatter moved into the gemm1 prologue (decode graph 3 to
+      2 nodes). In the engineer's 8-vs-8 same-slot ABAB run, the decode-weighted median speedup was 1.3370
+      for the identity path vs 1.3156 for the sort-path control (about 1.63%), with non-overlapping ranges
+      (1.333-1.341 vs 1.309-1.325); dec_bs1 improved x1.065 and dec_bs2 x1.033. Larger decode M stayed on the
+      sort path.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: mxfp4
+      shape_layout: decode M=1-42; prefill M=256-32768
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
+- id: intra-cta-wave-k-split-for-underfilled-decode-gemm
+  type: performance_candidate
+  axes:
+  - execution_geometry
+  - data_movement
+  - compute_schedule
+  match:
+    operator_families:
+    - fused_moe_grouped_gemm
+    target_languages:
+    - flydsl
+    gfx:
+    - gfx950
+  question: When should a fill-limited decode grouped GEMM split its K loop across wave groups inside one CTA?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: unreviewed
+  conditions:
+  - Decode grouped GEMM whose CTA count at the smallest batch is too low to fill the GPU, so each CTA streams
+    a long K range alone
+  - Small M tile (BM=16 here) with the epilogue fused into the same kernel
+  - K tile count divisible by the split factor, with each group's share still larger than the software pipeline
+    stage count
+  - LDS must hold the larger of the per-group staging regions (each sized for half the K tiles) and split-factor
+    fp32 accumulator slices; the accumulators reuse the staging space after the barrier
+  actions:
+  - Launch the CTA with split-factor times the waves (here 8 waves as two 4-wave groups), all working on the
+    same output n-block
+  - Give each group a contiguous slice of K tiles, and offset all K-indexed loads (quantized and hidden activation,
+    weight, weight scale) by the group's start tile
+  - Give each group its own LDS staging region and its own accumulator slice; after a barrier, sum the slices
+    before the epilogue
+  - Run the epilogue (activation, requantization, scale stores) once, from the first wave group only, unchanged
+    from the unsplit kernel
+  - Gate the split per grid-size bucket and keep the unsplit kernel wherever a bucket does not gain
+  - Put the split factor in the kernel name so split and unsplit variants compile separately
+  alternatives:
+  - Split K across CTAs instead, with a global partial buffer and a reduction pass or atomics
+  - Narrow the N tile to raise the CTA count at small batch
+  - Keep the unsplit kernel for buckets that already fill the GPU
+  why:
+  - 'The engineer''s rationale: two wave groups streaming disjoint K halves double the outstanding weight loads
+    per CU when too few CTAs are resident'
+  - The reduction stays in LDS within one CTA, so there is no global partial buffer, extra launch or atomic
+    traffic
+  - Because the epilogue sees the same summed accumulator, its quantization contract to the down-projection
+    is unchanged
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - Evidence is one recorded step on mxfp4 gfx950; in the engineer's A/B only the batch-1 decode bucket gained
+  - Per the code comment, the batch-2 bucket was measured slower with the split, so the benefit depends on
+    the bucket and each bucket must be measured
+  - Only a split of 2 was implemented, restricted to BM=16 with inline quantization and no interleave or XCD
+    swizzle
+  - It doubles threads per CTA and grows LDS (the accumulator space doubles and each group has its own staging
+    region), which can reduce co-resident CTAs; the second wave group idles during the epilogue
+  - The kernel-level time drop (18.92 -> 14.76 us) the engineer cites came from an earlier profile and was
+    not re-collected for this step
+  experience:
+  - outcome: beneficial
+    conditions:
+    - mxfp4 fused-MoE gate/up GEMM with inline activation quantization, BM=16 tile, on gfx950 (FlyDSL kernel)
+    - Split gated to the smallest decode bucket (batch 1); the engineer reported a per-case speedup of 1.1344
+      there in their own A/B
+    - In the engineer's A/B the other decode buckets were within noise (0.989-1.007) and prefill M=1936-32768
+      was at parity (0.9968-1.0028)
+    - Per the code comment, the batch-2 bucket was measured slower with the split, so it was left on the unsplit
+      kernel
+    summary: A 2-way intra-CTA wave K-split of the decode gate/up GEMM, gated to the batch-1 grid bucket, beat
+      its parent. The engineer attributes the gain to batch 1; other buckets were at parity or slower.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: mxfp4
+      shape_layout: decode M=1-42; prefill M=256-32768
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
 shared_cards:
 - moe-communication-arena-lifetime
 - moe-route-map-capacity

@@ -1204,6 +1204,40 @@ cards:
       protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
         3 recorded steps; not re-run for KernelWiki
       correctness: the GEAK task's correctness check passed for every counted step
+  - outcome: mixed
+    conditions:
+    - bf16 dense GEMM on gfx950 (MI355X), N=6144 K=2048, routed by a shape-keyed per-M-bucket dispatch shim
+      choosing among Triton configs, hipBLASLt and the default op; no FlyDSL kernel was raced.
+    - Decode M=9-12 matched no row in the selector table and fell through to the same default op the baseline
+      uses. Adding one routing row onto the candidate Triton path was the step with the largest measured gain.
+    - 'Decode M=36 and 42, under graph replay, per the engineer''s race: the shipped Triton config beat hipBLASLt
+      over its full solution pool by 14.0% and 10.7%, and beat torch F.linear by 24-27%. Nothing was rewired.'
+    - 'Prefill M=16955 and M=30519: the engineer''s per-case reports associate the prefill improvement with
+      pinning a range-keyed hipBLASLt solution index for large M.'
+    - 'Prefill M=1936, 5916 and 32768, per the engineer: hipBLASLt pins that won warm or screening races did
+      not hold under cold timing. Two regressed (M=1936 to 0.92x, M=32768 to 0.9919) and M=5916 was null. A
+      later two-process re-sweep found no index 2% faster than F.linear at M=5916 or M=32768.'
+    - 'Prefill M=5916/32768, per the engineer: Triton 256x256x64 crashed the compiler on this build, and 128x256x64
+      ran 1.35-2.0x slower than F.linear.'
+    summary: For bf16 N=6144 K=2048 on gfx950, splitting decode and prefill buckets gave only small measured
+      gains. The clearest step closed a decode selector gap so M=9-12 stopped falling through to the default
+      op. The engineer's races kept shipped Triton ahead of hipBLASLt at decode M=36/42. hipBLASLt solution
+      pins helped only at large prefill M, and screened pins at other M did not transfer; no FlyDSL kernel
+      was tested.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: torch 2.9.1+rocm7.2.0, HIP 7.2.26015, Triton 3.7.0; AMD Instinct MI355X
+      dtype: bf16
+      shape_layout: N=6144 K=2048, decode M=1-64; prefill M=1936-32768
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
+        6 recorded steps; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
 - id: gemm-default-backend-routing
   type: performance_candidate
   axes:

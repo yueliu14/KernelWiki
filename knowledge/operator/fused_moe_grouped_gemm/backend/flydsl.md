@@ -16,7 +16,6 @@ sources:
   - https://www.lmsys.org/blog/2026-05-28-mori/
   - https://rocm.blogs.amd.com/artificial-intelligence/mlperf-inference-v6.0/README.html
 ---
-
 # fused_moe_grouped_gemm × FlyDSL (fp4 a4w4)
 
 ## TL;DR
@@ -77,6 +76,12 @@ From `flydsl_moe_stage1` / `flydsl_moe_stage2` and `get_flydsl_stage{1,2}_kernel
 | `mode` (s2) | atomic / reduce | accumulation strategy | atomic |
 | `xcd_swizzle` | 0 / 4 | XCD remap | 0 |
 
+## What recorded tuning runs found (fp4 a4w4 MoE decode)
+Operator-level associations from GEAK runs on an MXFP4 MoE (hidden 6144, intermediate 256, 257 experts, top-9) at decode buckets bs1–bs7 (6–42 token rows). Re-measure on other shapes.
+- **The tuned-config tier sets stage-2 routing at decode.** `get_2stage_cfgs` keys on nextPow2(M): bs1/bs2 land on tiers 8/16, bs3–bs7 on tiers 32/64. Those rows shared the stage-1 kernel, `block_m=16` and `ksplit=0` and differed only in `kernelName2`. Substituting the tier-8/16 stage-2 name into tiers 32/64 (host-side, no kernel body edit) was associated with +13.7% call-weighted decode speed. Check per-tier `kernelName2` before tuning kernel bodies; tiers above 64 were not timed.
+- **Non-temporal (NT) weight loads were associated with stage-2 decode speed.** Every alternative stage-2 routing (same bm16 atomic kernel without NT loads; v2 256×256 or 128×128 tiles) was 10–25% slower on each tier it changed. In the engineer's trace the non-NT version took 26.7 us vs 16.5 us.
+- **Negatives, scoped to that shape:** packing 2 n-tiles per stage-2 CTA at K = 256 was 9.5% slower at bs1 and its bs2 kernel gain did not survive end to end (the engineer attributes this to lost CTA parallelism and serialized atomic epilogues); stage-1 BN=128 was bracketed by regressions (BN=256 at bs3–bs7 lowered bs4/bs5, BN=64 was 11% slower at bs1).
+
 ## Numerics / parity
 fp4 (E2M1) MXFP4 with **per-1×32 e8m0 block scales**. The fused `silu_and_mul_fq` kernel computes SiLU via
 `llvm.amdgcn.exp2.f32`/`rcp.f32`, takes the per-32-lane abs-max (warp shuffle-xor reduction), derives the
@@ -101,6 +106,7 @@ mixed builders are `lru_cache`d on the full shape/dtype tuple. Symbols only impo
 - fp4 is lossy; never gate correctness on bit-exact parity — use the ≥95%-close / task-accuracy bar.
 - `mock_gate_only` requires `k_batch>1`; misusing it raises `ValueError`.
 - Optional dependency + per-shape JIT cost as in the standard path.
+- Padded-M tiers cannot be split by routing alone: bs3–bs5 all land in tier 32 and need the real token count passed into the config lookup.
 
 ## How to verify
 ```bash

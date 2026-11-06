@@ -42,12 +42,15 @@ A required trait must be established for the actual design before the card appli
 #### Use when
 
 - The workload executes the recurrent gated-delta decode path.
+- MTP chains and draft trees extending the state update are in scope; reported kernel gains cover validated 128x128 head dimensions only.
 
 #### Try
 
 - Preserve the distinction between read_indices and write_indices; both default to indices but may designate different state slots.
 - Respect the state alignment, dtype and Q/K last-dimension stride checks; use need_shuffle_state only with its corresponding layout conversion.
 - Validate the updated recurrent state as well as the visible output, including multi-step execution and state-slot reuse.
+- In public dispatch, pass draft-window metadata from the host rather than syncing GPU metadata to the CPU, and avoid duplicate validation.
+- Benchmark the public entry against its disabled path, not only the kernel; kernel gains did not imply public-entry gains.
 
 #### Rationale
 
@@ -97,6 +100,9 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 - Softmax KV-split reduction is not an implementation of this recurrence.
 - A one-step output match does not verify the next token's state.
+- gfx950, B=1, T=4, HV=32 public fused entry: a dispatch that synced GPU metadata to the CPU measured 69.5 vs 35.9 us median against the disabled path despite kernel gains (low confidence).
+- With host metadata the author reports a 3.87 us median public-entry gain in that configuration, not independently rerun.
+- Kernel speedups over vendored vLLM/SGLang baselines come from low-confidence gfx942/gfx950 sweeps with unspecified per-launch timing.
 
 <a id="gated-delta-prefill-state-and-snapshots"></a>
 ### How are persistent states and per-chunk snapshots distinguished in gated-delta prefill?
