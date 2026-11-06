@@ -29,7 +29,7 @@ def check_index(data):
         assert re.fullmatch(r"[a-z][a-z0-9_]*", row["id"])
         assert row["id"] not in ids
         ids.add(row["id"])
-        assert row["kind"] in {"source_code", "extraction_metadata", "environment_summary", "extraction_report"}
+        assert row["kind"] in {"source_code", "documentation", "extraction_metadata", "environment_summary", "extraction_report"}
         assert row["supports"].strip()
     assert not re.search(r"/(?:shared_nfs|home|mnt|tmp|workspace)/", yaml.safe_dump(data))
 

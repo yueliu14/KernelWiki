@@ -1,11 +1,14 @@
 # <Semantic chain>: <model or stack> <topic>
 
-Save as `<semantic_chain>/cases/<model_or_stack>_<regime>[_<topic>].md` and index the case in its semantic-chain README. Replace placeholders and retain only relevant sections. Keep reusable contracts in the chain's topic pages and source-specific details here.
+Save as `<semantic_chain>/cases/<model_or_stack>_<regime>[_<topic>].md`, index the case in its semantic-chain README, and register it in `../catalog.yaml`. Replace placeholders and retain only relevant sections. Keep reusable contracts in the chain's topic pages and source-specific details here.
+
+Move the metadata below to YAML front matter at the very top of the case, enclosed by `---` lines.
+Keep the model, semantic chain, phases and source set consistent with the catalog entry.
 
 ```yaml
 semantic_chain: <parent directory name>
 model: <model name>
-phase: <prefill, decode, decode_target_verify, or both>
+phase: [<prefill, decode, target_verify, draft_decode, or draft_extend>]
 topics: [dataflow, scheduling, dispatch, memory, communication, measurement, fusion]
 evidence: <source_inspection, source_inspection_and_local_reports, reported_measurement, reproduced_measurement, or hypothesis>
 source_set: ../../_sources/<source_set>.yaml
@@ -49,3 +52,7 @@ State the reusable conclusion, conditions under which it applies and unresolved 
 relevant topic pages, constituent operators and public evidence summaries. Publish a scoped validation
 summary; retain raw measurements, traces and candidate artifacts privately. For fusion-specific
 comparisons, also use the [fusion supplement](fusion_case.md).
+
+Reusable source-only choices can become records in the owning chain's `corpus/decisions.yaml`.
+Follow the [workload maintenance guide](../../../tools/workload/README.md) for evidence/confidence
+requirements and regenerate the catalog and decision pages after registration.

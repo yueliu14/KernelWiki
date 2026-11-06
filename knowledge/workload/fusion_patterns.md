@@ -2,6 +2,22 @@
 
 These patterns connect the [general fusion strategy](../general/optimization/kernel_fusion_strategy.md) to concrete workload boundaries. They describe opportunities and tradeoffs; each implementation needs its own shape contract and evidence.
 
+## Persistent layer and stack implementations
+
+The [workload decision index](CORPUS.md) links source-grounded examples of fusion, megakernel and
+monokernel execution. Treat these as nonexclusive implementation labels; compare their actual
+boundaries and contracts:
+
+| Choice | Reviewed case | Reusable decisions |
+|---|---|---|
+| Keep a cache-publication launch boundary and count conditional indexer work | [DeepSeek-V4.1](decoder_layer/cases/deepseek_v41_decode.md) | [Layer decisions](decoder_layer/corpus/decisions.md) |
+| Fuse post-attention projection, MoE and collectives while preserving the residual handoff | [MiniMax-M3.1](attention_output_moe/cases/minimax_m31_decode.md) | [Handoff, residency and epoch decisions](attention_output_moe/corpus/decisions.md) |
+| Use tagged global mailboxes and bounded layer groups for target verification | [Qwen3.8-Flash-Next](decoder_stack/cases/qwen38_flash_next_verify.md) | [Mailbox, state and fusion-depth decisions](decoder_stack/corpus/decisions.md) |
+
+These cases inspect source and test definitions. Their launch plans are not measured eliminated-launch
+counts, and no isolated fusion speedup is encoded. Follow each decision's conditions, alternatives and
+validation plan before transferring it to a new model.
+
 ## Patterns and examples
 
 | Pattern | Boundary to examine | Benefit to investigate | Constraint | Example / operator reference |

@@ -1,0 +1,194 @@
+schema_version: 1
+reviewed_on: '2026-11-06'
+evidence_kind: source_inspection
+access: Public sources at one fixed sgl-amd-mono commit. Source code and selected test definitions were inspected;
+  no upstream modules were imported and no GPU tests or performance experiments were run. Installed SGLang,
+  AITER and FlyDSL revisions remain unspecified.
+sources:
+- id: overview
+  kind: documentation
+  availability: public
+  verification: source_linked
+  supports: Upstream model/phase support and distinction between layer launches and surrounding framework work.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/README.md#L4-L43
+- id: dsv41_boundary
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: K1/K2 visibility boundary, deferred residuals, conditional indexer/compressor work and token-parallel
+    final gather.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/deepseek_v41/spec.py#L2-L40
+- id: dsv41_call
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: _launch calls K1, optional _select and K2 with shared cache and scratch state.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/deepseek_v41/spec.py#L720-L779
+- id: dsv41_select
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Compressor, identity selection and conditional K2i/top-k integration between the two core launches.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/deepseek_v41/spec.py#L782-L935
+- id: dsv41_forward
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Model forward, Engram and pending residual fold/settle decisions around covered layers.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/deepseek_v41/spec.py#L945-L1045
+- id: dsv41_admission
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: gfx950 widths 1..48, TP2/4, BF16 interface, dsv4 attention, DSpark and cache/weight requirements.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/deepseek_v41/spec.py#L1259-L1310
+- id: dsv41_body
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: K2 composes attention back and FFN stages in one device kernel, with a 256-CTA launch through common
+    geometry.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/deepseek_v41/gfx950/layer.py#L1004-L1304
+- id: dsv41_runner
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Live K1/K2 arguments, output buffers and compiled-launch calls.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/deepseek_v41/gfx950/runner.py#L603-L856
+- id: dsv41_tests
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: K2 reference and checking harness; source availability does not mean this suite was run here.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/test/kernels/deepseek_v41/check_k2.py
+- id: m31_boundary
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Post-attention replacement boundary, retained SGLang modules and separate MXFP8 shared expert.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/minimax_m31/spec.py#L2-L17
+- id: m31_call
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Actual attention call followed by FfnRunner, residual-stream handoff and retained final norm/logits.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/minimax_m31/spec.py#L301-L376
+- id: m31_build
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Post-load routed/shared weight views, runtime occupancy warmup, numerical envelope and spec capabilities.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/minimax_m31/spec.py#L393-L485
+- id: m31_stages
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: o_proj, TP reduction/residual/norm, router, shared/routed experts, down projection and final reduction.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/minimax_m31/ffn.py#L2-L24
+- id: m31_body
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Persistent stage calls and kernel launch rather than separate dispatches for each stage.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/minimax_m31/ffn.py#L1102-L1336
+- id: m31_runner
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Shared epoch ownership, per-width scratch, compiled residency gate, negative-slot behavior and
+    returned buffers.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/minimax_m31/runner.py#L46-L171
+- id: m31_residency
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Driver occupancy query for the actual compiled kernel and block size.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/minimax_m31/residency.py#L36-L85
+- id: m31_epoch
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Completion marks, epoch advance and clearing a reused 16-bit tag cycle after readers complete.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/minimax_m31/ffn.py#L1339-L1368
+- id: m31_tests
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: FFN correctness and synchronization test sources; not executed for this knowledge entry.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/test/kernels/test_minimax_m31_ffn.py
+- id: qwen_plan
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: 'Launch plan: layer 0, layers 1..3, then groups of four.'
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/gfx950/runner.py#L132-L141
+- id: qwen_launch
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Target verify launch loop and separate host-issued epoch tensor update after the stack.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/gfx950/runner.py#L555-L579
+- id: qwen_mailbox
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Step/launch tags, paired payload/tag stores and guarded device-scope polls in global scratch.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/gfx950/kernel.py#L375-L470
+- id: qwen_recurrence
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Read committed per-request recurrent state and write per-token verify snapshots through dedicated
+    scratch pointers.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/gfx950/kernel.py#L1623-L2008
+- id: qwen_stages
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Static per-layer GDN/QSA, out-projection, mixer and expert stage sequence within each compiled
+    launch.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/gfx950/kernel.py#L4450-L4625
+- id: qwen_state
+  kind: documentation
+  availability: public
+  verification: source_linked
+  supports: Per-request verify snapshots, KV/index-cache writes, MRoPE positions, stage structure and co-resident
+    mailbox assumptions.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/README.md#L47-L163
+- id: qwen_partition
+  kind: documentation
+  availability: public
+  verification: source_linked
+  supports: 13 launch partition and the documented code-size/compile-time reason for bounding fusion depth.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/README.md#L32-L46
+- id: qwen_spec
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Single-GPU model guards, target-verify forward fallback and runtime entry to the stack.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/spec.py#L286-L387
+- id: qwen_admission
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: TP1, four-token verify request widths and constraints on attention, ReplaySSM, expert layout and
+    KV dtype.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/spec.py#L430-L485
+- id: qwen_wait
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Single-GPU guarded waits, timeout and fault-path distinction.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/gfx950/device.py#L16-L58
+- id: qwen_tests
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: Stage/launch and state-output reference tests; source-only reference, not a recorded execution.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/test/kernels/test_qwen38_flash_next_launches.py
+- id: common_geometry
+  kind: source_code
+  availability: public
+  verification: source_linked
+  supports: 256 CTAs, 512 threads and stage task assignment used by these persistent kernels.
+  reference: https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/common/plan.py#L21-L37
