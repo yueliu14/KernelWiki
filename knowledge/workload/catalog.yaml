@@ -1,0 +1,205 @@
+schema_version: 1
+description: Semantic workload chains, canonical model cases and scoped fusion decisions. Execution forms are
+  searchable labels; source support is not runtime engagement or measured benefit.
+source_sets:
+  muse_spark_c8: knowledge/workload/_sources/muse_spark_c8.yaml
+  sgl_amd_mono_7a4a552d: knowledge/workload/_sources/sgl_amd_mono_7a4a552d.yaml
+chains:
+- id: qkv_projection_norm_rope_cache
+  directory: knowledge/workload/qkv_projection_norm_rope_cache
+  operators:
+  - dense_gemm
+  - qk_norm_rope_cache
+- id: router_pooler_topk
+  directory: knowledge/workload/router_pooler_topk
+  operators:
+  - dense_gemm
+  - moe_routing_topk
+- id: projection_norm_residual
+  directory: knowledge/workload/projection_norm_residual
+  operators:
+  - dense_gemm
+  - gemm_epilogue_fused
+- id: moe_expert_pipeline
+  directory: knowledge/workload/moe_expert_pipeline
+  operators:
+  - grouped_gemm_moe
+  - moe_dispatch_combine
+  - fused_moe_grouped_gemm
+- id: decoder_layer
+  directory: knowledge/workload/decoder_layer
+  operators:
+  - qk_norm_rope_cache
+  - sparse_attention_nsa
+  - attention_indexer
+  - moe_routing_topk
+  - grouped_gemm_moe
+  - shared_expert_fusion
+- id: attention_output_moe
+  directory: knowledge/workload/attention_output_moe
+  operators:
+  - dense_gemm
+  - moe_routing_topk
+  - grouped_gemm_moe
+  - shared_expert_fusion
+  - moe_dispatch_combine
+- id: decoder_stack
+  directory: knowledge/workload/decoder_stack
+  operators:
+  - linear_attention_gated_delta
+  - sparse_attention_nsa
+  - attention_indexer
+  - qk_norm_rope_cache
+  - grouped_gemm_moe
+cases:
+- id: qkv_projection_norm_rope_cache_muse_spark_decode
+  chain: qkv_projection_norm_rope_cache
+  path: knowledge/workload/qkv_projection_norm_rope_cache/cases/muse_spark_decode.md
+  model: Muse-Spark-Open-816B-A42B-Quark-MXFP4
+  phases:
+  - target_verify
+  backends: []
+  execution_forms:
+  - staged
+  launch_summary: Retained historical extraction case; see its actual stage boundaries and limited coverage.
+  source_refs:
+  - muse_spark_c8:c8_environment
+  - muse_spark_c8:qkv_source
+  - muse_spark_c8:qkv_metadata
+- id: router_pooler_topk_muse_spark_decode
+  chain: router_pooler_topk
+  path: knowledge/workload/router_pooler_topk/cases/muse_spark_decode.md
+  model: Muse-Spark-Open-816B-A42B-Quark-MXFP4
+  phases:
+  - target_verify
+  backends: []
+  execution_forms:
+  - staged
+  launch_summary: Retained historical extraction case; see its actual stage boundaries and limited coverage.
+  source_refs:
+  - muse_spark_c8:c8_environment
+  - muse_spark_c8:router_source
+  - muse_spark_c8:router_metadata
+- id: projection_norm_residual_muse_spark_decode
+  chain: projection_norm_residual
+  path: knowledge/workload/projection_norm_residual/cases/muse_spark_decode.md
+  model: Muse-Spark-Open-816B-A42B-Quark-MXFP4
+  phases:
+  - target_verify
+  backends: []
+  execution_forms:
+  - staged
+  launch_summary: Retained historical extraction case; see its actual stage boundaries and limited coverage.
+  source_refs:
+  - muse_spark_c8:c8_environment
+  - muse_spark_c8:unpool_source
+  - muse_spark_c8:unpool_metadata
+- id: moe_expert_pipeline_muse_spark_decode
+  chain: moe_expert_pipeline
+  path: knowledge/workload/moe_expert_pipeline/cases/muse_spark_decode.md
+  model: Muse-Spark-Open-816B-A42B-Quark-MXFP4
+  phases:
+  - target_verify
+  backends: []
+  execution_forms:
+  - staged
+  launch_summary: Retained historical extraction case; see its actual stage boundaries and limited coverage.
+  source_refs:
+  - muse_spark_c8:c8_environment
+  - muse_spark_c8:moe_source
+  - muse_spark_c8:moe_metadata
+- id: moe_expert_pipeline_muse_spark_decode_dataflow
+  chain: moe_expert_pipeline
+  path: knowledge/workload/moe_expert_pipeline/cases/muse_spark_decode_dataflow.md
+  model: Muse-Spark-Open-816B-A42B-Quark-MXFP4
+  phases:
+  - target_verify
+  backends: []
+  execution_forms:
+  - staged
+  launch_summary: Retained historical extraction case; see its actual stage boundaries and limited coverage.
+  source_refs:
+  - muse_spark_c8:c8_environment
+  - muse_spark_c8:moe_source
+  - muse_spark_c8:moe_metadata
+- id: deepseek_v41_decode
+  chain: decoder_layer
+  path: knowledge/workload/decoder_layer/cases/deepseek_v41_decode.md
+  model: DeepSeek-V4.1-Flash
+  phases:
+  - decode
+  - target_verify
+  backends:
+  - flydsl
+  execution_forms:
+  - fusion
+  - persistent
+  - monokernel
+  launch_summary: Two core launches per layer (K1/K2), plus conditional compressor/indexer/top-k and surrounding
+    framework work.
+  source_refs:
+  - sgl_amd_mono_7a4a552d:overview
+  - sgl_amd_mono_7a4a552d:dsv41_boundary
+  - sgl_amd_mono_7a4a552d:dsv41_call
+  - sgl_amd_mono_7a4a552d:dsv41_select
+  - sgl_amd_mono_7a4a552d:dsv41_forward
+  - sgl_amd_mono_7a4a552d:dsv41_admission
+  - sgl_amd_mono_7a4a552d:dsv41_body
+  - sgl_amd_mono_7a4a552d:dsv41_runner
+  - sgl_amd_mono_7a4a552d:dsv41_tests
+  - sgl_amd_mono_7a4a552d:common_geometry
+- id: minimax_m31_decode
+  chain: attention_output_moe
+  path: knowledge/workload/attention_output_moe/cases/minimax_m31_decode.md
+  model: MiniMax-M3.1-Flash
+  phases:
+  - decode
+  - target_verify
+  backends:
+  - flydsl
+  execution_forms:
+  - fusion
+  - persistent
+  - monokernel
+  launch_summary: One persistent post-attention launch per sparse layer/rank; attention and surrounding framework
+    operations remain separate.
+  source_refs:
+  - sgl_amd_mono_7a4a552d:overview
+  - sgl_amd_mono_7a4a552d:m31_boundary
+  - sgl_amd_mono_7a4a552d:m31_call
+  - sgl_amd_mono_7a4a552d:m31_build
+  - sgl_amd_mono_7a4a552d:m31_stages
+  - sgl_amd_mono_7a4a552d:m31_body
+  - sgl_amd_mono_7a4a552d:m31_runner
+  - sgl_amd_mono_7a4a552d:m31_residency
+  - sgl_amd_mono_7a4a552d:m31_epoch
+  - sgl_amd_mono_7a4a552d:m31_tests
+  - sgl_amd_mono_7a4a552d:common_geometry
+- id: qwen38_flash_next_verify
+  chain: decoder_stack
+  path: knowledge/workload/decoder_stack/cases/qwen38_flash_next_verify.md
+  model: Qwen3.8-Flash-Next
+  phases:
+  - target_verify
+  backends:
+  - flydsl
+  execution_forms:
+  - fusion
+  - persistent
+  - monokernel
+  launch_summary: 13 persistent launches for the 48-layer target stack; logits, epoch update and other step
+    operations are outside this count.
+  source_refs:
+  - sgl_amd_mono_7a4a552d:overview
+  - sgl_amd_mono_7a4a552d:qwen_plan
+  - sgl_amd_mono_7a4a552d:qwen_launch
+  - sgl_amd_mono_7a4a552d:qwen_mailbox
+  - sgl_amd_mono_7a4a552d:qwen_recurrence
+  - sgl_amd_mono_7a4a552d:qwen_stages
+  - sgl_amd_mono_7a4a552d:qwen_state
+  - sgl_amd_mono_7a4a552d:qwen_partition
+  - sgl_amd_mono_7a4a552d:qwen_spec
+  - sgl_amd_mono_7a4a552d:qwen_admission
+  - sgl_amd_mono_7a4a552d:qwen_wait
+  - sgl_amd_mono_7a4a552d:qwen_tests
+  - sgl_amd_mono_7a4a552d:common_geometry

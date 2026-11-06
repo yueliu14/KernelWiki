@@ -1,0 +1,171 @@
+schema_version: 1
+semantic_chain: decoder_layer
+decisions:
+- id: layer-preserve-cache-publication-boundary
+  question: When must a fused layer keep a launch boundary for cache publication?
+  axes:
+  - fusion_boundary
+  - synchronization
+  - data_lifetime
+  status: candidate_only
+  conditions:
+  - A front stage writes KV records that the attention consumer reads across producer workgroups.
+  - The target uses the documented gfx950 K1/K2 organization and cache representation.
+  actions:
+  - Keep the K1-to-K2 ordering until a replacement explicitly supplies publication, visibility and progress
+    guarantees for every consumer.
+  - Review cache readers and memory scopes before combining the launches; account for the conditional indexer
+    work between them.
+  rationale:
+  - The pinned spec assigns device-wide release to the launch boundary; the live caller invokes K1 before K2.
+  alternatives:
+  - Retain staged execution as a correctness baseline.
+  - Design and separately validate an in-kernel handoff for the target memory hierarchy.
+  case_refs:
+  - deepseek_v41_decode
+  source_refs:
+  - sgl_amd_mono_7a4a552d:dsv41_boundary
+  - sgl_amd_mono_7a4a552d:dsv41_call
+  - sgl_amd_mono_7a4a552d:dsv41_body
+  effect:
+    outcome: not_assessed
+    summary: This pass records an implemented contract. A comparable baseline/candidate performance result
+      and an isolated effect for this decision have not been assessed.
+  assessment:
+    implementation:
+      level: high
+      reasons:
+      - The pinned case entry and named implementation establish this scoped mechanism; this is not runtime
+        or numerical validation.
+      missing_evidence:
+      - target_model_engagement
+    effect:
+      level: unknown
+      reasons:
+      - No comparable workload measurement is encoded for this decision.
+      missing_evidence:
+      - paired_measurement
+      - correctness_result
+      - runtime_environment
+    attribution:
+      level: unknown
+      reasons:
+      - Source inspection does not isolate the performance contribution of this mechanism.
+      missing_evidence:
+      - controlled_ablation
+  validation_plan:
+  - Compare all written KV slots and attention outputs across multiple workgroups, context lengths and graph
+    replays.
+  - Measure the complete front/attention boundary, including any replacement synchronization and indexing.
+  limitations:
+  - The source rationale is not a universal claim that every attention pipeline needs two launches.
+  - A single block barrier does not establish cross-workgroup visibility or progress.
+- id: layer-count-conditional-indexer-work
+  question: How should launch accounting include an indexer between fused layer stages?
+  axes:
+  - fusion_boundary
+  - dispatch
+  - measurement
+  status: candidate_only
+  conditions:
+  - The layer can use a compressed/indexed KV source or a window-only path.
+  actions:
+  - Record K1, conditional compressor/index-query/K2i/selection work, and K2 as separate execution boundaries.
+  - Resolve identity, full, producer and reindex branches for the actual rows and context before counting launches.
+  - Keep logits, metadata, copies and end-of-stack gathers outside the core count but inside full-step measurement.
+  rationale:
+  - Two core launches do not imply two total device launches for an index-source layer or a complete serving
+    step.
+  alternatives:
+  - Report a branch-conditioned launch sequence without inventing a fixed total.
+  case_refs:
+  - deepseek_v41_decode
+  source_refs:
+  - sgl_amd_mono_7a4a552d:dsv41_call
+  - sgl_amd_mono_7a4a552d:dsv41_select
+  - sgl_amd_mono_7a4a552d:dsv41_runner
+  effect:
+    outcome: not_assessed
+    summary: This pass records an implemented contract. A comparable baseline/candidate performance result
+      and an isolated effect for this decision have not been assessed.
+  assessment:
+    implementation:
+      level: high
+      reasons:
+      - The pinned case entry and named implementation establish this scoped mechanism; this is not runtime
+        or numerical validation.
+      missing_evidence:
+      - target_model_engagement
+    effect:
+      level: unknown
+      reasons:
+      - No comparable workload measurement is encoded for this decision.
+      missing_evidence:
+      - paired_measurement
+      - correctness_result
+      - runtime_environment
+    attribution:
+      level: unknown
+      reasons:
+      - Source inspection does not isolate the performance contribution of this mechanism.
+      missing_evidence:
+      - controlled_ablation
+  validation_plan:
+  - Trace the same layer type, row count, context and graph mode in both configurations.
+  - Attribute shared kernels to call sites and report the full callable latency.
+  limitations:
+  - This source inspection does not provide observed dispatch frequencies or profiler counts.
+- id: layer-deferred-residual-ownership
+  question: When can a layer defer its residual update into the next consumer?
+  axes:
+  - data_lifetime
+  - fusion_boundary
+  - numerical_contract
+  status: candidate_only
+  conditions:
+  - A consumer understands the pending output, residual, post/combine and pre-mix representation.
+  actions:
+  - Represent pending versus settled residuals explicitly and apply the post update exactly once.
+  - Respect the first-layer, Engram and final-head boundaries; retain captured auxiliary hidden states and
+    token-parallel row ownership.
+  rationale:
+  - The forward carries pending state between layers and settles it when a consumer requires the ordinary representation.
+  alternatives:
+  - Materialize each residual update before calling the next layer.
+  case_refs:
+  - deepseek_v41_decode
+  source_refs:
+  - sgl_amd_mono_7a4a552d:dsv41_boundary
+  - sgl_amd_mono_7a4a552d:dsv41_forward
+  effect:
+    outcome: not_assessed
+    summary: This pass records an implemented contract. A comparable baseline/candidate performance result
+      and an isolated effect for this decision have not been assessed.
+  assessment:
+    implementation:
+      level: high
+      reasons:
+      - The pinned case entry and named implementation establish this scoped mechanism; this is not runtime
+        or numerical validation.
+      missing_evidence:
+      - target_model_engagement
+    effect:
+      level: unknown
+      reasons:
+      - No comparable workload measurement is encoded for this decision.
+      missing_evidence:
+      - paired_measurement
+      - correctness_result
+      - runtime_environment
+    attribution:
+      level: unknown
+      reasons:
+      - Source inspection does not isolate the performance contribution of this mechanism.
+      missing_evidence:
+      - controlled_ablation
+  validation_plan:
+  - Compare every visible residual and auxiliary capture against the materialized path, including first/last
+    and Engram layers.
+  - Measure both removed launches and any extra layout/copy work.
+  limitations:
+  - The model-specific hyper-connection representation is not interchangeable with a plain residual tensor.

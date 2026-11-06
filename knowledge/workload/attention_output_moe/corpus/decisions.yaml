@@ -1,0 +1,179 @@
+schema_version: 1
+semantic_chain: attention_output_moe
+decisions:
+- id: post-attention-preserve-handoff
+  question: What must a post-attention monokernel return to the next layer?
+  axes:
+  - fusion_boundary
+  - numerical_contract
+  - data_lifetime
+  status: candidate_only
+  conditions:
+  - The framework retains attention and passes its unprojected output plus the residual into a fused projection/MoE
+    path.
+  actions:
+  - Return reduced MoE output and the residual after attention as separate values.
+  - Leave the final MoE residual addition to the next input norm when using the PLAIN_ADD handoff.
+  - 'Preserve padded-row semantics: negative slots join no expert and produce zero MoE output; their seam residual
+    is unspecified.'
+  rationale:
+  - The live caller records the returned buffers in the residual stream instead of immediately adding them.
+  alternatives:
+  - Use the ordinary projection, residual/norm, router, expert and collective sequence.
+  case_refs:
+  - minimax_m31_decode
+  source_refs:
+  - sgl_amd_mono_7a4a552d:m31_boundary
+  - sgl_amd_mono_7a4a552d:m31_call
+  - sgl_amd_mono_7a4a552d:m31_runner
+  - sgl_amd_mono_7a4a552d:m31_stages
+  effect:
+    outcome: not_assessed
+    summary: This pass records an implemented contract. A comparable baseline/candidate performance result
+      and an isolated effect for this decision have not been assessed.
+  assessment:
+    implementation:
+      level: high
+      reasons:
+      - The pinned case entry and named implementation establish this scoped mechanism; this is not runtime
+        or numerical validation.
+      missing_evidence:
+      - target_model_engagement
+    effect:
+      level: unknown
+      reasons:
+      - No comparable workload measurement is encoded for this decision.
+      missing_evidence:
+      - paired_measurement
+      - correctness_result
+      - runtime_environment
+    attribution:
+      level: unknown
+      reasons:
+      - Source inspection does not isolate the performance contribution of this mechanism.
+      missing_evidence:
+      - controlled_ablation
+  validation_plan:
+  - Check both returned buffers, the following norm and final norm; include padded rows and routing differences.
+  - Use the model-specific numerical envelope and an end-to-end accuracy check when changing precision or router
+    order.
+  limitations:
+  - This fusion starts after attention and does not remove its KV work.
+  - The public check compares a tolerance-bounded path; it is not evidence of bitwise equivalence.
+- id: post-attention-gate-compiled-residency
+  question: How should persistent fusion admission depend on compiled occupancy?
+  axes:
+  - scheduling
+  - dispatch
+  - compilation
+  status: candidate_only
+  conditions:
+  - Progress depends on the whole persistent grid being resident.
+  - Resource use can vary by compiled shape or specialization.
+  actions:
+  - Query occupancy for the compiled binary and block size, then reject a width if resident blocks per CU times
+    CU count is smaller than the grid.
+  - Repeat the check after changing fusion extent, tile geometry or compiler version; keep an ordinary fallback
+    outside the accepted envelope.
+  rationale:
+  - FfnRunner.warm checks every compiled width against the 256-CTA grid before live execution.
+  alternatives:
+  - Reduce resource pressure or redesign the scheduling/progress protocol.
+  - Use separate launches for stages that cannot meet the residency requirement.
+  case_refs:
+  - minimax_m31_decode
+  source_refs:
+  - sgl_amd_mono_7a4a552d:m31_runner
+  - sgl_amd_mono_7a4a552d:m31_residency
+  - sgl_amd_mono_7a4a552d:m31_build
+  - sgl_amd_mono_7a4a552d:common_geometry
+  effect:
+    outcome: not_assessed
+    summary: This pass records an implemented contract. A comparable baseline/candidate performance result
+      and an isolated effect for this decision have not been assessed.
+  assessment:
+    implementation:
+      level: high
+      reasons:
+      - The pinned case entry and named implementation establish this scoped mechanism; this is not runtime
+        or numerical validation.
+      missing_evidence:
+      - target_model_engagement
+    effect:
+      level: unknown
+      reasons:
+      - No comparable workload measurement is encoded for this decision.
+      missing_evidence:
+      - paired_measurement
+      - correctness_result
+      - runtime_environment
+    attribution:
+      level: unknown
+      reasons:
+      - Source inspection does not isolate the performance contribution of this mechanism.
+      missing_evidence:
+      - controlled_ablation
+  validation_plan:
+  - Inspect register/LDS use and occupancy for every admitted width.
+  - Stress progress and guard behavior under graph replay; measure complete-chain latency, not occupancy alone.
+  limitations:
+  - Passing the occupancy check is necessary for this protocol but is not a complete proof of deadlock freedom
+    or performance.
+- id: post-attention-peer-buffer-epochs
+  question: How can fused compute and collectives reuse peer buffers without accepting stale data?
+  axes:
+  - communication
+  - synchronization
+  - data_lifetime
+  status: candidate_only
+  conditions:
+  - Several layer/width runners share peer-visible storage with tagged payloads.
+  actions:
+  - Share the epoch across every runner using the same peer buffer and keep the launch sequence consistent
+    across ranks.
+  - Advance or recycle tags only after the required completion marks; preserve the tag-cycle clearing boundary
+    and guards.
+  rationale:
+  - The runner documents buffer-lifetime epoch ownership, and the kernel completes work before advancing the
+    epoch and clearing a reused cycle.
+  alternatives:
+  - Give independent runners independent storage and synchronization lifetimes.
+  - Keep ordinary collectives as the reference path.
+  case_refs:
+  - minimax_m31_decode
+  source_refs:
+  - sgl_amd_mono_7a4a552d:m31_runner
+  - sgl_amd_mono_7a4a552d:m31_epoch
+  - sgl_amd_mono_7a4a552d:m31_body
+  effect:
+    outcome: not_assessed
+    summary: This pass records an implemented contract. A comparable baseline/candidate performance result
+      and an isolated effect for this decision have not been assessed.
+  assessment:
+    implementation:
+      level: high
+      reasons:
+      - The pinned case entry and named implementation establish this scoped mechanism; this is not runtime
+        or numerical validation.
+      missing_evidence:
+      - target_model_engagement
+    effect:
+      level: unknown
+      reasons:
+      - No comparable workload measurement is encoded for this decision.
+      missing_evidence:
+      - paired_measurement
+      - correctness_result
+      - runtime_environment
+    attribution:
+      level: unknown
+      reasons:
+      - Source inspection does not isolate the performance contribution of this mechanism.
+      missing_evidence:
+      - controlled_ablation
+  validation_plan:
+  - Exercise alternating widths, repeated graphs, delayed peers, tag wrap and multiple runner instances.
+  - Check intermediate ownership and completed outputs before attributing any communication-latency gain.
+  limitations:
+  - Per-CTA barriers alone do not prove that peer readers are finished.
+  - The recorded protocol is model/runtime specific and has not been reproduced here.

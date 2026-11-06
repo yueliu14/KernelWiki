@@ -4,6 +4,11 @@ This collection organizes multi-operator execution subgraphs by their **semantic
 
 Start with a semantic chain below, the [non-fusion MoE dataflow example](moe_expert_pipeline/cases/muse_spark_decode_dataflow.md), or the [fusion patterns](fusion_patterns.md). Backend implementation details remain in the [operator collection](../operator/README.md); reusable profiling and tuning methods remain in [general knowledge](../general/README.md).
 
+The [case and decision index](CORPUS.md) adds searchable phase/backend/execution-form metadata
+and source-grounded fusion decisions. The initial public monokernel review covers DeepSeek-V4.1-Flash,
+MiniMax-M3.1-Flash and Qwen3.8-Flash-Next at one fixed sgl-amd-mono commit. Implementation evidence,
+effect confidence and independent attribution are kept separate; no new GPU results are claimed.
+
 ## Semantic chains
 
 | Semantic chain | Scope | Initial case |
@@ -12,6 +17,9 @@ Start with a semantic chain below, the [non-fusion MoE dataflow example](moe_exp
 | [router_pooler_topk](router_pooler_topk/README.md) | Shared input → routing projection/top-k and pooler projection/norm → expert IDs, weights and input | [Muse Spark decode](router_pooler_topk/cases/muse_spark_decode.md) |
 | [projection_norm_residual](projection_norm_residual/README.md) | Branch projection → normalization → residual update → next-input normalization | [Muse Spark decode](projection_norm_residual/cases/muse_spark_decode.md) |
 | [moe_expert_pipeline](moe_expert_pipeline/README.md) | Routed tokens → preparation → expert gate/up, activation and down projection → combined output | [Fusion boundaries](moe_expert_pipeline/cases/muse_spark_decode.md) · [Token reuse and execution contracts](moe_expert_pipeline/cases/muse_spark_decode_dataflow.md) |
+| [attention_output_moe](attention_output_moe/README.md) | Attention output + residual → output projection/TP completion → routing/experts → reduced MoE contribution + residual | [MiniMax-M3.1-Flash](attention_output_moe/cases/minimax_m31_decode.md) |
+| [decoder_layer](decoder_layer/README.md) | Layer input/residual and KV state → attention + FFN → next-layer representation and state | [DeepSeek-V4.1-Flash](decoder_layer/cases/deepseek_v41_decode.md) |
+| [decoder_stack](decoder_stack/README.md) | Step inputs and committed state → groups of layers → hidden output, residuals and verify state | [Qwen3.8-Flash-Next](decoder_stack/cases/qwen38_flash_next_verify.md) |
 
 The initial cases use reviewed extracted source and local metadata. They introduce no GPU measurements or isolated fusion-speedup claim.
 
@@ -20,6 +28,8 @@ The initial cases use reviewed extracted source and local metadata. They introdu
 ```text
 workload/
   README.md
+  catalog.yaml
+  CORPUS.md                        # generated case/decision index
   fusion_patterns.md
   _templates/workload_case.md
   _templates/fusion_case.md
@@ -32,6 +42,8 @@ workload/
     dispatch.md
     measurement.md
     cases/<case>.md
+    corpus/decisions.yaml           # where reusable decisions have been curated
+    corpus/decisions.md             # generated
 ```
 
 Name the directory after the composed computation, keeping its external inputs and outputs explicit. Use an existing category when a new case has the same composition. Model names, GPU generations, dtypes, prefill/decode and backend names belong in case filenames or metadata. Split-K, kernel counts and particular fusion schedules are implementation choices within the category; changing them does not rename the semantic chain.
@@ -70,6 +82,16 @@ Use these descriptions precisely:
 Create `workload/<semantic_chain>/README.md` with the model-independent contract, topic navigation and constituent operator links. Add focused `cases/` pages using the [workload case template](_templates/workload_case.md); use the [fusion supplement](_templates/fusion_case.md) when appropriate. Index each case in its chain README. Keep model-specific constraints and reviewed outcome summaries in the case. Shared public comparison context and evidence availability can live under `_sources/` so several cases can cite the same source IDs. Link new semantic chains here and keep documents in English.
 
 Each case should identify the model/stack revision, phase, shapes, dtypes, TP/EP, graph mode, caller and actual device entry points. Show the semantic chain and implementation boundaries separately. Include materialized intermediates, numerical rounding, mutation/aliasing and synchronization requirements, plus the dispatch branches the evidence does not cover.
+
+Register cases in `catalog.yaml`; keep its model/phase/owner/source metadata consistent with the
+case front matter. Execution forms (`fusion`, `staged`, `persistent`, `megakernel`, `monokernel`)
+are nonexclusive labels. Backend names describe actual implementations, not the upstream term
+"monokernel". An empty backend list means it has not been classified in this index.
+
+Distill reusable choices into the owning semantic chain's `corpus/decisions.yaml`. Schema 1 records
+source-only decisions with explicit conditions, alternatives, validation plans and unknown effects.
+It does not accept inferred performance metrics. Use [the workload maintenance guide](../../tools/workload/README.md)
+for validation, generated pages and the optional pinned Git source-location audit.
 
 Label source inspection, reported measurements and measurements reproduced for the entry separately.
 For privately inspected sources, publish an evidence ID, its role, availability and verification status.

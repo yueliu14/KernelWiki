@@ -32,6 +32,7 @@ jobs:
         run: |
           set -e
           python3 tools/corpus/build.py --check
+          python3 tools/workload/build.py --check
 
       # Schema, provenance, citation grounding, and the no-performance-number rule on source
       # evidence. Tests also check shared links and reproducible extraction from pinned git objects.

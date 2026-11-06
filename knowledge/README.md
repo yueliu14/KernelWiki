@@ -2,6 +2,7 @@
 
 - [Operators](operator/README.md): GEMM, MoE, attention and indexer implementations, variants, fusions and lessons for LLM inference.
 - [Workloads](workload/README.md): semantic subgraphs spanning multiple operators, with data contracts, scheduling, dispatch, memory/state, communication, fusion and whole-subgraph evidence.
+- [Workload fusion decisions](workload/CORPUS.md): model cases and reusable decisions for staged, persistent, megakernel and monokernel execution, with explicit source scope and effect confidence.
 - [General knowledge](general/README.md): profiling, optimization, backend programming, hardware and reusable recipes.
 - [Operator corpus](operator/CORPUS.md): structured development cards, pinned source evidence and configuration records.
 

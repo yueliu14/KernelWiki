@@ -7,6 +7,19 @@ Copyright © 2026 Advanced Micro Devices, Inc. All rights reserved. Distributed 
 
 KernelWiki reorganized documents, adjusted links and distilled reusable conclusions into corpus decisions. Per-document migration provenance identifies original paths. Nested resources retain their own notices where present.
 
+## SGLang-AMD-Mono workload references
+
+The public workload cases and derived fusion decisions reference
+[sgl-project/sgl-amd-mono](https://github.com/sgl-project/sgl-amd-mono) at commit
+`7a4a552db119d1c3689165a182f151388a636272`. The source index links the reviewed files and
+selected line ranges; the repository does not vendor the upstream kernels or code objects.
+Copyright 2026 SGLang contributors, Apache License 2.0; see the pinned upstream
+[LICENSE](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/LICENSE)
+and [NOTICE](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/NOTICE).
+The reviewed files also retain vLLM contributor notices and, for adapted common/DeepSeek
+components, ROCm/ATOM's AMD attribution under MIT. KernelWiki summarizes their contracts
+and adds scoped decisions; source inspection does not confer upstream validation or measured gains.
+
 ## AITER
 
 The structured corpus contains attributed source excerpts: the retained GEMM snapshot is

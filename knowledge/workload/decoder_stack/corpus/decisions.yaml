@@ -1,0 +1,181 @@
+schema_version: 1
+semantic_chain: decoder_stack
+decisions:
+- id: stack-tagged-stage-mailboxes
+  question: When can stages inside a persistent stack communicate through tagged mailboxes?
+  axes:
+  - scheduling
+  - data_lifetime
+  - synchronization
+  status: candidate_only
+  conditions:
+  - The target is the single-GPU static stage schedule with all required CTAs co-resident.
+  - Dependencies point to earlier stages and the payload/tag representation fits the chosen memory operations.
+  actions:
+  - Publish payload and tag together, identify both the step and launch, and poll only the inputs needed by
+    the consumer.
+  - Use the required memory scope/cache policy and preserve timeout/error handling.
+  - Account for mailbox storage and traffic as global scratch even though the stages share a launch.
+  rationale:
+  - The kernel writes paired values and tags and polls them through device-scope buffer operations; it does
+    not eliminate intermediate storage.
+  alternatives:
+  - Separate the stages into launches with ordinary tensors.
+  - Use registers or LDS only where ownership and lifetime really allow it.
+  case_refs:
+  - qwen38_flash_next_verify
+  source_refs:
+  - sgl_amd_mono_7a4a552d:qwen_mailbox
+  - sgl_amd_mono_7a4a552d:qwen_stages
+  - sgl_amd_mono_7a4a552d:qwen_state
+  - sgl_amd_mono_7a4a552d:qwen_wait
+  effect:
+    outcome: not_assessed
+    summary: This pass records an implemented contract. A comparable baseline/candidate performance result
+      and an isolated effect for this decision have not been assessed.
+  assessment:
+    implementation:
+      level: high
+      reasons:
+      - The pinned case entry and named implementation establish this scoped mechanism; this is not runtime
+        or numerical validation.
+      missing_evidence:
+      - target_model_engagement
+    effect:
+      level: unknown
+      reasons:
+      - No comparable workload measurement is encoded for this decision.
+      missing_evidence:
+      - paired_measurement
+      - correctness_result
+      - runtime_environment
+    attribution:
+      level: unknown
+      reasons:
+      - Source inspection does not isolate the performance contribution of this mechanism.
+      missing_evidence:
+      - controlled_ablation
+  validation_plan:
+  - Stress stale tags, partially ready inputs and graph replay; establish progress for the target residency
+    and dependency graph.
+  - Measure polling, global traffic, spills and full-stack latency.
+  limitations:
+  - This TP1 protocol cannot be used as a cross-GPU collective protocol without additional design.
+  - A persistent label by itself does not prove memory visibility or progress.
+- id: stack-preserve-verify-state
+  question: Which state writes must survive fusion of a speculative verification stack?
+  axes:
+  - numerical_contract
+  - data_lifetime
+  - dispatch
+  status: candidate_only
+  conditions:
+  - The target runs four-token NEXTN target verification with per-request GDN/PLE scratch and QSA cache updates.
+  actions:
+  - Keep per-token state/window snapshots in the request row consumed by accept/commit logic.
+  - Preserve KV/index-ring writes, residual outputs and padding rules; keep committed recurrent state distinct
+    from speculative scratch.
+  - Use sequence positions for causal/context logic and MRoPE positions for rotary transforms where they differ.
+  rationale:
+  - The fused stages must leave the same externally visible state for accept, draft and later target steps.
+  alternatives:
+  - Keep the framework recurrent and attention paths for unsupported verification contracts.
+  case_refs:
+  - qwen38_flash_next_verify
+  source_refs:
+  - sgl_amd_mono_7a4a552d:qwen_state
+  - sgl_amd_mono_7a4a552d:qwen_recurrence
+  - sgl_amd_mono_7a4a552d:qwen_spec
+  - sgl_amd_mono_7a4a552d:qwen_admission
+  effect:
+    outcome: not_assessed
+    summary: This pass records an implemented contract. A comparable baseline/candidate performance result
+      and an isolated effect for this decision have not been assessed.
+  assessment:
+    implementation:
+      level: high
+      reasons:
+      - The pinned case entry and named implementation establish this scoped mechanism; this is not runtime
+        or numerical validation.
+      missing_evidence:
+      - target_model_engagement
+    effect:
+      level: unknown
+      reasons:
+      - No comparable workload measurement is encoded for this decision.
+      missing_evidence:
+      - paired_measurement
+      - correctness_result
+      - runtime_environment
+    attribution:
+      level: unknown
+      reasons:
+      - Source inspection does not isolate the performance contribution of this mechanism.
+      missing_evidence:
+      - controlled_ablation
+  validation_plan:
+  - Compare all snapshots and cache mutations for mixed acceptance lengths, padding, multiple requests and
+    multimodal positions.
+  - Test the following accepted/draft step, not just the current returned hidden state.
+  limitations:
+  - The reviewed target spec excludes ReplaySSM; the separate MTP draft implementation is outside this case.
+- id: stack-bound-fusion-depth
+  question: How should cross-layer fusion depth be bounded?
+  axes:
+  - fusion_boundary
+  - compilation
+  - measurement
+  status: candidate_only
+  conditions:
+  - Layer bodies are unrolled at compile time and each supported row shape requires specialization.
+  actions:
+  - Choose a bounded layer group and preserve special first/prelude and final-mixer boundaries.
+  - Compare compilation cost, code size, resource use and steady-state latency while retaining identical state
+    semantics.
+  - Count the 13 stack launches separately from logits, host-issued epoch updates and other serving work.
+  rationale:
+  - The reviewed plan uses layer 0, layers 1..3, then groups of four; the documentation gives code size and
+    compilation time as reasons for the bound.
+  alternatives:
+  - Use one layer per launch.
+  - Evaluate larger groups only with a measured resource and compilation budget.
+  case_refs:
+  - qwen38_flash_next_verify
+  source_refs:
+  - sgl_amd_mono_7a4a552d:qwen_plan
+  - sgl_amd_mono_7a4a552d:qwen_partition
+  - sgl_amd_mono_7a4a552d:qwen_launch
+  - sgl_amd_mono_7a4a552d:qwen_stages
+  effect:
+    outcome: not_assessed
+    summary: This pass records an implemented contract. A comparable baseline/candidate performance result
+      and an isolated effect for this decision have not been assessed.
+  assessment:
+    implementation:
+      level: high
+      reasons:
+      - The pinned case entry and named implementation establish this scoped mechanism; this is not runtime
+        or numerical validation.
+      missing_evidence:
+      - target_model_engagement
+    effect:
+      level: unknown
+      reasons:
+      - No comparable workload measurement is encoded for this decision.
+      missing_evidence:
+      - paired_measurement
+      - correctness_result
+      - runtime_environment
+    attribution:
+      level: unknown
+      reasons:
+      - Source inspection does not isolate the performance contribution of this mechanism.
+      missing_evidence:
+      - controlled_ablation
+  validation_plan:
+  - Measure cold compilation, cache reuse, warm latency, occupancy and correctness across supported request
+    counts.
+  - Use an actual before/after trace before claiming eliminated launches or end-to-end benefit.
+  limitations:
+  - Thirteen is this model plan, not a universal optimal count.
+  - The current source supplies a design rationale; this pass does not encode a fusion-depth ablation.
