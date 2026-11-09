@@ -31,5 +31,21 @@
     "endpoint_log_replay": "127 parsed commands identical; only whitespace differs"
   },
   "gpu_profiling": "not performed; original compatible traces unavailable",
-  "causal_kernel_speedup": "not established"
+  "causal_kernel_speedup": "not established",
+  "log_comparison_validation": {
+    "validated_at_utc": "2026-11-09T08:44:51.487412+00:00",
+    "endpoint_artifacts": 31,
+    "exact_upload_links": 31,
+    "phase_windows": 31,
+    "recovered_pairs": 16,
+    "existing_pairs_enriched": 10,
+    "supplemental_v01_to_v09_pairs": 6,
+    "pytest": "238 passed; includes 16 InferenceX checks",
+    "corpus_and_workload_build": "passed",
+    "runtime_and_pair_replay": "identical",
+    "muse_structured_pair_regression": "identical",
+    "markdown_links": "134 files checked; no broken local links",
+    "skill_validator": "passed",
+    "new_gpu_jobs": 0
+  }
 }

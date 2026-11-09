@@ -17,3 +17,21 @@ Use `--cache /path/to/external-cache` and `--knowledge knowledge/top_model/deeps
 The checked-in evidence represents the November 9 collection. Container inspection completed as CPU-only Slurm job 275610. Original GPU profiles were not recovered, so top-kernel time shares and causal speedups remain unavailable. A later reproduced GPU profile would be a new measurement and should have its own configuration/provenance.
 
 `check_dockerhub.py --cache ...` checks exact tags, full/short commit-name matches and known historical digests directly against Docker Hub/Registry. It records response hashes and distinguishes a missing tag from an unavailable manifest. This HTTP-only verification needs neither Docker nor a GPU.
+
+## Deeper log and recovered-container comparisons
+
+Run these without a GPU job after the image export:
+
+```bash
+python3 tools/inferencex/deepseek_flash/collect_recovered_logs.py --cache /path/to/cache --knowledge knowledge/top_model/deepseek_v41_flash
+python3 tools/inferencex/deepseek_flash/prepare_recovered_sources.py --cache /path/to/cache --knowledge knowledge/top_model/deepseek_v41_flash
+python3 tools/inferencex/deepseek_flash/analyze_recovered_logs.py --cache /path/to/cache --knowledge knowledge/top_model/deepseek_v41_flash
+python3 tools/inferencex/deepseek_flash/render_recovered.py --knowledge knowledge/top_model/deepseek_v41_flash
+python3 tools/inferencex/skills/inferencex-kernel-evolution/scripts/build_pair_history.py --knowledge knowledge/top_model/deepseek_v41_flash
+```
+
+`collect_recovered_logs.py` follows exact job-upload artifact IDs for every representative with a recovered image. It records every archive member's hash, retaining full logs/request exports outside Git. `prepare_recovered_sources.py` maps logged JIT names to captured source candidates and stores both file hashes and symbol code/AST hashes. Device symbol candidates are not assumed to be unique binary dispatch identities.
+
+`analyze_recovered_logs.py` joins server active/HIT/JIT messages to AIPerf phase boundaries, using CI timestamps for the legacy baseline. Its 16-pair view is consecutive within the recovered-image subset: six V01→V09 comparisons supplement the original chronology, and ten existing pairs receive detailed links. Review `evidence/recovered_kernel_reviews.json` separately before rendering; source changes alone do not establish new runtime fusion.
+
+AIPerf's `Profiling` phase and `profile_export` files are E2E request evidence, not GPU traces. The default JIT monitor activates after server warmup and logs once per signature. HIT/active messages can occur during graph preparation. No message is not proof of no execution; diagnostic counts are not kernel invocation counts.

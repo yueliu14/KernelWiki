@@ -1490,7 +1490,12 @@
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "after",
+        "artifact_id": 12222765118
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -1511,7 +1516,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp2_ep1_conc1_off_2026-10-20_to_2026-11-09",
@@ -1928,7 +1934,16 @@
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12222765118
+      },
+      {
+        "side": "after",
+        "artifact_id": 13563028606
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -1948,6 +1963,17 @@
           "sha256:6f126f27a3b58959da3c16076248fc99eb31e26d0a3ae9f8563bda7317d6a7e6"
         ]
       }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json",
+    "runtime_log_evidence": {
+      "pair_id": "tp2_ep1_conc1_off_2026-10-20_to_2026-11-09",
+      "report": "recovered_pairs/tp2_ep1_conc1_v09_to_v11.md",
+      "before_point_id": "445386",
+      "after_point_id": "447798",
+      "before_artifact_id": 12222765118,
+      "after_artifact_id": 13563028606,
+      "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+      "gpu_profile_status": "unavailable"
     }
   },
   {
@@ -3431,7 +3457,12 @@
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "after",
+        "artifact_id": 12222711774
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -3452,7 +3483,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp2_ep1_conc2_off_2026-10-20_to_2026-11-09",
@@ -3869,7 +3901,16 @@
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12222711774
+      },
+      {
+        "side": "after",
+        "artifact_id": 13564127198
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -3889,6 +3930,17 @@
           "sha256:6f126f27a3b58959da3c16076248fc99eb31e26d0a3ae9f8563bda7317d6a7e6"
         ]
       }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json",
+    "runtime_log_evidence": {
+      "pair_id": "tp2_ep1_conc2_off_2026-10-20_to_2026-11-09",
+      "report": "recovered_pairs/tp2_ep1_conc2_v09_to_v11.md",
+      "before_point_id": "445387",
+      "after_point_id": "447799",
+      "before_artifact_id": 12222711774,
+      "after_artifact_id": 13564127198,
+      "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+      "gpu_profile_status": "unavailable"
     }
   },
   {
@@ -5372,7 +5424,12 @@
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "after",
+        "artifact_id": 12222959431
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -5393,7 +5450,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp2_ep1_conc4_off_2026-10-20_to_2026-11-09",
@@ -5810,7 +5868,16 @@
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12222959431
+      },
+      {
+        "side": "after",
+        "artifact_id": 13563853565
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -5830,6 +5897,17 @@
           "sha256:6f126f27a3b58959da3c16076248fc99eb31e26d0a3ae9f8563bda7317d6a7e6"
         ]
       }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json",
+    "runtime_log_evidence": {
+      "pair_id": "tp2_ep1_conc4_off_2026-10-20_to_2026-11-09",
+      "report": "recovered_pairs/tp2_ep1_conc4_v09_to_v11.md",
+      "before_point_id": "445389",
+      "after_point_id": "447801",
+      "before_artifact_id": 12222959431,
+      "after_artifact_id": 13563853565,
+      "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+      "gpu_profile_status": "unavailable"
     }
   },
   {
@@ -7323,7 +7401,12 @@
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "after",
+        "artifact_id": 12229059529
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -7344,7 +7427,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp2_ep1_conc8_off_2026-10-20_to_2026-11-09",
@@ -7761,7 +7845,16 @@
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12229059529
+      },
+      {
+        "side": "after",
+        "artifact_id": 13563787714
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -7781,6 +7874,17 @@
           "sha256:6f126f27a3b58959da3c16076248fc99eb31e26d0a3ae9f8563bda7317d6a7e6"
         ]
       }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json",
+    "runtime_log_evidence": {
+      "pair_id": "tp2_ep1_conc8_off_2026-10-20_to_2026-11-09",
+      "report": "recovered_pairs/tp2_ep1_conc8_v09_to_v11.md",
+      "before_point_id": "445391",
+      "after_point_id": "447803",
+      "before_artifact_id": 12229059529,
+      "after_artifact_id": 13563787714,
+      "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+      "gpu_profile_status": "unavailable"
     }
   },
   {
@@ -9268,7 +9372,12 @@
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "after",
+        "artifact_id": 12224605382
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -9289,7 +9398,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp2_ep1_conc16_off_2026-10-20_to_2026-11-09",
@@ -9701,7 +9811,16 @@
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12224605382
+      },
+      {
+        "side": "after",
+        "artifact_id": 13564725051
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -9721,6 +9840,17 @@
           "sha256:6f126f27a3b58959da3c16076248fc99eb31e26d0a3ae9f8563bda7317d6a7e6"
         ]
       }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json",
+    "runtime_log_evidence": {
+      "pair_id": "tp2_ep1_conc16_off_2026-10-20_to_2026-11-09",
+      "report": "recovered_pairs/tp2_ep1_conc16_v09_to_v11.md",
+      "before_point_id": "445385",
+      "after_point_id": "447797",
+      "before_artifact_id": 12224605382,
+      "after_artifact_id": 13564725051,
+      "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+      "gpu_profile_status": "unavailable"
     }
   },
   {
@@ -11204,7 +11334,12 @@
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "after",
+        "artifact_id": 12236676394
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -11225,7 +11360,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp2_ep1_conc32_off_2026-10-20_to_2026-11-09",
@@ -11637,7 +11773,16 @@
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12236676394
+      },
+      {
+        "side": "after",
+        "artifact_id": 13564049818
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -11657,6 +11802,17 @@
           "sha256:6f126f27a3b58959da3c16076248fc99eb31e26d0a3ae9f8563bda7317d6a7e6"
         ]
       }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json",
+    "runtime_log_evidence": {
+      "pair_id": "tp2_ep1_conc32_off_2026-10-20_to_2026-11-09",
+      "report": "recovered_pairs/tp2_ep1_conc32_v09_to_v11.md",
+      "before_point_id": "445388",
+      "after_point_id": "447800",
+      "before_artifact_id": 12236676394,
+      "after_artifact_id": 13564049818,
+      "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+      "gpu_profile_status": "unavailable"
     }
   },
   {
@@ -13146,7 +13302,12 @@
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "after",
+        "artifact_id": 12229184365
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -13167,7 +13328,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp2_ep1_conc64_off_2026-10-20_to_2026-11-09",
@@ -13568,7 +13730,16 @@
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12229184365
+      },
+      {
+        "side": "after",
+        "artifact_id": 13565030597
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -13588,6 +13759,17 @@
           "sha256:6f126f27a3b58959da3c16076248fc99eb31e26d0a3ae9f8563bda7317d6a7e6"
         ]
       }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json",
+    "runtime_log_evidence": {
+      "pair_id": "tp2_ep1_conc64_off_2026-10-20_to_2026-11-09",
+      "report": "recovered_pairs/tp2_ep1_conc64_v09_to_v11.md",
+      "before_point_id": "445390",
+      "after_point_id": "447802",
+      "before_artifact_id": 12229184365,
+      "after_artifact_id": 13565030597,
+      "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+      "gpu_profile_status": "unavailable"
     }
   },
   {
@@ -14262,7 +14444,8 @@
           null
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp4_ep1_conc1_off_2026-09-13_to_2026-09-22",
@@ -16024,7 +16207,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp4_ep1_conc1_off_2026-10-20_to_2026-11-09",
@@ -16394,6 +16578,17 @@
           "sha256:6f126f27a3b58959da3c16076248fc99eb31e26d0a3ae9f8563bda7317d6a7e6"
         ]
       }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json",
+    "runtime_log_evidence": {
+      "pair_id": "tp4_ep1_conc1_off_2026-10-20_to_2026-11-09",
+      "report": "recovered_pairs/tp4_ep1_conc1_v09_to_v11.md",
+      "before_point_id": "445393",
+      "after_point_id": "447804",
+      "before_artifact_id": 12228583807,
+      "after_artifact_id": 13561965484,
+      "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+      "gpu_profile_status": "unavailable"
     }
   },
   {
@@ -16658,7 +16853,12 @@
       "V01 is a current tag snapshot whose vLLM commit matches CI, not a historical-digest-verified container. V02 is commit source corroborated by CI.",
       "Server admission and CUDA graph capture limits also changed. The large E2E gain is not a measured causal effect of mHC or MoE alone."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 10287897591
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -16679,7 +16879,8 @@
           null
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp4_ep1_conc2_off_2026-09-13_to_2026-09-22",
@@ -18356,7 +18557,12 @@
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "after",
+        "artifact_id": 12232283661
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -18377,7 +18583,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp4_ep1_conc2_off_2026-10-20_to_2026-11-09",
@@ -18708,7 +18915,16 @@
       "New TP8 support is not a new fusion for this already supported TP4 pair.",
       "TP2 ratio-2 tuned schedule is not selected at TP4."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12232283661
+      },
+      {
+        "side": "after",
+        "artifact_id": 13563797350
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -18728,6 +18944,17 @@
           "sha256:6f126f27a3b58959da3c16076248fc99eb31e26d0a3ae9f8563bda7317d6a7e6"
         ]
       }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json",
+    "runtime_log_evidence": {
+      "pair_id": "tp4_ep1_conc2_off_2026-10-20_to_2026-11-09",
+      "report": "recovered_pairs/tp4_ep1_conc2_v09_to_v11.md",
+      "before_point_id": "445394",
+      "after_point_id": "447805",
+      "before_artifact_id": 12232283661,
+      "after_artifact_id": 13563797350,
+      "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+      "gpu_profile_status": "unavailable"
     }
   },
   {
@@ -18992,7 +19219,12 @@
       "V01 is a current tag snapshot whose vLLM commit matches CI, not a historical-digest-verified container. V02 is commit source corroborated by CI.",
       "Server admission and CUDA graph capture limits also changed. The large E2E gain is not a measured causal effect of mHC or MoE alone."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 10287648269
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -19013,7 +19245,8 @@
           null
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp4_ep1_conc4_off_2026-09-13_to_2026-09-22",
@@ -20686,7 +20919,12 @@
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "after",
+        "artifact_id": 12232949220
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -20707,7 +20945,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp4_ep1_conc8_off_2026-09-12_to_2026-09-13",
@@ -20971,7 +21210,12 @@
       "V01 is a current tag snapshot whose vLLM commit matches CI, not a historical-digest-verified container. V02 is commit source corroborated by CI.",
       "Server admission and CUDA graph capture limits also changed. The large E2E gain is not a measured causal effect of mHC or MoE alone."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 10288486291
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -20992,7 +21236,8 @@
           null
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp4_ep1_conc8_off_2026-09-13_to_2026-09-22",
@@ -22675,7 +22920,12 @@
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "after",
+        "artifact_id": 12232726920
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -22696,7 +22946,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp4_ep1_conc16_off_2026-09-12_to_2026-09-13",
@@ -22960,7 +23211,12 @@
       "V01 is a current tag snapshot whose vLLM commit matches CI, not a historical-digest-verified container. V02 is commit source corroborated by CI.",
       "Server admission and CUDA graph capture limits also changed. The large E2E gain is not a measured causal effect of mHC or MoE alone."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 10289485380
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -22981,7 +23237,8 @@
           null
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp4_ep1_conc16_off_2026-09-13_to_2026-09-22",
@@ -24664,7 +24921,12 @@
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "after",
+        "artifact_id": 12232727040
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -24685,7 +24947,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp4_ep1_conc32_off_2026-09-12_to_2026-09-13",
@@ -24949,7 +25212,12 @@
       "V01 is a current tag snapshot whose vLLM commit matches CI, not a historical-digest-verified container. V02 is commit source corroborated by CI.",
       "Server admission and CUDA graph capture limits also changed. The large E2E gain is not a measured causal effect of mHC or MoE alone."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 10288831728
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -24970,7 +25238,8 @@
           null
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp4_ep1_conc32_off_2026-09-13_to_2026-09-22",
@@ -26653,7 +26922,12 @@
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "after",
+        "artifact_id": 12232816951
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -26674,7 +26948,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp4_ep1_conc64_off_2026-09-22_to_2026-09-24",
@@ -28167,7 +28442,12 @@
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "after",
+        "artifact_id": 12233686948
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
@@ -28188,7 +28468,8 @@
           "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
         ]
       }
-    }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json"
   },
   {
     "id": "tp4_ep1_conc128_off_2026-09-22_to_2026-09-24",
@@ -28896,6 +29177,10 @@
       {
         "side": "before",
         "artifact_id": 13122361038
+      },
+      {
+        "side": "after",
+        "artifact_id": 13566143184
       }
     ],
     "top_kernels": null,
@@ -28917,6 +29202,17 @@
           "sha256:6f126f27a3b58959da3c16076248fc99eb31e26d0a3ae9f8563bda7317d6a7e6"
         ]
       }
+    },
+    "additional_server_log_evidence": "evidence/recovered_endpoint_logs.json",
+    "runtime_log_evidence": {
+      "pair_id": "tp8_ep1_conc1_off_2026-11-03_to_2026-11-09",
+      "report": "recovered_pairs/tp8_ep1_conc1_v10_to_v11.md",
+      "before_point_id": "447088",
+      "after_point_id": "447806",
+      "before_artifact_id": 13122361038,
+      "after_artifact_id": 13566143184,
+      "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+      "gpu_profile_status": "unavailable"
     }
   }
 ]

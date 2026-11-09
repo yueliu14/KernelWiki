@@ -33,6 +33,9 @@ For each pair, create an individual kernel-change record linked from that config
 
 For each `date1 → date2`, then `date2 → date3` edge, track the same workload points. Establish top kernels from compatible GPU traces/profiles, ranked by total GPU time with call counts and percentage. Record phase (prefill/decode/verify), trace coverage, overlap/timing method, and profile configuration. Static source inspection supplies **candidate hot paths**, not measured top kernels. Reprofiling is a separate measurement, not the original CI profile.
 
+When no new GPU run is requested, inspect every comparable endpoint's server artifacts, not just one job per image. Extract explicit dispatch/HIT shapes and named JIT events, locate their source logging sites, and align timestamps to the benchmark warmup and measurement windows. An active message before measurement proves a guarded path was reached during setup, not sustained benchmark coverage. JIT monitor warnings may activate only after server warmup and be deduplicated with `warning_once`; missing messages do not prove non-use, and their counts are not kernel invocation counts. Distinguish AIPerf request-level `Profiling`/`profile_export` from GPU traces. Compare logged-symbol bodies as well as whole-file hashes: a new function can change a file while existing kernels remain identical. Label ambiguous source-name mappings explicitly. If analyzing only recoverable images, preserve that subset's longer edges as a supplemental view rather than overwriting the full chronology.
+
+
 For each relevant operator/semantic pipeline, record:
 
 - Actual dispatch/call path, source file and symbol, source SHA256 and git/package revision, and shape/dtype/flag guards. A stable path/name does not imply a stable body; a rename does not prove an implementation change.

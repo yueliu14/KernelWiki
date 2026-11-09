@@ -29,3 +29,5 @@ Fusion review learned here:
 - These benchmarks use five DSpark drafts with synthetic acceptance length 3.51. Performance deltas do not establish natural acceptance or causal kernel effects.
 
 [Knowledge](../../../../../knowledge/top_model/deepseek_v41_flash/README.md) · [Evidence refresh tools](../../../deepseek_flash/README.md)
+
+The [recovered-container log supplement](../../../../../knowledge/top_model/deepseek_v41_flash/recovered_image_history.md) inspects 31 exact endpoint artifacts and 16 pairs. It aligns server diagnostics to request warmup and E2E measurement, maps named JIT symbols to file/body hashes, and separates unchanged device bodies from new fusion. V11 TP2 c64 records a four-row quant+GEMM HIT during measurement, while both TP8 c1 endpoints retain the same block32 fusion body and 41 pre-measurement HIT shape signatures. Every first mono/Markov active message is before measurement. These examples show why client concurrency, active logs and JIT warnings cannot substitute for a complete GPU trace.
