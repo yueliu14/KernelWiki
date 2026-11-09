@@ -15,3 +15,5 @@ Use `--cache /path/to/external-cache` and `--knowledge knowledge/top_model/deeps
 9. Run the common `build_pair_history.py --knowledge ...`, then `render_summary.py --knowledge ...`. The latter renders all observations and the reviewed image-level chain. Validate using `python -m pytest -q tests/inferencex` and the repository checks.
 
 The checked-in evidence represents the November 9 collection. Container inspection completed as CPU-only Slurm job 275610. Original GPU profiles were not recovered, so top-kernel time shares and causal speedups remain unavailable. A later reproduced GPU profile would be a new measurement and should have its own configuration/provenance.
+
+`check_dockerhub.py --cache ...` checks exact tags, full/short commit-name matches and known historical digests directly against Docker Hub/Registry. It records response hashes and distinguishes a missing tag from an unavailable manifest. This HTTP-only verification needs neither Docker nor a GPU.

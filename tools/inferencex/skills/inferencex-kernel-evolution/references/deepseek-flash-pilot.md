@@ -16,7 +16,7 @@ CI handling learned here:
 Container recovery learned here:
 
 - V01, V09, V10 and V11 pulled on a CPU-only node. V02–V08 tags were removed. Full-SHA tags plus matching CI startup package versions identify upstream vLLM commits, but not historical image bytes or AITER dependencies.
-- V01's present tag resolves and its package commit matches CI; no historical digest was recovered. Only V09–V11 match API-recorded immutable digests.
+- V01's present tag resolves and its package commit matches CI; no historical digest was recovered. Only V09–V11 match API-recorded immutable digests. Direct Hub/Registry checks subsequently confirmed V02–V08 tag 404s and zero full/short-SHA tag matches. V09 also returns 404 by tag but HTTP 200 by historical digest, demonstrating that absent tags do not establish deleted image bytes. See the model's `evidence/dockerhub_verification.md`.
 - Use inventories keyed by image name/source snapshot, not `None` digests. Preserve source_kind (`container` or `upstream_commit`), historical digests, current resolved digests and original/repository paths. Normalize `deepseek_v4_1` → `deepseek_v41` for diffs only.
 - vLLM can be installed under `/usr/local/lib/python3.12/dist-packages/vllm`, with separate `/app/vllm` build copies. Prefer the installed runtime package and retain original paths/hashes.
 
