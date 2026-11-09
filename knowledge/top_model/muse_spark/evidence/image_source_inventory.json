@@ -1,0 +1,1331 @@
+[
+  {
+    "image_name": "lmsysorg/sglang-rocm:muse-spark-open",
+    "digest": "sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4",
+    "image_id": "sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4",
+    "repo_digests": [
+      "lmsysorg/sglang-rocm@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4"
+    ],
+    "platform": "linux/amd64",
+    "image_created": "2026-10-14T21:11:34.456981289Z",
+    "image_size_bytes": 87685912380,
+    "capture_utc": "2026-11-09T05:51:38.091956+00:00",
+    "git": [
+      {
+        "path": "/sgl-workspace/aiter",
+        "head": "4ad99832823dde2315b361cbd3b54b1c5c12acd5",
+        "tracked_dirty_lines": 5,
+        "status_sha256": "8c8a49b8007814f57e674a5d01f198b86b39a2b302c7e2ffd8aadbdeafb17717"
+      },
+      {
+        "path": "/sgl-workspace/sglang",
+        "head": "c722c0a160981f21c81cffaab7bbcc117089a2a6",
+        "tracked_dirty_lines": 3,
+        "status_sha256": "983eb3011f444c89fa5bfc465a43a5990e402189ac235752a76a27dac8566ca8"
+      }
+    ],
+    "packages": {
+      "sglang": "0.5.21+gc722c0a1",
+      "triton": "3.7.0+amd.rocm7.2.0.git89002410",
+      "triton_kernels": "1.0.0+amd.rocm7.2.0.git89002410",
+      "torch": "2.9.1+rocm7.2.0.lw.git7e1940d4",
+      "sglang-router": "0.3.2",
+      "sglang-kernel": "0.4.9",
+      "amd-aiter": "0.1.21.dev48+g4ad998328.d20261014",
+      "flydsl": "0.3.2",
+      "torchaudio": "2.9.0+rocm7.2.0.gite3c6ee2b",
+      "torchvision": "0.24.0+rocm7.2.0.gitb919bd0c"
+    },
+    "captured_source_count": 18812,
+    "archive_sha256": "6d64e2e3b32623aa511b80850df56c82ed5cb1ac48d7cb320cc188736ef7976c",
+    "external_archive": "/shared_nfs/yueliu14/inferencex_muse_spark_research/images/72065dfc0b87/sources.tar.gz",
+    "relevant_files": [
+      {
+        "path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_finalize.py",
+        "sha256": "48af597a54827b3e7f9340dada68f74759bee80213df01fbe8f95c4e95fe6d2b",
+        "bytes": 11172
+      },
+      {
+        "path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+        "sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+        "bytes": 45872
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/environ.py",
+        "sha256": "aa4b3f150b684269760017b19983a8f85f9ecc52cf380a38e0c8ebca530b99f1",
+        "bytes": 111764
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
+        "sha256": "d0402c3cbe75080db71f988f6ad8f1e8611aaca2dc63ec24b8182d569d4aba8f",
+        "bytes": 225577
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/base_fused_op.py",
+        "sha256": "d2fe8f48237b8007435993cb99fa0ecdcd2cd3fd8a987f863b3d3f83428b208a",
+        "bytes": 14761
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fi_trtllm_moe_finalize_with_rmsnorm_cutedsl.py",
+        "sha256": "8dd75e47ce99056fb7c35dcc88d64d6eacaa57995eb2f40d807eefc3ea8a9e74",
+        "bytes": 15738
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fp4_moe.py",
+        "sha256": "e7fd0c34ff8cdb48c83cc3d689acd909d041524ac87fd97a246daeee18e64235",
+        "bytes": 15266
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_muse_spark_routing.py",
+        "sha256": "27f8d5867233fe4e76d5941d0f85149886b4cfa0d3802b49810f4e156bdf1b2e",
+        "bytes": 32737
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+        "sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
+        "bytes": 8460
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+        "sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
+        "bytes": 13374
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_op_tuning.py",
+        "sha256": "94c5b8f1cf0b125f513cd800a1f5f1fa590cc9881ca67238da69909e58721158",
+        "bytes": 3317
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_post_expert_norm_weighted_sum_trtllm.py",
+        "sha256": "16412f9a50fdccd6a2ddac0975e2155ae0624affe436d9b302f705f50bf8e5f5",
+        "bytes": 9327
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/layers.py",
+        "sha256": "1fa94beb4543f10bbf3023d001a41639b583faf3090517902adba15571cced5c",
+        "bytes": 8694
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+        "sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
+        "bytes": 60213
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_moe_flydsl.py",
+        "sha256": "d6f346b41ca0b87dca7547da5ac4ce82afc70ae974967321c13431c510ff584b",
+        "bytes": 14246
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_moe_triton.py",
+        "sha256": "769e8bd8c24032e509d8f1c5338cc2d297683745957e2627ee5b453fae41eb2d",
+        "bytes": 31648
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
+        "sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
+        "bytes": 2702
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_router_gemv.py",
+        "sha256": "31c2557d84510337d9cfe78898485d7e1d2459be47bb2935682a44a5fabdff33",
+        "bytes": 4025
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/nvfp4_moe.py",
+        "sha256": "54312e5261b2e900e3c10a266f0a0b608dcb23e1dba2bab2a7865c360c4410e0",
+        "bytes": 5056
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/triton_sum.py",
+        "sha256": "4dcfb33b08a108e61d18f61914a0d12d21e4904a5bedb37eaec8d88df104f843",
+        "bytes": 1528
+      }
+    ]
+  },
+  {
+    "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+    "digest": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+    "image_id": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+    "repo_digests": [
+      "lmsysorg/sglang-rocm@sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935"
+    ],
+    "platform": "linux/amd64",
+    "image_created": "2026-10-21T01:18:49.566898893Z",
+    "image_size_bytes": 87868967179,
+    "capture_utc": "2026-11-09T05:51:54.028601+00:00",
+    "git": [
+      {
+        "path": "/sgl-workspace/aiter",
+        "head": "4ad99832823dde2315b361cbd3b54b1c5c12acd5",
+        "tracked_dirty_lines": 7,
+        "status_sha256": "8411e121464c50fcab0eab3b14a9f401b99e88454a825dac4fe56f99c2448ee0"
+      },
+      {
+        "path": "/sgl-workspace/sglang",
+        "head": "c722c0a160981f21c81cffaab7bbcc117089a2a6",
+        "tracked_dirty_lines": 1105,
+        "status_sha256": "f2eefb4b985443bbc5523838202d96ba88f2450214ecda74b431e2b7875fde0e"
+      }
+    ],
+    "packages": {
+      "sglang": "0.5.21+gc722c0a1",
+      "triton": "3.7.0+amd.rocm7.2.0.git89002410",
+      "triton_kernels": "1.0.0+amd.rocm7.2.0.git89002410",
+      "torch": "2.9.1+rocm7.2.0.lw.git7e1940d4",
+      "sglang-router": "0.3.2",
+      "sglang-kernel": "0.4.9",
+      "amd-aiter": "0.1.21.dev48+g4ad998328.d20261014",
+      "flydsl": "0.3.2",
+      "torchaudio": "2.9.0+rocm7.2.0.gite3c6ee2b",
+      "torchvision": "0.24.0+rocm7.2.0.gitb919bd0c"
+    },
+    "captured_source_count": 19060,
+    "archive_sha256": "4705fd70a040dfafa303f06297be6ae5d4cb1d4e264cf8728f16df700df63c46",
+    "external_archive": "/shared_nfs/yueliu14/inferencex_muse_spark_research/images/7343002d0dc2/sources.tar.gz",
+    "relevant_files": [
+      {
+        "path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_finalize.py",
+        "sha256": "48af597a54827b3e7f9340dada68f74759bee80213df01fbe8f95c4e95fe6d2b",
+        "bytes": 11172
+      },
+      {
+        "path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+        "sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+        "bytes": 45872
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/gqa_verify_splitkv_2kv.py",
+        "sha256": "c03436991d5473940e5926bb347d2be553c2c9c7d0b270bb8a7e6c3b7caaa0bd",
+        "bytes": 11492
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+        "sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
+        "bytes": 8651
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/swa_verify_splitkv.py",
+        "sha256": "46187f5cb142ae95942d588866119f615da5f597fb2de8002a53cd8a077692d9",
+        "bytes": 7329
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/gemm/bf16_tiled_small_m_gemm.py",
+        "sha256": "118007981b393b59758b1b9850f2352eafdf41f374686523f57e5fe448702747",
+        "bytes": 4282
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py",
+        "sha256": "6a2cd481da888c296c252e116cde2f26745e01a74858276cdc48e167d5031474",
+        "bytes": 8906
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+        "sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
+        "bytes": 10384
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/environ.py",
+        "sha256": "42a3b2158bd02f31a6e0e7082bfa820ddfa95c54db9fb8b86d76f100f9f7518c",
+        "bytes": 122608
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
+        "sha256": "90f2fe0d341cea7189268bcefa23aa7bd9dfe845c8962dc9c2af084bbbf63c09",
+        "bytes": 238222
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/__init__.py",
+        "sha256": "f7be53e66db7d05f1ccb5888213a3a18839c1aa6afb740bad2af0c13d3c62af7",
+        "bytes": 300
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/guards.py",
+        "sha256": "05b0d1ebf2a389c90282ecfeefa84d6278867efe8912d4f6b61edd0466e67f02",
+        "bytes": 8168
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
+        "sha256": "914e7957ee99f22eef5e1e11a1bf05a0cdc9ae90b6efe7a7ccbf810f5a8f03dc",
+        "bytes": 14465
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/spec.py",
+        "sha256": "fe025c0392984a870668ead9f710d170b928a71cab27960863a118d227f87ff8",
+        "bytes": 8064
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+        "sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
+        "bytes": 6709
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/base_fused_op.py",
+        "sha256": "d2fe8f48237b8007435993cb99fa0ecdcd2cd3fd8a987f863b3d3f83428b208a",
+        "bytes": 14761
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fi_trtllm_moe_finalize_with_rmsnorm_cutedsl.py",
+        "sha256": "8dd75e47ce99056fb7c35dcc88d64d6eacaa57995eb2f40d807eefc3ea8a9e74",
+        "bytes": 15738
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fp4_moe.py",
+        "sha256": "e7fd0c34ff8cdb48c83cc3d689acd909d041524ac87fd97a246daeee18e64235",
+        "bytes": 15266
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_muse_spark_routing.py",
+        "sha256": "27f8d5867233fe4e76d5941d0f85149886b4cfa0d3802b49810f4e156bdf1b2e",
+        "bytes": 32737
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+        "sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
+        "bytes": 8460
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+        "sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
+        "bytes": 13374
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_op_tuning.py",
+        "sha256": "94c5b8f1cf0b125f513cd800a1f5f1fa590cc9881ca67238da69909e58721158",
+        "bytes": 3317
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_post_expert_norm_weighted_sum_trtllm.py",
+        "sha256": "16412f9a50fdccd6a2ddac0975e2155ae0624affe436d9b302f705f50bf8e5f5",
+        "bytes": 9327
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/layers.py",
+        "sha256": "1fa94beb4543f10bbf3023d001a41639b583faf3090517902adba15571cced5c",
+        "bytes": 8694
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+        "sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
+        "bytes": 75116
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_moe_flydsl.py",
+        "sha256": "d6f346b41ca0b87dca7547da5ac4ce82afc70ae974967321c13431c510ff584b",
+        "bytes": 14246
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_moe_triton.py",
+        "sha256": "769e8bd8c24032e509d8f1c5338cc2d297683745957e2627ee5b453fae41eb2d",
+        "bytes": 31648
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
+        "sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
+        "bytes": 2702
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py",
+        "sha256": "39b054665c41c85e6fc85a4fb9e1a706c240a6c90a9b6a5232eb9d229fe08c22",
+        "bytes": 6104
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/nvfp4_moe.py",
+        "sha256": "54312e5261b2e900e3c10a266f0a0b608dcb23e1dba2bab2a7865c360c4410e0",
+        "bytes": 5056
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+        "sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
+        "bytes": 5144
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/sequence_parallel.py",
+        "sha256": "e7b4dee9370c0625942227fda3762dc23594de2190180a53432dca4c5b1f790a",
+        "bytes": 5589
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/triton_sum.py",
+        "sha256": "4dcfb33b08a108e61d18f61914a0d12d21e4904a5bedb37eaec8d88df104f843",
+        "bytes": 1528
+      }
+    ]
+  },
+  {
+    "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+    "digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+    "image_id": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+    "repo_digests": [
+      "lmsysorg/sglang-rocm@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040"
+    ],
+    "platform": "linux/amd64",
+    "image_created": "2026-10-28T00:24:08.845588494Z",
+    "image_size_bytes": 87985298900,
+    "capture_utc": "2026-11-09T05:52:09.671600+00:00",
+    "git": [
+      {
+        "path": "/sgl-workspace/aiter",
+        "head": "4ad99832823dde2315b361cbd3b54b1c5c12acd5",
+        "tracked_dirty_lines": 8,
+        "status_sha256": "633b1653554adaa77f36f03f55d3a01396eb0ffdcaf5f4101fa8b7ade542a56d"
+      },
+      {
+        "path": "/sgl-workspace/sglang",
+        "head": "c722c0a160981f21c81cffaab7bbcc117089a2a6",
+        "tracked_dirty_lines": 1112,
+        "status_sha256": "139bd45f7ddcabe6457950933dff89b273204cf60228849d152ebda17fdb06a0"
+      }
+    ],
+    "packages": {
+      "sgl-amd-mono": "0.1.0.dev0",
+      "sglang": "0.5.21+gc722c0a1",
+      "triton": "3.7.0+amd.rocm7.2.0.git89002410",
+      "triton_kernels": "1.0.0+amd.rocm7.2.0.git89002410",
+      "torch": "2.9.1+rocm7.2.0.lw.git7e1940d4",
+      "sglang-router": "0.3.2",
+      "sglang-kernel": "0.4.9",
+      "amd-aiter": "0.1.21.dev48+g4ad998328.d20261014",
+      "flydsl": "0.3.2",
+      "torchaudio": "2.9.0+rocm7.2.0.gite3c6ee2b",
+      "torchvision": "0.24.0+rocm7.2.0.gitb919bd0c"
+    },
+    "captured_source_count": 19318,
+    "archive_sha256": "67b4b77af0af9079c2d338d816291e21251e02f0064c73b4bd0dadac2c1c2c8d",
+    "external_archive": "/shared_nfs/yueliu14/inferencex_muse_spark_research/images/7184d3ae2bfd/sources.tar.gz",
+    "relevant_files": [
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/__init__.py",
+        "sha256": "e9dbdede1fd4a9b86f15e47e67de55355de9ce016e41bf8035d07cbf804f1221",
+        "bytes": 1270
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py",
+        "sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+        "bytes": 27974
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/fp8_quant.py",
+        "sha256": "ad84614f4f66061425d0679a42b025e55ed256ba434e42b514d2e10adee95b48",
+        "bytes": 3352
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/mxfp4_quant.py",
+        "sha256": "cf3b77d8e909b47875fe3a2a4bd28c25e8d022fc621ede703d5aa1980966d93c",
+        "bytes": 3046
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/spec.py",
+        "sha256": "a6b921f327a40d8588f4087484c26793c551bdce9e834bd9ab29b5b68605d7c4",
+        "bytes": 21142
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/weights.py",
+        "sha256": "607b709be8e4375546d6c95574404a2f1438018f7b9876a97a7e7688f79c824a",
+        "bytes": 21674
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/__init__.py",
+        "sha256": "a960c2f1cd6cc202ee71533b46bdb3b305e9715139756ee17e6f9d6045996037",
+        "bytes": 288
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/build_k2.py",
+        "sha256": "3fd4e787686c80752948efd051c2cf06b6a7944f49c6ab08b085c3beb4b05a85",
+        "bytes": 7669
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/build_k3.py",
+        "sha256": "0b756db6577c77b27ca4a49b261567960808be95eb0e71297466df5100ab0c13",
+        "bytes": 8635
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/compat.py",
+        "sha256": "9ed102db2f4894e2407241a144d7fdfd35fc19d75707974611027862bbd7d381",
+        "bytes": 4254
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/config.py",
+        "sha256": "adb901724d7f96bdd7199c58fda5793bcf27a80c4d92dac2e42702441226590f",
+        "bytes": 1901
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/device.py",
+        "sha256": "89089913ff6ca0d459fcb5920a726b1d31466534a14b8620e52aa07667c25368",
+        "bytes": 5615
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
+        "sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+        "bytes": 38593
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
+        "sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+        "bytes": 24704
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
+        "sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+        "bytes": 27252
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layer.py",
+        "sha256": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
+        "bytes": 20722
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layout.py",
+        "sha256": "f1d3b5b5f5e951f4881a444ef4ed39fa3218c90fbb57c68f80603478b6a6850d",
+        "bytes": 6329
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/runner.py",
+        "sha256": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
+        "bytes": 30675
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/__init__.py",
+        "sha256": "6795ecc42a33f12957fdeec8ccbe7e588f47357e9cbbbb4ee0ef1a5cc9fd7d7c",
+        "bytes": 157
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/attention.py",
+        "sha256": "82507e89e504bcf175f472c8a742d90b2e6e3346928bcdd5d17fd8bd167032a2",
+        "bytes": 33131
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/ffn.py",
+        "sha256": "a842cbbe262f3b8bad17bea9caa985bec9f909b0e53445a1e3454e5a1621466c",
+        "bytes": 63954
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/mxfp4.py",
+        "sha256": "70f8ea1d0bf97cf423977904dcfd992f99850d666a1ec674d5cb5953d9f91b0c",
+        "bytes": 2698
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/post_attn.py",
+        "sha256": "c318d2c768a509055116908b69deb5695656aae31089b8c6e0549baad85b1a16",
+        "bytes": 45927
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/pre_attn.py",
+        "sha256": "642c33cfb11e766d5d455998d2c5f56e7d8dcff2c87ad8b3fba7a6dcf4269472",
+        "bytes": 19066
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/__init__.py",
+        "sha256": "e9dbdede1fd4a9b86f15e47e67de55355de9ce016e41bf8035d07cbf804f1221",
+        "bytes": 1270
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/draft.py",
+        "sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+        "bytes": 27974
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/fp8_quant.py",
+        "sha256": "ad84614f4f66061425d0679a42b025e55ed256ba434e42b514d2e10adee95b48",
+        "bytes": 3352
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/mxfp4_quant.py",
+        "sha256": "cf3b77d8e909b47875fe3a2a4bd28c25e8d022fc621ede703d5aa1980966d93c",
+        "bytes": 3046
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/spec.py",
+        "sha256": "a6b921f327a40d8588f4087484c26793c551bdce9e834bd9ab29b5b68605d7c4",
+        "bytes": 21142
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/weights.py",
+        "sha256": "607b709be8e4375546d6c95574404a2f1438018f7b9876a97a7e7688f79c824a",
+        "bytes": 21674
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/__init__.py",
+        "sha256": "a960c2f1cd6cc202ee71533b46bdb3b305e9715139756ee17e6f9d6045996037",
+        "bytes": 288
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/build_k2.py",
+        "sha256": "3fd4e787686c80752948efd051c2cf06b6a7944f49c6ab08b085c3beb4b05a85",
+        "bytes": 7669
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/build_k3.py",
+        "sha256": "0b756db6577c77b27ca4a49b261567960808be95eb0e71297466df5100ab0c13",
+        "bytes": 8635
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/compat.py",
+        "sha256": "9ed102db2f4894e2407241a144d7fdfd35fc19d75707974611027862bbd7d381",
+        "bytes": 4254
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/config.py",
+        "sha256": "adb901724d7f96bdd7199c58fda5793bcf27a80c4d92dac2e42702441226590f",
+        "bytes": 1901
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/device.py",
+        "sha256": "89089913ff6ca0d459fcb5920a726b1d31466534a14b8620e52aa07667c25368",
+        "bytes": 5615
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
+        "sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+        "bytes": 38593
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
+        "sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+        "bytes": 24704
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
+        "sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+        "bytes": 27252
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/layer.py",
+        "sha256": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
+        "bytes": 20722
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/layout.py",
+        "sha256": "f1d3b5b5f5e951f4881a444ef4ed39fa3218c90fbb57c68f80603478b6a6850d",
+        "bytes": 6329
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/runner.py",
+        "sha256": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
+        "bytes": 30675
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/stages/__init__.py",
+        "sha256": "6795ecc42a33f12957fdeec8ccbe7e588f47357e9cbbbb4ee0ef1a5cc9fd7d7c",
+        "bytes": 157
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/stages/attention.py",
+        "sha256": "82507e89e504bcf175f472c8a742d90b2e6e3346928bcdd5d17fd8bd167032a2",
+        "bytes": 33131
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/stages/ffn.py",
+        "sha256": "a842cbbe262f3b8bad17bea9caa985bec9f909b0e53445a1e3454e5a1621466c",
+        "bytes": 63954
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/stages/mxfp4.py",
+        "sha256": "70f8ea1d0bf97cf423977904dcfd992f99850d666a1ec674d5cb5953d9f91b0c",
+        "bytes": 2698
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/stages/post_attn.py",
+        "sha256": "c318d2c768a509055116908b69deb5695656aae31089b8c6e0549baad85b1a16",
+        "bytes": 45927
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/stages/pre_attn.py",
+        "sha256": "642c33cfb11e766d5d455998d2c5f56e7d8dcff2c87ad8b3fba7a6dcf4269472",
+        "bytes": 19066
+      },
+      {
+        "path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_finalize.py",
+        "sha256": "48af597a54827b3e7f9340dada68f74759bee80213df01fbe8f95c4e95fe6d2b",
+        "bytes": 11172
+      },
+      {
+        "path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+        "sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+        "bytes": 45872
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/gqa_verify_splitkv_2kv.py",
+        "sha256": "67b394d79b5f1771fc64cd17b4f32ce710ab8fc910a7b271dddcccb325f2226a",
+        "bytes": 12189
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+        "sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+        "bytes": 8958
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/swa_verify_splitkv.py",
+        "sha256": "910dac4ecc10ded5705428f65b526fa22e8b97b9d99103dfbdbf2aee92855bf9",
+        "bytes": 7487
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
+        "sha256": "72dc1e2cd6f57fc503904782e2c082745fbc93bd98c2576e53f2a99563b5a651",
+        "bytes": 30888
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_gluon.py",
+        "sha256": "73f8c5b89137e10eaeb8be67a6cf6686194af50a03300a22569764a0af58e471",
+        "bytes": 12830
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
+        "sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
+        "bytes": 4084
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/gemm/bf16_tiled_small_m_gemm.py",
+        "sha256": "b56015b4e82ed8606583173f894e82843155e0d6355ffe4a293c47cfe3ef5c07",
+        "bytes": 9426
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py",
+        "sha256": "63551020e74ad73bae018b34f2562e6f65235492e84913226fb1883f631470a8",
+        "bytes": 10789
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+        "sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
+        "bytes": 18201
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/environ.py",
+        "sha256": "d92a79d213c55297ce35bbd950ab0c30ab1844ff6e8cb343618b8b78065687d2",
+        "bytes": 126306
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
+        "sha256": "76d2d1732b8e1c765d437504270ecfd885c28fec4db2c7f639c2cd2fbc698d2b",
+        "bytes": 243311
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/__init__.py",
+        "sha256": "f7be53e66db7d05f1ccb5888213a3a18839c1aa6afb740bad2af0c13d3c62af7",
+        "bytes": 300
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/guards.py",
+        "sha256": "05b0d1ebf2a389c90282ecfeefa84d6278867efe8912d4f6b61edd0466e67f02",
+        "bytes": 8168
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
+        "sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
+        "bytes": 14990
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/spec.py",
+        "sha256": "80e81a615c1a383c570b7277efcb33ee6ffb4930db17431e5c00165457d96d51",
+        "bytes": 8392
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+        "sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
+        "bytes": 6885
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/base_fused_op.py",
+        "sha256": "d2fe8f48237b8007435993cb99fa0ecdcd2cd3fd8a987f863b3d3f83428b208a",
+        "bytes": 14761
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fi_trtllm_moe_finalize_with_rmsnorm_cutedsl.py",
+        "sha256": "8dd75e47ce99056fb7c35dcc88d64d6eacaa57995eb2f40d807eefc3ea8a9e74",
+        "bytes": 15738
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fp4_moe.py",
+        "sha256": "e7fd0c34ff8cdb48c83cc3d689acd909d041524ac87fd97a246daeee18e64235",
+        "bytes": 15266
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_muse_spark_routing.py",
+        "sha256": "27f8d5867233fe4e76d5941d0f85149886b4cfa0d3802b49810f4e156bdf1b2e",
+        "bytes": 32737
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+        "sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
+        "bytes": 9322
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+        "sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
+        "bytes": 14791
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_op_tuning.py",
+        "sha256": "94c5b8f1cf0b125f513cd800a1f5f1fa590cc9881ca67238da69909e58721158",
+        "bytes": 3317
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_post_expert_norm_weighted_sum_trtllm.py",
+        "sha256": "16412f9a50fdccd6a2ddac0975e2155ae0624affe436d9b302f705f50bf8e5f5",
+        "bytes": 9327
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/layers.py",
+        "sha256": "1fa94beb4543f10bbf3023d001a41639b583faf3090517902adba15571cced5c",
+        "bytes": 8694
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+        "sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
+        "bytes": 90614
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_moe_flydsl.py",
+        "sha256": "3eda78c33bf63bdd1f0b814f975625a3f0c7bab5f6a8dc321c1db59382c103cd",
+        "bytes": 14784
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_moe_triton.py",
+        "sha256": "769e8bd8c24032e509d8f1c5338cc2d297683745957e2627ee5b453fae41eb2d",
+        "bytes": 31648
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
+        "sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
+        "bytes": 2702
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py",
+        "sha256": "4dd1c5eff0bd1f913b1bbe31e865141e94449bb24f3dc8ee8fd74e02d18139be",
+        "bytes": 7252
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/nvfp4_moe.py",
+        "sha256": "54312e5261b2e900e3c10a266f0a0b608dcb23e1dba2bab2a7865c360c4410e0",
+        "bytes": 5056
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+        "sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
+        "bytes": 8153
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/sequence_parallel.py",
+        "sha256": "60bbde896369987461c1fd38aa25184d55353d8d337c409cad8263f3c5e315ed",
+        "bytes": 16450
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/triton_sum.py",
+        "sha256": "4dcfb33b08a108e61d18f61914a0d12d21e4904a5bedb37eaec8d88df104f843",
+        "bytes": 1528
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
+        "sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
+        "bytes": 10405
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
+        "sha256": "1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12",
+        "bytes": 9588
+      }
+    ]
+  },
+  {
+    "image_name": "lmsysorg/sglang-rocm:muse-spark-open-mi355-1106",
+    "digest": "sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2",
+    "image_id": "sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2",
+    "repo_digests": [
+      "lmsysorg/sglang-rocm@sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2"
+    ],
+    "platform": "linux/amd64",
+    "image_created": "2026-11-07T00:29:51.056854938Z",
+    "image_size_bytes": 87988348189,
+    "capture_utc": "2026-11-09T05:52:24.680987+00:00",
+    "git": [
+      {
+        "path": "/sgl-workspace/aiter",
+        "head": "4ad99832823dde2315b361cbd3b54b1c5c12acd5",
+        "tracked_dirty_lines": 8,
+        "status_sha256": "633b1653554adaa77f36f03f55d3a01396eb0ffdcaf5f4101fa8b7ade542a56d"
+      },
+      {
+        "path": "/sgl-workspace/sglang",
+        "head": "c722c0a160981f21c81cffaab7bbcc117089a2a6",
+        "tracked_dirty_lines": 1113,
+        "status_sha256": "62c68a8349642354e7ed4e0274f0a9c30f675460443426eb9580e4c4978d82c7"
+      }
+    ],
+    "packages": {
+      "sgl-amd-mono": "0.1.0.dev0",
+      "sglang": "0.5.21+gc722c0a1",
+      "triton": "3.7.0+amd.rocm7.2.0.git89002410",
+      "triton_kernels": "1.0.0+amd.rocm7.2.0.git89002410",
+      "torch": "2.9.1+rocm7.2.0.lw.git7e1940d4",
+      "sglang-router": "0.3.2",
+      "sglang-kernel": "0.4.9",
+      "amd-aiter": "0.1.21.dev48+g4ad998328.d20261014",
+      "flydsl": "0.3.2",
+      "torchaudio": "2.9.0+rocm7.2.0.gite3c6ee2b",
+      "torchvision": "0.24.0+rocm7.2.0.gitb919bd0c"
+    },
+    "captured_source_count": 19322,
+    "archive_sha256": "656d0cef5b1449fc219df8597aa5457903e74b769d96546fd7c1319d96c3a169",
+    "external_archive": "/shared_nfs/yueliu14/inferencex_muse_spark_research/images/d231181df079/sources.tar.gz",
+    "relevant_files": [
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/__init__.py",
+        "sha256": "e9dbdede1fd4a9b86f15e47e67de55355de9ce016e41bf8035d07cbf804f1221",
+        "bytes": 1270
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py",
+        "sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+        "bytes": 27974
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/fp8_quant.py",
+        "sha256": "ad84614f4f66061425d0679a42b025e55ed256ba434e42b514d2e10adee95b48",
+        "bytes": 3352
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/mxfp4_quant.py",
+        "sha256": "cf3b77d8e909b47875fe3a2a4bd28c25e8d022fc621ede703d5aa1980966d93c",
+        "bytes": 3046
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/spec.py",
+        "sha256": "a6b921f327a40d8588f4087484c26793c551bdce9e834bd9ab29b5b68605d7c4",
+        "bytes": 21142
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/weights.py",
+        "sha256": "607b709be8e4375546d6c95574404a2f1438018f7b9876a97a7e7688f79c824a",
+        "bytes": 21674
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/__init__.py",
+        "sha256": "a960c2f1cd6cc202ee71533b46bdb3b305e9715139756ee17e6f9d6045996037",
+        "bytes": 288
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/build_k2.py",
+        "sha256": "3fd4e787686c80752948efd051c2cf06b6a7944f49c6ab08b085c3beb4b05a85",
+        "bytes": 7669
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/build_k3.py",
+        "sha256": "0b756db6577c77b27ca4a49b261567960808be95eb0e71297466df5100ab0c13",
+        "bytes": 8635
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/compat.py",
+        "sha256": "9ed102db2f4894e2407241a144d7fdfd35fc19d75707974611027862bbd7d381",
+        "bytes": 4254
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/config.py",
+        "sha256": "adb901724d7f96bdd7199c58fda5793bcf27a80c4d92dac2e42702441226590f",
+        "bytes": 1901
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/device.py",
+        "sha256": "89089913ff6ca0d459fcb5920a726b1d31466534a14b8620e52aa07667c25368",
+        "bytes": 5615
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
+        "sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+        "bytes": 38593
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
+        "sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+        "bytes": 24704
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
+        "sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+        "bytes": 27252
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layer.py",
+        "sha256": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
+        "bytes": 20722
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layout.py",
+        "sha256": "f1d3b5b5f5e951f4881a444ef4ed39fa3218c90fbb57c68f80603478b6a6850d",
+        "bytes": 6329
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/runner.py",
+        "sha256": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
+        "bytes": 30675
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/__init__.py",
+        "sha256": "6795ecc42a33f12957fdeec8ccbe7e588f47357e9cbbbb4ee0ef1a5cc9fd7d7c",
+        "bytes": 157
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/attention.py",
+        "sha256": "82507e89e504bcf175f472c8a742d90b2e6e3346928bcdd5d17fd8bd167032a2",
+        "bytes": 33131
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/ffn.py",
+        "sha256": "a842cbbe262f3b8bad17bea9caa985bec9f909b0e53445a1e3454e5a1621466c",
+        "bytes": 63954
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/mxfp4.py",
+        "sha256": "70f8ea1d0bf97cf423977904dcfd992f99850d666a1ec674d5cb5953d9f91b0c",
+        "bytes": 2698
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/post_attn.py",
+        "sha256": "c318d2c768a509055116908b69deb5695656aae31089b8c6e0549baad85b1a16",
+        "bytes": 45927
+      },
+      {
+        "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/pre_attn.py",
+        "sha256": "642c33cfb11e766d5d455998d2c5f56e7d8dcff2c87ad8b3fba7a6dcf4269472",
+        "bytes": 19066
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/__init__.py",
+        "sha256": "e9dbdede1fd4a9b86f15e47e67de55355de9ce016e41bf8035d07cbf804f1221",
+        "bytes": 1270
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/draft.py",
+        "sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+        "bytes": 27974
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/fp8_quant.py",
+        "sha256": "ad84614f4f66061425d0679a42b025e55ed256ba434e42b514d2e10adee95b48",
+        "bytes": 3352
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/mxfp4_quant.py",
+        "sha256": "cf3b77d8e909b47875fe3a2a4bd28c25e8d022fc621ede703d5aa1980966d93c",
+        "bytes": 3046
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/spec.py",
+        "sha256": "a6b921f327a40d8588f4087484c26793c551bdce9e834bd9ab29b5b68605d7c4",
+        "bytes": 21142
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/weights.py",
+        "sha256": "607b709be8e4375546d6c95574404a2f1438018f7b9876a97a7e7688f79c824a",
+        "bytes": 21674
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/__init__.py",
+        "sha256": "a960c2f1cd6cc202ee71533b46bdb3b305e9715139756ee17e6f9d6045996037",
+        "bytes": 288
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/build_k2.py",
+        "sha256": "3fd4e787686c80752948efd051c2cf06b6a7944f49c6ab08b085c3beb4b05a85",
+        "bytes": 7669
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/build_k3.py",
+        "sha256": "0b756db6577c77b27ca4a49b261567960808be95eb0e71297466df5100ab0c13",
+        "bytes": 8635
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/compat.py",
+        "sha256": "9ed102db2f4894e2407241a144d7fdfd35fc19d75707974611027862bbd7d381",
+        "bytes": 4254
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/config.py",
+        "sha256": "adb901724d7f96bdd7199c58fda5793bcf27a80c4d92dac2e42702441226590f",
+        "bytes": 1901
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/device.py",
+        "sha256": "89089913ff6ca0d459fcb5920a726b1d31466534a14b8620e52aa07667c25368",
+        "bytes": 5615
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
+        "sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+        "bytes": 38593
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
+        "sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+        "bytes": 24704
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
+        "sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+        "bytes": 27252
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/layer.py",
+        "sha256": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
+        "bytes": 20722
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/layout.py",
+        "sha256": "f1d3b5b5f5e951f4881a444ef4ed39fa3218c90fbb57c68f80603478b6a6850d",
+        "bytes": 6329
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/runner.py",
+        "sha256": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
+        "bytes": 30675
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/stages/__init__.py",
+        "sha256": "6795ecc42a33f12957fdeec8ccbe7e588f47357e9cbbbb4ee0ef1a5cc9fd7d7c",
+        "bytes": 157
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/stages/attention.py",
+        "sha256": "82507e89e504bcf175f472c8a742d90b2e6e3346928bcdd5d17fd8bd167032a2",
+        "bytes": 33131
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/stages/ffn.py",
+        "sha256": "a842cbbe262f3b8bad17bea9caa985bec9f909b0e53445a1e3454e5a1621466c",
+        "bytes": 63954
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/stages/mxfp4.py",
+        "sha256": "70f8ea1d0bf97cf423977904dcfd992f99850d666a1ec674d5cb5953d9f91b0c",
+        "bytes": 2698
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/stages/post_attn.py",
+        "sha256": "c318d2c768a509055116908b69deb5695656aae31089b8c6e0549baad85b1a16",
+        "bytes": 45927
+      },
+      {
+        "path": "/opt/venv/lib/python3.10/site-packages/sgl_amd_mono/muse_spark/gfx950/stages/pre_attn.py",
+        "sha256": "642c33cfb11e766d5d455998d2c5f56e7d8dcff2c87ad8b3fba7a6dcf4269472",
+        "bytes": 19066
+      },
+      {
+        "path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_finalize.py",
+        "sha256": "48af597a54827b3e7f9340dada68f74759bee80213df01fbe8f95c4e95fe6d2b",
+        "bytes": 11172
+      },
+      {
+        "path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+        "sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+        "bytes": 45872
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/gqa_verify_splitkv_2kv.py",
+        "sha256": "fc7648fee931485fc96212e889041616d08003960d91779cd8addc75315b3a7e",
+        "bytes": 12240
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+        "sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+        "bytes": 8958
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/swa_verify_splitkv.py",
+        "sha256": "44c2c074ace820d08c87d2345f1463f08025e9a27f26b42c66860ac35b468d72",
+        "bytes": 7525
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_balanced.py",
+        "sha256": "7ab7b5084c44fd90cd128ed4304d4e33939bb56b0f5590a9b5dc83563484b19a",
+        "bytes": 13186
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_flydsl.py",
+        "sha256": "cdfa8cadad2f252028875ef1b4e9506281161f7b974f7cfe47326bc49fcf882e",
+        "bytes": 33726
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_gluon.py",
+        "sha256": "bda27d18907adcb7a5c1ea0253fbd3ebca6377d4a952dbf4d1d012434e27b7e6",
+        "bytes": 14594
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
+        "sha256": "3df4cf24bded61346b0dd4b57aa8c2a3ff4851e5a0a614da94131bc4ff771f5c",
+        "bytes": 34725
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
+        "sha256": "6e1a6ca9b85aa6bda3fbb18f630a4231ce809b3a9f76cdd35b202081fd8c8b69",
+        "bytes": 4362
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/gemm/bf16_tiled_small_m_gemm.py",
+        "sha256": "b0787f543cdbd87ac3c6a0b1aaeef800ab669d589f8a0954c95d41292a1aa865",
+        "bytes": 9558
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py",
+        "sha256": "b835bf30b7c4d22d002f3963b25db9e9950157313e705ab482b53766e341014b",
+        "bytes": 12187
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+        "sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
+        "bytes": 18593
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/environ.py",
+        "sha256": "bfc0c7b0c6eed35c40263fbbdf4f02c23ea789e43129ef69a01ed9b1f63b53c2",
+        "bytes": 127393
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
+        "sha256": "e8053575975ff7d2de8971c4c47de19699b0251b3f6a60458f8011a5e609db33",
+        "bytes": 245588
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/__init__.py",
+        "sha256": "f7be53e66db7d05f1ccb5888213a3a18839c1aa6afb740bad2af0c13d3c62af7",
+        "bytes": 300
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/guards.py",
+        "sha256": "05b0d1ebf2a389c90282ecfeefa84d6278867efe8912d4f6b61edd0466e67f02",
+        "bytes": 8168
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
+        "sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
+        "bytes": 14990
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/spec.py",
+        "sha256": "80e81a615c1a383c570b7277efcb33ee6ffb4930db17431e5c00165457d96d51",
+        "bytes": 8392
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+        "sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
+        "bytes": 6991
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/base_fused_op.py",
+        "sha256": "d2fe8f48237b8007435993cb99fa0ecdcd2cd3fd8a987f863b3d3f83428b208a",
+        "bytes": 14761
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fi_trtllm_moe_finalize_with_rmsnorm_cutedsl.py",
+        "sha256": "8dd75e47ce99056fb7c35dcc88d64d6eacaa57995eb2f40d807eefc3ea8a9e74",
+        "bytes": 15738
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fp4_moe.py",
+        "sha256": "e7fd0c34ff8cdb48c83cc3d689acd909d041524ac87fd97a246daeee18e64235",
+        "bytes": 15266
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_muse_spark_routing.py",
+        "sha256": "27f8d5867233fe4e76d5941d0f85149886b4cfa0d3802b49810f4e156bdf1b2e",
+        "bytes": 32737
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+        "sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
+        "bytes": 9322
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+        "sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
+        "bytes": 14791
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_op_tuning.py",
+        "sha256": "94c5b8f1cf0b125f513cd800a1f5f1fa590cc9881ca67238da69909e58721158",
+        "bytes": 3317
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_post_expert_norm_weighted_sum_trtllm.py",
+        "sha256": "16412f9a50fdccd6a2ddac0975e2155ae0624affe436d9b302f705f50bf8e5f5",
+        "bytes": 9327
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/layers.py",
+        "sha256": "1fa94beb4543f10bbf3023d001a41639b583faf3090517902adba15571cced5c",
+        "bytes": 8694
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+        "sha256": "4db441d29bbb985805db4a5d67e377c481f8cdb2b8a151e9d7e28493be224ed1",
+        "bytes": 90657
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_moe_flydsl.py",
+        "sha256": "3eda78c33bf63bdd1f0b814f975625a3f0c7bab5f6a8dc321c1db59382c103cd",
+        "bytes": 14784
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_moe_triton.py",
+        "sha256": "769e8bd8c24032e509d8f1c5338cc2d297683745957e2627ee5b453fae41eb2d",
+        "bytes": 31648
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
+        "sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
+        "bytes": 2702
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py",
+        "sha256": "4dd1c5eff0bd1f913b1bbe31e865141e94449bb24f3dc8ee8fd74e02d18139be",
+        "bytes": 7252
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/nvfp4_moe.py",
+        "sha256": "54312e5261b2e900e3c10a266f0a0b608dcb23e1dba2bab2a7865c360c4410e0",
+        "bytes": 5056
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+        "sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
+        "bytes": 8767
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/sequence_parallel.py",
+        "sha256": "60bbde896369987461c1fd38aa25184d55353d8d337c409cad8263f3c5e315ed",
+        "bytes": 16450
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/triton_sum.py",
+        "sha256": "4dcfb33b08a108e61d18f61914a0d12d21e4904a5bedb37eaec8d88df104f843",
+        "bytes": 1528
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
+        "sha256": "20a0a111064e9d1c41ea5a10f0af60c3812d77a6b9631bef62fd4db0d2c3a11b",
+        "bytes": 11771
+      },
+      {
+        "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
+        "sha256": "b27664445f8928ac5b358ba15b82a0bfd3e3d113874200f40ffa922bf978bd92",
+        "bytes": 10296
+      }
+    ]
+  }
+]

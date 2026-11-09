@@ -1,0 +1,33 @@
+{
+  "validated_at_utc": "2026-11-09T06:01:29.316967+00:00",
+  "checks": {
+    "skill_validator": "passed",
+    "python_compilation": "passed",
+    "offline_history_replay": "passed",
+    "raw_to_normalized_points": 54,
+    "unique_point_to_ci_job_joins": 54,
+    "deduplicated_images": 4,
+    "adjacent_comparisons": 10,
+    "all_selected_chip_normalizations": "passed",
+    "latency_reciprocal_and_missing_percentile_semantics": "passed",
+    "historical_snapshot_duplicate_handling": "passed",
+    "mutable_tag_comparison_suppression": "passed",
+    "earliest_valid_representative_selection": "passed",
+    "comparison_configs_and_percent_deltas": "passed",
+    "relevant_container_source_bytes_vs_sha256": "passed for all four images",
+    "local_markdown_links": "passed",
+    "cpu_allocation": "275462 completed: 1 CPU, 0 GPU requested",
+    "git_diff_check": "passed"
+  },
+  "scripts_sha256": {
+    "capture_image_sources.py": "a8b6acc8062030c7dfbb567a27ce747f40155ae206d4ac9bd2af1ce9aed9252f",
+    "collect_history.py": "c5e614b55b0d12afb9fc29422d78eb0ee0080c011900d4973c446226bdb7e27b",
+    "summarize_image_sources.py": "8e83c43d9bf3f4ec9f1a69dfdebbab7ac118a6bb1cb979f6c498465c044a6f19"
+  },
+  "not_validated": [
+    "GPU execution or numerical correctness of the exported kernels",
+    "GPU-time top-kernel ranks or benchmark-phase launch counts",
+    "causal contribution of individual kernel changes",
+    "historical public curves removed before this API snapshot"
+  ]
+}

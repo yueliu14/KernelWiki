@@ -1,0 +1,818 @@
+[
+  {
+    "run_id": "38877885539",
+    "job_id": 116897688890,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c8",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688890",
+    "log_sha256": "9878662a7d47058462ccff0b5590c5d482394069d5f109cfff018a9581e0ae55",
+    "log_bytes": 165931,
+    "extracts": [
+      {
+        "line": 410,
+        "text": "2026-10-16T10:18:34.3411144Z [command]/usr/bin/git checkout --progress --force 3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+      },
+      {
+        "line": 608,
+        "text": "2026-10-16T10:18:39.7541085Z [command]/usr/bin/git checkout --progress --force 3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+      },
+      {
+        "line": 1187,
+        "text": "2026-10-16T10:19:23.4441322Z 2026-10-16 10:19:23 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1350,
+        "text": "2026-10-16T10:19:30.0412405Z 2026-10-16 10:19:29 [INFO] Env: HEAD_NODE_IP=10.24.112.101 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1351,
+        "text": "2026-10-16T10:19:30.0416116Z 2026-10-16 10:19:29 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1379,
+        "text": "2026-10-16T10:40:13.5896439Z 2026-10-16 10:40:12 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "38877885539",
+    "job_id": 116897688917,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c16",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688917",
+    "log_sha256": "2210a498c1858c658f9181aa05792d6d2deec322ec0a19504da89ff2dfaf6238",
+    "log_bytes": 165841,
+    "extracts": [
+      {
+        "line": 412,
+        "text": "2026-10-16T10:50:14.8723601Z [command]/usr/bin/git checkout --progress --force 3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+      },
+      {
+        "line": 610,
+        "text": "2026-10-16T10:50:19.9064160Z [command]/usr/bin/git checkout --progress --force 3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+      },
+      {
+        "line": 1189,
+        "text": "2026-10-16T10:51:03.8797651Z 2026-10-16 10:51:03 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1352,
+        "text": "2026-10-16T10:51:10.4656283Z 2026-10-16 10:51:10 [INFO] Env: HEAD_NODE_IP=10.24.112.136 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1353,
+        "text": "2026-10-16T10:51:10.4659329Z 2026-10-16 10:51:10 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1382,
+        "text": "2026-10-16T11:09:55.6153543Z 2026-10-16 11:09:53 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "38947852942",
+    "job_id": 117132178956,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model dram KV offload hicache c16",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178956",
+    "log_sha256": "6a0a00cca798f5dbbe6390fe0a1ae96f1eb23e68b7a2a89dd6f815232ab874b2",
+    "log_bytes": 167173,
+    "extracts": [
+      {
+        "line": 430,
+        "text": "2026-10-16T19:22:50.4013839Z [command]/usr/bin/git checkout --progress --force 1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b"
+      },
+      {
+        "line": 630,
+        "text": "2026-10-16T19:23:00.3571720Z [command]/usr/bin/git checkout --progress --force 1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b"
+      },
+      {
+        "line": 1212,
+        "text": "2026-10-16T19:24:51.6084589Z 2026-10-16 19:24:51 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1375,
+        "text": "2026-10-16T19:25:32.0189252Z 2026-10-16 19:25:31 [INFO] Env: HEAD_NODE_IP=10.24.112.107 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1376,
+        "text": "2026-10-16T19:25:32.0192219Z 2026-10-16 19:25:31 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-hierarchical-cache --enable-metrics --expert-parallel-size 8 --hicache-size 180 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1404,
+        "text": "2026-10-16T19:48:05.1550282Z 2026-10-16 19:48:04 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "38947852942",
+    "job_id": 117132178964,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c8",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178964",
+    "log_sha256": "03be75d32cbf52b91be579cd74de0e2c8a838c316d2ae542eeb8d2fc46163ccf",
+    "log_bytes": 166770,
+    "extracts": [
+      {
+        "line": 431,
+        "text": "2026-10-16T19:22:44.7934651Z [command]/usr/bin/git checkout --progress --force 1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b"
+      },
+      {
+        "line": 629,
+        "text": "2026-10-16T19:22:54.3005920Z [command]/usr/bin/git checkout --progress --force 1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b"
+      },
+      {
+        "line": 1209,
+        "text": "2026-10-16T19:24:45.3713604Z 2026-10-16 19:24:45 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1372,
+        "text": "2026-10-16T19:24:55.1887503Z 2026-10-16 19:24:54 [INFO] Env: HEAD_NODE_IP=10.24.112.105 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1373,
+        "text": "2026-10-16T19:24:55.1890456Z 2026-10-16 19:24:54 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1401,
+        "text": "2026-10-16T19:45:38.1254135Z 2026-10-16 19:45:37 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "39179279826",
+    "job_id": 117828661400,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model dram KV offload hicache c16",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661400",
+    "log_sha256": "2a9be2067972bd1ec7990e467623cb345f52fd3362de6744106a10c8551e99d2",
+    "log_bytes": 177560,
+    "extracts": [
+      {
+        "line": 439,
+        "text": "2026-10-19T00:09:08.7725785Z [command]/usr/bin/git checkout --progress --force 57df14d3ccf6f04a37215a8b84575e5ec70b0dd5"
+      },
+      {
+        "line": 642,
+        "text": "2026-10-19T00:09:14.9062153Z [command]/usr/bin/git checkout --progress --force 57df14d3ccf6f04a37215a8b84575e5ec70b0dd5"
+      },
+      {
+        "line": 1248,
+        "text": "2026-10-19T00:10:37.0249298Z 2026-10-19 00:10:37 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1411,
+        "text": "2026-10-19T00:11:11.6584024Z 2026-10-19 00:11:11 [INFO] Env: HEAD_NODE_IP=10.24.112.136 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1412,
+        "text": "2026-10-19T00:11:11.6587394Z 2026-10-19 00:11:11 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-hierarchical-cache --enable-metrics --expert-parallel-size 8 --hicache-size 180 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1439,
+        "text": "2026-10-19T00:31:20.5220949Z 2026-10-19 00:31:20 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "39179279826",
+    "job_id": 117828661501,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c8",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661501",
+    "log_sha256": "10a3e47c82287fa8a3672cb1044a7a2a19ca2b5bdff6ee89fabbc36ddcdd8987",
+    "log_bytes": 175810,
+    "extracts": [
+      {
+        "line": 432,
+        "text": "2026-10-19T01:51:44.2446069Z [command]/usr/bin/git checkout --progress --force 57df14d3ccf6f04a37215a8b84575e5ec70b0dd5"
+      },
+      {
+        "line": 623,
+        "text": "2026-10-19T01:51:49.0536306Z [command]/usr/bin/git checkout --progress --force 57df14d3ccf6f04a37215a8b84575e5ec70b0dd5"
+      },
+      {
+        "line": 1218,
+        "text": "2026-10-19T01:52:34.7080000Z 2026-10-19 01:52:34 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1381,
+        "text": "2026-10-19T01:52:43.3432639Z 2026-10-19 01:52:41 [INFO] Env: HEAD_NODE_IP=10.24.112.101 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1382,
+        "text": "2026-10-19T01:52:43.3435519Z 2026-10-19 01:52:41 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1410,
+        "text": "2026-10-19T02:13:14.4061327Z 2026-10-19 02:13:13 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "39659301076",
+    "job_id": 119428436736,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1020@sha256:7343002d0dc2c1e525c0563f0c5c0377b471f... / p7.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model dram KV offload hicache c16",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436736",
+    "log_sha256": "1bba1e1cadd84abee60d2b5f2dafc7526cee1059a4dba3ff370ac6250839df57",
+    "log_bytes": 179526,
+    "extracts": [
+      {
+        "line": 464,
+        "text": "2026-10-21T19:14:15.7283431Z [command]/usr/bin/git checkout --progress --force 2dd693edb2d7318867f7f6759034571ad734f9f2"
+      },
+      {
+        "line": 667,
+        "text": "2026-10-21T19:14:24.1633801Z [command]/usr/bin/git checkout --progress --force 2dd693edb2d7318867f7f6759034571ad734f9f2"
+      },
+      {
+        "line": 1273,
+        "text": "2026-10-21T19:15:55.7639991Z 2026-10-21 19:15:55 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1436,
+        "text": "2026-10-21T19:16:22.6366451Z 2026-10-21 19:16:21 [INFO] Env: HEAD_NODE_IP=10.24.112.136 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1437,
+        "text": "2026-10-21T19:16:22.6371486Z 2026-10-21 19:16:21 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-hierarchical-cache --enable-metrics --expert-parallel-size 8 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 253 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1464,
+        "text": "2026-10-21T20:03:42.6526703Z 2026-10-21 20:03:41 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "39659301076",
+    "job_id": 119428437135,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1020@sha256:7343002d0dc2c1e525c0563f0c5c0377b471f... / p7.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c8",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428437135",
+    "log_sha256": "e7c2febe168355973db0434d2454a9159e202d804c67e663b1ae1522f36714bf",
+    "log_bytes": 176291,
+    "extracts": [
+      {
+        "line": 436,
+        "text": "2026-10-21T20:35:39.8262664Z [command]/usr/bin/git checkout --progress --force 2dd693edb2d7318867f7f6759034571ad734f9f2"
+      },
+      {
+        "line": 627,
+        "text": "2026-10-21T20:35:44.7785397Z [command]/usr/bin/git checkout --progress --force 2dd693edb2d7318867f7f6759034571ad734f9f2"
+      },
+      {
+        "line": 1223,
+        "text": "2026-10-21T20:36:37.1275048Z 2026-10-21 20:36:37 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1386,
+        "text": "2026-10-21T20:36:45.7184312Z 2026-10-21 20:36:44 [INFO] Env: HEAD_NODE_IP=10.24.112.106 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1387,
+        "text": "2026-10-21T20:36:45.7188605Z 2026-10-21 20:36:44 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1414,
+        "text": "2026-10-21T20:58:08.7590759Z 2026-10-21 20:58:07 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910587816,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c40",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587816",
+    "log_sha256": "d16e6195a65d38c54ac7661602450c4128cbb07413b06859d4fffafe04f961bb",
+    "log_bytes": 174839,
+    "extracts": [
+      {
+        "line": 442,
+        "text": "2026-10-28T22:31:15.2181609Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 641,
+        "text": "2026-10-28T22:31:21.3603645Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 1225,
+        "text": "2026-10-28T22:32:16.8370595Z 2026-10-28 22:32:16 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1389,
+        "text": "2026-10-28T22:33:17.4949588Z 2026-10-28 22:33:16 [INFO] Env: HEAD_NODE_IP=10.24.112.136 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True PYTORCH_HIP_ALLOC_CONF=expandable_segments:True ROCR_VISIBLE_DEVICES=0,1,2,3 SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1390,
+        "text": "2026-10-28T22:33:17.4954818Z 2026-10-28 22:33:16 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 80 --mem-fraction-static 0.86 --page-size 16 --prefill-decode-interval 80 --random-seed 42 --reasoning-parser muse --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.1 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1417,
+        "text": "2026-10-28T22:44:38.3202193Z 2026-10-28 22:44:37 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910587901,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c28",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587901",
+    "log_sha256": "2b4c5f9d18bd8ad9d001df07b7dbff2f9e5134d0c94644d51598e0749bf31bec",
+    "log_bytes": 175052,
+    "extracts": [
+      {
+        "line": 444,
+        "text": "2026-10-28T22:36:21.5553203Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 643,
+        "text": "2026-10-28T22:36:28.2185055Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 1227,
+        "text": "2026-10-28T22:37:28.6698556Z 2026-10-28 22:37:28 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1391,
+        "text": "2026-10-28T22:40:31.5673808Z 2026-10-28 22:40:31 [INFO] Env: HEAD_NODE_IP=10.24.112.106 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True PYTORCH_HIP_ALLOC_CONF=expandable_segments:True ROCR_VISIBLE_DEVICES=0,1,2,3 SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1392,
+        "text": "2026-10-28T22:40:31.5678781Z 2026-10-28 22:40:31 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 56 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 56 --mem-fraction-static 0.86 --page-size 16 --prefill-decode-interval 80 --random-seed 42 --reasoning-parser muse --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.1 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1419,
+        "text": "2026-10-28T22:52:23.0163077Z 2026-10-28 22:52:22 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910588046,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c36",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588046",
+    "log_sha256": "eab7359da53f7772043a39639ab4c5c1714ce13d0b5e66fab9425b32a6c7cc07",
+    "log_bytes": 174632,
+    "extracts": [
+      {
+        "line": 441,
+        "text": "2026-10-28T22:43:10.8548407Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 640,
+        "text": "2026-10-28T22:43:17.1591436Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 1224,
+        "text": "2026-10-28T22:44:26.0147650Z 2026-10-28 22:44:26 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1388,
+        "text": "2026-10-28T22:45:26.6644688Z 2026-10-28 22:45:26 [INFO] Env: HEAD_NODE_IP=10.24.112.125 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True PYTORCH_HIP_ALLOC_CONF=expandable_segments:True ROCR_VISIBLE_DEVICES=0,1,2,3 SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1389,
+        "text": "2026-10-28T22:45:26.6650200Z 2026-10-28 22:45:26 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 72 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 72 --mem-fraction-static 0.86 --page-size 16 --prefill-decode-interval 24 --random-seed 42 --reasoning-parser muse --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.1 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1416,
+        "text": "2026-10-28T22:57:19.2074615Z 2026-10-28 22:57:18 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910588087,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c8",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588087",
+    "log_sha256": "c1a12f27d133ee5511b9e443e80b598858f572b0c247e5451f4bad9ce40ee228",
+    "log_bytes": 172330,
+    "extracts": [
+      {
+        "line": 423,
+        "text": "2026-10-28T22:43:10.1296317Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 620,
+        "text": "2026-10-28T22:43:16.4195019Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 1194,
+        "text": "2026-10-28T22:44:25.9870167Z 2026-10-28 22:44:25 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1358,
+        "text": "2026-10-28T22:44:32.5864259Z 2026-10-28 22:44:32 [INFO] Env: HEAD_NODE_IP=10.24.112.110 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1359,
+        "text": "2026-10-28T22:44:32.5867612Z 2026-10-28 22:44:32 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --cuda-graph-max-bs-decode 2 --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 2 --mem-fraction-static 0.85 --monokernel-backend amd --page-size 16 --prefill-decode-interval 64 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1387,
+        "text": "2026-10-28T23:03:11.4298286Z 2026-10-28 23:03:09 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "42394597374",
+    "job_id": 128469427930,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-mi355-1106@sha256:d231181df079a5b271a0459d024492c... / p2.950 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c28",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469427930",
+    "log_sha256": "29e756e486189f30e1049cd8e6c7a3bcb6ecf9018e23d578fa2c3d0b87901b0e",
+    "log_bytes": 454287,
+    "extracts": [
+      {
+        "line": 484,
+        "text": "2026-11-07T17:09:24.9555077Z [command]/usr/bin/git checkout --progress --force 03d973bca01a7c532a49ac5d0f59f644f80866e0"
+      },
+      {
+        "line": 691,
+        "text": "2026-11-07T17:09:36.1202307Z [command]/usr/bin/git checkout --progress --force 03d973bca01a7c532a49ac5d0f59f644f80866e0"
+      },
+      {
+        "line": 1323,
+        "text": "2026-11-07T17:10:58.7791481Z 2026-11-07 17:10:58 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1486,
+        "text": "2026-11-07T17:11:30.0280050Z 2026-11-07 17:11:28 [INFO] Env: HEAD_NODE_IP=10.24.112.106 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True PYTORCH_HIP_ALLOC_CONF=expandable_segments:True ROCR_VISIBLE_DEVICES=0,1,2,3 SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_OPT_UNIFIED_CACHE_FREE_OUT_OF_WINDOW_SLOTS=1 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1 SGLANG_WARMUP_TIMEOUT=1800"
+      },
+      {
+        "line": 1487,
+        "text": "2026-11-07T17:11:30.0284990Z 2026-11-07 17:11:28 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 56 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 56 --mem-fraction-static 0.86 --page-size 128 --prefill-decode-interval 80 --random-seed 42 --reasoning-parser muse --revision c7bc74fd64371315a091bc15f9723882eead0dc1 --schedule-policy shortest-prefill-first --scheduler-recv-interval 1 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --stream-interval 20 --swa-full-tokens-ratio 0.3 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1519,
+        "text": "2026-11-07T17:23:20.9510011Z 2026-11-07 17:23:20 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      },
+      {
+        "line": 1734,
+        "text": "2026-11-07T17:24:55.0358361Z + /tmp/inferencex-agentic-53248/venv/bin/agentx profile --url http://10.24.112.106:8000 --model amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --tokenizer amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --concurrency 28 --benchmark-duration 3600 --tokenizer-trust-remote-code --server-metrics http://10.24.112.106:8000/metrics http://10.24.112.106:9405/metrics --output-artifact-dir /logs/agentic/aiperf_artifacts --public-dataset semianalysis_cc_traces_weka_062126"
+      },
+      {
+        "line": 3409,
+        "text": "2026-11-07T18:34:08.2172057Z '/logs/agentic/aiperf_artifacts' --public-dataset 'semianalysis_cc_traces_weka_062126'"
+      }
+    ]
+  },
+  {
+    "run_id": "42394597374",
+    "job_id": 128469427944,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-mi355-1106@sha256:d231181df079a5b271a0459d024492c... / p2.950 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c40",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469427944",
+    "log_sha256": "3ee322ada92dc7f284c8e7397c16b3555911113512ee2d68700eac8337a2971b",
+    "log_bytes": 467525,
+    "extracts": [
+      {
+        "line": 479,
+        "text": "2026-11-07T17:09:23.8304319Z [command]/usr/bin/git checkout --progress --force 03d973bca01a7c532a49ac5d0f59f644f80866e0"
+      },
+      {
+        "line": 686,
+        "text": "2026-11-07T17:09:34.6707398Z [command]/usr/bin/git checkout --progress --force 03d973bca01a7c532a49ac5d0f59f644f80866e0"
+      },
+      {
+        "line": 1319,
+        "text": "2026-11-07T17:10:58.7683680Z 2026-11-07 17:10:58 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1482,
+        "text": "2026-11-07T17:11:29.6793029Z 2026-11-07 17:11:29 [INFO] Env: HEAD_NODE_IP=10.24.112.107 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True PYTORCH_HIP_ALLOC_CONF=expandable_segments:True ROCR_VISIBLE_DEVICES=0,1,2,3 SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1 SGLANG_WARMUP_TIMEOUT=1800"
+      },
+      {
+        "line": 1483,
+        "text": "2026-11-07T17:11:29.6797562Z 2026-11-07 17:11:29 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 80 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 80 --mem-fraction-static 0.86 --page-size 128 --prefill-decode-interval 24 --random-seed 42 --reasoning-parser muse --revision c7bc74fd64371315a091bc15f9723882eead0dc1 --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --stream-interval 20 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1515,
+        "text": "2026-11-07T17:25:16.3870687Z 2026-11-07 17:25:14 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      },
+      {
+        "line": 1730,
+        "text": "2026-11-07T17:28:28.5583098Z + /tmp/inferencex-agentic-53249/venv/bin/agentx profile --url http://10.24.112.107:8000 --model amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --tokenizer amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --concurrency 40 --benchmark-duration 3600 --tokenizer-trust-remote-code --server-metrics http://10.24.112.107:8000/metrics http://10.24.112.107:9405/metrics --output-artifact-dir /logs/agentic/aiperf_artifacts --public-dataset semianalysis_cc_traces_weka_062126"
+      },
+      {
+        "line": 3476,
+        "text": "2026-11-07T18:41:53.2685328Z '/logs/agentic/aiperf_artifacts' --public-dataset 'semianalysis_cc_traces_weka_062126'"
+      }
+    ]
+  },
+  {
+    "run_id": "42394597374",
+    "job_id": 128469428100,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-mi355-1106@sha256:d231181df079a5b271a0459d024492c... / p2.950 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c36",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469428100",
+    "log_sha256": "648a4ac32dd8b8b011024e6b5e114f3b58e314151bdcb56cddc9c7c670ee3931",
+    "log_bytes": 471044,
+    "extracts": [
+      {
+        "line": 476,
+        "text": "2026-11-07T17:09:36.9193441Z [command]/usr/bin/git checkout --progress --force 03d973bca01a7c532a49ac5d0f59f644f80866e0"
+      },
+      {
+        "line": 683,
+        "text": "2026-11-07T17:09:48.4506170Z [command]/usr/bin/git checkout --progress --force 03d973bca01a7c532a49ac5d0f59f644f80866e0"
+      },
+      {
+        "line": 1316,
+        "text": "2026-11-07T17:11:42.1489497Z 2026-11-07 17:11:42 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1479,
+        "text": "2026-11-07T17:11:51.2790688Z 2026-11-07 17:11:49 [INFO] Env: HEAD_NODE_IP=10.24.112.110 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True PYTORCH_HIP_ALLOC_CONF=expandable_segments:True ROCR_VISIBLE_DEVICES=0,1,2,3 SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1 SGLANG_WARMUP_TIMEOUT=1800"
+      },
+      {
+        "line": 1480,
+        "text": "2026-11-07T17:11:51.2795288Z 2026-11-07 17:11:49 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 72 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 72 --mem-fraction-static 0.86 --page-size 128 --prefill-decode-interval 48 --random-seed 42 --reasoning-parser muse --revision c7bc74fd64371315a091bc15f9723882eead0dc1 --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --stream-interval 20 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1512,
+        "text": "2026-11-07T17:26:18.0694447Z 2026-11-07 17:26:16 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      },
+      {
+        "line": 1727,
+        "text": "2026-11-07T17:29:38.2294221Z + /tmp/inferencex-agentic-53251/venv/bin/agentx profile --url http://10.24.112.110:8000 --model amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --tokenizer amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --concurrency 36 --benchmark-duration 3600 --tokenizer-trust-remote-code --server-metrics http://10.24.112.110:8000/metrics http://10.24.112.110:9405/metrics --output-artifact-dir /logs/agentic/aiperf_artifacts --public-dataset semianalysis_cc_traces_weka_062126"
+      },
+      {
+        "line": 3493,
+        "text": "2026-11-07T18:41:38.7314387Z '/logs/agentic/aiperf_artifacts' --public-dataset 'semianalysis_cc_traces_weka_062126'"
+      }
+    ]
+  },
+  {
+    "run_id": "42394597374",
+    "job_id": 128469428179,
+    "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-mi355-1106@sha256:d231181df079a5b271a0459d024492c... / p2.950 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c10",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469428179",
+    "log_sha256": "369993f36ea599aaf42fe3b9fcf8f87dab8375128ac8d2ebc254ad76ec464321",
+    "log_bytes": 438492,
+    "extracts": [
+      {
+        "line": 465,
+        "text": "2026-11-07T17:09:22.3556424Z [command]/usr/bin/git checkout --progress --force 03d973bca01a7c532a49ac5d0f59f644f80866e0"
+      },
+      {
+        "line": 670,
+        "text": "2026-11-07T17:09:32.3396790Z [command]/usr/bin/git checkout --progress --force 03d973bca01a7c532a49ac5d0f59f644f80866e0"
+      },
+      {
+        "line": 1293,
+        "text": "2026-11-07T17:10:58.1046587Z 2026-11-07 17:10:58 | INFO | Applied override: --set roles.agg.env.SGLANG_SIMULATE_ACC_LEN=4.05"
+      },
+      {
+        "line": 1456,
+        "text": "2026-11-07T17:11:07.2470595Z 2026-11-07 17:11:05 [INFO] Env: HEAD_NODE_IP=10.24.112.101 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1 SGLANG_WARMUP_TIMEOUT=1800"
+      },
+      {
+        "line": 1457,
+        "text": "2026-11-07T17:11:07.2474710Z 2026-11-07 17:11:05 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --cuda-graph-max-bs-decode 2 --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 2 --mem-fraction-static 0.85 --monokernel-backend amd --page-size 16 --prefill-decode-interval 64 --random-seed 42 --reasoning-parser muse --revision c7bc74fd64371315a091bc15f9723882eead0dc1 --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --stream-interval 40 --swa-full-tokens-ratio 0.3 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1490,
+        "text": "2026-11-07T17:31:59.9536501Z 2026-11-07 17:31:58 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      },
+      {
+        "line": 1705,
+        "text": "2026-11-07T17:35:08.1410109Z + /tmp/inferencex-agentic-53247/venv/bin/agentx profile --url http://10.24.112.101:8000 --model amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --tokenizer amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --concurrency 10 --benchmark-duration 3600 --tokenizer-trust-remote-code --server-metrics http://10.24.112.101:8000/metrics http://10.24.112.101:9405/metrics --output-artifact-dir /logs/agentic/aiperf_artifacts --public-dataset semianalysis_cc_traces_weka_062126"
+      },
+      {
+        "line": 3322,
+        "text": "2026-11-07T18:39:20.0076558Z '/logs/agentic/aiperf_artifacts' --public-dataset 'semianalysis_cc_traces_weka_062126'"
+      }
+    ]
+  },
+  {
+    "run_id": "38877885539",
+    "job_id": 116897688634,
+    "name": "TEP8 c1 off",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688634",
+    "log_sha256": "f57c99664e8feafe955626426bc1dc849a2a784d3e6626b24c691b319ae70669",
+    "log_bytes": 166224,
+    "extracts": [
+      {
+        "line": 413,
+        "text": "2026-10-16T09:58:17.8563064Z [command]/usr/bin/git checkout --progress --force 3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+      },
+      {
+        "line": 608,
+        "text": "2026-10-16T09:58:25.8755813Z [command]/usr/bin/git checkout --progress --force 3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+      },
+      {
+        "line": 1351,
+        "text": "2026-10-16T09:59:19.2428040Z 2026-10-16 09:59:17 [INFO] Env: HEAD_NODE_IP=10.24.112.110 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1352,
+        "text": "2026-10-16T09:59:19.2430879Z 2026-10-16 09:59:17 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1381,
+        "text": "2026-10-16T10:07:42.5645455Z 2026-10-16 10:07:41 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "39659301076",
+    "job_id": 119428436852,
+    "name": "TEP8 c1 off",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436852",
+    "log_sha256": "8323d6d3cb035acbe14531ca03bf81c3c898e3b7a62d12dae642d4a901efe6a7",
+    "log_bytes": 177759,
+    "extracts": [
+      {
+        "line": 454,
+        "text": "2026-10-21T19:14:16.8672517Z [command]/usr/bin/git checkout --progress --force 2dd693edb2d7318867f7f6759034571ad734f9f2"
+      },
+      {
+        "line": 655,
+        "text": "2026-10-21T19:14:25.1838717Z [command]/usr/bin/git checkout --progress --force 2dd693edb2d7318867f7f6759034571ad734f9f2"
+      },
+      {
+        "line": 1413,
+        "text": "2026-10-21T19:16:04.6619028Z 2026-10-21 19:16:02 [INFO] Env: HEAD_NODE_IP=10.24.112.109 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1414,
+        "text": "2026-10-21T19:16:04.6623052Z 2026-10-21 19:16:02 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1441,
+        "text": "2026-10-21T19:25:29.1112937Z 2026-10-21 19:25:27 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910588033,
+    "name": "TEP8 c1 off",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588033",
+    "log_sha256": "059c3b31078c7259c15980c03434b3a75af385d426c48f9d0c2b68c875f80ada",
+    "log_bytes": 173169,
+    "extracts": [
+      {
+        "line": 434,
+        "text": "2026-10-28T22:43:11.9837222Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 631,
+        "text": "2026-10-28T22:43:18.1328289Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 1370,
+        "text": "2026-10-28T22:44:32.6015554Z 2026-10-28 22:44:32 [INFO] Env: HEAD_NODE_IP=10.24.112.120 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1371,
+        "text": "2026-10-28T22:44:32.6019146Z 2026-10-28 22:44:32 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --cuda-graph-max-bs-decode 1 --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 1 --mem-fraction-static 0.85 --monokernel-backend amd --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1398,
+        "text": "2026-10-29T00:09:11.8474349Z 2026-10-28 23:03:41 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "38877885539",
+    "job_id": 116897688547,
+    "name": "TEP8 c4 off",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688547",
+    "log_sha256": "d6c148275c9987154d84a91f2fdb2de1936ba906c250d66fff13b0a8da3ea44d",
+    "log_bytes": 165282,
+    "extracts": [
+      {
+        "line": 403,
+        "text": "2026-10-16T09:25:19.2306179Z [command]/usr/bin/git checkout --progress --force 3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+      },
+      {
+        "line": 601,
+        "text": "2026-10-16T09:25:24.3807301Z [command]/usr/bin/git checkout --progress --force 3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+      },
+      {
+        "line": 1344,
+        "text": "2026-10-16T09:26:15.0922260Z 2026-10-16 09:26:14 [INFO] Env: HEAD_NODE_IP=10.24.112.107 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1345,
+        "text": "2026-10-16T09:26:15.0925041Z 2026-10-16 09:26:14 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1373,
+        "text": "2026-10-16T09:46:48.9220710Z 2026-10-16 09:46:48 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "39659301076",
+    "job_id": 119428436698,
+    "name": "TEP8 c4 off",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436698",
+    "log_sha256": "96497b6fe79bacb6202e8030a7f1ec0af608c9111d84cf6837712108d84aefca",
+    "log_bytes": 177392,
+    "extracts": [
+      {
+        "line": 445,
+        "text": "2026-10-21T19:14:18.9431146Z [command]/usr/bin/git checkout --progress --force 2dd693edb2d7318867f7f6759034571ad734f9f2"
+      },
+      {
+        "line": 646,
+        "text": "2026-10-21T19:14:26.4302825Z [command]/usr/bin/git checkout --progress --force 2dd693edb2d7318867f7f6759034571ad734f9f2"
+      },
+      {
+        "line": 1406,
+        "text": "2026-10-21T19:16:03.0150127Z 2026-10-21 19:16:02 [INFO] Env: HEAD_NODE_IP=10.24.112.110 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1407,
+        "text": "2026-10-21T19:16:03.0153750Z 2026-10-21 19:16:02 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1434,
+        "text": "2026-10-21T19:25:27.5451674Z 2026-10-21 19:25:25 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910587858,
+    "name": "TEP8 c4 off",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587858",
+    "log_sha256": "e938ce4c913e6c5148e441b069e545d648811b89e14fe6c6abf9c5a1c51be0c1",
+    "log_bytes": 173033,
+    "extracts": [
+      {
+        "line": 430,
+        "text": "2026-10-28T22:31:10.0644080Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 627,
+        "text": "2026-10-28T22:31:16.2689766Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 1365,
+        "text": "2026-10-28T22:32:12.9840735Z 2026-10-28 22:32:12 [INFO] Env: HEAD_NODE_IP=10.24.112.109 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1366,
+        "text": "2026-10-28T22:32:12.9844037Z 2026-10-28 22:32:12 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --cuda-graph-max-bs-decode 2 --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 2 --mem-fraction-static 0.85 --monokernel-backend amd --page-size 16 --prefill-decode-interval 64 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1394,
+        "text": "2026-10-28T22:50:44.5989840Z 2026-10-28 22:50:43 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "38947852942",
+    "job_id": 117132178838,
+    "name": "TEP4 c16 on",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178838",
+    "log_sha256": "d8dcbacc5b98bde0652b8c8f0dfe0398bd4724002287edc18bc429cfb64b957d",
+    "log_bytes": 168738,
+    "extracts": [
+      {
+        "line": 448,
+        "text": "2026-10-16T19:22:58.1438732Z [command]/usr/bin/git checkout --progress --force 1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b"
+      },
+      {
+        "line": 648,
+        "text": "2026-10-16T19:23:08.4183700Z [command]/usr/bin/git checkout --progress --force 1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b"
+      },
+      {
+        "line": 1405,
+        "text": "2026-10-16T19:26:01.7826715Z 2026-10-16 19:26:00 [INFO] Env: HEAD_NODE_IP=10.24.112.110 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 ROCR_VISIBLE_DEVICES=0,1,2,3 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1406,
+        "text": "2026-10-16T19:26:01.7831148Z 2026-10-16 19:26:00 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-size 180 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1433,
+        "text": "2026-10-16T19:37:36.3153089Z 2026-10-16 19:37:34 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910588096,
+    "name": "TEP4 c16 on",
+    "url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588096",
+    "log_sha256": "2b257176a3259eead57c27eaf20b6e2a74c7e3e725926df601ab0c7c3c6a4b13",
+    "log_bytes": 173959,
+    "extracts": [
+      {
+        "line": 437,
+        "text": "2026-10-29T00:13:36.2077025Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 626,
+        "text": "2026-10-29T00:13:42.2535063Z [command]/usr/bin/git checkout --progress --force 639d4565920c1af90bbe958c8ac2957bf11eb603"
+      },
+      {
+        "line": 1374,
+        "text": "2026-10-29T00:16:02.8480331Z 2026-10-29 00:16:02 [INFO] Env: HEAD_NODE_IP=10.24.112.107 HF_HUB_OFFLINE=1 MUSE_MOE_BACKEND=flydsl PYTHONNOUSERSITE=1 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True PYTORCH_HIP_ALLOC_CONF=expandable_segments:True ROCR_VISIBLE_DEVICES=0,1,2,3 SGLANG_CUDA_COREDUMP_BEFORE_CRASH=0 SGLANG_PYSPY_DUMP_BEFORE_CRASH=0 SGLANG_SIMULATE_ACC_LEN=4.05 SGLANG_SIMULATE_ACC_METHOD=match-expected SGLANG_SIMULATE_ACC_TOKEN_MODE=real-draft-token SGLANG_TIMEOUT_KEEP_ALIVE=900 SGLANG_USE_AITER=1 SGLANG_USE_AITER_UNIFIED_ATTN=1"
+      },
+      {
+        "line": 1375,
+        "text": "2026-10-29T00:16:02.8485619Z 2026-10-29 00:16:02 [INFO] Command: python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 8192 --cuda-graph-max-bs-decode 12 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 253 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 8192 --max-running-requests 12 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 96 --random-seed 42 --reasoning-parser muse --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.1 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800"
+      },
+      {
+        "line": 1402,
+        "text": "2026-10-29T00:26:44.3854055Z 2026-10-29 00:26:43 [INFO] Command: bash -lc 'bash /infmax-workspace/benchmarks/srt_agentic.sh'"
+      }
+    ]
+  }
+]

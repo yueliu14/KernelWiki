@@ -1,0 +1,4536 @@
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/kernels/ops/attention/gqa_verify_splitkv_2kv.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/kernels/ops/attention/gqa_verify_splitkv_2kv.py
+@@ -0,0 +1,389 @@
++"""Target-verify attention, both KV heads per program: full layers, 8 verify tokens, 16 Q heads / 2 KV heads per rank, HD64, FP8 KV, page 16.
++
++One program per (request, split) owns BOTH KV heads (2 x 64 rows = 8 tokens x 16 heads), so every 128-byte KV
++line (head0 64 B | head1 64 B) and every page-table entry is fetched once by one CU.
++QK on FP8 MFMA: Q is quantized per row (token x head, amax/448) in the prologue, K stays FP8 straight from the
++cache; the row scale, the K descale, softmax scale and log2(e) fold into one per-row multiplier used by the exp2 fma.
++PV in BF16 (V upcast) by default, FP8 PV (P biased by 2^8) as a variant.
++Interior tiles run without any mask (causal/verify mask and kv length only matter on the last 1-2 tiles).
++Partials use the layout [T, H, S, 64] fp32 + max/denom [T, H, S] of gqa_verify_splitkv; the reduce is the same
++math. Only the exact mode (BF16 QK and PV, QF8 = PVF8 = False) is served: bitwise equal to the GQA-folded and
++unified 3D paths.
++"""
++
++import torch
++import triton
++import triton.language as tl
++
++QL = 8
++HD = 64
++HKV = 2
++GQA = 8
++
++
++@triton.jit
++def _vv2_tile(
++    acc0,
++    acc1,
++    m0,
++    m1,
++    l0,
++    l1,
++    q0,
++    q1,
++    q0l,
++    q1l,
++    c0,
++    c1,
++    K,
++    V,
++    blocks,
++    tile,
++    kv_s0,
++    kv_s1,
++    nr,
++    d,
++    context,
++    kvlen,
++    qrel,
++    BN: tl.constexpr,
++    PAGE: tl.constexpr,
++    MASKED: tl.constexpr,
++    QF8: tl.constexpr,
++    PVF8: tl.constexpr,
++    QSPLIT: tl.constexpr,
++):
++    positions = tile * BN + nr
++    if MASKED:
++        valid = positions < kvlen
++    kb = blocks * kv_s0 + (nr % PAGE) * kv_s1
++    if MASKED:
++        k0 = tl.load(K + kb[None, :] + d[:, None], mask=valid[None, :], other=0.0)
++        k1 = tl.load(K + kb[None, :] + 64 + d[:, None], mask=valid[None, :], other=0.0)
++        v0 = tl.load(V + kb[:, None] + d[None, :], mask=valid[:, None], other=0.0)
++        v1 = tl.load(V + kb[:, None] + 64 + d[None, :], mask=valid[:, None], other=0.0)
++    else:
++        k0 = tl.load(K + kb[None, :] + d[:, None])
++        k1 = tl.load(K + kb[None, :] + 64 + d[:, None])
++        v0 = tl.load(V + kb[:, None] + d[None, :])
++        v1 = tl.load(V + kb[:, None] + 64 + d[None, :])
++    if QSPLIT:
++        # Q = hi + lo, both FP8 (about bf16 precision for Q); K stays FP8 from the cache
++        s0 = tl.dot(q0l, k0, acc=tl.dot(q0, k0))
++        s1 = tl.dot(q1l, k1, acc=tl.dot(q1, k1))
++    elif QF8:
++        s0 = tl.dot(q0, k0)
++        s1 = tl.dot(q1, k1)
++    else:
++        s0 = tl.dot(q0, k0.to(tl.bfloat16))
++        s1 = tl.dot(q1, k1.to(tl.bfloat16))
++    if MASKED:
++        vis = (positions[None, :] <= (context + qrel)[:, None]) & valid[None, :]
++        s0 = tl.where(vis, s0, float("-inf"))
++        s1 = tl.where(vis, s1, float("-inf"))
++    n0 = tl.maximum(m0, tl.max(s0, axis=1) * c0)
++    n1 = tl.maximum(m1, tl.max(s1, axis=1) * c1)
++    if MASKED:
++        n0 = tl.where(n0 > float("-inf"), n0, 0.0)
++        n1 = tl.where(n1 > float("-inf"), n1, 0.0)
++    if PVF8:
++        # bias 2^8 keeps P inside e4m3's normal range; it rides through acc and denom and cancels in the reduce
++        p0 = tl.exp2(tl.fma(s0, c0[:, None], (8.0 - n0)[:, None]))
++        p1 = tl.exp2(tl.fma(s1, c1[:, None], (8.0 - n1)[:, None]))
++    else:
++        p0 = tl.exp2(tl.fma(s0, c0[:, None], -n0[:, None]))
++        p1 = tl.exp2(tl.fma(s1, c1[:, None], -n1[:, None]))
++    r0 = tl.exp2(m0 - n0)
++    r1 = tl.exp2(m1 - n1)
++    l0 = l0 * r0 + tl.sum(p0, axis=1)
++    l1 = l1 * r1 + tl.sum(p1, axis=1)
++    if PVF8:
++        acc0 = tl.dot(p0.to(tl.float8e4nv), v0, acc=acc0 * r0[:, None])
++        acc1 = tl.dot(p1.to(tl.float8e4nv), v1, acc=acc1 * r1[:, None])
++    else:
++        acc0 = tl.dot(p0.to(tl.bfloat16), v0.to(tl.bfloat16), acc=acc0 * r0[:, None])
++        acc1 = tl.dot(p1.to(tl.bfloat16), v1.to(tl.bfloat16), acc=acc1 * r1[:, None])
++    return acc0, acc1, n0, n1, l0, l1
++
++
++@triton.jit
++def _vv2_partials(
++    Q,
++    K,
++    V,
++    SEQ,
++    TABLE,
++    PARTIAL,
++    MAXIMUM,
++    DENOM,
++    K_SCALE,
++    q_stride_0,
++    q_stride_1,
++    kv_s0: tl.constexpr,
++    kv_s1: tl.constexpr,
++    table_stride,
++    HEADS: tl.constexpr,
++    PAGE: tl.constexpr,
++    SPLITS: tl.constexpr,
++    SCALE: tl.constexpr,
++    BN: tl.constexpr,
++    QF8: tl.constexpr,
++    PVF8: tl.constexpr,
++    PVBIAS_LOG2: tl.constexpr,
++    QSPLIT: tl.constexpr,
++    TPF: tl.constexpr,
++):
++    slot = tl.program_id(0)
++    seq = slot // SPLITS
++    split = slot % SPLITS
++    kvlen = tl.load(SEQ + seq)
++    context = kvlen - 8
++    mr = tl.arange(0, 64)
++    d = tl.arange(0, 64)
++    nr = tl.arange(0, BN)
++    qrel = mr // 8
++    qrow = seq * 8 + qrel
++    head0 = mr % 8
++    head1 = 8 + head0
++    q0 = tl.load(
++        Q + qrow[:, None] * q_stride_0 + head0[:, None] * q_stride_1 + d[None, :]
++    ).to(tl.float32)
++    q1 = tl.load(
++        Q + qrow[:, None] * q_stride_0 + head1[:, None] * q_stride_1 + d[None, :]
++    ).to(tl.float32)
++    scale = SCALE * 1.4426950408889634
++    if K_SCALE is not None:
++        scale *= tl.load(K_SCALE)
++    if QF8:
++        qs0 = tl.maximum(tl.max(tl.abs(q0), axis=1), 1e-20) / 448.0
++        qs1 = tl.maximum(tl.max(tl.abs(q1), axis=1), 1e-20) / 448.0
++        q0s = q0 / qs0[:, None]
++        q1s = q1 / qs1[:, None]
++        q0c = q0s.to(tl.float8e4nv)
++        q1c = q1s.to(tl.float8e4nv)
++        if QSPLIT:
++            q0l = (q0s - q0c.to(tl.float32)).to(tl.float8e4nv)
++            q1l = (q1s - q1c.to(tl.float32)).to(tl.float8e4nv)
++        else:
++            q0l = q0c
++            q1l = q1c
++        c0 = qs0 * scale
++        c1 = qs1 * scale
++    else:
++        q0c = q0.to(tl.bfloat16)
++        q1c = q1.to(tl.bfloat16)
++        q0l = q0c
++        q1l = q1c
++        c0 = tl.full((64,), 1.0, tl.float32) * scale
++        c1 = tl.full((64,), 1.0, tl.float32) * scale
++    tiles = tl.cdiv(kvlen, BN)
++    tps = tl.cdiv(tiles, SPLITS)
++    begin = split * tps
++    end = tl.minimum(tiles, begin + tps)
++    interior_end = tl.minimum(end, (context + 1) // BN)
++    m0 = tl.full((64,), float("-inf"), tl.float32)
++    m1 = tl.full((64,), float("-inf"), tl.float32)
++    l0 = tl.zeros((64,), tl.float32)
++    l1 = tl.zeros((64,), tl.float32)
++    acc0 = tl.zeros((64, 64), tl.float32)
++    acc1 = tl.zeros((64, 64), tl.float32)
++    table_row = TABLE + seq * table_stride
++    # page ids are software-pipelined one tile ahead of the KV loads (the table load latency is otherwise exposed
++    # every iteration: table -> wait -> KV address)
++    pos0 = begin * BN + nr
++    nxt_blocks = tl.load(table_row + pos0 // PAGE, mask=pos0 < kvlen, other=0)
++    for tile in range(begin, interior_end):
++        blocks = nxt_blocks
++        if TPF:
++            pos1 = (tile + 1) * BN + nr
++            nxt_blocks = tl.load(table_row + pos1 // PAGE, mask=pos1 < kvlen, other=0)
++        else:
++            blocks = tl.load(table_row + (tile * BN + nr) // PAGE)
++        acc0, acc1, m0, m1, l0, l1 = _vv2_tile(
++            acc0,
++            acc1,
++            m0,
++            m1,
++            l0,
++            l1,
++            q0c,
++            q1c,
++            q0l,
++            q1l,
++            c0,
++            c1,
++            K,
++            V,
++            blocks,
++            tile,
++            kv_s0,
++            kv_s1,
++            nr,
++            d,
++            context,
++            kvlen,
++            qrel,
++            BN,
++            PAGE,
++            False,
++            QF8,
++            PVF8,
++            QSPLIT,
++        )
++    for tile in range(tl.maximum(begin, interior_end), end):
++        pos1 = tile * BN + nr
++        blocks = tl.load(table_row + pos1 // PAGE, mask=pos1 < kvlen, other=0)
++        acc0, acc1, m0, m1, l0, l1 = _vv2_tile(
++            acc0,
++            acc1,
++            m0,
++            m1,
++            l0,
++            l1,
++            q0c,
++            q1c,
++            q0l,
++            q1l,
++            c0,
++            c1,
++            K,
++            V,
++            blocks,
++            tile,
++            kv_s0,
++            kv_s1,
++            nr,
++            d,
++            context,
++            kvlen,
++            qrel,
++            BN,
++            PAGE,
++            True,
++            QF8,
++            PVF8,
++            QSPLIT,
++        )
++    i0 = (qrow * HEADS + head0) * SPLITS + split
++    i1 = (qrow * HEADS + head1) * SPLITS + split
++    tl.store(MAXIMUM + i0, m0)
++    tl.store(MAXIMUM + i1, m1)
++    tl.store(DENOM + i0, l0)
++    tl.store(DENOM + i1, l1)
++    tl.store(PARTIAL + i0[:, None] * 64 + d[None, :], acc0)
++    tl.store(PARTIAL + i1[:, None] * 64 + d[None, :], acc1)
++
++
++@triton.jit
++def _vv2_reduce(
++    PARTIAL,
++    MAXIMUM,
++    DENOM,
++    OUT,
++    V_SCALE,
++    HEADS: tl.constexpr,
++    SPLITS: tl.constexpr,
++    o_stride_0,
++    o_stride_1,
++):
++    # identical math to production _verify_reduce
++    token, head = tl.program_id(0), tl.program_id(1)
++    segments = tl.arange(0, SPLITS)
++    d = tl.arange(0, 64)
++    index = (token * HEADS + head) * SPLITS + segments
++    maximum = tl.load(MAXIMUM + index)
++    denom = tl.load(DENOM + index)
++    global_max = tl.max(tl.where(denom > 0, maximum, float("-inf")), axis=0)
++    global_max = tl.where(global_max > float("-inf"), global_max, 0.0)
++    weights = tl.where(denom > 0, tl.exp2(maximum - global_max), 0.0)
++    total = tl.sum(denom * weights, axis=0)
++    partial = tl.load(PARTIAL + index[:, None] * 64 + d[None, :])
++    accum = tl.sum(partial * weights[:, None], axis=0)
++    inverse = tl.where(total > 0, 1.0 / total, 0.0)
++    if V_SCALE is not None:
++        inverse *= tl.load(V_SCALE)
++    tl.store(OUT + token * o_stride_0 + head * o_stride_1 + d, accum * inverse)
++
++
++def pick_splits_v2(num_seqs: int, max_kv: int = 0) -> int:
++    # >= 512 CTAs (2 per CU) when the batch allows it: bs 1 -> 256 ... bs 8 -> 64, bs 16..64 -> 32
++    s = 32
++    while s < 256 and s * num_seqs < 512:
++        s *= 2
++    return s
++
++
++def gqa_verify_splitkv_2kv(
++    q,
++    k,
++    v,
++    out,
++    seqused_k,
++    block_table,
++    softmax_scale,
++    k_descale,
++    v_descale,
++    *,
++    splits=None,
++    bn=64,
++    num_warps=4,
++    num_stages=2,
++):
++    """Full-attention verify, 8 tokens x 16 Q heads x 2 KV heads per (request, split) program, BF16 QK / PV."""
++    num_seqs = seqused_k.numel()
++    heads = q.shape[1]
++    assert q.dtype == torch.bfloat16 and k.dtype == v.dtype
++    assert q.shape[-1] == HD and heads == 16 and k.shape[2] == HKV and k.shape[1] == 16
++    assert (
++        q.shape[0] == num_seqs * QL
++        and k.stride() == v.stride()
++        and k.stride(2) == 64
++        and k.stride(3) == 1
++    )
++    splits = splits or pick_splits_v2(num_seqs)
++    state_shape = (q.shape[0], heads, splits)
++    partial = torch.empty((*state_shape, HD), dtype=torch.float32, device=q.device)
++    maximum = torch.empty(state_shape, dtype=torch.float32, device=q.device)
++    denom = torch.empty(state_shape, dtype=torch.float32, device=q.device)
++    _vv2_partials[(num_seqs * splits,)](
++        q,
++        k,
++        v,
++        seqused_k,
++        block_table,
++        partial,
++        maximum,
++        denom,
++        k_descale,
++        q.stride(0),
++        q.stride(1),
++        k.stride(0),
++        k.stride(1),
++        block_table.stride(0),
++        heads,
++        k.shape[1],
++        splits,
++        float(softmax_scale),
++        bn,
++        False,
++        False,
++        8,
++        False,
++        False,
++        num_warps=num_warps,
++        num_stages=num_stages,
++        matrix_instr_nonkdim=16,
++    )
++    _vv2_reduce[(q.shape[0], heads)](
++        partial,
++        maximum,
++        denom,
++        out,
++        v_descale,
++        heads,
++        splits,
++        out.stride(0),
++        out.stride(1),
++        num_warps=2,
++    )
++    return out
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py
+@@ -0,0 +1,290 @@
++"""Per-head QK RMSNorm + interleaved RoPE + paged FP8 KV-cache store (Muse Spark, head_dim 64, page 16).
++
++* ``qk_norm_rope_cache``: from projected Q/K/V. One program per (token, Q head) normalizes, scales and rotates
++  Q; the first Q head of each GQA group also normalizes and rotates its K and stores K/V into the FP8 cache
++  (optionally through the full -> SWA slot mapping).
++* ``qkv_proj_qk_norm_rope_cache``: the same epilogue fed straight from the BF16 split-K partials of the fused
++  QKV + output-gate projection (``bf16_splitk_gemm``), which also emits V and the gate.
++
++The BF16 round trips of the unfused sequence (norm output, query scaling, RoPE products, projection store)
++are explicit, so the results match the separate norm / RoPE / cache-write kernels.
++"""
++
++import torch
++import triton
++import triton.language as tl
++
++from sglang.kernels.ops.gemm.bf16_splitk_gemm import bf16_splitk_gemm_partials
++
++
++@triton.jit
++def _norm_rope(
++    x,
++    COS,
++    POS,
++    eps,
++    scale,
++    D: tl.constexpr,
++    ROPE: tl.constexpr,
++    Q_SCALE: tl.constexpr,
++    COS_STRIDE: tl.constexpr,
++):
++    d = tl.arange(0, D)
++    f = x.to(tl.float32)
++    inv = tl.rsqrt(tl.sum(f * f, axis=0) / D + eps)
++    value = (f * inv).to(tl.bfloat16).to(tl.float32)
++    if Q_SCALE:
++        value = (value * scale).to(tl.bfloat16).to(tl.float32)
++    if ROPE:
++        pos = tl.load(POS + tl.program_id(0))
++        # Day0 pos_enc.cu stores the FP32 cache loads in scalar_t (BF16),
++        # and its BF16 operators round both products before the final add.
++        cosine = tl.load(COS + pos * COS_STRIDE + d // 2).to(tl.bfloat16).to(tl.float32)
++        sine = (
++            tl.load(COS + pos * COS_STRIDE + D // 2 + d // 2)
++            .to(tl.bfloat16)
++            .to(tl.float32)
++        )
++        other = tl.reshape(tl.flip(tl.reshape(value, (D // 2, 2)), 1), (D,))
++        rotated = tl.where(d % 2 == 0, -other, other)
++        first = (value * cosine).to(tl.bfloat16).to(tl.float32)
++        second = (rotated * sine).to(tl.bfloat16).to(tl.float32)
++        value = first + second
++    return value.to(tl.bfloat16)
++
++
++@triton.jit
++def _muse_qk_rope_cache(
++    Q,
++    K,
++    V,
++    POS,
++    COS,
++    LOC,
++    MAP,
++    KC,
++    VC,
++    QO,
++    KO,
++    KS,
++    VS,
++    QS: tl.constexpr,
++    KSTR: tl.constexpr,
++    VSTR: tl.constexpr,
++    HQ: tl.constexpr,
++    HK: tl.constexpr,
++    D: tl.constexpr,
++    EPS: tl.constexpr,
++    SCALE: tl.constexpr,
++    ROPE: tl.constexpr,
++    HAS_MAP: tl.constexpr,
++    HAS_SCALE: tl.constexpr,
++    COS_STRIDE: tl.constexpr,
++):
++    token, head = tl.program_id(0), tl.program_id(1)
++    d = tl.arange(0, D)
++    q = tl.load(Q + token * QS + head * D + d)
++    q = _norm_rope(q, COS, POS, EPS, SCALE, D, ROPE, True, COS_STRIDE)
++    tl.store(QO + token * HQ * D + head * D + d, q)
++    if head % (HQ // HK) == 0:
++        kh = head // (HQ // HK)
++        k = tl.load(K + token * KSTR + kh * D + d)
++        k = _norm_rope(k, COS, POS, EPS, 1.0, D, ROPE, False, COS_STRIDE)
++        tl.store(KO + token * HK * D + kh * D + d, k)
++        slot = tl.load(LOC + token).to(tl.int64)
++        if slot >= 0:
++            if HAS_MAP:
++                slot = tl.load(MAP + slot).to(tl.int64)
++            if slot >= 0:
++                v = tl.load(V + token * VSTR + kh * D + d)
++                if HAS_SCALE:
++                    k_value = k.to(tl.float32) / tl.load(KS)
++                    v_value = v.to(tl.float32) / tl.load(VS)
++                else:
++                    k_value = k.to(tl.float32)
++                    v_value = v.to(tl.float32)
++                offset = slot * HK * D + kh * D + d
++                tl.store(KC + offset, k_value)
++                tl.store(VC + offset, v_value)
++
++
++@triton.jit
++def _project_slice(
++    P, TOKEN, FIRST, M: tl.constexpr, N: tl.constexpr, SK: tl.constexpr, D: tl.constexpr
++):
++    split = tl.arange(0, SK)
++    col = FIRST + tl.arange(0, D)
++    partial = tl.load(P + split[:, None] * M * N + TOKEN * N + col[None, :])
++    return tl.sum(partial, axis=0).to(tl.bfloat16)
++
++
++@triton.jit
++def _qkv_epilogue(
++    P,
++    POS,
++    COS,
++    LOC,
++    MAP,
++    KC,
++    VC,
++    QO,
++    KO,
++    VO,
++    GO,
++    KS,
++    VS,
++    M: tl.constexpr,
++    N: tl.constexpr,
++    SK: tl.constexpr,
++    HQ: tl.constexpr,
++    HK: tl.constexpr,
++    D: tl.constexpr,
++    EPS: tl.constexpr,
++    SCALE: tl.constexpr,
++    ROPE: tl.constexpr,
++    HAS_MAP: tl.constexpr,
++    COS_STRIDE: tl.constexpr,
++):
++    token, head = tl.program_id(0), tl.program_id(1)
++    d = tl.arange(0, D)
++    gate = _project_slice(P, token, (HQ + 2 * HK) * D + head * D, M, N, SK, D)
++    tl.store(GO + token * HQ * D + head * D + d, gate)
++    q = _project_slice(P, token, head * D, M, N, SK, D)
++    q = _norm_rope(q, COS, POS, EPS, SCALE, D, ROPE, True, COS_STRIDE)
++    tl.store(QO + token * HQ * D + head * D + d, q)
++    if head % (HQ // HK) == 0:
++        kh = head // (HQ // HK)
++        k = _project_slice(P, token, HQ * D + kh * D, M, N, SK, D)
++        v = _project_slice(P, token, (HQ + HK) * D + kh * D, M, N, SK, D)
++        k = _norm_rope(k, COS, POS, EPS, 1.0, D, ROPE, False, COS_STRIDE)
++        tl.store(KO + token * HK * D + kh * D + d, k)
++        tl.store(VO + token * HK * D + kh * D + d, v)
++        slot = tl.load(LOC + token).to(tl.int64)
++        if slot >= 0:
++            if HAS_MAP:
++                slot = tl.load(MAP + slot).to(tl.int64)
++            if slot >= 0:
++                offset = slot * HK * D + kh * D + d
++                tl.store(KC + offset, k.to(tl.float32) / tl.load(KS))
++                tl.store(VC + offset, v.to(tl.float32) / tl.load(VS))
++
++
++def qk_norm_rope_cache(
++    q,
++    k,
++    v,
++    positions,
++    cos_sin,
++    cache_k,
++    cache_v,
++    locations,
++    swa_mapping,
++    eps,
++    q_scale,
++    k_scale,
++    v_scale,
++    warps=1,
++    fp_fusion=True,
++):
++    """Return (normalized + rotated Q [M, HQ*64], K [M, HK*64]); K/V of each token go to the FP8 cache."""
++    m = q.shape[0]
++    d = 64
++    hq = q.shape[1] // d
++    hk = k.shape[1] // d
++    assert q.dtype == k.dtype == v.dtype == torch.bfloat16
++    assert cache_k.dtype == cache_v.dtype == torch.float8_e4m3fn
++    assert cache_k.is_contiguous() and cache_v.is_contiguous()
++    assert q.shape == (m, hq * d) and k.shape == v.shape == (m, hk * d)
++    qo = torch.empty_like(q, memory_format=torch.contiguous_format)
++    ko = torch.empty_like(k, memory_format=torch.contiguous_format)
++    if m:
++        _muse_qk_rope_cache[(m, hq)](
++            q,
++            k,
++            v,
++            positions,
++            cos_sin,
++            locations,
++            swa_mapping,
++            cache_k,
++            cache_v,
++            qo,
++            ko,
++            k_scale,
++            v_scale,
++            q.stride(0),
++            k.stride(0),
++            v.stride(0),
++            hq,
++            hk,
++            d,
++            float(eps),
++            float(q_scale),
++            cos_sin is not None,
++            swa_mapping is not None,
++            k_scale is not None,
++            cos_sin.stride(0) if cos_sin is not None else d,
++            num_warps=warps,
++            enable_fp_fusion=fp_fusion,
++        )
++    return qo, ko
++
++
++def qkv_proj_qk_norm_rope_cache(
++    x,
++    weight,
++    positions,
++    cos_sin,
++    cache_k,
++    cache_v,
++    locations,
++    mapping,
++    eps,
++    q_scale,
++    k_scale,
++    v_scale,
++):
++    """Fused QKV + gate projection of ``x`` [M <= 32, 8192] with the QK-norm / RoPE / FP8-cache epilogue.
++
++    Returns (Q [M, 1024], K [M, 128], V [M, 128], gate [M, 1024]), BF16.
++    """
++    m, k = x.shape
++    assert 0 < m <= 32 and k == 8192 and weight.shape == (2304, 8192)
++    assert x.dtype == weight.dtype == torch.bfloat16
++    assert x.is_contiguous() and weight.is_contiguous()
++    assert cache_k.dtype == cache_v.dtype == torch.float8_e4m3fn
++    assert cache_k.is_contiguous() and cache_v.is_contiguous()
++    partials = torch.empty((8, m, 2304), device=x.device, dtype=torch.float32)
++    bf16_splitk_gemm_partials(x, weight, partials, block_n=32, block_k=128, split_k=8)
++    qo = torch.empty((m, 1024), device=x.device, dtype=torch.bfloat16)
++    ko = torch.empty((m, 128), device=x.device, dtype=torch.bfloat16)
++    vo = torch.empty_like(ko)
++    go = torch.empty_like(qo)
++    _qkv_epilogue[(m, 16)](
++        partials,
++        positions,
++        cos_sin,
++        locations,
++        mapping,
++        cache_k,
++        cache_v,
++        qo,
++        ko,
++        vo,
++        go,
++        k_scale,
++        v_scale,
++        m,
++        2304,
++        8,
++        16,
++        2,
++        64,
++        float(eps),
++        float(q_scale),
++        cos_sin is not None,
++        mapping is not None,
++        cos_sin.stride(0) if cos_sin is not None else 64,
++        num_warps=1,
++    )
++    return qo, ko, vo, go
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/kernels/ops/attention/swa_verify_splitkv.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/kernels/ops/attention/swa_verify_splitkv.py
+@@ -0,0 +1,234 @@
++"""Split-KV target-verify attention on a sliding window (Muse Spark shape).
++
++8 verify tokens per request, GQA 8, head_dim 64, BF16 Q, FP8 KV in 16-token pages, 2047-token window. The
++window is split across workgroups (exact causal and left-window masks); FP32 partials are merged by a second
++kernel. Used for up to 8 requests, where the unified kernel's grid is too small.
++"""
++
++import torch
++import triton
++import triton.language as tl
++
++
++@triton.jit
++def _swa_verify_partials(
++    Q,
++    K,
++    V,
++    CU,
++    SEQ,
++    TABLE,
++    PARTIAL,
++    MAXIMUM,
++    DENOM,
++    Q_SCALE,
++    K_SCALE,
++    q_stride_0: tl.constexpr,
++    q_stride_1: tl.constexpr,
++    k_stride_0: tl.constexpr,
++    k_stride_1: tl.constexpr,
++    k_stride_2: tl.constexpr,
++    k_stride_3: tl.constexpr,
++    v_stride_0: tl.constexpr,
++    v_stride_1: tl.constexpr,
++    v_stride_2: tl.constexpr,
++    v_stride_3: tl.constexpr,
++    table_stride: tl.constexpr,
++    HEADS: tl.constexpr,
++    GQA: tl.constexpr,
++    PAGE: tl.constexpr,
++    WINDOW: tl.constexpr,
++    SPLITS: tl.constexpr,
++    SCALE: tl.constexpr,
++    BM: tl.constexpr,
++    BN: tl.constexpr,
++):
++    qblock, kvhead, slot = tl.program_id(0), tl.program_id(1), tl.program_id(2)
++    seq, split = slot // SPLITS, slot % SPLITS
++    qstart = tl.load(CU + seq)
++    qlen = tl.load(CU + seq + 1) - qstart
++    kvlen = tl.load(SEQ + seq)
++    context = kvlen - qlen
++    mr = tl.arange(0, BM)
++    d = tl.arange(0, 64)
++    nr = tl.arange(0, BN)
++    qrel = qblock * (BM // GQA) + mr // GQA
++    qhead = kvhead * GQA + mr % GQA
++    qvalid = qrel < qlen
++    qrow = qstart + qrel
++    q = tl.load(
++        Q + qrow[:, None] * q_stride_0 + qhead[:, None] * q_stride_1 + d[None, :],
++        mask=qvalid[:, None],
++        other=0,
++    )
++    first_query = qblock * (BM // GQA)
++    last_query = tl.minimum(first_query + BM // GQA - 1, qlen - 1)
++    low = tl.maximum(0, context + first_query - WINDOW + 1)
++    high = tl.maximum(0, tl.minimum(kvlen, context + last_query + 1))
++    tile_start = low // BN
++    tile_stop = tl.cdiv(high, BN)
++    tiles_per_split = tl.cdiv(tl.maximum(tile_stop - tile_start, 0), SPLITS)
++    begin = tile_start + split * tiles_per_split
++    end = tl.minimum(tile_stop, begin + tiles_per_split)
++    scale = SCALE * 1.4426950408889634
++    if Q_SCALE is not None:
++        scale *= tl.load(Q_SCALE)
++    if K_SCALE is not None:
++        scale *= tl.load(K_SCALE)
++    maximum = tl.full((BM,), float("-inf"), tl.float32)
++    denom = tl.zeros((BM,), tl.float32)
++    accum = tl.zeros((BM, 64), tl.float32)
++    for tile in range(begin, end):
++        positions = tile * BN + nr
++        valid = (positions >= low) & (positions < high)
++        blocks = tl.load(
++            TABLE + seq * table_stride + positions // PAGE, mask=valid, other=0
++        ).to(tl.int64)
++        in_page = positions % PAGE
++        k = tl.load(
++            K
++            + blocks[None, :] * k_stride_0
++            + in_page[None, :] * k_stride_1
++            + kvhead * k_stride_2
++            + d[:, None] * k_stride_3,
++            mask=valid[None, :],
++            other=0.0,
++        ).to(tl.bfloat16)
++        v = tl.load(
++            V
++            + blocks[:, None] * v_stride_0
++            + in_page[:, None] * v_stride_1
++            + kvhead * v_stride_2
++            + d[None, :] * v_stride_3,
++            mask=valid[:, None],
++            other=0.0,
++        ).to(tl.bfloat16)
++        scores = tl.dot(q, k) * scale
++        absolute_query = context + qrel
++        mask = (
++            qvalid[:, None]
++            & valid[None, :]
++            & (positions[None, :] <= absolute_query[:, None])
++            & (absolute_query[:, None] - positions[None, :] < WINDOW)
++        )
++        scores = tl.where(mask, scores, float("-inf"))
++        new_maximum = tl.maximum(maximum, tl.max(scores, axis=1))
++        new_maximum = tl.where(new_maximum > float("-inf"), new_maximum, 0.0)
++        probabilities = tl.exp2(scores - new_maximum[:, None])
++        rescale = tl.exp2(maximum - new_maximum)
++        denom = denom * rescale + tl.sum(probabilities, axis=1)
++        accum = tl.dot(probabilities.to(tl.bfloat16), v, acc=accum * rescale[:, None])
++        maximum = new_maximum
++    state_index = (qrow * HEADS + qhead) * SPLITS + split
++    tl.store(MAXIMUM + state_index, maximum, mask=qvalid)
++    tl.store(DENOM + state_index, denom, mask=qvalid)
++    tl.store(
++        PARTIAL + state_index[:, None] * 64 + d[None, :], accum, mask=qvalid[:, None]
++    )
++
++
++@triton.jit
++def _swa_verify_reduce(
++    PARTIAL,
++    MAXIMUM,
++    DENOM,
++    OUT,
++    V_SCALE,
++    HEADS: tl.constexpr,
++    SPLITS: tl.constexpr,
++    o_stride_0: tl.constexpr,
++    o_stride_1: tl.constexpr,
++):
++    token, head = tl.program_id(0), tl.program_id(1)
++    segments = tl.arange(0, SPLITS)
++    d = tl.arange(0, 64)
++    index = (token * HEADS + head) * SPLITS + segments
++    maximum = tl.load(MAXIMUM + index)
++    denom = tl.load(DENOM + index)
++    global_max = tl.max(tl.where(denom > 0, maximum, float("-inf")), axis=0)
++    global_max = tl.where(global_max > float("-inf"), global_max, 0.0)
++    weights = tl.where(denom > 0, tl.exp2(maximum - global_max), 0.0)
++    total = tl.sum(denom * weights, axis=0)
++    partial = tl.load(PARTIAL + index[:, None] * 64 + d[None, :])
++    accum = tl.sum(partial * weights[:, None], axis=0)
++    inverse = tl.where(total > 0, 1.0 / total, 0.0)
++    if V_SCALE is not None:
++        inverse *= tl.load(V_SCALE)
++    tl.store(OUT + token * o_stride_0 + head * o_stride_1 + d, accum * inverse)
++
++
++def swa_verify_splitkv(
++    q,
++    k,
++    v,
++    out,
++    cu_seqlens_q,
++    max_seqlen_q,
++    seqused_k,
++    max_seqlen_k,
++    softmax_scale,
++    causal,
++    window_size,
++    block_table,
++    softcap,
++    q_descale,
++    k_descale,
++    v_descale,
++    *,
++    num_splits=8,
++    num_stages=2,
++):
++    assert q.dtype == torch.bfloat16 and k.dtype == v.dtype == torch.float8_e4m3fn
++    assert (
++        out.dtype == torch.bfloat16 and q.shape[-1] == k.shape[-1] == v.shape[-1] == 64
++    )
++    assert q.shape[1] // k.shape[2] == 8 and k.shape[2] == v.shape[2]
++    assert k.shape[1] == v.shape[1] == 16
++    assert max_seqlen_q == 8 and q.shape[0] == seqused_k.numel() * 8
++    assert causal and window_size == (2046, 0) and softcap == 0
++    assert num_splits in (2, 4, 8, 16, 32)
++    state_shape = (q.shape[0], q.shape[1], num_splits)
++    partial = torch.empty((*state_shape, 64), dtype=torch.float32, device=q.device)
++    maximum = torch.empty(state_shape, dtype=torch.float32, device=q.device)
++    denom = torch.empty(state_shape, dtype=torch.float32, device=q.device)
++    _swa_verify_partials[(4, k.shape[2], seqused_k.numel() * num_splits)](
++        q,
++        k,
++        v,
++        cu_seqlens_q,
++        seqused_k,
++        block_table,
++        partial,
++        maximum,
++        denom,
++        q_descale,
++        k_descale,
++        q.stride(0),
++        q.stride(1),
++        *k.stride(),
++        *v.stride(),
++        block_table.stride(0),
++        q.shape[1],
++        8,
++        16,
++        2047,
++        num_splits,
++        softmax_scale,
++        16,
++        64,
++        num_warps=2,
++        num_stages=num_stages,
++    )
++    _swa_verify_reduce[(q.shape[0], q.shape[1])](
++        partial,
++        maximum,
++        denom,
++        out,
++        v_descale,
++        q.shape[1],
++        num_splits,
++        out.stride(0),
++        out.stride(1),
++        num_warps=4,
++    )
++    return out
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/kernels/ops/gemm/bf16_tiled_small_m_gemm.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/kernels/ops/gemm/bf16_tiled_small_m_gemm.py
+@@ -0,0 +1,141 @@
++"""BF16 GEMMs at 17..64 rows from a tile-contiguous weight copy (gfx950).
++
++``W [N, K]`` is copied once at load into ``[N/BN, K/BK, BN, BK]`` so each program streams one contiguous slab
++(its BN columns over its share of K); split-K partials are FP32 and summed by a second kernel. Same products
++and FP32 accumulation as a plain GEMM; only the K summation order differs.
++
++``LAYOUT`` / ``LAUNCH`` are the MI355X tuning data (Muse Spark TP8 shapes), kept only where the tiled kernel
++beat the incumbent path at that width with HBM-resident weights: the MoE pooler at 17-64 rows (vs hipBLASLt:
++16.8 vs 20.6 us at 32, 20.4 vs 27.5 at 64), the attention O projection at 33-64 (6.5 vs 8.8), the DFlash draft
++gate/up and down at 17-64 (24.5 vs 26.2 / 29.8 vs 33.1, 14.4 vs 18.3 / 16.9 vs 19.9).
++"""
++
++import torch
++import triton
++import triton.language as tl
++
++MIN_M = 17
++MAX_M = 64
++
++# (N, K) -> (BN, BK) of the stored copy; (N, K, BM) -> (SK, warps).
++LAYOUT = {
++    (4096, 8192): (32, 128),
++    (8192, 1024): (32, 256),
++    (7168, 8192): (64, 128),
++    (8192, 3584): (32, 256),
++}
++LAUNCH = {
++    (4096, 8192, 32): (4, 4),
++    (4096, 8192, 64): (4, 4),
++    (8192, 1024, 64): (1, 8),
++    (7168, 8192, 32): (4, 8),
++    (7168, 8192, 64): (4, 8),
++    (8192, 3584, 32): (2, 4),
++    (8192, 3584, 64): (1, 4),
++}
++
++
++@triton.jit
++def _tiled_partial(
++    X,
++    Wt,
++    P,
++    M,
++    N: tl.constexpr,
++    K: tl.constexpr,
++    BM: tl.constexpr,
++    BN: tl.constexpr,
++    BK: tl.constexpr,
++    SK: tl.constexpr,
++):
++    pn, pk = tl.program_id(0), tl.program_id(1)
++    KT: tl.constexpr = K // BK
++    KT_PER: tl.constexpr = KT // SK
++    m = tl.arange(0, BM)
++    kk = tl.arange(0, BK)
++    nn = tl.arange(0, BN)
++    bp = (
++        Wt
++        + (pn * KT + pk * KT_PER).to(tl.int64) * (BN * BK)
++        + nn[None, :] * BK
++        + kk[:, None]
++    )
++    ap = X + m[:, None] * K + (pk * KT_PER * BK + kk)[None, :]
++    acc = tl.zeros((BM, BN), tl.float32)
++    for _ in range(KT_PER):
++        a = tl.load(ap, mask=m[:, None] < M, other=0.0)
++        b = tl.load(bp, cache_modifier=".cg")
++        acc = tl.dot(a, b, acc)
++        ap += BK
++        bp += BN * BK
++    n = pn * BN + nn
++    tl.store(
++        P + pk * M * N + m[:, None] * N + n[None, :],
++        acc.to(P.dtype.element_ty),
++        mask=m[:, None] < M,
++    )
++
++
++@triton.jit
++def _sum_partials(P, Y, MN, SK: tl.constexpr, B: tl.constexpr):
++    i = tl.program_id(0) * B + tl.arange(0, B)
++    s = tl.arange(0, SK)
++    p = tl.load(P + s[:, None] * MN + i[None, :], mask=i[None, :] < MN, other=0.0)
++    tl.store(Y + i, tl.sum(p, axis=0).to(Y.dtype.element_ty), mask=i < MN)
++
++
++@torch.no_grad()
++def prepare_tiled_weight(weight: torch.Tensor):
++    """Tile-contiguous copy of a [N, K] BF16 weight, or None when the shape has no tuned layout."""
++    n, k = weight.shape
++    layout = LAYOUT.get((n, k))
++    if layout is None or weight.dtype != torch.bfloat16:
++        return None
++    bn, bk = layout
++    return weight.view(n // bn, bn, k // bk, bk).permute(0, 2, 1, 3).contiguous()
++
++
++def _bm(m: int) -> int:
++    return max(16, 1 << (m - 1).bit_length())
++
++
++def tiled_gemm_applies(x: torch.Tensor, tiled) -> bool:
++    """Whether ``tiled_gemm(x, tiled, ...)`` covers these operands (tuned launch for this row count)."""
++    if (
++        tiled is None
++        or x.dim() != 2
++        or not x.is_contiguous()
++        or not MIN_M <= x.shape[0] <= MAX_M
++    ):
++        return False
++    n = tiled.shape[0] * tiled.shape[2]
++    k = tiled.shape[1] * tiled.shape[3]
++    return (n, k, _bm(x.shape[0])) in LAUNCH
++
++
++def tiled_gemm(x: torch.Tensor, tiled: torch.Tensor, n: int, k: int) -> torch.Tensor:
++    """``x @ W.T`` (BF16 out) from the tile-contiguous copy of ``W [n, k]``."""
++    m = x.shape[0]
++    bm = _bm(m)
++    bn, bk = LAYOUT[(n, k)]
++    sk, warps = LAUNCH[(n, k, bm)]
++    y = torch.empty((m, n), device=x.device, dtype=torch.bfloat16)
++    p = y if sk == 1 else torch.empty((sk, m, n), device=x.device, dtype=torch.float32)
++    _tiled_partial[(n // bn, sk)](
++        x,
++        tiled,
++        p,
++        m,
++        n,
++        k,
++        bm,
++        bn,
++        bk,
++        sk,
++        num_warps=warps,
++        num_stages=2,
++        matrix_instr_nonkdim=16,
++    )
++    if sk > 1:
++        _sum_partials[(triton.cdiv(m * n, 256),)](p, y, m * n, sk, 256, num_warps=4)
++    return y
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py
+@@ -0,0 +1,265 @@
++"""Compact A4W4 MoE experts for small target-verify batches (MXFP4 weights and activations, gfx950).
++
++TP8 / EP8 Muse Spark layout: 32 local experts, top-8 routing, hidden 4096, intermediate 4096, Quark MXFP4
++checkpoint weights (per-32 E8M0 scales) used as stored. For M (a multiple of 8, up to MAX_ROWS) rows:
++
++1. ``_prepare_a4``: per-expert route counts -> 16-row block map, and per-row MXFP4 quantization of the input;
++2. ``_scatter_a4``: per local expert, rank its routes in token order into its blocks;
++3. ``_expert_a4`` (ACT): gate/up ``dot_scaled`` GEMMs, SiLU-and-mul rounded to BF16, MXFP4 re-quantization;
++4. ``_expert_a4``: down GEMM into unweighted per-(token, slot) BF16 rows.
++
++``compact_a4_experts`` returns those per-slot rows ``[M * 8, 4096]``; the caller's finalize applies the
++per-expert norm and the route-weighted sum. Quark MXFP4 declares dynamic MXFP4 activations, so A4 is the
++checkpoint numerics.
++"""
++
++import torch
++import triton
++import triton.language as tl
++from aiter.ops.triton._triton_kernels.quant.quant import _mxfp4_quant_op
++
++MAX_ROWS = 512
++BLOCK_M = 16  # BM 32 / 64 give wrong rows and are no faster
++
++
++@triton.jit
++def _prepare_a4(
++    X,
++    Q,
++    QS,
++    IDS,
++    EXPERT,
++    POST,
++    FIRST,
++    M: tl.constexpr,
++    START: tl.constexpr,
++    NB: tl.constexpr,
++    NBB: tl.constexpr,
++    S: tl.constexpr,
++    PER_E: tl.constexpr,
++    BM: tl.constexpr,
++):
++    # Program 0: per-expert route counts -> block offsets and the block->expert map; the rank scan and
++    # scatter run per expert in _scatter_a4. Programs 1..4M quantize activation rows.
++    pid = tl.program_id(0)
++    if pid == 0:
++        r = tl.arange(0, S)
++        e = tl.arange(0, 32)
++        ids = tl.load(IDS + r, r < M * 8, other=-1)
++        hits = (ids[None, :] == START + e[:, None]) & (r[None, :] < M * 8)
++        blocks = tl.cdiv(tl.sum(hits.to(tl.int32), axis=1), BM)
++        first = tl.cumsum(blocks, axis=0) - blocks
++        b = tl.arange(0, NBB)
++        tl.store(EXPERT + b, -1, b < NB)
++        tl.store(FIRST + e, first)
++        # The later block-map writes may be owned by a different lane than initialization.
++        tl.debug_barrier()
++        eb = tl.arange(0, PER_E)
++        tl.store(
++            EXPERT + first[:, None] + eb[None, :],
++            e[:, None],
++            eb[None, :] < blocks[:, None],
++        )
++        tl.store(POST, tl.sum(blocks, axis=0) * BM)
++    else:
++        row = (pid - 1) // 4
++        tile = (pid - 1) % 4
++        col = tile * 1024 + tl.arange(0, 1024)
++        x = tl.load(X + row * 4096 + col).to(tl.float32)
++        q, qscale = _mxfp4_quant_op(x[None, :], 1024, 1, 32)
++        packed_col = tile * 512 + tl.arange(0, 512)
++        scale_col = tile * 32 + tl.arange(0, 32)
++        tl.store(Q + row * 2048 + packed_col, tl.reshape(q, (512,)))
++        tl.store(QS + row * 128 + scale_col, tl.reshape(qscale, (32,)))
++
++
++@triton.jit
++def _scatter_a4(
++    IDS,
++    SORTED,
++    FIRST,
++    M: tl.constexpr,
++    START: tl.constexpr,
++    S: tl.constexpr,
++    PER_E: tl.constexpr,
++    BM: tl.constexpr,
++):
++    # One program per local expert: rank its routes in token order and fill its blocks (sentinel M*8).
++    e = tl.program_id(0)
++    s = tl.arange(0, S)
++    ids = tl.load(IDS + s, s < M * 8, other=-1)
++    hit = (ids == START + e) & (s < M * 8)
++    rank = tl.cumsum(hit.to(tl.int32), axis=0) - 1
++    nslots = tl.cdiv(tl.sum(hit.to(tl.int32), axis=0), BM) * BM
++    base = tl.load(FIRST + e) * BM
++    c = tl.arange(0, PER_E * BM)
++    tl.store(SORTED + base + c, M * 8, c < nslots)
++    tl.debug_barrier()
++    tl.store(SORTED + base + rank, s, hit)
++
++
++@triton.jit
++def _expert_a4(
++    A,
++    AS,
++    W,
++    WS,
++    SORTED,
++    EXPERT,
++    OUT,
++    OS,
++    ROWS: tl.constexpr,
++    BN: tl.constexpr,
++    BK: tl.constexpr,
++    ACT: tl.constexpr,
++    BM: tl.constexpr,
++):
++    expert_block, n_block = tl.program_id(1), tl.program_id(0)
++    expert = tl.load(EXPERT + expert_block)
++    if expert >= 0:
++        slot = tl.load(SORTED + expert_block * BM + tl.arange(0, BM))
++        valid = slot < ROWS
++        src = slot // 8 if ACT else slot
++        n = n_block * BN + tl.arange(0, BN)
++        kp = tl.arange(0, BK // 2)
++        ks = tl.arange(0, BK // 32)
++        wn: tl.constexpr = 8192 if ACT else 4096
++        acc = tl.full((BM, BN), 0, tl.float32)
++        if ACT:
++            up = tl.full((BM, BN), 0, tl.float32)
++        for tile in range(4096 // BK):
++            a = tl.load(
++                A + src[:, None] * 2048 + tile * (BK // 2) + kp[None, :],
++                valid[:, None],
++                other=0,
++            )
++            asc = tl.load(
++                AS + src[:, None] * 128 + tile * (BK // 32) + ks[None, :],
++                valid[:, None],
++                other=127,
++            )
++            w = tl.load(
++                W
++                + expert * (wn * 2048)
++                + n[None, :] * 2048
++                + tile * (BK // 2)
++                + kp[:, None]
++            )
++            ws = tl.load(
++                WS
++                + expert * (wn * 128)
++                + n[:, None] * 128
++                + tile * (BK // 32)
++                + ks[None, :]
++            )
++            acc = tl.dot_scaled(a, asc, "e2m1", w, ws, "e2m1", acc)
++            if ACT:
++                wu = tl.load(
++                    W
++                    + expert * (wn * 2048)
++                    + (n[None, :] + 4096) * 2048
++                    + tile * (BK // 2)
++                    + kp[:, None]
++                )
++                wsu = tl.load(
++                    WS
++                    + expert * (wn * 128)
++                    + (n[:, None] + 4096) * 128
++                    + tile * (BK // 32)
++                    + ks[None, :]
++                )
++                up = tl.dot_scaled(a, asc, "e2m1", wu, wsu, "e2m1", up)
++        if ACT:
++            activated = (acc * tl.sigmoid(acc) * up).to(tl.bfloat16).to(tl.float32)
++            q, s = _mxfp4_quant_op(activated, BN, BM, 32)
++            pn = n_block * (BN // 2) + tl.arange(0, BN // 2)
++            sn = n_block * (BN // 32) + tl.arange(0, BN // 32)
++            tl.store(OUT + slot[:, None] * 2048 + pn[None, :], q, valid[:, None])
++            tl.store(OS + slot[:, None] * 128 + sn[None, :], s, valid[:, None])
++        else:
++            # Preserve the BF16 per-slot boundary before the Muse finalizer.
++            tl.store(OUT + slot[:, None] * 4096 + n[None, :], acc, valid[:, None])
++
++
++def compact_a4_applies(m: int, h: int, w13, w2, s13, s2) -> bool:
++    return (
++        0 < m <= MAX_ROWS
++        and m % 8 == 0
++        and h == 4096
++        and w13.shape == (32, 8192, 2048)
++        and w2.shape == (32, 4096, 2048)
++        and s13.shape == (32, 8192, 128)
++        and s2.shape == (32, 4096, 128)
++        and all(
++            t.dtype == torch.uint8 and t.is_contiguous() for t in (w13, w2, s13, s2)
++        )
++    )
++
++
++def compact_a4_experts(x, ids, w13, w2, s13, s2, *, local_start):
++    """Per-(token, slot) expert outputs BF16 [M * 8, 4096] for the 32 local experts starting at ``local_start``."""
++    m, h = x.shape
++    if not (
++        compact_a4_applies(m, h, w13, w2, s13, s2)
++        and x.dtype == torch.bfloat16
++        and ids.shape == (m, 8)
++    ):
++        raise ValueError(
++            f"A4 requires M a multiple of 8 up to {MAX_ROWS}, native TP8 local32 checkpoint weights"
++        )
++    bm = BLOCK_M
++    rows, cap = m * 8, m * 8 + 32 * (bm - 1)
++    nb = triton.cdiv(cap, bm)
++    sid = torch.empty(cap, device=x.device, dtype=torch.int32)
++    eid = torch.empty(nb, device=x.device, dtype=torch.int32)
++    post = torch.empty(1, device=x.device, dtype=torch.int32)
++    q = torch.empty((m, 2048), device=x.device, dtype=torch.uint8)
++    qs = torch.empty((m, 128), device=x.device, dtype=torch.uint8)
++    inter = torch.empty((rows, 2048), device=x.device, dtype=torch.uint8)
++    inter_scale = torch.empty((rows, 128), device=x.device, dtype=torch.uint8)
++    y = torch.empty((rows, h), device=x.device, dtype=torch.bfloat16)
++    first = torch.empty(32, device=x.device, dtype=torch.int32)
++    s_pow2, per_e = (
++        triton.next_power_of_2(rows),
++        triton.next_power_of_2(triton.cdiv(rows, bm)),
++    )
++    _prepare_a4[(1 + m * 4,)](
++        x,
++        q,
++        qs,
++        ids,
++        eid,
++        post,
++        first,
++        m,
++        local_start,
++        nb,
++        triton.next_power_of_2(nb),
++        s_pow2,
++        per_e,
++        bm,
++        num_warps=4,
++    )
++    _scatter_a4[(32,)](ids, sid, first, m, local_start, s_pow2, per_e, bm, num_warps=4)
++    grid = (4096 // 64, nb)
++    options = dict(num_warps=4, num_stages=2, matrix_instr_nonkdim=16)
++    _expert_a4[grid](
++        q,
++        qs,
++        w13,
++        s13,
++        sid,
++        eid,
++        inter,
++        inter_scale,
++        rows,
++        64,
++        512,
++        True,
++        bm,
++        **options,
++    )
++    _expert_a4[grid](
++        inter, inter_scale, w2, s2, sid, eid, y, y, rows, 64, 512, False, bm, **options
++    )
++    return y
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py
+@@ -0,0 +1,329 @@
++"""Muse Spark MoE routing front: FP32 router + BF16 pooler projection with a shared top-8 / RMSNorm epilogue.
++
++For M <= 64 rows of hidden ``x [M, 8192]`` (BF16): router logits ``fp32(x) @ W_router [8192, 256]`` (IEEE FP32
++split-K), sigmoid scores, bias-corrected top-8 selection with normalized weights, and the pooled expert input
++``rmsnorm(x @ W_pool.T)`` (``W_pool [4096, 8192]`` BF16, the projection rounded to BF16 before the norm).
++
++* ``router_pooler_topk``: three ordered launches, router partials, pooler partials (both split-K) and one
++  epilogue kernel whose programs either route a row or normalize a row. Above 16 rows the pooler output comes
++  completed from hipBLASLt (or the tiled small-M GEMM when its copy is given) and only the epilogue is shared.
++* ``joint_router_pooler_topk``: one split-K GEMM over a packed ``[pooler; router_hi; router_lo]`` BF16 weight
++  (the FP32 router as high + low BF16 parts) and the same epilogue; 8 / 16 / 24-row verify batches.
++
++Router ids follow the unfused routing sequence; the pooler and router projections differ from it only in
++FP32 summation order (and, for the joint form, the two-part BF16 router weights).
++"""
++
++import torch
++import triton
++import triton.language as tl
++
++from sglang.kernels.ops.gemm.bf16_splitk_gemm import bf16_splitk_gemm_partials
++from sglang.kernels.ops.gemm.bf16_tiled_small_m_gemm import (
++    tiled_gemm,
++    tiled_gemm_applies,
++)
++from sglang.kernels.ops.gemm.router_gemm_fp32 import _router_partial_kernel
++
++
++@triton.jit
++def _reduce_route(
++    P,
++    BIAS,
++    SCORES,
++    IDS,
++    M: tl.constexpr,
++    N: tl.constexpr,
++    SK: tl.constexpr,
++    MULT: tl.constexpr,
++    SCALE: tl.constexpr,
++    EPS: tl.constexpr,
++    TREE: tl.constexpr,
++):
++    m = tl.program_id(0)
++    n = tl.arange(0, N)
++    if TREE:
++        s = tl.arange(0, SK)
++        p = tl.load(P + s[:, None] * M * N + m * N + n[None, :])
++        logits = tl.sum(p, axis=0)
++    else:
++        logits = tl.zeros((N,), tl.float32)
++        for s in tl.static_range(SK):
++            logits += tl.load(P + s * M * N + m * N + n)
++    scores = tl.sigmoid(logits * MULT)
++    biased = scores + tl.load(BIAS + n)
++    ks = tl.arange(0, 8)
++    selected_ids = tl.full((8,), 0, tl.int32)
++    selected_scores = tl.full((8,), 0, tl.float32)
++    denom = tl.full((), 0, tl.float32)
++    for k in tl.static_range(8):
++        idx = tl.argmax(biased, axis=0)
++        is_selected = n == idx
++        score = tl.sum(tl.where(is_selected, scores, 0), axis=0)
++        denom += score
++        biased = tl.where(is_selected, -float("inf"), biased)
++        selected_ids = tl.where(ks == k, idx, selected_ids)
++        selected_scores = tl.where(ks == k, score, selected_scores)
++    inv = SCALE / (denom + EPS)
++    tl.store(SCORES + m * 8 + ks, selected_scores * inv)
++    tl.store(IDS + m * 8 + ks, selected_ids)
++
++
++@triton.jit
++def _route_preproject_epilogue(
++    RP,
++    DP,
++    BIAS,
++    NORM,
++    SCORES,
++    IDS,
++    Y,
++    M: tl.constexpr,
++    DN: tl.constexpr,
++    DS: tl.constexpr,
++    RS: tl.constexpr,
++    MULT: tl.constexpr,
++    SCALE: tl.constexpr,
++    REPS: tl.constexpr,
++    NORM_EPS: tl.constexpr,
++):
++    pid = tl.program_id(0)
++    if pid < M:
++        _reduce_route(RP, BIAS, SCORES, IDS, M, 256, RS, MULT, SCALE, 1e-15, False)
++    else:
++        row = (pid - M) // REPS
++        replica = (pid - M) % REPS
++        n = tl.arange(0, DN)
++        s = tl.arange(0, DS)
++        part = tl.load(DP + s[:, None] * M * DN + row * DN + n[None, :])
++        value = tl.sum(part, axis=0).to(tl.bfloat16).to(tl.float32)
++        rstd = tl.rsqrt(tl.sum(value * value, axis=0) / DN + NORM_EPS)
++        weight = tl.load(NORM + n).to(tl.float32)
++        result = value * rstd * weight
++        tl.store(Y + row * DN + n, result, n // (DN // REPS) == replica)
++
++
++@triton.jit
++def _joint_epilogue(
++    P,
++    BIAS,
++    NORM,
++    SCORES,
++    IDS,
++    Y,
++    M: tl.constexpr,
++    SK: tl.constexpr,
++    MULT: tl.constexpr,
++    SCALE: tl.constexpr,
++    EPS: tl.constexpr,
++):
++    pid = tl.program_id(0)
++    s = tl.arange(0, SK)
++    if pid < M:
++        n = tl.arange(0, 256)
++        high = tl.load(P + s[:, None] * M * 4608 + pid * 4608 + 4096 + n[None, :])
++        low = tl.load(P + s[:, None] * M * 4608 + pid * 4608 + 4352 + n[None, :])
++        logits = tl.sum(high, axis=0) + tl.sum(low, axis=0)
++        scores = tl.sigmoid(logits * MULT)
++        biased = scores + tl.load(BIAS + n)
++        slots = tl.arange(0, 8)
++        ids = tl.full((8,), 0, tl.int32)
++        selected = tl.full((8,), 0, tl.float32)
++        denominator = tl.full((), 0, tl.float32)
++        for j in tl.static_range(8):
++            idx = tl.argmax(biased, axis=0)
++            score = tl.sum(tl.where(n == idx, scores, 0), axis=0)
++            denominator += score
++            biased = tl.where(n == idx, -float("inf"), biased)
++            ids = tl.where(slots == j, idx, ids)
++            selected = tl.where(slots == j, score, selected)
++        tl.store(IDS + pid * 8 + slots, ids)
++        tl.store(SCORES + pid * 8 + slots, selected * (SCALE / (denominator + 1e-15)))
++    else:
++        row = pid - M
++        dn = tl.arange(0, 4096)
++        partial = tl.load(P + s[:, None] * M * 4608 + row * 4608 + dn[None, :])
++        value = tl.sum(partial, axis=0).to(tl.bfloat16).to(tl.float32)
++        rstd = tl.rsqrt(tl.sum(value * value, axis=0) / 4096 + EPS)
++        result = value * rstd * tl.load(NORM + dn).to(tl.float32)
++        tl.store(Y + row * 4096 + dn, result)
++
++
++def router_pooler_topk(
++    x,
++    router_weight,
++    pooler_weight,
++    bias,
++    norm_weight,
++    multiplier,
++    scale,
++    eps,
++    pooler_tiled=None,
++):
++    """Return (top-8 scores FP32 [M, 8], expert ids int32 [M, 8], normalized expert input BF16 [M, 4096])."""
++    m, k = x.shape
++    if m > 16:
++        return _router_topk_completed_pooler(
++            x,
++            router_weight,
++            pooler_weight,
++            bias,
++            norm_weight,
++            multiplier,
++            scale,
++            eps,
++            pooler_tiled,
++        )
++    n = pooler_weight.shape[0]
++    assert 0 < m <= 16 and k == 8192 and n == 4096
++    rp = torch.empty((64, m, 256), device=x.device, dtype=torch.float32)
++    dp = torch.empty((8, m, n), device=x.device, dtype=torch.float32)
++    _router_partial_kernel[(2, 64, 1)](
++        x,
++        router_weight,
++        rp,
++        m,
++        256,
++        k,
++        x.stride(0),
++        router_weight.stride(0),
++        rp.stride(0),
++        rp.stride(1),
++        BLOCK_M=16,
++        BLOCK_N=128,
++        BLOCK_K=64,
++        SPLIT_K=64,
++        num_warps=4,
++        num_stages=2,
++    )
++    bf16_splitk_gemm_partials(x, pooler_weight, dp, block_n=32, block_k=128, split_k=8)
++    scores = torch.empty((m, 8), device=x.device, dtype=torch.float32)
++    ids = torch.empty((m, 8), device=x.device, dtype=torch.int32)
++    expert_input = torch.empty((m, n), device=x.device, dtype=torch.bfloat16)
++    _route_preproject_epilogue[(2 * m,)](
++        rp,
++        dp,
++        bias,
++        norm_weight,
++        scores,
++        ids,
++        expert_input,
++        m,
++        n,
++        8,
++        64,
++        multiplier,
++        scale,
++        1,
++        eps,
++        num_warps=4,
++    )
++    return scores, ids, expert_input
++
++
++def _router_topk_completed_pooler(
++    x,
++    router_weight,
++    pooler_weight,
++    bias,
++    norm_weight,
++    multiplier,
++    scale,
++    eps,
++    pooler_tiled,
++):
++    """Share the norm/routing epilogue with a completed BF16 pooler output (tiled GEMM or hipBLASLt)."""
++    m, k = x.shape
++    n = pooler_weight.shape[0]
++    assert 0 < m <= 64 and k == 8192 and n == 4096
++    rp = torch.empty((64, m, 256), device=x.device, dtype=torch.float32)
++    _router_partial_kernel[(2, 64, triton.cdiv(m, 16))](
++        x,
++        router_weight,
++        rp,
++        m,
++        256,
++        k,
++        x.stride(0),
++        router_weight.stride(0),
++        rp.stride(0),
++        rp.stride(1),
++        BLOCK_M=16,
++        BLOCK_N=128,
++        BLOCK_K=64,
++        SPLIT_K=64,
++        num_warps=4,
++        num_stages=2,
++    )
++    dp = (
++        tiled_gemm(x, pooler_tiled, n, k)
++        if tiled_gemm_applies(x, pooler_tiled)
++        else torch.nn.functional.linear(x, pooler_weight)
++    )
++    scores = torch.empty((m, 8), device=x.device, dtype=torch.float32)
++    ids = torch.empty((m, 8), device=x.device, dtype=torch.int32)
++    expert_input = torch.empty((m, n), device=x.device, dtype=torch.bfloat16)
++    _route_preproject_epilogue[(2 * m,)](
++        rp,
++        dp,
++        bias,
++        norm_weight,
++        scores,
++        ids,
++        expert_input,
++        m,
++        n,
++        1,
++        64,
++        multiplier,
++        scale,
++        1,
++        eps,
++        num_warps=4,
++    )
++    return scores, ids, expert_input
++
++
++def pack_joint_router_pooler_weight(router, pooler):
++    """``[pooler; router.T high BF16; router.T low BF16]`` -> [4608, 8192] BF16."""
++    assert router.shape == (8192, 256) and router.dtype == torch.float32
++    assert pooler.shape == (4096, 8192) and pooler.dtype == torch.bfloat16
++    high = router.T.to(torch.bfloat16)
++    low = (router.T - high.float()).to(torch.bfloat16)
++    return torch.cat([pooler, high, low], dim=0).contiguous()
++
++
++def joint_router_pooler_topk(x, packed, bias, norm, multiplier, scale, eps):
++    """Same outputs as ``router_pooler_topk`` from the packed joint weight, for 8 / 16 / 24 rows."""
++    m, k = x.shape
++    assert m in (8, 16, 24) and k == 8192 and packed.shape == (4608, 8192)
++    if m == 24:
++        from aiter.ops.triton.gemm_a16w16 import gemm_a16w16
++
++        partial = gemm_a16w16(x, packed, dtype=torch.float32, skip_reduce=True)
++        sk = partial.shape[0] if partial.ndim == 3 else 1
++    else:
++        sk = 8
++        partial = torch.empty((sk, m, 4608), device=x.device, dtype=torch.float32)
++        bf16_splitk_gemm_partials(
++            x, packed, partial, block_n=64, block_k=128, split_k=sk
++        )
++    assert partial.dtype == torch.float32 and sk & (sk - 1) == 0
++    scores = torch.empty((m, 8), device=x.device, dtype=torch.float32)
++    ids = torch.empty((m, 8), device=x.device, dtype=torch.int32)
++    expert_input = torch.empty((m, 4096), device=x.device, dtype=torch.bfloat16)
++    _joint_epilogue[(2 * m,)](
++        partial,
++        bias,
++        norm,
++        scores,
++        ids,
++        expert_input,
++        m,
++        sk,
++        multiplier,
++        scale,
++        eps,
++        num_warps=4,
++    )
++    return scores, ids, expert_input
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py
+@@ -6,6 +6,7 @@
+ end to end attention solution with aiter kernels
+ """
+ 
++import inspect
+ import logging
+ import os
+ from dataclasses import dataclass
+@@ -60,6 +61,10 @@
+     from aiter.mla import mla_decode_fwd, mla_prefill_fwd
+     from aiter.ops.triton.attention.unified_attention import unified_attention
+ 
++    # Muse Spark's opt-in unified-attention tiles (3rdparty/amd/muse_spark aiter patch 05).
++    _unified_attention_has_muse_tiles = (
++        "verify_block_m" in inspect.signature(unified_attention).parameters
++    )
+     from sglang.kernels.ops.attention.unified_attention_3d_mtp import (
+         asm_verify_attn_enabled,
+         reset_verify_attn_plan_cache,
+@@ -68,6 +73,7 @@
+         unified_attention_3d_mtp_ragged_func,
+     )
+ except ImportError:
++    _unified_attention_has_muse_tiles = False
+     print(
+         "aiter is AMD specific kernel library. Please make sure aiter is installed on your AMD device."
+     )
+@@ -85,7 +91,13 @@
+     compact_dcp_verify_token_table_to_ragged,
+     create_mla_kv_page_table_for_dcp,
+ )
++from sglang.kernels.ops.attention.gqa_verify_splitkv import gqa_verify_splitkv
++from sglang.kernels.ops.attention.gqa_verify_splitkv_2kv import (
++    gqa_verify_splitkv_2kv,
++    pick_splits_v2,
++)
+ from sglang.kernels.ops.attention.merge_state import merge_state_triton
++from sglang.kernels.ops.attention.swa_verify_splitkv import swa_verify_splitkv
+ from sglang.kernels.ops.attention.utils import (
+     launch_reshape_and_cache_flash,
+     pad_sequence_with_mask,
+@@ -171,6 +183,104 @@
+ # decode) of long-context servers. Everything else keeps the historical
+ # one-program-per-request launch.
+ _KV_INDEX_BLOCKS_MIN_CONTEXT = 32768
++
++# Muse Spark extend: FP8 Q on full layers from this many query tokens.
++_MUSE_EXTEND_FP8_MIN_Q = 256
++# Muse Spark long-prefill 2D tile config (BLOCK_M, num_warps, num_stages, TILE_SIZE,
++# waves_per_eu) for 256+ query tokens: 90K cached + 5K new 5.57 -> 4.08 ms.
++_MUSE_PREFILL_2D_CONFIG = (128, 4, 2, 128, 2)
++# Muse Spark 8-token verify on the unified 3D kernel: one 64-row tile per
++# (request, KV head) and 256 split-KV segments (C1-tuned).
++_MUSE_VERIFY_BLOCK_M = 64
++_MUSE_VERIFY_NUM_SEGMENTS = 256
++# Full-layer GQA-folded verify (when the two-KV-head kernel is off): batch
++# floor, splits, BN, warps. 12 x 20K-120K contexts: 166 us vs 238 us for the 3D path.
++_MUSE_VERIFY_FULL_GQA = (8, 64, 64, 4)
++_muse_verify_v2_logged: set = set()
++
++
++def _muse_verify_attention(
++    q,
++    k,
++    v,
++    out,
++    cu_seqlens_q,
++    max_seqlen_q,
++    seqused_k,
++    block_table,
++    softmax_scale,
++    window_size,
++    softcap,
++    k_descale,
++    v_descale,
++    sinks,
++    kernels,
++) -> bool:
++    """Muse Spark target verify (8 tokens x GQA 8, head_dim 64, FP8 KV in 16-token
++    pages) on the verify kernels; False leaves the call to unified_attention.
++
++    Sliding layers (2047-token window): split-KV up to 8 requests, GQA-folded
++    tiles beyond. Full layers: the two-KV-head kernel (16 Q / 2 KV heads per
++    rank, bitwise equal to the GQA-folded and 3D paths), else GQA-folded
++    split-KV from 8 requests. ``kernels`` holds the enabled kernel names.
++    """
++    num_tokens, num_query_heads, head_size = q.shape
++    _, block_size, num_kv_heads, _ = k.shape
++    num_seqs = len(seqused_k)
++    sliding_window = 1 + window_size[0]
++    if not (
++        num_seqs > 0
++        and block_size == 16
++        and head_size == 64
++        and num_query_heads == 8 * num_kv_heads
++        and int(max_seqlen_q) == 8
++        and num_tokens == num_seqs * 8
++        and q.dtype == torch.bfloat16
++        and k.dtype == v.dtype == fp8_dtype
++        and softcap == 0
++        and sinks is None
++    ):
++        return False
++    if sliding_window == 2047 and window_size[1] == 0:
++        if "swa_splitkv" in kernels and num_query_heads == 16 and 0 < num_seqs <= 8:
++            swa_verify_splitkv(
++                q, k, v, out, cu_seqlens_q, max_seqlen_q, seqused_k, None,
++                softmax_scale, True, window_size, block_table, softcap,
++                None, k_descale, v_descale, num_splits=16,
++            )  # fmt: skip
++            return True
++        if "swa_gqa" in kernels and num_seqs > 8:
++            gqa_verify_splitkv(
++                q, k, v, out, cu_seqlens_q, seqused_k, block_table, softmax_scale,
++                sliding_window, k_descale, v_descale,
++                splits=16 if num_seqs <= 16 else 8, bn=64, num_warps=4, num_stages=2,
++            )  # fmt: skip
++            return True
++        return False
++    if sliding_window != 0:
++        return False
++    if "full_v2" in kernels and num_query_heads == 16 and k.stride() == v.stride():
++        splits = pick_splits_v2(num_seqs)
++        if num_seqs not in _muse_verify_v2_logged:
++            _muse_verify_v2_logged.add(num_seqs)
++            logger.info(
++                "Muse verify v2 full layers: num_seqs=%d mode=exact splits=%d",
++                num_seqs,
++                splits,
++            )
++        gqa_verify_splitkv_2kv(
++            q, k, v, out, seqused_k, block_table, softmax_scale, k_descale, v_descale,
++            splits=splits,
++        )  # fmt: skip
++        return True
++    min_seqs, splits, bn, warps = _MUSE_VERIFY_FULL_GQA
++    if "full_gqa" in kernels and num_seqs >= min_seqs:
++        gqa_verify_splitkv(
++            q, k, v, out, cu_seqlens_q, seqused_k, block_table, softmax_scale, 0,
++            k_descale, v_descale, splits=splits, bn=bn, num_warps=warps, num_stages=2,
++        )  # fmt: skip
++        return True
++    return False
+ 
+ 
+ class WrapperDispatch(Enum):
+@@ -237,6 +347,9 @@
+     cprr_kv_indices: Optional[torch.Tensor] = None
+     cprr_kv_indptr: Optional[torch.Tensor] = None
+     cprr_empty_rows: Optional[torch.Tensor] = None
++    # Unified target verify KV lengths (seq_lens + draft tokens), computed once
++    # per batch; graph replay refills preallocated storage.
++    verify_seqlen_k: Optional[torch.Tensor] = None
+ 
+ 
+ def _build_paged_kv_view(
+@@ -583,6 +696,67 @@
+             and get_bool_env_var("SGLANG_AITER_UNIFIED_VERIFY", "1")
+         )
+ 
++        # Muse Spark TP8 shapes on gfx950: head_dim 64, GQA 8, SWA KV pool, unified
++        # Triton attention. Extend and target verify take the Muse fast paths below
++        # (each behind its own SGLANG_MUSE_* switch); decode is unchanged.
++        self.use_muse_attention_paths = (
++            is_gfx95_supported()
++            and not self.use_mla
++            and self.use_triton_unified_attention
++            and self.use_sliding_window_kv_pool
++            and not self.kv_cache_is_vectorized_5d
++            and self.head_dim == 64
++            and self.num_head == 8 * self.num_kv_head
++        )
++        self.muse_reuse_extend_metadata = (
++            self.use_muse_attention_paths
++            and envs.SGLANG_MUSE_REUSE_EXTEND_METADATA.get()
++        )
++        self.muse_reuse_verify_lengths = (
++            self.use_muse_attention_paths
++            and self._use_unified_verify
++            and envs.SGLANG_MUSE_REUSE_VERIFY_LENGTHS.get()
++        )
++        self.muse_extend_fp8_q = (
++            self.use_muse_attention_paths and envs.SGLANG_MUSE_EXTEND_FP8_Q.get()
++        )
++        self._muse_extend_fp8_logged = False
++        self.muse_verify_kernels = frozenset(
++            name
++            for name, env in (
++                ("swa_splitkv", envs.SGLANG_MUSE_VERIFY_SWA_SPLITKV),
++                ("swa_gqa", envs.SGLANG_MUSE_VERIFY_SWA_GQA),
++                ("full_v2", envs.SGLANG_MUSE_VERIFY_FULL_V2),
++                ("full_gqa", envs.SGLANG_MUSE_VERIFY_FULL_GQA),
++            )
++            if self.use_muse_attention_paths and self._use_unified_verify and env.get()
++        )
++        # Extra unified_attention() arguments for Muse extend / verify calls.
++        self.muse_unified_attention_kwargs = {}
++        if self.use_muse_attention_paths and _unified_attention_has_muse_tiles:
++            if envs.SGLANG_MUSE_PREFILL_2D_TILES.get():
++                self.muse_unified_attention_kwargs["prefill_2d_config"] = (
++                    _MUSE_PREFILL_2D_CONFIG
++                )
++            if envs.SGLANG_MUSE_UNMASKED_INTERIOR.get():
++                self.muse_unified_attention_kwargs["unmasked_interior"] = True
++            if envs.SGLANG_MUSE_VERIFY_BM64.get():
++                self.muse_unified_attention_kwargs.update(
++                    verify_block_m=_MUSE_VERIFY_BLOCK_M,
++                    verify_num_segments=_MUSE_VERIFY_NUM_SEGMENTS,
++                )
++        if self.use_muse_attention_paths:
++            logger.info(
++                "Muse Spark attention paths: reuse_extend_metadata=%s "
++                "reuse_verify_lengths=%s extend_fp8_q=%s verify_kernels=%s "
++                "unified_attention_tiles=%s",
++                self.muse_reuse_extend_metadata,
++                self.muse_reuse_verify_lengths,
++                self.muse_extend_fp8_q,
++                sorted(self.muse_verify_kernels),
++                sorted(self.muse_unified_attention_kwargs),
++            )
++
+         # aiter kernel related initialization
+         self.max_num_partitions = (
+             self.max_context_len + _AITER_PARTITION_SIZE_ROCM - 1
+@@ -1240,19 +1414,28 @@
+         dim to the next power of two and reads the same paged KV the decode path
+         reads, so one kernel serves prefill and decode."""
+         bs = forward_batch.batch_size
+-        max_kv_len = int(forward_batch.seq_lens_cpu.max().item())
+-        page_table, swa_page_table = self._build_extend_unified_page_table(
+-            bs, forward_batch.seq_lens, forward_batch.req_pool_indices, max_kv_len
+-        )
+-
+-        # Build cu_seqlens_q from this batch's extend lengths. The standard
+-        # prefill metadata path leaves self.qo_indptr unset (qo_indptr=None in
+-        # ForwardMetadata), so relying on it corrupts multi-sequence batches
+-        # (only bs=1 happens to work).
+-        cu_seqlens_q = torch.zeros(bs + 1, dtype=torch.int32, device=q.device)
+-        cu_seqlens_q[1:] = torch.cumsum(
+-            forward_batch.extend_seq_lens.to(torch.int32), dim=0
+-        )
++        if self.muse_reuse_extend_metadata and self.page_size > 1:
++            # init_forward_metadata already built both block page tables, and the
++            # prefill updater wrote this batch's query offsets before any layer ran.
++            fm = self.forward_metadata
++            page_table = fm.kv_indices
++            swa_page_table = fm.swa_page_table
++            cu_seqlens_q = fm.qo_indptr
++            assert page_table.ndim == 2 and cu_seqlens_q is not None
++        else:
++            max_kv_len = int(forward_batch.seq_lens_cpu.max().item())
++            page_table, swa_page_table = self._build_extend_unified_page_table(
++                bs, forward_batch.seq_lens, forward_batch.req_pool_indices, max_kv_len
++            )
++
++            # Build cu_seqlens_q from this batch's extend lengths. The standard
++            # prefill metadata path leaves self.qo_indptr unset (qo_indptr=None in
++            # ForwardMetadata), so relying on it corrupts multi-sequence batches
++            # (only bs=1 happens to work).
++            cu_seqlens_q = torch.zeros(bs + 1, dtype=torch.int32, device=q.device)
++            cu_seqlens_q[1:] = torch.cumsum(
++                forward_batch.extend_seq_lens.to(torch.int32), dim=0
++            )
+ 
+         # unified_attention uses (left, right) window = (window-1, 0), NOT the
+         # CK convention (window, -1). Match the decode path (`de_window`).
+@@ -1269,6 +1452,39 @@
+             (q_u.shape[0], layer.tp_q_head_num, layer.v_head_dim),
+             dtype=self.input_dtype,
+         )
++        q_descale = None
++        if (
++            self.muse_extend_fp8_q
++            and uni_window == (-1, -1)
++            and forward_batch.forward_mode == ForwardMode.EXTEND
++            and forward_batch.spec_info is None
++            and q_u.shape[0] >= _MUSE_EXTEND_FP8_MIN_Q
++            and layer.qk_head_dim == layer.v_head_dim == 64
++            and not layer.is_cross_attention
++            and sinks is None
++            and layer.logit_cap == 0.0
++            and q_u.dtype == torch.bfloat16
++            and k_cache.dtype == v_cache.dtype == fp8_dtype
++            and k_descale is not None
++            and v_descale is not None
++            and k_descale.numel() == v_descale.numel() == 1
++            and layer.k_scale is None
++            and layer.v_scale is None
++            and k_descale is self.k_scale
++            and v_descale is self.v_scale
++        ):
++            # Muse Spark A8 extend: FP8 Q with a per-tensor scale computed on the
++            # device (no host sync) against the FP8 KV cache, as B200's trtllm_mha
++            # runs it when the KV cache is FP8.
++            q_descale = (q_u.abs().amax().float() / 448.0).clamp_min(1e-12).view(1)
++            q_u = (q_u.float() / q_descale).to(fp8_dtype)
++            if not self._muse_extend_fp8_logged:
++                self._muse_extend_fp8_logged = True
++                logger.info(
++                    "Muse extend FP8 (a8) for full layers, q=%d max_q=%d",
++                    q_u.shape[0],
++                    self.forward_metadata.max_q_len,
++                )
+         unified_attention(
+             q=q_u,
+             k=k_cache.view(-1, self.page_size, layer.tp_k_head_num, layer.qk_head_dim),
+@@ -1283,10 +1499,11 @@
+             window_size=uni_window,
+             block_table=pt,
+             softcap=layer.logit_cap,
+-            q_descale=None,
++            q_descale=q_descale,
+             k_descale=k_descale,
+             v_descale=v_descale,
+             sinks=sinks,
++            **self.muse_unified_attention_kwargs,
+         )
+         return o.view(-1, layer.tp_q_head_num * layer.v_head_dim)
+ 
+@@ -2499,6 +2716,12 @@
+                         max_extend_len=max_q_len,
+                         swa_page_table=swa_page_table,
+                         swa_out_cache_loc=swa_out_cache_loc,
++                        # Same lengths forward_extend would add per layer.
++                        verify_seqlen_k=(
++                            forward_batch.seq_lens[:bs] + draft_num
++                            if self.muse_reuse_verify_lengths
++                            else None
++                        ),
+                     )
+                 else:
+                     qo_indptr = torch.arange(
+@@ -2649,7 +2872,12 @@
+                 self.forward_metadata = ForwardMetadata(
+                     self.indices_updater_prefill.kv_indptr,
+                     kv_indices,
+-                    None,
++                    # The prefill updater wrote this batch's query offsets.
++                    (
++                        self.qo_indptr[: bs + 1]
++                        if self.muse_reuse_extend_metadata
++                        else None
++                    ),
+                     None,
+                     max(forward_batch.extend_seq_lens_cpu),
+                     forward_batch.seq_lens_cpu.max().item(),
+@@ -2982,6 +3210,12 @@
+                 dtype=torch.int64,
+                 device=self.device,
+             )
++        if self.muse_reuse_verify_lengths:
++            # Verify KV lengths, refilled by replay preparation; every layer of the
++            # captured graph reads this storage.
++            self.cuda_graph_verify_seqlen_k = torch.empty(
++                max_bs, dtype=torch.int64, device=self.device
++            )
+ 
+     def _apply_cuda_graph_metadata(
+         self,
+@@ -3197,32 +3431,38 @@
+                 )
+             else:
+                 kv_lens = seq_lens
+-            kv_indptr = self.kv_indptr[: bs + 1]
+-            kv_indptr[1 : bs + 1] = torch.cumsum(kv_lens, dim=0)
+-            kv_indices = self.cuda_graph_kv_indices
+-            # seq_lens_sum is None at capture (dummy seq_lens); only check on replay.
+-            if seq_lens_sum is not None:
+-                kv_indices_used = seq_lens_sum + (
+-                    self.num_draft_tokens * bs if self.use_mla else 0
+-                )
+-                assert_buffer_fits(
+-                    kv_indices_used,
+-                    kv_indices.numel(),
+-                    "aiter target_verify kv_indices",
+-                    bs=bs,
+-                    seq_lens_sum=seq_lens_sum,
+-                )
+-            num_token_blocks = self._kv_index_blocks(bs)
+-            create_flashinfer_kv_indices_triton[(bs, num_token_blocks)](
+-                self.req_to_token,
+-                req_pool_indices,
+-                kv_lens,
+-                kv_indptr,
+-                None,
+-                kv_indices,
+-                self.req_to_token.stride(0),
+-                TOKEN_BLOCK_PARALLEL=num_token_blocks > 1,
+-            )
++            if self.use_muse_attention_paths and self._use_unified_verify:
++                # Unified verify reads the block page table only; the token-level
++                # KV index build (cumsum + index kernel over the whole context)
++                # would be wasted replay preparation.
++                kv_indptr = kv_indices = None
++            else:
++                kv_indptr = self.kv_indptr[: bs + 1]
++                kv_indptr[1 : bs + 1] = torch.cumsum(kv_lens, dim=0)
++                kv_indices = self.cuda_graph_kv_indices
++                # seq_lens_sum is None at capture (dummy seq_lens); only check on replay.
++                if seq_lens_sum is not None:
++                    kv_indices_used = seq_lens_sum + (
++                        self.num_draft_tokens * bs if self.use_mla else 0
++                    )
++                    assert_buffer_fits(
++                        kv_indices_used,
++                        kv_indices.numel(),
++                        "aiter target_verify kv_indices",
++                        bs=bs,
++                        seq_lens_sum=seq_lens_sum,
++                    )
++                num_token_blocks = self._kv_index_blocks(bs)
++                create_flashinfer_kv_indices_triton[(bs, num_token_blocks)](
++                    self.req_to_token,
++                    req_pool_indices,
++                    kv_lens,
++                    kv_indptr,
++                    None,
++                    kv_indices,
++                    self.req_to_token.stride(0),
++                    TOKEN_BLOCK_PARALLEL=num_token_blocks > 1,
++                )
+             kv_last_page_len = self.cuda_graph_kv_last_page_len[:bs]
+ 
+             if self.use_mla and self.dcp_world_size > 1:
+@@ -3360,6 +3600,12 @@
+                     )
+ 
+                     max_kv_len_unified = max_num_blocks_per_seq * self.page_size
++                    verify_seqlen_k = None
++                    if self.muse_reuse_verify_lengths:
++                        verify_seqlen_k = self.cuda_graph_verify_seqlen_k[:bs]
++                        torch.add(
++                            seq_lens[:bs], verify_tokens_per_req, out=verify_seqlen_k
++                        )
+                     self.forward_metadata = ForwardMetadata(
+                         None,
+                         _page_table,
+@@ -3369,6 +3615,7 @@
+                         max_kv_len_unified,
+                         max_extend_len=_max_q_len,
+                         swa_page_table=_swa_page_table,
++                        verify_seqlen_k=verify_seqlen_k,
+                     )
+                 else:
+                     custom_mask = self.cuda_graph_custom_mask
+@@ -4263,6 +4510,39 @@
+                         )
+                         return o.view(-1, layer.tp_q_head_num * layer.v_head_dim)
+ 
++                    # seq_lens + draft tokens: precomputed once per batch when
++                    # the Muse verify-length reuse is on, else added here, inside
++                    # the graph region (a host-side add would allocate a new
++                    # tensor each replay and break the captured pointer).
++                    seqused_k = self.forward_metadata.verify_seqlen_k
++                    if seqused_k is None:
++                        seqused_k = (
++                            forward_batch.seq_lens + self.forward_metadata.max_q_len
++                        )
++                    if (
++                        self.muse_verify_kernels
++                        and not layer.is_cross_attention
++                        and layer.qk_head_dim == layer.v_head_dim == 64
++                        and _muse_verify_attention(
++                            q_unified,
++                            k_unified,
++                            v_unified,
++                            o.view(-1, layer.tp_q_head_num, layer.v_head_dim),
++                            self.forward_metadata.qo_indptr,
++                            self.forward_metadata.max_q_len,
++                            seqused_k,
++                            page_table,
++                            layer.scaling,
++                            window_size,
++                            layer.logit_cap,
++                            k_descale,
++                            v_descale,
++                            sinks,
++                            self.muse_verify_kernels,
++                        )
++                    ):
++                        return o.view(-1, layer.tp_q_head_num * layer.v_head_dim)
++
+                     # GQA-packing fix: do NOT expand the single KV head to
+                     # tp_q_head_num. Passing K/V with the true kv-head count (exactly
+                     # like forward_decode) lets unified_attention derive
+@@ -4273,18 +4553,13 @@
+                     # signature num_query_heads_16/num_queries_per_kv_1). GQA head
+                     # mapping here is identical to the proven decode path.
+ 
+-                    # The seq_lens + draft_num add has to run INSIDE the graph
+-                    # region; a host-side pre-add would allocate a new tensor
+-                    # each replay and break the captured pointer.
+                     unified_attention(
+                         q=q_unified,
+                         k=k_unified,
+                         v=v_unified,
+                         out=o.view(-1, layer.tp_q_head_num, layer.v_head_dim),
+                         cu_seqlens_q=self.forward_metadata.qo_indptr,
+-                        seqused_k=(
+-                            forward_batch.seq_lens + self.forward_metadata.max_q_len
+-                        ),
++                        seqused_k=seqused_k,
+                         max_seqlen_q=self.forward_metadata.max_q_len,
+                         max_seqlen_k=max_kv_len,
+                         softmax_scale=layer.scaling,
+@@ -4296,6 +4571,7 @@
+                         k_descale=k_descale,
+                         v_descale=v_descale,
+                         sinks=sinks,
++                        **self.muse_unified_attention_kwargs,
+                     )
+                     return o.view(-1, layer.tp_q_head_num * layer.v_head_dim)
+ 
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/srt/monokernels/__init__.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/srt/monokernels/__init__.py
+@@ -0,0 +1,6 @@
++"""Experimental full-forward dispatch for vendor monokernel plugins.
++
++General plugins register specs through the sglang.srt.plugins entry point.
++The runtime validates configuration, observes weight loading, and routes
++supported steps through the selected spec; other steps use the model forward.
++"""
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/srt/monokernels/guards.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/srt/monokernels/guards.py
+@@ -0,0 +1,218 @@
++# SPDX-License-Identifier: Apache-2.0
++"""Startup validation, graph-size alignment, and wait deadlines for monokernels."""
++
++from __future__ import annotations
++
++import logging
++from typing import TYPE_CHECKING, Any, Optional
++
++import torch
++
++from sglang.srt.arg_groups.overrides import (
++    attention_backends_of,
++    declare_resolution,
++    model_config_of,
++    resolving_view,
++)
++from sglang.srt.environ import envs
++from sglang.srt.model_executor.cuda_graph_config import Backend, Phase, with_phase
++from sglang.srt.monokernels.spec import Feature, MonoSpec, NumericsKind, find_spec
++
++if TYPE_CHECKING:
++    from sglang.srt.configs.model_config import ModelConfig
++    from sglang.srt.server_args import ServerArgs
++
++logger = logging.getLogger(__name__)
++
++# Leave time for peers to abort before the process watchdog fires.
++MAX_DEADLINE_S, MIN_DEADLINE_S = 60.0, 5.0
++
++
++def deadline_s(watchdog_timeout: Optional[float]) -> float:
++    """Return half the watchdog timeout, capped at MAX_DEADLINE_S."""
++    if not watchdog_timeout or watchdog_timeout <= 0:
++        return MAX_DEADLINE_S
++    return min(MAX_DEADLINE_S, 0.5 * float(watchdog_timeout))
++
++
++def device_isa() -> Optional[str]:
++    """Return the GPU ISA without feature suffixes, or None without a GPU."""
++    if not torch.cuda.is_available():
++        return None
++    props = torch.cuda.get_device_properties(torch.cuda.current_device())
++    if torch.version.hip:
++        return props.gcnArchName.split(":")[0]
++    return f"sm_{props.major}{props.minor}"
++
++
++def _ragged_verify(cfg: Any) -> bool:
++    mode = envs.SGLANG_RAGGED_VERIFY_MODE.get().lower()
++    return cfg.speculative_algorithm is not None and mode != "static"
++
++
++# PARTITIONED_GPU needs the device, so install checks it
++_PROBES = {
++    Feature.PIPELINE_PARALLEL: lambda c: c.pp_size > 1,
++    Feature.MULTI_NODE_TP: lambda c: c.nnodes > 1,
++    Feature.DP_ATTENTION: lambda c: (
++        bool(c.enable_dp_attention) or (c.attn_dp_size or 1) > 1
++    ),
++    Feature.EXPERT_PARALLEL: lambda c: (c.ep_size or 1) > 1,
++    Feature.EPLB: lambda c: bool(c.enable_eplb),
++    Feature.CONTEXT_PARALLEL: lambda c: (
++        (c.attn_cp_size or 1) > 1 or (c.dcp_size or 1) > 1 or bool(c.enable_prefill_cp)
++    ),
++    Feature.SPECULATIVE_DECODING: lambda c: c.speculative_algorithm is not None,
++    Feature.RAGGED_VERIFY: _ragged_verify,
++    Feature.TWO_BATCH_OVERLAP: lambda c: bool(
++        c.enable_two_batch_overlap or c.enable_single_batch_overlap
++    ),
++    Feature.LORA: lambda c: bool(c.enable_lora or c.lora_paths),
++    Feature.PD_DISAGGREGATION: lambda c: (c.disaggregation_mode or "null") != "null",
++    Feature.RETURN_ROUTED_EXPERTS: lambda c: bool(c.enable_return_routed_experts),
++    Feature.RETURN_INDEXER_TOPK: lambda c: bool(c.enable_return_indexer_topk),
++    Feature.EAGLE3_HIDDEN_STATES: lambda c: (
++        (c.speculative_algorithm or "").upper() == "EAGLE3"
++    ),
++    Feature.KV_OFFLOAD: lambda c: bool(
++        c.enable_hierarchical_cache
++        or c.disaggregation_decode_enable_offload_kvcache
++        or c.enable_lmcache
++        or c.enable_flexkv
++    ),
++    Feature.MEMORY_RELEASE: lambda c: bool(
++        c.enable_memory_saver or c.enable_weights_cpu_backup
++    ),
++    Feature.CPU_OFFLOAD: lambda c: (
++        (c.cpu_offload_gb or 0) > 0 or (c.offload_group_size or 0) > 0
++    ),
++    Feature.TORCH_COMPILE: lambda c: bool(c.enable_torch_compile),
++}
++
++
++def features_in_use(cfg: Any) -> set[Feature]:
++    return {feature for feature, probe in _PROBES.items() if probe(cfg)}
++
++
++def monokernel_disable_reasons(
++    *, cfg: Any, model_config: ModelConfig, isa: Optional[str]
++) -> tuple[Optional[MonoSpec], list[str]]:
++    """Return the matching spec and all configuration rejection reasons."""
++    if isa is None:
++        return None, ["no GPU is visible"]
++    hf_config = model_config.hf_config
++    spec, why = find_spec(
++        backend=cfg.monokernel_backend, architectures=hf_config.architectures, isa=isa
++    )
++    if spec is None:
++        return None, [why]
++    reasons = [
++        f"{f.value} is in use and the spec does not accept it"
++        for f in sorted(features_in_use(cfg) - spec.features, key=lambda f: f.name)
++    ]
++    req = spec.requires
++    dtype = str(model_config.dtype).replace("torch.", "")  # resolved, e.g. bfloat16
++    _, decode_backend = attention_backends_of(cfg)
++    one_of = [
++        ("tp_size", cfg.tp_size, spec.devices[isa].tp_sizes),
++        ("dtype", dtype, req.dtypes),
++        # Served steps run on the decode-phase backend.
++        ("decode attention backend", decode_backend, req.attention_backends),
++    ] + [(arg, getattr(cfg, arg), ok) for arg, ok in req.server_args.items()]
++    exactly = [
++        # another model's config may not have the field at all
++        (f"config.{key}", getattr(hf_config, key, None), want)
++        for key, want in req.hf_config.items()
++    ] + [(name, getattr(envs, name).get(), want) for name, want in req.env.items()]
++    reasons += [
++        f"{what} {value!r} is not one of {sorted(map(str, allowed))}"
++        for what, value, allowed in one_of
++        if allowed and value not in allowed
++    ]
++    reasons += [
++        f"{what} {value!r} is not {want!r}"
++        for what, value, want in exactly
++        if value != want
++    ]
++    watchdog = cfg.watchdog_timeout
++    if watchdog and deadline_s(watchdog) < MIN_DEADLINE_S:
++        reasons.append(
++            f"--watchdog-timeout {watchdog:g} s leaves the waits a deadline under "
++            f"{MIN_DEADLINE_S:g} s"
++        )
++    if spec.numerics.kind is not NumericsKind.BITWISE:
++        for flag, value in (
++            ("--enable-deterministic-inference", cfg.enable_deterministic_inference),
++            ("--rl-on-policy-target", cfg.rl_on_policy_target),
++        ):
++            if value:
++                reasons.append(f"{flag} needs a BITWISE spec, and this one is not")
++    if spec.config_disable_reasons is not None:
++        reasons += spec.config_disable_reasons(cfg, hf_config)
++    return spec, reasons
++
++
++def covered_capture_sizes(
++    *, widths: tuple[int, ...], tokens_per_request: int, sizes: list[int]
++) -> list[int]:
++    """Align supported buckets without raising the configured capture ceiling."""
++    max_bs = max(sizes, default=0)
++    covered = sorted(
++        {
++            w // tokens_per_request
++            for w in widths
++            if w % tokens_per_request == 0 and w // tokens_per_request <= max_bs
++        }
++    )
++    if not covered:
++        return list(sizes)
++    return covered + sorted(b for b in set(sizes) if b > covered[-1])
++
++
++def handle_monokernel(server_args: ServerArgs) -> None:
++    """Validate the selected backend and resolve its decode capture sizes."""
++    cfg = resolving_view(server_args)
++    backend = cfg.monokernel_backend
++    if backend is None:
++        return
++    isa = device_isa()
++    spec, reasons = monokernel_disable_reasons(
++        cfg=cfg, model_config=model_config_of(server_args), isa=isa
++    )
++    if reasons:
++        raise ValueError(
++            f"--monokernel-backend {backend} cannot run this setup:\n  - "
++            + "\n  - ".join(reasons)
++        )
++    tokens = (
++        int(cfg.speculative_num_draft_tokens or 1) if cfg.speculative_algorithm else 1
++    )
++    graph = cfg.cuda_graph_config
++    explicit_bs = (Phase.DECODE, "bs") in getattr(
++        server_args, "_cuda_graph_config_locked", set()
++    )
++    if graph.decode.backend != Backend.DISABLED and not explicit_bs:
++        sizes = list(graph.decode.bs or [])
++        new = covered_capture_sizes(
++            widths=spec.widths(isa), tokens_per_request=tokens, sizes=sizes
++        )
++        if sizes and new != sorted(set(sizes)):
++            declare_resolution(
++                server_args,
++                "handle_monokernel",
++                cuda_graph_config=with_phase(
++                    graph, Phase.DECODE, bs=new, max_bs=max(new)
++                ),
++            )
++    logger.warning(
++        "--monokernel-backend is experimental. Its kernels, coverage and plugin API "
++        "may change."
++    )
++    logger.info(
++        "--monokernel-backend %s: %s on %s, widths %s (%d tokens a request)",
++        backend,
++        spec.name,
++        isa,
++        list(spec.widths(isa)),
++        tokens,
++    )
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py
+@@ -0,0 +1,387 @@
++# SPDX-License-Identifier: Apache-2.0
++"""Weight observation and full-forward dispatch for the selected monokernel backend."""
++
++from __future__ import annotations
++
++import functools
++import logging
++import time
++from typing import TYPE_CHECKING, Any, Callable, Iterable, Optional
++
++import torch
++import torch.distributed as dist
++
++from sglang.srt.model_executor.cuda_graph_config import Backend
++from sglang.srt.model_executor.forward_context import get_attn_backend
++from sglang.srt.monokernels.guards import deadline_s, device_isa
++from sglang.srt.monokernels.spec import (
++    BuildContext,
++    BuiltMonokernels,
++    Feature,
++    MonoSpec,
++    Plan,
++    ShapeKey,
++    find_spec,
++    spec_registered,
++)
++from sglang.srt.runtime_context import (
++    attention_backends,
++    get_context,
++    get_device,
++    get_exec,
++    get_parallel,
++    get_spec,
++)
++
++if TYPE_CHECKING:
++    from transformers import PretrainedConfig
++
++    from sglang.srt.model_executor.forward_batch_info import ForwardBatch
++    from sglang.srt.model_executor.runner.decode_cuda_graph_runner import (
++        DecodeCudaGraphRunner,
++    )
++
++logger = logging.getLogger(__name__)
++
++
++def _backend() -> Optional[str]:
++    """Return the selected backend, or None without published server configuration."""
++    # the model loader also runs without a server's config (tools, unit tests)
++    if not get_context().is_config_namespace_published("exec"):
++        return None
++    return get_exec().kernel.monokernel_backend
++
++
++def _gather_tp(obj: Any) -> list[Any]:
++    """Gather a value from every TP rank through the CPU group."""
++    group = get_parallel().tp_group
++    if group.world_size == 1:
++        return [obj]
++    out: list[Any] = [None] * group.world_size
++    dist.all_gather_object(out, obj, group=group.cpu_group)
++    return out
++
++
++def monokernel_weights_iterator(
++    *, model: torch.nn.Module, weights: Iterable[tuple[str, torch.Tensor]]
++) -> Iterable[tuple[str, torch.Tensor]]:
++    """Let the spec observe checkpoint tensors before model-specific conversion."""
++    backend = _backend()
++    if backend is None:
++        return weights
++    spec, _ = find_spec(
++        backend=backend, architectures=model.config.architectures, isa=device_isa()
++    )
++    if spec is None or spec.load_tensor is None:
++        return weights
++    # the copies ride on the model from the loader to install_monokernel_forward
++    copies = model.__dict__.setdefault("_mono_copies", {})
++
++    def watched():
++        for name, tensor in weights:
++            spec.load_tensor(copies, model, name, tensor)
++            yield name, tensor
++
++    return watched()
++
++
++def shape_key(forward_batch: ForwardBatch) -> Optional[ShapeKey]:
++    """The graph key of a DECODE or TARGET_VERIFY step, else None."""
++    mode = forward_batch.forward_mode
++    if mode.is_decode():
++        name = "decode"
++    elif mode.is_target_verify():
++        name = "target_verify"
++    else:
++        return None
++    bs, rows = int(forward_batch.batch_size), int(forward_batch.input_ids.shape[0])
++    if bs <= 0 or rows % bs:
++        return None
++    return ShapeKey(forward_mode=name, batch_size=bs, tokens_per_request=rows // bs)
++
++
++def install_monokernel_forward(
++    *,
++    model: torch.nn.Module,
++    hf_config: PretrainedConfig,
++    capture_tail_hooks: list[Callable[..., None]],
++) -> None:
++    """Build the selected spec and install its forward; runs before KV cache sizing."""
++    backend = _backend()
++    if backend is None:
++        return
++    isa = device_isa()
++    archs = hf_config.architectures
++    spec, why = find_spec(backend=backend, architectures=archs, isa=isa)
++    is_load_observed = "_mono_copies" in model.__dict__
++    copies = model.__dict__.pop("_mono_copies", {})
++    # Ranks branch together; one skipping the collectives below would hang its peers.
++    lookups = _gather_tp(
++        (
++            spec is not None,
++            spec_registered(backend=backend, architectures=archs),
++            why,
++            None if spec is None else (spec.name, spec.api_version),
++        )
++    )
++    if not any(is_registered for _, is_registered, _, _ in lookups):
++        # A draft model may have no registered spec.
++        logger.info("monokernel: %s: the normal forward", why)
++        return
++    reasons = [
++        f"rank {rank}: {reason}"
++        for rank, (is_found, _, reason, _) in enumerate(lookups)
++        if not is_found
++    ]
++    if reasons:
++        raise ValueError(f"--monokernel-backend {backend}: " + "; ".join(reasons))
++    if len({identity for *_, identity in lookups}) > 1:
++        raise ValueError(
++            f"--monokernel-backend {backend}: the ranks load different specs: "
++            + "; ".join(
++                f"rank {rank}: {name} (API version {api_version})"
++                for rank, (*_, (name, api_version)) in enumerate(lookups)
++            )
++        )
++
++    reasons = list(spec.model_disable_reasons(model, hf_config, copies))
++    if spec.load_tensor is not None and not is_load_observed:
++        # e.g. the layered, dummy, sharded-state and remote loaders
++        reasons.append(
++            f"{spec.name} keeps weight copies at load, and this load path does not "
++            "pass checkpoint tensors through monokernel_weights_iterator"
++        )
++    props = torch.cuda.get_device_properties(torch.cuda.current_device())
++    if props.multi_processor_count < spec.devices[isa].resident_blocks:
++        reasons.append(
++            f"{Feature.PARTITIONED_GPU.value}: {props.multi_processor_count} compute "
++            f"units, the launch grid needs {spec.devices[isa].resident_blocks}"
++        )
++    # Collect validation failures before the plugin starts collective setup.
++    reasons = [
++        f"rank {rank}: {reason}"
++        for rank, rank_reasons in enumerate(_gather_tp(reasons))
++        for reason in rank_reasons
++    ]
++    if reasons:
++        raise ValueError(f"--monokernel-backend {backend}: " + "; ".join(reasons))
++
++    mode, tokens = _server_step()
++    if spec.tokens_per_request is not None:
++        tokens = spec.tokens_per_request(model)
++    capture_keys = _capture_keys(mode=mode, tokens=tokens)
++    capture_rows = {k.rows for k in capture_keys}
++    # Eager execution can use every supported width.
++    widths = tuple(
++        w
++        for w in spec.widths(isa)
++        if w % tokens == 0 and (not capture_keys or w in capture_rows)
++    )
++    served = _served_keys(mode=mode, widths=widths, tokens=tokens)
++    # Different routes would leave ranks waiting in incompatible collectives.
++    if any(other != served for other in _gather_tp(served)):
++        raise RuntimeError(
++            f"--monokernel-backend {backend}: the ranks route different graph keys"
++        )
++    if not served:
++        raise ValueError(
++            f"--monokernel-backend {backend}: {spec.name} has no width for this "
++            f"server's steps ({tokens} tokens a request)"
++        )
++    build_context = BuildContext(
++        isa=isa,
++        widths=widths,
++        deadline_s=deadline_s(get_device().watchdog_timeout),
++        copies=copies,
++    )
++    build_start, memory_before = time.perf_counter(), torch.cuda.memory_allocated()
++    built = spec.build(model, hf_config, build_context)
++    _install_forward(
++        model=model, built=built, served=served, spec=spec, backend=backend
++    )
++    # Captured kernels retain weight copies that online updates cannot refresh.
++    model._derived_weight_cache_error = (
++        f"Online weight updates are not supported with --monokernel-backend {backend} "
++        f"({spec.name})"
++    )
++    logger.info(
++        "monokernel %s on %s: widths %s built in %.1f s, %.1f MiB; wait deadline "
++        "%.0f s (a failed wait stops every rank with a GPU fault at address 0x0); "
++        "weight copies: %s",
++        spec.name,
++        isa,
++        list(widths),
++        time.perf_counter() - build_start,
++        (torch.cuda.memory_allocated() - memory_before) / 2**20,
++        build_context.deadline_s,
++        _format_weight_copies(copies),
++    )
++    if capture_keys:
++        capture_tail_hooks.append(
++            _CaptureCheck(spec=spec, backend=backend, isa=isa, served=served)
++        )
++    else:
++        # Without CUDA graphs every step runs eagerly, routed by its own key.
++        logger.info(
++            "monokernel %s on %s runs %s; every other step runs the standard path",
++            spec.name,
++            isa,
++            _format_steps(served),
++        )
++
++
++class _CaptureCheck:
++    """Check the captured decode graphs, not the configured sizes, once all are in.
++
++    Logs the steps that run the monokernels, captured and eager, and refuses a
++    runner none of whose graphs run them.
++    """
++
++    def __init__(self, *, spec: MonoSpec, backend: str, isa: str, served: frozenset):
++        self.spec, self.backend, self.isa, self.served = spec, backend, isa, served
++        self.captured: dict[int, Optional[ShapeKey]] = {}
++        self.is_done = False
++
++    def __call__(
++        self,
++        runner: DecodeCudaGraphRunner,
++        out: Any,
++        forward_batch: ForwardBatch,
++        num_tokens: int,
++    ) -> None:
++        if self.is_done or not torch.cuda.is_current_stream_capturing():
++            return  # the runner's warmup runs, and any recapture
++        self.captured[int(forward_batch.batch_size)] = shape_key(forward_batch)
++        if not set(runner.capture_bs) <= set(self.captured):
++            return
++        self.is_done = True
++        routed = [k for k in self.captured.values() if k in self.served]
++        if not routed:
++            raise ValueError(
++                f"--monokernel-backend {self.backend}: none of the "
++                f"{len(self.captured)} captured decode graphs (batch sizes "
++                f"{sorted(self.captured)}) runs {self.spec.name}'s monokernels"
++            )
++        eager = _eager_keys(served=self.served, captured=self.captured.values())
++        logger.info(
++            "monokernel %s on %s runs %s (%d of %d captured decode graphs)%s; every "
++            "other step runs the standard path",
++            self.spec.name,
++            self.isa,
++            _format_steps(routed),
++            len(routed),
++            len(self.captured),
++            f", and eagerly {_format_steps(eager)}" if eager else "",
++        )
++
++
++def _eager_keys(
++    *, served: frozenset[ShapeKey], captured: Iterable[Optional[ShapeKey]]
++) -> list[ShapeKey]:
++    """Return served keys larger than every captured graph of their mode."""
++    # A step pads up to the smallest captured graph of its mode that holds it.
++    largest: dict = {}
++    for k in captured:
++        if k is not None:
++            mode = (k.forward_mode, k.tokens_per_request)
++            largest[mode] = max(largest.get(mode, 0), k.batch_size)
++    return [
++        k
++        for k in served
++        if k.batch_size > largest.get((k.forward_mode, k.tokens_per_request), 0)
++    ]
++
++
++def _served_keys(
++    *, mode: str, widths: tuple[int, ...], tokens: int
++) -> frozenset[ShapeKey]:
++    """The graph keys of the model's step at each width that holds whole requests."""
++    return frozenset(
++        ShapeKey(forward_mode=mode, batch_size=w // tokens, tokens_per_request=tokens)
++        for w in widths
++        if w % tokens == 0
++    )
++
++
++def _install_forward(
++    *,
++    model: torch.nn.Module,
++    built: BuiltMonokernels,
++    served: frozenset[ShapeKey],
++    spec: MonoSpec,
++    backend: str,
++) -> None:
++    """Install shape-based dispatch while preserving the original forward signature."""
++    original = model.forward
++    allowed = spec.requires.attention_backends
++    is_backend_checked = not allowed
++
++    # Graph runners inspect the original parameters to select forward arguments.
++    @functools.wraps(original)
++    def forward(*args, **kwargs):
++        nonlocal is_backend_checked
++        # model forwards take (input_ids, positions, forward_batch, ...)
++        batch = kwargs["forward_batch"] if "forward_batch" in kwargs else args[2]
++        key = shape_key(batch)
++        if key not in served:
++            return original(*args, **kwargs)
++        if not is_backend_checked:
++            # a draft runner may override the backend the launcher checked: read the
++            # one this step runs on, as model dispatch does, before the first forward
++            _, configured = attention_backends()
++            attention = get_attn_backend().decode_attention_backend_str or configured
++            if attention not in allowed:
++                raise ValueError(
++                    f"--monokernel-backend {backend}: {spec.name} needs a decode "
++                    f"attention backend in {sorted(allowed)}, this runner's is "
++                    f"{attention!r}"
++                )
++            is_backend_checked = True
++        return built.forward(Plan(key=key), *args, **kwargs)
++
++    model.forward = forward
++
++
++def _format_steps(keys: Iterable[ShapeKey]) -> str:
++    """Format supported batch sizes grouped by step mode and tokens per request."""
++    sizes: dict = {}
++    for k in keys:
++        sizes.setdefault((k.forward_mode, k.tokens_per_request), []).append(
++            k.batch_size
++        )
++    return ", ".join(
++        f"{mode} steps of batch size {sorted(bs)}" + (f" x {t} tokens" if t > 1 else "")
++        for (mode, t), bs in sorted(sizes.items())
++    )
++
++
++def _format_weight_copies(copies: dict[tuple, torch.Tensor]) -> str:
++    totals: dict = {}  # kind -> (tensors, bytes)
++    for (kind, *_), tensor in copies.items():
++        count, nbytes = totals.get(kind, (0, 0))
++        totals[kind] = (count + 1, nbytes + tensor.numel() * tensor.element_size())
++    return ", ".join(
++        f"{kind} ({count} tensor{'' if count == 1 else 's'}, {nbytes / 2**20:.1f} MiB)"
++        for kind, (count, nbytes) in sorted(totals.items())
++    )
++
++
++def _server_step() -> tuple[str, int]:
++    """The mode and tokens per request of this server's decode-phase steps."""
++    spec_config = get_spec()
++    if spec_config.speculative_algorithm is None:
++        return "decode", 1
++    # the target's and its draft's steps are verify steps at any token count
++    return "target_verify", int(spec_config.speculative_num_draft_tokens or 1)
++
++
++def _capture_keys(*, mode: str, tokens: int) -> list[ShapeKey]:
++    """Return configured decode or verify graph keys, or [] when graphs are disabled."""
++    graph = get_exec().graph.cuda_graph_config
++    if graph is None or graph.decode.backend == Backend.DISABLED:
++        return []
++    sizes = sorted(set(graph.decode.bs or []))
++    return [
++        ShapeKey(forward_mode=mode, batch_size=bs, tokens_per_request=tokens)
++        for bs in sizes
++    ]
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/srt/monokernels/spec.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/srt/monokernels/spec.py
+@@ -0,0 +1,215 @@
++# SPDX-License-Identifier: Apache-2.0
++"""Lazy plugin registration and model-specific monokernel contracts."""
++
++from __future__ import annotations
++
++import enum
++import importlib
++from typing import TYPE_CHECKING, Any, Callable, Mapping, Optional, Protocol, Sequence
++
++import msgspec
++
++if TYPE_CHECKING:
++    import torch
++
++# bumped on any breaking change to the contracts in this module
++MONOKERNEL_API_VERSION = 1
++
++
++class Feature(enum.Enum):
++    """SGLang features refused unless a spec lists them."""
++
++    PIPELINE_PARALLEL = "pipeline parallelism"
++    MULTI_NODE_TP = "multi-node tensor parallelism"
++    DP_ATTENTION = "DP attention"
++    EXPERT_PARALLEL = "expert parallelism"
++    EPLB = "EPLB"
++    CONTEXT_PARALLEL = "context parallelism"
++    SPECULATIVE_DECODING = "speculative decoding"
++    RAGGED_VERIFY = "uneven tokens per request in verify (SGLANG_RAGGED_VERIFY_MODE)"
++    TWO_BATCH_OVERLAP = "two-batch / single-batch overlap"
++    LORA = "LoRA"
++    PD_DISAGGREGATION = "PD disaggregation"
++    RETURN_ROUTED_EXPERTS = "--enable-return-routed-experts"
++    RETURN_INDEXER_TOPK = "--enable-return-indexer-topk"
++    EAGLE3_HIDDEN_STATES = "EAGLE3 hidden states at covered layers"
++    KV_OFFLOAD = "KV offload"
++    MEMORY_RELEASE = "memory release"
++    CPU_OFFLOAD = "CPU offload"
++    TORCH_COMPILE = "torch-compiled decode"
++    PARTITIONED_GPU = "partitioned GPUs"
++
++
++class DeviceLimits(msgspec.Struct, frozen=True):
++    """What a spec's kernels support on one ISA, e.g. gfx950."""
++
++    widths: tuple[int, ...]  # step rows, ascending
++    tp_sizes: tuple[int, ...]
++    resident_blocks: int  # the launch grid: one workgroup a CU
++
++
++class Requirements(msgspec.Struct, frozen=True):
++    """Configuration a spec needs, checked alike for every spec at startup; an empty
++    field accepts any value."""
++
++    dtypes: frozenset[str] = frozenset()
++    # checked against the decode-phase backend, which runs the served steps
++    attention_backends: frozenset[str] = frozenset()
++    # a server argument -> its accepted values, as resolved for this server
++    server_args: Mapping[str, frozenset] = {}
++    # an HF config field -> the value the kernels are built for
++    hf_config: Mapping[str, Any] = {}
++    # an SGLang environment variable in envs -> its required value
++    env: Mapping[str, Any] = {}
++
++
++class NumericsKind(enum.Enum):
++    BITWISE = "bitwise"
++    TOLERANCE = "tolerance"
++
++
++class Numerics(msgspec.Struct, frozen=True):
++    """Numerical bounds against the standard path on the same GPU.
++
++    Bounds use <launch>.<output>.<metric>; metrics are max_abs, rel, or cosine.
++    A max_abs bound of zero requires bitwise equality.
++    """
++
++    kind: NumericsKind
++    bounds: Mapping[str, float] = {}
++
++    def __post_init__(self):
++        metrics = ("max_abs", "rel", "cosine")
++        bad = [
++            n
++            for n in self.bounds
++            if n.count(".") < 2 or n.rsplit(".", 1)[1] not in metrics
++        ]
++        if bad or (self.kind is NumericsKind.TOLERANCE and not self.bounds):
++            raise ValueError(
++                f"bounds must be <launch>.<output>.<metric>: {bad or 'none'}"
++            )
++
++    def bound(self, name: str) -> float:
++        return self.bounds[name]
++
++
++class ShapeKey(msgspec.Struct, frozen=True):
++    """The graph key a step is routed by; every rank holds it alike."""
++
++    forward_mode: str  # "decode" or "target_verify"
++    batch_size: int  # requests, padded to the graph's batch size
++    tokens_per_request: int
++
++    @property
++    def rows(self) -> int:
++        return self.batch_size * self.tokens_per_request
++
++
++class BuildContext(msgspec.Struct, frozen=True):
++    isa: str
++    widths: tuple[int, ...]  # the rows the capture plan routes
++    deadline_s: float  # every wait's deadline, below --watchdog-timeout
++    copies: dict  # (kind, ...) -> tensor: the load hook's copies; build adds its own
++
++
++class Plan(msgspec.Struct, frozen=True):
++    """A routed forward's graph key and state shared by its layers within that step."""
++
++    key: ShapeKey
++    state: dict = {}
++
++
++class BuiltMonokernels(Protocol):
++    """The object a spec's build returns; it runs every built width's steps."""
++
++    def forward(self, plan: Plan, *args: Any, **kwargs: Any) -> Any:
++        """Run a routed step in place of the model's forward.
++
++        It takes that forward's arguments and returns what it returns, writes the KV
++        cache and auxiliary hidden states the standard path writes for every row,
++        padded rows included, and is capturable in a CUDA graph: no host sync, and
++        shapes fixed by plan.key.
++        """
++
++
++class MonoSpec(msgspec.Struct, frozen=True):
++    """A model-specific plugin contract; build returns its BuiltMonokernels."""
++
++    name: str
++    devices: Mapping[str, DeviceLimits]  # per ISA
++    features: frozenset[Feature]  # the refused-by-default features it accepts
++    requires: Requirements
++    numerics: Numerics
++    # (model, hf_config, copies): after load, with the load hook's copies
++    model_disable_reasons: Callable[[torch.nn.Module, Any, dict], list[str]]
++    build: Callable[[torch.nn.Module, Any, BuildContext], BuiltMonokernels]
++    api_version: int  # the MONOKERNEL_API_VERSION this spec is written against
++    # (cfg, hf_config), before load: the checks requires cannot state
++    config_disable_reasons: Optional[Callable[[Any, Any], list[str]]] = None
++    # (copies, model, name, tensor): retain weights before model-specific conversion
++    load_tensor: Optional[
++        Callable[[dict, torch.nn.Module, str, torch.Tensor], None]
++    ] = None
++    # (model) -> tokens per request when different from the target, e.g. draft blocks
++    tokens_per_request: Optional[Callable[[torch.nn.Module], int]] = None
++
++    def widths(self, isa: str) -> tuple[int, ...]:
++        return self.devices[isa].widths
++
++
++# backend name -> HF architecture -> the "module:attribute" path of its spec
++_REGISTRY: dict[str, dict[str, str]] = {}
++
++
++def register(*, backend: str, architecture: str, path: str) -> None:
++    """Register a module:attribute spec path from a general plugin entry point."""
++    specs = _REGISTRY.setdefault(backend, {})
++    if specs.get(architecture, path) != path:
++        raise ValueError(
++            f"monokernel backend {backend!r} already has a spec for {architecture}: "
++            f"{specs[architecture]}"
++        )
++    specs[architecture] = path
++
++
++def spec_registered(*, backend: str, architectures: Optional[Sequence[str]]) -> bool:
++    """Whether the backend registers a spec for any architecture, usable or not."""
++    specs = _REGISTRY.get(backend, {})
++    return any(arch in specs for arch in architectures or ())
++
++
++def find_spec(
++    *, backend: str, architectures: Optional[Sequence[str]], isa: Optional[str]
++) -> tuple[Optional[MonoSpec], str]:
++    """The compatible spec and an empty reason, or None and a rejection reason."""
++    if backend not in _REGISTRY:
++        return None, (
++            f"no monokernel backend {backend!r} is registered (registered: "
++            f"{sorted(_REGISTRY)}); install the plugin that provides it"
++        )
++    why = []
++    for arch in architectures or ():
++        path = _REGISTRY[backend].get(arch)
++        if path is None:
++            continue
++        module, _, attr = path.partition(":")
++        # a broken plugin is a refusal every rank reports, not a crash on one
++        try:
++            spec = getattr(importlib.import_module(module), attr)
++        except Exception as e:
++            why.append(f"{path} does not import: {type(e).__name__}: {e}")
++            continue
++        if not isinstance(spec, MonoSpec):
++            why.append(f"{path} is not a MonoSpec")
++        elif spec.api_version != MONOKERNEL_API_VERSION:
++            why.append(
++                f"{path} uses monokernel API version {spec.api_version}; this "
++                f"SGLang requires version {MONOKERNEL_API_VERSION}"
++            )
++        elif isa in spec.devices:
++            return spec, ""
++    archs = list(architectures or ())
++    return None, "; ".join(why) or (
++        f"monokernel backend {backend!r} has no spec for {archs} on {isa}"
++    )
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py
+@@ -0,0 +1,200 @@
++"""Fused QK norm / RoPE / FP8 KV-cache write for Muse Spark attention on ROCm (decode and target verify).
++
++``MuseSpark1xAttention`` hands K/V to the cache itself when one of these kernels applies and then calls the
++attention layer with ``save_kv_cache=False``, the usual SGLang pattern for producers that fuse the cache store
++(bailing_moe, gemma4):
++
++* ``qkv_proj_norm_rope_kv_write`` (``SGLANG_MUSE_FUSED_QKV_CACHE``): up to 32 rows, the QKV + output-gate
++  projection's split-K partials feed the QK-norm / RoPE / cache-store epilogue directly.
++* ``qk_norm_rope_kv_write`` (``SGLANG_MUSE_QK_ROPE_CACHE``): up to 64 rows, from the projected Q/K/V.
++
++Both write exactly where and what the backend's own store would (FP8 with the layer's per-tensor scales, through
++the full -> SWA slot mapping on sliding layers), so they only engage when the backend reads K/V from the
++16-token NHD FP8 pages of the aiter unified-attention backend.
++"""
++
++from __future__ import annotations
++
++import logging
++from typing import NamedTuple
++
++import torch
++
++from sglang.kernels.ops.attention.qk_norm_rope_cache import (
++    qk_norm_rope_cache,
++    qkv_proj_qk_norm_rope_cache,
++)
++from sglang.srt.environ import envs
++from sglang.srt.layers.attention.aiter_backend import AiterAttnBackend
++from sglang.srt.model_executor.forward_batch_info import ForwardBatch
++from sglang.srt.model_executor.forward_context import get_attn_backend
++
++logger = logging.getLogger(__name__)
++
++QK_ROPE_CACHE = envs.SGLANG_MUSE_QK_ROPE_CACHE.get()
++FUSED_QKV_CACHE = envs.SGLANG_MUSE_FUSED_QKV_CACHE.get()
++_logged: set = set()
++
++
++class _KVWriteTarget(NamedTuple):
++    k_cache: torch.Tensor
++    v_cache: torch.Tensor
++    locations: torch.Tensor
++    swa_mapping: torch.Tensor | None
++    k_scale: torch.Tensor
++    v_scale: torch.Tensor
++    cos_sin: torch.Tensor | None
++
++
++def _attention_shape_ok(attention, forward_batch: ForwardBatch) -> bool:
++    return (
++        attention.head_dim == 64
++        and attention.num_heads == 16
++        and attention.num_kv_heads == 2
++        and attention.use_qk_norm
++        and not attention.use_attn_temperature_tuning
++        and (
++            forward_batch.forward_mode.is_decode()
++            or forward_batch.forward_mode.is_target_verify()
++        )
++        and not forward_batch.attn_attend_prefix_cache
++        and forward_batch.dcp_kv_mask is None
++    )
++
++
++def _kv_write_target(attention, forward_batch: ForwardBatch) -> _KVWriteTarget | None:
++    """Where the backend reads this layer's K/V from, if the fused kernels can write it there."""
++    backend = get_attn_backend()
++    layer = attention.attn
++    if not (
++        isinstance(backend, AiterAttnBackend)
++        and not backend.use_mla
++        and backend.page_size == 16
++        and not backend.kv_cache_is_vectorized_5d
++        and backend.use_triton_unified_attention
++        and not layer.is_cross_attention
++        and backend.kv_cache_dtype == torch.float8_e4m3fn
++    ):
++        return None
++    rope = attention.rotary_emb
++    if rope is not None and not (
++        type(rope).__name__ == "RotaryEmbedding"
++        and not rope.is_neox_style
++        and rope.rotary_dim == 64
++        and rope.position_start == 0
++        and rope.cos_sin_cache.dtype == torch.float32
++    ):
++        return None
++    k_cache, v_cache = backend.token_to_kv_pool.get_kv_buffer(layer.layer_id)
++    if not (
++        k_cache.dtype == v_cache.dtype == torch.float8_e4m3fn
++        and k_cache.is_contiguous()
++        and v_cache.is_contiguous()
++    ):
++        return None
++    # The same per-tensor scales the backend's own store would divide by.
++    k_scale = layer.k_scale if layer.k_scale is not None else backend.k_scale
++    v_scale = layer.v_scale if layer.v_scale is not None else backend.v_scale
++    if not (
++        k_scale is not None
++        and v_scale is not None
++        and k_scale.numel() == v_scale.numel() == 1
++    ):
++        return None
++    swa_mapping = (
++        backend.swa_kv_pool.full_to_swa_index_mapping
++        if backend.use_sliding_window_kv_pool and layer.sliding_window_size > 0
++        else None
++    )
++    return _KVWriteTarget(
++        k_cache,
++        v_cache,
++        forward_batch.out_cache_loc,
++        swa_mapping,
++        k_scale,
++        v_scale,
++        rope.cos_sin_cache if rope is not None else None,
++    )
++
++
++def _note(name: str, rows: int) -> None:
++    if name not in _logged:
++        _logged.add(name)
++        logger.info("Muse fast path: %s, rows=%d", name, rows)
++
++
++def qkv_proj_norm_rope_kv_write(
++    attention, positions: torch.Tensor, x: torch.Tensor, forward_batch: ForwardBatch
++):
++    """(q, k, v, o_gate) with K/V already in the cache, or None when the fused projection does not apply."""
++    projection = attention.qkv_proj
++    if not (
++        x.ndim == 2
++        and 0 < x.shape[0] <= 32
++        and x.shape[1] == 8192
++        and x.dtype == torch.bfloat16
++        and x.is_contiguous()
++        and projection.weight.shape == (2304, 8192)
++        and projection.weight.dtype == torch.bfloat16
++        and projection.weight.is_contiguous()
++        and projection.bias is None
++        and not projection.gather_output
++        and attention.use_o_gate
++        and _attention_shape_ok(attention, forward_batch)
++    ):
++        return None
++    target = _kv_write_target(attention, forward_batch)
++    if target is None:
++        return None
++    _note("QKV projection/QK norm/RoPE/FP8 cache", x.shape[0])
++    return qkv_proj_qk_norm_rope_cache(
++        x,
++        projection.weight,
++        positions,
++        target.cos_sin,
++        target.k_cache,
++        target.v_cache,
++        target.locations,
++        target.swa_mapping,
++        attention.norm_eps,
++        attention.scale_query_by,
++        target.k_scale,
++        target.v_scale,
++    )
++
++
++def qk_norm_rope_kv_write(
++    attention,
++    positions: torch.Tensor,
++    q: torch.Tensor,
++    k: torch.Tensor,
++    v: torch.Tensor,
++    forward_batch: ForwardBatch,
++):
++    """(q, k) normalized and rotated with K/V already in the cache, or None when the kernel does not apply."""
++    if not (
++        0 < q.shape[0] <= 64
++        and q.dtype == k.dtype == v.dtype == torch.bfloat16
++        and q.stride(1) == k.stride(1) == v.stride(1) == 1
++        and _attention_shape_ok(attention, forward_batch)
++    ):
++        return None
++    target = _kv_write_target(attention, forward_batch)
++    if target is None:
++        return None
++    _note("QK norm/RoPE/FP8 cache", q.shape[0])
++    return qk_norm_rope_cache(
++        q,
++        k,
++        v,
++        positions,
++        target.cos_sin,
++        target.k_cache,
++        target.v_cache,
++        target.locations,
++        target.swa_mapping,
++        attention.norm_eps,
++        attention.scale_query_by,
++        target.k_scale,
++        target.v_scale,
++    )
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py
+@@ -13,6 +13,8 @@
+ 
+ from __future__ import annotations
+ 
++import csv
++import functools
+ import logging
+ import os
+ import re
+@@ -22,11 +24,26 @@
+ import torch.nn.functional as F
+ from torch import nn
+ 
++from sglang.kernels.ops.gemm.bf16_tiled_small_m_gemm import LAYOUT as TILED_GEMM_LAYOUT
++from sglang.kernels.ops.gemm.bf16_tiled_small_m_gemm import (
++    prepare_tiled_weight,
++    tiled_gemm,
++    tiled_gemm_applies,
++)
++from sglang.kernels.ops.gemm.router_gemm_fp32 import (
++    router_gemm_tuned,
++    router_gemv_fp32,
++    router_gemv_fp32_supported,
++)
++from sglang.kernels.ops.gemm.unpool_gemm_norm_residual import (
++    unpool_gemm_norm_residual,
++)
+ from sglang.srt.configs.muse_spark import (
+-    MuseSpark1xTextConfig,
++    MuseSparkTextConfig,
+     should_skip_weight_loading,
+ )
+ from sglang.srt.distributed import tensor_model_parallel_all_reduce
++from sglang.srt.environ import envs
+ from sglang.srt.layers.linear import (
+     MergedColumnParallelLinear,
+     QKVParallelLinear,
+@@ -34,6 +51,9 @@
+ )
+ from sglang.srt.layers.logits_processor import LogitsProcessor as OSSLogitsProcessor
+ from sglang.srt.layers.quantization.base_config import QuantizationConfig
++from sglang.srt.layers.quantization.unquant import (
++    register_gfx950_unquantized_gemm_shapes,
++)
+ from sglang.srt.layers.quantization.utils import is_layer_skipped
+ from sglang.srt.layers.radix_attention import RadixAttention
+ from sglang.srt.layers.rotary_embedding import get_rope
+@@ -43,6 +63,13 @@
+ )
+ from sglang.srt.model_executor.forward_batch_info import ForwardBatch
+ from sglang.srt.model_loader.weight_utils import default_weight_loader
++from sglang.srt.rocm_muse_spark import mxfp4_moe, router_pooler
++from sglang.srt.rocm_muse_spark.attention_kv_write import (
++    FUSED_QKV_CACHE,
++    QK_ROPE_CACHE,
++    qk_norm_rope_kv_write,
++    qkv_proj_norm_rope_kv_write,
++)
+ from sglang.srt.rocm_muse_spark.fp4_moe import MuseSpark1xFp4Experts
+ from sglang.srt.rocm_muse_spark.fused_muse_spark_routing import FusedMuseSparkRouting
+ from sglang.srt.rocm_muse_spark.fused_norm_gate import FusedRMSNormGate
+@@ -54,9 +81,15 @@
+     QKVOGateParallelLinear,
+ )
+ from sglang.srt.rocm_muse_spark.muse_qk_norm import fused_qk_norm, qk_norm_supported
+-from sglang.srt.rocm_muse_spark.muse_router_gemv import (
+-    router_gemv,
+-    router_gemv_supported,
++from sglang.srt.rocm_muse_spark.sequence_parallel import (
++    SPShape,
++    prepare_ulysses,
++    sp_gather,
++    sp_reduce_scatter,
++    sp_shape,
++    sp_shard,
++    ulysses_attention,
++    ulysses_enabled,
+ )
+ from sglang.srt.runtime_context import get_parallel
+ from sglang.srt.utils import add_prefix
+@@ -282,25 +315,103 @@
+ )
+ _tgemm = None
+ 
++# MI355X AgentX fast paths (switches in sglang.srt.environ, all on by default).
++# Pooler / unpooler at the verify widths aiter patch 06 tunes go through aiter's
++# tuned BF16 GEMM (searched hipBLASLt solutions); the FP32 router runs a tuned
++# split-K GEMM (configs in kernels/ops/gemm/configs).
++_DENSE_TUNED = envs.SGLANG_MUSE_DENSE_TUNED.get()
++# Tiled 17..64-row GEMMs: the pooler here, unquantized linear layers through
++# register_gfx950_unquantized_gemm_shapes (the O projection, the DFlash draft MLP).
++_DENSE_TILED = envs.SGLANG_MUSE_DENSE_TILED.get()
++# The DFlash draft's gate/up and down GEMMs at the measured M = 24 (TP8) on the
++# aiter Triton a16w16 kernel instead of the tuned table's padded-M pick.
++_DRAFT_TRITON_A16W16_GEMMS = ((24, 7168, 8192), (24, 8192, 3584))
++# Unpooler GEMM fused with the next FFN boundary's norms at decode / verify widths.
++_FUSED_UNPOOL_BOUNDARY = envs.SGLANG_MUSE_FUSED_UNPOOL_BOUNDARY.get()
++_dense_tuned_logged: set = set()
++
++
++def _log_dense_tuned(kind: str, key) -> None:
++    if key not in _dense_tuned_logged:
++        _dense_tuned_logged.add(key)
++        logger.info("Muse dense tuned: %s %s", kind, key)
++
++
++def _get_tgemm():
++    global _tgemm
++    if _tgemm is None:
++        try:
++            from aiter.tuned_gemm import tgemm as _t
++
++            _tgemm = _t
++        except Exception:  # aiter without tuned_gemm: stay on torch
++            _tgemm = False
++    return _tgemm
++
++
++@functools.lru_cache(maxsize=1)
++def _aiter_tuned_moe_projections() -> frozenset:
++    """(N, K, M) of the pooler / unpooler GEMMs that aiter patch 06 tunes for this GPU.
++
++    Read from aiter's own table (model_configs/muse_spark_bf16_tuned_gemm.csv), so it
++    is the single source of the solutions; only these exact M leave nn.Linear (any
++    other M would hit aiter's padded-M lookup of other models' rows).
++    """
++    try:
++        import aiter
++        from aiter.jit.utils.chip_info import get_cu_num, get_gfx
++    except Exception:
++        return frozenset()
++    path = os.path.join(
++        os.path.dirname(aiter.__file__),
++        "configs",
++        "model_configs",
++        "muse_spark_bf16_tuned_gemm.csv",
++    )
++    if not os.path.exists(path):
++        return frozenset()
++    gfx, cu_num = get_gfx(), get_cu_num()
++    shapes = set()
++    with open(path) as f:
++        for row in csv.DictReader(f):
++            n, k = int(row["N"]), int(row["K"])
++            if (
++                (n, k) in ((4096, 8192), (8192, 4096))
++                and row["gfx"] == gfx
++                and int(row["cu_num"]) == cu_num
++                and row["bias"] == "False"
++                and row["outdtype"] == "torch.bfloat16"
++            ):
++                shapes.add((n, k, int(row["M"])))
++    return frozenset(shapes)
++
+ 
+ def _dense_linear(x: torch.Tensor, linear: nn.Linear, max_m: int) -> torch.Tensor:
+-    global _tgemm
++    tiled = getattr(linear, "small_m_tiled_weight", None)
++    if tiled is not None and linear.bias is None and tiled_gemm_applies(x, tiled):
++        return tiled_gemm(x, tiled, *linear.weight.shape)
++    if (
++        _DENSE_TUNED
++        and linear.bias is None
++        and x.dim() == 2
++        and x.dtype == torch.bfloat16
++        and linear.weight.dtype == torch.bfloat16
++        and x.is_contiguous()
++        and linear.weight.is_contiguous()
++        and (*linear.weight.shape, x.shape[0]) in _aiter_tuned_moe_projections()
++        and _get_tgemm()
++    ):
++        _log_dense_tuned("gemm", (*linear.weight.shape, x.shape[0]))
++        return _tgemm.mm(x, linear.weight, None, otype=torch.bfloat16)
+     if (
+         _USE_AITER_DENSE
+         and linear.bias is None
+         and x.dtype == torch.bfloat16
+         and linear.weight.dtype == torch.bfloat16
+         and 0 < x.shape[0] <= max_m
++        and _get_tgemm()
+     ):
+-        if _tgemm is None:
+-            try:
+-                from aiter.tuned_gemm import tgemm as _t
+-
+-                _tgemm = _t
+-            except Exception:  # aiter without tuned_gemm: stay on torch
+-                _tgemm = False
+-        if _tgemm:
+-            return _tgemm.mm(x, linear.weight, None, otype=torch.bfloat16)
++        return _tgemm.mm(x, linear.weight, None, otype=torch.bfloat16)
+     return linear(x)
+ 
+ 
+@@ -318,7 +429,7 @@
+ 
+ 
+ class MuseSpark1xAttention(nn.Module):
+-    def __init__(self, config: MuseSpark1xTextConfig, layer_idx: int, prefix: str):
++    def __init__(self, config: MuseSparkTextConfig, layer_idx: int, prefix: str):
+         super().__init__()
+         self.layer_idx = layer_idx
+         self.hidden_size = config.hidden_size
+@@ -431,21 +542,9 @@
+             .to(dtype)
+         )
+ 
+-    def forward(
+-        self,
+-        positions: torch.Tensor,
+-        hidden_states: torch.Tensor,
+-        forward_batch: ForwardBatch,
+-    ) -> torch.Tensor:
+-        if hidden_states.shape[0] == 0:
+-            return hidden_states
+-        qkv, _ = self.qkv_proj(hidden_states)
+-        split_sizes = [self.q_size, self.kv_size, self.kv_size]
+-        if self.use_o_gate:
+-            q, k, v, o_gate = qkv.split(split_sizes + [self.q_size], dim=-1)
+-        else:
+-            q, k, v = qkv.split(split_sizes, dim=-1)
+-            o_gate = None
++    def qk_norm_rope(
++        self, positions: torch.Tensor, q: torch.Tensor, k: torch.Tensor
++    ) -> tuple[torch.Tensor, torch.Tensor]:
+         if self.use_qk_norm:
+             if _USE_FUSED_QK_NORM and qk_norm_supported(q, k, self.head_dim):
+                 q, k = fused_qk_norm(
+@@ -463,14 +562,50 @@
+             q = (q * temperature.unsqueeze(-1)).to(q.dtype)
+         if self.rotary_emb is not None:
+             q, k = self.rotary_emb(positions, q, k)
+-        output = self.attn(q, k, v, forward_batch)
++        return q, k
++
++    def forward(
++        self,
++        positions: torch.Tensor,
++        hidden_states: torch.Tensor,
++        forward_batch: ForwardBatch,
++        reduce: bool = True,
++    ) -> torch.Tensor:
++        if hidden_states.shape[0] == 0:
++            return hidden_states
++        # Decode / verify: the fused QK-norm / RoPE kernels also store K/V into
++        # the FP8 cache, so the attention layer must not store them again.
++        projected = (
++            qkv_proj_norm_rope_kv_write(self, positions, hidden_states, forward_batch)
++            if FUSED_QKV_CACHE and QK_ROPE_CACHE and _USE_FUSED_QK_NORM
++            else None
++        )
++        if projected is not None:
++            q, k, v, o_gate = projected
++            kv_written = True
++        else:
++            qkv, _ = self.qkv_proj(hidden_states)
++            split_sizes = [self.q_size, self.kv_size, self.kv_size]
++            if self.use_o_gate:
++                q, k, v, o_gate = qkv.split(split_sizes + [self.q_size], dim=-1)
++            else:
++                q, k, v = qkv.split(split_sizes, dim=-1)
++                o_gate = None
++            fused_qk = (
++                qk_norm_rope_kv_write(self, positions, q, k, v, forward_batch)
++                if QK_ROPE_CACHE and _USE_FUSED_QK_NORM
++                else None
++            )
++            kv_written = fused_qk is not None
++            q, k = fused_qk if kv_written else self.qk_norm_rope(positions, q, k)
++        output = self.attn(q, k, v, forward_batch, save_kv_cache=not kv_written)
+         output = self._fused_o_norm_gate.forward(output, o_gate)
+-        output, _ = self.o_proj(output)
++        output, _ = self.o_proj(output, skip_all_reduce=not reduce)
+         return output
+ 
+ 
+ class MuseSpark1xMLP(nn.Module):
+-    def __init__(self, config: MuseSpark1xTextConfig, prefix: str):
++    def __init__(self, config: MuseSparkTextConfig, prefix: str):
+         super().__init__()
+         self.gate_up_proj = MergedColumnParallelLinear(
+             input_size=config.hidden_size,
+@@ -684,7 +819,7 @@
+ class MuseSpark1xMoE(nn.Module):
+     def __init__(
+         self,
+-        config: MuseSpark1xTextConfig,
++        config: MuseSparkTextConfig,
+         layer_idx: int,
+         nvfp4_checkpoint: bool,
+         prefix: str,
+@@ -701,6 +836,7 @@
+         if config.num_local_experts % parallel.moe_ep_size:
+             raise ValueError("num_experts must be divisible by expert parallel size")
+         self.layer_idx = layer_idx
++        self._compact_a4_reported = False
+         self.tp_size = parallel.tp_size
+         self.ep_size = parallel.moe_ep_size
+         self.ep_rank = parallel.moe_ep_rank
+@@ -795,23 +931,74 @@
+             object.__setattr__(self, "_fused_routing_op", op)
+         return op
+ 
+-    def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
++    def forward(
++        self,
++        hidden_states: torch.Tensor,
++        *,
++        skip_post_expert_proj: bool = False,
++        target_verify: bool = False,
++        sp: SPShape | None = None,
++    ) -> torch.Tensor:
++        """MoE on ``hidden_states``; under sequence parallelism (``sp``) they are this
++        rank's token shard and so is the result. ``skip_post_expert_proj`` returns the
++        reduced expert output before the unpooler (fused into the next boundary)."""
++        topk_scores, topk_ids, expert_input = self.route(hidden_states)
++        rows = topk_ids.shape[0] if sp is None else sp.padded
++        use_a4w4 = self.uses_a4w4(rows, target_verify)
++        quantized = None
++        if sp is not None:
++            if use_a4w4:
++                # Row-local MXFP4: gather the shards' FP4 data and scales, not BF16 rows.
++                a1, a1s = mxfp4_moe.quantize_rows(expert_input)
++                quantized = (
++                    sp_gather(a1.view(torch.uint8), rows).view(a1.dtype),
++                    sp_gather(a1s.view(torch.uint8), rows).view(a1s.dtype),
++                )
++                expert_input = None
++            else:
++                expert_input = sp_gather(expert_input, rows)
++            topk_ids = sp_gather(topk_ids, rows)
++            topk_scores = sp_gather(topk_scores, rows)
++        output = self.run_experts(
++            expert_input, topk_scores, topk_ids, target_verify, use_a4w4, quantized
++        )
++        if sp is not None:
++            output = sp_reduce_scatter(output, sp.padded)
++        elif self.tp_size > 1:
++            output = tensor_model_parallel_all_reduce(output)
++        if skip_post_expert_proj:
++            return output
++        return self.unpool(output)
++
++    def route(self, hidden_states: torch.Tensor):
++        """Router top-k and the expert input (pooler + pre-expert norm) of these rows."""
++        if (
++            router_pooler.SHARED_ROUTER_POOLER
++            and _USE_ROUTER_GEMV
++            and router_pooler.can_share_router_pooler(self, hidden_states)
++        ):
++            return router_pooler.route_with_shared_pooler(self, hidden_states)
+         if (
+             _USE_ROUTER_GEMV
+             and self.router_in_fp32
+-            and router_gemv_supported(hidden_states, self.router.weight)
++            and router_gemv_fp32_supported(hidden_states, self.router.weight)
+         ):
+             # bf16 -> fp32 conversion happens inside the kernel (exact), IEEE fp32 accumulate
+-            router_logits = router_gemv(hidden_states, self.router.weight)
++            router_logits = router_gemv_fp32(hidden_states, self.router.weight)
+         else:
+-            router_input = (
+-                hidden_states.float() if self.router_in_fp32 else hidden_states
+-            )
+-            router_logits = self.router(router_input)
++            router_logits = None
++            if _DENSE_TUNED and self.router_in_fp32:
++                router_logits = router_gemm_tuned(hidden_states, self.router.weight)
++                if router_logits is not None:
++                    _log_dense_tuned("router", hidden_states.shape[0])
++            if router_logits is None:
++                router_input = (
++                    hidden_states.float() if self.router_in_fp32 else hidden_states
++                )
++                router_logits = self.router(router_input)
+         topk_scores, topk_ids = self._routing_op().forward(
+             None, router_logits, self.top_k, True
+         )
+-
+         expert_input = (
+             _dense_linear(hidden_states, self.pre_expert_proj, max_m=128)
+             if self.pre_expert_proj is not None
+@@ -819,20 +1006,84 @@
+         )
+         if self.pre_expert_norm is not None:
+             expert_input = self.pre_expert_norm(expert_input)
+-        if self.nvfp4_checkpoint:
+-            output = self.experts(
+-                expert_input, topk_scores, topk_ids, self.post_expert_norm
+-            )
+-        else:
+-            output = self.experts(
++        return topk_scores, topk_ids, expert_input
++
++    def uses_a4w4(self, rows: int, target_verify: bool) -> bool:
++        return (
++            mxfp4_moe.A4W4_ENABLED
++            and not target_verify
++            and self.mxfp4_checkpoint
++            and rows >= mxfp4_moe.A4W4_MIN_ROWS
++            and getattr(self.experts, "a4w4_weights", None) is not None
++        )
++
++    def run_experts(
++        self,
++        expert_input,
++        topk_scores,
++        topk_ids,
++        target_verify: bool,
++        use_a4w4: bool,
++        quantized=None,
++    ):
++        """This rank's experts over all given rows; per-token partial sums before the TP reduction."""
++        if use_a4w4:
++            norm_weight, gain, has_norm = _post_expert_norm_args(self.post_expert_norm)
++            assert has_norm and norm_weight is not None
++            return mxfp4_moe.run_a4w4(
+                 expert_input,
+                 topk_scores,
+                 topk_ids,
++                self.experts,
+                 self.local_expert_start,
+-                self.post_expert_norm,
+-            )
+-        if self.tp_size > 1:
+-            output = tensor_model_parallel_all_reduce(output)
++                norm_weight,
++                self.post_expert_norm.eps,
++                gain,
++                quantized=quantized,
++            )
++        if (
++            mxfp4_moe.COMPACT_A4_ENABLED
++            and target_verify
++            and self.mxfp4_checkpoint
++            and self.tp_size == self.ep_size == 8
++            and self.num_local_experts == 32
++            and self.top_k == 8
++            and expert_input.shape[0] % 8 == 0
++            and 0 < expert_input.shape[0] <= mxfp4_moe.COMPACT_A4_MAX_ROWS
++        ):
++            norm_weight, gain, has_norm = _post_expert_norm_args(self.post_expert_norm)
++            assert has_norm and norm_weight is not None
++            if not self._compact_a4_reported:
++                logger.info(
++                    "Muse compact A4 target-verify: layer=%d rows=%d local_start=%d",
++                    self.layer_idx,
++                    expert_input.shape[0],
++                    self.local_expert_start,
++                )
++                self._compact_a4_reported = True
++            return mxfp4_moe.run_compact_a4(
++                expert_input,
++                topk_scores,
++                topk_ids,
++                self.experts,
++                self.local_expert_start,
++                norm_weight,
++                self.post_expert_norm.eps,
++                gain,
++            )
++        if self.nvfp4_checkpoint:
++            return self.experts(
++                expert_input, topk_scores, topk_ids, self.post_expert_norm
++            )
++        return self.experts(
++            expert_input,
++            topk_scores,
++            topk_ids,
++            self.local_expert_start,
++            self.post_expert_norm,
++        )
++
++    def unpool(self, output: torch.Tensor) -> torch.Tensor:
+         if self.post_expert_proj is not None:
+             output = _dense_linear(output, self.post_expert_proj, max_m=64)
+         return output
+@@ -841,7 +1092,7 @@
+ class MuseSpark1xDecoderLayer(nn.Module):
+     def __init__(
+         self,
+-        config: MuseSpark1xTextConfig,
++        config: MuseSparkTextConfig,
+         layer_idx: int,
+         nvfp4_checkpoint: bool,
+         prefix: str,
+@@ -907,7 +1158,7 @@
+         )
+ 
+     @staticmethod
+-    def _is_moe_layer(config: MuseSpark1xTextConfig, layer_idx: int) -> bool:
++    def _is_moe_layer(config: MuseSparkTextConfig, layer_idx: int) -> bool:
+         return config.mlp_layer_types[layer_idx] == "sparse"
+ 
+     def forward(
+@@ -918,15 +1169,64 @@
+         attn_input: torch.Tensor | None = None,
+         ffn_boundary: FusedPostNormResidualPreNorm | None = None,
+         pre_norm_dtype: torch.dtype | None = None,
++        sp: SPShape | None = None,
+     ):
++        """Under sequence parallelism (``sp``) ``stream`` / ``attn_input`` are this rank's
++        token shard; attention and the experts still see every token."""
+         attn_input = (
+             self.self_attn_input_norm(stream) if attn_input is None else attn_input
+         )
+-        attn_output = self.self_attn(positions, attn_input, forward_batch)
++        if sp is not None and hasattr(self.self_attn, "ulysses_qkv_weight"):
++            attn_output = ulysses_attention(
++                self.self_attn, attn_input, positions, forward_batch, sp
++            )
++        elif sp is not None:
++            partial = self.self_attn(
++                positions,
++                sp_gather(attn_input, sp.num_tokens),
++                forward_batch,
++                reduce=False,
++            )
++            attn_output = sp_reduce_scatter(partial, sp.padded)
++        else:
++            attn_output = self.self_attn(positions, attn_input, forward_batch)
+         ffn_input, stream, _ = self._fused_attn_boundary.forward(
+             stream, attn_output, branch_dtype=torch.bfloat16
+         )
+-        ffn_output = self.mlp(ffn_input)
++        target_verify = forward_batch.forward_mode.is_target_verify()
++        if (
++            sp is None
++            and _FUSED_UNPOOL_BOUNDARY
++            and self._can_fuse_unpool_boundary(ffn_input, ffn_boundary)
++        ):
++            # The MoE keeps its per-expert norm / combine and TP reduction; only the
++            # unpooler moves into the next boundary's norm-residual kernel.
++            expert_output = self.mlp(
++                ffn_input, skip_post_expert_proj=True, target_verify=target_verify
++            )
++            ffn_boundary._ensure_cached_weights(torch.bfloat16)
++            next_attn_input, stream = unpool_gemm_norm_residual(
++                expert_output,
++                self.mlp.post_expert_proj.weight,
++                stream,
++                ffn_boundary._cc_post_weight,
++                ffn_boundary._cc_pre_weight,
++                ffn_boundary._cc_alpha,
++                ffn_boundary._cc_beta,
++                ffn_boundary._post_norm.eps,
++                ffn_boundary._pre_norm.eps,
++                block_n=64,
++                block_k=128,
++                split_k=4,
++                pre_bf16=pre_norm_dtype is torch.bfloat16,
++                num_warps=16,
++            )
++            return stream, next_attn_input
++        ffn_output = (
++            self.mlp(ffn_input, target_verify=target_verify, sp=sp)
++            if self.is_moe_layer
++            else self.mlp(ffn_input)
++        )
+         if ffn_boundary is None:
+             return self.post_feedforward_residual_gate(
+                 stream, self.post_feedforward_layernorm(ffn_output)
+@@ -944,10 +1244,37 @@
+     def self_attn_input_norm(self, stream: torch.Tensor) -> torch.Tensor:
+         return self.self_attn.pre_attn_norm(stream).to(torch.bfloat16)
+ 
++    def _can_fuse_unpool_boundary(
++        self, x: torch.Tensor, boundary: FusedPostNormResidualPreNorm | None
++    ) -> bool:
++        """Unpooler + FFN boundary fusion: TP8/EP8 MoE layers at up to 16 rows."""
++        if not self.is_moe_layer or boundary is None:
++            return False
++        moe = self.mlp
++        proj = moe.post_expert_proj
++        return (
++            proj is not None
++            and proj.bias is None
++            and moe.tp_size == 8
++            and moe.ep_size == 8
++            and 0 < x.shape[0] <= 16
++            and x.dtype == torch.bfloat16
++            and x.shape[1] == 8192
++            and x.is_contiguous()
++            and proj.weight.shape == (8192, 4096)
++            and proj.weight.dtype == torch.bfloat16
++            and proj.weight.is_contiguous()
++            and boundary._post_norm_is_input_scale
++            and boundary._use_residual_gate
++            and boundary._post_norm.has_weight
++            and boundary._pre_norm.has_weight
++            and boundary._residual_add.gate.numel() == 8192
++        )
++
+ 
+ # Keep the pre-attention norm under self_attn to match Muse checkpoint names.
+ def _install_pre_attn_norm(
+-    config: MuseSpark1xTextConfig, layer: MuseSpark1xDecoderLayer
++    config: MuseSparkTextConfig, layer: MuseSpark1xDecoderLayer
+ ) -> None:
+     layer.self_attn.pre_attn_norm = MuseSpark1xRMSNorm(
+         config.hidden_size,
+@@ -961,7 +1288,7 @@
+ class MuseSpark1xModel(nn.Module):
+     def __init__(
+         self,
+-        config: MuseSpark1xTextConfig,
++        config: MuseSparkTextConfig,
+         quant_config: QuantizationConfig | None,
+         prefix: str,
+     ):
+@@ -969,7 +1296,7 @@
+         self.config = config
+         self.residual_dtype = torch.float32
+         # Layer indices whose output residual stream feeds the DFLASH draft
+-        # context (set through MuseSpark1xForCausalLM.set_dflash_layers_to_capture).
++        # context (set through MuseSparkTextForCausalLM.set_dflash_layers_to_capture).
+         self.layers_to_capture: list[int] = []
+         self.embed_tokens = VocabParallelEmbedding(
+             config.vocab_size,
+@@ -1037,6 +1364,10 @@
+         # in operator dtype (bf16) like the CUDA model does.
+         aux_hidden_states: list[torch.Tensor] = []
+         if self._ffn_boundaries is not None and stream.shape[0] > 0:
++            # Long plain prefills: every rank keeps a 1/TP token shard of the stream.
++            sp = sp_shape(forward_batch, stream.shape[0])
++            if sp is not None:
++                stream = sp_shard(stream, sp)
+             final_pre_norm_dtype = torch.bfloat16
+             attn_input = self.layers[0].self_attn_input_norm(stream)
+             last = len(self.layers) - 1
+@@ -1048,11 +1379,17 @@
+                     attn_input=attn_input,
+                     ffn_boundary=self._ffn_boundaries[i],
+                     pre_norm_dtype=final_pre_norm_dtype if i == last else None,
++                    sp=sp,
+                 )
+                 if i in self.layers_to_capture:
+                     aux_hidden_states.append(stream.to(torch.bfloat16))
+             # == self.norm(norm_input).to(bf16) from the last boundary
+             hidden_states = attn_input
++            if sp is not None:
++                hidden_states = sp_gather(hidden_states, sp.num_tokens)
++                aux_hidden_states = [
++                    sp_gather(a, sp.num_tokens) for a in aux_hidden_states
++                ]
+         else:
+             for i, layer in enumerate(self.layers):
+                 stream = layer(positions, stream, forward_batch)
+@@ -1075,7 +1412,7 @@
+ 
+     def __init__(
+         self,
+-        config: MuseSpark1xTextConfig,
++        config: MuseSparkTextConfig,
+         quant_config: QuantizationConfig | None,
+         prefix: str,
+     ):
+@@ -1096,7 +1433,7 @@
+         return self.language_model(*args, **kwargs)
+ 
+ 
+-class MuseSpark1xForCausalLM(nn.Module):
++class MuseSparkTextForCausalLM(nn.Module):
+     packed_modules_mapping = {
+         "qkv_proj": ["q_proj", "k_proj", "v_proj"],
+         "gate_up_proj": ["gate_proj", "up_proj"],
+@@ -1104,11 +1441,19 @@
+ 
+     def __init__(
+         self,
+-        config: MuseSpark1xTextConfig,
++        config: MuseSparkTextConfig,
+         quant_config: QuantizationConfig | None = None,
+         prefix: str = "",
+     ):
+         super().__init__()
++        # Unquantized linear shapes tuned on MI355X at TP8, registered before any
++        # weights load: tiled small-M GEMMs for the attention O projection and the
++        # DFlash draft's MLP (the draft loads after the target, in this process),
++        # and the draft MLP's M = 24 GEMMs on the aiter Triton a16w16 kernel.
++        register_gfx950_unquantized_gemm_shapes(
++            tiled_weights=tuple(TILED_GEMM_LAYOUT),
++            triton_a16w16=_DRAFT_TRITON_A16W16_GEMMS,
++        )
+         if getattr(config, "inference_moe_w13_interleaved", False):
+             raise ValueError("Interleaved expert checkpoints are not supported")
+         quant_name = _quantization_name(quant_config)
+@@ -1492,6 +1837,28 @@
+ 
+     @torch.no_grad()
+     def post_load_weights(self) -> None:
++        moe_layers = [
++            layer.mlp
++            for layer in self.model.layers
++            if isinstance(layer.mlp, MuseSpark1xMoE)
++        ]
++        if router_pooler.JOINT_ROUTER_POOLER:
++            for moe in moe_layers:
++                router_pooler.prepare_joint_router_pooler(moe)
++        if mxfp4_moe.A4W4_ENABLED:
++            for module in self.model.modules():
++                if isinstance(module, MuseSpark1xMxfp4Experts):
++                    mxfp4_moe.prepare_a4w4_weights(module)
++        if _DENSE_TILED:
++            for moe in moe_layers:
++                for proj in (moe.pre_expert_proj, moe.post_expert_proj):
++                    if proj is not None:
++                        proj.small_m_tiled_weight = prepare_tiled_weight(
++                            proj.weight.data
++                        )
++        if ulysses_enabled():
++            for layer in self.model.layers:
++                prepare_ulysses(layer.self_attn)
+         for layer in self.model.layers:
+             for residual in (
+                 layer.post_attention_residual_gate,
+@@ -1510,9 +1877,7 @@
+                 ensure(torch.bfloat16)
+ 
+ 
+-EntryClass = [MuseSpark1xForCausalLM]
+-
+ __all__ = [
+-    "MuseSpark1xForCausalLM",
+-    "MuseSpark1xTextConfig",
++    "MuseSparkTextForCausalLM",
++    "MuseSparkTextConfig",
+ ]
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_router_gemv.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_router_gemv.py
+@@ -1,135 +0,0 @@
+-"""Decode-sized router GEMM: logits[M, N] = fp32(hidden_bf16[M, K]) @ W_fp32[K, N].
+-
+-The eager path is `hidden.float()` (a copy kernel) + hipBLASLt fp32 GEMM (split-K + reduce
+-kernel): 3 launches, ~23 us/layer at M=1 on MI355X. Here: split-K partial products with IEEE fp32
+-MFMA dots, then a deterministic reduce over the splits (2 launches). Used for M <= ROUTER_GEMV_MAX_M;
+-larger M keeps the torch path.
+-"""
+-
+-from __future__ import annotations
+-
+-import torch
+-import triton
+-import triton.language as tl
+-
+-ROUTER_GEMV_MAX_M = 64
+-
+-
+-@triton.jit
+-def _router_partial_kernel(
+-    X,
+-    W,
+-    P,
+-    M,
+-    N,
+-    K,
+-    stride_xm,
+-    stride_wk,
+-    stride_pk,
+-    stride_pm,
+-    BLOCK_M: tl.constexpr,
+-    BLOCK_N: tl.constexpr,
+-    BLOCK_K: tl.constexpr,
+-    SPLIT_K: tl.constexpr,
+-):
+-    pid_n = tl.program_id(0)
+-    pid_k = tl.program_id(1)
+-    pid_m = tl.program_id(2)
+-    offs_m = pid_m * BLOCK_M + tl.arange(0, BLOCK_M)
+-    offs_n = pid_n * BLOCK_N + tl.arange(0, BLOCK_N)
+-    offs_k = tl.arange(0, BLOCK_K)
+-    m_mask = offs_m < M
+-    k0 = pid_k * (K // SPLIT_K)
+-    x_ptrs = X + offs_m[:, None].to(tl.int64) * stride_xm + (k0 + offs_k)[None, :]
+-    w_ptrs = W + (k0 + offs_k)[:, None].to(tl.int64) * stride_wk + offs_n[None, :]
+-    acc = tl.zeros((BLOCK_M, BLOCK_N), dtype=tl.float32)
+-    for _ in range(0, K // SPLIT_K, BLOCK_K):
+-        x = tl.load(x_ptrs, mask=m_mask[:, None], other=0.0).to(tl.float32)
+-        w = tl.load(w_ptrs)
+-        acc = tl.dot(x, w, acc, input_precision="ieee")
+-        x_ptrs += BLOCK_K
+-        w_ptrs += BLOCK_K * stride_wk
+-    tl.store(
+-        P
+-        + pid_k * stride_pk
+-        + offs_m[:, None].to(tl.int64) * stride_pm
+-        + offs_n[None, :],
+-        acc,
+-        mask=m_mask[:, None],
+-    )
+-
+-
+-@triton.jit
+-def _router_reduce_kernel(
+-    P, OUT, M, N, stride_pk, stride_pm, SPLIT_K: tl.constexpr, BLOCK_N: tl.constexpr
+-):
+-    m = tl.program_id(0).to(tl.int64)
+-    offs_n = tl.arange(0, BLOCK_N)
+-    mask = offs_n < N
+-    acc = tl.zeros((BLOCK_N,), dtype=tl.float32)
+-    for k in tl.static_range(SPLIT_K):
+-        acc += tl.load(P + k * stride_pk + m * stride_pm + offs_n, mask=mask, other=0.0)
+-    tl.store(OUT + m * N + offs_n, acc, mask=mask)
+-
+-
+-def router_gemv_supported(x: torch.Tensor, w: torch.Tensor) -> bool:
+-    return (
+-        x.dim() == 2
+-        and x.dtype == torch.bfloat16
+-        and x.shape[0] <= ROUTER_GEMV_MAX_M
+-        and x.stride(1) == 1
+-        and w.dtype == torch.float32
+-        and w.dim() == 2
+-        and w.stride(1) == 1
+-        and w.shape[0] == x.shape[1]
+-        and 32 <= w.shape[1] <= 512
+-        and (w.shape[1] & (w.shape[1] - 1)) == 0
+-        and w.shape[0] % 8192 == 0
+-    )
+-
+-
+-def router_gemv(x: torch.Tensor, w: torch.Tensor) -> torch.Tensor:
+-    """x: [M, K] bf16 (row stride free), w: [K, N] fp32 contiguous rows. Returns fp32 [M, N]."""
+-    M, K = x.shape
+-    N = w.shape[1]
+-    # full-width N tiles (contiguous 1 KB rows of W, vectorized loads) and a deep K split so
+-    # ~128 programs each stream one 64-row slab of W; tuned on MI355X for K=8192, N=256
+-    BLOCK_M, BLOCK_K = 16, 64
+-    BLOCK_N = min(N, 128)
+-    SPLIT_K = max(
+-        1, min(64, K // BLOCK_K)
+-    )  # MI355X sweep (K=8192, N=256): 12.4 us vs 17.7 us torch at M=1
+-    part = torch.empty((SPLIT_K, M, N), dtype=torch.float32, device=x.device)
+-    out = torch.empty((M, N), dtype=torch.float32, device=x.device)
+-    if M == 0:
+-        return out
+-    grid = (N // BLOCK_N, SPLIT_K, triton.cdiv(M, BLOCK_M))
+-    _router_partial_kernel[grid](
+-        x,
+-        w,
+-        part,
+-        M,
+-        N,
+-        K,
+-        x.stride(0),
+-        w.stride(0),
+-        part.stride(0),
+-        part.stride(1),
+-        BLOCK_M=BLOCK_M,
+-        BLOCK_N=BLOCK_N,
+-        BLOCK_K=BLOCK_K,
+-        SPLIT_K=SPLIT_K,
+-        num_warps=4,
+-    )
+-    _router_reduce_kernel[(M,)](
+-        part,
+-        out,
+-        M,
+-        N,
+-        part.stride(0),
+-        part.stride(1),
+-        SPLIT_K=SPLIT_K,
+-        BLOCK_N=triton.next_power_of_2(N),
+-        num_warps=4,
+-    )
+-    return out
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py
+@@ -0,0 +1,178 @@
++"""Muse Spark MoE experts with MXFP4 activations (Quark MXFP4 checkpoints, MI355X).
++
++The Quark checkpoint declares dynamic per-32 MXFP4 activations, so A4W4 is the checkpoint numerics. Both paths
++produce unweighted per-(token, slot) expert rows; Muse's FlyDSL finalize then applies the per-expert RMSNorm
++with input scale before the route-weighted sum, which a combining MoE epilogue cannot express.
++
++* Compact A4 (``SGLANG_MUSE_COMPACT_A4_VERIFY``): target-verify batches (a multiple of 8 rows, up to 512) at
++  TP8 / EP8 run the Triton ``mxfp4_compact_a4_moe`` experts on the checkpoint weights as stored.
++* a4w4 (``SGLANG_MUSE_A4W4_MOE``): prefill batches of at least ``A4W4_MIN_ROWS`` rows run aiter's FlyDSL
++  stage-1 / stage-2 MXFP4 kernels on weights shuffled once at load into aiter's preshuffle layout (an extra copy
++  beside the native one); stage 1 writes MXFP4 + sorted scales itself.
++"""
++
++from __future__ import annotations
++
++import torch
++
++from sglang.kernels.ops.moe.mxfp4_compact_a4_moe import MAX_ROWS as COMPACT_A4_MAX_ROWS
++from sglang.kernels.ops.moe.mxfp4_compact_a4_moe import compact_a4_experts
++from sglang.kernels.ops.quantization.mxfp4_quant_rows import mxfp4_quant_rows
++from sglang.srt.environ import envs
++from sglang.srt.rocm_muse_spark import muse_moe_flydsl
++
++COMPACT_A4_ENABLED = envs.SGLANG_MUSE_COMPACT_A4_VERIFY.get()
++A4W4_ENABLED = envs.SGLANG_MUSE_A4W4_MOE.get()
++A4W4_MIN_ROWS = 256
++# Stage-1 launch (tile_n, async copy, waves per EU), MI355X prefill widths.
++_S1_TILE_N = 128
++_S1_ASYNC = True
++_S1_WAVES = 3
++
++__all__ = [
++    "A4W4_ENABLED",
++    "A4W4_MIN_ROWS",
++    "COMPACT_A4_ENABLED",
++    "COMPACT_A4_MAX_ROWS",
++    "prepare_a4w4_weights",
++    "quantize_rows",
++    "run_a4w4",
++    "run_compact_a4",
++]
++
++
++def _finalize_per_slot(
++    y, norm_weight, scores, ids, local_start, num_local_experts, eps, gain
++):
++    """Muse finalize: per-expert norm (with input scale) and route-weighted sum of per-slot rows."""
++    m, topk = ids.shape
++    h = y.shape[-1]
++    out = torch.empty((m, h), dtype=torch.bfloat16, device=ids.device)
++    fx, runner = muse_moe_flydsl._require_flydsl()
++    runner(
++        muse_moe_flydsl._cached_finalize_launch(h, topk, True, True, "bf16", 1),
++        y.view(m * topk, h),
++        norm_weight,
++        scores,
++        ids,
++        out,
++        local_start,
++        num_local_experts,
++        float(eps),
++        float(gain),
++        m,
++        fx.Stream(torch.cuda.current_stream(ids.device).cuda_stream),
++    )
++    return out
++
++
++def run_compact_a4(x, scores, ids, experts, local_start, norm_weight, eps, gain):
++    """Compact A4 target-verify experts of this rank, finalized; partial sums before the TP reduction."""
++    y = compact_a4_experts(
++        x,
++        ids,
++        experts.w13_weight,
++        experts.w2_weight,
++        experts.w13_weight_scale,
++        experts.w2_weight_scale,
++        local_start=local_start,
++    )
++    return _finalize_per_slot(
++        y, norm_weight, scores, ids, local_start, experts.w13_weight.shape[0], eps, gain
++    )
++
++
++@torch.no_grad()
++def prepare_a4w4_weights(experts) -> None:
++    """Shuffle the MXFP4 expert weights and scales into aiter's FlyDSL preshuffle layout (a second copy)."""
++    from aiter import dtypes
++    from aiter.ops.shuffle import (
++        shuffle_scale_a16w4,
++        shuffle_weight,
++        shuffle_weight_a16w4,
++    )
++    from aiter.utility.fp4_utils import e8m0_shuffle
++
++    w13, w2 = experts.w13_weight, experts.w2_weight
++    s13, s2 = experts.w13_weight_scale, experts.w2_weight_scale
++    e, two_i, h_half = w13.shape
++    h, i = w2.shape[1], two_i // 2
++    experts.a4w4_weights = (
++        shuffle_weight(w13.view(dtypes.fp4x2), (16, 16)),
++        shuffle_weight_a16w4(w2.view(dtypes.fp4x2), 16, False),
++        e8m0_shuffle(s13.view(dtypes.fp8_e8m0).view(e * two_i, h_half * 2 // 32)),
++        shuffle_scale_a16w4(s2.view(dtypes.fp8_e8m0).view(e * h, i // 32), e, False),
++    )
++
++
++def quantize_rows(x):
++    """Per-row MXFP4 expert input: (fp4x2 [m, H/2], e8m0 [m, H/32]). Row-local, so quantizing token shards
++    and gathering them equals quantizing the gathered rows."""
++    return mxfp4_quant_rows(x)
++
++
++def run_a4w4(
++    x, scores, ids, experts, local_start, norm_weight, eps, gain, *, quantized=None
++):
++    """a4w4 prefill experts of this rank, finalized; ``quantized`` = (fp4, scales) replaces ``x``."""
++    from aiter.fused_moe import moe_sorting
++    from aiter.ops.flydsl.moe_kernels import flydsl_moe_stage1, flydsl_moe_stage2
++    from aiter.utility.fp4_utils import moe_mxfp4_sort
++
++    w1s, w2s, s1s, s2s = experts.a4w4_weights
++    m, h = ids.shape[0], experts.w2_weight.shape[1]
++    topk = ids.shape[1]
++    e_local = experts.w13_weight.shape[0]
++    block_m = 32 if m <= 1024 else 64
++    mask = torch.zeros(256, dtype=torch.int32, device=ids.device)
++    mask[local_start : local_start + e_local] = 1
++    sorted_ids, _, sorted_eids, num_valid, _ = moe_sorting(
++        ids, scores, 256, h, torch.bfloat16, block_m, expert_mask=mask
++    )
++    a1, a1s = quantize_rows(x) if quantized is None else quantized
++    a1s = moe_mxfp4_sort(
++        a1s[:m].view(m, 1, -1),
++        sorted_ids=sorted_ids,
++        num_valid_ids=num_valid,
++        token_num=m,
++        block_size=block_m,
++    )
++    a2, a2s = flydsl_moe_stage1(
++        a1,
++        w1s,
++        sorted_ids,
++        sorted_eids,
++        num_valid,
++        topk=topk,
++        tile_m=block_m,
++        tile_n=_S1_TILE_N,
++        tile_k=256,
++        a_dtype="fp4",
++        b_dtype="fp4",
++        out_dtype="fp4",
++        w1_scale=s1s,
++        a1_scale=a1s,
++        sorted_weights=None,
++        use_async_copy=_S1_ASYNC,
++        waves_per_eu=_S1_WAVES,
++    )
++    y = flydsl_moe_stage2(
++        a2.view(m, topk, -1),
++        w2s,
++        sorted_ids,
++        sorted_eids,
++        num_valid,
++        topk=topk,
++        tile_m=block_m,
++        tile_n=256,
++        tile_k=256,
++        a_dtype="fp4",
++        b_dtype="fp4",
++        out_dtype="bf16",
++        w2_scale=s2s,
++        a2_scale=a2s,
++        return_per_slot=True,
++    )
++    return _finalize_per_slot(
++        y, norm_weight, scores, ids, local_start, e_local, eps, gain
++    )
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py
+@@ -0,0 +1,127 @@
++"""Muse Spark MoE routing front on ROCm: one kernel sequence for the FP32 router and the BF16 pooler.
++
++At decode / verify widths (up to 64 rows) the router logits, the sigmoid top-8 routing, the pooler projection
++and the pre-expert RMSNorm share one epilogue (``kernels/ops/moe/router_pooler_topk``) instead of separate
++router GEMM, routing, pooler GEMM and norm launches (``SGLANG_MUSE_SHARED_ROUTER_POOLER``). Verify batches of
++8 / 16 / 24 rows run the router and the pooler as one GEMM over a packed weight prepared after loading
++(``SGLANG_MUSE_JOINT_ROUTER_POOLER``).
++"""
++
++from __future__ import annotations
++
++import logging
++
++import torch
++
++from sglang.kernels.ops.moe.router_pooler_topk import (
++    joint_router_pooler_topk,
++    pack_joint_router_pooler_weight,
++    router_pooler_topk,
++)
++from sglang.srt.environ import envs
++
++logger = logging.getLogger(__name__)
++
++SHARED_ROUTER_POOLER = envs.SGLANG_MUSE_SHARED_ROUTER_POOLER.get()
++JOINT_ROUTER_POOLER = envs.SGLANG_MUSE_JOINT_ROUTER_POOLER.get()
++_JOINT_ROWS = (8, 16, 24)
++_logged: set = set()
++
++
++def can_share_router_pooler(moe, x: torch.Tensor) -> bool:
++    """The Muse Spark TP8 routing front: 8192 hidden, 256 experts top-8 sigmoid, 4096-wide pooler + norm."""
++    op = moe._routing_op()
++    return (
++        0 < x.shape[0] <= 64
++        and x.shape[1] == 8192
++        and x.is_contiguous()
++        and x.dtype == torch.bfloat16
++        and moe.router_in_fp32
++        and moe.router.weight.dtype == torch.float32
++        and moe.router.weight.shape == (8192, 256)
++        and moe.router.weight.is_contiguous()
++        and moe.top_k == 8
++        and moe.num_experts == 256
++        and moe.pre_expert_proj is not None
++        and moe.pre_expert_proj.bias is None
++        and moe.pre_expert_proj.weight.shape == (4096, 8192)
++        and moe.pre_expert_proj.weight.dtype == torch.bfloat16
++        and moe.pre_expert_proj.weight.is_contiguous()
++        and moe.pre_expert_norm is not None
++        and moe.pre_expert_norm.weight is not None
++        and op.router_score_normalization == "sigmoid"
++        and op.num_valid_tokens is None
++        and op.local_expert_mapping is None
++        and op.sol_topk_out is None
++    )
++
++
++def route_with_shared_pooler(moe, x: torch.Tensor):
++    """(top-8 scores, expert ids, normalized expert input) for ``x``; requires ``can_share_router_pooler``."""
++    m = x.shape[0]
++    norm_weight = moe.pre_expert_norm._get_effective_weight()
++    if JOINT_ROUTER_POOLER and m in _JOINT_ROWS:
++        packed = moe.router_pooler_packed_weight
++        assert moe.pre_expert_proj.weight.data_ptr() == packed.data_ptr()
++        key = ("joint", moe.layer_idx, m)
++        if key not in _logged:
++            _logged.add(key)
++            logger.info(
++                "Muse joint router/pooler active: layer=%d rows=%d", moe.layer_idx, m
++            )
++        return joint_router_pooler_topk(
++            x,
++            packed,
++            moe.expert_bias,
++            norm_weight,
++            float(moe.router_multiplier),
++            float(moe.route_scale),
++            float(moe.pre_expert_norm.eps),
++        )
++    key = "shared" if m <= 16 else "shared_completed"
++    if key not in _logged:
++        _logged.add(key)
++        logger.info(
++            "Muse fast path: %s, rows=%d",
++            (
++                "shared router/preproject epilogue"
++                if m <= 16
++                else "shared router/norm with hipBLASLt pooler"
++            ),
++            m,
++        )
++    return router_pooler_topk(
++        x,
++        moe.router.weight,
++        moe.pre_expert_proj.weight,
++        moe.expert_bias,
++        norm_weight,
++        float(moe.router_multiplier),
++        float(moe.route_scale),
++        float(moe.pre_expert_norm.eps),
++        pooler_tiled=getattr(moe.pre_expert_proj, "small_m_tiled_weight", None),
++    )
++
++
++@torch.no_grad()
++def prepare_joint_router_pooler(moe) -> None:
++    """Pack ``[pooler; router high; router low]`` once after loading; the pooler weight aliases the prefix."""
++    router, pooler = moe.router.weight, moe.pre_expert_proj.weight
++    assert router.is_cuda and pooler.is_cuda
++    assert router.shape == (8192, 256) and router.dtype == torch.float32
++    assert pooler.shape == (4096, 8192) and pooler.dtype == torch.bfloat16
++    packed = getattr(moe, "router_pooler_packed_weight", None)
++    if packed is None:
++        # Runs in post_load_weights, before warmup or graph capture. The pooler prefix holds exactly the
++        # original BF16 values and stays available to the plain nn.Linear path at larger M.
++        packed = pack_joint_router_pooler_weight(router, pooler)
++        pooler.data = packed[:4096]
++        moe.register_buffer("router_pooler_packed_weight", packed, persistent=False)
++    else:
++        # Later checkpoint writes already land in the aliased prefix; refresh only the router parts,
++        # without moving any captured addresses.
++        assert pooler.data_ptr() == packed.data_ptr()
++        high = router.T.to(torch.bfloat16)
++        packed[4096:4352].copy_(high)
++        packed[4352:].copy_((router.T - high.float()).to(torch.bfloat16))
++    assert pooler.is_contiguous() and pooler.data_ptr() == packed.data_ptr()
+--- sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/sequence_parallel.py
++++ sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/sequence_parallel.py
+@@ -0,0 +1,132 @@
++"""Sequence-parallel Muse Spark prefill on ROCm, with Ulysses all-to-all attention.
++
++Plain EXTEND batches of at least ``SP_MIN_TOKENS`` tokens run the norms, residuals, router and the replicated
++pooler / unpooler on 1/TP of the tokens (each rank keeps a contiguous shard, padded to a multiple of TP).
++Attention and the experts still see every token:
++
++* Ulysses (``SGLANG_MUSE_PREFILL_ULYSSES``): each rank projects its own token shard for every head with the
++  gathered QKV/gate weight, an all-to-all hands every rank all tokens of its own heads, attention and the output
++  norm/gate run as under TP, a second all-to-all returns all heads of the rank's tokens and the full O projection
++  finishes them without a reduction. Per 16K tokens and layer that moves ~95 MB per rank instead of the
++  all-gather + reduce-scatter's ~450 MB. Without it the shard is all-gathered before attention and the
++  attention output reduce-scattered.
++* Experts: the shard's router outputs and expert inputs are all-gathered (as MXFP4 bytes when the a4w4 experts
++  run, since per-row quantization commutes with the gather) and the expert output is reduce-scattered.
++"""
++
++from __future__ import annotations
++
++from dataclasses import dataclass
++
++import torch
++import torch.distributed as dist
++import torch.nn.functional as F
++
++from sglang.srt.distributed import get_tp_group
++from sglang.srt.environ import envs
++from sglang.srt.model_executor.forward_batch_info import ForwardBatch, ForwardMode
++
++SP_MIN_TOKENS = 2048
++
++_PREFILL_SP = envs.SGLANG_MUSE_PREFILL_SP.get()
++_PREFILL_ULYSSES = envs.SGLANG_MUSE_PREFILL_ULYSSES.get()
++
++
++@dataclass(frozen=True)
++class SPShape:
++    """Token counts of one sequence-parallel prefill: real rows and rows padded to a multiple of TP."""
++
++    num_tokens: int
++    padded: int
++
++
++def sp_shape(forward_batch: ForwardBatch, num_tokens: int) -> SPShape | None:
++    if not (
++        _PREFILL_SP
++        and forward_batch.forward_mode == ForwardMode.EXTEND
++        and num_tokens >= SP_MIN_TOKENS
++    ):
++        return None
++    world = get_tp_group().world_size
++    if world == 1:
++        return None
++    return SPShape(num_tokens, -(-num_tokens // world) * world)
++
++
++def sp_shard(stream: torch.Tensor, sp: SPShape) -> torch.Tensor:
++    """This rank's contiguous token shard of ``stream`` (padded to ``sp.padded`` rows)."""
++    group = get_tp_group()
++    stream = F.pad(stream, (0, 0, 0, sp.padded - sp.num_tokens))
++    return stream.tensor_split(group.world_size)[group.rank_in_group].contiguous()
++
++
++def sp_gather(shard: torch.Tensor, rows: int) -> torch.Tensor:
++    """All-gather token shards and keep the first ``rows`` rows."""
++    group = get_tp_group()
++    shard = shard.contiguous()
++    if shard.dtype == torch.uint8 and shard.dim() == 2 and shard.shape[1] % 2 == 0:
++        # MXFP4 rows / E8M0 scales: gathered as bf16 words, so the aiter custom all-gather (f32 / f16 / bf16
++        # only) carries them instead of RCCL; a gather copies bytes, the result is exact.
++        return sp_gather(shard.view(torch.bfloat16), rows).view(torch.uint8)
++    out = shard.new_empty((shard.shape[0] * group.world_size, *shard.shape[1:]))
++    group.all_gather_into_tensor(out, shard)
++    return out[:rows]
++
++
++def sp_reduce_scatter(full: torch.Tensor, padded: int) -> torch.Tensor:
++    """Sum ``full`` over ranks and return this rank's token shard."""
++    group = get_tp_group()
++    if full.shape[0] != padded:
++        full = F.pad(full, (0, 0, 0, padded - full.shape[0]))
++    out = full.new_empty((padded // group.world_size, *full.shape[1:]))
++    group.reduce_scatter_tensor(out, full.contiguous())
++    return out
++
++
++def ulysses_enabled() -> bool:
++    return _PREFILL_SP and _PREFILL_ULYSSES and get_tp_group().world_size > 1
++
++
++@torch.no_grad()
++def prepare_ulysses(attention) -> None:
++    """Gather the TP shards of the QKV/gate and O projections once after loading (rank-major head order)."""
++    group = get_tp_group()
++    attention.ulysses_qkv_weight = group.all_gather(
++        attention.qkv_proj.weight.data.contiguous(), dim=0
++    )
++    attention.ulysses_o_weight = group.all_gather(
++        attention.o_proj.weight.data.contiguous(), dim=1
++    ).contiguous()
++
++
++def _all_to_all(x: torch.Tensor, group) -> torch.Tensor:
++    out = torch.empty_like(x)
++    dist.all_to_all_single(out, x, group=group.device_group)
++    return out
++
++
++def ulysses_attention(
++    attention,
++    x: torch.Tensor,
++    positions: torch.Tensor,
++    forward_batch: ForwardBatch,
++    sp: SPShape,
++) -> torch.Tensor:
++    """Attention block for this rank's token shard ``x`` [padded / world, hidden]; returns its output rows."""
++    group = get_tp_group()
++    world, rows = group.world_size, x.shape[0]
++    # [rows, hidden] shard -> all-to-all -> [world * rows, q|k|v|gate of this rank's heads]
++    qkv = F.linear(x, attention.ulysses_qkv_weight).view(rows, world, -1)
++    qkv = _all_to_all(qkv.transpose(0, 1).contiguous(), group).view(world * rows, -1)
++    q, k, v, o_gate = qkv[: sp.num_tokens].split(
++        [attention.q_size, attention.kv_size, attention.kv_size, attention.q_size],
++        dim=-1,
++    )
++    q, k = attention.qk_norm_rope(positions, q, k)
++    out = attention.attn(q, k, v, forward_batch)
++    out = attention._fused_o_norm_gate.forward(out, o_gate)
++    # [tokens, this rank's heads] -> all-to-all -> full O projection of this rank's token shard
++    out = F.pad(out, (0, 0, 0, sp.padded - out.shape[0])).contiguous()
++    shard_rows = sp.padded // world
++    heads = _all_to_all(out, group).view(world, shard_rows, -1).transpose(0, 1)
++    return F.linear(heads.reshape(shard_rows, -1), attention.ulysses_o_weight)

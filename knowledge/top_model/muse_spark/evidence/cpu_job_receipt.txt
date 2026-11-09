@@ -1,0 +1,20 @@
+JobId=275462 JobName=muse-image-cpu
+   UserId=yueliu14 Account=amd-burst
+   Partition=amd-spur-v2 QOS=amd-burst-qos
+   JobState=COMPLETED Reason=None Dependency=(null)
+   Requeue=0 Restarts=0 BatchFlag=1 Exclusive=0
+   RunTime=00:01:04 TimeLimit=02:00:00 TimeMin=N/A
+   SubmitTime=2026-11-09T05:51:21 EligibleTime=2026-11-09T05:51:21 AccrueTime=2026-11-09T05:51:21
+   StartTime=2026-11-09T05:51:22 EndTime=2026-11-09T05:52:26 Deadline=N/A
+   LastSchedEval=2026-11-09T05:51:21
+   ReqNodeList=crsuse2-m2m-v3-237 ExcNodeList=(null)
+   NodeList=crsuse2-m2m-v3-237
+   NumNodes=1 NumTasks=1 CPUs/Task=1
+   ReqTRES=cpu=1,mem=16384M,node=1
+   MinCPUsNode=1 MinMemoryNode=16384M
+   Features=(null)
+   WorkDir=/shared_nfs/yueliu14
+   StdOut=/shared_nfs/yueliu14/inferencex_muse_spark_research/pull_images_cpu.out StdErr=/shared_nfs/yueliu14/inferencex_muse_spark_research/pull_images_cpu.err
+   Command=set -eu
+   SubmitLine=sbatch --parsable -p amd-spur-v2 -A amd-burst -q amd-burst-qos -w crsuse2-m2m-v3-237 -N 1 -n 1 -c 1 --gpus=0 --mem=16G -t 02:00:00 -J muse-image-cpu -o /shared_nfs/yueliu14/inferencex_muse_spark_research/pull_images_cpu.out -e /shared_nfs/yueliu14/inferencex_muse_spark_research/pull_images_cpu.err /shared_nfs/yueliu14/inferencex_muse_spark_research/pull_images_cpu.sh
+   ExitCode=0:0 DerivedExitCode=0:0 Priority=1110

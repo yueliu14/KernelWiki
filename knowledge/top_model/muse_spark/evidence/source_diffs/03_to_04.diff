@@ -1,0 +1,2283 @@
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/kernels/ops/attention/gqa_verify_splitkv_2kv.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/kernels/ops/attention/gqa_verify_splitkv_2kv.py
+@@ -57,7 +57,7 @@
+     if MASKED:
+         valid = positions < kvlen
+     # 64-bit page offsets: a layer's pool can exceed 2^31 bytes
+-    kb = blocks.to(tl.int64) * kv_s0 + (nr % PAGE) * kv_s1
++    kb = blocks.to(tl.int64) * kv_s0 + (positions % PAGE) * kv_s1
+     if MASKED:
+         k0 = tl.load(K + kb[None, :] + d[:, None], mask=valid[None, :], other=0.0)
+         k1 = tl.load(K + kb[None, :] + 64 + d[:, None], mask=valid[None, :], other=0.0)
+@@ -341,7 +341,7 @@
+     pairs = kv_heads // 2
+     assert q.dtype == torch.bfloat16 and k.dtype == v.dtype
+     assert q.shape[-1] == HD and kv_heads in (2, 4) and heads == GQA * kv_heads
+-    assert k.shape[1] == 16
++    assert k.shape[1] == v.shape[1] and k.shape[1] in (16, 32, 64, 128)
+     assert (
+         q.shape[0] == num_seqs * QL
+         and k.stride() == v.stride()
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_flydsl.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_flydsl.py
+@@ -0,0 +1,684 @@
++"""Muse Spark full-attention extend (prefill) on gfx950 in FlyDSL.
++
++FP8 e4m3 Q [tokens, 8 * KV heads, 64] (per-tensor descale) over a paged FP8 e4m3 KV cache [pages, 16, KV heads, 64],
++causal, BF16 output. Same API as ``muse_extend_gluon.muse_extend_attention`` (``muse_extend_attention_fly``).
++
++One workgroup = (16-token query block, KV head) = 128 query columns (16 tokens x GQA 8); 4 waves of 32 columns
++(4 tokens x 8 heads), 3 waves / SIMD (waves_per_eu=3, ~156 VGPRs). Transposed form on 32x32x64 scaled FP8 MFMAs:
++  * S^T = K Q^T per 128-key tile: 4 MFMAs (key tiles of 32), K A-fragments from LDS (2 x ds_read_b128), Q^T as the
++    B fragment in 8 VGPRs for the whole kernel (lane half hl holds dims 32 hl .. 32 hl + 31 for both operands).
++  * Softmax along keys = accumulator rows, in-lane over the 64 rows a lane holds (v_max3); the rescale runs only
++    when a score exceeds the running max (ballot, wave-uniform, llvm.expect -> out-of-line block): P = 448 *
++    exp2(s c - m) as in the Gluon kernel. All 32 pk_fma exponent arguments are formed before the exps.
++  * P^T accumulators, packed to FP8, are the PV B operand as-is (byte b of half hl = key
++    64 ks + 32 (b // 16) + 8 ((b % 16) // 4) + 4 hl + b % 4); V^T A-fragments come from ds_read_b64_tr_b8 in that key
++    order. Row sums on the matrix core (ones x P^T, 2 extra MFMAs / tile: cheaper than 32 VALU adds).
++  * K / V tiles (128 keys x 64 B each) are LDS-DMA'd (buffer_load ... lds) by the 4 waves, one 16-key page per
++    instruction, through a per-page buffer descriptor (64-bit page base, num_records = valid rows): rows past the
++    request read as zero (no stale NaN bytes reach P.V) and there is no 2^31 offset limit. 2 LDS stages, one bare
++    s_barrier per tile, the loop unrolled per stage with one LLVM alias scope per stage so the compiler waits only
++    for the DMA of the stage being read. 16-byte chunks XOR-swizzled by row ((r>>1) + 2 (r>>3)) & 3: the b128 K
++    reads and the transposed V reads are bank-conflict free.
++  * Page ids are vector loads (SMEM loads placed after LDS DMAs get a conservative vmcnt(0)).
++See DEVLOG.md for the version history, measurements and dead ends.
++"""
++
++import functools
++import math
++
++import flydsl.compiler as flyc
++import flydsl.expr as fx
++from flydsl._mlir import ir
++from flydsl._mlir.dialects import llvm
++from flydsl._mlir.dialects import rocdl as _rocdl
++from flydsl.expr import arith, gpu, range_constexpr
++from flydsl.expr import math as fmath
++from flydsl.expr.typing import T
++
++from aiter.ops.flydsl.kernels import buffer_ops
++from aiter.ops.flydsl.kernels.tensor_shim import _run_compiled, _to_raw
++
++GQA = 8
++HD = 64
++BQ = 16  # query tokens per workgroup
++NW = 4  # waves per workgroup
++TILE = 128  # keys per tile
++PAGE = 16
++LOG2E = 1.4426950408889634
++M_INIT = -1.0e30
++LOG2_448 = math.log2(448.0)  # P = 448 at the running max: the dominant P is exact in FP8
++# sum check: rescale when a column's packed-P tile sum exceeds SC_TH (< 448: every P <= sum), re-aim at SC_TGT
++SC_TH = 384.0
++SC_TGT = 96.0
++STAGE = 2 * TILE * HD  # K + V bytes of one LDS stage
++
++
++def _f32(v):
++    return arith.constant(float(v), type=T.f32)
++
++
++def _i32c(v):
++    return arith.constant(int(v), type=T.i32)
++
++
++def _vec(raw, n, dt=fx.Float32):
++    return fx.Vector(_to_raw(raw), shape=n, dtype=dt)
++
++
++def _cat(a, b, n, dt=fx.Int32):
++    return _to_raw(_vec(a, n, dt).shuffle(_vec(b, n, dt), list(range(2 * n))))
++
++
++def _allreduce32(x_f32, use_max):
++    """Combine lanes l and l ^ 32: permlane32_swap(x, x) -> (vdst, vsrc) hold {own, partner} in some order per
++    lane, so op(vdst, vsrc) is the all-reduce."""
++    i32 = ir.IntegerType.get_signless(32)
++    pair = ir.Type.parse("!llvm.struct<(i32, i32)>")
++    raw = arith.bitcast(T.i32, _to_raw(x_f32))
++    sw = _rocdl.permlane32_swap(pair, raw, raw, False, True)
++    a = arith.bitcast(T.f32, llvm.extractvalue(i32, sw, [0]))
++    b = arith.bitcast(T.f32, llvm.extractvalue(i32, sw, [1]))
++    return arith.maximumf(a, b) if use_max else arith.addf(a, b)
++
++
++def _tree_max(vals):
++    """Max of a list of raw f32 (pairwise tree; the compiler folds it into v_max3)."""
++    vals = list(vals)
++    while len(vals) > 1:
++        nxt = [arith.maximumf(vals[i], vals[i + 1]) for i in range(0, len(vals) - 1, 2)]
++        if len(vals) % 2:
++            nxt.append(vals[-1])
++        vals = nxt
++    return vals[0]
++
++
++def _scope_kwargs(scopes, sc):
++    """alias / noalias scope kwargs for an access to LDS stage sc (None: no metadata)."""
++    if sc is None or scopes is None:
++        return {}
++    return dict(
++        alias_scopes=ir.ArrayAttr.get([scopes[sc]]),
++        noalias_scopes=ir.ArrayAttr.get([scopes[i] for i in range(len(scopes)) if i != sc]),
++    )
++
++
++def _sclamp16(x):
++    """clamp(x, 0, 16) for a wave-uniform i32 on the scalar unit."""
++    return llvm.InlineAsmOp(
++        T.i32, [_to_raw(fx.Int32(x))], "s_max_i32 $0, $1, 0\n\ts_min_i32 $0, $0, 16", "=&s,s,~{scc}"
++    ).result
++
++
++def _uniform(x):
++    return fx.Int32(_rocdl.readfirstlane(T.i32, _to_raw(fx.Int32(x))))
++
++
++@functools.lru_cache(maxsize=64)
++def _launcher(hk, kv_s0, kv_s1, scale, logb, wpe, bias, rescale, nbuf, sub, abl=0, sc_th=SC_TH, sc_tgt=SC_TGT, ppb=1):
++    # ppb: 16-row blocks per physical page (physical page = 16 ppb tokens; kv_s0 = physical page stride)
++    vsum = bool(abl & 512)
++    scheck = bool(abl & 1024)  # sum-checked lazy softmax (no per-tile max)  # row sums on the VALU (packed adds) instead of the ones-MFMA
++    # abl (timing ablations, wrong results): 1 no s_barrier, 2 no DMA, 4 no max / rescale check, 8 no v_exp,
++    # 16 no fp8 pack, 32 no PV MFMAs, 64 no QK MFMAs (S = K bits)
++    exp_scale = float(scale) * LOG2E
++    s1w = kv_s1 // 4
++    nsub = TILE // sub  # softmax steps per tile
++    mts = sub // 32  # 32-key MFMA row tiles per step
++    vm_wait = (6 if ppb == 1 else 5) * (nbuf - 2)  # VMEM ops per iteration: 2 page-id loads + 4 DMAs
++
++    @fx.struct
++    class Lds:
++        kv: fx.Array[fx.Int8, nbuf * STAGE, 16]
++
++    @flyc.kernel(name="muse_extend_fly")
++    def kernel(
++        q: fx.Tensor,
++        k: fx.Tensor,
++        v: fx.Tensor,
++        out: fx.Tensor,
++        cuq: fx.Tensor,
++        seqlens: fx.Tensor,
++        table: fx.Tensor,
++        qd: fx.Tensor,
++        kd: fx.Tensor,
++        vd: fx.Tensor,
++        num_seqs: fx.Int32,
++        nqb: fx.Int32,
++        bt_s0: fx.Int32,
++        q_s0: fx.Int32,
++        o_s0: fx.Int32,
++    ):
++        pid = fx.block_idx.x
++        tid = fx.thread_idx.x
++        wave = _uniform(tid // 64)
++        lane = tid % 64
++        col = lane % 32
++        hl = lane // 32
++        h = pid % hk
++        # longest blocks (last of a request) first
++        qb = nqb - 1 - pid // hk
++
++        cu_r = buffer_ops.create_buffer_resource(cuq, max_size=True)
++        sl_r = buffer_ops.create_buffer_resource(seqlens, max_size=True)
++        bt_r = buffer_ops.create_buffer_resource(table, max_size=True)
++        sc_r = [buffer_ops.create_buffer_resource(x, max_size=True) for x in (qd, kd, vd)]
++
++        def sload(r, i):
++            return fx.Int32(buffer_ops.buffer_load(r, i, vec_width=1, dtype=T.i32, is_scalar=True))
++
++        # request owning q-block qb in the grid numbering cu_q[s] // BQ + s
++        lo = fx.Int32(0)
++        hi = num_seqs
++        for _ in range_constexpr(logb):
++            mid = (lo + hi) // 2
++            go = lo < hi
++            val = sload(cu_r, mid) // BQ + mid
++            lo = (go & (val <= qb)).select(mid + 1, lo)
++            hi = (go & (val > qb)).select(mid, hi)
++        seq = lo - 1
++        seq = (seq > 0).select(seq, fx.Int32(0))
++        q_start = sload(cu_r, seq)
++        q_len = sload(cu_r, seq + 1) - q_start
++        local = qb - (q_start // BQ + seq)
++        valid = (local * BQ < q_len) & (local >= 0)
++        seq_len = sload(sl_r, seq)
++        ctx = seq_len - q_len
++        descale = [arith.bitcast(T.f32, _to_raw(sload(r, 0))) for r in sc_r]
++        c_s = arith.mulf(arith.mulf(descale[0], descale[1]), _f32(exp_scale))
++        inv_c = arith.divf(_f32(1.0), c_s)
++        c_pair = _to_raw(fx.Vector.from_elements([fx.Float32(c_s), fx.Float32(c_s)], fx.Float32))
++
++        blk_end = (local * BQ + BQ < q_len).select(local * BQ + BQ, q_len)
++        n_tiles = (ctx + blk_end + TILE - 1) // TILE
++        n_tiles = valid.select(n_tiles, fx.Int32(0))
++        # tiles below `interior` are visible to every query of the block: no masks
++        interior = (ctx + local * BQ + 1) // TILE
++        interior = (interior < n_tiles).select(interior, n_tiles)
++        last_page = (seq_len - 1) // PAGE
++        bt_row = seq * bt_s0
++
++        # Q^T B fragment: column col -> token local*16 + 4 wave + col // 8, head h*8 + col % 8; lane half hl holds
++        # dims 32 hl .. 32 hl + 31 (rows past the request read as zero through the descriptor bound)
++        q_base = fx.Int64(arith.index_cast(T.i64, buffer_ops.extract_base_index(q)))
++        q_rs = buffer_ops.create_buffer_resource_from_addr(
++            _to_raw(q_base + fx.Int64(q_start) * fx.Int64(q_s0)),
++            num_records_bytes=_to_raw(fx.Int64(q_len) * fx.Int64(q_s0)),
++        )
++        tok = local * BQ + wave * 4 + col // GQA
++        head = h * GQA + col % GQA
++        q_off = (tok * q_s0 + head * HD + hl * 32) // 4
++        qf = _cat(
++            buffer_ops.buffer_load(q_rs, q_off, vec_width=4, dtype=T.i32),
++            buffer_ops.buffer_load(q_rs, q_off + 4, vec_width=4, dtype=T.i32),
++            4,
++        )
++        qpos = ctx + tok
++
++        k_base = fx.Int64(arith.index_cast(T.i64, buffer_ops.extract_base_index(k)))
++        v_base = fx.Int64(arith.index_cast(T.i64, buffer_ops.extract_base_index(v)))
++
++        lds = fx.SharedAllocator().allocate(Lds).peek()
++        lptr = lds.kv.ptr
++
++        # one alias scope per LDS stage: the backend tracks LDS-DMA waits per scope, so reads of stage s do not
++        # wait for the DMA into the other stages
++        _scopes = ir.Attribute.parse(
++            "[" + ", ".join(
++                f"#llvm.alias_scope<id = distinct[{i + 1}]<>, domain = #llvm.alias_scope_domain<id = distinct[0]<>>>"
++                for i in range(nbuf)
++            ) + "]"
++        )
++        _sc = [_scopes[i] for i in range(nbuf)]
++
++        def _scope_kw(sc):
++            return _scope_kwargs(_sc, sc)
++
++        # loader: wave w fills rows 16 (2w + n) .. + 15 (= page 8 j + 2 w + n of the request) of K and V; lane ->
++        # row 16 p + lane // 4, physical chunk lane % 4 holding logical chunk (lane % 4) ^ swz(row)
++        swz_w = ((lane // 8) + 2 * (lane // 32)) % 4
++        lc_w = fx.Int32(arith.xori(_to_raw(lane % 4), _to_raw(swz_w)))
++        voff_b = ((lane // 4) * s1w + h * (HD // 4) + lc_w * 4) * 4
++
++        def pages(tile):
++            # page ids of tile's two pages for this wave, clamped into the table row; vector loads with a uniform
++            # address (SMEM loads after LDS DMAs get a conservative vmcnt(0) from the compiler)
++            ids = []
++            # ppb >= 2: the wave's two 16-row blocks (2 k, 2 k + 1) share one physical page -> one id load
++            for n in range_constexpr(2 if ppb == 1 else 1):
++                pi = tile * 8 + wave * 2 + n
++                pc = (pi < last_page).select(pi, last_page)
++                if fx.const_expr(ppb > 1):
++                    pc = pc // ppb
++                ids.append(_to_raw(buffer_ops.buffer_load(bt_r, bt_row + pc, vec_width=1, dtype=T.i32)))
++            return ids
++
++        wave_lds = _uniform(wave * 2048)
++
++        def issue_dma(tile, stage_off, ids, sc):
++            if fx.const_expr(abl & 2):
++                return
++            # LDS DMA: lane l of instruction (tensor ui, page n) lands at M0 + 16 l. Per-page descriptor: 64-bit page
++            # base, num_records = valid rows * row stride (rows past the request read as zero: no stale NaN bytes
++            # reach P.V, no 2^31 offset limit)
++            nrec = []
++            sub_off = []
++            if fx.const_expr(ppb > 1):
++                # 16-row block inside the physical page (block index clamped like the page id); block 2k+1 is the
++                # next 16 rows of the same page
++                pi = tile * 8 + wave * 2
++                pc = (pi < last_page).select(pi, last_page)
++                o0 = fx.Int64(_uniform(ids[0])) * fx.Int64(kv_s0) + fx.Int64((pc % ppb) * (PAGE * kv_s1))
++                sub_off = [o0, o0 + fx.Int64(PAGE * kv_s1)]
++            for n in range_constexpr(2):
++                nv = seq_len - (tile * 8 + wave * 2 + n) * PAGE
++                # clamp(nv, 0, 16) on the scalar unit (the compiler picks v_med3 + readfirstlane otherwise)
++                nrec.append(fx.Int32(_sclamp16(nv)) * kv_s1)
++            for ui, base in enumerate((k_base, v_base)):
++                for n in range_constexpr(2):
++                    rs = buffer_ops.create_buffer_resource_from_addr(
++                        _to_raw(base + (sub_off[n] if ppb > 1 else fx.Int64(_uniform(ids[n])) * fx.Int64(kv_s0))),
++                        num_records_bytes=_to_raw(fx.Int64(nrec[n])),
++                    )
++                    dst = wave_lds + (stage_off + ui * (TILE * HD) + n * 1024)
++                    _rocdl.raw_ptr_buffer_load_lds(
++                        rs, fx.to_llvm_ptr(lptr + fx.Int64(dst)), _i32c(16), _to_raw(voff_b), _i32c(0), _i32c(0),
++                        **_scope_kw(sc),
++                    )
++
++        # reader offsets. K: lane (col, hl) reads key 32 mt + col, logical chunks 2 hl, 2 hl + 1
++        swz_k = ((col // 2) + 2 * ((col // 8) % 2)) % 4
++        k_rd = [
++            col * HD + fx.Int32(arith.xori(_to_raw(fx.Int32(2) * hl + u), _to_raw(swz_k))) * 16 for u in range_constexpr(2)
++        ]
++        # V (transposed): lane (G, i) of read r addresses key 64 ks + 32 (r // 2) + 16 (r % 2) + key0, logical
++        # chunk 2 dt + G % 2, byte 8 (i % 2)
++        gq = lane // 16
++        li = lane % 16
++        kk = li // 2
++        key0 = 8 * (kk // 4) + 4 * hl + kk % 4
++        swz_v = (2 * hl + (kk % 4) // 2 + 2 * (kk // 4)) % 4
++        v_rd = [
++            TILE * HD
++            + key0 * HD
++            + fx.Int32(arith.xori(_to_raw(2 * dt + gq % 2), _to_raw(swz_v))) * 16
++            + (li % 2) * 8
++            for dt in range_constexpr(2)
++        ]
++
++        s127 = _i32c(127)
++        zero16 = _to_raw(fx.full(16, 0.0, fx.Float32))
++        ones8 = _to_raw(fx.full(8, 0x38383838, fx.Int32))  # FP8 e4m3 1.0 bytes
++
++        def mfma(a, b, acc):
++            return fx.rocdl.mfma_scale_f32_32x32x64_f8f6f4(T.vec(16, T.f32), [a, b, acc, 0, 0, 0, s127, 0, s127])
++
++        def softmax_step(j, stage_off, si, o_acc, negm, thr, l_run, masked, sc):
++            # keys 64 * (mts * si) .. of the tile: mts row tiles of 32 keys
++            kfr = []
++            for t in range_constexpr(mts):
++                mt = si * mts + t
++                parts = [
++                    llvm.load(
++                        T.vec(4, T.i32), fx.to_llvm_ptr(lptr + fx.Int64(stage_off + mt * 32 * HD + k_rd[u])),
++                        alignment=16, **_scope_kw(sc),
++                    )
++                    for u in range_constexpr(2)
++                ]
++                if fx.const_expr(abl & 128):
++                    # loop-variant stand-in without the LDS read (keeps the MFMAs in the loop)
++                    kfr.append(_to_raw(_vec(qf, 8, fx.Int32) + _vec(_to_raw(fx.full(8, 0, fx.Int32)), 8, fx.Int32) + fx.Int32(j * 4 + mt)))
++                else:
++                    kfr.append(_cat(parts[0], parts[1], 4))
++            if fx.const_expr(abl & 64):
++                s = [_to_raw(_vec(_cat(kfr[t], kfr[t], 8), 16, fx.Int32).bitcast(fx.Float32)) for t in range_constexpr(mts)]
++            else:
++                s = [mfma(kfr[t], qf, zero16) for t in range_constexpr(mts)]
++            ninf = fx.Float32(float("-inf"))
++            flat = []
++            for t in range_constexpr(mts):
++                mt = si * mts + t
++                x = _vec(s[t], 16)
++                if fx.const_expr(masked):
++                    lim = qpos - j * TILE - 4 * hl
++                    flat.extend(
++                        _to_raw((fx.Int32(32 * mt + 8 * (r // 4) + r % 4) <= lim).select(x[r], ninf)) for r in range(16)
++                    )
++                else:
++                    flat.extend(_to_raw(x[r]) for r in range(16))
++            mx = _tree_max(flat) if not (abl & 4) else flat[0]
++            need = arith.cmpf(arith.CmpFPredicate.OGT, mx, _to_raw(thr))
++            if fx.const_expr(abl & 4):
++                need = arith.cmpf(arith.CmpFPredicate.OGT, mx, _f32(3e38))
++            vote = fx.Int64(_rocdl.ballot(T.i64, need))
++            # rare: llvm.expect(false) lets block placement move the rescale out of line (the common path falls
++            # through instead of taking a branch per check)
++            hit = fx.Boolean(llvm.intr_expect(_to_raw(vote != fx.Int64(0)), arith.constant(0, type=ir.IntegerType.get_signless(1))))
++            if hit:
++                mxa = _allreduce32(mx, True)
++                m_old = arith.subf(_f32(bias), _to_raw(_vec(negm, 2)[0]))
++                mn = arith.maximumf(m_old, arith.mulf(mxa, c_s))
++                alpha = fx.rocdl.exp2(T.f32, arith.subf(m_old, mn))
++                nm = arith.subf(_f32(bias), mn)
++                negm = _to_raw(fx.Vector.from_elements([fx.Float32(nm), fx.Float32(nm)], fx.Float32))
++                thr = arith.mulf(arith.addf(mn, _f32(rescale)), inv_c)
++                l_run = _to_raw(_vec(l_run, 2) * fx.Float32(alpha))
++                o_acc = [_to_raw(_vec(o, 16) * fx.Float32(alpha)) for o in o_acc]
++            # P = exp2(s c + bias - m_used): all exponent arguments first (in place over S; interleaving
++            # fma -> exp through one temporary pair serializes on the trans-unit operand reads), then exp + pack
++            zs = []
++            for i in range_constexpr(len(flat) // 2):
++                pr = fx.Vector.from_elements([fx.Float32(flat[2 * i]), fx.Float32(flat[2 * i + 1])], fx.Float32)
++                zs.append(_vec(fmath.fma(_to_raw(pr), c_pair, _to_raw(negm)), 2))
++            fx.rocdl.sched_barrier(0)
++            words = []
++            psum = None
++            for t in range_constexpr(mts):
++                ps = []
++                for r in range_constexpr(0, 16, 2):
++                    z = zs[t * 8 + r // 2]
++                    if fx.const_expr(abl & 8):
++                        ps.append(_to_raw(z[0]))
++                        ps.append(_to_raw(z[1]))
++                    else:
++                        ps.append(_to_raw(fx.rocdl.exp2(T.f32, _to_raw(z[0]))))
++                        ps.append(_to_raw(fx.rocdl.exp2(T.f32, _to_raw(z[1]))))
++                    if fx.const_expr(vsum):
++                        pp = fx.Vector.from_elements([fx.Float32(ps[-2]), fx.Float32(ps[-1])], fx.Float32)
++                        psum = pp if psum is None else psum + pp
++                for w4 in range_constexpr(4):
++                    if fx.const_expr(abl & 16):
++                        words.append(arith.bitcast(T.i32, ps[4 * w4 + (t + w4) % 4]))
++                        continue
++                    lo_w = _rocdl.cvt_pk_fp8_f32(T.i32, ps[4 * w4], ps[4 * w4 + 1], llvm.mlir_poison(T.i32), False)
++                    words.append(_rocdl.cvt_pk_fp8_f32(T.i32, ps[4 * w4 + 2], ps[4 * w4 + 3], lo_w, True))
++            # P^T B operand of k-step ks (64 keys = row tiles 2 ks, 2 ks + 1)
++            o_new = list(o_acc)
++            lt = None
++            for kq in range_constexpr(mts // 2):
++                ks = si * (mts // 2) + kq
++                pb = _to_raw(fx.Vector.from_elements([fx.Int32(w) for w in words[8 * kq : 8 * kq + 8]], fx.Int32))
++                # row sums on the matrix core first (ones x P^T): their consumer then sits after the PV MFMAs
++                if fx.const_expr(not vsum):
++                    lt = mfma(ones8, pb, zero16 if kq == 0 else lt)
++                for dt in range_constexpr(2):
++                    rd = []
++                    for r in range_constexpr(4):
++                        off = stage_off + v_rd[dt] + (64 * ks + 32 * (r // 2) + 16 * (r % 2)) * HD
++                        raw = _rocdl.ds_read_tr8_b64(
++                            T.vec(2, T.i32), fx.to_llvm_ptr(lptr + fx.Int64(off)), **_scope_kw(sc)
++                        ).result
++                        rd.append(raw)
++                    va = pb if (abl & 256) else _cat(_cat(rd[0], rd[1], 2), _cat(rd[2], rd[3], 2), 4)
++                    if fx.const_expr(abl & 32):
++                        o_new[dt] = _to_raw(_vec(o_new[dt], 16) + _vec(_cat(va, va, 8), 16, fx.Int32).bitcast(fx.Float32))
++                    else:
++                        o_new[dt] = mfma(va, pb, o_new[dt])
++            if fx.const_expr(vsum):
++                l_run = _to_raw(_vec(l_run, 2) + psum)
++            else:
++                l_run = _to_raw(_vec(l_run, 2) + fx.Vector.from_elements([_vec(lt, 16)[0], fx.Float32(0.0)], fx.Float32))
++            return o_new, negm, thr, l_run
++
++        def scores(j, stage_off, masked, sc):
++            kfr = []
++            for mt in range_constexpr(4):
++                parts = [
++                    llvm.load(
++                        T.vec(4, T.i32), fx.to_llvm_ptr(lptr + fx.Int64(stage_off + mt * 32 * HD + k_rd[u])),
++                        alignment=16, **_scope_kw(sc),
++                    )
++                    for u in range_constexpr(2)
++                ]
++                kfr.append(_cat(parts[0], parts[1], 4))
++            s = [mfma(kfr[mt], qf, zero16) for mt in range_constexpr(4)]
++            ninf = fx.Float32(float("-inf"))
++            flat = []
++            for mt in range_constexpr(4):
++                x = _vec(s[mt], 16)
++                if fx.const_expr(masked):
++                    lim = qpos - j * TILE - 4 * hl
++                    flat.extend(
++                        _to_raw((fx.Int32(32 * mt + 8 * (r // 4) + r % 4) <= lim).select(x[r], ninf)) for r in range(16)
++                    )
++                else:
++                    flat.extend(_to_raw(x[r]) for r in range(16))
++            return flat
++
++        def exps(flat, negm, scale_pair=None):
++            # z = s c + negm (packed, in place), p = exp2(z) (fp32 list)
++            zs = []
++            for i in range_constexpr(32):
++                pr = fx.Vector.from_elements([fx.Float32(flat[2 * i]), fx.Float32(flat[2 * i + 1])], fx.Float32)
++                zs.append(_vec(fmath.fma(_to_raw(pr), c_pair, _to_raw(negm)), 2))
++            fx.rocdl.sched_barrier(0)
++            ps = []
++            for i in range_constexpr(32):
++                ps.append(_to_raw(fx.rocdl.exp2(T.f32, _to_raw(zs[i][0]))))
++                ps.append(_to_raw(fx.rocdl.exp2(T.f32, _to_raw(zs[i][1]))))
++            return ps
++
++        def pack(ps):
++            words = []
++            for w in range_constexpr(16):
++                lo_w = _rocdl.cvt_pk_fp8_f32(T.i32, ps[4 * w], ps[4 * w + 1], llvm.mlir_poison(T.i32), False)
++                words.append(_rocdl.cvt_pk_fp8_f32(T.i32, ps[4 * w + 2], ps[4 * w + 3], lo_w, True))
++            pb = [
++                _to_raw(fx.Vector.from_elements([fx.Int32(w) for w in words[8 * ks : 8 * ks + 8]], fx.Int32))
++                for ks in range_constexpr(2)
++            ]
++            lt = mfma(ones8, pb[0], zero16)
++            lt = mfma(ones8, pb[1], lt)
++            return pb, lt
++
++        def softmax_sc(j, stage_off, o_acc, negm, l_run, masked, sc):
++            # sum-checked lazy softmax: no per-tile max. P = exp2(s c + negm) packed to FP8; the ones-MFMA column
++            # sum T of the packed P bounds every P (P >= 0), so T <= SC_TH (unordered compare: NaN / inf trigger)
++            # proves the FP8 pack exact-range. Otherwise (rare, wave-uniform): recompute S, rescale to the true
++            # max, and shift further by log2(T / SC_TGT) so a flat tile does not re-trigger.
++            flat = scores(j, stage_off, masked, sc)
++            ps = exps(flat, negm)
++            pb, lt = pack(ps)
++            tsum = _vec(lt, 16)[0]
++            need = arith.cmpf(arith.CmpFPredicate.UGT, _to_raw(tsum), _f32(sc_th))
++            vote = fx.Int64(_rocdl.ballot(T.i64, need))
++            hit = fx.Boolean(llvm.intr_expect(_to_raw(vote != fx.Int64(0)), arith.constant(0, type=ir.IntegerType.get_signless(1))))
++            if hit:
++                flat2 = scores(j, stage_off, masked, sc)
++                mx = _allreduce32(_tree_max(flat2), True)
++                m_old = arith.subf(_f32(bias), _to_raw(_vec(negm, 2)[0]))
++                mn = arith.maximumf(m_old, arith.mulf(mx, c_s))
++                nm = arith.subf(_f32(bias), mn)
++                nmp = _to_raw(fx.Vector.from_elements([fx.Float32(nm), fx.Float32(nm)], fx.Float32))
++                ps2 = exps(flat2, nmp)
++                acc = None
++                for i in range_constexpr(32):
++                    pp = fx.Vector.from_elements([fx.Float32(ps2[2 * i]), fx.Float32(ps2[2 * i + 1])], fx.Float32)
++                    acc = pp if acc is None else acc + pp
++                tot = _allreduce32(arith.addf(_to_raw(acc[0]), _to_raw(acc[1])), False)
++                # delta = max(0, log2(T / SC_TGT)) (T > 0: the column sees key 0 .. qpos, or is a padding column)
++                lg = _rocdl.log(T.f32, arith.maximumf(tot, _f32(1e-30)))  # v_log_f32 = log2
++                dl = arith.maximumf(_f32(0.0), arith.subf(lg, _f32(math.log2(sc_tgt))))
++                sh = fx.rocdl.exp2(T.f32, arith.subf(_f32(0.0), dl))
++                ps2 = [arith.mulf(x, sh) for x in ps2]
++                mn = arith.addf(mn, dl)
++                alpha = fx.rocdl.exp2(T.f32, arith.subf(m_old, mn))
++                nm = arith.subf(_f32(bias), mn)
++                negm = _to_raw(fx.Vector.from_elements([fx.Float32(nm), fx.Float32(nm)], fx.Float32))
++                l_run = _to_raw(_vec(l_run, 2) * fx.Float32(alpha))
++                o_acc = [_to_raw(_vec(o, 16) * fx.Float32(alpha)) for o in o_acc]
++                pb, lt = pack(ps2)
++            o_new = list(o_acc)
++            for ks in range_constexpr(2):
++                for dt in range_constexpr(2):
++                    rd = []
++                    for r in range_constexpr(4):
++                        off = stage_off + v_rd[dt] + (64 * ks + 32 * (r // 2) + 16 * (r % 2)) * HD
++                        raw = _rocdl.ds_read_tr8_b64(
++                            T.vec(2, T.i32), fx.to_llvm_ptr(lptr + fx.Int64(off)), **_scope_kw(sc)
++                        ).result
++                        rd.append(raw)
++                    va = _cat(_cat(rd[0], rd[1], 2), _cat(rd[2], rd[3], 2), 4)
++                    o_new[dt] = mfma(va, pb[ks], o_new[dt])
++            l_run = _to_raw(_vec(l_run, 2) + fx.Vector.from_elements([_vec(lt, 16)[0], fx.Float32(0.0)], fx.Float32))
++            return o_new, negm, l_run
++
++        def tile_barrier():
++            # VMEM ops per iteration, in order: 2 page-id loads then 4 DMAs. Tile j's DMAs were issued nbuf - 1
++            # iterations ago; wait until only the later iterations' ops are in flight, then a bare s_barrier
++            # (gpu.barrier's release fence would wait for every DMA in flight)
++            fx.rocdl.sched_barrier(0)
++            fx.rocdl.s_waitcnt(vmcnt=vm_wait)
++            if fx.const_expr(not (abl & 1)):
++                _rocdl.s_barrier()
++            fx.rocdl.sched_barrier(0)
++
++        def step(j, st, stage, masked):
++            # stage: Python int (static LDS stage, scoped reads) or None (dynamic j % nbuf, unscoped)
++            o_acc = list(st[0:2])
++            negm, thr, l_run = st[2], st[3], st[4]
++            ids = list(st[5:7])
++            tile_barrier()
++            nids = pages(j + nbuf)
++            fx.rocdl.sched_barrier(0)
++            if fx.const_expr(stage is None):
++                issue_dma(j + nbuf - 1, ((j + nbuf - 1) % nbuf) * STAGE, ids, None)
++                stage_off = (j % nbuf) * STAGE
++                sc = None
++            else:
++                nst = (stage + nbuf - 1) % nbuf
++                issue_dma(j + nbuf - 1, nst * STAGE, ids, nst)
++                stage_off = stage * STAGE
++                sc = stage
++            fx.rocdl.sched_barrier(0)
++            if fx.const_expr(scheck):
++                o_acc, negm, l_run = softmax_sc(j, stage_off, o_acc, negm, l_run, masked, sc)
++            else:
++                for si in range_constexpr(nsub):
++                    o_acc, negm, thr, l_run = softmax_step(j, stage_off, si, o_acc, negm, thr, l_run, masked, sc)
++            return [_to_raw(x) for x in o_acc] + [_to_raw(negm), _to_raw(thr), _to_raw(l_run)] + [_to_raw(x) for x in nids]
++
++        # prologue: tiles 0 .. nbuf - 2 in flight, page ids of tile nbuf - 1
++        for t in range_constexpr(nbuf - 1):
++            issue_dma(fx.Int32(t), t * STAGE, pages(fx.Int32(t)), t)
++        ids0 = pages(fx.Int32(nbuf - 1))
++        nm0 = _to_raw(fx.Vector.from_elements([fx.Float32(bias - M_INIT), fx.Float32(bias - M_INIT)], fx.Float32))
++        thr0 = arith.mulf(_f32(M_INIT + rescale), inv_c)
++        l0 = _to_raw(fx.full(2, 0.0, fx.Float32))
++        init = [zero16, zero16, nm0, thr0, l0] + ids0
++        # interior tiles in groups of nbuf with static LDS stages, then the rest with dynamic stages
++        ngr = interior // nbuf
++        for gi, st in range(0, ngr, 1, init=init):
++            j0 = fx.Int32(arith.index_cast(T.i32, _to_raw(gi))) * nbuf
++            for u in range_constexpr(nbuf - 1):
++                st = step(j0 + u, st, u, False)
++            fin0 = yield step(j0 + nbuf - 1, st, nbuf - 1, False)
++        for jj, st in range(ngr * nbuf, interior, 1, init=list(fin0)):
++            j = fx.Int32(arith.index_cast(T.i32, _to_raw(jj)))
++            fin = yield step(j, st, None, False)
++        for jj, st in range(0, n_tiles - interior, 1, init=list(fin)):
++            j = interior + fx.Int32(arith.index_cast(T.i32, _to_raw(jj)))
++            fin2 = yield step(j, st, None, True)
++        o_acc = list(fin2[0:2])
++        l_run = _vec(fin2[4], 2)
++        lsum = arith.addf(_to_raw(l_run[0]), _to_raw(l_run[1]))
++        if fx.const_expr(vsum):
++            lsum = _allreduce32(lsum, False)
++        inv = arith.divf(descale[2], lsum)
++
++        o_base = fx.Int64(arith.index_cast(T.i64, buffer_ops.extract_base_index(out)))
++        o_rs = buffer_ops.create_buffer_resource_from_addr(
++            _to_raw(o_base + fx.Int64(q_start) * fx.Int64(o_s0 * 2)),
++            num_records_bytes=_to_raw(fx.Int64(q_len) * fx.Int64(o_s0 * 2)),
++        )
++        o_row = tok * o_s0 + head * HD + hl * 4
++        for dt in range_constexpr(2):
++            ov = _vec(o_acc[dt], 16) * fx.Float32(inv)
++            for i in range_constexpr(4):
++                seg = ov.shuffle(ov, [4 * i, 4 * i + 1, 4 * i + 2, 4 * i + 3]).to(fx.BFloat16)
++                buffer_ops.buffer_store(_to_raw(seg), o_rs, o_row + 32 * dt + 8 * i)
++
++    @flyc.jit
++    def launch(
++        q: fx.Tensor,
++        k: fx.Tensor,
++        v: fx.Tensor,
++        out: fx.Tensor,
++        cuq: fx.Tensor,
++        seqlens: fx.Tensor,
++        table: fx.Tensor,
++        qd: fx.Tensor,
++        kd: fx.Tensor,
++        vd: fx.Tensor,
++        num_seqs: fx.Int32,
++        nqb: fx.Int32,
++        bt_s0: fx.Int32,
++        q_s0: fx.Int32,
++        o_s0: fx.Int32,
++        grid: fx.Int32,
++        stream: fx.Stream,
++    ):
++        kernel(
++            q, k, v, out, cuq, seqlens, table, qd, kd, vd, num_seqs, nqb, bt_s0, q_s0, o_s0,
++            value_attrs={"rocdl.waves_per_eu": wpe} if wpe else None,
++        ).launch(grid=(fx.Int64(grid), 1, 1), block=(NW * 64, 1, 1), stream=stream)
++
++    return launch
++
++
++def muse_extend_attention_fly(
++    q, k_cache, v_cache, out, cu_seqlens_q, seq_lens, block_table, q_descale, k_descale, v_descale, scale, window=0,
++    wpe=3, bias=LOG2_448, rescale=0.0, nbuf=2, sub=128, abl=0, sc_th=440.0, sc_tgt=400.0, sum_check=False,
++):
++    """Causal full-attention extend: ``out [tokens, heads, 64]`` (BF16) from FP8 ``q`` and the paged FP8 cache
++    (same contract as ``muse_extend_gluon.muse_extend_attention``).
++
++    Defaults: P = 448 * exp2(s c - m) with m the running max (the rescale runs only when some score exceeds it,
++    wave-uniform branch), as accurate as the Gluon kernel. ``sum_check=True``: opt-in faster variant without the
++    per-tile max (P range proven by the ones-MFMA tile sum, rescale on overflow); ~3% faster at long prefixes,
++    rel-L2 up to ~5% higher than Gluon on peaky test data. ``abl``: timing ablation bits (wrong results)."""
++    if sum_check:
++        abl |= 1024
++    import torch
++
++    assert window == 0, "sliding window not implemented in the FlyDSL extend kernel"
++    n = q.shape[0]
++    hk = k_cache.shape[2]
++    bs = seq_lens.numel()
++    assert q.shape[1] == GQA * hk and q.shape[2] == HD and k_cache.shape[1] in (16, 32, 64, 128)
++    assert q.stride(2) == 1 and q.stride(1) == HD and out.stride(2) == 1 and out.stride(1) == HD
++    assert k_cache.stride() == v_cache.stride() and k_cache.stride(3) == 1 and k_cache.stride(2) == HD
++    if seq_lens.dtype != torch.int32:
++        seq_lens = seq_lens.to(torch.int32)
++    if block_table.dtype != torch.int32:
++        block_table = block_table.to(torch.int32)
++    if cu_seqlens_q.dtype != torch.int32:
++        cu_seqlens_q = cu_seqlens_q.to(torch.int32)
++    nqb = n // BQ + bs
++    one = None
++    descs = []
++    for d in (q_descale, k_descale, v_descale):
++        if d is None:
++            if one is None:
++                one = torch.ones(1, dtype=torch.float32, device=q.device)
++            d = one
++        descs.append(d)
++    _run_compiled(
++        _launcher(hk, k_cache.stride(0), k_cache.stride(1), float(scale), max(1, bs.bit_length()), wpe, bias, rescale,
++                  nbuf, sub, abl, sc_th, sc_tgt, k_cache.shape[1] // PAGE),
++        q.view(torch.uint8),
++        k_cache.view(torch.uint8),
++        v_cache.view(torch.uint8),
++        out,
++        cu_seqlens_q,
++        seq_lens,
++        block_table,
++        *descs,
++        int(bs),
++        int(nqb),
++        int(block_table.stride(0)),
++        int(q.stride(0)),
++        int(out.stride(0)),
++        int(nqb * hk),
++        fx.Stream(torch.cuda.current_stream(q.device).cuda_stream),
++    )
++    return out
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_gluon.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_gluon.py
+@@ -41,13 +41,14 @@
+ 
+ 
+ @gluon.jit
+-def _pages(bt, j, kr, vr, seq_len, PAGE: gl.constexpr, TILE: gl.constexpr, n_tiles):
+-    # Page ids of tile j's K rows (key order) and V rows (relabelled order); 0 past the end.
++def _pages(bt, j, kr, vr, seq_len, PAGE: gl.constexpr, TILE: gl.constexpr, n_tiles, lo):
++    # Page ids of tile j's K rows (key order) and V rows (relabelled order); 0 past the end and below ``lo`` (the
++    # first key a sliding block sees: the pages before it may be freed).
+     key = j * TILE + kr
+     key_v = j * TILE + vr
+     live = j < n_tiles
+-    page = gl.load(bt + key // PAGE, mask=live & (key < seq_len), other=0)
+-    page_v = gl.load(bt + key_v // PAGE, mask=live & (key_v < seq_len), other=0)
++    page = gl.load(bt + key // PAGE, mask=live & (key < seq_len) & (key >= lo), other=0)
++    page_v = gl.load(bt + key_v // PAGE, mask=live & (key_v < seq_len) & (key_v >= lo), other=0)
+     return page, page_v
+ 
+ 
+@@ -74,6 +75,7 @@
+     PAGE: gl.constexpr,
+     TILE: gl.constexpr,
+     n_tiles,
++    lo,
+     MASKED: gl.constexpr,
+ ):
+     key = j * TILE + kr
+@@ -95,10 +97,10 @@
+     if MASKED:
+         live = j < n_tiles
+         gl.amd.cdna4.async_copy.global_load_to_shared(
+-            k_buf, k_ptr, mask=(live & (key < seq_len))[:, None], other=0.0
++            k_buf, k_ptr, mask=(live & (key < seq_len) & (key >= lo))[:, None], other=0.0
+         )
+         gl.amd.cdna4.async_copy.global_load_to_shared(
+-            v_buf, v_ptr, mask=(live & (key_v < seq_len))[:, None], other=0.0
++            v_buf, v_ptr, mask=(live & (key_v < seq_len) & (key_v >= lo))[:, None], other=0.0
+         )
+     else:
+         gl.amd.cdna4.async_copy.global_load_to_shared(k_buf, k_ptr)
+@@ -134,6 +136,7 @@
+     v_stride1,
+     v_stride2,
+     n_tiles,
++    lo,
+     mfma: gl.constexpr,
+     a_op: gl.constexpr,
+     b_op: gl.constexpr,
+@@ -142,6 +145,7 @@
+     BM: gl.constexpr,
+     MASKED: gl.constexpr,
+     NEXT_MASKED: gl.constexpr,
++    WINDOW: gl.constexpr,
+ ):
+     # pg / pg_v: page ids of tile j + 1, loaded one iteration earlier. One barrier: tile j's copies (the only
+     # group in flight) are visible to every warp, and every warp is done with tile j - 1's buffer, which takes
+@@ -171,9 +175,10 @@
+         PAGE,
+         TILE,
+         n_tiles,
++        lo,
+         NEXT_MASKED,
+     )
+-    pg, pg_v = _pages(bt, j + 2, kr, vr, seq_len, PAGE, TILE, n_tiles)
++    pg, pg_v = _pages(bt, j + 2, kr, vr, seq_len, PAGE, TILE, n_tiles, lo)
+     cb = j % 2
+     ka = gl.amd.cdna4.async_copy.load_shared_relaxed(k_bufs.index(cb), a_op)
+     s = gl.amd.cdna4.mfma_scaled(
+@@ -182,6 +187,8 @@
+     if MASKED:
+         kpos = j * TILE + gl.arange(0, TILE, layout=gl.SliceLayout(1, mfma))
+         ok = (kpos[:, None] <= q_pos[None, :]) & (kpos < seq_len)[:, None]
++        if WINDOW > 0:
++            ok = ok & (kpos[:, None] > q_pos[None, :] - WINDOW)
+         s = gl.where(ok, s, float("-inf"))
+     m_new = gl.maximum(m_i, gl.max(s, axis=0) * c)
+     # log2(448): P = 448 * exp2(s * c - m), the FP8 E4M3 range.
+@@ -229,6 +236,7 @@
+     BLOCK_Q: gl.constexpr,
+     TILE: gl.constexpr,
+     NW: gl.constexpr,
++    WINDOW: gl.constexpr = 0,
+ ):
+     BM: gl.constexpr = BLOCK_Q * GQA
+     mfma: gl.constexpr = gl.amd.AMDMFMALayout(
+@@ -277,17 +285,31 @@
+         bt = BT + seq * bt_stride
+ 
+         q_pos = ctx + local * BLOCK_Q + gl.arange(0, BM, layout=col) // GQA
+-        m_i = gl.full([BM], float("-inf"), gl.float32, layout=col)
++        # sliding: a query can see none of the window's first tile, so the running max starts finite (exp2 of
++        # -inf - (-inf) would be NaN); full layers always see key 0 first
++        m_i = gl.full([BM], -1.0e30 if WINDOW > 0 else float("-inf"), gl.float32, layout=col)
+         l_i = gl.zeros([BM], gl.float32, layout=col)
+         acc = gl.zeros([D, BM], gl.float32, layout=mfma)
+         # Tiles below `interior` are seen in full by every query of the block.
+         interior = (ctx + local * BLOCK_Q + 1) // TILE
+         n_tiles = gl.cdiv(ctx + gl.minimum(local * BLOCK_Q + BLOCK_Q, q_len), TILE)
+-        pg, pg_v = _pages(bt, 0, kr, vr, seq_len, PAGE, TILE, n_tiles)
++        if WINDOW > 0:
++            # sliding (key visible when q - WINDOW < key <= q): from the tile of the block's first visible key;
++            # tiles before `full_lo` hold keys the block's last queries no longer see, so they take the masks too
++            lo = gl.maximum(ctx + local * BLOCK_Q - WINDOW + 1, 0)
++            j0 = lo // TILE
++            q_hi = ctx + gl.minimum(local * BLOCK_Q + BLOCK_Q, q_len) - 1
++            full_lo = gl.minimum(gl.cdiv(gl.maximum(q_hi - WINDOW + 1, 0), TILE), interior)
++            full_lo = gl.maximum(full_lo, j0)
++        else:
++            lo = 0
++            j0 = 0
++            full_lo = 0
++        pg, pg_v = _pages(bt, j0, kr, vr, seq_len, PAGE, TILE, n_tiles, lo)
+         _issue(
+             K,
+             V,
+-            0,
++            j0,
+             pg,
+             pg_v,
+             kr,
+@@ -301,34 +323,43 @@
+             v_stride0,
+             v_stride1,
+             v_stride2,
+-            k_bufs.index(0),
+-            v_bufs.index(0),
++            k_bufs.index(j0 % 2),
++            v_bufs.index(j0 % 2),
+             PAGE,
+             TILE,
+             n_tiles,
++            lo,
+             True,
+         )
+-        pg, pg_v = _pages(bt, 1, kr, vr, seq_len, PAGE, TILE, n_tiles)
+-        for j in range(0, interior - 1):
++        pg, pg_v = _pages(bt, j0 + 1, kr, vr, seq_len, PAGE, TILE, n_tiles, lo)
++        if WINDOW > 0:
++            for j in range(j0, full_lo):
++                pg, pg_v, m_i, l_i, acc = _step(
++                    j, pg, pg_v, k_bufs, v_bufs, qt, m_i, l_i, acc, c, q_pos, seq_len,
++                    K, V, bt, kr, vr, kd, kvh, k_stride0, k_stride1, k_stride2,
++                    v_stride0, v_stride1, v_stride2, n_tiles, lo, mfma, a_op, b_op, PAGE, TILE, BM,
++                    True, True, WINDOW,
++                )  # fmt: skip
++        for j in range(full_lo, interior - 1):
+             pg, pg_v, m_i, l_i, acc = _step(
+                 j, pg, pg_v, k_bufs, v_bufs, qt, m_i, l_i, acc, c, q_pos, seq_len,
+                 K, V, bt, kr, vr, kd, kvh, k_stride0, k_stride1, k_stride2,
+-                v_stride0, v_stride1, v_stride2, n_tiles, mfma, a_op, b_op, PAGE, TILE, BM,
+-                False, False,
++                v_stride0, v_stride1, v_stride2, n_tiles, lo, mfma, a_op, b_op, PAGE, TILE, BM,
++                False, False, WINDOW,
+             )  # fmt: skip
+-        for j in range(gl.maximum(interior - 1, 0), interior):
++        for j in range(gl.maximum(interior - 1, full_lo), interior):
+             pg, pg_v, m_i, l_i, acc = _step(
+                 j, pg, pg_v, k_bufs, v_bufs, qt, m_i, l_i, acc, c, q_pos, seq_len,
+                 K, V, bt, kr, vr, kd, kvh, k_stride0, k_stride1, k_stride2,
+-                v_stride0, v_stride1, v_stride2, n_tiles, mfma, a_op, b_op, PAGE, TILE, BM,
+-                False, True,
++                v_stride0, v_stride1, v_stride2, n_tiles, lo, mfma, a_op, b_op, PAGE, TILE, BM,
++                False, True, WINDOW,
+             )  # fmt: skip
+         for j in range(interior, n_tiles):
+             pg, pg_v, m_i, l_i, acc = _step(
+                 j, pg, pg_v, k_bufs, v_bufs, qt, m_i, l_i, acc, c, q_pos, seq_len,
+                 K, V, bt, kr, vr, kd, kvh, k_stride0, k_stride1, k_stride2,
+-                v_stride0, v_stride1, v_stride2, n_tiles, mfma, a_op, b_op, PAGE, TILE, BM,
+-                True, True,
++                v_stride0, v_stride1, v_stride2, n_tiles, lo, mfma, a_op, b_op, PAGE, TILE, BM,
++                True, True, WINDOW,
+             )  # fmt: skip
+         gl.amd.cdna4.async_copy.wait_group(0)
+         o = acc * (gl.load(VD) / l_i)[None, :]
+@@ -351,14 +382,14 @@
+         q.dim() == 3
+         and k_cache.dim() == 4
+         and q.shape[2] == k_cache.shape[3] == 64
+-        and k_cache.shape[1] == 16
++        and k_cache.shape[1] in (16, 32, 64, 128)
+         and q.shape[1] == 8 * k_cache.shape[2]
+         and q.dtype == k_cache.dtype == torch.float8_e4m3fn
+     )
+ 
+ 
+ def muse_extend_attention(
+-    q, k_cache, v_cache, out, cu_seqlens_q, seq_lens, block_table, q_descale, k_descale, v_descale, scale
++    q, k_cache, v_cache, out, cu_seqlens_q, seq_lens, block_table, q_descale, k_descale, v_descale, scale, window=0
+ ):
+     """Causal full-attention extend: ``out [tokens, heads, 64]`` (BF16) from FP8 ``q`` and the paged FP8 cache.
+ 
+@@ -395,6 +426,7 @@
+         BLOCK_Q=BLOCK_Q,
+         TILE=TILE,
+         NW=NUM_WARPS,
++        WINDOW=window,
+         num_warps=NUM_WARPS,
+         waves_per_eu=2,
+     )
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_balanced.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_balanced.py
+@@ -0,0 +1,348 @@
++"""Muse Spark full-layer target verify with a length-balanced split-KV work list.
++
++The FlyDSL verify kernel (``muse_verify_flydsl``) used to give every request the same number of splits, so in a batch
++of very uneven contexts the longest request set the time. Here one tiny planning kernel splits the batch's total KV
++chunks into equal segments of whole slot groups (each request gets ``ceil(chunks / segment)`` of them, at least one),
++the verify kernel runs one segment per program and writes its partials to the segment's slot, and the merge reads
++each request's own segments. Everything stays on the device, so the step is graph-capturable.
++
++Partials: ``[segments + 1, 8, heads, 64]`` FP32 with max / denom ``[segments + 1, 8, heads]`` (log2 domain); the last
++slot takes the idle programs' writes.
++"""
++
++import torch
++import triton
++import triton.language as tl
++from sglang.kernels.ops.attention.muse_verify_flydsl import (
++    CHUNK,
++    QL,
++    _launcher,
++    _run_compiled,
++    fx,
++)
++
++# slot groups per chunk group of the kernel's main loop (``slots`` of verify_fly_partials)
++NS = 2
++NUM_CUS = 256
++# smallest segment, in chunks (a segment pays ~2 us of fixed cost: Q load, prefetch fill, epilogue)
++MIN_SEGMENT_CHUNKS = 4
++MAX_REQUESTS = 128
++
++
++@triton.jit
++def _plan_kernel(
++    SEQ_LENS,
++    PLAN,
++    SEG_START,
++    SEG_COUNT,
++    num_seqs,
++    WINDOW: tl.constexpr,
++    SEGMENTS: tl.constexpr,
++    BLOCK_R: tl.constexpr,
++    CHUNK_: tl.constexpr,
++    NS_: tl.constexpr,
++    MIN_CHUNKS: tl.constexpr,
++    BLOCK_P: tl.constexpr,
++):
++    # every program recomputes the per-request counts (BLOCK_R values) and fills BLOCK_P plan rows
++    r = tl.arange(0, BLOCK_R)
++    rmask = r < num_seqs
++    lens = tl.load(SEQ_LENS + r, mask=rmask, other=0).to(tl.int32)
++    nchunks = (lens + CHUNK_ - 1) // CHUNK_
++    if WINDOW > 0:
++        # sliding layers: from the chunk of the first key any of the 8 queries sees
++        first = tl.maximum(lens - 8 + 1 - WINDOW, 0) // CHUNK_
++    else:
++        first = tl.zeros_like(nchunks)
++    chunks = nchunks - first
++    total = tl.sum(chunks, axis=0)
++    # segment length: the total over the segments left after one per request, in whole slot groups
++    budget = tl.maximum(SEGMENTS - num_seqs, 1)
++    seg = (total + budget - 1) // budget
++    seg = tl.maximum(seg, MIN_CHUNKS)
++    seg = (seg + NS_ - 1) // NS_ * NS_
++    count = tl.where(rmask, tl.maximum((chunks + seg - 1) // seg, 1), 0)
++    start = tl.cumsum(count, axis=0) - count
++    if tl.program_id(0) == 0:
++        tl.store(SEG_START + r, start, mask=rmask)
++        tl.store(SEG_COUNT + r, count, mask=rmask)
++    used = tl.sum(count, axis=0)
++    p = tl.program_id(0) * BLOCK_P + tl.arange(0, BLOCK_P)
++    # owner request of program p: the last request whose first segment is <= p
++    owner = tl.sum((start[None, :] <= p[:, None]) & rmask[None, :], axis=1) - 1
++    owner = tl.maximum(owner, 0)
++    own_start = tl.sum(
++        tl.where(r[None, :] == owner[:, None], start[None, :], 0), axis=1
++    )
++    own_chunks = tl.sum(
++        tl.where(r[None, :] == owner[:, None], chunks[None, :], 0), axis=1
++    )
++    own_first = tl.sum(
++        tl.where(r[None, :] == owner[:, None], first[None, :], 0), axis=1
++    )
++    i = p - own_start
++    begin = own_first + i * seg
++    end = own_first + tl.minimum(i * seg + seg, own_chunks)
++    busy = p < used
++    tl.store(PLAN + p * 4, tl.where(busy, owner, 0))
++    tl.store(PLAN + p * 4 + 1, tl.where(busy, begin, 0))
++    tl.store(PLAN + p * 4 + 2, tl.where(busy, end, 0))
++    # idle programs write the spare slot SEGMENTS
++    tl.store(PLAN + p * 4 + 3, tl.where(busy, p, SEGMENTS))
++
++
++def verify_plan(seqused_k, segments, window=0):
++    """(plan [segments, 4] int32, seg_start [n], seg_count [n]) for the batch's KV lengths."""
++    n = seqused_k.numel()
++    assert (
++        0 < n <= MAX_REQUESTS and segments >= 2 * n and segments & (segments - 1) == 0
++    )
++    dev = seqused_k.device
++    plan = torch.empty((segments, 4), dtype=torch.int32, device=dev)
++    seg_start = torch.empty(n, dtype=torch.int32, device=dev)
++    seg_count = torch.empty(n, dtype=torch.int32, device=dev)
++    block_p = min(segments, 64)
++    _plan_kernel[(segments // block_p,)](
++        seqused_k, plan, seg_start, seg_count, n, window, segments, triton.next_power_of_2(max(n, 2)),
++        CHUNK, NS, MIN_SEGMENT_CHUNKS, block_p, num_warps=2,
++    )  # fmt: skip
++    return plan, seg_start, seg_count
++
++
++@triton.jit
++def _seg_reduce(
++    PARTIAL,
++    MAXIMUM,
++    DENOM,
++    SEG_START,
++    SEG_COUNT,
++    V_SCALE,
++    G,
++    W,
++    Y,
++    eps,
++    N,
++    H,
++    y_stride_t,
++    y_stride_h,
++    stride_g0,
++    stride_g1,
++    HEADS_PER_GROUP: tl.constexpr,
++    QL_: tl.constexpr,
++    BLOCK_S: tl.constexpr,
++    BLOCK_M: tl.constexpr,
++    NORM: tl.constexpr,
++    HAS_WEIGHT: tl.constexpr,
++    HAS_GATE: tl.constexpr,
++):
++    # BLOCK_M (token, head) rows per program; row = token * H + head; token = request * QL + t
++    rows = tl.program_id(0) * BLOCK_M + tl.arange(0, BLOCK_M)
++    row_mask = rows < N
++    token = rows // H
++    head = rows % H
++    req = token // QL_
++    t = token % QL_
++    s0 = tl.load(SEG_START + req, mask=row_mask, other=0)
++    cnt = tl.load(SEG_COUNT + req, mask=row_mask, other=0)
++    d = tl.arange(0, 64)
++    s = tl.arange(0, BLOCK_S)
++    gmax = tl.full((BLOCK_M,), float("-inf"), tl.float32)
++    for base in range(0, tl.max(cnt, axis=0), BLOCK_S):
++        valid = (base + s[None, :]) < cnt[:, None]
++        index = ((s0[:, None] + base + s[None, :]) * QL_ + t[:, None]) * H + head[
++            :, None
++        ]
++        m = tl.load(MAXIMUM + index, mask=valid, other=float("-inf"))
++        l = tl.load(DENOM + index, mask=valid, other=0.0)
++        gmax = tl.maximum(gmax, tl.max(tl.where(l > 0, m, float("-inf")), axis=1))
++    gmax = tl.where(gmax > float("-inf"), gmax, 0.0)
++    total = tl.zeros((BLOCK_M,), tl.float32)
++    acc = tl.zeros((BLOCK_M, 64), tl.float32)
++    for base in range(0, tl.max(cnt, axis=0), BLOCK_S):
++        valid = (base + s[None, :]) < cnt[:, None]
++        index = ((s0[:, None] + base + s[None, :]) * QL_ + t[:, None]) * H + head[
++            :, None
++        ]
++        m = tl.load(MAXIMUM + index, mask=valid, other=float("-inf"))
++        l = tl.load(DENOM + index, mask=valid, other=0.0)
++        w = tl.where(l > 0, tl.exp2(m - gmax[:, None]), 0.0)
++        total += tl.sum(l * w, axis=1)
++        part = tl.load(
++            PARTIAL + index[:, :, None] * 64 + d[None, None, :],
++            mask=valid[:, :, None],
++            other=0.0,
++        )
++        acc += tl.sum(part * w[:, :, None], axis=1)
++    inverse = tl.where(total > 0, 1.0 / total, 0.0)
++    if V_SCALE is not None:
++        inverse *= tl.load(V_SCALE)
++    x = acc * inverse[:, None]
++    if NORM:
++        x = x.to(tl.bfloat16).to(tl.float32)
++        rstd = 1.0 / tl.sqrt(tl.sum(x * x, axis=1) / 64 + eps)
++        x = x * rstd[:, None]
++        if HAS_WEIGHT:
++            x = x * tl.load(W + d).to(tl.float32)[None, :]
++        if HAS_GATE:
++            offset = (head // HEADS_PER_GROUP) * stride_g1 + (
++                head % HEADS_PER_GROUP
++            ) * 64
++            g = tl.load(
++                G + token[:, None] * stride_g0 + offset[:, None] + d[None, :],
++                mask=row_mask[:, None],
++                other=0.0,
++            )
++            x = x * tl.sigmoid(g.to(tl.float32))
++    tl.store(
++        Y + token[:, None] * y_stride_t + head[:, None] * y_stride_h + d[None, :],
++        x,
++        mask=row_mask[:, None],
++    )
++
++
++def _launch_reduce(
++    state, y, y_stride_t, y_stride_h, norm, gate=None, eps=0.0, weight=None
++):
++    # deferred states come back from the attention backend as (partial, maximum, denom, segments, v_scale)
++    partial, maximum, denom, segs, v_scale = (
++        state if isinstance(state[3], tuple) else (*state[:3], state[4], state[3])
++    )
++    seg_start, seg_count = segs
++    heads = maximum.shape[2]
++    tokens = seg_start.numel() * QL
++    n = tokens * heads
++    if gate is None:
++        stride_g0 = stride_g1 = 0
++        heads_per_group = heads
++    else:
++        heads_per_group = gate.shape[-1] // 64
++        stride_g0, stride_g1 = gate.stride(0), gate.stride(1)
++    block_m = 1
++    _seg_reduce[(triton.cdiv(n, block_m),)](
++        partial, maximum, denom, seg_start, seg_count, v_scale, gate, weight, y, eps, n, heads,
++        y_stride_t, y_stride_h, stride_g0, stride_g1, heads_per_group, QL, 32, block_m,
++        norm, weight is not None, gate is not None, num_warps=1,
++    )  # fmt: skip
++    return y
++
++
++def segmented_reduce_norm_gate(state, out_shape, out_dtype, gate, eps, weight=None):
++    """``verify_reduce_norm_gate`` for the segmented partials of ``gqa_verify_flydsl_balanced``."""
++    y = torch.empty(out_shape, device=state[0].device, dtype=out_dtype)
++    heads = state[1].shape[2]
++    return _launch_reduce(state, y, heads * 64, 64, True, gate, eps, weight)
++
++
++def segments_for(num_seqs: int, kv_heads: int, heads_per_group: int) -> int:
++    """Programs per call: one workgroup per CU (every CU takes one segment of every head group)."""
++    groups = kv_heads // heads_per_group
++    segs = NUM_CUS // groups
++    return max(segs, triton.next_power_of_2(2 * num_seqs))
++
++
++def gqa_verify_flydsl_balanced(
++    q,
++    k,
++    v,
++    out,
++    seqused_k,
++    block_table,
++    softmax_scale,
++    k_descale,
++    v_descale,
++    *,
++    defer_reduce=False,
++    heads_per_group=None,
++    segments=None,
++    wg_per_cu=1,
++    spw=None,
++    window=0,
++):
++    """Full-attention verify (exact BF16 QK / PV) on the FlyDSL kernel with the length-balanced work list."""
++    num_seqs = seqused_k.numel()
++    heads, kvh = q.shape[1], k.shape[2]
++    hpg = heads_per_group or kvh
++    if seqused_k.dtype != torch.int32:
++        seqused_k = seqused_k.to(torch.int32)
++    if block_table.dtype != torch.int32:
++        block_table = block_table.to(torch.int32)
++    # two segments per workgroup at 2 KV heads: 4 waves per CU keep enough KV bytes in flight
++    spw = spw or (2 if kvh // hpg * hpg == kvh and hpg == 2 else 1)
++    segs = segments or segments_for(num_seqs, kvh, hpg) * wg_per_cu * spw
++    plan, seg_start, seg_count = verify_plan(seqused_k, segs, window)
++    st = (segs + 1, QL, heads)
++    part = torch.empty((*st, 64), dtype=torch.float32, device=q.device)
++    maxi = torch.empty(st, dtype=torch.float32, device=q.device)
++    den = torch.empty(st, dtype=torch.float32, device=q.device)
++    kd = (
++        k_descale
++        if k_descale is not None
++        else torch.ones(1, dtype=torch.float32, device=q.device)
++    )
++    addr64 = max(k.numel(), v.numel()) * k.element_size() >= 2**31
++    _run_compiled(
++        _launcher(heads, kvh, hpg, k.stride(0), k.stride(1), float(softmax_scale), 1, True, NS, False, False, False,
++                  True, wg_per_cu, addr64, True, spw, window, k.shape[1]),
++        q, k.view(torch.uint8), v.view(torch.uint8), block_table, seqused_k, kd, part, maxi, den, plan,
++        segs, segs, int(block_table.stride(0)), int(q.stride(0)), int(segs // spw * (kvh // hpg)),
++        fx.Stream(torch.cuda.current_stream(q.device).cuda_stream),
++    )  # fmt: skip
++    if defer_reduce:
++        return part, maxi, den, (seg_start, seg_count)
++    return _launch_reduce(
++        (part, maxi, den, (seg_start, seg_count), v_descale),
++        out,
++        out.stride(0),
++        out.stride(1),
++        False,
++    )
++
++
++def swa_verify_flydsl(
++    q,
++    k,
++    v,
++    out,
++    seqused_k,
++    block_table,
++    softmax_scale,
++    k_descale,
++    v_descale,
++    *,
++    window,
++    defer_reduce=False,
++):
++    """Sliding-layer verify on the FlyDSL kernel: fixed splits over each request's window (every window has the same
++    length, so no plan), two workgroups per CU. Faster than the Triton kernels from 16 requests at 4 KV heads per
++    rank and from 48 at 2 (MI355X, per layer: n64 TP4 40 vs 72 us, TP8 35 vs 45 us)."""
++    from sglang.kernels.ops.attention.gqa_verify_splitkv_2kv import _vv2_reduce
++    from sglang.kernels.ops.attention.muse_verify_flydsl import verify_fly_partials
++
++    num_seqs = seqused_k.numel()
++    heads = q.shape[1]
++    if seqused_k.dtype != torch.int32:
++        seqused_k = seqused_k.to(torch.int32)
++    if block_table.dtype != torch.int32:
++        block_table = block_table.to(torch.int32)
++    work = 16 if num_seqs <= 16 else (8 if num_seqs <= 32 else 4)
++    splits = work
++    partial, maximum, denom = verify_fly_partials(
++        q, k, v, seqused_k, block_table, softmax_scale, k_descale, splits,
++        waves_per_eu=1, fence_vmem=True, wg_per_cu=2, work_splits=work, window=window,
++    )  # fmt: skip
++    if defer_reduce:
++        return partial, maximum, denom
++    _vv2_reduce[(q.shape[0], heads)](
++        partial, maximum, denom, out, v_descale, heads, splits, out.stride(0), out.stride(1), num_warps=2,
++    )  # fmt: skip
++    return out
++
++
++def use_balanced_full(num_seqs: int, kv_heads: int) -> bool:
++    # TEP8 (2 KV heads), MI355X, 8 x 20-150K contexts: the even split costs 80-96 us at 6-8 requests (two waves a CU)
++    # against 60-62 for the work list, which stays flat; up to 5 requests the even split is the faster one (39-55 us).
++    return num_seqs >= (4 if kv_heads >= 4 else 6)
++
++
++def use_flydsl_sliding(num_seqs: int, kv_heads: int) -> bool:
++    return num_seqs >= (16 if kv_heads >= 4 else 48)
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py
+@@ -133,8 +133,13 @@
+ 
+ 
+ @functools.lru_cache(maxsize=64)
+-def _launcher(heads, kvh, hpg, kv_s0, kv_s1, scale, waves_per_eu, vec_ids, NS, q_lds, qf8, pvf8, fence_vmem, wg_per_cu, addr64):
+-    W = hpg
++def _launcher(heads, kvh, hpg, kv_s0, kv_s1, scale, waves_per_eu, vec_ids, NS, q_lds, qf8, pvf8, fence_vmem, wg_per_cu, addr64, balanced=False, spw=1, window=0, physical_page=PAGE):
++    # physical pages of 32-128 tokens: the kernel keeps its 16-token pages and maps each to its physical page and
++    # the 16-row block inside it (kv_s0 becomes the stride of one 16-row block)
++    pages_per_block = physical_page // PAGE
++    kv_s0 = kv_s0 // pages_per_block
++    # balanced: spw segments per workgroup (waves hpg * j .. of segment j), so a 2-KV-head rank still fills 4 SIMDs
++    W = hpg * spw
+     groups = kvh // hpg
+     lds_wave = 2 * CHUNK * HD  # two V stages of 32 rows x 64 bytes per wave
+     exp_scale = float(scale) * LOG2E
+@@ -162,6 +167,7 @@
+         part: fx.Tensor,
+         maxi: fx.Tensor,
+         den: fx.Tensor,
++        plan: fx.Tensor,
+         splits: fx.Int32,
+         work_splits: fx.Int32,
+         t_stride: fx.Int32,
+@@ -176,10 +182,19 @@
+         # head groups of the same (request, split) are adjacent programs: they share page-table and KV lines; only
+         # the work_splits busy splits get programs (dispatch spreads them evenly over XCDs / CUs), and split j also
+         # writes the empty padding slot j + work_splits of the partials
+-        work = pid // groups
+-        h = (pid % groups) * W + wave
+-        seq = work // work_splits
+-        split = work % work_splits
++        work = (pid // groups) * spw + wave // hpg
++        h = (pid % groups) * hpg + wave % hpg
++        if fx.const_expr(balanced):
++            # length-balanced work list (muse_verify_plan): program work runs plan row work = (request, first
++            # chunk, end chunk) and writes partials slot work
++            pl_r = buffer_ops.create_buffer_resource(plan, max_size=True)
++            seq = fx.Int32(buffer_ops.buffer_load(pl_r, work * 4, vec_width=1, dtype=T.i32, is_scalar=True))
++            seg_begin = fx.Int32(buffer_ops.buffer_load(pl_r, work * 4 + 1, vec_width=1, dtype=T.i32, is_scalar=True))
++            seg_end = fx.Int32(buffer_ops.buffer_load(pl_r, work * 4 + 2, vec_width=1, dtype=T.i32, is_scalar=True))
++            split = work
++        else:
++            seq = work // work_splits
++            split = work % work_splits
+ 
+         sl_r = buffer_ops.create_buffer_resource(seqlens, max_size=True)
+         tb_r = buffer_ops.create_buffer_resource(table, max_size=True)
+@@ -204,12 +219,30 @@
+         last_chunk = nchunks - 1
+         # chunks per split rounded up to whole slot groups, so only the last busy split runs dummy chunks; splits
+         # >= work_splits (padding up to the power-of-two partials layout) stay empty
+-        cps = ((nchunks + work_splits - 1) // work_splits + NS - 1) // NS * NS
+-        begin = split * cps
+-        end = (begin + cps < nchunks).select(begin + cps, nchunks)
+-        begin = (begin < end).select(begin, end)
++        if fx.const_expr(balanced):
++            # segment bounds are whole slot groups except at the request's end (the plan rounds them to NS)
++            end = (seg_end < nchunks).select(seg_end, nchunks)
++            begin = (seg_begin < end).select(seg_begin, end)
++        elif fx.const_expr(window):
++            # sliding, fixed splits over the window (every request's window has the same length): from the chunk
++            # of the first key any query sees
++            first = ctx + 1 - window
++            first = (first > 0).select(first, fx.Int32(0)) // CHUNK
++            cps = ((nchunks - first + work_splits - 1) // work_splits + NS - 1) // NS * NS
++            begin = first + split * cps
++            end = (begin + cps < nchunks).select(begin + cps, nchunks)
++            begin = (begin < end).select(begin, end)
++        else:
++            cps = ((nchunks + work_splits - 1) // work_splits + NS - 1) // NS * NS
++            begin = split * cps
++            end = (begin + cps < nchunks).select(begin + cps, nchunks)
++            begin = (begin < end).select(begin, end)
+         # chunks below `interior` are visible to every query position: no masks
+         interior = (ctx + 1) // CHUNK
++        if fx.const_expr(window):
++            # sliding layers (key visible when qpos - window < key <= qpos): all chunks masked, the window is short
++            interior = begin
++            win_lo = ctx + 1 - window
+         interior = (interior < end).select(interior, end)
+         interior = (interior > begin).select(interior, begin)
+         row_base = seq * t_stride
+@@ -271,11 +304,25 @@
+             p1 = (p1 < last_page).select(p1, last_page)
+             if fx.const_expr(vec_ids):
+                 # vector loads, in order with the K / V loads: the vmcnt wait for an older chunk covers them
+-                a = fx.Int32(buffer_ops.buffer_load(tb_r, row_base + p0, vec_width=1, dtype=T.i32))
+-                b = fx.Int32(buffer_ops.buffer_load(tb_r, row_base + p1, vec_width=1, dtype=T.i32))
++                if fx.const_expr(pages_per_block == 1):
++                    a = fx.Int32(buffer_ops.buffer_load(tb_r, row_base + p0, vec_width=1, dtype=T.i32))
++                    b = fx.Int32(buffer_ops.buffer_load(tb_r, row_base + p1, vec_width=1, dtype=T.i32))
++                else:
++                    # a chunk's two 16-row blocks share one physical page (32 | physical page)
++                    a = fx.Int32(buffer_ops.buffer_load(tb_r, row_base + p0 // pages_per_block, vec_width=1, dtype=T.i32))
++                    b = a
+             else:
+-                a = fx.Int32(buffer_ops.buffer_load(tb_r, row_base + p0, vec_width=1, dtype=T.i32, is_scalar=True))
+-                b = fx.Int32(buffer_ops.buffer_load(tb_r, row_base + p1, vec_width=1, dtype=T.i32, is_scalar=True))
++                if fx.const_expr(pages_per_block == 1):
++                    a = fx.Int32(buffer_ops.buffer_load(tb_r, row_base + p0, vec_width=1, dtype=T.i32, is_scalar=True))
++                    b = fx.Int32(buffer_ops.buffer_load(tb_r, row_base + p1, vec_width=1, dtype=T.i32, is_scalar=True))
++                else:
++                    a = fx.Int32(
++                        buffer_ops.buffer_load(tb_r, row_base + p0 // pages_per_block, vec_width=1, dtype=T.i32, is_scalar=True)
++                    )
++                    b = a
++            if fx.const_expr(pages_per_block > 1):
++                # 16-row block index in units of the reduced kv_s0
++                return a * pages_per_block + p0 % pages_per_block, b * pages_per_block + p1 % pages_per_block
+             return a, b
+ 
+         def clamp(chunk):
+@@ -326,7 +373,11 @@
+                 zero = fx.full(4, 0, fx.Int32)
+                 vraw = [
+                     _to_raw(
+-                        (chunk * CHUNK + v_keys[u] < kvlen).select(fx.Vector(vraw[u], shape=4, dtype=fx.Int32), zero)
++                        (
++                            (chunk * CHUNK + v_keys[u] < kvlen) & (chunk * CHUNK + v_keys[u] >= win_lo)
++                            if fx.const_expr(window)
++                            else (chunk * CHUNK + v_keys[u] < kvlen)
++                        ).select(fx.Vector(vraw[u], shape=4, dtype=fx.Int32), zero)
+                     )
+                     for u in range_constexpr(2)
+                 ]
+@@ -372,6 +423,8 @@
+                         for j in range_constexpr(4):
+                             key = chunk * CHUNK + mt * 16 + g * 4 + j
+                             ok = (key <= qpos) & (chunk < end)
++                            if fx.const_expr(window):
++                                ok = ok & (key + window > qpos)
+                             elems.append(ok.select(sv[j], ninf))
+                         sv = fx.Vector.from_elements(elems, fx.Float32)
+                     s.append(sv)
+@@ -502,7 +555,11 @@
+             n = li + 16 * nt
+             t = n // GQA
+             qh = n % GQA
+-            state = ((seq * QL + t) * heads + h * GQA + qh) * splits + split
++            if fx.const_expr(balanced):
++                # segmented layout [segments, QL, heads]: the reduce reads each request's own segments
++                state = (split * QL + t) * heads + h * GQA + qh
++            else:
++                state = ((seq * QL + t) * heads + h * GQA + qh) * splits + split
+             l2 = fx.Vector(l_run[nt], shape=2, dtype=fx.Float32)
+             l_tot = _allreduce_groups(arith.addf(_to_raw(l2[0]), _to_raw(l2[1])), False)
+             m_fin = arith.subf(_f32(p_bias), _to_raw(fx.Vector(n_run[nt], shape=2, dtype=fx.Float32)[0]))
+@@ -510,7 +567,7 @@
+             buffer_ops.buffer_store(l_tot, d_r, state)
+             for mt in range_constexpr(4):
+                 buffer_ops.buffer_store(o_acc[mt * 4 + nt], p_r, state * HD + mt * 16 + g * 4)
+-            if split + work_splits < splits:
++            if fx.const_expr(not balanced) and split + work_splits < splits:
+                 pad = state + work_splits
+                 buffer_ops.buffer_store(_f32(M_INIT), m_r, pad)
+                 buffer_ops.buffer_store(_f32(0.0), d_r, pad)
+@@ -528,6 +585,7 @@
+         part: fx.Tensor,
+         maxi: fx.Tensor,
+         den: fx.Tensor,
++        plan: fx.Tensor,
+         splits: fx.Int32,
+         work_splits: fx.Int32,
+         t_stride: fx.Int32,
+@@ -536,7 +594,7 @@
+         stream: fx.Stream,
+     ):
+         kernel(
+-            q, k, v, table, seqlens, kd, part, maxi, den, splits, work_splits, t_stride, q_s0,
++            q, k, v, table, seqlens, kd, part, maxi, den, plan, splits, work_splits, t_stride, q_s0,
+             value_attrs={"rocdl.waves_per_eu": waves_per_eu} if waves_per_eu else None,
+         ).launch(grid=(fx.Int64(grid), 1, 1), block=(W * 64, 1, 1), stream=stream)
+ 
+@@ -562,6 +620,7 @@
+     fence_vmem=False,
+     work_splits=None,
+     wg_per_cu=0,
++    window=0,
+ ):
+     """FP32 split-KV partials [T, H, S, 64] + max / denom [T, H, S] (log2 domain) of the full-layer verify.
+ 
+@@ -576,7 +635,8 @@
+     hpg = heads_per_group or kvh
+     assert kvh % hpg == 0
+     assert q.dtype == torch.bfloat16 and q.shape[-1] == HD and heads == GQA * kvh and q.shape[0] == n * QL
+-    assert k.shape[1] == PAGE and k.stride() == v.stride() and k.stride(2) == HD and k.stride(3) == 1
++    assert k.shape[1] in (16, 32, 64, 128) and k.shape[1] == v.shape[1]
++    assert k.stride() == v.stride() and k.stride(2) == HD and k.stride(3) == 1
+     assert q.stride(2) == 1 and q.stride(1) == HD
+     assert work_splits is None or splits <= 2 * work_splits <= 2 * splits
+     # buffer offsets are 32-bit byte offsets: a pool past them takes the 64-bit loads
+@@ -587,7 +647,7 @@
+     den = torch.empty(st, dtype=torch.float32, device=q.device)
+     kd = k_descale if k_descale is not None else torch.ones(1, dtype=torch.float32, device=q.device)
+     _run_compiled(
+-        _launcher(heads, kvh, hpg, k.stride(0), k.stride(1), float(softmax_scale), waves_per_eu, vec_ids, slots, q_lds, qf8, pvf8, fence_vmem, wg_per_cu, addr64),
++        _launcher(heads, kvh, hpg, k.stride(0), k.stride(1), float(softmax_scale), waves_per_eu, vec_ids, slots, q_lds, qf8, pvf8, fence_vmem, wg_per_cu, addr64, False, 1, window, k.shape[1]),
+         q,
+         k.view(torch.uint8),
+         v.view(torch.uint8),
+@@ -597,6 +657,7 @@
+         part,
+         maxi,
+         den,
++        kd,
+         int(splits),
+         int(work_splits or splits),
+         int(block_table.stride(0)),
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/kernels/ops/attention/swa_verify_splitkv.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/kernels/ops/attention/swa_verify_splitkv.py
+@@ -184,7 +184,7 @@
+         out.dtype == torch.bfloat16 and q.shape[-1] == k.shape[-1] == v.shape[-1] == 64
+     )
+     assert q.shape[1] // k.shape[2] == 8 and k.shape[2] == v.shape[2]
+-    assert k.shape[1] == v.shape[1] == 16
++    assert k.shape[1] == v.shape[1] and k.shape[1] in (16, 32, 64, 128)
+     assert max_seqlen_q == 8 and q.shape[0] == seqused_k.numel() * 8
+     assert causal and window_size == (2046, 0) and softcap == 0
+     assert num_splits in (2, 4, 8, 16, 32)
+@@ -211,7 +211,7 @@
+         block_table.stride(0),
+         q.shape[1],
+         8,
+-        16,
++        k.shape[1],
+         2047,
+         num_splits,
+         softmax_scale,
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py
+@@ -91,6 +91,11 @@
+     """Merged, RMS-normalized (``weight`` optional) and sigmoid-gated attention output ``out_shape``
+     (``[T, H * 64]``) from the deferred verify ``state``; ``gate`` is ``None`` or the grouped
+     ``[T, groups, heads_per_group * 64]`` gate view."""
++    if len(state) == 5:
++        # segmented partials of the length-balanced FlyDSL verify
++        from sglang.kernels.ops.attention.muse_verify_balanced import segmented_reduce_norm_gate
++
++        return segmented_reduce_norm_gate(state, out_shape, out_dtype, gate, eps, weight)
+     partial, maximum, denom, v_scale = state
+     tokens, heads, splits = maximum.shape
+     n = tokens * heads
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/kernels/ops/gemm/bf16_tiled_small_m_gemm.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/kernels/ops/gemm/bf16_tiled_small_m_gemm.py
+@@ -43,6 +43,8 @@
+     (4096, 8192, 64): (64, 128, 8, 8, 2),
+     (4096, 8192, 128): (64, 128, 4, 8, 3),
+     (4608, 8192, 64): (128, 128, 4, 4, 3),
++    # the joint pooler + split router at 65-128 rows (SGLANG_MUSE_JOINT_ROUTER_MAX_ROWS)
++    (4608, 8192, 128): (64, 128, 4, 8, 3),
+     (8192, 4096, 64): (32, 256, 1, 4, 3),
+     (8192, 4096, 128): (64, 128, 2, 8, 3),
+     (8192, 2048, 64): (32, 256, 1, 4, 3),
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py
+@@ -3,8 +3,8 @@
+ Muse Spark EP8 / EP4 layout: 32 or 64 local experts, top-8 routing, hidden 4096, intermediate 4096, Quark MXFP4
+ checkpoint weights (per-32 E8M0 scales) used as stored. For M (a multiple of 8, up to MAX_ROWS) rows:
+ 
+-1. ``_prepare_a4``: per-row MXFP4 quantization of the input (or the caller passes it, ``quantized``);
+-2. ``_scatter_a4``: per local expert, place its 16-row blocks after the lower experts' and rank its routes in
++1-2. ``_route_quant_a4``, one launch: per-row MXFP4 quantization of the input (unless the caller passes it,
++   ``quantized``) and, per local expert, its 16-row blocks placed after the lower experts' and its routes ranked in
+    token order into them;
+ 3. ``_expert_a4`` (ACT): gate/up ``dot_scaled`` GEMMs, SiLU-and-mul rounded to BF16, MXFP4 re-quantization;
+ 4. ``_expert_a4``: down GEMM into unweighted per-(token, slot) BF16 rows.
+@@ -23,13 +23,47 @@
+ from aiter.ops.triton._triton_kernels.quant.quant import _mxfp4_quant_op
+ 
+ MAX_ROWS = 512
+-BLOCK_M = 16  # BM 32 / 64 give wrong rows and are no faster
++BLOCK_M = 16
++# From 384 rows, 32-slot blocks: an expert with 17-32 routes reads its weights once instead of twice (MI355X per
++# layer at M 512: 199.7 -> 180.1 us at 32 local experts, 358.1 -> 328.6 at 64); below, 16 is as fast or faster.
++BLOCK_M_LARGE, LARGE_ROWS = 32, 384
++
++
++@triton.jit
++def _route_quant_a4(
++    IDS,
++    SORTED,
++    EXPERT,
++    X,
++    Q,
++    QS,
++    M: tl.constexpr,
++    START: tl.constexpr,
++    E: tl.constexpr,
++    S: tl.constexpr,
++    PER_E: tl.constexpr,
++    BM: tl.constexpr,
++    NB: tl.constexpr,
++    NBB: tl.constexpr,
++    QUANT: tl.constexpr,
++):
++    # One launch for both: programs [0, E) place the local experts' routes (_scatter_a4), programs E.. quantize the
++    # input rows (_prepare_a4, four 1024-column tiles a row).
++    pid = tl.program_id(0)
++    if pid < E:
++        _scatter_body(IDS, SORTED, EXPERT, pid, M, START, E, S, PER_E, BM, NB, NBB)
++    elif QUANT:
++        _prepare_body(X, Q, QS, pid - E)
+ 
+ 
+ @triton.jit
+ def _prepare_a4(X, Q, QS):
+-    # Per-row MXFP4 quantization of the input, four 1024-column tiles per row.
+-    pid = tl.program_id(0)
++    # Per-row MXFP4 quantization of the input on its own (the router / pooler tests' reference).
++    _prepare_body(X, Q, QS, tl.program_id(0))
++
++
++@triton.jit
++def _prepare_body(X, Q, QS, pid):
+     row = pid // 4
+     tile = pid % 4
+     col = tile * 1024 + tl.arange(0, 1024)
+@@ -42,37 +76,35 @@
+ 
+ 
+ @triton.jit
+-def _scatter_a4(
++def _scatter_body(
+     IDS,
+     SORTED,
+     EXPERT,
++    e,
+     M: tl.constexpr,
+     START: tl.constexpr,
+     E: tl.constexpr,
+     S: tl.constexpr,
+-    CH: tl.constexpr,
+     PER_E: tl.constexpr,
+     BM: tl.constexpr,
+     NB: tl.constexpr,
+     NBB: tl.constexpr,
+ ):
+-    # One program per local expert. Each counts every local expert's routes and places its blocks after the
+-    # lower experts' (fixed block order, nothing to clear between calls); the last also marks the unused tail
+-    # blocks (-1). Its routes are ranked in token order into its blocks (sentinel M*8).
+-    e = tl.program_id(0)
++    # Local expert e (one program each). Counts every local expert's routes and places its blocks after the lower
++    # experts' (fixed block order, nothing to clear between calls); the last also marks the unused tail blocks (-1).
++    # Its routes are ranked in token order into its blocks (sentinel M*8).
+     ee = tl.arange(0, E)
+-    counts = tl.zeros((E,), tl.int32)
+-    for c0 in tl.static_range(0, S, CH):
+-        sc = c0 + tl.arange(0, CH)
+-        idc = tl.load(IDS + sc, sc < M * 8, other=-1)
+-        counts += tl.sum(((idc[:, None] - START) == ee[None, :]).to(tl.int32), axis=0)
++    s = tl.arange(0, S)
++    ids = tl.load(IDS + s, s < M * 8, other=-1)
++    rel = ids - START
++    # bin E takes the other ranks' experts and the padding (MI355X, 512 rows: 16.1 -> 8.5 us per launch)
++    counts = tl.histogram(tl.where((rel >= 0) & (rel < E), rel, E), 2 * E)
++    counts = tl.sum(tl.where(tl.arange(0, 2 * E)[:, None] == ee[None, :], counts[:, None], 0), axis=0)
+     blocks_all = (counts + BM - 1) // BM
+     first = tl.sum(tl.where(ee < e, blocks_all, 0), axis=0)
+     if e == E - 1:
+         b = tl.arange(0, NBB)
+         tl.store(EXPERT + b, -1, (b >= tl.sum(blocks_all, axis=0)) & (b < NB))
+-    s = tl.arange(0, S)
+-    ids = tl.load(IDS + s, s < M * 8, other=-1)
+     hit = (ids == START + e) & (s < M * 8)
+     count = tl.sum(hit.to(tl.int32), axis=0)
+     blocks = tl.cdiv(count, BM)
+@@ -91,7 +123,8 @@
+ def _load_w(W, n0, k0, BN: tl.constexpr, KB: tl.constexpr, SHUF: tl.constexpr):
+     """[KB bytes, BN rows] tile of one expert's [N, 2048] packed E2M1 rows from row n0, byte k0. Preshuffled layout:
+     [N/16, 2048/16, 16 rows, 16 bytes] (aiter shuffle_weight (16, 16) and shuffle_weight_a16w4 (16) agree on it for
+-    K 2048), loaded as whole contiguous 16-row groups and permuted in registers."""
++    K 2048), loaded as whole contiguous 16-row groups and permuted in registers. Streamed past the caches (.cs): each
++    expert's weights are read once per call (MI355X, 32 local experts: 171.5 -> 156.4 us at M 512)."""
+     if SHUF:
+         g = tl.arange(0, BN // 16)
+         kc = tl.arange(0, KB // 16)
+@@ -103,11 +136,11 @@
+             + (r * 16)[None, None, :, None]
+             + b[None, None, None, :]
+         )
+-        x = tl.permute(tl.load(W + offset), (1, 3, 0, 2))
++        x = tl.permute(tl.load(W + offset, cache_modifier=".cs"), (1, 3, 0, 2))
+         return tl.reshape(x, (KB, BN))
+     n = n0 + tl.arange(0, BN)
+     k = k0 + tl.arange(0, KB)
+-    return tl.load(W + n[None, :] * 2048 + k[:, None])
++    return tl.load(W + n[None, :] * 2048 + k[:, None], cache_modifier=".cs")
+ 
+ 
+ @triton.jit
+@@ -222,7 +255,7 @@
+ 
+ 
+ def compact_a4_experts(
+-    x, ids, w13, w2, s13, s2, *, local_start, shuffled=False, quantized=None
++    x, ids, w13, w2, s13, s2, *, local_start, shuffled=False, quantized=None, block_m=None
+ ):
+     """Per-(token, slot) expert outputs BF16 [M * 8, 4096] for the 32 or 64 local experts starting at ``local_start``.
+ 
+@@ -238,7 +271,7 @@
+             f"A4 requires M a multiple of 8 up to {MAX_ROWS}, local32 / local64 MXFP4 expert weights"
+         )
+     dev = ids.device
+-    bm, e_local = BLOCK_M, w13.shape[0]
++    bm, e_local = block_m or (BLOCK_M_LARGE if m >= LARGE_ROWS else BLOCK_M), w13.shape[0]
+     rows, cap = m * 8, m * 8 + e_local * (bm - 1)
+     nb = triton.cdiv(cap, bm)
+     sid = torch.empty(cap, device=dev, dtype=torch.int32)
+@@ -253,26 +286,30 @@
+     if quantized is None:
+         q = torch.empty((m, 2048), device=dev, dtype=torch.uint8)
+         qs = torch.empty((m, 128), device=dev, dtype=torch.uint8)
+-        _prepare_a4[(m * 4,)](x, q, qs, num_warps=4)
+     else:
+         q, qs = quantized
+-    _scatter_a4[(e_local,)](
++    _route_quant_a4[(e_local + (m * 4 if quantized is None else 0),)](
+         ids,
+         sid,
+         eid,
++        x,
++        q,
++        qs,
+         m,
+         local_start,
+         e_local,
+         s_pow2,
+-        min(s_pow2, 256),
+         per_e,
+         bm,
+         nb,
+         triton.next_power_of_2(nb),
++        quantized is None,
+         num_warps=4,
+     )
+-    grid = (4096 // 64, nb)
+-    options = dict(num_warps=4, num_stages=2, matrix_instr_nonkdim=16)
++    # one request's verify (8 rows): narrower programs, twice as many over the few touched experts
++    bn = 32 if m <= 8 else 64
++    grid = (4096 // bn, nb)
++    options = dict(num_warps=2 if m <= 8 else 4, num_stages=2, matrix_instr_nonkdim=16)
+     _expert_a4[grid](
+         q,
+         qs,
+@@ -283,7 +320,7 @@
+         inter,
+         inter_scale,
+         rows,
+-        64,
++        bn,
+         512,
+         True,
+         bm,
+@@ -300,7 +337,7 @@
+         y,
+         y,
+         rows,
+-        64,
++        bn,
+         512,
+         False,
+         bm,
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py
+@@ -412,14 +412,19 @@
+ # writing the same ``[SK, M, 4608]`` partials. Tuned on MI355X (bench_joint_fp8.py).
+ FP8_JOINT = {
+     32: (64, 256, 4, 8, 3),
+-    64: (64, 128, 4, 8, 3),
+-    128: (64, 128, 4, 8, 2),
++    64: (32, 128, 4, 4, 2),
++    128: (64, 128, 4, 8, 3),
++    256: (64, 128, 4, 8, 3),
++    512: (128, 128, 4, 8, 2),
+ }
+-# Measured 10-23 (bench_joint_fp8.py): 21-22 us at 24-32 rows vs 26.9 for the aiter BF16 launch; at 33-128 rows
+-# the BF16 row-major joint (17.6 us at 64 rows) beats this tiling (72 + 8 router tiles x 4 splits = 288 programs,
+-# a 32-program tail wave), so the FP8 form stops at 32 rows until the router tiles are balanced into the grid.
++# Measured 10-23 (bench_joint_fp8.py): 21-22 us at 24-32 rows vs 26.9 for the aiter BF16 launch. MI355X, whole
++# front (GEMM + epilogue) in CUDA graphs, vs the BF16 row-major joint: 28.3 -> 25.4 us at 40 rows, 30.0 -> 27.3 at
++# 64, 35.7 -> 30.1 at 72, 41.6 -> 34.9 at 128; vs the unfused router GEMM + routing + BF16 pooler + norm above 128
++# rows: 79.1 -> 38.2 us at 136, 89.2 -> 46.7 at 256, 106.0 -> 54.1 at 384, 131.5 -> 71.5 at 512.
+ FP8_JOINT_MIN_M = 17
+-FP8_JOINT_MAX_M = 32
++FP8_JOINT_MAX_M = 512
++# Largest row tile of the FP8 joint partials; more rows take more tiles along the grid's third axis.
++FP8_JOINT_MAX_TILE_M = 128
+ 
+ 
+ @triton.jit
+@@ -439,8 +444,8 @@
+     N: tl.constexpr = 4608
+     K: tl.constexpr = 8192
+     KT_PER: tl.constexpr = K // BK // SK
+-    pn, pk = tl.program_id(0), tl.program_id(1)
+-    m = tl.arange(0, BM)
++    pn, pk, pm = tl.program_id(0), tl.program_id(1), tl.program_id(2)
++    m = pm * BM + tl.arange(0, BM)
+     kk = pk * KT_PER * BK + tl.arange(0, BK)
+     nn = tl.arange(0, BN)
+     acc = tl.zeros((BM, BN), tl.float32)
+@@ -500,15 +505,16 @@
+     assert k == 8192 and packed.shape == (4608, 8192) and xq.shape == x.shape
+     wq, ws = pooler_fp8
+     bn, bk, sk, warps, stages = FP8_JOINT[_bm(m)]
++    tile_m = min(_bm(m), FP8_JOINT_MAX_TILE_M)
+     partial = torch.empty((sk, m, 4608), device=x.device, dtype=torch.float32)
+-    _joint_fp8_partial[(4608 // bn, sk)](
++    _joint_fp8_partial[(4608 // bn, sk, triton.cdiv(m, tile_m))](
+         xq,
+         x,
+         wq,
+         packed[4096:],
+         partial,
+         m,
+-        _bm(m),
++        tile_m,
+         bn,
+         bk,
+         sk,
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py
+@@ -95,6 +95,13 @@
+ except ImportError:  # Triton without Gluon's CDNA4 ops
+     muse_extend_attention = None
+ 
++try:
++    from sglang.kernels.ops.attention.muse_extend_flydsl import (
++        muse_extend_attention_fly,
++    )
++except ImportError:
++    muse_extend_attention_fly = None
++
+ from sglang.kernels.ops.attention.dcp_kernels import (
+     compact_dcp_verify_token_table_to_ragged,
+     create_mla_kv_page_table_for_dcp,
+@@ -112,6 +119,12 @@
+ 
+ try:
+     from sglang.kernels.ops.attention.muse_verify_flydsl import gqa_verify_flydsl
++    from sglang.kernels.ops.attention.muse_verify_balanced import (
++        gqa_verify_flydsl_balanced,
++        swa_verify_flydsl,
++        use_balanced_full,
++        use_flydsl_sliding,
++    )
+ except Exception:  # no flydsl / aiter FlyDSL in this environment
+     gqa_verify_flydsl = None
+ from sglang.kernels.ops.attention.utils import (
+@@ -253,7 +266,7 @@
+     sliding_window = 1 + window_size[0]
+     if not (
+         num_seqs > 0
+-        and block_size == 16
++        and block_size in (16, 32, 64, 128)
+         and head_size == 64
+         and num_query_heads == 8 * num_kv_heads
+         and int(max_seqlen_q) == 8
+@@ -267,6 +280,21 @@
+     # Splits were tuned at 2 KV heads per rank (TP8); more KV heads (TP4: 4) divide them to keep the CTA count.
+     kv_scale = max(1, num_kv_heads // 2)
+     if sliding_window == 2047 and window_size[1] == 0:
++        if (
++            "swa_fly" in kernels
++            and gqa_verify_flydsl is not None
++            and num_kv_heads in (2, 4)
++            and k.stride() == v.stride()
++            and use_flydsl_sliding(num_seqs, num_kv_heads)
++        ):
++            _defer_or_merged(
++                swa_verify_flydsl(
++                    q, k, v, out, seqused_k, block_table, softmax_scale, k_descale, v_descale,
++                    window=sliding_window, defer_reduce=_VERIFY_REDUCE_DEFERRAL.requested,
++                ),
++                v_descale,
++            )  # fmt: skip
++            return True
+         if "swa_splitkv" in kernels and 0 < num_seqs <= 8:
+             _defer_or_merged(
+                 swa_verify_splitkv(
+@@ -298,11 +326,14 @@
+         and num_kv_heads in (2, 4)
+         and k.stride() == v.stride()
+     ):
++        balanced = "full_fly_bal" in kernels and use_balanced_full(num_seqs, num_kv_heads)
+         if ("fly", num_seqs) not in _muse_verify_v2_logged:
+             _muse_verify_v2_logged.add(("fly", num_seqs))
+-            logger.info("Muse verify FlyDSL full layers: num_seqs=%d mode=exact", num_seqs)
++            logger.info(
++                "Muse verify FlyDSL full layers: num_seqs=%d mode=exact balanced=%s", num_seqs, balanced
++            )
+         _defer_or_merged(
+-            gqa_verify_flydsl(
++            (gqa_verify_flydsl_balanced if balanced else gqa_verify_flydsl)(
+                 q, k, v, out, seqused_k, block_table, softmax_scale, k_descale, v_descale,
+                 defer_reduce=_VERIFY_REDUCE_DEFERRAL.requested,
+             ),
+@@ -818,6 +849,14 @@
+             and envs.SGLANG_MUSE_EXTEND_GLUON.get()
+         )
+         self._muse_extend_fp8_logged = False
++        # sliding-layer extend on the Gluon kernel's window variant (FP8 Q like the full layers)
++        self.muse_extend_swa_gluon = bool(self.muse_extend_gluon) and envs.SGLANG_MUSE_EXTEND_SWA_GLUON.get()
++        # full layers on the FlyDSL extend kernel
++        self.muse_extend_fly = (
++            bool(self.muse_extend_gluon)
++            and muse_extend_attention_fly is not None
++            and envs.SGLANG_MUSE_EXTEND_FLYDSL.get()
++        )
+         self.muse_verify_kernels = frozenset(
+             name
+             for name, env in (
+@@ -826,6 +865,8 @@
+                 ("full_v2", envs.SGLANG_MUSE_VERIFY_FULL_V2),
+                 ("full_v2_fp8", envs.SGLANG_MUSE_VERIFY_FP8),
+                 ("full_fly", envs.SGLANG_MUSE_VERIFY_FLYDSL),
++                ("full_fly_bal", envs.SGLANG_MUSE_VERIFY_BALANCED),
++                ("swa_fly", envs.SGLANG_MUSE_VERIFY_SWA_FLYDSL),
+                 ("full_gqa", envs.SGLANG_MUSE_VERIFY_FULL_GQA),
+             )
+             if self.use_muse_attention_paths and self._use_unified_verify and env.get()
+@@ -1552,9 +1593,11 @@
+             dtype=self.input_dtype,
+         )
+         q_descale = None
++        # sliding layers take the FP8 extend only on the Gluon kernel (its window variant)
++        swa_gluon = self.muse_extend_swa_gluon and uni_window == (2046, 0)
+         if (
+             self.muse_extend_fp8_q
+-            and uni_window == (-1, -1)
++            and (uni_window == (-1, -1) or swa_gluon)
+             and forward_batch.forward_mode == ForwardMode.EXTEND
+             and forward_batch.spec_info is None
+             and q_u.shape[0] >= _MUSE_EXTEND_FP8_MIN_Q
+@@ -1580,7 +1623,8 @@
+             if not self._muse_extend_fp8_logged:
+                 self._muse_extend_fp8_logged = True
+                 logger.info(
+-                    "Muse extend FP8 (a8) for full layers, q=%d max_q=%d",
++                    "Muse extend FP8 (a8) for full%s layers, q=%d max_q=%d",
++                    " and sliding" if self.muse_extend_swa_gluon else "",
+                     q_u.shape[0],
+                     self.forward_metadata.max_q_len,
+                 )
+@@ -1595,7 +1639,12 @@
+             and self.muse_extend_gluon
+             and muse_extend_applies(q_u, k_paged)
+         ):
+-            muse_extend_attention(
++            extend = (
++                muse_extend_attention_fly
++                if self.muse_extend_fly and not swa_gluon
++                else muse_extend_attention
++            )
++            extend(
+                 q_u,
+                 k_paged,
+                 v_paged,
+@@ -1607,6 +1656,7 @@
+                 k_descale,
+                 v_descale,
+                 layer.scaling,
++                window=uni_window[0] + 1 if swa_gluon else 0,
+             )
+             return o.view(-1, layer.tp_q_head_num * layer.v_head_dim)
+         unified_attention(
+@@ -5472,8 +5522,8 @@
+                 self.req_to_token.shape[1],
+             )
+ 
+-            token_num = kv_indptr[-1]
+-            kv_indices[token_num:] = kv_indices[0]
++            # kv_indptr[-1] == paged_kernel_lens_sum; the host int avoids a sync.
++            kv_indices[paged_kernel_lens_sum:] = kv_indices[0]
+ 
+             extend_lens = seq_lens - prefix_lens
+ 
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py
+@@ -33,6 +33,7 @@
+ 
+ QK_ROPE_CACHE = envs.SGLANG_MUSE_QK_ROPE_CACHE.get()
+ FUSED_QKV_CACHE = envs.SGLANG_MUSE_FUSED_QKV_CACHE.get()
++QK_ROPE_CACHE_MAX_ROWS = envs.SGLANG_MUSE_QK_ROPE_CACHE_MAX_ROWS.get()
+ _logged: set = set()
+ 
+ 
+@@ -69,7 +70,7 @@
+     if not (
+         isinstance(backend, AiterAttnBackend)
+         and not backend.use_mla
+-        and backend.page_size == 16
++        and backend.page_size in (16, 32, 64, 128)
+         and not backend.kv_cache_is_vectorized_5d
+         and backend.use_triton_unified_attention
+         and not layer.is_cross_attention
+@@ -176,7 +177,7 @@
+ ):
+     """(q, k) normalized and rotated with K/V already in the cache, or None when the kernel does not apply."""
+     if not (
+-        0 < q.shape[0] <= 64
++        0 < q.shape[0] <= QK_ROPE_CACHE_MAX_ROWS
+         and q.dtype == k.dtype == v.dtype == torch.bfloat16
+         and q.stride(1) == k.stride(1) == v.stride(1) == 1
+         and _attention_shape_ok(attention, forward_batch)
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip
+@@ -1,13 +1,15 @@
+-// Muse Spark MoE finalize fused with the TP4 all-reduce of its output (gfx950, xGMI peers).
++// Muse Spark MoE finalize fused with the TP4 / TP8 all-reduce of its output (gfx950, xGMI peers).
+ //
+-// One 256-thread block per token row r of an M-row batch (M a multiple of 4, hidden 4096, top-8):
++// One 256-thread block per token row r of an M-row batch (M a multiple of NR, hidden 4096, top-8):
+ //   1. finalize: the per-expert input-scale RMSNorm and route-weighted sum of the row's local-expert slots, with the
+ //      thread mapping, reduction order and rounding points of aiter's FlyDSL muse_moe_finalize_vector_flydsl;
+-//   2. the row's partial goes to its owner rank r / (M / 4), which sums the four partials in the order of aiter's
++//   2. the row's partial goes to its owner rank r / (M / NR), which sums the NR partials in the order of aiter's
+ //      cross_device_reduce_2stage (owner first, then owner+1, ...; FP32, one BF16 rounding) and pushes the sum to
+ //      the other ranks; every rank writes the row to `out`.
+-// So the result is bitwise the FlyDSL finalize followed by the aiter two-stage all-reduce, except that a -0.0 can
+-// come out as +0.0.
++//      One-shot calls (`oneshot`, small batches) instead push the row's partial to every rank, and each rank sums
++//      the NR partials in rank order 0..NR-1 as aiter's cross_device_reduce_1stage does (FP32, one BF16 rounding).
++// So the result is bitwise the FlyDSL finalize followed by the aiter two-stage (one-stage) all-reduce, except that a
++// -0.0 can come out as +0.0.
+ //
+ // The data is its own flag (Lamport): inbox records start as the BF16 -0.0 pattern (0x8000), senders map -0.0 to
+ // +0.0, readers spin with cache-bypassing volatile loads until no lane holds the sentinel. Each row keeps a call
+@@ -18,7 +20,8 @@
+ #include <hip/hip_runtime.h>
+ #include <cstdint>
+ 
+-#define NR 4
++// NR (ranks) is set at build time; the peer table is sized for the largest.
++#define MAX_NR 8
+ #define HID 4096
+ #define TOPK 8
+ #define ROW_BYTES (HID * 2)
+@@ -31,7 +34,7 @@
+ #define CPOL_SYS_VOL (17 | (1u << 31))
+ 
+ struct Peers {
+-    uint8_t* inbox[NR];
++    uint8_t* inbox[MAX_NR];
+ };
+ 
+ struct Args {
+@@ -49,9 +52,9 @@
+     int32_t rank;
+     int32_t rows;
+     uint32_t max_rows;
+-    uint32_t pad;
++    uint32_t oneshot;
+ };
+-static_assert(sizeof(Args) == 112, "Args is mirrored by a ctypes struct");
++static_assert(sizeof(Args) == 144, "Args is mirrored by a ctypes struct");
+ 
+ __device__ __forceinline__ rsrc_t make_rsrc(const void* base) {
+     return __builtin_amdgcn_make_buffer_rsrc((void*)base, 0, 0x7fffffff, 0x00020000);
+@@ -105,13 +108,14 @@
+     return (3u * NR * a.max_rows + slot * a.max_rows + row) * ROW_BYTES;
+ }
+ 
+-extern "C" __global__ void __launch_bounds__(256) muse_finalize_allreduce_tp4(Args a) {
++extern "C" __global__ void __launch_bounds__(256) muse_finalize_allreduce(Args a) {
+     const int r = blockIdx.x;
+     const int tid = threadIdx.x, lane = tid & 63, wave = tid >> 6;
+     const uint32_t call = (uint32_t)a.row_state[2 * r];
+     const int prev_owner = a.row_state[2 * r + 1];
+     const uint32_t slot = call % 3u, prev = (call + 2u) % 3u;
+-    const int owner = r / (a.rows / NR);
++    // a one-shot row is summed by every rank: each counts as its owner (for the inbox reset below)
++    const int owner = a.oneshot ? a.rank : r / (a.rows / NR);
+     __shared__ float sums[TOPK * 4];
+     __shared__ uint16_t rowbuf[HID];
+ 
+@@ -172,7 +176,30 @@
+ 
+     const rsrc_t my = make_rsrc(a.peers.inbox[a.rank]);
+     uint4* outrow = a.out + (size_t)r * PACKS_PER_ROW;
+-    if (owner != a.rank) {
++    if (a.oneshot) {
++        // ---- push the partial to every other rank, then sum all NR partials in rank order ----
++        const uint32_t base = s1_off(a, slot, a.rank, r);
++#pragma unroll
++        for (int k = 1; k < NR; ++k) {
++            const rsrc_t dst = make_rsrc(a.peers.inbox[(a.rank + k) % NR]);
++#pragma unroll
++            for (int i = 0; i < 2; ++i) bst_x4(dst, base + (tid + i * 256) * 16, mine[i]);
++        }
++#pragma unroll
++        for (int i = 0; i < 2; ++i) {
++            const int p = tid + i * 256;
++            float acc[8];
++#pragma unroll
++            for (int src = 0; src < NR; ++src) {
++                uint4 t = mine[i];
++                if (src != a.rank) {
++                    do { t = bld_x4(my, s1_off(a, slot, src, r) + p * 16); } while (has_sentinel(t));
++                }
++                add_pack(t, acc, src == 0);
++            }
++            outrow[p] = pack_acc(acc);
++        }
++    } else if (owner != a.rank) {
+         // ---- push the partial to the owner, then wait for the owner's sum ----
+         const rsrc_t dst = make_rsrc(a.peers.inbox[owner]);
+         const uint32_t base = s1_off(a, slot, a.rank, r);
+@@ -186,7 +213,7 @@
+             outrow[tid + i * 256] = t;
+         }
+     } else {
+-        // ---- owner: sum the four partials (owner first), push the sum to the other ranks ----
++        // ---- owner: sum the NR partials (owner first), push the sum to the other ranks ----
+ #pragma unroll
+         for (int i = 0; i < 2; ++i) {
+             const int p = tid + i * 256;
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py
+@@ -1,4 +1,4 @@
+-"""Muse Spark decode MoE finalize fused with the TP4 all-reduce (MI355X, ``SGLANG_MUSE_FINALIZE_AR_PUSH``).
++"""Muse Spark decode MoE finalize fused with the TP4 / TP8 all-reduce (MI355X, ``SGLANG_MUSE_FINALIZE_AR_PUSH``).
+ 
+ ``finalize_allreduce.hip`` replaces the FlyDSL finalize + aiter two-stage all-reduce pair of the compact A4
+ target-verify MoE with one launch; see its header for the protocol. The code object is built at first use with
+@@ -23,7 +23,7 @@
+ _SRC = os.path.join(
+     os.path.dirname(os.path.abspath(__file__)), "finalize_allreduce.hip"
+ )
+-_NR = 4
++_MAX_NR = 8
+ _HIDDEN = 4096
+ _TOPK = 8
+ _ROW_BYTES = _HIDDEN * 2
+@@ -41,7 +41,7 @@
+         ("scores", ctypes.c_void_p),
+         ("ids", ctypes.c_void_p),
+         ("out", ctypes.c_void_p),
+-        ("peers", ctypes.c_void_p * _NR),
++        ("peers", ctypes.c_void_p * _MAX_NR),
+         ("row_state", ctypes.c_void_p),
+         ("local_start", ctypes.c_int32),
+         ("num_local", ctypes.c_int32),
+@@ -50,7 +50,7 @@
+         ("rank", ctypes.c_int32),
+         ("rows", ctypes.c_int32),
+         ("max_rows", ctypes.c_uint32),
+-        ("pad", ctypes.c_uint32),
++        ("oneshot", ctypes.c_uint32),
+     ]
+ 
+ 
+@@ -58,7 +58,7 @@
+     _fields_ = [("p", ctypes.c_void_p), ("n16", ctypes.c_uint64)]
+ 
+ 
+-assert ctypes.sizeof(_Args) == 112 and ctypes.sizeof(_FillArgs) == 16
++assert ctypes.sizeof(_Args) == 144 and ctypes.sizeof(_FillArgs) == 16
+ 
+ _hip = None
+ 
+@@ -92,13 +92,13 @@
+         )
+ 
+ 
+-def _build(arch: str, sqrt: str) -> str:
++def _build(arch: str, sqrt: str, nr: int) -> str:
+     out_dir = tempfile.mkdtemp(prefix="sglang_muse_finalize_ar_")
+     co = os.path.join(out_dir, "finalize_allreduce.co")
+     hipcc = os.path.join(os.environ.get("ROCM_PATH", "/opt/rocm"), "bin", "hipcc")
+     # No FMA contraction: the FlyDSL finalize rounds every multiply and add separately.
+     cmd = [hipcc, "--genco", f"--offload-arch={arch}", "-O3", "-ffp-contract=off",
+-           f"-DMUSE_SQRT={sqrt}", "-o", co, _SRC]  # fmt: skip
++           f"-DMUSE_SQRT={sqrt}", f"-DNR={nr}", "-o", co, _SRC]  # fmt: skip
+     subprocess.run(cmd, check=True, capture_output=True, text=True)
+     return co
+ 
+@@ -137,7 +137,7 @@
+ 
+ 
+ class MuseFinalizeAllreduce:
+-    """Per-process TP4 finalize + all-reduce; every rank must issue the same sequence of calls."""
++    """Per-process TP4 / TP8 finalize + all-reduce; every rank must issue the same sequence of calls."""
+ 
+     def __init__(
+         self,
+@@ -147,14 +147,20 @@
+         sqrt: str = "__builtin_amdgcn_sqrtf",
+     ):
+         self.rank = dist.get_rank(group=cpu_group)
+-        if dist.get_world_size(group=cpu_group) != _NR:
+-            raise ValueError("finalize_allreduce supports TP4 only")
++        self.nr = dist.get_world_size(group=cpu_group)
++        if self.nr not in (4, 8):
++            raise ValueError("finalize_allreduce supports TP4 and TP8 only")
++        # TP8 rows where this beats FlyDSL finalize + aiter all-reduce (MI355X graph replay): one-shot at 8 rows
++        # (22.1 -> 19.0 us; aiter's one-stage order there), two-stage from 128 (24.4 -> 22.1 us, 39.7 -> 35.5 at
++        # 512). Between, both forms are slower (one-shot 25.9 vs 19.3 us at 32 rows).
++        self.oneshot_below = 16 if self.nr == 8 else 0
++        self.twostage_from = 128 if self.nr == 8 else 0
+         self.device = device
+         self.max_rows = int(max_rows)
+         h = _hip_lib()
+         with torch.cuda.device(device):
+             arch = torch.cuda.get_device_properties(device).gcnArchName.split(":")[0]
+-            co = _build(arch, sqrt)
++            co = _build(arch, sqrt, self.nr)
+             module = ctypes.c_void_p()
+             try:
+                 _check(
+@@ -163,20 +169,20 @@
+             finally:
+                 shutil.rmtree(os.path.dirname(co), ignore_errors=True)
+             self._module = module
+-            self._k = _Kernel(module, "muse_finalize_allreduce_tp4")
++            self._k = _Kernel(module, "muse_finalize_allreduce")
+             fill = _Kernel(module, "muse_finalize_allreduce_fill")
+-            nbytes = 3 * (_NR + 1) * self.max_rows * _ROW_BYTES
++            nbytes = 3 * (self.nr + 1) * self.max_rows * _ROW_BYTES
+             ptr = ctypes.c_void_p()
+             _check(h.hipMalloc(ctypes.byref(ptr), nbytes), "hipMalloc")
+             handle = _IpcHandle()
+             _check(
+                 h.hipIpcGetMemHandle(ctypes.byref(handle), ptr), "hipIpcGetMemHandle"
+             )
+-            handles = [None] * _NR
++            handles = [None] * self.nr
+             dist.all_gather_object(
+                 handles, ctypes.string_at(ctypes.addressof(handle), 64), group=cpu_group
+             )
+-            self._peers = (ctypes.c_void_p * _NR)()
++            self._peers = (ctypes.c_void_p * _MAX_NR)()
+             for i, raw in enumerate(handles):
+                 if i == self.rank:
+                     self._peers[i] = ptr.value
+@@ -202,7 +208,11 @@
+         dist.barrier(group=cpu_group)
+ 
+     def applies(self, rows: int) -> bool:
+-        return 0 < rows <= self.max_rows and rows % _NR == 0
++        return (
++            0 < rows <= self.max_rows
++            and rows % self.nr == 0
++            and (rows < self.oneshot_below or rows >= self.twostage_from)
++        )
+ 
+     def __call__(
+         self,
+@@ -237,7 +247,7 @@
+         args = _Args(
+             y.data_ptr(), gamma.data_ptr(), scores.data_ptr(), ids.data_ptr(), out.data_ptr(),
+             self._peers, self.row_state.data_ptr(), int(local_start), int(num_local), float(eps), float(gain),
+-            self.rank, m, self.max_rows, 0,
++            self.rank, m, self.max_rows, int(m < self.oneshot_below),
+         )  # fmt: skip
+         self._k.launch(m, args, torch.cuda.current_stream(y.device).cuda_stream)
+         return out
+@@ -252,7 +262,9 @@
+     if _instance is None:
+         _instance = MuseFinalizeAllreduce(cpu_group, device)
+         logger.info(
+-            "Muse fused finalize + TP4 all-reduce enabled (rank %d)", _instance.rank
++            "Muse fused finalize + TP%d all-reduce enabled (rank %d)",
++            _instance.nr,
++            _instance.rank,
+         )
+     return _instance
+ 
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py
+@@ -1042,8 +1042,8 @@
+             and _is_rocm()
+             and mxfp4_moe.COMPACT_A4_ENABLED
+             and self.mxfp4_checkpoint
+-            and self.tp_size == self.ep_size == 4
+-            and self.num_local_experts == 64
++            and self.tp_size == self.ep_size
++            and (self.tp_size, self.num_local_experts) in ((4, 64), (8, 32))
+             and self.top_k == 8
+             and self.expert_hidden_size == 4096
+             else None
+@@ -1412,7 +1412,7 @@
+             and (
+                 (
+                     sp is None
+-                    and 0 < attn_output.shape[0] <= _FP8_MAX_ROWS
++                    and 0 < attn_output.shape[0] <= router_pooler.FP8_JOINT_MAX_M
+                     and (forward_batch.forward_mode.is_decode() or target_verify)
+                 )
+                 or (
+--- sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py
++++ sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py
+@@ -34,12 +34,26 @@
+ # activation (same switch as the FP8 dense GEMMs).
+ JOINT_POOLER_FP8 = JOINT_ROUTER_POOLER and envs.SGLANG_MUSE_DENSE_FP8.get()
+ _JOINT_ROWS = (8, 16, 24)
++# Rows above 64 go to the joint form wherever it has a row-major tile (BM 128 in bf16_tiled_small_m_gemm.ROW_MAJOR).
++JOINT_MAX_ROWS = envs.SGLANG_MUSE_JOINT_ROUTER_MAX_ROWS.get()
+ _logged: set = set()
+ 
+ 
+ def can_share_router_pooler(moe, x: torch.Tensor) -> bool:
+     """The Muse Spark TP8 routing front: 8192 hidden, 256 experts top-8 sigmoid, 4096-wide pooler + norm."""
+-    return 0 < x.shape[0] <= 64 and _routing_front_matches(moe, x)
++    m = x.shape[0]
++    if not (0 < m <= max(64, JOINT_MAX_ROWS) and _routing_front_matches(moe, x)):
++        return False
++    if m <= 64:
++        return True
++    # Above 64 rows only the joint form serves: the shared form's completed-pooler epilogue stops at 64.
++    packed = getattr(moe, "router_pooler_packed_weight", None)
++    return (
++        JOINT_ROUTER_POOLER
++        and envs.SGLANG_MUSE_DENSE_TILED.get()
++        and packed is not None
++        and joint_router_pooler_applies(x, packed)
++    )
+ 
+ 
+ def can_route_fp8_joint(moe, x: torch.Tensor, x_fp8) -> bool:

@@ -1,0 +1,578 @@
+[
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/03d973bca01a7c532a49ac5d0f59f644f80866e0/.github/workflows/run-sweep.yml",
+    "commit": "03d973bca01a7c532a49ac5d0f59f644f80866e0",
+    "path": ".github/workflows/run-sweep.yml",
+    "sha256": "23e02ddf496da5e5af3bd357528523bec0fa3670ecde7d6e764bd0abc419853d",
+    "bytes": 54286,
+    "retrieved_at_utc": "2026-11-09T05:51:56.912366+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/03d973bca01a7c532a49ac5d0f59f644f80866e0/inferencex-e2e/benchmarks/multi_node/srt-slurm-recipes/musespark/sglang/gb300-fp4/agentx/agg-variants.yaml",
+    "commit": "03d973bca01a7c532a49ac5d0f59f644f80866e0",
+    "path": "inferencex-e2e/benchmarks/multi_node/srt-slurm-recipes/musespark/sglang/gb300-fp4/agentx/agg-variants.yaml",
+    "sha256": "e27c7ded2e70061272372882e7f200aa1c0f62fe972253bf115ecf521ca26480",
+    "bytes": 6665,
+    "retrieved_at_utc": "2026-11-09T05:51:57.086724+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/03d973bca01a7c532a49ac5d0f59f644f80866e0/inferencex-e2e/benchmarks/multi_node/srt-slurm-recipes/musespark/trtllm/gb300-fp4/agentx/agg-variants.yaml",
+    "commit": "03d973bca01a7c532a49ac5d0f59f644f80866e0",
+    "path": "inferencex-e2e/benchmarks/multi_node/srt-slurm-recipes/musespark/trtllm/gb300-fp4/agentx/agg-variants.yaml",
+    "sha256": "1ca622fb9d456cf6bf917b365e2fefeb1a4cfe26bf25925902bd88c256108fe5",
+    "bytes": 7645,
+    "retrieved_at_utc": "2026-11-09T05:51:57.274389+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/03d973bca01a7c532a49ac5d0f59f644f80866e0/inferencex-e2e/benchmarks/single_node/speedbench/musespark_fp4_b300_sglang.sh",
+    "commit": "03d973bca01a7c532a49ac5d0f59f644f80866e0",
+    "path": "inferencex-e2e/benchmarks/single_node/speedbench/musespark_fp4_b300_sglang.sh",
+    "sha256": "7a4553cd563f87f0ece2e95a94a3d4eb4933e1438f7fa880f99e007e6fe77009",
+    "bytes": 9008,
+    "retrieved_at_utc": "2026-11-09T05:51:57.430523+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/03d973bca01a7c532a49ac5d0f59f644f80866e0/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b200-fp4-mtp/agentic.yaml",
+    "commit": "03d973bca01a7c532a49ac5d0f59f644f80866e0",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b200-fp4-mtp/agentic.yaml",
+    "sha256": "19491643768dce84c59e6a7860e02ffe431a145889d24e3178cfa701c888845d",
+    "bytes": 8172,
+    "retrieved_at_utc": "2026-11-09T05:51:57.651317+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/03d973bca01a7c532a49ac5d0f59f644f80866e0/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b300-fp4-mtp/agentic.yaml",
+    "commit": "03d973bca01a7c532a49ac5d0f59f644f80866e0",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b300-fp4-mtp/agentic.yaml",
+    "sha256": "735b3db4e89e801a8b49b382f4ed68e5fe116535298b1cf774df8e4bae531f4c",
+    "bytes": 9307,
+    "retrieved_at_utc": "2026-11-09T05:51:57.808811+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/03d973bca01a7c532a49ac5d0f59f644f80866e0/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb200-fp4-mtp/agentic.yaml",
+    "commit": "03d973bca01a7c532a49ac5d0f59f644f80866e0",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb200-fp4-mtp/agentic.yaml",
+    "sha256": "af94b98e78ead7a1a43e7402a3afa964596f1d45e4ba215da35f8f498d6c9f46",
+    "bytes": 7893,
+    "retrieved_at_utc": "2026-11-09T05:51:57.964240+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/03d973bca01a7c532a49ac5d0f59f644f80866e0/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb300-fp4-mtp/agentic.yaml",
+    "commit": "03d973bca01a7c532a49ac5d0f59f644f80866e0",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb300-fp4-mtp/agentic.yaml",
+    "sha256": "2c1899c04de5055565e4e1c33ecff1159c8ffd2123299c49c0c96974afca4e50",
+    "bytes": 6878,
+    "retrieved_at_utc": "2026-11-09T05:51:58.153417+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/03d973bca01a7c532a49ac5d0f59f644f80866e0/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h100-fp4-mtp/agentic.yaml",
+    "commit": "03d973bca01a7c532a49ac5d0f59f644f80866e0",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h100-fp4-mtp/agentic.yaml",
+    "sha256": "ba57e88e81a707e2080293f517f799ac7bc362f0558a3f40331a212e6eb2be01",
+    "bytes": 3189,
+    "retrieved_at_utc": "2026-11-09T05:51:58.332819+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/03d973bca01a7c532a49ac5d0f59f644f80866e0/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h200-fp4-mtp/agentic.yaml",
+    "commit": "03d973bca01a7c532a49ac5d0f59f644f80866e0",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h200-fp4-mtp/agentic.yaml",
+    "sha256": "cde15f8865899540dcce30c71c76ba39cce984d256cbd89ced7f85bc519d752f",
+    "bytes": 2606,
+    "retrieved_at_utc": "2026-11-09T05:51:58.502753+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/03d973bca01a7c532a49ac5d0f59f644f80866e0/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/mi355x-fp4-mtp/agentic.yaml",
+    "commit": "03d973bca01a7c532a49ac5d0f59f644f80866e0",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/mi355x-fp4-mtp/agentic.yaml",
+    "sha256": "42af3cbcbd1e04d0c34d120c48ccb556ee049f03972f00c97b06367ee9c2bb0c",
+    "bytes": 5900,
+    "retrieved_at_utc": "2026-11-09T05:51:58.758113+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/03d973bca01a7c532a49ac5d0f59f644f80866e0/inferencex-e2e/benchmarks/srt_agentic.sh",
+    "commit": "03d973bca01a7c532a49ac5d0f59f644f80866e0",
+    "path": "inferencex-e2e/benchmarks/srt_agentic.sh",
+    "sha256": "31bff4098ec869700716fae7c1dc0415fd7815e8dc0dfcdbb4a7433a7221861c",
+    "bytes": 322,
+    "retrieved_at_utc": "2026-11-09T05:51:58.916863+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/03d973bca01a7c532a49ac5d0f59f644f80866e0/inferencex-e2e/configs/amd-master.yaml",
+    "commit": "03d973bca01a7c532a49ac5d0f59f644f80866e0",
+    "path": "inferencex-e2e/configs/amd-master.yaml",
+    "sha256": "90c5d3d04afdc6b32dc359b7139bdccd4b9bf7ce4c3a26c7736067986850181a",
+    "bytes": 47012,
+    "retrieved_at_utc": "2026-11-09T05:51:59.090343+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b/.github/workflows/run-sweep.yml",
+    "commit": "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b",
+    "path": ".github/workflows/run-sweep.yml",
+    "sha256": "e931e1a81b56ee423bbabf3aa09fcd03e2cc603c26473b09f941fd3f27cd91e0",
+    "bytes": 50177,
+    "retrieved_at_utc": "2026-11-09T05:51:56.980250+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b/inferencex-e2e/benchmarks/single_node/speedbench/musespark_fp4_b300_sglang.sh",
+    "commit": "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b",
+    "path": "inferencex-e2e/benchmarks/single_node/speedbench/musespark_fp4_b300_sglang.sh",
+    "sha256": "66ecbe03a4c9e284aecaf3f10d8dd1eb087e4941ae3127d729c8a6975afb03ff",
+    "bytes": 8368,
+    "retrieved_at_utc": "2026-11-09T05:51:57.143211+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b200-fp4-mtp/agentic.yaml",
+    "commit": "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b200-fp4-mtp/agentic.yaml",
+    "sha256": "e68f10cc7c9734a7d5a961ced3102bc765bd5e4a5521166c42fdc0620ddf5272",
+    "bytes": 3961,
+    "retrieved_at_utc": "2026-11-09T05:51:57.300826+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b300-fp4-mtp/agentic.yaml",
+    "commit": "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b300-fp4-mtp/agentic.yaml",
+    "sha256": "07fd97b1576a40db821710890fff22183f730f3c8a8612f29802da9eccfccc8a",
+    "bytes": 2146,
+    "retrieved_at_utc": "2026-11-09T05:51:57.489187+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb200-fp4-mtp/agentic.yaml",
+    "commit": "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb200-fp4-mtp/agentic.yaml",
+    "sha256": "8ec27edb0deb355486ac110de58a9415e3157b745bb6c39679f22b348595ceff",
+    "bytes": 3621,
+    "retrieved_at_utc": "2026-11-09T05:51:57.649824+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb300-fp4-mtp/agentic.yaml",
+    "commit": "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb300-fp4-mtp/agentic.yaml",
+    "sha256": "5e809e27b3048c7fb25bf48915b9717ea8acb519ef795bd05c10e05dbe54bdab",
+    "bytes": 2280,
+    "retrieved_at_utc": "2026-11-09T05:51:57.796111+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h100-fp4-mtp/agentic.yaml",
+    "commit": "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h100-fp4-mtp/agentic.yaml",
+    "sha256": "dd07fd8e9eeeb84351c44d4ebb98bbb5101523b3f0798ca10c5f20b29b38758f",
+    "bytes": 3145,
+    "retrieved_at_utc": "2026-11-09T05:51:57.963395+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h200-fp4-mtp/agentic.yaml",
+    "commit": "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h200-fp4-mtp/agentic.yaml",
+    "sha256": "cfbeb49c242a6a2d9e254d5ebe215590519aec38645841afdb2e0c4f36f73cc9",
+    "bytes": 2042,
+    "retrieved_at_utc": "2026-11-09T05:51:58.139311+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/mi355x-fp4-mtp/agentic.yaml",
+    "commit": "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/mi355x-fp4-mtp/agentic.yaml",
+    "sha256": "5f735c18aba523de2cf4e8178100e45692edcdbb326bfa7ab007ff687b390d88",
+    "bytes": 4185,
+    "retrieved_at_utc": "2026-11-09T05:51:58.318925+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b/inferencex-e2e/benchmarks/srt_agentic.sh",
+    "commit": "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b",
+    "path": "inferencex-e2e/benchmarks/srt_agentic.sh",
+    "sha256": "31bff4098ec869700716fae7c1dc0415fd7815e8dc0dfcdbb4a7433a7221861c",
+    "bytes": 322,
+    "retrieved_at_utc": "2026-11-09T05:51:58.474160+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b/inferencex-e2e/configs/amd-master.yaml",
+    "commit": "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b",
+    "path": "inferencex-e2e/configs/amd-master.yaml",
+    "sha256": "c5378c347389879a6c0a6c9b8c6d8104108efae468bf6b39cabf2957bef18b42",
+    "bytes": 60445,
+    "retrieved_at_utc": "2026-11-09T05:51:58.696314+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b/inferencex-e2e/infx/golden_al_distribution/musespark_dflash.yaml",
+    "commit": "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b",
+    "path": "inferencex-e2e/infx/golden_al_distribution/musespark_dflash.yaml",
+    "sha256": "9fa72195d6bd2c01f6c97b673da2b50bcd1345b3722fb9e5f1d7506bce82f0d3",
+    "bytes": 751,
+    "retrieved_at_utc": "2026-11-09T05:51:58.856912+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/2dd693edb2d7318867f7f6759034571ad734f9f2/.github/workflows/run-sweep.yml",
+    "commit": "2dd693edb2d7318867f7f6759034571ad734f9f2",
+    "path": ".github/workflows/run-sweep.yml",
+    "sha256": "87ecb34184853f02f28daaa845433baae9a925cff448c3b75daf12ae5c11889c",
+    "bytes": 51415,
+    "retrieved_at_utc": "2026-11-09T05:51:56.985460+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/2dd693edb2d7318867f7f6759034571ad734f9f2/inferencex-e2e/benchmarks/single_node/speedbench/musespark_fp4_b300_sglang.sh",
+    "commit": "2dd693edb2d7318867f7f6759034571ad734f9f2",
+    "path": "inferencex-e2e/benchmarks/single_node/speedbench/musespark_fp4_b300_sglang.sh",
+    "sha256": "66ecbe03a4c9e284aecaf3f10d8dd1eb087e4941ae3127d729c8a6975afb03ff",
+    "bytes": 8368,
+    "retrieved_at_utc": "2026-11-09T05:51:57.150023+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/2dd693edb2d7318867f7f6759034571ad734f9f2/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b200-fp4-mtp/agentic.yaml",
+    "commit": "2dd693edb2d7318867f7f6759034571ad734f9f2",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b200-fp4-mtp/agentic.yaml",
+    "sha256": "97d42ab9497da179e63e3aa0684cc053b387d1f9913950e9bd0e391a24a11de0",
+    "bytes": 4330,
+    "retrieved_at_utc": "2026-11-09T05:51:57.359271+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/2dd693edb2d7318867f7f6759034571ad734f9f2/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b300-fp4-mtp/agentic.yaml",
+    "commit": "2dd693edb2d7318867f7f6759034571ad734f9f2",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b300-fp4-mtp/agentic.yaml",
+    "sha256": "40f9a9397856616e43961b67bfe4d4d30bfd7b76c4cc879b3b78cac4be2cf036",
+    "bytes": 2995,
+    "retrieved_at_utc": "2026-11-09T05:51:57.509927+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/2dd693edb2d7318867f7f6759034571ad734f9f2/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb200-fp4-mtp/agentic.yaml",
+    "commit": "2dd693edb2d7318867f7f6759034571ad734f9f2",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb200-fp4-mtp/agentic.yaml",
+    "sha256": "75a8128fd2a393f0d262d084f21b005131753d9bb841816f45820bf1029a7dc1",
+    "bytes": 7204,
+    "retrieved_at_utc": "2026-11-09T05:51:57.671647+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/2dd693edb2d7318867f7f6759034571ad734f9f2/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb300-fp4-mtp/agentic.yaml",
+    "commit": "2dd693edb2d7318867f7f6759034571ad734f9f2",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb300-fp4-mtp/agentic.yaml",
+    "sha256": "6d33bc94f80afbcc12478af2d3772670c93c62fa4ee68798867a19ab4e6e3df3",
+    "bytes": 2504,
+    "retrieved_at_utc": "2026-11-09T05:51:57.823705+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/2dd693edb2d7318867f7f6759034571ad734f9f2/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h100-fp4-mtp/agentic.yaml",
+    "commit": "2dd693edb2d7318867f7f6759034571ad734f9f2",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h100-fp4-mtp/agentic.yaml",
+    "sha256": "ba57e88e81a707e2080293f517f799ac7bc362f0558a3f40331a212e6eb2be01",
+    "bytes": 3189,
+    "retrieved_at_utc": "2026-11-09T05:51:57.980378+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/2dd693edb2d7318867f7f6759034571ad734f9f2/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h200-fp4-mtp/agentic.yaml",
+    "commit": "2dd693edb2d7318867f7f6759034571ad734f9f2",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h200-fp4-mtp/agentic.yaml",
+    "sha256": "cde15f8865899540dcce30c71c76ba39cce984d256cbd89ced7f85bc519d752f",
+    "bytes": 2606,
+    "retrieved_at_utc": "2026-11-09T05:51:58.154706+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/2dd693edb2d7318867f7f6759034571ad734f9f2/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/mi355x-fp4-mtp/agentic.yaml",
+    "commit": "2dd693edb2d7318867f7f6759034571ad734f9f2",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/mi355x-fp4-mtp/agentic.yaml",
+    "sha256": "b5b455fe1ac8aa233097b2560b06e05fd5ef10fa2e8707681c053beda24aec40",
+    "bytes": 3510,
+    "retrieved_at_utc": "2026-11-09T05:51:58.323353+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/2dd693edb2d7318867f7f6759034571ad734f9f2/inferencex-e2e/benchmarks/srt_agentic.sh",
+    "commit": "2dd693edb2d7318867f7f6759034571ad734f9f2",
+    "path": "inferencex-e2e/benchmarks/srt_agentic.sh",
+    "sha256": "31bff4098ec869700716fae7c1dc0415fd7815e8dc0dfcdbb4a7433a7221861c",
+    "bytes": 322,
+    "retrieved_at_utc": "2026-11-09T05:51:58.493954+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/2dd693edb2d7318867f7f6759034571ad734f9f2/inferencex-e2e/configs/amd-master.yaml",
+    "commit": "2dd693edb2d7318867f7f6759034571ad734f9f2",
+    "path": "inferencex-e2e/configs/amd-master.yaml",
+    "sha256": "2adfd352c5e927b034d26b7d4858aabf0fe37ed0ff4475d548158d4379fb9ed2",
+    "bytes": 60578,
+    "retrieved_at_utc": "2026-11-09T05:51:58.681735+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/2dd693edb2d7318867f7f6759034571ad734f9f2/inferencex-e2e/infx/golden_al_distribution/musespark_dflash.yaml",
+    "commit": "2dd693edb2d7318867f7f6759034571ad734f9f2",
+    "path": "inferencex-e2e/infx/golden_al_distribution/musespark_dflash.yaml",
+    "sha256": "9fa72195d6bd2c01f6c97b673da2b50bcd1345b3722fb9e5f1d7506bce82f0d3",
+    "bytes": 751,
+    "retrieved_at_utc": "2026-11-09T05:51:58.872924+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/3bc5b2fca6ae71dfdf71476f58d39a0832601b19/.github/workflows/run-sweep.yml",
+    "commit": "3bc5b2fca6ae71dfdf71476f58d39a0832601b19",
+    "path": ".github/workflows/run-sweep.yml",
+    "sha256": "e931e1a81b56ee423bbabf3aa09fcd03e2cc603c26473b09f941fd3f27cd91e0",
+    "bytes": 50177,
+    "retrieved_at_utc": "2026-11-09T05:51:57.095458+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/3bc5b2fca6ae71dfdf71476f58d39a0832601b19/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b200-fp4-mtp/agentic.yaml",
+    "commit": "3bc5b2fca6ae71dfdf71476f58d39a0832601b19",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b200-fp4-mtp/agentic.yaml",
+    "sha256": "e68f10cc7c9734a7d5a961ced3102bc765bd5e4a5521166c42fdc0620ddf5272",
+    "bytes": 3961,
+    "retrieved_at_utc": "2026-11-09T05:51:57.270647+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/3bc5b2fca6ae71dfdf71476f58d39a0832601b19/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b300-fp4-mtp/agentic.yaml",
+    "commit": "3bc5b2fca6ae71dfdf71476f58d39a0832601b19",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b300-fp4-mtp/agentic.yaml",
+    "sha256": "07fd97b1576a40db821710890fff22183f730f3c8a8612f29802da9eccfccc8a",
+    "bytes": 2146,
+    "retrieved_at_utc": "2026-11-09T05:51:57.437852+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/3bc5b2fca6ae71dfdf71476f58d39a0832601b19/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb200-fp4-mtp/agentic.yaml",
+    "commit": "3bc5b2fca6ae71dfdf71476f58d39a0832601b19",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb200-fp4-mtp/agentic.yaml",
+    "sha256": "8ec27edb0deb355486ac110de58a9415e3157b745bb6c39679f22b348595ceff",
+    "bytes": 3621,
+    "retrieved_at_utc": "2026-11-09T05:51:57.617908+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/3bc5b2fca6ae71dfdf71476f58d39a0832601b19/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb300-fp4-mtp/agentic.yaml",
+    "commit": "3bc5b2fca6ae71dfdf71476f58d39a0832601b19",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb300-fp4-mtp/agentic.yaml",
+    "sha256": "5e809e27b3048c7fb25bf48915b9717ea8acb519ef795bd05c10e05dbe54bdab",
+    "bytes": 2280,
+    "retrieved_at_utc": "2026-11-09T05:51:57.811191+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/3bc5b2fca6ae71dfdf71476f58d39a0832601b19/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/mi355x-fp4-mtp/agentic.yaml",
+    "commit": "3bc5b2fca6ae71dfdf71476f58d39a0832601b19",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/mi355x-fp4-mtp/agentic.yaml",
+    "sha256": "cb7048e4000161a4190135c1b578a137276f12e86fac0ff529f431d3dab048e6",
+    "bytes": 3610,
+    "retrieved_at_utc": "2026-11-09T05:51:57.966785+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/3bc5b2fca6ae71dfdf71476f58d39a0832601b19/inferencex-e2e/benchmarks/srt_agentic.sh",
+    "commit": "3bc5b2fca6ae71dfdf71476f58d39a0832601b19",
+    "path": "inferencex-e2e/benchmarks/srt_agentic.sh",
+    "sha256": "31bff4098ec869700716fae7c1dc0415fd7815e8dc0dfcdbb4a7433a7221861c",
+    "bytes": 322,
+    "retrieved_at_utc": "2026-11-09T05:51:58.177146+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/3bc5b2fca6ae71dfdf71476f58d39a0832601b19/inferencex-e2e/configs/amd-master.yaml",
+    "commit": "3bc5b2fca6ae71dfdf71476f58d39a0832601b19",
+    "path": "inferencex-e2e/configs/amd-master.yaml",
+    "sha256": "2d7629122e8067278ee2c2b3bcc0f54d33f893ab3b06e833485b03e8d4251ae7",
+    "bytes": 60041,
+    "retrieved_at_utc": "2026-11-09T05:51:58.337862+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/3bc5b2fca6ae71dfdf71476f58d39a0832601b19/inferencex-e2e/infx/golden_al_distribution/musespark_dflash.yaml",
+    "commit": "3bc5b2fca6ae71dfdf71476f58d39a0832601b19",
+    "path": "inferencex-e2e/infx/golden_al_distribution/musespark_dflash.yaml",
+    "sha256": "9fa72195d6bd2c01f6c97b673da2b50bcd1345b3722fb9e5f1d7506bce82f0d3",
+    "bytes": 751,
+    "retrieved_at_utc": "2026-11-09T05:51:58.522643+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/57df14d3ccf6f04a37215a8b84575e5ec70b0dd5/.github/workflows/run-sweep.yml",
+    "commit": "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5",
+    "path": ".github/workflows/run-sweep.yml",
+    "sha256": "51d6bfae4249c3ece4fc09c01ed7bf2edbf125af6eb913a6dbf024958bf73b32",
+    "bytes": 51367,
+    "retrieved_at_utc": "2026-11-09T05:51:58.978687+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/57df14d3ccf6f04a37215a8b84575e5ec70b0dd5/inferencex-e2e/benchmarks/single_node/speedbench/musespark_fp4_b300_sglang.sh",
+    "commit": "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5",
+    "path": "inferencex-e2e/benchmarks/single_node/speedbench/musespark_fp4_b300_sglang.sh",
+    "sha256": "66ecbe03a4c9e284aecaf3f10d8dd1eb087e4941ae3127d729c8a6975afb03ff",
+    "bytes": 8368,
+    "retrieved_at_utc": "2026-11-09T05:51:59.164203+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/57df14d3ccf6f04a37215a8b84575e5ec70b0dd5/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b200-fp4-mtp/agentic.yaml",
+    "commit": "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b200-fp4-mtp/agentic.yaml",
+    "sha256": "e68f10cc7c9734a7d5a961ced3102bc765bd5e4a5521166c42fdc0620ddf5272",
+    "bytes": 3961,
+    "retrieved_at_utc": "2026-11-09T05:51:59.330463+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/57df14d3ccf6f04a37215a8b84575e5ec70b0dd5/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b300-fp4-mtp/agentic.yaml",
+    "commit": "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b300-fp4-mtp/agentic.yaml",
+    "sha256": "423180e1ad718031ed03b88070dec857b145ec7e5ef2d415ad8f54f605186d70",
+    "bytes": 2967,
+    "retrieved_at_utc": "2026-11-09T05:51:59.487243+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/57df14d3ccf6f04a37215a8b84575e5ec70b0dd5/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb200-fp4-mtp/agentic.yaml",
+    "commit": "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb200-fp4-mtp/agentic.yaml",
+    "sha256": "8ec27edb0deb355486ac110de58a9415e3157b745bb6c39679f22b348595ceff",
+    "bytes": 3621,
+    "retrieved_at_utc": "2026-11-09T05:51:59.639768+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/57df14d3ccf6f04a37215a8b84575e5ec70b0dd5/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb300-fp4-mtp/agentic.yaml",
+    "commit": "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb300-fp4-mtp/agentic.yaml",
+    "sha256": "5e809e27b3048c7fb25bf48915b9717ea8acb519ef795bd05c10e05dbe54bdab",
+    "bytes": 2280,
+    "retrieved_at_utc": "2026-11-09T05:51:59.818032+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/57df14d3ccf6f04a37215a8b84575e5ec70b0dd5/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h100-fp4-mtp/agentic.yaml",
+    "commit": "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h100-fp4-mtp/agentic.yaml",
+    "sha256": "ba57e88e81a707e2080293f517f799ac7bc362f0558a3f40331a212e6eb2be01",
+    "bytes": 3189,
+    "retrieved_at_utc": "2026-11-09T05:52:00.004981+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/57df14d3ccf6f04a37215a8b84575e5ec70b0dd5/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h200-fp4-mtp/agentic.yaml",
+    "commit": "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h200-fp4-mtp/agentic.yaml",
+    "sha256": "003468354a04121db99b93821deb5c003fb3d9d9d4d0ad4c211074e886dc1d5d",
+    "bytes": 2373,
+    "retrieved_at_utc": "2026-11-09T05:52:00.161999+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/57df14d3ccf6f04a37215a8b84575e5ec70b0dd5/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/mi355x-fp4-mtp/agentic.yaml",
+    "commit": "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/mi355x-fp4-mtp/agentic.yaml",
+    "sha256": "5f735c18aba523de2cf4e8178100e45692edcdbb326bfa7ab007ff687b390d88",
+    "bytes": 4185,
+    "retrieved_at_utc": "2026-11-09T05:52:00.320121+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/57df14d3ccf6f04a37215a8b84575e5ec70b0dd5/inferencex-e2e/benchmarks/srt_agentic.sh",
+    "commit": "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5",
+    "path": "inferencex-e2e/benchmarks/srt_agentic.sh",
+    "sha256": "31bff4098ec869700716fae7c1dc0415fd7815e8dc0dfcdbb4a7433a7221861c",
+    "bytes": 322,
+    "retrieved_at_utc": "2026-11-09T05:52:00.465281+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/57df14d3ccf6f04a37215a8b84575e5ec70b0dd5/inferencex-e2e/configs/amd-master.yaml",
+    "commit": "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5",
+    "path": "inferencex-e2e/configs/amd-master.yaml",
+    "sha256": "c5378c347389879a6c0a6c9b8c6d8104108efae468bf6b39cabf2957bef18b42",
+    "bytes": 60445,
+    "retrieved_at_utc": "2026-11-09T05:52:00.634513+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/57df14d3ccf6f04a37215a8b84575e5ec70b0dd5/inferencex-e2e/infx/golden_al_distribution/musespark_dflash.yaml",
+    "commit": "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5",
+    "path": "inferencex-e2e/infx/golden_al_distribution/musespark_dflash.yaml",
+    "sha256": "9fa72195d6bd2c01f6c97b673da2b50bcd1345b3722fb9e5f1d7506bce82f0d3",
+    "bytes": 751,
+    "retrieved_at_utc": "2026-11-09T05:52:00.793979+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/.github/workflows/run-sweep.yml",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": ".github/workflows/run-sweep.yml",
+    "sha256": "65c0088e9b44d220f1e5fba9922b3bc1ecaebc9d81d4942d9739242948cab16e",
+    "bytes": 50026,
+    "retrieved_at_utc": "2026-11-09T05:51:59.383061+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/inferencex-e2e/benchmarks/multi_node/srt-slurm-recipes/musespark/sglang/gb300-fp4/agentx/agg-variants.yaml",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": "inferencex-e2e/benchmarks/multi_node/srt-slurm-recipes/musespark/sglang/gb300-fp4/agentx/agg-variants.yaml",
+    "sha256": "e27c7ded2e70061272372882e7f200aa1c0f62fe972253bf115ecf521ca26480",
+    "bytes": 6665,
+    "retrieved_at_utc": "2026-11-09T05:51:59.596366+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/inferencex-e2e/benchmarks/multi_node/srt-slurm-recipes/musespark/trtllm/gb300-fp4/agentx/agg-variants.yaml",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": "inferencex-e2e/benchmarks/multi_node/srt-slurm-recipes/musespark/trtllm/gb300-fp4/agentx/agg-variants.yaml",
+    "sha256": "1ca622fb9d456cf6bf917b365e2fefeb1a4cfe26bf25925902bd88c256108fe5",
+    "bytes": 7645,
+    "retrieved_at_utc": "2026-11-09T05:51:59.788407+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/inferencex-e2e/benchmarks/single_node/speedbench/musespark_fp4_b300_sglang.sh",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": "inferencex-e2e/benchmarks/single_node/speedbench/musespark_fp4_b300_sglang.sh",
+    "sha256": "66ecbe03a4c9e284aecaf3f10d8dd1eb087e4941ae3127d729c8a6975afb03ff",
+    "bytes": 8368,
+    "retrieved_at_utc": "2026-11-09T05:51:59.956901+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b200-fp4-mtp/agentic.yaml",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b200-fp4-mtp/agentic.yaml",
+    "sha256": "1d46a048d60541651893287deec9e68ca0f29afa9cabb0efb966f4e1bd39b43a",
+    "bytes": 9559,
+    "retrieved_at_utc": "2026-11-09T05:52:00.161822+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b300-fp4-mtp/agentic.yaml",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/b300-fp4-mtp/agentic.yaml",
+    "sha256": "596c27b8cfa4682a5a73256396649a8868131fde519979de651bbd8f30014c96",
+    "bytes": 10136,
+    "retrieved_at_utc": "2026-11-09T05:52:00.311409+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb200-fp4-mtp/agentic.yaml",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb200-fp4-mtp/agentic.yaml",
+    "sha256": "4e0d654af8e9cfd5d2b4d9d867a31c7b429791f8f3dc93312ac18c2224269ef8",
+    "bytes": 7447,
+    "retrieved_at_utc": "2026-11-09T05:52:00.505110+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb300-fp4-mtp/agentic.yaml",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/gb300-fp4-mtp/agentic.yaml",
+    "sha256": "60628e3c501f032386c21a18b19b9dfc532063f1d8d472e371f3486b058a14bc",
+    "bytes": 7237,
+    "retrieved_at_utc": "2026-11-09T05:52:00.651972+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h100-fp4-mtp/agentic.yaml",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h100-fp4-mtp/agentic.yaml",
+    "sha256": "ba57e88e81a707e2080293f517f799ac7bc362f0558a3f40331a212e6eb2be01",
+    "bytes": 3189,
+    "retrieved_at_utc": "2026-11-09T05:52:00.816979+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h200-fp4-mtp/agentic.yaml",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/h200-fp4-mtp/agentic.yaml",
+    "sha256": "cde15f8865899540dcce30c71c76ba39cce984d256cbd89ced7f85bc519d752f",
+    "bytes": 2606,
+    "retrieved_at_utc": "2026-11-09T05:52:01.011152+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/mi355x-fp4-mtp/agentic.yaml",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": "inferencex-e2e/benchmarks/single_node/srt-slurm-recipes/musespark/sglang/mi355x-fp4-mtp/agentic.yaml",
+    "sha256": "802ca5dffc48b65014876c7235794e0f69a75cb79fb226d8fbc26f9fa2d56a01",
+    "bytes": 7716,
+    "retrieved_at_utc": "2026-11-09T05:52:01.193456+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/inferencex-e2e/benchmarks/srt_agentic.sh",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": "inferencex-e2e/benchmarks/srt_agentic.sh",
+    "sha256": "31bff4098ec869700716fae7c1dc0415fd7815e8dc0dfcdbb4a7433a7221861c",
+    "bytes": 322,
+    "retrieved_at_utc": "2026-11-09T05:52:01.372660+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/inferencex-e2e/configs/amd-master.yaml",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": "inferencex-e2e/configs/amd-master.yaml",
+    "sha256": "c5758ca3caa3d81d3a6121a4670d9e3d9fbef692d79297ec8b437c1bd96049c1",
+    "bytes": 66562,
+    "retrieved_at_utc": "2026-11-09T05:52:01.543439+00:00"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SemiAnalysisAI/InferenceX/639d4565920c1af90bbe958c8ac2957bf11eb603/inferencex-e2e/infx/golden_al_distribution/musespark_dflash.yaml",
+    "commit": "639d4565920c1af90bbe958c8ac2957bf11eb603",
+    "path": "inferencex-e2e/infx/golden_al_distribution/musespark_dflash.yaml",
+    "sha256": "9fa72195d6bd2c01f6c97b673da2b50bcd1345b3722fb9e5f1d7506bce82f0d3",
+    "bytes": 751,
+    "retrieved_at_utc": "2026-11-09T05:52:01.714431+00:00"
+  }
+]

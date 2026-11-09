@@ -1,0 +1,411 @@
+[
+  {
+    "from_date": "2026-10-16",
+    "to_date": "2026-10-22",
+    "from_image": "lmsysorg/sglang-rocm:muse-spark-open",
+    "to_image": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+    "from_digest": "sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4",
+    "to_digest": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+    "performance_pairs": [
+      {
+        "from_image": "lmsysorg/sglang-rocm:muse-spark-open",
+        "to_image": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+        "from_id": "445154",
+        "to_id": "446033",
+        "from_date": "2026-10-16",
+        "to_date": "2026-10-22",
+        "tp": "8",
+        "ep": "8",
+        "conc": "1",
+        "offload": "off",
+        "x1": "184.1620626151013",
+        "x2": "316.4556962025316",
+        "y1": "17.80801",
+        "y2": "18.76961",
+        "interactivity_change_pct": "71.83544303797467",
+        "throughput_change_pct": "5.399817273238283",
+        "recipe_changed": "True",
+        "status": "descriptive_same_dashboard_config",
+        "from_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/attempts/1",
+        "to_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/attempts/1"
+      },
+      {
+        "from_image": "lmsysorg/sglang-rocm:muse-spark-open",
+        "to_image": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+        "from_id": "445172",
+        "to_id": "446032",
+        "from_date": "2026-10-16",
+        "to_date": "2026-10-22",
+        "tp": "8",
+        "ep": "8",
+        "conc": "16",
+        "offload": "on",
+        "x1": "66.18133686300463",
+        "x2": "152.67175572519082",
+        "y1": "80.08901",
+        "y2": "85.64186",
+        "interactivity_change_pct": "130.68702290076334",
+        "throughput_change_pct": "6.933348283366203",
+        "recipe_changed": "True",
+        "status": "descriptive_same_dashboard_config",
+        "from_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/attempts/1",
+        "to_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/attempts/1"
+      },
+      {
+        "from_image": "lmsysorg/sglang-rocm:muse-spark-open",
+        "to_image": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+        "from_id": "445155",
+        "to_id": "446037",
+        "from_date": "2026-10-16",
+        "to_date": "2026-10-22",
+        "tp": "8",
+        "ep": "8",
+        "conc": "4",
+        "offload": "off",
+        "x1": "164.20361247947454",
+        "x2": "277.77777777777777",
+        "y1": "25.60845",
+        "y2": "28.07251",
+        "interactivity_change_pct": "69.16666666666667",
+        "throughput_change_pct": "9.622058344023166",
+        "recipe_changed": "True",
+        "status": "descriptive_same_dashboard_config",
+        "from_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/attempts/1",
+        "to_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/attempts/1"
+      },
+      {
+        "from_image": "lmsysorg/sglang-rocm:muse-spark-open",
+        "to_image": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+        "from_id": "445156",
+        "to_id": "446039",
+        "from_date": "2026-10-16",
+        "to_date": "2026-10-22",
+        "tp": "8",
+        "ep": "8",
+        "conc": "8",
+        "offload": "off",
+        "x1": "116.82242990654206",
+        "x2": "223.21428571428572",
+        "y1": "43.15223",
+        "y2": "52.50394",
+        "interactivity_change_pct": "91.07142857142858",
+        "throughput_change_pct": "21.671440850217927",
+        "recipe_changed": "True",
+        "status": "descriptive_same_dashboard_config",
+        "from_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/attempts/1",
+        "to_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/attempts/1"
+      }
+    ],
+    "source_findings": [
+      {
+        "evidence_level": "source_verified",
+        "pipeline": "attention_qk_cache",
+        "change": "new Triton normalization/RoPE/FP8 cache-write epilogue and QKV split-K epilogue dispatch",
+        "language": [
+          "Triton"
+        ],
+        "fusion_type": "expanded_semantic_epilogue",
+        "evidence": [
+          "source_diffs/01_to_02.diff",
+          "source_excerpts.md#e1"
+        ]
+      },
+      {
+        "evidence_level": "source_verified",
+        "pipeline": "router_pooler",
+        "change": "shared and joint projection/top-k/pre-expert norm epilogue",
+        "language": [
+          "Triton",
+          "library_GEMM"
+        ],
+        "fusion_type": "projection_and_epilogue_reorganization",
+        "evidence": [
+          "source_diffs/01_to_02.diff"
+        ]
+      },
+      {
+        "evidence_level": "source_verified",
+        "pipeline": "moe",
+        "change": "compact A4 target verify and A4W4 prefill routes added, preserving separate per-expert finalize semantics",
+        "language": [
+          "Triton",
+          "FlyDSL"
+        ],
+        "fusion_type": "quantization_staging_and_dispatch",
+        "evidence": [
+          "source_diffs/01_to_02.diff"
+        ]
+      }
+    ],
+    "runtime_path_evidence": "selected historical server logs confirm initialization and fast-path dispatch; may include warmup",
+    "top_kernels": null,
+    "gpu_time_share": null,
+    "historical_gpu_profile_status": "unavailable",
+    "causal_performance_attribution": "not_established",
+    "confounders_reference": "../kernel_evolution.md"
+  },
+  {
+    "from_date": "2026-10-22",
+    "to_date": "2026-10-30",
+    "from_image": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+    "to_image": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+    "from_digest": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+    "to_digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+    "performance_pairs": [
+      {
+        "from_image": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+        "to_image": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+        "from_id": "446033",
+        "to_id": "446944",
+        "from_date": "2026-10-22",
+        "to_date": "2026-10-30",
+        "tp": "8",
+        "ep": "8",
+        "conc": "1",
+        "offload": "off",
+        "x1": "316.4556962025316",
+        "x2": "469.4835680751174",
+        "y1": "18.76961",
+        "y2": "20.8882",
+        "interactivity_change_pct": "48.3568075117371",
+        "throughput_change_pct": "11.287341612319057",
+        "recipe_changed": "True",
+        "status": "descriptive_same_dashboard_config",
+        "from_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/attempts/1",
+        "to_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/attempts/1"
+      },
+      {
+        "from_image": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+        "to_image": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+        "from_id": "446037",
+        "to_id": "446945",
+        "from_date": "2026-10-22",
+        "to_date": "2026-10-30",
+        "tp": "8",
+        "ep": "8",
+        "conc": "4",
+        "offload": "off",
+        "x1": "277.77777777777777",
+        "x2": "373.13432835820896",
+        "y1": "28.07251",
+        "y2": "31.54411",
+        "interactivity_change_pct": "34.32835820895524",
+        "throughput_change_pct": "12.36654648978661",
+        "recipe_changed": "True",
+        "status": "descriptive_same_dashboard_config",
+        "from_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/attempts/1",
+        "to_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/attempts/1"
+      },
+      {
+        "from_image": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+        "to_image": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+        "from_id": "446039",
+        "to_id": "446946",
+        "from_date": "2026-10-22",
+        "to_date": "2026-10-30",
+        "tp": "8",
+        "ep": "8",
+        "conc": "8",
+        "offload": "off",
+        "x1": "223.21428571428572",
+        "x2": "363.6363636363637",
+        "y1": "52.50394",
+        "y2": "54.00621",
+        "interactivity_change_pct": "62.909090909090914",
+        "throughput_change_pct": "2.8612519365213362",
+        "recipe_changed": "True",
+        "status": "descriptive_same_dashboard_config",
+        "from_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/attempts/1",
+        "to_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/attempts/1"
+      }
+    ],
+    "source_findings": [
+      {
+        "evidence_level": "source_verified",
+        "pipeline": "eligible_mxfp4_layer",
+        "change": "AMD monokernel merges attention, output projection/reduction, routing, MoE, boundary and next-layer K1 under default merged mode",
+        "language": [
+          "FlyDSL"
+        ],
+        "fusion_type": "cross_operator_and_cross_layer_launch_fusion",
+        "evidence": [
+          "source_excerpts.md#e2",
+          "source_excerpts.md#e3",
+          "server_log_extracts.json"
+        ]
+      },
+      {
+        "evidence_level": "source_verified",
+        "pipeline": "moe_finalize_allreduce",
+        "change": "TP4 per-expert norm/weighted finalize and peer all-reduce in one HIP launch",
+        "language": [
+          "HIP/C++"
+        ],
+        "fusion_type": "compute_collective_fusion",
+        "evidence": [
+          "source_excerpts.md#e4",
+          "source_diffs/02_to_03.diff",
+          "server_log_extracts.json"
+        ]
+      }
+    ],
+    "runtime_path_evidence": "selected historical server logs confirm initialization and fast-path dispatch; may include warmup",
+    "top_kernels": null,
+    "gpu_time_share": null,
+    "historical_gpu_profile_status": "unavailable",
+    "causal_performance_attribution": "not_established",
+    "confounders_reference": "../kernel_evolution.md"
+  },
+  {
+    "from_date": "2026-10-30",
+    "to_date": "2026-11-08",
+    "from_image": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+    "to_image": "lmsysorg/sglang-rocm:muse-spark-open-mi355-1106",
+    "from_digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+    "to_digest": "sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2",
+    "performance_pairs": [
+      {
+        "from_image": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+        "to_image": "lmsysorg/sglang-rocm:muse-spark-open-mi355-1106",
+        "from_id": "446940",
+        "to_id": "447695",
+        "from_date": "2026-10-30",
+        "to_date": "2026-11-08",
+        "tp": "4",
+        "ep": "4",
+        "conc": "28",
+        "offload": "on",
+        "x1": "105.15247108307047",
+        "x2": "125.31328320802007",
+        "y1": "212.74006",
+        "y2": "264.84478",
+        "interactivity_change_pct": "19.172932330827063",
+        "throughput_change_pct": "24.4921995415438",
+        "recipe_changed": "True",
+        "status": "descriptive_same_dashboard_config",
+        "from_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/attempts/1",
+        "to_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/attempts/1"
+      },
+      {
+        "from_image": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+        "to_image": "lmsysorg/sglang-rocm:muse-spark-open-mi355-1106",
+        "from_id": "446941",
+        "to_id": "447696",
+        "from_date": "2026-10-30",
+        "to_date": "2026-11-08",
+        "tp": "4",
+        "ep": "4",
+        "conc": "36",
+        "offload": "on",
+        "x1": "54.43658138268916",
+        "x2": "97.18172983479106",
+        "y1": "237.04612",
+        "y2": "307.26669",
+        "interactivity_change_pct": "78.52283770651118",
+        "throughput_change_pct": "29.623167845987087",
+        "recipe_changed": "True",
+        "status": "descriptive_same_dashboard_config",
+        "from_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/attempts/1",
+        "to_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/attempts/1"
+      },
+      {
+        "from_image": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+        "to_image": "lmsysorg/sglang-rocm:muse-spark-open-mi355-1106",
+        "from_id": "446942",
+        "to_id": "447697",
+        "from_date": "2026-10-30",
+        "to_date": "2026-11-08",
+        "tp": "4",
+        "ep": "4",
+        "conc": "40",
+        "offload": "on",
+        "x1": "95.60229445506691",
+        "x2": "72.25433526011561",
+        "y1": "258.1968",
+        "y2": "333.1187",
+        "interactivity_change_pct": "-24.42196531791906",
+        "throughput_change_pct": "29.0173619502643",
+        "recipe_changed": "True",
+        "status": "descriptive_same_dashboard_config",
+        "from_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/attempts/1",
+        "to_run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/attempts/1"
+      }
+    ],
+    "source_findings": [
+      {
+        "evidence_level": "source_verified",
+        "pipeline": "amd_muse_monokernel",
+        "change": "captured Muse monokernel package sources unchanged",
+        "language": [
+          "FlyDSL"
+        ],
+        "fusion_type": "unchanged",
+        "evidence": [
+          "source_changes.json"
+        ]
+      },
+      {
+        "evidence_level": "source_verified",
+        "pipeline": "qk_norm_rope_cache",
+        "change": "same body path now dispatched for page sizes 16/32/64/128 and up to default 512 rows",
+        "language": [
+          "Triton"
+        ],
+        "fusion_type": "expanded_eligibility",
+        "evidence": [
+          "source_excerpts.md#e5",
+          "source_diffs/03_to_04.diff",
+          "server_log_extracts.json"
+        ]
+      },
+      {
+        "evidence_level": "source_verified",
+        "pipeline": "moe_finalize_allreduce",
+        "change": "TP8 support with one-shot below 16 rows and two-stage from 128 rows, intermediate widths fall back",
+        "language": [
+          "HIP/C++"
+        ],
+        "fusion_type": "expanded_eligibility_and_protocol",
+        "evidence": [
+          "source_excerpts.md#e6",
+          "source_diffs/03_to_04.diff",
+          "server_log_extracts.json"
+        ]
+      },
+      {
+        "evidence_level": "source_verified",
+        "pipeline": "full_attention_prefill",
+        "change": "new FlyDSL implementation alongside Gluon fallback/sliding path",
+        "language": [
+          "FlyDSL",
+          "Gluon"
+        ],
+        "fusion_type": "implementation_change_not_new_cross_operator_fusion",
+        "evidence": [
+          "source_excerpts.md#e7",
+          "source_diffs/03_to_04.diff"
+        ]
+      },
+      {
+        "evidence_level": "source_verified",
+        "pipeline": "full_attention_verify",
+        "change": "Triton planning balances split-KV segments for FlyDSL partial computation and merge",
+        "language": [
+          "Triton",
+          "FlyDSL"
+        ],
+        "fusion_type": "additional_planning_launch_not_fusion",
+        "evidence": [
+          "source_excerpts.md#e8",
+          "source_diffs/03_to_04.diff"
+        ]
+      }
+    ],
+    "runtime_path_evidence": "selected historical server logs confirm initialization and fast-path dispatch; may include warmup",
+    "top_kernels": null,
+    "gpu_time_share": null,
+    "historical_gpu_profile_status": "unavailable",
+    "causal_performance_attribution": "not_established",
+    "confounders_reference": "../kernel_evolution.md"
+  }
+]

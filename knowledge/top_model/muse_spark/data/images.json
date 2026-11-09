@@ -1,0 +1,269 @@
+[
+  {
+    "image_name": "lmsysorg/sglang-rocm:muse-spark-open",
+    "first_date": "2026-10-16",
+    "last_date": "2026-10-19",
+    "digests": [
+      "sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4"
+    ],
+    "run_ids": [
+      "38877885539",
+      "38947852942",
+      "39179279826"
+    ],
+    "point_count": 30,
+    "representative_ids": [
+      "445147",
+      "445148",
+      "445149",
+      "445150",
+      "445151",
+      "445152",
+      "445153",
+      "445154",
+      "445155",
+      "445156",
+      "445166",
+      "445167",
+      "445171",
+      "445172"
+    ],
+    "repetitions": [
+      {
+        "representative_id": "445149",
+        "ids": [
+          "445149",
+          "445168",
+          "445324"
+        ],
+        "x_min_max": [
+          138.88888888888889,
+          143.0615164520744
+        ],
+        "y_min_max": [
+          26.05009,
+          30.85665
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445150",
+        "ids": [
+          "445150",
+          "445169",
+          "445325"
+        ],
+        "x_min_max": [
+          106.83760683760683,
+          120.48192771084337
+        ],
+        "y_min_max": [
+          40.69173,
+          47.87384
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445151",
+        "ids": [
+          "445151",
+          "445170",
+          "445326"
+        ],
+        "x_min_max": [
+          64.85084306095979,
+          73.47538574577516
+        ],
+        "y_min_max": [
+          76.10511,
+          80.89658
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445154",
+        "ids": [
+          "445154",
+          "445173",
+          "445329"
+        ],
+        "x_min_max": [
+          181.1594202898551,
+          193.42359767891682
+        ],
+        "y_min_max": [
+          14.74012,
+          17.80801
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445155",
+        "ids": [
+          "445155",
+          "445174",
+          "445330"
+        ],
+        "x_min_max": [
+          158.4786053882726,
+          164.4736842105263
+        ],
+        "y_min_max": [
+          23.44406,
+          25.84921
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445156",
+        "ids": [
+          "445156",
+          "445175",
+          "445331"
+        ],
+        "x_min_max": [
+          110.01100110011001,
+          116.82242990654206
+        ],
+        "y_min_max": [
+          43.15223,
+          44.23556
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445166",
+        "ids": [
+          "445166",
+          "445322"
+        ],
+        "x_min_max": [
+          51.89413596263623,
+          52.74261603375527
+        ],
+        "y_min_max": [
+          93.97718,
+          107.37563
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445167",
+        "ids": [
+          "445167",
+          "445323"
+        ],
+        "x_min_max": [
+          34.494653328734046,
+          38.255547054322875
+        ],
+        "y_min_max": [
+          107.11103,
+          127.52659
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445171",
+        "ids": [
+          "445171",
+          "445327"
+        ],
+        "x_min_max": [
+          87.26003490401396,
+          92.85051067780873
+        ],
+        "y_min_max": [
+          56.04779,
+          64.38917
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445172",
+        "ids": [
+          "445172",
+          "445328"
+        ],
+        "x_min_max": [
+          60.64281382656155,
+          66.18133686300463
+        ],
+        "y_min_max": [
+          69.4226,
+          80.08901
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      }
+    ]
+  },
+  {
+    "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+    "first_date": "2026-10-22",
+    "last_date": "2026-10-22",
+    "digests": [
+      "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935"
+    ],
+    "run_ids": [
+      "39659301076"
+    ],
+    "point_count": 8,
+    "representative_ids": [
+      "446032",
+      "446033",
+      "446034",
+      "446035",
+      "446036",
+      "446037",
+      "446038",
+      "446039"
+    ],
+    "repetitions": []
+  },
+  {
+    "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+    "first_date": "2026-10-30",
+    "last_date": "2026-10-30",
+    "digests": [
+      "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040"
+    ],
+    "run_ids": [
+      "40714803265"
+    ],
+    "point_count": 10,
+    "representative_ids": [
+      "446937",
+      "446938",
+      "446939",
+      "446940",
+      "446941",
+      "446942",
+      "446943",
+      "446944",
+      "446945",
+      "446946"
+    ],
+    "repetitions": []
+  },
+  {
+    "image_name": "lmsysorg/sglang-rocm:muse-spark-open-mi355-1106",
+    "first_date": "2026-11-08",
+    "last_date": "2026-11-08",
+    "digests": [
+      "sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2"
+    ],
+    "run_ids": [
+      "42394597374"
+    ],
+    "point_count": 6,
+    "representative_ids": [
+      "447695",
+      "447696",
+      "447697",
+      "447698",
+      "447699",
+      "447700"
+    ],
+    "repetitions": []
+  }
+]

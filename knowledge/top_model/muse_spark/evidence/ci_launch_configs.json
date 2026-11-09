@@ -1,0 +1,619 @@
+[
+  {
+    "run_id": "38877885539",
+    "job_id": 116897688890,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688890",
+    "effective_checkouts": [
+      "3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.101",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "38877885539",
+    "job_id": 116897688917,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688917",
+    "effective_checkouts": [
+      "3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.136",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "38947852942",
+    "job_id": 117132178956,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178956",
+    "effective_checkouts": [
+      "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-hierarchical-cache --enable-metrics --expert-parallel-size 8 --hicache-size 180 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.107",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "38947852942",
+    "job_id": 117132178964,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178964",
+    "effective_checkouts": [
+      "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.105",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "39179279826",
+    "job_id": 117828661400,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661400",
+    "effective_checkouts": [
+      "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-hierarchical-cache --enable-metrics --expert-parallel-size 8 --hicache-size 180 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.136",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "39179279826",
+    "job_id": 117828661501,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661501",
+    "effective_checkouts": [
+      "57df14d3ccf6f04a37215a8b84575e5ec70b0dd5"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.101",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "39659301076",
+    "job_id": 119428436736,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436736",
+    "effective_checkouts": [
+      "2dd693edb2d7318867f7f6759034571ad734f9f2"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-hierarchical-cache --enable-metrics --expert-parallel-size 8 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 253 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.136",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "39659301076",
+    "job_id": 119428437135,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428437135",
+    "effective_checkouts": [
+      "2dd693edb2d7318867f7f6759034571ad734f9f2"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.106",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910587816,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587816",
+    "effective_checkouts": [
+      "639d4565920c1af90bbe958c8ac2957bf11eb603"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 80 --mem-fraction-static 0.86 --page-size 16 --prefill-decode-interval 80 --random-seed 42 --reasoning-parser muse --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.1 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.136",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+      "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+      "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+      "SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910587901,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587901",
+    "effective_checkouts": [
+      "639d4565920c1af90bbe958c8ac2957bf11eb603"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 56 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 56 --mem-fraction-static 0.86 --page-size 16 --prefill-decode-interval 80 --random-seed 42 --reasoning-parser muse --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.1 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.106",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+      "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+      "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+      "SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910588046,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588046",
+    "effective_checkouts": [
+      "639d4565920c1af90bbe958c8ac2957bf11eb603"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 72 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 72 --mem-fraction-static 0.86 --page-size 16 --prefill-decode-interval 24 --random-seed 42 --reasoning-parser muse --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.1 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.125",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+      "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+      "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+      "SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910588087,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588087",
+    "effective_checkouts": [
+      "639d4565920c1af90bbe958c8ac2957bf11eb603"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --cuda-graph-max-bs-decode 2 --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 2 --mem-fraction-static 0.85 --monokernel-backend amd --page-size 16 --prefill-decode-interval 64 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.110",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "42394597374",
+    "job_id": 128469427930,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469427930",
+    "effective_checkouts": [
+      "03d973bca01a7c532a49ac5d0f59f644f80866e0"
+    ],
+    "datasets": [
+      "semianalysis_cc_traces_weka_062126"
+    ],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 56 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 56 --mem-fraction-static 0.86 --page-size 128 --prefill-decode-interval 80 --random-seed 42 --reasoning-parser muse --revision c7bc74fd64371315a091bc15f9723882eead0dc1 --schedule-policy shortest-prefill-first --scheduler-recv-interval 1 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --stream-interval 20 --swa-full-tokens-ratio 0.3 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.106",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+      "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+      "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+      "SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_OPT_UNIFIED_CACHE_FREE_OUT_OF_WINDOW_SLOTS": "1",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1",
+      "SGLANG_WARMUP_TIMEOUT": "1800"
+    }
+  },
+  {
+    "run_id": "42394597374",
+    "job_id": 128469427944,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469427944",
+    "effective_checkouts": [
+      "03d973bca01a7c532a49ac5d0f59f644f80866e0"
+    ],
+    "datasets": [
+      "semianalysis_cc_traces_weka_062126"
+    ],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 80 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 80 --mem-fraction-static 0.86 --page-size 128 --prefill-decode-interval 24 --random-seed 42 --reasoning-parser muse --revision c7bc74fd64371315a091bc15f9723882eead0dc1 --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --stream-interval 20 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.107",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+      "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+      "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+      "SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1",
+      "SGLANG_WARMUP_TIMEOUT": "1800"
+    }
+  },
+  {
+    "run_id": "42394597374",
+    "job_id": 128469428100,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469428100",
+    "effective_checkouts": [
+      "03d973bca01a7c532a49ac5d0f59f644f80866e0"
+    ],
+    "datasets": [
+      "semianalysis_cc_traces_weka_062126"
+    ],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 72 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 72 --mem-fraction-static 0.86 --page-size 128 --prefill-decode-interval 48 --random-seed 42 --reasoning-parser muse --revision c7bc74fd64371315a091bc15f9723882eead0dc1 --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --stream-interval 20 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.110",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+      "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+      "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+      "SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1",
+      "SGLANG_WARMUP_TIMEOUT": "1800"
+    }
+  },
+  {
+    "run_id": "42394597374",
+    "job_id": 128469428179,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469428179",
+    "effective_checkouts": [
+      "03d973bca01a7c532a49ac5d0f59f644f80866e0"
+    ],
+    "datasets": [
+      "semianalysis_cc_traces_weka_062126"
+    ],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --cuda-graph-max-bs-decode 2 --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 2 --mem-fraction-static 0.85 --monokernel-backend amd --page-size 16 --prefill-decode-interval 64 --random-seed 42 --reasoning-parser muse --revision c7bc74fd64371315a091bc15f9723882eead0dc1 --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --stream-interval 40 --swa-full-tokens-ratio 0.3 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.101",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1",
+      "SGLANG_WARMUP_TIMEOUT": "1800"
+    }
+  },
+  {
+    "run_id": "38877885539",
+    "job_id": 116897688634,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688634",
+    "effective_checkouts": [
+      "3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.110",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "39659301076",
+    "job_id": 119428436852,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436852",
+    "effective_checkouts": [
+      "2dd693edb2d7318867f7f6759034571ad734f9f2"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.109",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910588033,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588033",
+    "effective_checkouts": [
+      "639d4565920c1af90bbe958c8ac2957bf11eb603"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --cuda-graph-max-bs-decode 1 --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 1 --mem-fraction-static 0.85 --monokernel-backend amd --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.120",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "38877885539",
+    "job_id": 116897688547,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688547",
+    "effective_checkouts": [
+      "3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.107",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "39659301076",
+    "job_id": 119428436698,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436698",
+    "effective_checkouts": [
+      "2dd693edb2d7318867f7f6759034571ad734f9f2"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.110",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910587858,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587858",
+    "effective_checkouts": [
+      "639d4565920c1af90bbe958c8ac2957bf11eb603"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --cuda-graph-max-bs-decode 2 --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 2 --mem-fraction-static 0.85 --monokernel-backend amd --page-size 16 --prefill-decode-interval 64 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.109",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "38947852942",
+    "job_id": 117132178838,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178838",
+    "effective_checkouts": [
+      "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-size 180 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.110",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  },
+  {
+    "run_id": "40714803265",
+    "job_id": 122910588096,
+    "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588096",
+    "effective_checkouts": [
+      "639d4565920c1af90bbe958c8ac2957bf11eb603"
+    ],
+    "datasets": [],
+    "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 8192 --cuda-graph-max-bs-decode 12 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 253 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 8192 --max-running-requests 12 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 96 --random-seed 42 --reasoning-parser muse --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.1 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+    "server_env": {
+      "HEAD_NODE_IP": "10.24.112.107",
+      "HF_HUB_OFFLINE": "1",
+      "MUSE_MOE_BACKEND": "flydsl",
+      "PYTHONNOUSERSITE": "1",
+      "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+      "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+      "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+      "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+      "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+      "SGLANG_SIMULATE_ACC_LEN": "4.05",
+      "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+      "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+      "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+      "SGLANG_USE_AITER": "1",
+      "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+    }
+  }
+]
