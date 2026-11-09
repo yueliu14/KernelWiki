@@ -1,0 +1,556 @@
+[
+  {
+    "from_digest": "sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4",
+    "to_digest": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+    "config_selector": {
+      "decode_tp": 8,
+      "decode_ep": 8
+    },
+    "required_cli": {
+      "before": {
+        "monokernel-backend": null
+      },
+      "after": {
+        "monokernel-backend": null
+      }
+    },
+    "kernel_changes": [
+      {
+        "pipeline": "QK normalization, RoPE and FP8 KV write",
+        "before": "Existing _qk_norm_kernel combines Q/K RMSNorm and query scale; projection, RoPE and backend KV writing have separate boundaries.",
+        "after": "_muse_qk_rope_cache or _qkv_epilogue writes normalized/rotated Q/K and FP8 KV; model attention bypasses its ordinary cache write.",
+        "language": "Triton \u2192 Triton; the projection remains a separate split-K partial producer.",
+        "body_change": "New cache-store epilogue folds normalization, scale, rotation and FP8 conversion; explicit BF16 round trips preserve the former sequence semantics.",
+        "fusion": "The QK route shares norm/RoPE/cache write in one launch. The QKV route is partial GEMM plus an epilogue launch; the whole projection is not one fused launch.",
+        "applicability": "TEP8, head_dim 64, local 16 Q / 2 KV heads, AITER NHD FP8 pages of size 16; decode or target verify; QKV at up to 32 rows, QK at up to 64. Actual row counts vary during the job.",
+        "sources": [
+          {
+            "role": "prior norm / new epilogue",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py"
+          },
+          {
+            "role": "dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py"
+          },
+          {
+            "role": "eligibility wrapper",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff",
+          "evidence/source_excerpts.md#e1"
+        ]
+      },
+      {
+        "pipeline": "MoE router and pooler",
+        "before": "Router GEMM, fused top-k routing, pooler GEMM and pre-expert norm remain separate stages.",
+        "after": "route_with_shared_pooler chooses a shared epilogue or a joint packed projection followed by _joint_epilogue.",
+        "language": "Triton / GEMM library calls \u2192 Triton / GEMM library calls.",
+        "body_change": "Packed pooler/router weights and shared reduction/top-k/norm epilogues avoid separate processing of completed router/pooler results.",
+        "fusion": "Shared router/top-k/pre-expert norm epilogue; selected widths also share a router/pooler GEMM. Expert GEMMs remain separate.",
+        "applicability": "Shape guards: hidden 8192, 256 experts, top-8 sigmoid, 4096-wide pooler, contiguous BF16 input and FP32 router; at most 64 rows, with joint widths 8/16/24 in this version.",
+        "sources": [
+          {
+            "role": "model routing",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py"
+          },
+          {
+            "role": "new routing dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py"
+          },
+          {
+            "role": "new epilogues",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff"
+        ]
+      },
+      {
+        "pipeline": "MXFP4 expert route",
+        "before": "Native-layout FlyDSL grouped experts and per-expert finalize; the MUSE_MOE_BACKEND=flydsl setting is present.",
+        "after": "Compact A4 target-verify experts in Triton, or AITER FlyDSL A4W4 prefill stages, followed by per-expert finalize.",
+        "language": "FlyDSL \u2192 shape-dependent Triton or FlyDSL; Python mxfp4_moe.py is dispatch glue.",
+        "body_change": "Add per-32 MXFP4 activations, compact verify work and preshuffled A4W4 weights; prefill stage 1 emits quantized intermediates/scales.",
+        "fusion": "Activation and quantization staging change, while the required per-expert normalization and route-weighted reduction remain explicit. Do not call the entire MoE one kernel.",
+        "applicability": "Compact verify requires TEP8, 32 local experts, top-8, rows divisible by 8 and no more than 512; prefill A4W4 uses at least 256 rows. Native fallbacks remain.",
+        "sources": [
+          {
+            "role": "existing expert implementation",
+            "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+            "after_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py"
+          },
+          {
+            "role": "new compact experts",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py"
+          },
+          {
+            "role": "new dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff"
+        ]
+      }
+    ],
+    "excluded_attributions": [
+      "The SGLang monokernel interface is present in 1020, but this pair does not pass --monokernel-backend amd and has no AMD plugin execution claim."
+    ]
+  },
+  {
+    "from_digest": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+    "to_digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+    "config_selector": {
+      "decode_tp": 8,
+      "decode_ep": 8
+    },
+    "required_cli": {
+      "before": {
+        "monokernel-backend": null
+      },
+      "after": {
+        "monokernel-backend": "amd"
+      }
+    },
+    "kernel_changes": [
+      {
+        "pipeline": "AMD Muse layer monokernel",
+        "before": "Ordinary SGLang attention, projection, routing, experts, residual/norm and collective launches. The monokernel interface alone does not activate the plugin.",
+        "after": "runtime \u2192 Muse spec \u2192 Runner.launch \u2192 build_layer; eligible MXFP4 layers combine attention, K2, K3 and the next eligible layer K1.",
+        "language": "Mixed Triton/FlyDSL/library path \u2192 FlyDSL layer kernel (the log/spec name muse_spark_hip does not identify the implementation language).",
+        "body_change": "Device mailbox flags connect producer/consumer stages; one launch reuses stage LDS while retaining scratch regions. The first necessary K1 and BF16-expert layers keep separate execution.",
+        "fusion": "Merge attention, output norm/gate and projection/reduction, routing/pooler/top-k, experts/finalize/reduction, unpooler/boundary and next-layer QKV preparation across host launch boundaries. Scratch traffic is not assumed eliminated.",
+        "applicability": "Both endpoint CLI logs are checked: only the new endpoint passes monokernel-backend=amd. TEP8/EP8 with 8-token DFLASH; one admitted request corresponds to 8 verify rows and two to 16. Unsupported shapes, prefill and BF16-expert layers use fallback. The exact admission is shown in this pair\u2019s CI table.",
+        "sources": [
+          {
+            "role": "runtime integration",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py"
+          },
+          {
+            "role": "new runner",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/runner.py"
+          },
+          {
+            "role": "new device body",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layer.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff",
+          "evidence/source_excerpts.md#e2",
+          "evidence/source_excerpts.md#e3"
+        ]
+      },
+      {
+        "pipeline": "Ordinary verify merge with output norm/gate",
+        "before": "The attention partials are merged, then the existing output norm-gate kernel runs.",
+        "after": "VerifyReduceDeferral hands partials to forward_verify_partials \u2192 _reduce_norm_gate.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "The new body reads partials/maxima/denominators, performs split-KV reduction, rounds to BF16, and applies per-head RMSNorm and sigmoid gate before the output store.",
+        "fusion": "One reduce+norm+gate launch replaces separate merge and norm-gate launches; removes the completed-attention intermediate between those launches.",
+        "applicability": "Ordinary target-verify path, head_dim 64, output normalization enabled, and backend deferral active. On monokernel-covered MXFP4 layers the layer kernel supersedes this path; retain this candidate only for ordinary/fallback layers.",
+        "sources": [
+          {
+            "role": "output consumer",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py"
+          },
+          {
+            "role": "new fused reducer",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff"
+        ]
+      },
+      {
+        "pipeline": "Residual/norm boundary with FP8 output",
+        "before": "The fused boundary yields a BF16 attention input and residual stream.",
+        "after": "forward_fp8 can additionally write the next projection input as FP8 plus per-row scales.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "The boundary kernel gains output/scaling buffers and a guarded FP8 output path; native fallback can still perform separate quantization.",
+        "fusion": "For its fused Triton branch, quantization is part of the norm/boundary producer, saving a separate read/quantize launch.",
+        "applicability": "Ordinary path when the model requests fp8_out/forward_fp8; do not transfer this benefit to the monokernel-covered layers without a trace.",
+        "sources": [
+          {
+            "role": "boundary body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py"
+          },
+          {
+            "role": "requesting model",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff"
+        ]
+      }
+    ],
+    "excluded_attributions": [
+      "The new standalone TP4 finalize/all-reduce kernel is outside this TEP8 configuration; do not list it as this pair\u2019s executed fusion."
+    ]
+  },
+  {
+    "from_digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+    "to_digest": "sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2",
+    "config_selector": {
+      "decode_tp": 4,
+      "decode_ep": 4
+    },
+    "required_cli": {
+      "before": {
+        "monokernel-backend": null,
+        "page-size": "16"
+      },
+      "after": {
+        "monokernel-backend": null,
+        "page-size": "128"
+      }
+    },
+    "kernel_changes": [
+      {
+        "pipeline": "QK/RoPE/FP8 cache fusion eligibility",
+        "before": "The existing fused wrapper allows only page size 16 and at most 64 QK rows.",
+        "after": "The same QK device file is retained; wrapper guards admit pages 16/32/64/128 and a default cap of 512 rows.",
+        "language": "Triton \u2192 Triton; the change is in Python dispatch guards.",
+        "body_change": "Wrapper changes page-size and row predicates. The recorded device source hash stays identical for qk_norm_rope_cache.py.",
+        "fusion": "Broader applicability of existing norm/RoPE/FP8-cache fusion; no new device body is inferred from the larger cap.",
+        "applicability": "This pair is TEP4 with page size 16 \u2192 128, matching the expanded page guard; target-verify row count and other shape guards still determine use. The c40 endpoint server log records rows=512.",
+        "sources": [
+          {
+            "role": "wrapper guards",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py"
+          },
+          {
+            "role": "device body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e5"
+        ]
+      },
+      {
+        "pipeline": "MoE finalize + all-reduce on TP4",
+        "before": "Already uses a one-launch TP4 HIP finalize/peer reduction on supported compact-A4 verify rows.",
+        "after": "Retains TP4 fusion; source is generalized to NR=4 or 8 and gains a one-shot branch used for selected TP8 widths.",
+        "language": "HIP/C++ \u2192 HIP/C++; Python/ctypes wrapper is unchanged in role.",
+        "body_change": "The device symbol becomes muse_finalize_allreduce; peer storage/arguments grow for up to 8 ranks. This TEP4 pair still compiles NR=4 and selects the two-stage protocol.",
+        "fusion": "Existing TP4 fusion is retained. New TP8 eligibility and its one-shot branch are not an added fusion benefit for this TEP4 pair.",
+        "applicability": "Both endpoints are TEP4/EP4; the wrapper\u2019s TP4 thresholds keep the two-stage route. Actual rows must satisfy compact-A4/finalize predicates.",
+        "sources": [
+          {
+            "role": "HIP device body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip"
+          },
+          {
+            "role": "protocol dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e6"
+        ]
+      },
+      {
+        "pipeline": "Joint router/pooler wider rows",
+        "before": "The existing shared routing front admits at most 64 rows and its established FP8 joint range.",
+        "after": "Joint row-major routing can extend to default 128 rows, and model gating uses FP8_JOINT_MAX_M.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "Add wider eligibility and the row-major tile route; retain hidden/expert/weight guards and the separate shared fallback.",
+        "fusion": "Existing projection/epilogue fusion extends to additional shapes; not a new whole-MoE fusion.",
+        "applicability": "TEP4 is not rejected by _routing_front_matches: its tests are hidden/expert/weight shapes. Applicability remains conditional on packed weights and rows; client concurrency is not the kernel row count.",
+        "sources": [
+          {
+            "role": "routing wrapper",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py"
+          },
+          {
+            "role": "router device epilogues",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff"
+        ]
+      },
+      {
+        "pipeline": "Full-attention prefill implementation",
+        "before": "Gluon muse_extend_attention serves the specialized ordinary full-attention prefill route.",
+        "after": "AITER backend can select muse_extend_attention_fly; Gluon remains for supported fallback/sliding paths.",
+        "language": "Gluon \u2192 FlyDSL for the full-attention route; Gluon remains available.",
+        "body_change": "New FP8 MFMA kernel uses transposed fragments, two-stage LDS loading, matrix-core row sums and explicit paged addressing.",
+        "fusion": "A kernel implementation/language change; no additional cross-operator fusion is established.",
+        "applicability": "The new endpoint enables the default FlyDSL extend route; dispatch requires gfx950 and supported FP8 Q/KV shape/layout. These TEP4 jobs retain ordinary prefill, which is outside the Muse monokernel route.",
+        "sources": [
+          {
+            "role": "old/new attention bodies",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_gluon.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_flydsl.py"
+          },
+          {
+            "role": "backend dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e7"
+        ]
+      },
+      {
+        "pipeline": "Length-balanced verify and segmented fused merge",
+        "before": "FlyDSL full-attention verify uses the former split scheduling; verify_reduce_norm_gate accepts four-element partial state.",
+        "after": "A Triton planner builds a length-balanced segment list for FlyDSL partials; five-element state selects segmented_reduce_norm_gate.",
+        "language": "FlyDSL + Triton \u2192 FlyDSL + Triton.",
+        "body_change": "Distribute KV work by sequence lengths; add segment offsets/counts and teach the reducer dispatch to accept segmented state.",
+        "fusion": "Planning adds a launch. The segmented output reducer retains split-KV reduction + norm/gate fusion; this is not a reduction to a single verify launch.",
+        "applicability": "Ordinary full-attention target verify when use_balanced_full and backend flags/shape guards select it. Heterogeneous context lengths, not just client concurrency, determine applicability.",
+        "sources": [
+          {
+            "role": "new segmented planner/reducer",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_balanced.py"
+          },
+          {
+            "role": "partial kernel",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py"
+          },
+          {
+            "role": "fused-reducer dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e8"
+        ]
+      }
+    ],
+    "excluded_attributions": [
+      "Both endpoints are ordinary TEP4 serving: the AMD layer monokernel is not enabled by either CLI. Its captured Muse bodies are unchanged between these image digests.",
+      "TP8 finalize/all-reduce eligibility is not a new TP4 optimization."
+    ]
+  },
+  {
+    "from_digest": "sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4",
+    "to_digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+    "config_selector": {
+      "decode_tp": 4,
+      "decode_ep": 4
+    },
+    "required_cli": {
+      "before": {
+        "monokernel-backend": null
+      },
+      "after": {
+        "monokernel-backend": null
+      }
+    },
+    "kernel_changes": [
+      {
+        "pipeline": "QK normalization, RoPE and FP8 KV write",
+        "before": "Existing _qk_norm_kernel combines Q/K RMSNorm and query scale; projection, RoPE and backend KV writing have separate boundaries.",
+        "after": "_muse_qk_rope_cache or _qkv_epilogue writes normalized/rotated Q/K and FP8 KV; model attention bypasses its ordinary cache write.",
+        "language": "Triton \u2192 Triton; the projection remains a separate split-K partial producer.",
+        "body_change": "New cache-store epilogue folds normalization, scale, rotation and FP8 conversion; explicit BF16 round trips preserve the former sequence semantics.",
+        "fusion": "The QK route shares norm/RoPE/cache write in one launch. The QKV route is partial GEMM plus an epilogue launch; the whole projection is not one fused launch.",
+        "applicability": "This TEP4 pair spans baseline \u2192 1027. Unlike 1020\u2019s TP8-only QK guard, 1027 permits local KV-head counts 2 or 4 and Q-head count 8 times KV heads; page size remains 16 in both endpoint CLIs. Shape/row guards remain conditional.",
+        "sources": [
+          {
+            "role": "prior norm / new epilogue",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py"
+          },
+          {
+            "role": "dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py"
+          },
+          {
+            "role": "eligibility wrapper",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff",
+          "evidence/source_excerpts.md#e1",
+          "evidence/source_diffs/02_to_03.diff"
+        ]
+      },
+      {
+        "pipeline": "MoE router and pooler",
+        "before": "Router GEMM, fused top-k routing, pooler GEMM and pre-expert norm remain separate stages.",
+        "after": "route_with_shared_pooler chooses a shared epilogue or a joint packed projection followed by _joint_epilogue.",
+        "language": "Triton / GEMM library calls \u2192 Triton / GEMM library calls.",
+        "body_change": "Packed pooler/router weights and shared reduction/top-k/norm epilogues avoid separate processing of completed router/pooler results.",
+        "fusion": "Shared router/top-k/pre-expert norm epilogue; selected widths also share a router/pooler GEMM. Expert GEMMs remain separate.",
+        "applicability": "TEP4 is admitted by the hidden/expert/weight-shape routing predicates; available row ranges and packed-weight conditions still govern shared/joint selection.",
+        "sources": [
+          {
+            "role": "model routing",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py"
+          },
+          {
+            "role": "new routing dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py"
+          },
+          {
+            "role": "new epilogues",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff",
+          "evidence/source_diffs/02_to_03.diff"
+        ]
+      },
+      {
+        "pipeline": "MXFP4 expert route",
+        "before": "Native-layout FlyDSL grouped experts and per-expert finalize; the MUSE_MOE_BACKEND=flydsl setting is present.",
+        "after": "Compact A4 target-verify experts in Triton, or AITER FlyDSL A4W4 prefill stages, followed by per-expert finalize.",
+        "language": "FlyDSL \u2192 shape-dependent Triton or FlyDSL; Python mxfp4_moe.py is dispatch glue.",
+        "body_change": "Add per-32 MXFP4 activations, compact verify work and preshuffled A4W4 weights; prefill stage 1 emits quantized intermediates/scales.",
+        "fusion": "Activation and quantization staging change, while the required per-expert normalization and route-weighted reduction remain explicit. Do not call the entire MoE one kernel.",
+        "applicability": "By 1027 compact A4 accepts 32 or 64 local experts, including TEP4/EP4 with 64 local experts. Verify rows must be divisible by 8 and within the cap. Other batches can use A4W4 or native fallback.",
+        "sources": [
+          {
+            "role": "existing expert implementation",
+            "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+            "after_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py"
+          },
+          {
+            "role": "new compact experts",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py"
+          },
+          {
+            "role": "new dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff",
+          "evidence/source_diffs/02_to_03.diff"
+        ]
+      },
+      {
+        "pipeline": "TP4 MoE finalize + all-reduce introduced",
+        "before": "FlyDSL per-expert normalization/weighted finalize followed by a separate collective.",
+        "after": "A single muse_finalize_allreduce_tp4 HIP launch finalizes each row and exchanges/reduces peer partials.",
+        "language": "FlyDSL + separate collective \u2192 HIP/C++ fused finalize/collective.",
+        "body_change": "Use one 256-thread CTA per token row and peer inbox protocol; align normalization/reduction order and BF16 rounding with the prior path.",
+        "fusion": "Compute + collective launch fusion; removes the separate finalize-to-collective launch boundary for supported rows.",
+        "applicability": "New endpoint TEP4/EP4 and compact-A4 enabled; supported row count, top-8, hidden 4096 and local-expert predicates apply. The CLI does not enable the AMD layer monokernel.",
+        "sources": [
+          {
+            "role": "prior finalize/new fused body",
+            "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_finalize.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip"
+          },
+          {
+            "role": "new collective wrapper",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py"
+          },
+          {
+            "role": "model guard",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff",
+          "evidence/source_diffs/02_to_03.diff",
+          "evidence/source_excerpts.md#e4"
+        ]
+      },
+      {
+        "pipeline": "Ordinary verify merge with output norm/gate",
+        "before": "The attention partials are merged, then the existing output norm-gate kernel runs.",
+        "after": "VerifyReduceDeferral hands partials to forward_verify_partials \u2192 _reduce_norm_gate.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "The new body reads partials/maxima/denominators, performs split-KV reduction, rounds to BF16, and applies per-head RMSNorm and sigmoid gate before the output store.",
+        "fusion": "One reduce+norm+gate launch replaces separate merge and norm-gate launches; removes the completed-attention intermediate between those launches.",
+        "applicability": "Ordinary target-verify path, head_dim 64, output normalization enabled, and backend deferral active. On monokernel-covered MXFP4 layers the layer kernel supersedes this path; retain this candidate only for ordinary/fallback layers.",
+        "sources": [
+          {
+            "role": "output consumer",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py"
+          },
+          {
+            "role": "new fused reducer",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff"
+        ]
+      },
+      {
+        "pipeline": "Residual/norm boundary with FP8 output",
+        "before": "The fused boundary yields a BF16 attention input and residual stream.",
+        "after": "forward_fp8 can additionally write the next projection input as FP8 plus per-row scales.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "The boundary kernel gains output/scaling buffers and a guarded FP8 output path; native fallback can still perform separate quantization.",
+        "fusion": "For its fused Triton branch, quantization is part of the norm/boundary producer, saving a separate read/quantize launch.",
+        "applicability": "Ordinary path when the model requests fp8_out/forward_fp8; do not transfer this benefit to the monokernel-covered layers without a trace.",
+        "sources": [
+          {
+            "role": "boundary body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py"
+          },
+          {
+            "role": "requesting model",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff"
+        ]
+      }
+    ],
+    "excluded_attributions": [
+      "No intermediate TEP4 conc16 HiCache point exists for 1020; the measured change spans both source transitions.",
+      "The 1027 image has an AMD monokernel plugin, but this TEP4 endpoint does not enable it."
+    ]
+  }
+]

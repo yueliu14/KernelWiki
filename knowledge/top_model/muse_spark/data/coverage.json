@@ -1,0 +1,18 @@
+{
+  "model": "Muse-Spark-Open",
+  "hardware": "mi355x",
+  "framework": "sglang",
+  "history_total_rows": 325,
+  "selected_snapshot_rows": 54,
+  "unique_points": 54,
+  "image_versions": 4,
+  "run_count": 6,
+  "first_date": "2026-10-16",
+  "latest_date": "2026-11-08",
+  "adjacent_matched_pairs": 10,
+  "latest_point_count": 6,
+  "source": "https://inferencex.semianalysis.com/api/v1/benchmarks/history?model=Muse-Spark-Open&benchmarkType=agentic_traces",
+  "coverage": "currently retained published AgentX curve snapshots, not all CI runs ever executed",
+  "policy": "earliest valid observation per image name and dashboard configuration; preserve every repetition",
+  "causal_kernel_attribution": "not established"
+}

@@ -1,0 +1,2663 @@
+[
+  {
+    "run_id": "38877885539",
+    "name": "Run Sweep - [Klaud Cold] Add Muse Spark Open MXFP4 MI355X SGLang DFlash2 AgentX recipe / [Klaud Cold] 新增 Muse Spark Open MXFP4 MI355X SGLang DFlash2 AgentX 配方",
+    "head_sha": "8a76a78e410a412b74c43ebcb969a1bd2fa7549f",
+    "created_at": "2026-10-16T09:03:55Z",
+    "head_branch": "feat/musespark-mi355x-sglang-dflash-dayzero",
+    "path": ".github/workflows/run-sweep.yml",
+    "run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539",
+    "conclusion": "success",
+    "muse_jobs": [
+      {
+        "id": 116897688547,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c4",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688547",
+        "started_at": "2026-10-16T09:24:32Z",
+        "completed_at": "2026-10-16T10:54:12Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 116897688559,
+        "name": "agentic eval / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d2... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model   c16 | eval-only",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688559",
+        "started_at": "2026-10-16T09:25:43Z",
+        "completed_at": "2026-10-16T09:53:38Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 116897688626,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model   c4",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688626",
+        "started_at": "2026-10-16T09:54:54Z",
+        "completed_at": "2026-10-16T11:15:22Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 116897688634,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c1",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688634",
+        "started_at": "2026-10-16T09:57:24Z",
+        "completed_at": "2026-10-16T11:14:42Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 116897688746,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model   c1",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688746",
+        "started_at": "2026-10-16T09:57:56Z",
+        "completed_at": "2026-10-16T11:14:48Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 116897688887,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model   c16",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688887",
+        "started_at": "2026-10-16T10:14:31Z",
+        "completed_at": "2026-10-16T11:38:02Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 116897688890,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c8",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688890",
+        "started_at": "2026-10-16T10:17:47Z",
+        "completed_at": "2026-10-16T11:49:00Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 116897688898,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model   c8",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688898",
+        "started_at": "2026-10-16T10:21:52Z",
+        "completed_at": "2026-10-16T11:42:34Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 116897688909,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c12",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688909",
+        "started_at": "2026-10-16T10:24:43Z",
+        "completed_at": "2026-10-16T11:53:59Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 116897688917,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c16",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688917",
+        "started_at": "2026-10-16T10:49:28Z",
+        "completed_at": "2026-10-16T12:18:22Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 116897688964,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model   c12",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688964",
+        "started_at": "2026-10-16T10:57:05Z",
+        "completed_at": "2026-10-16T12:19:51Z",
+        "conclusion": "success"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 12045865144,
+        "name": "server_logs_musespark_tp8_conc16_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-fddbf5f658b3c3e027ed",
+        "size_in_bytes": 21435466,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12045865144/zip"
+      },
+      {
+        "id": 12045786172,
+        "name": "bmk_agentic_musespark_tp4_conc12_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false-07f4a690c15bb94555b9",
+        "size_in_bytes": 2325,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12045786172/zip"
+      },
+      {
+        "id": 12045592008,
+        "name": "server_logs_musespark_tp4_conc12_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false-07f4a690c15bb94555b9",
+        "size_in_bytes": 13624496,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12045592008/zip"
+      },
+      {
+        "id": 12045566755,
+        "name": "bmk_agentic_musespark_tp8_conc16_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-fddbf5f658b3c3e027ed",
+        "size_in_bytes": 2340,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12045566755/zip"
+      },
+      {
+        "id": 12045536959,
+        "name": "power_audit_musespark_tp8_conc16_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-fddbf5f658b3c3e027ed",
+        "size_in_bytes": 322302,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12045536959/zip"
+      },
+      {
+        "id": 12044928551,
+        "name": "changelog-metadata",
+        "size_in_bytes": 996,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12044928551/zip"
+      },
+      {
+        "id": 12044763899,
+        "name": "agentic_musespark_tp8_conc16_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-fddbf5f658b3c3e027ed",
+        "size_in_bytes": 30797368,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12044763899/zip"
+      },
+      {
+        "id": 12044679344,
+        "name": "agentic_musespark_tp4_conc12_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false-07f4a690c15bb94555b9",
+        "size_in_bytes": 19677155,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12044679344/zip"
+      },
+      {
+        "id": 12044549840,
+        "name": "power_audit_musespark_tp4_conc12_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false-07f4a690c15bb94555b9",
+        "size_in_bytes": 302642,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12044549840/zip"
+      },
+      {
+        "id": 12044215289,
+        "name": "server_logs_musespark_tp4_conc8_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-10b69042ebea0c6086e4",
+        "size_in_bytes": 11819068,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12044215289/zip"
+      },
+      {
+        "id": 12044117812,
+        "name": "bmk_agentic_musespark_tp8_conc12_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-c4a38b4192de0138b116",
+        "size_in_bytes": 2496,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12044117812/zip"
+      },
+      {
+        "id": 12044000291,
+        "name": "power_audit_musespark_tp4_conc16_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false-6f57061d8e679c61c1e1",
+        "size_in_bytes": 524183,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12044000291/zip"
+      },
+      {
+        "id": 12043960360,
+        "name": "bmk_agentic_musespark_tp4_conc16_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false-6f57061d8e679c61c1e1",
+        "size_in_bytes": 2473,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12043960360/zip"
+      },
+      {
+        "id": 12043956362,
+        "name": "power_audit_musespark_tp4_conc8_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-10b69042ebea0c6086e4",
+        "size_in_bytes": 513053,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12043956362/zip"
+      },
+      {
+        "id": 12043733891,
+        "name": "server_logs_musespark_tp8_conc12_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-c4a38b4192de0138b116",
+        "size_in_bytes": 18996569,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12043733891/zip"
+      },
+      {
+        "id": 12043499510,
+        "name": "agentic_musespark_tp8_conc12_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-c4a38b4192de0138b116",
+        "size_in_bytes": 27806890,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12043499510/zip"
+      },
+      {
+        "id": 12043498748,
+        "name": "agentic_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-133e1cc606cf3171c074",
+        "size_in_bytes": 23361180,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12043498748/zip"
+      },
+      {
+        "id": 12043393913,
+        "name": "server_logs_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-133e1cc606cf3171c074",
+        "size_in_bytes": 15074916,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12043393913/zip"
+      },
+      {
+        "id": 12043379522,
+        "name": "power_audit_musespark_tp8_conc12_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-c4a38b4192de0138b116",
+        "size_in_bytes": 656408,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12043379522/zip"
+      },
+      {
+        "id": 12043333958,
+        "name": "bmk_agentic_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-133e1cc606cf3171c074",
+        "size_in_bytes": 2490,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12043333958/zip"
+      },
+      {
+        "id": 12043278838,
+        "name": "bmk_agentic_musespark_tp4_conc8_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-10b69042ebea0c6086e4",
+        "size_in_bytes": 2464,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12043278838/zip"
+      },
+      {
+        "id": 12043154169,
+        "name": "power_audit_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-133e1cc606cf3171c074",
+        "size_in_bytes": 688349,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12043154169/zip"
+      },
+      {
+        "id": 12043013856,
+        "name": "agentic_musespark_tp4_conc16_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false-6f57061d8e679c61c1e1",
+        "size_in_bytes": 20801001,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12043013856/zip"
+      },
+      {
+        "id": 12042934086,
+        "name": "server_logs_musespark_tp4_conc16_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false-6f57061d8e679c61c1e1",
+        "size_in_bytes": 14878889,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12042934086/zip"
+      },
+      {
+        "id": 12042924820,
+        "name": "agentic_musespark_tp4_conc8_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-10b69042ebea0c6086e4",
+        "size_in_bytes": 17269340,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12042924820/zip"
+      },
+      {
+        "id": 12042566168,
+        "name": "power_audit_musespark_tp4_conc4_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-9d7e23cf31afdaae0373",
+        "size_in_bytes": 291083,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12042566168/zip"
+      },
+      {
+        "id": 12042407704,
+        "name": "bmk_agentic_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-48aa15c845bf63e7f394",
+        "size_in_bytes": 2312,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12042407704/zip"
+      },
+      {
+        "id": 12042322627,
+        "name": "agentic_musespark_tp4_conc1_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-0257ceba8fb605ce0842",
+        "size_in_bytes": 11800691,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12042322627/zip"
+      },
+      {
+        "id": 12042267751,
+        "name": "server_logs_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-48aa15c845bf63e7f394",
+        "size_in_bytes": 9663765,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12042267751/zip"
+      },
+      {
+        "id": 12042223817,
+        "name": "bmk_agentic_musespark_tp4_conc4_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-9d7e23cf31afdaae0373",
+        "size_in_bytes": 2322,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12042223817/zip"
+      },
+      {
+        "id": 12042148034,
+        "name": "power_audit_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-48aa15c845bf63e7f394",
+        "size_in_bytes": 284650,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12042148034/zip"
+      },
+      {
+        "id": 12042147988,
+        "name": "bmk_agentic_musespark_tp4_conc1_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-0257ceba8fb605ce0842",
+        "size_in_bytes": 2454,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12042147988/zip"
+      },
+      {
+        "id": 12042143044,
+        "name": "power_audit_musespark_tp4_conc1_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-0257ceba8fb605ce0842",
+        "size_in_bytes": 467260,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12042143044/zip"
+      },
+      {
+        "id": 12042084043,
+        "name": "server_logs_musespark_tp4_conc4_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-9d7e23cf31afdaae0373",
+        "size_in_bytes": 8160234,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12042084043/zip"
+      },
+      {
+        "id": 12042073072,
+        "name": "server_logs_musespark_tp4_conc1_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-0257ceba8fb605ce0842",
+        "size_in_bytes": 6798570,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12042073072/zip"
+      },
+      {
+        "id": 12042013056,
+        "name": "agentic_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-48aa15c845bf63e7f394",
+        "size_in_bytes": 17783823,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12042013056/zip"
+      },
+      {
+        "id": 12041859523,
+        "name": "agentic_musespark_tp4_conc4_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-9d7e23cf31afdaae0373",
+        "size_in_bytes": 13504839,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12041859523/zip"
+      },
+      {
+        "id": 12041675850,
+        "name": "bmk_agentic_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-767db59f32d8d39404ff",
+        "size_in_bytes": 2476,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12041675850/zip"
+      },
+      {
+        "id": 12041396462,
+        "name": "agentic_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-767db59f32d8d39404ff",
+        "size_in_bytes": 19228262,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12041396462/zip"
+      },
+      {
+        "id": 12041232346,
+        "name": "server_logs_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-767db59f32d8d39404ff",
+        "size_in_bytes": 11338037,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12041232346/zip"
+      },
+      {
+        "id": 12041216967,
+        "name": "power_audit_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-767db59f32d8d39404ff",
+        "size_in_bytes": 663182,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12041216967/zip"
+      },
+      {
+        "id": 12038910245,
+        "name": "eval_server_logs_musespark_tp4_conc16_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false-f691b7949d18a733f9e3_lm-eval_",
+        "size_in_bytes": 94500,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12038910245/zip"
+      },
+      {
+        "id": 12038288902,
+        "name": "eval_results_all",
+        "size_in_bytes": 686,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12038288902/zip"
+      },
+      {
+        "id": 12037799307,
+        "name": "eval_musespark_tp4_conc16_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false-f691b7949d18a733f9e3_lm-eval__1",
+        "size_in_bytes": 3692670,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12037799307/zip"
+      }
+    ]
+  },
+  {
+    "run_id": "38947852942",
+    "name": "Run Sweep - [Klaud Cold] Muse Spark Open MI355X: HiCache DRAM offload above conc 8 / [Klaud Cold] Muse Spark Open MI355X：并发大于 8 时启用 HiCache DRAM 卸载",
+    "head_sha": "59ec4f61e00386f9f45ee977d5c1753fad88ec02",
+    "created_at": "2026-10-16T18:30:21Z",
+    "head_branch": "feat/musespark-mi355x-hicache-high-conc",
+    "path": ".github/workflows/run-sweep.yml",
+    "run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942",
+    "conclusion": "success",
+    "muse_jobs": [
+      {
+        "id": 117132178311,
+        "name": "agentic eval / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d2... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c16 | eval-only",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178311",
+        "started_at": "2026-10-16T18:32:17Z",
+        "completed_at": "2026-10-16T19:01:43Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117132178702,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model dram KV offload hicache c12",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178702",
+        "started_at": "2026-10-16T19:21:24Z",
+        "completed_at": "2026-10-16T21:01:59Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117132178833,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c4",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178833",
+        "started_at": "2026-10-16T19:21:35Z",
+        "completed_at": "2026-10-16T20:52:38Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117132178838,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c16",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178838",
+        "started_at": "2026-10-16T19:21:35Z",
+        "completed_at": "2026-10-16T20:49:33Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117132178870,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model   c1",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178870",
+        "started_at": "2026-10-16T19:21:35Z",
+        "completed_at": "2026-10-16T20:39:55Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117132178924,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model   c4",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178924",
+        "started_at": "2026-10-16T19:21:35Z",
+        "completed_at": "2026-10-16T20:43:16Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117132178948,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c1",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178948",
+        "started_at": "2026-10-16T19:21:35Z",
+        "completed_at": "2026-10-16T20:52:53Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117132178956,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model dram KV offload hicache c16",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178956",
+        "started_at": "2026-10-16T19:21:35Z",
+        "completed_at": "2026-10-16T21:02:28Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117132178964,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c8",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178964",
+        "started_at": "2026-10-16T19:21:35Z",
+        "completed_at": "2026-10-16T20:54:13Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117132179064,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c12",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132179064",
+        "started_at": "2026-10-16T19:21:54Z",
+        "completed_at": "2026-10-16T20:46:02Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117132179065,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model   c8",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132179065",
+        "started_at": "2026-10-16T19:21:53Z",
+        "completed_at": "2026-10-16T20:42:11Z",
+        "conclusion": "success"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 12075495093,
+        "name": "agentic_musespark_tp8_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-94344d7b82d3ad520318",
+        "size_in_bytes": 29678598,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12075495093/zip"
+      },
+      {
+        "id": 12075425452,
+        "name": "changelog-metadata",
+        "size_in_bytes": 675,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12075425452/zip"
+      },
+      {
+        "id": 12075086829,
+        "name": "power_audit_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-5a817040f9e032abf387",
+        "size_in_bytes": 705313,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12075086829/zip"
+      },
+      {
+        "id": 12075080164,
+        "name": "server_logs_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3dbddea8862b13be3a1e",
+        "size_in_bytes": 11385173,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12075080164/zip"
+      },
+      {
+        "id": 12075070166,
+        "name": "server_logs_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-48aa15c845bf63e7f394",
+        "size_in_bytes": 9814642,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12075070166/zip"
+      },
+      {
+        "id": 12074950674,
+        "name": "power_audit_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-fa9034c8e38b3c876a9b",
+        "size_in_bytes": 676712,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074950674/zip"
+      },
+      {
+        "id": 12074787125,
+        "name": "power_audit_musespark_tp8_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-94344d7b82d3ad520318",
+        "size_in_bytes": 700835,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074787125/zip"
+      },
+      {
+        "id": 12074660661,
+        "name": "agentic_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-48aa15c845bf63e7f394",
+        "size_in_bytes": 17641594,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074660661/zip"
+      },
+      {
+        "id": 12074534270,
+        "name": "bmk_agentic_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-5a817040f9e032abf387",
+        "size_in_bytes": 2520,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074534270/zip"
+      },
+      {
+        "id": 12074467954,
+        "name": "server_logs_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-fa9034c8e38b3c876a9b",
+        "size_in_bytes": 15206573,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074467954/zip"
+      },
+      {
+        "id": 12074445908,
+        "name": "bmk_agentic_musespark_tp4_conc8_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-6bc77ce0bdad1450b0fc",
+        "size_in_bytes": 2464,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074445908/zip"
+      },
+      {
+        "id": 12074444466,
+        "name": "server_logs_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-5a817040f9e032abf387",
+        "size_in_bytes": 23374208,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074444466/zip"
+      },
+      {
+        "id": 12074380738,
+        "name": "bmk_agentic_musespark_tp4_conc1_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-68a31007066a210c1701",
+        "size_in_bytes": 2456,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074380738/zip"
+      },
+      {
+        "id": 12074359395,
+        "name": "agentic_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-5a817040f9e032abf387",
+        "size_in_bytes": 33030373,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074359395/zip"
+      },
+      {
+        "id": 12074331338,
+        "name": "bmk_agentic_musespark_tp4_conc4_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-75bd10f385e02343e8a3",
+        "size_in_bytes": 2467,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074331338/zip"
+      },
+      {
+        "id": 12074304522,
+        "name": "server_logs_musespark_tp8_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-94344d7b82d3ad520318",
+        "size_in_bytes": 20376347,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074304522/zip"
+      },
+      {
+        "id": 12074298208,
+        "name": "agentic_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-fa9034c8e38b3c876a9b",
+        "size_in_bytes": 23533459,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074298208/zip"
+      },
+      {
+        "id": 12074276579,
+        "name": "server_logs_musespark_tp4_conc4_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-75bd10f385e02343e8a3",
+        "size_in_bytes": 8468207,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074276579/zip"
+      },
+      {
+        "id": 12074271477,
+        "name": "agentic_musespark_tp4_conc4_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-75bd10f385e02343e8a3",
+        "size_in_bytes": 13592060,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074271477/zip"
+      },
+      {
+        "id": 12074239801,
+        "name": "bmk_agentic_musespark_tp8_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-94344d7b82d3ad520318",
+        "size_in_bytes": 2517,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074239801/zip"
+      },
+      {
+        "id": 12074218478,
+        "name": "bmk_agentic_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-fa9034c8e38b3c876a9b",
+        "size_in_bytes": 2475,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074218478/zip"
+      },
+      {
+        "id": 12074197638,
+        "name": "bmk_agentic_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-d2b962b5f0af9a631594",
+        "size_in_bytes": 2505,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074197638/zip"
+      },
+      {
+        "id": 12074097370,
+        "name": "agentic_musespark_tp4_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-efb96a6d57177132b4b2",
+        "size_in_bytes": 21370848,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074097370/zip"
+      },
+      {
+        "id": 12074096951,
+        "name": "power_audit_musespark_tp4_conc4_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-75bd10f385e02343e8a3",
+        "size_in_bytes": 507311,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12074096951/zip"
+      },
+      {
+        "id": 12073972547,
+        "name": "bmk_agentic_musespark_tp4_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-efb96a6d57177132b4b2",
+        "size_in_bytes": 2513,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073972547/zip"
+      },
+      {
+        "id": 12073793593,
+        "name": "power_audit_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-d2b962b5f0af9a631594",
+        "size_in_bytes": 532670,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073793593/zip"
+      },
+      {
+        "id": 12073783908,
+        "name": "agentic_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3dbddea8862b13be3a1e",
+        "size_in_bytes": 19244088,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073783908/zip"
+      },
+      {
+        "id": 12073737302,
+        "name": "power_audit_musespark_tp4_conc1_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-68a31007066a210c1701",
+        "size_in_bytes": 470367,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073737302/zip"
+      },
+      {
+        "id": 12073712389,
+        "name": "agentic_musespark_tp4_conc1_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-68a31007066a210c1701",
+        "size_in_bytes": 11817750,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073712389/zip"
+      },
+      {
+        "id": 12073689222,
+        "name": "bmk_agentic_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3dbddea8862b13be3a1e",
+        "size_in_bytes": 2487,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073689222/zip"
+      },
+      {
+        "id": 12073674227,
+        "name": "bmk_agentic_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-48aa15c845bf63e7f394",
+        "size_in_bytes": 2473,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073674227/zip"
+      },
+      {
+        "id": 12073654152,
+        "name": "power_audit_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-48aa15c845bf63e7f394",
+        "size_in_bytes": 655035,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073654152/zip"
+      },
+      {
+        "id": 12073654114,
+        "name": "power_audit_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3dbddea8862b13be3a1e",
+        "size_in_bytes": 658603,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073654114/zip"
+      },
+      {
+        "id": 12073602781,
+        "name": "server_logs_musespark_tp4_conc1_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-68a31007066a210c1701",
+        "size_in_bytes": 6780532,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073602781/zip"
+      },
+      {
+        "id": 12073594310,
+        "name": "agentic_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-d2b962b5f0af9a631594",
+        "size_in_bytes": 24331792,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073594310/zip"
+      },
+      {
+        "id": 12073589026,
+        "name": "server_logs_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-d2b962b5f0af9a631594",
+        "size_in_bytes": 17583897,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073589026/zip"
+      },
+      {
+        "id": 12073478807,
+        "name": "power_audit_musespark_tp4_conc8_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-6bc77ce0bdad1450b0fc",
+        "size_in_bytes": 486772,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073478807/zip"
+      },
+      {
+        "id": 12073434524,
+        "name": "server_logs_musespark_tp4_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-efb96a6d57177132b4b2",
+        "size_in_bytes": 14862967,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073434524/zip"
+      },
+      {
+        "id": 12073343993,
+        "name": "server_logs_musespark_tp4_conc8_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-6bc77ce0bdad1450b0fc",
+        "size_in_bytes": 11871367,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073343993/zip"
+      },
+      {
+        "id": 12073343989,
+        "name": "agentic_musespark_tp4_conc8_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-6bc77ce0bdad1450b0fc",
+        "size_in_bytes": 17335947,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073343989/zip"
+      },
+      {
+        "id": 12073269639,
+        "name": "power_audit_musespark_tp4_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-efb96a6d57177132b4b2",
+        "size_in_bytes": 509779,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12073269639/zip"
+      },
+      {
+        "id": 12068423360,
+        "name": "eval_results_all",
+        "size_in_bytes": 688,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12068423360/zip"
+      },
+      {
+        "id": 12068292577,
+        "name": "eval_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-dba7a005babbbb6fe641_lm-eval__1",
+        "size_in_bytes": 3673958,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12068292577/zip"
+      },
+      {
+        "id": 12067903644,
+        "name": "eval_server_logs_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-dba7a005babbbb6fe641_lm-eval_",
+        "size_in_bytes": 94646,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12067903644/zip"
+      }
+    ]
+  },
+  {
+    "run_id": "39179279826",
+    "name": "Run Sweep - [Klaud Cold] Re-sweep Muse Spark Open MI355X on the full trace corpus / [Klaud Cold] 在完整轨迹数据集上重新 sweep Muse Spark Open MI355X",
+    "head_sha": "680d5b9c29f784f4b787e4acf5109f3cf95c1cfb",
+    "created_at": "2026-10-19T00:06:38Z",
+    "head_branch": "klaud/musespark-mi355x-full-corpus-resweep",
+    "path": ".github/workflows/run-sweep.yml",
+    "run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826",
+    "conclusion": "success",
+    "muse_jobs": [
+      {
+        "id": 117828661348,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model dram KV offload hicache c12",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661348",
+        "started_at": "2026-10-19T00:08:15Z",
+        "completed_at": "2026-10-19T01:50:15Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117828661370,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model   c1",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661370",
+        "started_at": "2026-10-19T00:08:15Z",
+        "completed_at": "2026-10-19T01:30:23Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117828661400,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model dram KV offload hicache c16",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661400",
+        "started_at": "2026-10-19T00:08:15Z",
+        "completed_at": "2026-10-19T01:50:32Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117828661432,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c1",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661432",
+        "started_at": "2026-10-19T00:08:15Z",
+        "completed_at": "2026-10-19T01:36:52Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117828661456,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model   c8",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661456",
+        "started_at": "2026-10-19T01:31:10Z",
+        "completed_at": "2026-10-19T02:56:02Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117828661480,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model   c4",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661480",
+        "started_at": "2026-10-19T01:37:06Z",
+        "completed_at": "2026-10-19T02:56:33Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117828661501,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c8",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661501",
+        "started_at": "2026-10-19T01:50:56Z",
+        "completed_at": "2026-10-19T03:23:49Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117828661505,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c4",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661505",
+        "started_at": "2026-10-19T01:51:24Z",
+        "completed_at": "2026-10-19T03:20:10Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117828661522,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c16",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661522",
+        "started_at": "2026-10-19T02:56:51Z",
+        "completed_at": "2026-10-19T04:33:56Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117828661528,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c12",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661528",
+        "started_at": "2026-10-19T02:57:01Z",
+        "completed_at": "2026-10-19T04:27:08Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 117828661597,
+        "name": "agentic eval / (lmsysorg/sglang-rocm:muse-spark-open@sha256:72065dfc0b87818ab415f96c0fc08848233d2... / p2.700 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c16 | eval-only",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39179279826/job/117828661597",
+        "started_at": "2026-10-19T03:21:10Z",
+        "completed_at": "2026-10-19T03:50:52Z",
+        "conclusion": "success"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 12163651134,
+        "name": "changelog-metadata",
+        "size_in_bytes": 538,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12163651134/zip"
+      },
+      {
+        "id": 12163580782,
+        "name": "job_event_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a505d7cff77da24c5bcd",
+        "size_in_bytes": 1536,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12163580782/zip"
+      },
+      {
+        "id": 12163411068,
+        "name": "bmk_agentic_musespark_tp4_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-84f95abb94dce9d926bd",
+        "size_in_bytes": 2511,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12163411068/zip"
+      },
+      {
+        "id": 12163396161,
+        "name": "job_event_musespark_tp4_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-84f95abb94dce9d926bd",
+        "size_in_bytes": 1540,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12163396161/zip"
+      },
+      {
+        "id": 12163216532,
+        "name": "server_logs_musespark_tp4_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-84f95abb94dce9d926bd",
+        "size_in_bytes": 13637388,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12163216532/zip"
+      },
+      {
+        "id": 12163187448,
+        "name": "server_logs_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a505d7cff77da24c5bcd",
+        "size_in_bytes": 15307736,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12163187448/zip"
+      },
+      {
+        "id": 12163172502,
+        "name": "agentic_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a505d7cff77da24c5bcd",
+        "size_in_bytes": 23144712,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12163172502/zip"
+      },
+      {
+        "id": 12162948097,
+        "name": "power_audit_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a505d7cff77da24c5bcd",
+        "size_in_bytes": 601173,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12162948097/zip"
+      },
+      {
+        "id": 12162888478,
+        "name": "job_events",
+        "size_in_bytes": 3541,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12162888478/zip"
+      },
+      {
+        "id": 12162782873,
+        "name": "agentic_musespark_tp4_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-84f95abb94dce9d926bd",
+        "size_in_bytes": 20915640,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12162782873/zip"
+      },
+      {
+        "id": 12162733043,
+        "name": "power_audit_musespark_tp4_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-84f95abb94dce9d926bd",
+        "size_in_bytes": 553610,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12162733043/zip"
+      },
+      {
+        "id": 12162364890,
+        "name": "bmk_agentic_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a505d7cff77da24c5bcd",
+        "size_in_bytes": 2506,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12162364890/zip"
+      },
+      {
+        "id": 12162311394,
+        "name": "job_event_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-93bcf6dc4796560e137b_lm-eval_",
+        "size_in_bytes": 1353,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12162311394/zip"
+      },
+      {
+        "id": 12161872636,
+        "name": "eval_results_all",
+        "size_in_bytes": 687,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12161872636/zip"
+      },
+      {
+        "id": 12161785426,
+        "name": "bmk_agentic_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3a40968ea9c694d6136e",
+        "size_in_bytes": 2487,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12161785426/zip"
+      },
+      {
+        "id": 12161644710,
+        "name": "eval_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-93bcf6dc4796560e137b_lm-eval__1",
+        "size_in_bytes": 3700643,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12161644710/zip"
+      },
+      {
+        "id": 12161579879,
+        "name": "eval_server_logs_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-93bcf6dc4796560e137b_lm-eval_",
+        "size_in_bytes": 95256,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12161579879/zip"
+      },
+      {
+        "id": 12161481295,
+        "name": "power_audit_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3a40968ea9c694d6136e",
+        "size_in_bytes": 691332,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12161481295/zip"
+      },
+      {
+        "id": 12161401916,
+        "name": "server_logs_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3a40968ea9c694d6136e",
+        "size_in_bytes": 13976719,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12161401916/zip"
+      },
+      {
+        "id": 12161227866,
+        "name": "job_event_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3a40968ea9c694d6136e",
+        "size_in_bytes": 1522,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12161227866/zip"
+      },
+      {
+        "id": 12161078431,
+        "name": "agentic_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3a40968ea9c694d6136e",
+        "size_in_bytes": 22413310,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12161078431/zip"
+      },
+      {
+        "id": 12161038145,
+        "name": "job_event_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-8b0a715553bb4d941398",
+        "size_in_bytes": 1529,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12161038145/zip"
+      },
+      {
+        "id": 12160988454,
+        "name": "server_logs_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-8b0a715553bb4d941398",
+        "size_in_bytes": 10431650,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12160988454/zip"
+      },
+      {
+        "id": 12160945066,
+        "name": "job_event_musespark_tp4_conc8_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-940c6e9dea26bc28cb47",
+        "size_in_bytes": 1526,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12160945066/zip"
+      },
+      {
+        "id": 12160873952,
+        "name": "bmk_agentic_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-8b0a715553bb4d941398",
+        "size_in_bytes": 2487,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12160873952/zip"
+      },
+      {
+        "id": 12160860466,
+        "name": "server_logs_musespark_tp4_conc4_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-3066f06786169bb0f7ac",
+        "size_in_bytes": 7485881,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12160860466/zip"
+      },
+      {
+        "id": 12160819210,
+        "name": "power_audit_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-8b0a715553bb4d941398",
+        "size_in_bytes": 646903,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12160819210/zip"
+      },
+      {
+        "id": 12160819198,
+        "name": "agentic_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-8b0a715553bb4d941398",
+        "size_in_bytes": 18277167,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12160819198/zip"
+      },
+      {
+        "id": 12160760941,
+        "name": "bmk_agentic_musespark_tp4_conc4_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-3066f06786169bb0f7ac",
+        "size_in_bytes": 2480,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12160760941/zip"
+      },
+      {
+        "id": 12160750888,
+        "name": "server_logs_musespark_tp4_conc8_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-940c6e9dea26bc28cb47",
+        "size_in_bytes": 10927582,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12160750888/zip"
+      },
+      {
+        "id": 12160740954,
+        "name": "agentic_musespark_tp4_conc8_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-940c6e9dea26bc28cb47",
+        "size_in_bytes": 16624127,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12160740954/zip"
+      },
+      {
+        "id": 12160104028,
+        "name": "agentic_musespark_tp4_conc4_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-3066f06786169bb0f7ac",
+        "size_in_bytes": 12582435,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12160104028/zip"
+      },
+      {
+        "id": 12160049366,
+        "name": "job_event_musespark_tp4_conc4_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-3066f06786169bb0f7ac",
+        "size_in_bytes": 1526,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12160049366/zip"
+      },
+      {
+        "id": 12160034623,
+        "name": "power_audit_musespark_tp4_conc4_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-3066f06786169bb0f7ac",
+        "size_in_bytes": 490285,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12160034623/zip"
+      },
+      {
+        "id": 12159989694,
+        "name": "bmk_agentic_musespark_tp4_conc8_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-940c6e9dea26bc28cb47",
+        "size_in_bytes": 2470,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12159989694/zip"
+      },
+      {
+        "id": 12159954818,
+        "name": "power_audit_musespark_tp4_conc8_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-940c6e9dea26bc28cb47",
+        "size_in_bytes": 530533,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12159954818/zip"
+      },
+      {
+        "id": 12159025332,
+        "name": "agentic_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-4367b133a72efc903823",
+        "size_in_bytes": 33591175,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12159025332/zip"
+      },
+      {
+        "id": 12158796358,
+        "name": "power_audit_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-4367b133a72efc903823",
+        "size_in_bytes": 718819,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158796358/zip"
+      },
+      {
+        "id": 12158796323,
+        "name": "job_event_musespark_tp8_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-df6efb05da9bf41648a7",
+        "size_in_bytes": 1535,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158796323/zip"
+      },
+      {
+        "id": 12158796322,
+        "name": "bmk_agentic_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-4367b133a72efc903823",
+        "size_in_bytes": 2529,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158796322/zip"
+      },
+      {
+        "id": 12158616887,
+        "name": "power_audit_musespark_tp8_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-df6efb05da9bf41648a7",
+        "size_in_bytes": 727017,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158616887/zip"
+      },
+      {
+        "id": 12158611961,
+        "name": "server_logs_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-4367b133a72efc903823",
+        "size_in_bytes": 22290748,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158611961/zip"
+      },
+      {
+        "id": 12158555389,
+        "name": "agentic_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-530c17c14c7d81301480",
+        "size_in_bytes": 15930441,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158555389/zip"
+      },
+      {
+        "id": 12158397771,
+        "name": "server_logs_musespark_tp8_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-df6efb05da9bf41648a7",
+        "size_in_bytes": 18320048,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158397771/zip"
+      },
+      {
+        "id": 12158386157,
+        "name": "power_audit_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-530c17c14c7d81301480",
+        "size_in_bytes": 626870,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158386157/zip"
+      },
+      {
+        "id": 12158336432,
+        "name": "job_event_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-530c17c14c7d81301480",
+        "size_in_bytes": 1532,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158336432/zip"
+      },
+      {
+        "id": 12158327968,
+        "name": "bmk_agentic_musespark_tp8_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-df6efb05da9bf41648a7",
+        "size_in_bytes": 2532,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158327968/zip"
+      },
+      {
+        "id": 12158278251,
+        "name": "job_event_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-4367b133a72efc903823",
+        "size_in_bytes": 1544,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158278251/zip"
+      },
+      {
+        "id": 12158261472,
+        "name": "server_logs_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-530c17c14c7d81301480",
+        "size_in_bytes": 8139938,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158261472/zip"
+      },
+      {
+        "id": 12158071648,
+        "name": "server_logs_musespark_tp4_conc1_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-134994e80f3568f051e0",
+        "size_in_bytes": 5467540,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158071648/zip"
+      },
+      {
+        "id": 12158066652,
+        "name": "job_event_musespark_tp4_conc1_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-134994e80f3568f051e0",
+        "size_in_bytes": 1532,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158066652/zip"
+      },
+      {
+        "id": 12158019634,
+        "name": "agentic_musespark_tp8_conc12_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-df6efb05da9bf41648a7",
+        "size_in_bytes": 28536843,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158019634/zip"
+      },
+      {
+        "id": 12158017033,
+        "name": "agentic_musespark_tp4_conc1_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-134994e80f3568f051e0",
+        "size_in_bytes": 10363300,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12158017033/zip"
+      },
+      {
+        "id": 12157808705,
+        "name": "bmk_agentic_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-530c17c14c7d81301480",
+        "size_in_bytes": 2472,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12157808705/zip"
+      },
+      {
+        "id": 12157633706,
+        "name": "bmk_agentic_musespark_tp4_conc1_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-134994e80f3568f051e0",
+        "size_in_bytes": 2456,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12157633706/zip"
+      },
+      {
+        "id": 12157479553,
+        "name": "power_audit_musespark_tp4_conc1_kvnone_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disagg-false_-134994e80f3568f051e0",
+        "size_in_bytes": 502660,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12157479553/zip"
+      }
+    ]
+  },
+  {
+    "run_id": "39659301076",
+    "name": "Run Sweep - [AMD][MI35X] 1020 Muse Spark sglang dflash agentic / [AMD][MI35X] 1020 Muse Spark sglang dflash agentic 配置更新",
+    "head_sha": "8bfec0da6e887ca5925e6c51f414466ef8bb6441",
+    "created_at": "2026-10-21T19:10:33Z",
+    "head_branch": "amd/musespark-mi355x-sglang-1020",
+    "path": ".github/workflows/run-sweep.yml",
+    "run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076",
+    "conclusion": "success",
+    "muse_jobs": [
+      {
+        "id": 119428436648,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1020@sha256:7343002d0dc2c1e525c0563f0c5c0377b471f... / p7.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c2",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436648",
+        "started_at": "2026-10-21T19:13:08Z",
+        "completed_at": "2026-10-21T20:45:28Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 119428436698,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1020@sha256:7343002d0dc2c1e525c0563f0c5c0377b471f... / p7.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c4",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436698",
+        "started_at": "2026-10-21T19:13:21Z",
+        "completed_at": "2026-10-21T20:34:25Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 119428436736,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1020@sha256:7343002d0dc2c1e525c0563f0c5c0377b471f... / p7.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model dram KV offload hicache c16",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436736",
+        "started_at": "2026-10-21T19:13:08Z",
+        "completed_at": "2026-10-21T21:20:02Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 119428436843,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1020@sha256:7343002d0dc2c1e525c0563f0c5c0377b471f... / p7.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model dram KV offload hicache c64",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436843",
+        "started_at": "2026-10-21T19:13:08Z",
+        "completed_at": "2026-10-21T21:08:00Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 119428436852,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1020@sha256:7343002d0dc2c1e525c0563f0c5c0377b471f... / p7.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c1",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436852",
+        "started_at": "2026-10-21T19:13:08Z",
+        "completed_at": "2026-10-21T20:34:18Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 119428436854,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1020@sha256:7343002d0dc2c1e525c0563f0c5c0377b471f... / p7.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model dram KV offload hicache c48",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436854",
+        "started_at": "2026-10-21T19:13:08Z",
+        "completed_at": "2026-10-21T21:04:23Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 119428436857,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1020@sha256:7343002d0dc2c1e525c0563f0c5c0377b471f... / p7.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model dram KV offload hicache c32",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436857",
+        "started_at": "2026-10-21T19:53:26Z",
+        "completed_at": "2026-10-21T21:40:17Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 119428436913,
+        "name": "agentic eval / (lmsysorg/sglang-rocm:muse-spark-open-1020@sha256:7343002d0dc2c1e525c0563f0c5c0377... / p7.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model dram KV offload hicache c64 | eval-only",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436913",
+        "started_at": "2026-10-21T20:34:39Z",
+        "completed_at": "2026-10-21T21:11:29Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 119428437135,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1020@sha256:7343002d0dc2c1e525c0563f0c5c0377b471f... / p7.700 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c8",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428437135",
+        "started_at": "2026-10-21T20:34:50Z",
+        "completed_at": "2026-10-21T22:07:38Z",
+        "conclusion": "success"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 12385930166,
+        "name": "job_events",
+        "size_in_bytes": 3133,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12385930166/zip"
+      },
+      {
+        "id": 12385502804,
+        "name": "job_event_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3f6dd66f684607dd03ba",
+        "size_in_bytes": 1531,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12385502804/zip"
+      },
+      {
+        "id": 12384668859,
+        "name": "agentic_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3f6dd66f684607dd03ba",
+        "size_in_bytes": 24021762,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12384668859/zip"
+      },
+      {
+        "id": 12384589058,
+        "name": "power_audit_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3f6dd66f684607dd03ba",
+        "size_in_bytes": 685761,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12384589058/zip"
+      },
+      {
+        "id": 12384539094,
+        "name": "changelog-metadata",
+        "size_in_bytes": 551,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12384539094/zip"
+      },
+      {
+        "id": 12384533927,
+        "name": "bmk_agentic_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3f6dd66f684607dd03ba",
+        "size_in_bytes": 2486,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12384533927/zip"
+      },
+      {
+        "id": 12384521005,
+        "name": "job_event_musespark_tp8_conc32_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-616fdf2aa918f4afd45f",
+        "size_in_bytes": 1543,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12384521005/zip"
+      },
+      {
+        "id": 12384514175,
+        "name": "server_logs_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-3f6dd66f684607dd03ba",
+        "size_in_bytes": 15771293,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12384514175/zip"
+      },
+      {
+        "id": 12383856399,
+        "name": "power_audit_musespark_tp8_conc32_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-616fdf2aa918f4afd45f",
+        "size_in_bytes": 761640,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12383856399/zip"
+      },
+      {
+        "id": 12383377710,
+        "name": "bmk_agentic_musespark_tp8_conc32_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-616fdf2aa918f4afd45f",
+        "size_in_bytes": 2575,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12383377710/zip"
+      },
+      {
+        "id": 12383293105,
+        "name": "agentic_musespark_tp8_conc32_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-616fdf2aa918f4afd45f",
+        "size_in_bytes": 44477766,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12383293105/zip"
+      },
+      {
+        "id": 12383158026,
+        "name": "server_logs_musespark_tp8_conc32_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-616fdf2aa918f4afd45f",
+        "size_in_bytes": 34085160,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12383158026/zip"
+      },
+      {
+        "id": 12383066550,
+        "name": "server_logs_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-6f73f91c7876c332c69f",
+        "size_in_bytes": 24618655,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12383066550/zip"
+      },
+      {
+        "id": 12382891940,
+        "name": "power_audit_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-6f73f91c7876c332c69f",
+        "size_in_bytes": 880261,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12382891940/zip"
+      },
+      {
+        "id": 12382536822,
+        "name": "job_event_musespark_tp8_conc64_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-4ec6798ab4eb32bcc7b2",
+        "size_in_bytes": 1548,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12382536822/zip"
+      },
+      {
+        "id": 12382267864,
+        "name": "job_event_musespark_tp8_conc64_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-9a3e8562dfaf236b9331_lm-eval_",
+        "size_in_bytes": 1370,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12382267864/zip"
+      },
+      {
+        "id": 12382191806,
+        "name": "eval_musespark_tp8_conc64_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-9a3e8562dfaf236b9331_lm-eval__1",
+        "size_in_bytes": 3676048,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12382191806/zip"
+      },
+      {
+        "id": 12382181819,
+        "name": "eval_server_logs_musespark_tp8_conc64_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-9a3e8562dfaf236b9331_lm-eval_",
+        "size_in_bytes": 81726,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12382181819/zip"
+      },
+      {
+        "id": 12382161344,
+        "name": "power_audit_musespark_tp8_conc64_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-4ec6798ab4eb32bcc7b2",
+        "size_in_bytes": 797804,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12382161344/zip"
+      },
+      {
+        "id": 12381971403,
+        "name": "agentic_musespark_tp8_conc64_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-4ec6798ab4eb32bcc7b2",
+        "size_in_bytes": 59760716,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12381971403/zip"
+      },
+      {
+        "id": 12381938132,
+        "name": "bmk_agentic_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-6f73f91c7876c332c69f",
+        "size_in_bytes": 2528,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12381938132/zip"
+      },
+      {
+        "id": 12381916568,
+        "name": "server_logs_musespark_tp8_conc64_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-4ec6798ab4eb32bcc7b2",
+        "size_in_bytes": 48473323,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12381916568/zip"
+      },
+      {
+        "id": 12381843050,
+        "name": "eval_results_all",
+        "size_in_bytes": 690,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12381843050/zip"
+      },
+      {
+        "id": 12381803180,
+        "name": "agentic_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-6f73f91c7876c332c69f",
+        "size_in_bytes": 34722645,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12381803180/zip"
+      },
+      {
+        "id": 12381396744,
+        "name": "bmk_agentic_musespark_tp8_conc64_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-4ec6798ab4eb32bcc7b2",
+        "size_in_bytes": 2559,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12381396744/zip"
+      },
+      {
+        "id": 12381211571,
+        "name": "bmk_agentic_musespark_tp8_conc48_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-180e816ee103a0f76c35",
+        "size_in_bytes": 2549,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12381211571/zip"
+      },
+      {
+        "id": 12381208472,
+        "name": "job_event_musespark_tp8_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-6f73f91c7876c332c69f",
+        "size_in_bytes": 1545,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12381208472/zip"
+      },
+      {
+        "id": 12381141595,
+        "name": "power_audit_musespark_tp8_conc48_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-180e816ee103a0f76c35",
+        "size_in_bytes": 782783,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12381141595/zip"
+      },
+      {
+        "id": 12381113974,
+        "name": "job_event_musespark_tp8_conc48_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-180e816ee103a0f76c35",
+        "size_in_bytes": 1545,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12381113974/zip"
+      },
+      {
+        "id": 12381089121,
+        "name": "agentic_musespark_tp8_conc48_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-180e816ee103a0f76c35",
+        "size_in_bytes": 53300604,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12381089121/zip"
+      },
+      {
+        "id": 12381046017,
+        "name": "server_logs_musespark_tp8_conc2_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-997e678b5b59885f36cd",
+        "size_in_bytes": 9648771,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12381046017/zip"
+      },
+      {
+        "id": 12380991166,
+        "name": "power_audit_musespark_tp8_conc2_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-997e678b5b59885f36cd",
+        "size_in_bytes": 658297,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12380991166/zip"
+      },
+      {
+        "id": 12380859369,
+        "name": "server_logs_musespark_tp8_conc48_kvdram-hicache_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disa-180e816ee103a0f76c35",
+        "size_in_bytes": 42455798,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12380859369/zip"
+      },
+      {
+        "id": 12380821425,
+        "name": "bmk_agentic_musespark_tp8_conc2_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-997e678b5b59885f36cd",
+        "size_in_bytes": 2478,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12380821425/zip"
+      },
+      {
+        "id": 12380765288,
+        "name": "power_audit_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-ec6e1735590b2d226eeb",
+        "size_in_bytes": 578102,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12380765288/zip"
+      },
+      {
+        "id": 12380655552,
+        "name": "agentic_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-e46c7aa66f193b955df3",
+        "size_in_bytes": 19233088,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12380655552/zip"
+      },
+      {
+        "id": 12380550694,
+        "name": "job_event_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-ec6e1735590b2d226eeb",
+        "size_in_bytes": 1538,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12380550694/zip"
+      },
+      {
+        "id": 12380495812,
+        "name": "server_logs_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-e46c7aa66f193b955df3",
+        "size_in_bytes": 11135065,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12380495812/zip"
+      },
+      {
+        "id": 12379847113,
+        "name": "power_audit_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-e46c7aa66f193b955df3",
+        "size_in_bytes": 592960,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12379847113/zip"
+      },
+      {
+        "id": 12379777169,
+        "name": "agentic_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-ec6e1735590b2d226eeb",
+        "size_in_bytes": 16469450,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12379777169/zip"
+      },
+      {
+        "id": 12379757183,
+        "name": "server_logs_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-ec6e1735590b2d226eeb",
+        "size_in_bytes": 8442636,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12379757183/zip"
+      },
+      {
+        "id": 12379753787,
+        "name": "agentic_musespark_tp8_conc2_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-997e678b5b59885f36cd",
+        "size_in_bytes": 17628078,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12379753787/zip"
+      },
+      {
+        "id": 12379722178,
+        "name": "job_event_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-e46c7aa66f193b955df3",
+        "size_in_bytes": 1535,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12379722178/zip"
+      },
+      {
+        "id": 12379462361,
+        "name": "bmk_agentic_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-ec6e1735590b2d226eeb",
+        "size_in_bytes": 2477,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12379462361/zip"
+      },
+      {
+        "id": 12379232477,
+        "name": "bmk_agentic_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-e46c7aa66f193b955df3",
+        "size_in_bytes": 2494,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12379232477/zip"
+      },
+      {
+        "id": 12379144058,
+        "name": "job_event_musespark_tp8_conc2_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-997e678b5b59885f36cd",
+        "size_in_bytes": 1532,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12379144058/zip"
+      }
+    ]
+  },
+  {
+    "run_id": "40714803265",
+    "name": "Run Sweep - [AMD][MI35X] 1027 Muse Spark sglang dflash agentic / [AMD][MI35X] 1027 Muse Spark sglang dflash agentic 配置更新",
+    "head_sha": "c999c25431b0a4dda6a2c9e15e985abaecf12a21",
+    "created_at": "2026-10-28T15:19:39Z",
+    "head_branch": "amd/musespark-mi355x-sglang-1027",
+    "path": ".github/workflows/run-sweep.yml",
+    "run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265",
+    "conclusion": "success",
+    "muse_jobs": [
+      {
+        "id": 122910587816,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c40",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587816",
+        "started_at": "2026-10-28T22:30:06Z",
+        "completed_at": "2026-10-29T00:10:41Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 122910587858,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c4",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587858",
+        "started_at": "2026-10-28T22:30:06Z",
+        "completed_at": "2026-10-28T23:57:52Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 122910587874,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c13",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587874",
+        "started_at": "2026-10-28T22:35:23Z",
+        "completed_at": "2026-10-29T00:06:11Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 122910587886,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c10",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587886",
+        "started_at": "2026-10-28T22:35:23Z",
+        "completed_at": "2026-10-29T00:01:17Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 122910587901,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c28",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587901",
+        "started_at": "2026-10-28T22:35:23Z",
+        "completed_at": "2026-10-29T00:14:21Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 122910588033,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c1",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588033",
+        "started_at": "2026-10-28T22:42:16Z",
+        "completed_at": "2026-10-29T00:10:40Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 122910588046,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c36",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588046",
+        "started_at": "2026-10-28T22:42:16Z",
+        "completed_at": "2026-10-29T00:22:09Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 122910588087,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c8",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588087",
+        "started_at": "2026-10-28T22:42:16Z",
+        "completed_at": "2026-10-29T00:10:51Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 122910588096,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c16",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588096",
+        "started_at": "2026-10-29T00:12:32Z",
+        "completed_at": "2026-10-29T01:45:57Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 122910588376,
+        "name": "agentic eval / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e37... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c24 | eval-only",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588376",
+        "started_at": "2026-10-29T00:12:32Z",
+        "completed_at": "2026-10-29T00:40:14Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 122910588410,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c24",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588410",
+        "started_at": "2026-10-29T00:15:22Z",
+        "completed_at": "2026-10-29T01:51:15Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 122910588567,
+        "name": "agentic eval / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e37... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c13 | eval-only",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588567",
+        "started_at": "2026-10-29T00:41:34Z",
+        "completed_at": "2026-10-29T01:11:24Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 122910588629,
+        "name": "agentic eval / (lmsysorg/sglang-rocm:muse-spark-open-1027@sha256:7184d3ae2bfdc75a5bb8eb497b768e37... / p7.800 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c40 | eval-only",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588629",
+        "started_at": "2026-10-29T04:35:41Z",
+        "completed_at": "2026-10-29T05:03:28Z",
+        "conclusion": "success"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 12874841405,
+        "name": "eval_results_all",
+        "size_in_bytes": 937,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12874841405/zip"
+      },
+      {
+        "id": 12874816311,
+        "name": "eval_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a78668adb64abb6a71b3_lm-eval__1",
+        "size_in_bytes": 3682266,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12874816311/zip"
+      },
+      {
+        "id": 12874462215,
+        "name": "job_events",
+        "size_in_bytes": 4061,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12874462215/zip"
+      },
+      {
+        "id": 12874248639,
+        "name": "eval_server_logs_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a78668adb64abb6a71b3_lm-eval_",
+        "size_in_bytes": 81917,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12874248639/zip"
+      },
+      {
+        "id": 12874178999,
+        "name": "job_event_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a78668adb64abb6a71b3_lm-eval_",
+        "size_in_bytes": 1355,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12874178999/zip"
+      },
+      {
+        "id": 12873694469,
+        "name": "changelog-metadata",
+        "size_in_bytes": 547,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12873694469/zip"
+      },
+      {
+        "id": 12867070956,
+        "name": "bmk_agentic_musespark_tp4_conc24_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-e25cd1467d4d57cfe1cd",
+        "size_in_bytes": 2516,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12867070956/zip"
+      },
+      {
+        "id": 12867050699,
+        "name": "server_logs_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-e713fc242e824c0511e1",
+        "size_in_bytes": 18769659,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12867050699/zip"
+      },
+      {
+        "id": 12867050692,
+        "name": "agentic_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-e713fc242e824c0511e1",
+        "size_in_bytes": 25314236,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12867050692/zip"
+      },
+      {
+        "id": 12866786874,
+        "name": "job_event_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-e713fc242e824c0511e1",
+        "size_in_bytes": 1541,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12866786874/zip"
+      },
+      {
+        "id": 12866637146,
+        "name": "bmk_agentic_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-e713fc242e824c0511e1",
+        "size_in_bytes": 2520,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12866637146/zip"
+      },
+      {
+        "id": 12866477792,
+        "name": "server_logs_musespark_tp4_conc24_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-e25cd1467d4d57cfe1cd",
+        "size_in_bytes": 23549064,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12866477792/zip"
+      },
+      {
+        "id": 12866258318,
+        "name": "power_audit_musespark_tp4_conc16_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-e713fc242e824c0511e1",
+        "size_in_bytes": 543584,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12866258318/zip"
+      },
+      {
+        "id": 12866238206,
+        "name": "job_event_musespark_tp4_conc24_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-e25cd1467d4d57cfe1cd",
+        "size_in_bytes": 1540,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12866238206/zip"
+      },
+      {
+        "id": 12865968854,
+        "name": "power_audit_musespark_tp4_conc24_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-e25cd1467d4d57cfe1cd",
+        "size_in_bytes": 552915,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12865968854/zip"
+      },
+      {
+        "id": 12865689884,
+        "name": "agentic_musespark_tp4_conc24_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-e25cd1467d4d57cfe1cd",
+        "size_in_bytes": 30265706,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12865689884/zip"
+      },
+      {
+        "id": 12865001797,
+        "name": "eval_server_logs_musespark_tp8_conc13_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-5fe0b8c098679bbfb548_lm-eval_",
+        "size_in_bytes": 146796,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12865001797/zip"
+      },
+      {
+        "id": 12864323399,
+        "name": "eval_musespark_tp8_conc13_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-5fe0b8c098679bbfb548_lm-eval__1",
+        "size_in_bytes": 3682598,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12864323399/zip"
+      },
+      {
+        "id": 12864318511,
+        "name": "job_event_musespark_tp8_conc13_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-5fe0b8c098679bbfb548_lm-eval_",
+        "size_in_bytes": 1355,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12864318511/zip"
+      },
+      {
+        "id": 12863392932,
+        "name": "job_event_musespark_tp4_conc24_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a192b6290ac575c24cf5_lm-eval_",
+        "size_in_bytes": 1361,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12863392932/zip"
+      },
+      {
+        "id": 12863290087,
+        "name": "bmk_agentic_musespark_tp4_conc36_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a7e06c4455cbb6a6dd22",
+        "size_in_bytes": 2542,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12863290087/zip"
+      },
+      {
+        "id": 12863070821,
+        "name": "power_audit_musespark_tp4_conc36_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a7e06c4455cbb6a6dd22",
+        "size_in_bytes": 587703,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12863070821/zip"
+      },
+      {
+        "id": 12863068898,
+        "name": "eval_musespark_tp4_conc24_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a192b6290ac575c24cf5_lm-eval__1",
+        "size_in_bytes": 3683408,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12863068898/zip"
+      },
+      {
+        "id": 12863058927,
+        "name": "eval_server_logs_musespark_tp4_conc24_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a192b6290ac575c24cf5_lm-eval_",
+        "size_in_bytes": 87489,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12863058927/zip"
+      },
+      {
+        "id": 12862561226,
+        "name": "job_event_musespark_tp4_conc28_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-4a40821c01a527554ff0",
+        "size_in_bytes": 1543,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862561226/zip"
+      },
+      {
+        "id": 12862432149,
+        "name": "bmk_agentic_musespark_tp4_conc28_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-4a40821c01a527554ff0",
+        "size_in_bytes": 2518,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862432149/zip"
+      },
+      {
+        "id": 12862406321,
+        "name": "bmk_agentic_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-b1aae1a4424c4ffe7257",
+        "size_in_bytes": 2474,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862406321/zip"
+      },
+      {
+        "id": 12862393544,
+        "name": "agentic_musespark_tp4_conc36_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a7e06c4455cbb6a6dd22",
+        "size_in_bytes": 33355011,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862393544/zip"
+      },
+      {
+        "id": 12862391532,
+        "name": "agentic_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-3ec3fea36ac81ed730fc",
+        "size_in_bytes": 33941015,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862391532/zip"
+      },
+      {
+        "id": 12862340120,
+        "name": "bmk_agentic_musespark_tp4_conc10_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-8fe568d13d704de6f3f8",
+        "size_in_bytes": 2506,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862340120/zip"
+      },
+      {
+        "id": 12862320940,
+        "name": "bmk_agentic_musespark_tp8_conc13_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-e56f617e8ba570a661dd",
+        "size_in_bytes": 2477,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862320940/zip"
+      },
+      {
+        "id": 12862301760,
+        "name": "job_event_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-3ec3fea36ac81ed730fc",
+        "size_in_bytes": 1540,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862301760/zip"
+      },
+      {
+        "id": 12862296844,
+        "name": "server_logs_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-3ec3fea36ac81ed730fc",
+        "size_in_bytes": 26590431,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862296844/zip"
+      },
+      {
+        "id": 12862265487,
+        "name": "job_event_musespark_tp4_conc10_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-8fe568d13d704de6f3f8",
+        "size_in_bytes": 1542,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862265487/zip"
+      },
+      {
+        "id": 12862241935,
+        "name": "power_audit_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-3ec3fea36ac81ed730fc",
+        "size_in_bytes": 582262,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862241935/zip"
+      },
+      {
+        "id": 12862227056,
+        "name": "server_logs_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-b1aae1a4424c4ffe7257",
+        "size_in_bytes": 8708321,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862227056/zip"
+      },
+      {
+        "id": 12862152244,
+        "name": "agentic_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-b1aae1a4424c4ffe7257",
+        "size_in_bytes": 16695680,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862152244/zip"
+      },
+      {
+        "id": 12862137529,
+        "name": "job_event_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-6a5f3f25bbbc3531bba7",
+        "size_in_bytes": 1534,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862137529/zip"
+      },
+      {
+        "id": 12862095378,
+        "name": "agentic_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-7bf46422152de95dc0bf",
+        "size_in_bytes": 19562563,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862095378/zip"
+      },
+      {
+        "id": 12862044786,
+        "name": "job_event_musespark_tp4_conc36_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a7e06c4455cbb6a6dd22",
+        "size_in_bytes": 1545,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862044786/zip"
+      },
+      {
+        "id": 12862042015,
+        "name": "agentic_musespark_tp8_conc13_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-e56f617e8ba570a661dd",
+        "size_in_bytes": 27600106,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862042015/zip"
+      },
+      {
+        "id": 12862036074,
+        "name": "power_audit_musespark_tp4_conc10_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-8fe568d13d704de6f3f8",
+        "size_in_bytes": 498525,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862036074/zip"
+      },
+      {
+        "id": 12862017777,
+        "name": "agentic_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-6a5f3f25bbbc3531bba7",
+        "size_in_bytes": 24275573,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12862017777/zip"
+      },
+      {
+        "id": 12861992663,
+        "name": "server_logs_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-6a5f3f25bbbc3531bba7",
+        "size_in_bytes": 16132465,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861992663/zip"
+      },
+      {
+        "id": 12861982649,
+        "name": "bmk_agentic_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-6a5f3f25bbbc3531bba7",
+        "size_in_bytes": 2490,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861982649/zip"
+      },
+      {
+        "id": 12861960514,
+        "name": "bmk_agentic_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-7bf46422152de95dc0bf",
+        "size_in_bytes": 2476,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861960514/zip"
+      },
+      {
+        "id": 12861899940,
+        "name": "server_logs_musespark_tp4_conc36_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-a7e06c4455cbb6a6dd22",
+        "size_in_bytes": 26302019,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861899940/zip"
+      },
+      {
+        "id": 12861868210,
+        "name": "power_audit_musespark_tp8_conc8_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-6a5f3f25bbbc3531bba7",
+        "size_in_bytes": 645920,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861868210/zip"
+      },
+      {
+        "id": 12861798331,
+        "name": "job_event_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-b1aae1a4424c4ffe7257",
+        "size_in_bytes": 1534,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861798331/zip"
+      },
+      {
+        "id": 12861798266,
+        "name": "bmk_agentic_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-3ec3fea36ac81ed730fc",
+        "size_in_bytes": 2540,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861798266/zip"
+      },
+      {
+        "id": 12861779008,
+        "name": "server_logs_musespark_tp4_conc28_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-4a40821c01a527554ff0",
+        "size_in_bytes": 24341967,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861779008/zip"
+      },
+      {
+        "id": 12861622141,
+        "name": "agentic_musespark_tp4_conc10_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-8fe568d13d704de6f3f8",
+        "size_in_bytes": 20301659,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861622141/zip"
+      },
+      {
+        "id": 12861607772,
+        "name": "server_logs_musespark_tp8_conc13_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-e56f617e8ba570a661dd",
+        "size_in_bytes": 19130295,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861607772/zip"
+      },
+      {
+        "id": 12861593807,
+        "name": "power_audit_musespark_tp8_conc1_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-b1aae1a4424c4ffe7257",
+        "size_in_bytes": 624489,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861593807/zip"
+      },
+      {
+        "id": 12861559583,
+        "name": "agentic_musespark_tp4_conc28_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-4a40821c01a527554ff0",
+        "size_in_bytes": 31319860,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861559583/zip"
+      },
+      {
+        "id": 12861552858,
+        "name": "power_audit_musespark_tp8_conc13_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-e56f617e8ba570a661dd",
+        "size_in_bytes": 662839,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861552858/zip"
+      },
+      {
+        "id": 12861519568,
+        "name": "power_audit_musespark_tp4_conc28_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-4a40821c01a527554ff0",
+        "size_in_bytes": 564010,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861519568/zip"
+      },
+      {
+        "id": 12861322967,
+        "name": "server_logs_musespark_tp4_conc10_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-8fe568d13d704de6f3f8",
+        "size_in_bytes": 14469748,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861322967/zip"
+      },
+      {
+        "id": 12861043670,
+        "name": "job_event_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-7bf46422152de95dc0bf",
+        "size_in_bytes": 1537,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12861043670/zip"
+      },
+      {
+        "id": 12860914697,
+        "name": "job_event_musespark_tp8_conc13_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-e56f617e8ba570a661dd",
+        "size_in_bytes": 1532,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12860914697/zip"
+      },
+      {
+        "id": 12860679821,
+        "name": "server_logs_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-7bf46422152de95dc0bf",
+        "size_in_bytes": 11557445,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12860679821/zip"
+      },
+      {
+        "id": 12860389653,
+        "name": "power_audit_musespark_tp8_conc4_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-7bf46422152de95dc0bf",
+        "size_in_bytes": 644748,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12860389653/zip"
+      }
+    ]
+  },
+  {
+    "run_id": "42394597374",
+    "name": "Run Sweep - [AMD][MI35X] 1106 Muse Spark sglang dflash agentic / [AMD][MI35X] 1106 Muse Spark sglang dflash agentic 配置更新",
+    "head_sha": "75762ed31bd8c7f953f7e33fa718ffbcbbfb459b",
+    "created_at": "2026-11-07T17:05:56Z",
+    "head_branch": "amd/musespark-mi355x-sglang-1106",
+    "path": ".github/workflows/run-sweep.yml",
+    "run_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374",
+    "conclusion": "success",
+    "muse_jobs": [
+      {
+        "id": 128469427930,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-mi355-1106@sha256:d231181df079a5b271a0459d024492c... / p2.950 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c28",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469427930",
+        "started_at": "2026-11-07T17:07:57Z",
+        "completed_at": "2026-11-07T18:40:57Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 128469427944,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-mi355-1106@sha256:d231181df079a5b271a0459d024492c... / p2.950 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c40",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469427944",
+        "started_at": "2026-11-07T17:07:57Z",
+        "completed_at": "2026-11-07T18:49:02Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 128469427954,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-mi355-1106@sha256:d231181df079a5b271a0459d024492c... / p2.950 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c28",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469427954",
+        "started_at": "2026-11-07T17:07:57Z",
+        "completed_at": "2026-11-07T18:42:05Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 128469427998,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-mi355-1106@sha256:d231181df079a5b271a0459d024492c... / p2.950 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c6",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469427998",
+        "started_at": "2026-11-07T17:07:11Z",
+        "completed_at": "2026-11-07T18:39:15Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 128469428100,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-mi355-1106@sha256:d231181df079a5b271a0459d024492c... / p2.950 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c36",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469428100",
+        "started_at": "2026-11-07T17:07:57Z",
+        "completed_at": "2026-11-07T18:49:06Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 128469428179,
+        "name": "agentic / (lmsysorg/sglang-rocm:muse-spark-open-mi355-1106@sha256:d231181df079a5b271a0459d024492c... / p2.950 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c10",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469428179",
+        "started_at": "2026-11-07T17:07:57Z",
+        "completed_at": "2026-11-07T18:41:22Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 128469462887,
+        "name": "agentic eval / (lmsysorg/sglang-rocm:muse-spark-open-mi355-1106@sha256:d231181df079a5b271a0459d02... / p2.950 | musespark fp4 cluster:mi355x-amds sgl TP8/EP8 draft_model   c28 | eval-only",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469462887",
+        "started_at": "2026-11-07T17:08:11Z",
+        "completed_at": "2026-11-07T17:46:24Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 128469462916,
+        "name": "agentic eval / (lmsysorg/sglang-rocm:muse-spark-open-mi355-1106@sha256:d231181df079a5b271a0459d02... / p2.950 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c28 | eval-only",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469462916",
+        "started_at": "2026-11-07T17:08:11Z",
+        "completed_at": "2026-11-07T17:40:53Z",
+        "conclusion": "success"
+      },
+      {
+        "id": 128469462935,
+        "name": "agentic eval / (lmsysorg/sglang-rocm:muse-spark-open-mi355-1106@sha256:d231181df079a5b271a0459d02... / p2.950 | musespark fp4 cluster:mi355x-amds sgl TP4/EP4 draft_model dram KV offload hicache c40 | eval-only",
+        "html_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469462935",
+        "started_at": "2026-11-07T17:08:11Z",
+        "completed_at": "2026-11-07T17:45:29Z",
+        "conclusion": "success"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 13586745674,
+        "name": "power_audit_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-28705f73c5d0021eda1d",
+        "size_in_bytes": 734905,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586745674/zip"
+      },
+      {
+        "id": 13586745672,
+        "name": "job_event_musespark_tp4_conc36_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-1938408016b15d6714c1",
+        "size_in_bytes": 1550,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586745672/zip"
+      },
+      {
+        "id": 13586720904,
+        "name": "job_event_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-28705f73c5d0021eda1d",
+        "size_in_bytes": 1548,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586720904/zip"
+      },
+      {
+        "id": 13586666244,
+        "name": "agentic_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-28705f73c5d0021eda1d",
+        "size_in_bytes": 33619994,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586666244/zip"
+      },
+      {
+        "id": 13586580416,
+        "name": "bmk_agentic_musespark_tp8_conc10_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-ce08956d70e975f9ae71",
+        "size_in_bytes": 2698,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586580416/zip"
+      },
+      {
+        "id": 13586580117,
+        "name": "power_audit_musespark_tp8_conc6_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-77fbc77565a7ae10bdec",
+        "size_in_bytes": 825491,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586580117/zip"
+      },
+      {
+        "id": 13586565083,
+        "name": "bmk_agentic_musespark_tp4_conc28_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-f94aa9fa0d4a0ea6c694",
+        "size_in_bytes": 2711,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586565083/zip"
+      },
+      {
+        "id": 13586560143,
+        "name": "agentic_musespark_tp8_conc10_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-ce08956d70e975f9ae71",
+        "size_in_bytes": 23961268,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586560143/zip"
+      },
+      {
+        "id": 13586545125,
+        "name": "power_audit_musespark_tp4_conc28_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-f94aa9fa0d4a0ea6c694",
+        "size_in_bytes": 661634,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586545125/zip"
+      },
+      {
+        "id": 13586440317,
+        "name": "power_audit_musespark_tp8_conc28_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-f8ef5f6000ce6c34e473",
+        "size_in_bytes": 815461,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586440317/zip"
+      },
+      {
+        "id": 13586407181,
+        "name": "job_events",
+        "size_in_bytes": 3289,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586407181/zip"
+      },
+      {
+        "id": 13586350646,
+        "name": "agentic_musespark_tp8_conc28_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-f8ef5f6000ce6c34e473",
+        "size_in_bytes": 35277338,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586350646/zip"
+      },
+      {
+        "id": 13586307366,
+        "name": "server_logs_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-28705f73c5d0021eda1d",
+        "size_in_bytes": 27028466,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586307366/zip"
+      },
+      {
+        "id": 13586271690,
+        "name": "changelog-metadata",
+        "size_in_bytes": 534,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586271690/zip"
+      },
+      {
+        "id": 13586270677,
+        "name": "server_logs_musespark_tp4_conc28_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-f94aa9fa0d4a0ea6c694",
+        "size_in_bytes": 23827670,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586270677/zip"
+      },
+      {
+        "id": 13586156684,
+        "name": "bmk_agentic_musespark_tp4_conc36_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-1938408016b15d6714c1",
+        "size_in_bytes": 2790,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586156684/zip"
+      },
+      {
+        "id": 13586066388,
+        "name": "bmk_agentic_musespark_tp8_conc6_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-77fbc77565a7ae10bdec",
+        "size_in_bytes": 2708,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586066388/zip"
+      },
+      {
+        "id": 13586036535,
+        "name": "server_logs_musespark_tp8_conc6_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-77fbc77565a7ae10bdec",
+        "size_in_bytes": 12240492,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13586036535/zip"
+      },
+      {
+        "id": 13585876695,
+        "name": "job_event_musespark_tp8_conc28_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-f8ef5f6000ce6c34e473",
+        "size_in_bytes": 1538,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13585876695/zip"
+      },
+      {
+        "id": 13585846723,
+        "name": "job_event_musespark_tp4_conc28_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-f94aa9fa0d4a0ea6c694",
+        "size_in_bytes": 1545,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13585846723/zip"
+      },
+      {
+        "id": 13585814389,
+        "name": "server_logs_musespark_tp4_conc36_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-1938408016b15d6714c1",
+        "size_in_bytes": 25676708,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13585814389/zip"
+      },
+      {
+        "id": 13585807687,
+        "name": "bmk_agentic_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-28705f73c5d0021eda1d",
+        "size_in_bytes": 2749,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13585807687/zip"
+      },
+      {
+        "id": 13585767240,
+        "name": "server_logs_musespark_tp8_conc28_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-f8ef5f6000ce6c34e473",
+        "size_in_bytes": 26313047,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13585767240/zip"
+      },
+      {
+        "id": 13585734991,
+        "name": "power_audit_musespark_tp4_conc36_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-1938408016b15d6714c1",
+        "size_in_bytes": 737704,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13585734991/zip"
+      },
+      {
+        "id": 13585633848,
+        "name": "agentic_musespark_tp8_conc6_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-77fbc77565a7ae10bdec",
+        "size_in_bytes": 20234015,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13585633848/zip"
+      },
+      {
+        "id": 13585623518,
+        "name": "agentic_musespark_tp4_conc36_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-1938408016b15d6714c1",
+        "size_in_bytes": 32336678,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13585623518/zip"
+      },
+      {
+        "id": 13585592884,
+        "name": "bmk_agentic_musespark_tp8_conc28_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-f8ef5f6000ce6c34e473",
+        "size_in_bytes": 2723,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13585592884/zip"
+      },
+      {
+        "id": 13585577856,
+        "name": "server_logs_musespark_tp8_conc10_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-ce08956d70e975f9ae71",
+        "size_in_bytes": 16066273,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13585577856/zip"
+      },
+      {
+        "id": 13585529407,
+        "name": "job_event_musespark_tp8_conc6_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false_-77fbc77565a7ae10bdec",
+        "size_in_bytes": 1533,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13585529407/zip"
+      },
+      {
+        "id": 13585478183,
+        "name": "job_event_musespark_tp8_conc10_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-ce08956d70e975f9ae71",
+        "size_in_bytes": 1538,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13585478183/zip"
+      },
+      {
+        "id": 13584939761,
+        "name": "power_audit_musespark_tp8_conc10_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-ce08956d70e975f9ae71",
+        "size_in_bytes": 827302,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13584939761/zip"
+      },
+      {
+        "id": 13584859920,
+        "name": "agentic_musespark_tp4_conc28_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-f94aa9fa0d4a0ea6c694",
+        "size_in_bytes": 30309748,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13584859920/zip"
+      },
+      {
+        "id": 13584560922,
+        "name": "eval_server_logs_musespark_tp8_conc28_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-d403788c208aab4d413a_lm-eval_",
+        "size_in_bytes": 326510,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13584560922/zip"
+      },
+      {
+        "id": 13584461478,
+        "name": "job_event_musespark_tp8_conc28_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-d403788c208aab4d413a_lm-eval_",
+        "size_in_bytes": 1370,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13584461478/zip"
+      },
+      {
+        "id": 13584420889,
+        "name": "job_event_musespark_tp4_conc28_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-49bf63feaabd5847b747_lm-eval_",
+        "size_in_bytes": 1375,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13584420889/zip"
+      },
+      {
+        "id": 13584282157,
+        "name": "eval_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-5781dd753c02c7869119_lm-eval__1",
+        "size_in_bytes": 3700205,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13584282157/zip"
+      },
+      {
+        "id": 13584152522,
+        "name": "job_event_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-5781dd753c02c7869119_lm-eval_",
+        "size_in_bytes": 1376,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13584152522/zip"
+      },
+      {
+        "id": 13583908056,
+        "name": "eval_server_logs_musespark_tp4_conc40_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-5781dd753c02c7869119_lm-eval_",
+        "size_in_bytes": 307962,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13583908056/zip"
+      },
+      {
+        "id": 13583803628,
+        "name": "eval_results_all",
+        "size_in_bytes": 969,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13583803628/zip"
+      },
+      {
+        "id": 13583792710,
+        "name": "eval_musespark_tp4_conc28_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-49bf63feaabd5847b747_lm-eval__1",
+        "size_in_bytes": 3677666,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13583792710/zip"
+      },
+      {
+        "id": 13583773589,
+        "name": "eval_musespark_tp8_conc28_kvnone_spec-draft_model_fp4_sglang_tp8-pp1-dcp1-pcp1-ep8-dpafalse_disagg-false-d403788c208aab4d413a_lm-eval__1",
+        "size_in_bytes": 3711838,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13583773589/zip"
+      },
+      {
+        "id": 13583599877,
+        "name": "eval_server_logs_musespark_tp4_conc28_kvdram-hicache_spec-draft_model_fp4_sglang_tp4-pp1-dcp1-pcp1-ep4-dpafalse_disa-49bf63feaabd5847b747_lm-eval_",
+        "size_in_bytes": 304019,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13583599877/zip"
+      },
+      {
+        "id": 13582782687,
+        "name": "al_gate_dataset",
+        "size_in_bytes": 21698,
+        "expired": false,
+        "archive_download_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13582782687/zip"
+      }
+    ]
+  }
+]

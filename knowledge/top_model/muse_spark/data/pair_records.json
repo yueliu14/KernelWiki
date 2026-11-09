@@ -1,0 +1,3447 @@
+[
+  {
+    "id": "tep4_conc16_on_2026-10-16_to_2026-10-30",
+    "configuration_label": "TEP4 conc16 / HiCache",
+    "config": {
+      "hardware": "mi355x",
+      "framework": "sglang",
+      "model": "musespark",
+      "precision": "fp4",
+      "spec_method": "draft_model",
+      "disagg": false,
+      "is_multinode": false,
+      "prefill_tp": 4,
+      "prefill_ep": 4,
+      "prefill_dp_attention": false,
+      "prefill_num_workers": 0,
+      "decode_tp": 4,
+      "decode_ep": 4,
+      "decode_dp_attention": false,
+      "decode_num_workers": 0,
+      "num_prefill_gpu": 4,
+      "num_decode_gpu": 4,
+      "benchmark_type": "agentic_traces",
+      "offload_mode": "on",
+      "isl": null,
+      "osl": null,
+      "conc": 16,
+      "pp": 1,
+      "dcp_size": 1,
+      "pcp_size": 1,
+      "spec_algorithm": "dflash",
+      "spec_draft_model": "RadixArk/Muse-Spark-Open-DFlash2",
+      "kv_offloading": "dram"
+    },
+    "before": {
+      "id": "445167",
+      "date": "2026-10-16",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open",
+      "image_digest": "sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178838",
+      "github_job_id": 117132178838,
+      "recipe_fingerprint": "57e21483de9d6f0758e0270ee50f65b9043a0d45ece106d849a74d390a50a80a",
+      "p90_interactivity_tok_s_user": 38.255547054322875,
+      "output_tok_s_chip": 127.52659,
+      "launch": {
+        "run_id": "38947852942",
+        "job_id": 117132178838,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178838",
+        "effective_checkouts": [
+          "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-size 180 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.110",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "after": {
+      "id": "446938",
+      "date": "2026-10-30",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+      "image_digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588096",
+      "github_job_id": 122910588096,
+      "recipe_fingerprint": "5f19d1764ea5b019ac9a473cc2c734a299d3f4929d37c13c9011534d208142fd",
+      "p90_interactivity_tok_s_user": 151.285930408472,
+      "output_tok_s_chip": 142.52034,
+      "launch": {
+        "run_id": "40714803265",
+        "job_id": 122910588096,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588096",
+        "effective_checkouts": [
+          "639d4565920c1af90bbe958c8ac2957bf11eb603"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 8192 --cuda-graph-max-bs-decode 12 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 253 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 8192 --max-running-requests 12 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 96 --random-seed 42 --reasoning-parser muse --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.1 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.107",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+          "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+          "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "pairing": "next_observed_image_for_same_configuration",
+    "skipped_images": [
+      "lmsysorg/sglang-rocm:muse-spark-open-1020"
+    ],
+    "interactivity_change_pct": 295.46142208774586,
+    "throughput_change_pct": 11.757351937348904,
+    "launch_flag_changes": [
+      {
+        "key": "chunked-prefill-size",
+        "before": null,
+        "after": "8192"
+      },
+      {
+        "key": "cuda-graph-max-bs-decode",
+        "before": null,
+        "after": "12"
+      },
+      {
+        "key": "hicache-io-backend",
+        "before": null,
+        "after": "kernel"
+      },
+      {
+        "key": "hicache-mem-layout",
+        "before": null,
+        "after": "page_first"
+      },
+      {
+        "key": "hicache-size",
+        "before": "180",
+        "after": "253"
+      },
+      {
+        "key": "max-prefill-tokens",
+        "before": null,
+        "after": "8192"
+      },
+      {
+        "key": "max-running-requests",
+        "before": "128",
+        "after": "12"
+      },
+      {
+        "key": "prefill-decode-interval",
+        "before": null,
+        "after": "96"
+      },
+      {
+        "key": "random-seed",
+        "before": null,
+        "after": "42"
+      },
+      {
+        "key": "schedule-policy",
+        "before": null,
+        "after": "shortest-prefill-first"
+      },
+      {
+        "key": "scheduler-recv-interval",
+        "before": null,
+        "after": "20"
+      },
+      {
+        "key": "speculative-draft-window-size",
+        "before": null,
+        "after": "2048"
+      },
+      {
+        "key": "swa-full-tokens-ratio",
+        "before": null,
+        "after": "0.1"
+      },
+      {
+        "key": "tokenizer-worker-num",
+        "before": null,
+        "after": "4"
+      }
+    ],
+    "environment_changes": [
+      {
+        "key": "HEAD_NODE_IP",
+        "before": "10.24.112.110",
+        "after": "10.24.112.107"
+      },
+      {
+        "key": "PYTORCH_CUDA_ALLOC_CONF",
+        "before": null,
+        "after": "expandable_segments:True"
+      },
+      {
+        "key": "PYTORCH_HIP_ALLOC_CONF",
+        "before": null,
+        "after": "expandable_segments:True"
+      }
+    ],
+    "kernel_changes": [
+      {
+        "pipeline": "QK normalization, RoPE and FP8 KV write",
+        "before": "Existing _qk_norm_kernel combines Q/K RMSNorm and query scale; projection, RoPE and backend KV writing have separate boundaries.",
+        "after": "_muse_qk_rope_cache or _qkv_epilogue writes normalized/rotated Q/K and FP8 KV; model attention bypasses its ordinary cache write.",
+        "language": "Triton \u2192 Triton; the projection remains a separate split-K partial producer.",
+        "body_change": "New cache-store epilogue folds normalization, scale, rotation and FP8 conversion; explicit BF16 round trips preserve the former sequence semantics.",
+        "fusion": "The QK route shares norm/RoPE/cache write in one launch. The QKV route is partial GEMM plus an epilogue launch; the whole projection is not one fused launch.",
+        "applicability": "This TEP4 pair spans baseline \u2192 1027. Unlike 1020\u2019s TP8-only QK guard, 1027 permits local KV-head counts 2 or 4 and Q-head count 8 times KV heads; page size remains 16 in both endpoint CLIs. Shape/row guards remain conditional.",
+        "sources": [
+          {
+            "role": "prior norm / new epilogue",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+            "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
+            "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "eligibility wrapper",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+            "before_sha256": null,
+            "after_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff",
+          "evidence/source_excerpts.md#e1",
+          "evidence/source_diffs/02_to_03.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "MoE router and pooler",
+        "before": "Router GEMM, fused top-k routing, pooler GEMM and pre-expert norm remain separate stages.",
+        "after": "route_with_shared_pooler chooses a shared epilogue or a joint packed projection followed by _joint_epilogue.",
+        "language": "Triton / GEMM library calls \u2192 Triton / GEMM library calls.",
+        "body_change": "Packed pooler/router weights and shared reduction/top-k/norm epilogues avoid separate processing of completed router/pooler results.",
+        "fusion": "Shared router/top-k/pre-expert norm epilogue; selected widths also share a router/pooler GEMM. Expert GEMMs remain separate.",
+        "applicability": "TEP4 is admitted by the hidden/expert/weight-shape routing predicates; available row ranges and packed-weight conditions still govern shared/joint selection.",
+        "sources": [
+          {
+            "role": "model routing",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new routing dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+            "before_sha256": null,
+            "after_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new epilogues",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+            "before_sha256": null,
+            "after_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff",
+          "evidence/source_diffs/02_to_03.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "MXFP4 expert route",
+        "before": "Native-layout FlyDSL grouped experts and per-expert finalize; the MUSE_MOE_BACKEND=flydsl setting is present.",
+        "after": "Compact A4 target-verify experts in Triton, or AITER FlyDSL A4W4 prefill stages, followed by per-expert finalize.",
+        "language": "FlyDSL \u2192 shape-dependent Triton or FlyDSL; Python mxfp4_moe.py is dispatch glue.",
+        "body_change": "Add per-32 MXFP4 activations, compact verify work and preshuffled A4W4 weights; prefill stage 1 emits quantized intermediates/scales.",
+        "fusion": "Activation and quantization staging change, while the required per-expert normalization and route-weighted reduction remain explicit. Do not call the entire MoE one kernel.",
+        "applicability": "By 1027 compact A4 accepts 32 or 64 local experts, including TEP4/EP4 with 64 local experts. Verify rows must be divisible by 8 and within the cap. Other batches can use A4W4 or native fallback.",
+        "sources": [
+          {
+            "role": "existing expert implementation",
+            "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+            "after_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+            "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
+          },
+          {
+            "role": "new compact experts",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py",
+            "before_sha256": null,
+            "after_sha256": "63551020e74ad73bae018b34f2562e6f65235492e84913226fb1883f631470a8",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py",
+            "before_sha256": null,
+            "after_sha256": "4dd1c5eff0bd1f913b1bbe31e865141e94449bb24f3dc8ee8fd74e02d18139be",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff",
+          "evidence/source_diffs/02_to_03.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "TP4 MoE finalize + all-reduce introduced",
+        "before": "FlyDSL per-expert normalization/weighted finalize followed by a separate collective.",
+        "after": "A single muse_finalize_allreduce_tp4 HIP launch finalizes each row and exchanges/reduces peer partials.",
+        "language": "FlyDSL + separate collective \u2192 HIP/C++ fused finalize/collective.",
+        "body_change": "Use one 256-thread CTA per token row and peer inbox protocol; align normalization/reduction order and BF16 rounding with the prior path.",
+        "fusion": "Compute + collective launch fusion; removes the separate finalize-to-collective launch boundary for supported rows.",
+        "applicability": "New endpoint TEP4/EP4 and compact-A4 enabled; supported row count, top-8, hidden 4096 and local-expert predicates apply. The CLI does not enable the AMD layer monokernel.",
+        "sources": [
+          {
+            "role": "prior finalize/new fused body",
+            "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_finalize.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
+            "before_sha256": "48af597a54827b3e7f9340dada68f74759bee80213df01fbe8f95c4e95fe6d2b",
+            "after_sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new collective wrapper",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
+            "before_sha256": null,
+            "after_sha256": "1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "model guard",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff",
+          "evidence/source_diffs/02_to_03.diff",
+          "evidence/source_excerpts.md#e4"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Ordinary verify merge with output norm/gate",
+        "before": "The attention partials are merged, then the existing output norm-gate kernel runs.",
+        "after": "VerifyReduceDeferral hands partials to forward_verify_partials \u2192 _reduce_norm_gate.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "The new body reads partials/maxima/denominators, performs split-KV reduction, rounds to BF16, and applies per-head RMSNorm and sigmoid gate before the output store.",
+        "fusion": "One reduce+norm+gate launch replaces separate merge and norm-gate launches; removes the completed-attention intermediate between those launches.",
+        "applicability": "Ordinary target-verify path, head_dim 64, output normalization enabled, and backend deferral active. On monokernel-covered MXFP4 layers the layer kernel supersedes this path; retain this candidate only for ordinary/fallback layers.",
+        "sources": [
+          {
+            "role": "output consumer",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+            "before_sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
+            "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new fused reducer",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
+            "before_sha256": null,
+            "after_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Residual/norm boundary with FP8 output",
+        "before": "The fused boundary yields a BF16 attention input and residual stream.",
+        "after": "forward_fp8 can additionally write the next projection input as FP8 plus per-row scales.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "The boundary kernel gains output/scaling buffers and a guarded FP8 output path; native fallback can still perform separate quantization.",
+        "fusion": "For its fused Triton branch, quantization is part of the norm/boundary producer, saving a separate read/quantize launch.",
+        "applicability": "Ordinary path when the model requests fp8_out/forward_fp8; do not transfer this benefit to the monokernel-covered layers without a trace.",
+        "sources": [
+          {
+            "role": "boundary body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+            "before_sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
+            "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "requesting model",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff"
+        ],
+        "evidence_level": "source_verified"
+      }
+    ],
+    "excluded_attributions": [
+      "No intermediate TEP4 conc16 HiCache point exists for 1020; the measured change spans both source transitions.",
+      "The 1027 image has an AMD monokernel plugin, but this TEP4 endpoint does not enable it."
+    ],
+    "matched_server_artifacts": [],
+    "top_kernels": null,
+    "gpu_profile_status": "unavailable",
+    "causal_attribution": "not_established",
+    "report": "pairs/tep4_conc16_on_2026-10-16_to_2026-10-30.md"
+  },
+  {
+    "id": "tep4_conc28_on_2026-10-30_to_2026-11-08",
+    "configuration_label": "TEP4 conc28 / HiCache",
+    "config": {
+      "hardware": "mi355x",
+      "framework": "sglang",
+      "model": "musespark",
+      "precision": "fp4",
+      "spec_method": "draft_model",
+      "disagg": false,
+      "is_multinode": false,
+      "prefill_tp": 4,
+      "prefill_ep": 4,
+      "prefill_dp_attention": false,
+      "prefill_num_workers": 0,
+      "decode_tp": 4,
+      "decode_ep": 4,
+      "decode_dp_attention": false,
+      "decode_num_workers": 0,
+      "num_prefill_gpu": 4,
+      "num_decode_gpu": 4,
+      "benchmark_type": "agentic_traces",
+      "offload_mode": "on",
+      "isl": null,
+      "osl": null,
+      "conc": 28,
+      "pp": 1,
+      "dcp_size": 1,
+      "pcp_size": 1,
+      "spec_algorithm": "dflash",
+      "spec_draft_model": "RadixArk/Muse-Spark-Open-DFlash2",
+      "kv_offloading": "dram"
+    },
+    "before": {
+      "id": "446940",
+      "date": "2026-10-30",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+      "image_digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587901",
+      "github_job_id": 122910587901,
+      "recipe_fingerprint": "7fb98110e9867adf7c85d1102c51a69171d8dea6547445969c735642370ec6d7",
+      "p90_interactivity_tok_s_user": 105.15247108307047,
+      "output_tok_s_chip": 212.74006,
+      "launch": {
+        "run_id": "40714803265",
+        "job_id": 122910587901,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587901",
+        "effective_checkouts": [
+          "639d4565920c1af90bbe958c8ac2957bf11eb603"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 56 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 56 --mem-fraction-static 0.86 --page-size 16 --prefill-decode-interval 80 --random-seed 42 --reasoning-parser muse --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.1 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.106",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+          "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+          "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+          "SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "after": {
+      "id": "447695",
+      "date": "2026-11-08",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-mi355-1106",
+      "image_digest": "sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469427930",
+      "github_job_id": 128469427930,
+      "recipe_fingerprint": "e2c2eceeff6907ea8fdab2388f6e129e6a220b93873047b1cd997616134a2da0",
+      "p90_interactivity_tok_s_user": 125.31328320802007,
+      "output_tok_s_chip": 264.84478,
+      "launch": {
+        "run_id": "42394597374",
+        "job_id": 128469427930,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469427930",
+        "effective_checkouts": [
+          "03d973bca01a7c532a49ac5d0f59f644f80866e0"
+        ],
+        "datasets": [
+          "semianalysis_cc_traces_weka_062126"
+        ],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 56 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 56 --mem-fraction-static 0.86 --page-size 128 --prefill-decode-interval 80 --random-seed 42 --reasoning-parser muse --revision c7bc74fd64371315a091bc15f9723882eead0dc1 --schedule-policy shortest-prefill-first --scheduler-recv-interval 1 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --stream-interval 20 --swa-full-tokens-ratio 0.3 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.106",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+          "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+          "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+          "SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_OPT_UNIFIED_CACHE_FREE_OUT_OF_WINDOW_SLOTS": "1",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1",
+          "SGLANG_WARMUP_TIMEOUT": "1800"
+        }
+      }
+    },
+    "pairing": "next_observed_image_for_same_configuration",
+    "skipped_images": [],
+    "interactivity_change_pct": 19.172932330827063,
+    "throughput_change_pct": 24.4921995415438,
+    "launch_flag_changes": [
+      {
+        "key": "page-size",
+        "before": "16",
+        "after": "128"
+      },
+      {
+        "key": "revision",
+        "before": null,
+        "after": "c7bc74fd64371315a091bc15f9723882eead0dc1"
+      },
+      {
+        "key": "scheduler-recv-interval",
+        "before": "20",
+        "after": "1"
+      },
+      {
+        "key": "stream-interval",
+        "before": null,
+        "after": "20"
+      },
+      {
+        "key": "swa-full-tokens-ratio",
+        "before": "0.1",
+        "after": "0.3"
+      }
+    ],
+    "environment_changes": [
+      {
+        "key": "SGLANG_OPT_UNIFIED_CACHE_FREE_OUT_OF_WINDOW_SLOTS",
+        "before": null,
+        "after": "1"
+      },
+      {
+        "key": "SGLANG_WARMUP_TIMEOUT",
+        "before": null,
+        "after": "1800"
+      }
+    ],
+    "kernel_changes": [
+      {
+        "pipeline": "QK/RoPE/FP8 cache fusion eligibility",
+        "before": "The existing fused wrapper allows only page size 16 and at most 64 QK rows.",
+        "after": "The same QK device file is retained; wrapper guards admit pages 16/32/64/128 and a default cap of 512 rows.",
+        "language": "Triton \u2192 Triton; the change is in Python dispatch guards.",
+        "body_change": "Wrapper changes page-size and row predicates. The recorded device source hash stays identical for qk_norm_rope_cache.py.",
+        "fusion": "Broader applicability of existing norm/RoPE/FP8-cache fusion; no new device body is inferred from the larger cap.",
+        "applicability": "This pair is TEP4 with page size 16 \u2192 128, matching the expanded page guard; target-verify row count and other shape guards still determine use. The c40 endpoint server log records rows=512.",
+        "sources": [
+          {
+            "role": "wrapper guards",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+            "before_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
+            "after_sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "device body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+            "before_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+            "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e5"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "MoE finalize + all-reduce on TP4",
+        "before": "Already uses a one-launch TP4 HIP finalize/peer reduction on supported compact-A4 verify rows.",
+        "after": "Retains TP4 fusion; source is generalized to NR=4 or 8 and gains a one-shot branch used for selected TP8 widths.",
+        "language": "HIP/C++ \u2192 HIP/C++; Python/ctypes wrapper is unchanged in role.",
+        "body_change": "The device symbol becomes muse_finalize_allreduce; peer storage/arguments grow for up to 8 ranks. This TEP4 pair still compiles NR=4 and selects the two-stage protocol.",
+        "fusion": "Existing TP4 fusion is retained. New TP8 eligibility and its one-shot branch are not an added fusion benefit for this TEP4 pair.",
+        "applicability": "Both endpoints are TEP4/EP4; the wrapper\u2019s TP4 thresholds keep the two-stage route. Actual rows must satisfy compact-A4/finalize predicates.",
+        "sources": [
+          {
+            "role": "HIP device body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
+            "before_sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
+            "after_sha256": "20a0a111064e9d1c41ea5a10f0af60c3812d77a6b9631bef62fd4db0d2c3a11b",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "protocol dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
+            "before_sha256": "1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12",
+            "after_sha256": "b27664445f8928ac5b358ba15b82a0bfd3e3d113874200f40ffa922bf978bd92",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e6"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Joint router/pooler wider rows",
+        "before": "The existing shared routing front admits at most 64 rows and its established FP8 joint range.",
+        "after": "Joint row-major routing can extend to default 128 rows, and model gating uses FP8_JOINT_MAX_M.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "Add wider eligibility and the row-major tile route; retain hidden/expert/weight guards and the separate shared fallback.",
+        "fusion": "Existing projection/epilogue fusion extends to additional shapes; not a new whole-MoE fusion.",
+        "applicability": "TEP4 is not rejected by _routing_front_matches: its tests are hidden/expert/weight shapes. Applicability remains conditional on packed weights and rows; client concurrency is not the kernel row count.",
+        "sources": [
+          {
+            "role": "routing wrapper",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+            "before_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
+            "after_sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "router device epilogues",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+            "before_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
+            "after_sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Full-attention prefill implementation",
+        "before": "Gluon muse_extend_attention serves the specialized ordinary full-attention prefill route.",
+        "after": "AITER backend can select muse_extend_attention_fly; Gluon remains for supported fallback/sliding paths.",
+        "language": "Gluon \u2192 FlyDSL for the full-attention route; Gluon remains available.",
+        "body_change": "New FP8 MFMA kernel uses transposed fragments, two-stage LDS loading, matrix-core row sums and explicit paged addressing.",
+        "fusion": "A kernel implementation/language change; no additional cross-operator fusion is established.",
+        "applicability": "The new endpoint enables the default FlyDSL extend route; dispatch requires gfx950 and supported FP8 Q/KV shape/layout. These TEP4 jobs retain ordinary prefill, which is outside the Muse monokernel route.",
+        "sources": [
+          {
+            "role": "old/new attention bodies",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_gluon.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_flydsl.py",
+            "before_sha256": "73f8c5b89137e10eaeb8be67a6cf6686194af50a03300a22569764a0af58e471",
+            "after_sha256": "cdfa8cadad2f252028875ef1b4e9506281161f7b974f7cfe47326bc49fcf882e",
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "backend dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
+            "before_sha256": "76d2d1732b8e1c765d437504270ecfd885c28fec4db2c7f639c2cd2fbc698d2b",
+            "after_sha256": "e8053575975ff7d2de8971c4c47de19699b0251b3f6a60458f8011a5e609db33",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e7"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Length-balanced verify and segmented fused merge",
+        "before": "FlyDSL full-attention verify uses the former split scheduling; verify_reduce_norm_gate accepts four-element partial state.",
+        "after": "A Triton planner builds a length-balanced segment list for FlyDSL partials; five-element state selects segmented_reduce_norm_gate.",
+        "language": "FlyDSL + Triton \u2192 FlyDSL + Triton.",
+        "body_change": "Distribute KV work by sequence lengths; add segment offsets/counts and teach the reducer dispatch to accept segmented state.",
+        "fusion": "Planning adds a launch. The segmented output reducer retains split-KV reduction + norm/gate fusion; this is not a reduction to a single verify launch.",
+        "applicability": "Ordinary full-attention target verify when use_balanced_full and backend flags/shape guards select it. Heterogeneous context lengths, not just client concurrency, determine applicability.",
+        "sources": [
+          {
+            "role": "new segmented planner/reducer",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_balanced.py",
+            "before_sha256": null,
+            "after_sha256": "7ab7b5084c44fd90cd128ed4304d4e33939bb56b0f5590a9b5dc83563484b19a",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "partial kernel",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
+            "before_sha256": "72dc1e2cd6f57fc503904782e2c082745fbc93bd98c2576e53f2a99563b5a651",
+            "after_sha256": "3df4cf24bded61346b0dd4b57aa8c2a3ff4851e5a0a614da94131bc4ff771f5c",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "fused-reducer dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
+            "before_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
+            "after_sha256": "6e1a6ca9b85aa6bda3fbb18f630a4231ce809b3a9f76cdd35b202081fd8c8b69",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e8"
+        ],
+        "evidence_level": "source_verified"
+      }
+    ],
+    "excluded_attributions": [
+      "Both endpoints are ordinary TEP4 serving: the AMD layer monokernel is not enabled by either CLI. Its captured Muse bodies are unchanged between these image digests.",
+      "TP8 finalize/all-reduce eligibility is not a new TP4 optimization."
+    ],
+    "matched_server_artifacts": [],
+    "top_kernels": null,
+    "gpu_profile_status": "unavailable",
+    "causal_attribution": "not_established",
+    "report": "pairs/tep4_conc28_on_2026-10-30_to_2026-11-08.md"
+  },
+  {
+    "id": "tep4_conc36_on_2026-10-30_to_2026-11-08",
+    "configuration_label": "TEP4 conc36 / HiCache",
+    "config": {
+      "hardware": "mi355x",
+      "framework": "sglang",
+      "model": "musespark",
+      "precision": "fp4",
+      "spec_method": "draft_model",
+      "disagg": false,
+      "is_multinode": false,
+      "prefill_tp": 4,
+      "prefill_ep": 4,
+      "prefill_dp_attention": false,
+      "prefill_num_workers": 0,
+      "decode_tp": 4,
+      "decode_ep": 4,
+      "decode_dp_attention": false,
+      "decode_num_workers": 0,
+      "num_prefill_gpu": 4,
+      "num_decode_gpu": 4,
+      "benchmark_type": "agentic_traces",
+      "offload_mode": "on",
+      "isl": null,
+      "osl": null,
+      "conc": 36,
+      "pp": 1,
+      "dcp_size": 1,
+      "pcp_size": 1,
+      "spec_algorithm": "dflash",
+      "spec_draft_model": "RadixArk/Muse-Spark-Open-DFlash2",
+      "kv_offloading": "dram"
+    },
+    "before": {
+      "id": "446941",
+      "date": "2026-10-30",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+      "image_digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588046",
+      "github_job_id": 122910588046,
+      "recipe_fingerprint": "d2642e2367b3951faaaee46b6f62ea9c8e1d984669ade09e0df5a490dd52ad7d",
+      "p90_interactivity_tok_s_user": 54.43658138268916,
+      "output_tok_s_chip": 237.04612,
+      "launch": {
+        "run_id": "40714803265",
+        "job_id": 122910588046,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588046",
+        "effective_checkouts": [
+          "639d4565920c1af90bbe958c8ac2957bf11eb603"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 72 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 72 --mem-fraction-static 0.86 --page-size 16 --prefill-decode-interval 24 --random-seed 42 --reasoning-parser muse --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.1 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.125",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+          "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+          "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+          "SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "after": {
+      "id": "447696",
+      "date": "2026-11-08",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-mi355-1106",
+      "image_digest": "sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469428100",
+      "github_job_id": 128469428100,
+      "recipe_fingerprint": "270330864568f37e508aa091f06cfe11e318aa3846614abde1dd7b92c95ec218",
+      "p90_interactivity_tok_s_user": 97.18172983479106,
+      "output_tok_s_chip": 307.26669,
+      "launch": {
+        "run_id": "42394597374",
+        "job_id": 128469428100,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469428100",
+        "effective_checkouts": [
+          "03d973bca01a7c532a49ac5d0f59f644f80866e0"
+        ],
+        "datasets": [
+          "semianalysis_cc_traces_weka_062126"
+        ],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 72 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 72 --mem-fraction-static 0.86 --page-size 128 --prefill-decode-interval 48 --random-seed 42 --reasoning-parser muse --revision c7bc74fd64371315a091bc15f9723882eead0dc1 --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --stream-interval 20 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.110",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+          "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+          "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+          "SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1",
+          "SGLANG_WARMUP_TIMEOUT": "1800"
+        }
+      }
+    },
+    "pairing": "next_observed_image_for_same_configuration",
+    "skipped_images": [],
+    "interactivity_change_pct": 78.52283770651118,
+    "throughput_change_pct": 29.623167845987087,
+    "launch_flag_changes": [
+      {
+        "key": "page-size",
+        "before": "16",
+        "after": "128"
+      },
+      {
+        "key": "prefill-decode-interval",
+        "before": "24",
+        "after": "48"
+      },
+      {
+        "key": "revision",
+        "before": null,
+        "after": "c7bc74fd64371315a091bc15f9723882eead0dc1"
+      },
+      {
+        "key": "stream-interval",
+        "before": null,
+        "after": "20"
+      },
+      {
+        "key": "swa-full-tokens-ratio",
+        "before": "0.1",
+        "after": "0.2"
+      }
+    ],
+    "environment_changes": [
+      {
+        "key": "HEAD_NODE_IP",
+        "before": "10.24.112.125",
+        "after": "10.24.112.110"
+      },
+      {
+        "key": "SGLANG_WARMUP_TIMEOUT",
+        "before": null,
+        "after": "1800"
+      }
+    ],
+    "kernel_changes": [
+      {
+        "pipeline": "QK/RoPE/FP8 cache fusion eligibility",
+        "before": "The existing fused wrapper allows only page size 16 and at most 64 QK rows.",
+        "after": "The same QK device file is retained; wrapper guards admit pages 16/32/64/128 and a default cap of 512 rows.",
+        "language": "Triton \u2192 Triton; the change is in Python dispatch guards.",
+        "body_change": "Wrapper changes page-size and row predicates. The recorded device source hash stays identical for qk_norm_rope_cache.py.",
+        "fusion": "Broader applicability of existing norm/RoPE/FP8-cache fusion; no new device body is inferred from the larger cap.",
+        "applicability": "This pair is TEP4 with page size 16 \u2192 128, matching the expanded page guard; target-verify row count and other shape guards still determine use. The c40 endpoint server log records rows=512.",
+        "sources": [
+          {
+            "role": "wrapper guards",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+            "before_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
+            "after_sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "device body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+            "before_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+            "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e5"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "MoE finalize + all-reduce on TP4",
+        "before": "Already uses a one-launch TP4 HIP finalize/peer reduction on supported compact-A4 verify rows.",
+        "after": "Retains TP4 fusion; source is generalized to NR=4 or 8 and gains a one-shot branch used for selected TP8 widths.",
+        "language": "HIP/C++ \u2192 HIP/C++; Python/ctypes wrapper is unchanged in role.",
+        "body_change": "The device symbol becomes muse_finalize_allreduce; peer storage/arguments grow for up to 8 ranks. This TEP4 pair still compiles NR=4 and selects the two-stage protocol.",
+        "fusion": "Existing TP4 fusion is retained. New TP8 eligibility and its one-shot branch are not an added fusion benefit for this TEP4 pair.",
+        "applicability": "Both endpoints are TEP4/EP4; the wrapper\u2019s TP4 thresholds keep the two-stage route. Actual rows must satisfy compact-A4/finalize predicates.",
+        "sources": [
+          {
+            "role": "HIP device body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
+            "before_sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
+            "after_sha256": "20a0a111064e9d1c41ea5a10f0af60c3812d77a6b9631bef62fd4db0d2c3a11b",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "protocol dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
+            "before_sha256": "1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12",
+            "after_sha256": "b27664445f8928ac5b358ba15b82a0bfd3e3d113874200f40ffa922bf978bd92",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e6"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Joint router/pooler wider rows",
+        "before": "The existing shared routing front admits at most 64 rows and its established FP8 joint range.",
+        "after": "Joint row-major routing can extend to default 128 rows, and model gating uses FP8_JOINT_MAX_M.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "Add wider eligibility and the row-major tile route; retain hidden/expert/weight guards and the separate shared fallback.",
+        "fusion": "Existing projection/epilogue fusion extends to additional shapes; not a new whole-MoE fusion.",
+        "applicability": "TEP4 is not rejected by _routing_front_matches: its tests are hidden/expert/weight shapes. Applicability remains conditional on packed weights and rows; client concurrency is not the kernel row count.",
+        "sources": [
+          {
+            "role": "routing wrapper",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+            "before_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
+            "after_sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "router device epilogues",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+            "before_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
+            "after_sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Full-attention prefill implementation",
+        "before": "Gluon muse_extend_attention serves the specialized ordinary full-attention prefill route.",
+        "after": "AITER backend can select muse_extend_attention_fly; Gluon remains for supported fallback/sliding paths.",
+        "language": "Gluon \u2192 FlyDSL for the full-attention route; Gluon remains available.",
+        "body_change": "New FP8 MFMA kernel uses transposed fragments, two-stage LDS loading, matrix-core row sums and explicit paged addressing.",
+        "fusion": "A kernel implementation/language change; no additional cross-operator fusion is established.",
+        "applicability": "The new endpoint enables the default FlyDSL extend route; dispatch requires gfx950 and supported FP8 Q/KV shape/layout. These TEP4 jobs retain ordinary prefill, which is outside the Muse monokernel route.",
+        "sources": [
+          {
+            "role": "old/new attention bodies",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_gluon.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_flydsl.py",
+            "before_sha256": "73f8c5b89137e10eaeb8be67a6cf6686194af50a03300a22569764a0af58e471",
+            "after_sha256": "cdfa8cadad2f252028875ef1b4e9506281161f7b974f7cfe47326bc49fcf882e",
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "backend dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
+            "before_sha256": "76d2d1732b8e1c765d437504270ecfd885c28fec4db2c7f639c2cd2fbc698d2b",
+            "after_sha256": "e8053575975ff7d2de8971c4c47de19699b0251b3f6a60458f8011a5e609db33",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e7"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Length-balanced verify and segmented fused merge",
+        "before": "FlyDSL full-attention verify uses the former split scheduling; verify_reduce_norm_gate accepts four-element partial state.",
+        "after": "A Triton planner builds a length-balanced segment list for FlyDSL partials; five-element state selects segmented_reduce_norm_gate.",
+        "language": "FlyDSL + Triton \u2192 FlyDSL + Triton.",
+        "body_change": "Distribute KV work by sequence lengths; add segment offsets/counts and teach the reducer dispatch to accept segmented state.",
+        "fusion": "Planning adds a launch. The segmented output reducer retains split-KV reduction + norm/gate fusion; this is not a reduction to a single verify launch.",
+        "applicability": "Ordinary full-attention target verify when use_balanced_full and backend flags/shape guards select it. Heterogeneous context lengths, not just client concurrency, determine applicability.",
+        "sources": [
+          {
+            "role": "new segmented planner/reducer",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_balanced.py",
+            "before_sha256": null,
+            "after_sha256": "7ab7b5084c44fd90cd128ed4304d4e33939bb56b0f5590a9b5dc83563484b19a",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "partial kernel",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
+            "before_sha256": "72dc1e2cd6f57fc503904782e2c082745fbc93bd98c2576e53f2a99563b5a651",
+            "after_sha256": "3df4cf24bded61346b0dd4b57aa8c2a3ff4851e5a0a614da94131bc4ff771f5c",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "fused-reducer dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
+            "before_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
+            "after_sha256": "6e1a6ca9b85aa6bda3fbb18f630a4231ce809b3a9f76cdd35b202081fd8c8b69",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e8"
+        ],
+        "evidence_level": "source_verified"
+      }
+    ],
+    "excluded_attributions": [
+      "Both endpoints are ordinary TEP4 serving: the AMD layer monokernel is not enabled by either CLI. Its captured Muse bodies are unchanged between these image digests.",
+      "TP8 finalize/all-reduce eligibility is not a new TP4 optimization."
+    ],
+    "matched_server_artifacts": [],
+    "top_kernels": null,
+    "gpu_profile_status": "unavailable",
+    "causal_attribution": "not_established",
+    "report": "pairs/tep4_conc36_on_2026-10-30_to_2026-11-08.md"
+  },
+  {
+    "id": "tep4_conc40_on_2026-10-30_to_2026-11-08",
+    "configuration_label": "TEP4 conc40 / HiCache",
+    "config": {
+      "hardware": "mi355x",
+      "framework": "sglang",
+      "model": "musespark",
+      "precision": "fp4",
+      "spec_method": "draft_model",
+      "disagg": false,
+      "is_multinode": false,
+      "prefill_tp": 4,
+      "prefill_ep": 4,
+      "prefill_dp_attention": false,
+      "prefill_num_workers": 0,
+      "decode_tp": 4,
+      "decode_ep": 4,
+      "decode_dp_attention": false,
+      "decode_num_workers": 0,
+      "num_prefill_gpu": 4,
+      "num_decode_gpu": 4,
+      "benchmark_type": "agentic_traces",
+      "offload_mode": "on",
+      "isl": null,
+      "osl": null,
+      "conc": 40,
+      "pp": 1,
+      "dcp_size": 1,
+      "pcp_size": 1,
+      "spec_algorithm": "dflash",
+      "spec_draft_model": "RadixArk/Muse-Spark-Open-DFlash2",
+      "kv_offloading": "dram"
+    },
+    "before": {
+      "id": "446942",
+      "date": "2026-10-30",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+      "image_digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587816",
+      "github_job_id": 122910587816,
+      "recipe_fingerprint": "fa0c61877b9728c774d28fd2e9d823bd9f9b80a7032e5a838f164d43839c5099",
+      "p90_interactivity_tok_s_user": 95.60229445506691,
+      "output_tok_s_chip": 258.1968,
+      "launch": {
+        "run_id": "40714803265",
+        "job_id": 122910587816,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587816",
+        "effective_checkouts": [
+          "639d4565920c1af90bbe958c8ac2957bf11eb603"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 80 --mem-fraction-static 0.86 --page-size 16 --prefill-decode-interval 80 --random-seed 42 --reasoning-parser muse --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.1 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.136",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+          "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+          "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+          "SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "after": {
+      "id": "447697",
+      "date": "2026-11-08",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-mi355-1106",
+      "image_digest": "sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469427944",
+      "github_job_id": 128469427944,
+      "recipe_fingerprint": "359a672b8690340f077e986b4b659294b05e5b43f4c013274833bfe8220de2b9",
+      "p90_interactivity_tok_s_user": 72.25433526011561,
+      "output_tok_s_chip": 333.1187,
+      "launch": {
+        "run_id": "42394597374",
+        "job_id": 128469427944,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42394597374/job/128469427944",
+        "effective_checkouts": [
+          "03d973bca01a7c532a49ac5d0f59f644f80866e0"
+        ],
+        "datasets": [
+          "semianalysis_cc_traces_weka_062126"
+        ],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --chunked-prefill-size 16384 --cuda-graph-max-bs-decode 80 --enable-hierarchical-cache --enable-metrics --expert-parallel-size 4 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 310 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-prefill-tokens 16384 --max-running-requests 80 --mem-fraction-static 0.86 --page-size 128 --prefill-decode-interval 24 --random-seed 42 --reasoning-parser muse --revision c7bc74fd64371315a091bc15f9723882eead0dc1 --schedule-policy shortest-prefill-first --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --stream-interval 20 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 4 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.107",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+          "PYTORCH_HIP_ALLOC_CONF": "expandable_segments:True",
+          "ROCR_VISIBLE_DEVICES": "0,1,2,3",
+          "SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1",
+          "SGLANG_WARMUP_TIMEOUT": "1800"
+        }
+      }
+    },
+    "pairing": "next_observed_image_for_same_configuration",
+    "skipped_images": [],
+    "interactivity_change_pct": -24.42196531791906,
+    "throughput_change_pct": 29.0173619502643,
+    "launch_flag_changes": [
+      {
+        "key": "cuda-graph-max-bs-decode",
+        "before": null,
+        "after": "80"
+      },
+      {
+        "key": "page-size",
+        "before": "16",
+        "after": "128"
+      },
+      {
+        "key": "prefill-decode-interval",
+        "before": "80",
+        "after": "24"
+      },
+      {
+        "key": "revision",
+        "before": null,
+        "after": "c7bc74fd64371315a091bc15f9723882eead0dc1"
+      },
+      {
+        "key": "stream-interval",
+        "before": null,
+        "after": "20"
+      },
+      {
+        "key": "swa-full-tokens-ratio",
+        "before": "0.1",
+        "after": "0.2"
+      }
+    ],
+    "environment_changes": [
+      {
+        "key": "HEAD_NODE_IP",
+        "before": "10.24.112.136",
+        "after": "10.24.112.107"
+      },
+      {
+        "key": "SGLANG_WARMUP_TIMEOUT",
+        "before": null,
+        "after": "1800"
+      }
+    ],
+    "kernel_changes": [
+      {
+        "pipeline": "QK/RoPE/FP8 cache fusion eligibility",
+        "before": "The existing fused wrapper allows only page size 16 and at most 64 QK rows.",
+        "after": "The same QK device file is retained; wrapper guards admit pages 16/32/64/128 and a default cap of 512 rows.",
+        "language": "Triton \u2192 Triton; the change is in Python dispatch guards.",
+        "body_change": "Wrapper changes page-size and row predicates. The recorded device source hash stays identical for qk_norm_rope_cache.py.",
+        "fusion": "Broader applicability of existing norm/RoPE/FP8-cache fusion; no new device body is inferred from the larger cap.",
+        "applicability": "This pair is TEP4 with page size 16 \u2192 128, matching the expanded page guard; target-verify row count and other shape guards still determine use. The c40 endpoint server log records rows=512.",
+        "sources": [
+          {
+            "role": "wrapper guards",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+            "before_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
+            "after_sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "device body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+            "before_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+            "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e5"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "MoE finalize + all-reduce on TP4",
+        "before": "Already uses a one-launch TP4 HIP finalize/peer reduction on supported compact-A4 verify rows.",
+        "after": "Retains TP4 fusion; source is generalized to NR=4 or 8 and gains a one-shot branch used for selected TP8 widths.",
+        "language": "HIP/C++ \u2192 HIP/C++; Python/ctypes wrapper is unchanged in role.",
+        "body_change": "The device symbol becomes muse_finalize_allreduce; peer storage/arguments grow for up to 8 ranks. This TEP4 pair still compiles NR=4 and selects the two-stage protocol.",
+        "fusion": "Existing TP4 fusion is retained. New TP8 eligibility and its one-shot branch are not an added fusion benefit for this TEP4 pair.",
+        "applicability": "Both endpoints are TEP4/EP4; the wrapper\u2019s TP4 thresholds keep the two-stage route. Actual rows must satisfy compact-A4/finalize predicates.",
+        "sources": [
+          {
+            "role": "HIP device body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
+            "before_sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
+            "after_sha256": "20a0a111064e9d1c41ea5a10f0af60c3812d77a6b9631bef62fd4db0d2c3a11b",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "protocol dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
+            "before_sha256": "1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12",
+            "after_sha256": "b27664445f8928ac5b358ba15b82a0bfd3e3d113874200f40ffa922bf978bd92",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e6"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Joint router/pooler wider rows",
+        "before": "The existing shared routing front admits at most 64 rows and its established FP8 joint range.",
+        "after": "Joint row-major routing can extend to default 128 rows, and model gating uses FP8_JOINT_MAX_M.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "Add wider eligibility and the row-major tile route; retain hidden/expert/weight guards and the separate shared fallback.",
+        "fusion": "Existing projection/epilogue fusion extends to additional shapes; not a new whole-MoE fusion.",
+        "applicability": "TEP4 is not rejected by _routing_front_matches: its tests are hidden/expert/weight shapes. Applicability remains conditional on packed weights and rows; client concurrency is not the kernel row count.",
+        "sources": [
+          {
+            "role": "routing wrapper",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+            "before_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
+            "after_sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "router device epilogues",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+            "before_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
+            "after_sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Full-attention prefill implementation",
+        "before": "Gluon muse_extend_attention serves the specialized ordinary full-attention prefill route.",
+        "after": "AITER backend can select muse_extend_attention_fly; Gluon remains for supported fallback/sliding paths.",
+        "language": "Gluon \u2192 FlyDSL for the full-attention route; Gluon remains available.",
+        "body_change": "New FP8 MFMA kernel uses transposed fragments, two-stage LDS loading, matrix-core row sums and explicit paged addressing.",
+        "fusion": "A kernel implementation/language change; no additional cross-operator fusion is established.",
+        "applicability": "The new endpoint enables the default FlyDSL extend route; dispatch requires gfx950 and supported FP8 Q/KV shape/layout. These TEP4 jobs retain ordinary prefill, which is outside the Muse monokernel route.",
+        "sources": [
+          {
+            "role": "old/new attention bodies",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_gluon.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_flydsl.py",
+            "before_sha256": "73f8c5b89137e10eaeb8be67a6cf6686194af50a03300a22569764a0af58e471",
+            "after_sha256": "cdfa8cadad2f252028875ef1b4e9506281161f7b974f7cfe47326bc49fcf882e",
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "backend dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
+            "before_sha256": "76d2d1732b8e1c765d437504270ecfd885c28fec4db2c7f639c2cd2fbc698d2b",
+            "after_sha256": "e8053575975ff7d2de8971c4c47de19699b0251b3f6a60458f8011a5e609db33",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e7"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Length-balanced verify and segmented fused merge",
+        "before": "FlyDSL full-attention verify uses the former split scheduling; verify_reduce_norm_gate accepts four-element partial state.",
+        "after": "A Triton planner builds a length-balanced segment list for FlyDSL partials; five-element state selects segmented_reduce_norm_gate.",
+        "language": "FlyDSL + Triton \u2192 FlyDSL + Triton.",
+        "body_change": "Distribute KV work by sequence lengths; add segment offsets/counts and teach the reducer dispatch to accept segmented state.",
+        "fusion": "Planning adds a launch. The segmented output reducer retains split-KV reduction + norm/gate fusion; this is not a reduction to a single verify launch.",
+        "applicability": "Ordinary full-attention target verify when use_balanced_full and backend flags/shape guards select it. Heterogeneous context lengths, not just client concurrency, determine applicability.",
+        "sources": [
+          {
+            "role": "new segmented planner/reducer",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_balanced.py",
+            "before_sha256": null,
+            "after_sha256": "7ab7b5084c44fd90cd128ed4304d4e33939bb56b0f5590a9b5dc83563484b19a",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "partial kernel",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
+            "before_sha256": "72dc1e2cd6f57fc503904782e2c082745fbc93bd98c2576e53f2a99563b5a651",
+            "after_sha256": "3df4cf24bded61346b0dd4b57aa8c2a3ff4851e5a0a614da94131bc4ff771f5c",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "fused-reducer dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
+            "before_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
+            "after_sha256": "6e1a6ca9b85aa6bda3fbb18f630a4231ce809b3a9f76cdd35b202081fd8c8b69",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/03_to_04.diff",
+          "evidence/source_excerpts.md#e8"
+        ],
+        "evidence_level": "source_verified"
+      }
+    ],
+    "excluded_attributions": [
+      "Both endpoints are ordinary TEP4 serving: the AMD layer monokernel is not enabled by either CLI. Its captured Muse bodies are unchanged between these image digests.",
+      "TP8 finalize/all-reduce eligibility is not a new TP4 optimization."
+    ],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12862296844
+      },
+      {
+        "side": "after",
+        "artifact_id": 13586307366
+      }
+    ],
+    "top_kernels": null,
+    "gpu_profile_status": "unavailable",
+    "causal_attribution": "not_established",
+    "report": "pairs/tep4_conc40_on_2026-10-30_to_2026-11-08.md"
+  },
+  {
+    "id": "tep8_conc1_off_2026-10-16_to_2026-10-22",
+    "configuration_label": "TEP8 conc1 / GPU",
+    "config": {
+      "hardware": "mi355x",
+      "framework": "sglang",
+      "model": "musespark",
+      "precision": "fp4",
+      "spec_method": "draft_model",
+      "disagg": false,
+      "is_multinode": false,
+      "prefill_tp": 8,
+      "prefill_ep": 8,
+      "prefill_dp_attention": false,
+      "prefill_num_workers": 0,
+      "decode_tp": 8,
+      "decode_ep": 8,
+      "decode_dp_attention": false,
+      "decode_num_workers": 0,
+      "num_prefill_gpu": 8,
+      "num_decode_gpu": 8,
+      "benchmark_type": "agentic_traces",
+      "offload_mode": "off",
+      "isl": null,
+      "osl": null,
+      "conc": 1,
+      "pp": 1,
+      "dcp_size": 1,
+      "pcp_size": 1,
+      "spec_algorithm": "dflash",
+      "spec_draft_model": "RadixArk/Muse-Spark-Open-DFlash2",
+      "kv_offloading": "none"
+    },
+    "before": {
+      "id": "445154",
+      "date": "2026-10-16",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open",
+      "image_digest": "sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688634",
+      "github_job_id": 116897688634,
+      "recipe_fingerprint": "bc4c91e6a6e255614046a3e40d22b64921bdcab55980b82060040a811e4ad46d",
+      "p90_interactivity_tok_s_user": 184.1620626151013,
+      "output_tok_s_chip": 17.80801,
+      "launch": {
+        "run_id": "38877885539",
+        "job_id": 116897688634,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688634",
+        "effective_checkouts": [
+          "3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.110",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "after": {
+      "id": "446033",
+      "date": "2026-10-22",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+      "image_digest": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436852",
+      "github_job_id": 119428436852,
+      "recipe_fingerprint": "d7874302d9e717a11050531cb364ac4a6deda95f50e2739f6bc4edb34e3e47f6",
+      "p90_interactivity_tok_s_user": 316.4556962025316,
+      "output_tok_s_chip": 18.76961,
+      "launch": {
+        "run_id": "39659301076",
+        "job_id": 119428436852,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436852",
+        "effective_checkouts": [
+          "2dd693edb2d7318867f7f6759034571ad734f9f2"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.109",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "pairing": "next_observed_image_for_same_configuration",
+    "skipped_images": [],
+    "interactivity_change_pct": 71.83544303797467,
+    "throughput_change_pct": 5.399817273238283,
+    "launch_flag_changes": [
+      {
+        "key": "prefill-decode-interval",
+        "before": null,
+        "after": "20"
+      },
+      {
+        "key": "random-seed",
+        "before": null,
+        "after": "42"
+      },
+      {
+        "key": "scheduler-recv-interval",
+        "before": null,
+        "after": "20"
+      },
+      {
+        "key": "speculative-draft-window-size",
+        "before": null,
+        "after": "2048"
+      },
+      {
+        "key": "swa-full-tokens-ratio",
+        "before": null,
+        "after": "0.2"
+      },
+      {
+        "key": "tokenizer-worker-num",
+        "before": null,
+        "after": "4"
+      }
+    ],
+    "environment_changes": [
+      {
+        "key": "HEAD_NODE_IP",
+        "before": "10.24.112.110",
+        "after": "10.24.112.109"
+      }
+    ],
+    "kernel_changes": [
+      {
+        "pipeline": "QK normalization, RoPE and FP8 KV write",
+        "before": "Existing _qk_norm_kernel combines Q/K RMSNorm and query scale; projection, RoPE and backend KV writing have separate boundaries.",
+        "after": "_muse_qk_rope_cache or _qkv_epilogue writes normalized/rotated Q/K and FP8 KV; model attention bypasses its ordinary cache write.",
+        "language": "Triton \u2192 Triton; the projection remains a separate split-K partial producer.",
+        "body_change": "New cache-store epilogue folds normalization, scale, rotation and FP8 conversion; explicit BF16 round trips preserve the former sequence semantics.",
+        "fusion": "The QK route shares norm/RoPE/cache write in one launch. The QKV route is partial GEMM plus an epilogue launch; the whole projection is not one fused launch.",
+        "applicability": "TEP8, head_dim 64, local 16 Q / 2 KV heads, AITER NHD FP8 pages of size 16; decode or target verify; QKV at up to 32 rows, QK at up to 64. Actual row counts vary during the job.",
+        "sources": [
+          {
+            "role": "prior norm / new epilogue",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+            "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
+            "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "eligibility wrapper",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+            "before_sha256": null,
+            "after_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff",
+          "evidence/source_excerpts.md#e1"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "MoE router and pooler",
+        "before": "Router GEMM, fused top-k routing, pooler GEMM and pre-expert norm remain separate stages.",
+        "after": "route_with_shared_pooler chooses a shared epilogue or a joint packed projection followed by _joint_epilogue.",
+        "language": "Triton / GEMM library calls \u2192 Triton / GEMM library calls.",
+        "body_change": "Packed pooler/router weights and shared reduction/top-k/norm epilogues avoid separate processing of completed router/pooler results.",
+        "fusion": "Shared router/top-k/pre-expert norm epilogue; selected widths also share a router/pooler GEMM. Expert GEMMs remain separate.",
+        "applicability": "Shape guards: hidden 8192, 256 experts, top-8 sigmoid, 4096-wide pooler, contiguous BF16 input and FP32 router; at most 64 rows, with joint widths 8/16/24 in this version.",
+        "sources": [
+          {
+            "role": "model routing",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new routing dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+            "before_sha256": null,
+            "after_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new epilogues",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+            "before_sha256": null,
+            "after_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "MXFP4 expert route",
+        "before": "Native-layout FlyDSL grouped experts and per-expert finalize; the MUSE_MOE_BACKEND=flydsl setting is present.",
+        "after": "Compact A4 target-verify experts in Triton, or AITER FlyDSL A4W4 prefill stages, followed by per-expert finalize.",
+        "language": "FlyDSL \u2192 shape-dependent Triton or FlyDSL; Python mxfp4_moe.py is dispatch glue.",
+        "body_change": "Add per-32 MXFP4 activations, compact verify work and preshuffled A4W4 weights; prefill stage 1 emits quantized intermediates/scales.",
+        "fusion": "Activation and quantization staging change, while the required per-expert normalization and route-weighted reduction remain explicit. Do not call the entire MoE one kernel.",
+        "applicability": "Compact verify requires TEP8, 32 local experts, top-8, rows divisible by 8 and no more than 512; prefill A4W4 uses at least 256 rows. Native fallbacks remain.",
+        "sources": [
+          {
+            "role": "existing expert implementation",
+            "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+            "after_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+            "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
+          },
+          {
+            "role": "new compact experts",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py",
+            "before_sha256": null,
+            "after_sha256": "6a2cd481da888c296c252e116cde2f26745e01a74858276cdc48e167d5031474",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py",
+            "before_sha256": null,
+            "after_sha256": "39b054665c41c85e6fc85a4fb9e1a706c240a6c90a9b6a5232eb9d229fe08c22",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff"
+        ],
+        "evidence_level": "source_verified"
+      }
+    ],
+    "excluded_attributions": [
+      "The SGLang monokernel interface is present in 1020, but this pair does not pass --monokernel-backend amd and has no AMD plugin execution claim."
+    ],
+    "matched_server_artifacts": [],
+    "top_kernels": null,
+    "gpu_profile_status": "unavailable",
+    "causal_attribution": "not_established",
+    "report": "pairs/tep8_conc1_off_2026-10-16_to_2026-10-22.md"
+  },
+  {
+    "id": "tep8_conc1_off_2026-10-22_to_2026-10-30",
+    "configuration_label": "TEP8 conc1 / GPU",
+    "config": {
+      "hardware": "mi355x",
+      "framework": "sglang",
+      "model": "musespark",
+      "precision": "fp4",
+      "spec_method": "draft_model",
+      "disagg": false,
+      "is_multinode": false,
+      "prefill_tp": 8,
+      "prefill_ep": 8,
+      "prefill_dp_attention": false,
+      "prefill_num_workers": 0,
+      "decode_tp": 8,
+      "decode_ep": 8,
+      "decode_dp_attention": false,
+      "decode_num_workers": 0,
+      "num_prefill_gpu": 8,
+      "num_decode_gpu": 8,
+      "benchmark_type": "agentic_traces",
+      "offload_mode": "off",
+      "isl": null,
+      "osl": null,
+      "conc": 1,
+      "pp": 1,
+      "dcp_size": 1,
+      "pcp_size": 1,
+      "spec_algorithm": "dflash",
+      "spec_draft_model": "RadixArk/Muse-Spark-Open-DFlash2",
+      "kv_offloading": "none"
+    },
+    "before": {
+      "id": "446033",
+      "date": "2026-10-22",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+      "image_digest": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436852",
+      "github_job_id": 119428436852,
+      "recipe_fingerprint": "d7874302d9e717a11050531cb364ac4a6deda95f50e2739f6bc4edb34e3e47f6",
+      "p90_interactivity_tok_s_user": 316.4556962025316,
+      "output_tok_s_chip": 18.76961,
+      "launch": {
+        "run_id": "39659301076",
+        "job_id": 119428436852,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436852",
+        "effective_checkouts": [
+          "2dd693edb2d7318867f7f6759034571ad734f9f2"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.109",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "after": {
+      "id": "446944",
+      "date": "2026-10-30",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+      "image_digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588033",
+      "github_job_id": 122910588033,
+      "recipe_fingerprint": "8080915d72f5351984f478982084779f41e60f91bb20cd8903a2b6d68bce8712",
+      "p90_interactivity_tok_s_user": 469.4835680751174,
+      "output_tok_s_chip": 20.8882,
+      "launch": {
+        "run_id": "40714803265",
+        "job_id": 122910588033,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588033",
+        "effective_checkouts": [
+          "639d4565920c1af90bbe958c8ac2957bf11eb603"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --cuda-graph-max-bs-decode 1 --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 1 --mem-fraction-static 0.85 --monokernel-backend amd --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.120",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "pairing": "next_observed_image_for_same_configuration",
+    "skipped_images": [],
+    "interactivity_change_pct": 48.3568075117371,
+    "throughput_change_pct": 11.287341612319057,
+    "launch_flag_changes": [
+      {
+        "key": "cuda-graph-max-bs-decode",
+        "before": null,
+        "after": "1"
+      },
+      {
+        "key": "max-running-requests",
+        "before": "128",
+        "after": "1"
+      },
+      {
+        "key": "monokernel-backend",
+        "before": null,
+        "after": "amd"
+      }
+    ],
+    "environment_changes": [
+      {
+        "key": "HEAD_NODE_IP",
+        "before": "10.24.112.109",
+        "after": "10.24.112.120"
+      }
+    ],
+    "kernel_changes": [
+      {
+        "pipeline": "AMD Muse layer monokernel",
+        "before": "Ordinary SGLang attention, projection, routing, experts, residual/norm and collective launches. The monokernel interface alone does not activate the plugin.",
+        "after": "runtime \u2192 Muse spec \u2192 Runner.launch \u2192 build_layer; eligible MXFP4 layers combine attention, K2, K3 and the next eligible layer K1.",
+        "language": "Mixed Triton/FlyDSL/library path \u2192 FlyDSL layer kernel (the log/spec name muse_spark_hip does not identify the implementation language).",
+        "body_change": "Device mailbox flags connect producer/consumer stages; one launch reuses stage LDS while retaining scratch regions. The first necessary K1 and BF16-expert layers keep separate execution.",
+        "fusion": "Merge attention, output norm/gate and projection/reduction, routing/pooler/top-k, experts/finalize/reduction, unpooler/boundary and next-layer QKV preparation across host launch boundaries. Scratch traffic is not assumed eliminated.",
+        "applicability": "Both endpoint CLI logs are checked: only the new endpoint passes monokernel-backend=amd. TEP8/EP8 with 8-token DFLASH; one admitted request corresponds to 8 verify rows and two to 16. Unsupported shapes, prefill and BF16-expert layers use fallback. The exact admission is shown in this pair\u2019s CI table.",
+        "sources": [
+          {
+            "role": "runtime integration",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
+            "before_sha256": "914e7957ee99f22eef5e1e11a1bf05a0cdc9ae90b6efe7a7ccbf810f5a8f03dc",
+            "after_sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new runner",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/runner.py",
+            "before_sha256": null,
+            "after_sha256": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new device body",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layer.py",
+            "before_sha256": null,
+            "after_sha256": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff",
+          "evidence/source_excerpts.md#e2",
+          "evidence/source_excerpts.md#e3"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Ordinary verify merge with output norm/gate",
+        "before": "The attention partials are merged, then the existing output norm-gate kernel runs.",
+        "after": "VerifyReduceDeferral hands partials to forward_verify_partials \u2192 _reduce_norm_gate.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "The new body reads partials/maxima/denominators, performs split-KV reduction, rounds to BF16, and applies per-head RMSNorm and sigmoid gate before the output store.",
+        "fusion": "One reduce+norm+gate launch replaces separate merge and norm-gate launches; removes the completed-attention intermediate between those launches.",
+        "applicability": "Ordinary target-verify path, head_dim 64, output normalization enabled, and backend deferral active. On monokernel-covered MXFP4 layers the layer kernel supersedes this path; retain this candidate only for ordinary/fallback layers.",
+        "sources": [
+          {
+            "role": "output consumer",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+            "before_sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
+            "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new fused reducer",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
+            "before_sha256": null,
+            "after_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Residual/norm boundary with FP8 output",
+        "before": "The fused boundary yields a BF16 attention input and residual stream.",
+        "after": "forward_fp8 can additionally write the next projection input as FP8 plus per-row scales.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "The boundary kernel gains output/scaling buffers and a guarded FP8 output path; native fallback can still perform separate quantization.",
+        "fusion": "For its fused Triton branch, quantization is part of the norm/boundary producer, saving a separate read/quantize launch.",
+        "applicability": "Ordinary path when the model requests fp8_out/forward_fp8; do not transfer this benefit to the monokernel-covered layers without a trace.",
+        "sources": [
+          {
+            "role": "boundary body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+            "before_sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
+            "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "requesting model",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff"
+        ],
+        "evidence_level": "source_verified"
+      }
+    ],
+    "excluded_attributions": [
+      "The new standalone TP4 finalize/all-reduce kernel is outside this TEP8 configuration; do not list it as this pair\u2019s executed fusion."
+    ],
+    "matched_server_artifacts": [],
+    "top_kernels": null,
+    "gpu_profile_status": "unavailable",
+    "causal_attribution": "not_established",
+    "report": "pairs/tep8_conc1_off_2026-10-22_to_2026-10-30.md"
+  },
+  {
+    "id": "tep8_conc4_off_2026-10-16_to_2026-10-22",
+    "configuration_label": "TEP8 conc4 / GPU",
+    "config": {
+      "hardware": "mi355x",
+      "framework": "sglang",
+      "model": "musespark",
+      "precision": "fp4",
+      "spec_method": "draft_model",
+      "disagg": false,
+      "is_multinode": false,
+      "prefill_tp": 8,
+      "prefill_ep": 8,
+      "prefill_dp_attention": false,
+      "prefill_num_workers": 0,
+      "decode_tp": 8,
+      "decode_ep": 8,
+      "decode_dp_attention": false,
+      "decode_num_workers": 0,
+      "num_prefill_gpu": 8,
+      "num_decode_gpu": 8,
+      "benchmark_type": "agentic_traces",
+      "offload_mode": "off",
+      "isl": null,
+      "osl": null,
+      "conc": 4,
+      "pp": 1,
+      "dcp_size": 1,
+      "pcp_size": 1,
+      "spec_algorithm": "dflash",
+      "spec_draft_model": "RadixArk/Muse-Spark-Open-DFlash2",
+      "kv_offloading": "none"
+    },
+    "before": {
+      "id": "445155",
+      "date": "2026-10-16",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open",
+      "image_digest": "sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688547",
+      "github_job_id": 116897688547,
+      "recipe_fingerprint": "bc4c91e6a6e255614046a3e40d22b64921bdcab55980b82060040a811e4ad46d",
+      "p90_interactivity_tok_s_user": 164.20361247947454,
+      "output_tok_s_chip": 25.60845,
+      "launch": {
+        "run_id": "38877885539",
+        "job_id": 116897688547,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688547",
+        "effective_checkouts": [
+          "3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.107",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "after": {
+      "id": "446037",
+      "date": "2026-10-22",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+      "image_digest": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436698",
+      "github_job_id": 119428436698,
+      "recipe_fingerprint": "d7874302d9e717a11050531cb364ac4a6deda95f50e2739f6bc4edb34e3e47f6",
+      "p90_interactivity_tok_s_user": 277.77777777777777,
+      "output_tok_s_chip": 28.07251,
+      "launch": {
+        "run_id": "39659301076",
+        "job_id": 119428436698,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436698",
+        "effective_checkouts": [
+          "2dd693edb2d7318867f7f6759034571ad734f9f2"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.110",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "pairing": "next_observed_image_for_same_configuration",
+    "skipped_images": [],
+    "interactivity_change_pct": 69.16666666666667,
+    "throughput_change_pct": 9.622058344023166,
+    "launch_flag_changes": [
+      {
+        "key": "prefill-decode-interval",
+        "before": null,
+        "after": "20"
+      },
+      {
+        "key": "random-seed",
+        "before": null,
+        "after": "42"
+      },
+      {
+        "key": "scheduler-recv-interval",
+        "before": null,
+        "after": "20"
+      },
+      {
+        "key": "speculative-draft-window-size",
+        "before": null,
+        "after": "2048"
+      },
+      {
+        "key": "swa-full-tokens-ratio",
+        "before": null,
+        "after": "0.2"
+      },
+      {
+        "key": "tokenizer-worker-num",
+        "before": null,
+        "after": "4"
+      }
+    ],
+    "environment_changes": [
+      {
+        "key": "HEAD_NODE_IP",
+        "before": "10.24.112.107",
+        "after": "10.24.112.110"
+      }
+    ],
+    "kernel_changes": [
+      {
+        "pipeline": "QK normalization, RoPE and FP8 KV write",
+        "before": "Existing _qk_norm_kernel combines Q/K RMSNorm and query scale; projection, RoPE and backend KV writing have separate boundaries.",
+        "after": "_muse_qk_rope_cache or _qkv_epilogue writes normalized/rotated Q/K and FP8 KV; model attention bypasses its ordinary cache write.",
+        "language": "Triton \u2192 Triton; the projection remains a separate split-K partial producer.",
+        "body_change": "New cache-store epilogue folds normalization, scale, rotation and FP8 conversion; explicit BF16 round trips preserve the former sequence semantics.",
+        "fusion": "The QK route shares norm/RoPE/cache write in one launch. The QKV route is partial GEMM plus an epilogue launch; the whole projection is not one fused launch.",
+        "applicability": "TEP8, head_dim 64, local 16 Q / 2 KV heads, AITER NHD FP8 pages of size 16; decode or target verify; QKV at up to 32 rows, QK at up to 64. Actual row counts vary during the job.",
+        "sources": [
+          {
+            "role": "prior norm / new epilogue",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+            "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
+            "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "eligibility wrapper",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+            "before_sha256": null,
+            "after_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff",
+          "evidence/source_excerpts.md#e1"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "MoE router and pooler",
+        "before": "Router GEMM, fused top-k routing, pooler GEMM and pre-expert norm remain separate stages.",
+        "after": "route_with_shared_pooler chooses a shared epilogue or a joint packed projection followed by _joint_epilogue.",
+        "language": "Triton / GEMM library calls \u2192 Triton / GEMM library calls.",
+        "body_change": "Packed pooler/router weights and shared reduction/top-k/norm epilogues avoid separate processing of completed router/pooler results.",
+        "fusion": "Shared router/top-k/pre-expert norm epilogue; selected widths also share a router/pooler GEMM. Expert GEMMs remain separate.",
+        "applicability": "Shape guards: hidden 8192, 256 experts, top-8 sigmoid, 4096-wide pooler, contiguous BF16 input and FP32 router; at most 64 rows, with joint widths 8/16/24 in this version.",
+        "sources": [
+          {
+            "role": "model routing",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new routing dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+            "before_sha256": null,
+            "after_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new epilogues",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+            "before_sha256": null,
+            "after_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "MXFP4 expert route",
+        "before": "Native-layout FlyDSL grouped experts and per-expert finalize; the MUSE_MOE_BACKEND=flydsl setting is present.",
+        "after": "Compact A4 target-verify experts in Triton, or AITER FlyDSL A4W4 prefill stages, followed by per-expert finalize.",
+        "language": "FlyDSL \u2192 shape-dependent Triton or FlyDSL; Python mxfp4_moe.py is dispatch glue.",
+        "body_change": "Add per-32 MXFP4 activations, compact verify work and preshuffled A4W4 weights; prefill stage 1 emits quantized intermediates/scales.",
+        "fusion": "Activation and quantization staging change, while the required per-expert normalization and route-weighted reduction remain explicit. Do not call the entire MoE one kernel.",
+        "applicability": "Compact verify requires TEP8, 32 local experts, top-8, rows divisible by 8 and no more than 512; prefill A4W4 uses at least 256 rows. Native fallbacks remain.",
+        "sources": [
+          {
+            "role": "existing expert implementation",
+            "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+            "after_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+            "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
+          },
+          {
+            "role": "new compact experts",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py",
+            "before_sha256": null,
+            "after_sha256": "6a2cd481da888c296c252e116cde2f26745e01a74858276cdc48e167d5031474",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py",
+            "before_sha256": null,
+            "after_sha256": "39b054665c41c85e6fc85a4fb9e1a706c240a6c90a9b6a5232eb9d229fe08c22",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff"
+        ],
+        "evidence_level": "source_verified"
+      }
+    ],
+    "excluded_attributions": [
+      "The SGLang monokernel interface is present in 1020, but this pair does not pass --monokernel-backend amd and has no AMD plugin execution claim."
+    ],
+    "matched_server_artifacts": [],
+    "top_kernels": null,
+    "gpu_profile_status": "unavailable",
+    "causal_attribution": "not_established",
+    "report": "pairs/tep8_conc4_off_2026-10-16_to_2026-10-22.md"
+  },
+  {
+    "id": "tep8_conc4_off_2026-10-22_to_2026-10-30",
+    "configuration_label": "TEP8 conc4 / GPU",
+    "config": {
+      "hardware": "mi355x",
+      "framework": "sglang",
+      "model": "musespark",
+      "precision": "fp4",
+      "spec_method": "draft_model",
+      "disagg": false,
+      "is_multinode": false,
+      "prefill_tp": 8,
+      "prefill_ep": 8,
+      "prefill_dp_attention": false,
+      "prefill_num_workers": 0,
+      "decode_tp": 8,
+      "decode_ep": 8,
+      "decode_dp_attention": false,
+      "decode_num_workers": 0,
+      "num_prefill_gpu": 8,
+      "num_decode_gpu": 8,
+      "benchmark_type": "agentic_traces",
+      "offload_mode": "off",
+      "isl": null,
+      "osl": null,
+      "conc": 4,
+      "pp": 1,
+      "dcp_size": 1,
+      "pcp_size": 1,
+      "spec_algorithm": "dflash",
+      "spec_draft_model": "RadixArk/Muse-Spark-Open-DFlash2",
+      "kv_offloading": "none"
+    },
+    "before": {
+      "id": "446037",
+      "date": "2026-10-22",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+      "image_digest": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436698",
+      "github_job_id": 119428436698,
+      "recipe_fingerprint": "d7874302d9e717a11050531cb364ac4a6deda95f50e2739f6bc4edb34e3e47f6",
+      "p90_interactivity_tok_s_user": 277.77777777777777,
+      "output_tok_s_chip": 28.07251,
+      "launch": {
+        "run_id": "39659301076",
+        "job_id": 119428436698,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436698",
+        "effective_checkouts": [
+          "2dd693edb2d7318867f7f6759034571ad734f9f2"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.110",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "after": {
+      "id": "446945",
+      "date": "2026-10-30",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+      "image_digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587858",
+      "github_job_id": 122910587858,
+      "recipe_fingerprint": "0eded24f9c63609573fb85b94ef1f5516ae433a1fb17f62b9ce2ace2a164041a",
+      "p90_interactivity_tok_s_user": 373.13432835820896,
+      "output_tok_s_chip": 31.54411,
+      "launch": {
+        "run_id": "40714803265",
+        "job_id": 122910587858,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910587858",
+        "effective_checkouts": [
+          "639d4565920c1af90bbe958c8ac2957bf11eb603"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --cuda-graph-max-bs-decode 2 --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 2 --mem-fraction-static 0.85 --monokernel-backend amd --page-size 16 --prefill-decode-interval 64 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.109",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "pairing": "next_observed_image_for_same_configuration",
+    "skipped_images": [],
+    "interactivity_change_pct": 34.32835820895524,
+    "throughput_change_pct": 12.36654648978661,
+    "launch_flag_changes": [
+      {
+        "key": "cuda-graph-max-bs-decode",
+        "before": null,
+        "after": "2"
+      },
+      {
+        "key": "max-running-requests",
+        "before": "128",
+        "after": "2"
+      },
+      {
+        "key": "monokernel-backend",
+        "before": null,
+        "after": "amd"
+      },
+      {
+        "key": "prefill-decode-interval",
+        "before": "20",
+        "after": "64"
+      }
+    ],
+    "environment_changes": [
+      {
+        "key": "HEAD_NODE_IP",
+        "before": "10.24.112.110",
+        "after": "10.24.112.109"
+      }
+    ],
+    "kernel_changes": [
+      {
+        "pipeline": "AMD Muse layer monokernel",
+        "before": "Ordinary SGLang attention, projection, routing, experts, residual/norm and collective launches. The monokernel interface alone does not activate the plugin.",
+        "after": "runtime \u2192 Muse spec \u2192 Runner.launch \u2192 build_layer; eligible MXFP4 layers combine attention, K2, K3 and the next eligible layer K1.",
+        "language": "Mixed Triton/FlyDSL/library path \u2192 FlyDSL layer kernel (the log/spec name muse_spark_hip does not identify the implementation language).",
+        "body_change": "Device mailbox flags connect producer/consumer stages; one launch reuses stage LDS while retaining scratch regions. The first necessary K1 and BF16-expert layers keep separate execution.",
+        "fusion": "Merge attention, output norm/gate and projection/reduction, routing/pooler/top-k, experts/finalize/reduction, unpooler/boundary and next-layer QKV preparation across host launch boundaries. Scratch traffic is not assumed eliminated.",
+        "applicability": "Both endpoint CLI logs are checked: only the new endpoint passes monokernel-backend=amd. TEP8/EP8 with 8-token DFLASH; one admitted request corresponds to 8 verify rows and two to 16. Unsupported shapes, prefill and BF16-expert layers use fallback. The exact admission is shown in this pair\u2019s CI table.",
+        "sources": [
+          {
+            "role": "runtime integration",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
+            "before_sha256": "914e7957ee99f22eef5e1e11a1bf05a0cdc9ae90b6efe7a7ccbf810f5a8f03dc",
+            "after_sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new runner",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/runner.py",
+            "before_sha256": null,
+            "after_sha256": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new device body",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layer.py",
+            "before_sha256": null,
+            "after_sha256": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff",
+          "evidence/source_excerpts.md#e2",
+          "evidence/source_excerpts.md#e3"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Ordinary verify merge with output norm/gate",
+        "before": "The attention partials are merged, then the existing output norm-gate kernel runs.",
+        "after": "VerifyReduceDeferral hands partials to forward_verify_partials \u2192 _reduce_norm_gate.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "The new body reads partials/maxima/denominators, performs split-KV reduction, rounds to BF16, and applies per-head RMSNorm and sigmoid gate before the output store.",
+        "fusion": "One reduce+norm+gate launch replaces separate merge and norm-gate launches; removes the completed-attention intermediate between those launches.",
+        "applicability": "Ordinary target-verify path, head_dim 64, output normalization enabled, and backend deferral active. On monokernel-covered MXFP4 layers the layer kernel supersedes this path; retain this candidate only for ordinary/fallback layers.",
+        "sources": [
+          {
+            "role": "output consumer",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+            "before_sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
+            "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new fused reducer",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
+            "before_sha256": null,
+            "after_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Residual/norm boundary with FP8 output",
+        "before": "The fused boundary yields a BF16 attention input and residual stream.",
+        "after": "forward_fp8 can additionally write the next projection input as FP8 plus per-row scales.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "The boundary kernel gains output/scaling buffers and a guarded FP8 output path; native fallback can still perform separate quantization.",
+        "fusion": "For its fused Triton branch, quantization is part of the norm/boundary producer, saving a separate read/quantize launch.",
+        "applicability": "Ordinary path when the model requests fp8_out/forward_fp8; do not transfer this benefit to the monokernel-covered layers without a trace.",
+        "sources": [
+          {
+            "role": "boundary body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+            "before_sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
+            "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "requesting model",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff"
+        ],
+        "evidence_level": "source_verified"
+      }
+    ],
+    "excluded_attributions": [
+      "The new standalone TP4 finalize/all-reduce kernel is outside this TEP8 configuration; do not list it as this pair\u2019s executed fusion."
+    ],
+    "matched_server_artifacts": [],
+    "top_kernels": null,
+    "gpu_profile_status": "unavailable",
+    "causal_attribution": "not_established",
+    "report": "pairs/tep8_conc4_off_2026-10-22_to_2026-10-30.md"
+  },
+  {
+    "id": "tep8_conc8_off_2026-10-16_to_2026-10-22",
+    "configuration_label": "TEP8 conc8 / GPU",
+    "config": {
+      "hardware": "mi355x",
+      "framework": "sglang",
+      "model": "musespark",
+      "precision": "fp4",
+      "spec_method": "draft_model",
+      "disagg": false,
+      "is_multinode": false,
+      "prefill_tp": 8,
+      "prefill_ep": 8,
+      "prefill_dp_attention": false,
+      "prefill_num_workers": 0,
+      "decode_tp": 8,
+      "decode_ep": 8,
+      "decode_dp_attention": false,
+      "decode_num_workers": 0,
+      "num_prefill_gpu": 8,
+      "num_decode_gpu": 8,
+      "benchmark_type": "agentic_traces",
+      "offload_mode": "off",
+      "isl": null,
+      "osl": null,
+      "conc": 8,
+      "pp": 1,
+      "dcp_size": 1,
+      "pcp_size": 1,
+      "spec_algorithm": "dflash",
+      "spec_draft_model": "RadixArk/Muse-Spark-Open-DFlash2",
+      "kv_offloading": "none"
+    },
+    "before": {
+      "id": "445156",
+      "date": "2026-10-16",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open",
+      "image_digest": "sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688890",
+      "github_job_id": 116897688890,
+      "recipe_fingerprint": "bc4c91e6a6e255614046a3e40d22b64921bdcab55980b82060040a811e4ad46d",
+      "p90_interactivity_tok_s_user": 116.82242990654206,
+      "output_tok_s_chip": 43.15223,
+      "launch": {
+        "run_id": "38877885539",
+        "job_id": 116897688890,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38877885539/job/116897688890",
+        "effective_checkouts": [
+          "3bc5b2fca6ae71dfdf71476f58d39a0832601b19"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.101",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "after": {
+      "id": "446039",
+      "date": "2026-10-22",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+      "image_digest": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428437135",
+      "github_job_id": 119428437135,
+      "recipe_fingerprint": "d7874302d9e717a11050531cb364ac4a6deda95f50e2739f6bc4edb34e3e47f6",
+      "p90_interactivity_tok_s_user": 223.21428571428572,
+      "output_tok_s_chip": 52.50394,
+      "launch": {
+        "run_id": "39659301076",
+        "job_id": 119428437135,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428437135",
+        "effective_checkouts": [
+          "2dd693edb2d7318867f7f6759034571ad734f9f2"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.106",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "pairing": "next_observed_image_for_same_configuration",
+    "skipped_images": [],
+    "interactivity_change_pct": 91.07142857142858,
+    "throughput_change_pct": 21.671440850217927,
+    "launch_flag_changes": [
+      {
+        "key": "prefill-decode-interval",
+        "before": null,
+        "after": "20"
+      },
+      {
+        "key": "random-seed",
+        "before": null,
+        "after": "42"
+      },
+      {
+        "key": "scheduler-recv-interval",
+        "before": null,
+        "after": "20"
+      },
+      {
+        "key": "speculative-draft-window-size",
+        "before": null,
+        "after": "2048"
+      },
+      {
+        "key": "swa-full-tokens-ratio",
+        "before": null,
+        "after": "0.2"
+      },
+      {
+        "key": "tokenizer-worker-num",
+        "before": null,
+        "after": "4"
+      }
+    ],
+    "environment_changes": [
+      {
+        "key": "HEAD_NODE_IP",
+        "before": "10.24.112.101",
+        "after": "10.24.112.106"
+      }
+    ],
+    "kernel_changes": [
+      {
+        "pipeline": "QK normalization, RoPE and FP8 KV write",
+        "before": "Existing _qk_norm_kernel combines Q/K RMSNorm and query scale; projection, RoPE and backend KV writing have separate boundaries.",
+        "after": "_muse_qk_rope_cache or _qkv_epilogue writes normalized/rotated Q/K and FP8 KV; model attention bypasses its ordinary cache write.",
+        "language": "Triton \u2192 Triton; the projection remains a separate split-K partial producer.",
+        "body_change": "New cache-store epilogue folds normalization, scale, rotation and FP8 conversion; explicit BF16 round trips preserve the former sequence semantics.",
+        "fusion": "The QK route shares norm/RoPE/cache write in one launch. The QKV route is partial GEMM plus an epilogue launch; the whole projection is not one fused launch.",
+        "applicability": "TEP8, head_dim 64, local 16 Q / 2 KV heads, AITER NHD FP8 pages of size 16; decode or target verify; QKV at up to 32 rows, QK at up to 64. Actual row counts vary during the job.",
+        "sources": [
+          {
+            "role": "prior norm / new epilogue",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+            "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
+            "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "eligibility wrapper",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+            "before_sha256": null,
+            "after_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff",
+          "evidence/source_excerpts.md#e1"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "MoE router and pooler",
+        "before": "Router GEMM, fused top-k routing, pooler GEMM and pre-expert norm remain separate stages.",
+        "after": "route_with_shared_pooler chooses a shared epilogue or a joint packed projection followed by _joint_epilogue.",
+        "language": "Triton / GEMM library calls \u2192 Triton / GEMM library calls.",
+        "body_change": "Packed pooler/router weights and shared reduction/top-k/norm epilogues avoid separate processing of completed router/pooler results.",
+        "fusion": "Shared router/top-k/pre-expert norm epilogue; selected widths also share a router/pooler GEMM. Expert GEMMs remain separate.",
+        "applicability": "Shape guards: hidden 8192, 256 experts, top-8 sigmoid, 4096-wide pooler, contiguous BF16 input and FP32 router; at most 64 rows, with joint widths 8/16/24 in this version.",
+        "sources": [
+          {
+            "role": "model routing",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new routing dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+            "before_sha256": null,
+            "after_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new epilogues",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+            "before_sha256": null,
+            "after_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "MXFP4 expert route",
+        "before": "Native-layout FlyDSL grouped experts and per-expert finalize; the MUSE_MOE_BACKEND=flydsl setting is present.",
+        "after": "Compact A4 target-verify experts in Triton, or AITER FlyDSL A4W4 prefill stages, followed by per-expert finalize.",
+        "language": "FlyDSL \u2192 shape-dependent Triton or FlyDSL; Python mxfp4_moe.py is dispatch glue.",
+        "body_change": "Add per-32 MXFP4 activations, compact verify work and preshuffled A4W4 weights; prefill stage 1 emits quantized intermediates/scales.",
+        "fusion": "Activation and quantization staging change, while the required per-expert normalization and route-weighted reduction remain explicit. Do not call the entire MoE one kernel.",
+        "applicability": "Compact verify requires TEP8, 32 local experts, top-8, rows divisible by 8 and no more than 512; prefill A4W4 uses at least 256 rows. Native fallbacks remain.",
+        "sources": [
+          {
+            "role": "existing expert implementation",
+            "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+            "after_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+            "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
+          },
+          {
+            "role": "new compact experts",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py",
+            "before_sha256": null,
+            "after_sha256": "6a2cd481da888c296c252e116cde2f26745e01a74858276cdc48e167d5031474",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py",
+            "before_sha256": null,
+            "after_sha256": "39b054665c41c85e6fc85a4fb9e1a706c240a6c90a9b6a5232eb9d229fe08c22",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff"
+        ],
+        "evidence_level": "source_verified"
+      }
+    ],
+    "excluded_attributions": [
+      "The SGLang monokernel interface is present in 1020, but this pair does not pass --monokernel-backend amd and has no AMD plugin execution claim."
+    ],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12043393913
+      },
+      {
+        "side": "after",
+        "artifact_id": 12384514175
+      }
+    ],
+    "top_kernels": null,
+    "gpu_profile_status": "unavailable",
+    "causal_attribution": "not_established",
+    "report": "pairs/tep8_conc8_off_2026-10-16_to_2026-10-22.md"
+  },
+  {
+    "id": "tep8_conc8_off_2026-10-22_to_2026-10-30",
+    "configuration_label": "TEP8 conc8 / GPU",
+    "config": {
+      "hardware": "mi355x",
+      "framework": "sglang",
+      "model": "musespark",
+      "precision": "fp4",
+      "spec_method": "draft_model",
+      "disagg": false,
+      "is_multinode": false,
+      "prefill_tp": 8,
+      "prefill_ep": 8,
+      "prefill_dp_attention": false,
+      "prefill_num_workers": 0,
+      "decode_tp": 8,
+      "decode_ep": 8,
+      "decode_dp_attention": false,
+      "decode_num_workers": 0,
+      "num_prefill_gpu": 8,
+      "num_decode_gpu": 8,
+      "benchmark_type": "agentic_traces",
+      "offload_mode": "off",
+      "isl": null,
+      "osl": null,
+      "conc": 8,
+      "pp": 1,
+      "dcp_size": 1,
+      "pcp_size": 1,
+      "spec_algorithm": "dflash",
+      "spec_draft_model": "RadixArk/Muse-Spark-Open-DFlash2",
+      "kv_offloading": "none"
+    },
+    "before": {
+      "id": "446039",
+      "date": "2026-10-22",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+      "image_digest": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428437135",
+      "github_job_id": 119428437135,
+      "recipe_fingerprint": "d7874302d9e717a11050531cb364ac4a6deda95f50e2739f6bc4edb34e3e47f6",
+      "p90_interactivity_tok_s_user": 223.21428571428572,
+      "output_tok_s_chip": 52.50394,
+      "launch": {
+        "run_id": "39659301076",
+        "job_id": 119428437135,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428437135",
+        "effective_checkouts": [
+          "2dd693edb2d7318867f7f6759034571ad734f9f2"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.106",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "after": {
+      "id": "446946",
+      "date": "2026-10-30",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+      "image_digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588087",
+      "github_job_id": 122910588087,
+      "recipe_fingerprint": "0eded24f9c63609573fb85b94ef1f5516ae433a1fb17f62b9ce2ace2a164041a",
+      "p90_interactivity_tok_s_user": 363.6363636363637,
+      "output_tok_s_chip": 54.00621,
+      "launch": {
+        "run_id": "40714803265",
+        "job_id": 122910588087,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/40714803265/job/122910588087",
+        "effective_checkouts": [
+          "639d4565920c1af90bbe958c8ac2957bf11eb603"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --cuda-graph-max-bs-decode 2 --enable-metrics --expert-parallel-size 8 --kv-cache-dtype fp8_e4m3 --max-running-requests 2 --mem-fraction-static 0.85 --monokernel-backend amd --page-size 16 --prefill-decode-interval 64 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.110",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "pairing": "next_observed_image_for_same_configuration",
+    "skipped_images": [],
+    "interactivity_change_pct": 62.909090909090914,
+    "throughput_change_pct": 2.8612519365213362,
+    "launch_flag_changes": [
+      {
+        "key": "cuda-graph-max-bs-decode",
+        "before": null,
+        "after": "2"
+      },
+      {
+        "key": "max-running-requests",
+        "before": "128",
+        "after": "2"
+      },
+      {
+        "key": "monokernel-backend",
+        "before": null,
+        "after": "amd"
+      },
+      {
+        "key": "prefill-decode-interval",
+        "before": "20",
+        "after": "64"
+      }
+    ],
+    "environment_changes": [
+      {
+        "key": "HEAD_NODE_IP",
+        "before": "10.24.112.106",
+        "after": "10.24.112.110"
+      }
+    ],
+    "kernel_changes": [
+      {
+        "pipeline": "AMD Muse layer monokernel",
+        "before": "Ordinary SGLang attention, projection, routing, experts, residual/norm and collective launches. The monokernel interface alone does not activate the plugin.",
+        "after": "runtime \u2192 Muse spec \u2192 Runner.launch \u2192 build_layer; eligible MXFP4 layers combine attention, K2, K3 and the next eligible layer K1.",
+        "language": "Mixed Triton/FlyDSL/library path \u2192 FlyDSL layer kernel (the log/spec name muse_spark_hip does not identify the implementation language).",
+        "body_change": "Device mailbox flags connect producer/consumer stages; one launch reuses stage LDS while retaining scratch regions. The first necessary K1 and BF16-expert layers keep separate execution.",
+        "fusion": "Merge attention, output norm/gate and projection/reduction, routing/pooler/top-k, experts/finalize/reduction, unpooler/boundary and next-layer QKV preparation across host launch boundaries. Scratch traffic is not assumed eliminated.",
+        "applicability": "Both endpoint CLI logs are checked: only the new endpoint passes monokernel-backend=amd. TEP8/EP8 with 8-token DFLASH; one admitted request corresponds to 8 verify rows and two to 16. Unsupported shapes, prefill and BF16-expert layers use fallback. The exact admission is shown in this pair\u2019s CI table.",
+        "sources": [
+          {
+            "role": "runtime integration",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
+            "before_sha256": "914e7957ee99f22eef5e1e11a1bf05a0cdc9ae90b6efe7a7ccbf810f5a8f03dc",
+            "after_sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new runner",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/runner.py",
+            "before_sha256": null,
+            "after_sha256": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new device body",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layer.py",
+            "before_sha256": null,
+            "after_sha256": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff",
+          "evidence/source_excerpts.md#e2",
+          "evidence/source_excerpts.md#e3"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Ordinary verify merge with output norm/gate",
+        "before": "The attention partials are merged, then the existing output norm-gate kernel runs.",
+        "after": "VerifyReduceDeferral hands partials to forward_verify_partials \u2192 _reduce_norm_gate.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "The new body reads partials/maxima/denominators, performs split-KV reduction, rounds to BF16, and applies per-head RMSNorm and sigmoid gate before the output store.",
+        "fusion": "One reduce+norm+gate launch replaces separate merge and norm-gate launches; removes the completed-attention intermediate between those launches.",
+        "applicability": "Ordinary target-verify path, head_dim 64, output normalization enabled, and backend deferral active. On monokernel-covered MXFP4 layers the layer kernel supersedes this path; retain this candidate only for ordinary/fallback layers.",
+        "sources": [
+          {
+            "role": "output consumer",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
+            "before_sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
+            "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new fused reducer",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
+            "before_sha256": null,
+            "after_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "Residual/norm boundary with FP8 output",
+        "before": "The fused boundary yields a BF16 attention input and residual stream.",
+        "after": "forward_fp8 can additionally write the next projection input as FP8 plus per-row scales.",
+        "language": "Triton \u2192 Triton.",
+        "body_change": "The boundary kernel gains output/scaling buffers and a guarded FP8 output path; native fallback can still perform separate quantization.",
+        "fusion": "For its fused Triton branch, quantization is part of the norm/boundary producer, saving a separate read/quantize launch.",
+        "applicability": "Ordinary path when the model requests fp8_out/forward_fp8; do not transfer this benefit to the monokernel-covered layers without a trace.",
+        "sources": [
+          {
+            "role": "boundary body",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
+            "before_sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
+            "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "requesting model",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/02_to_03.diff"
+        ],
+        "evidence_level": "source_verified"
+      }
+    ],
+    "excluded_attributions": [
+      "The new standalone TP4 finalize/all-reduce kernel is outside this TEP8 configuration; do not list it as this pair\u2019s executed fusion."
+    ],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12384514175
+      },
+      {
+        "side": "after",
+        "artifact_id": 12861992663
+      }
+    ],
+    "top_kernels": null,
+    "gpu_profile_status": "unavailable",
+    "causal_attribution": "not_established",
+    "report": "pairs/tep8_conc8_off_2026-10-22_to_2026-10-30.md"
+  },
+  {
+    "id": "tep8_conc16_on_2026-10-16_to_2026-10-22",
+    "configuration_label": "TEP8 conc16 / HiCache",
+    "config": {
+      "hardware": "mi355x",
+      "framework": "sglang",
+      "model": "musespark",
+      "precision": "fp4",
+      "spec_method": "draft_model",
+      "disagg": false,
+      "is_multinode": false,
+      "prefill_tp": 8,
+      "prefill_ep": 8,
+      "prefill_dp_attention": false,
+      "prefill_num_workers": 0,
+      "decode_tp": 8,
+      "decode_ep": 8,
+      "decode_dp_attention": false,
+      "decode_num_workers": 0,
+      "num_prefill_gpu": 8,
+      "num_decode_gpu": 8,
+      "benchmark_type": "agentic_traces",
+      "offload_mode": "on",
+      "isl": null,
+      "osl": null,
+      "conc": 16,
+      "pp": 1,
+      "dcp_size": 1,
+      "pcp_size": 1,
+      "spec_algorithm": "dflash",
+      "spec_draft_model": "RadixArk/Muse-Spark-Open-DFlash2",
+      "kv_offloading": "dram"
+    },
+    "before": {
+      "id": "445172",
+      "date": "2026-10-16",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open",
+      "image_digest": "sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178956",
+      "github_job_id": 117132178956,
+      "recipe_fingerprint": "19b1c32bf71c59c97d3b333ec4cee5cae2e83d736acd874259d9f9f94e43a020",
+      "p90_interactivity_tok_s_user": 66.18133686300463,
+      "output_tok_s_chip": 80.08901,
+      "launch": {
+        "run_id": "38947852942",
+        "job_id": 117132178956,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38947852942/job/117132178956",
+        "effective_checkouts": [
+          "1102bcba5fe01f524ad88f0fd0fb4e1a8711b56b"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-hierarchical-cache --enable-metrics --expert-parallel-size 8 --hicache-size 180 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --reasoning-parser muse --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-num-draft-tokens 8 --tensor-parallel-size 8 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.107",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "after": {
+      "id": "446032",
+      "date": "2026-10-22",
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+      "image_digest": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+      "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436736",
+      "github_job_id": 119428436736,
+      "recipe_fingerprint": "7c1b55b9e84e84270e534fd9ecd0423f27953f0c8cedffa73671a2e1e623989d",
+      "p90_interactivity_tok_s_user": 152.67175572519082,
+      "output_tok_s_chip": 85.64186,
+      "launch": {
+        "run_id": "39659301076",
+        "job_id": 119428436736,
+        "job_url": "https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39659301076/job/119428436736",
+        "effective_checkouts": [
+          "2dd693edb2d7318867f7f6759034571ad734f9f2"
+        ],
+        "datasets": [],
+        "launch_command": "python3 -m sglang.launch_server --model-path amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --served-model-name amd/Muse-Spark-Open-816B-A42B-Quark-MXFP4 --host 0.0.0.0 --port 8000 --nccl-port 17500 --attention-backend aiter --enable-hierarchical-cache --enable-metrics --expert-parallel-size 8 --hicache-io-backend kernel --hicache-mem-layout page_first --hicache-size 253 --hicache-write-policy write_through --kv-cache-dtype fp8_e4m3 --max-running-requests 128 --mem-fraction-static 0.85 --page-size 16 --prefill-decode-interval 20 --random-seed 42 --reasoning-parser muse --scheduler-recv-interval 20 --speculative-algorithm DFLASH --speculative-draft-attention-backend triton --speculative-draft-model-path RadixArk/Muse-Spark-Open-DFlash2 --speculative-draft-window-size 2048 --speculative-num-draft-tokens 8 --swa-full-tokens-ratio 0.2 --tensor-parallel-size 8 --tokenizer-worker-num 4 --tool-call-parser muse --watchdog-timeout 1800",
+        "server_env": {
+          "HEAD_NODE_IP": "10.24.112.136",
+          "HF_HUB_OFFLINE": "1",
+          "MUSE_MOE_BACKEND": "flydsl",
+          "PYTHONNOUSERSITE": "1",
+          "SGLANG_CUDA_COREDUMP_BEFORE_CRASH": "0",
+          "SGLANG_PYSPY_DUMP_BEFORE_CRASH": "0",
+          "SGLANG_SIMULATE_ACC_LEN": "4.05",
+          "SGLANG_SIMULATE_ACC_METHOD": "match-expected",
+          "SGLANG_SIMULATE_ACC_TOKEN_MODE": "real-draft-token",
+          "SGLANG_TIMEOUT_KEEP_ALIVE": "900",
+          "SGLANG_USE_AITER": "1",
+          "SGLANG_USE_AITER_UNIFIED_ATTN": "1"
+        }
+      }
+    },
+    "pairing": "next_observed_image_for_same_configuration",
+    "skipped_images": [],
+    "interactivity_change_pct": 130.68702290076334,
+    "throughput_change_pct": 6.933348283366203,
+    "launch_flag_changes": [
+      {
+        "key": "hicache-io-backend",
+        "before": null,
+        "after": "kernel"
+      },
+      {
+        "key": "hicache-mem-layout",
+        "before": null,
+        "after": "page_first"
+      },
+      {
+        "key": "hicache-size",
+        "before": "180",
+        "after": "253"
+      },
+      {
+        "key": "prefill-decode-interval",
+        "before": null,
+        "after": "20"
+      },
+      {
+        "key": "random-seed",
+        "before": null,
+        "after": "42"
+      },
+      {
+        "key": "scheduler-recv-interval",
+        "before": null,
+        "after": "20"
+      },
+      {
+        "key": "speculative-draft-window-size",
+        "before": null,
+        "after": "2048"
+      },
+      {
+        "key": "swa-full-tokens-ratio",
+        "before": null,
+        "after": "0.2"
+      },
+      {
+        "key": "tokenizer-worker-num",
+        "before": null,
+        "after": "4"
+      }
+    ],
+    "environment_changes": [
+      {
+        "key": "HEAD_NODE_IP",
+        "before": "10.24.112.107",
+        "after": "10.24.112.136"
+      }
+    ],
+    "kernel_changes": [
+      {
+        "pipeline": "QK normalization, RoPE and FP8 KV write",
+        "before": "Existing _qk_norm_kernel combines Q/K RMSNorm and query scale; projection, RoPE and backend KV writing have separate boundaries.",
+        "after": "_muse_qk_rope_cache or _qkv_epilogue writes normalized/rotated Q/K and FP8 KV; model attention bypasses its ordinary cache write.",
+        "language": "Triton \u2192 Triton; the projection remains a separate split-K partial producer.",
+        "body_change": "New cache-store epilogue folds normalization, scale, rotation and FP8 conversion; explicit BF16 round trips preserve the former sequence semantics.",
+        "fusion": "The QK route shares norm/RoPE/cache write in one launch. The QKV route is partial GEMM plus an epilogue launch; the whole projection is not one fused launch.",
+        "applicability": "TEP8, head_dim 64, local 16 Q / 2 KV heads, AITER NHD FP8 pages of size 16; decode or target verify; QKV at up to 32 rows, QK at up to 64. Actual row counts vary during the job.",
+        "sources": [
+          {
+            "role": "prior norm / new epilogue",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+            "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
+            "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "dispatch",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "eligibility wrapper",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+            "before_sha256": null,
+            "after_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff",
+          "evidence/source_excerpts.md#e1"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "MoE router and pooler",
+        "before": "Router GEMM, fused top-k routing, pooler GEMM and pre-expert norm remain separate stages.",
+        "after": "route_with_shared_pooler chooses a shared epilogue or a joint packed projection followed by _joint_epilogue.",
+        "language": "Triton / GEMM library calls \u2192 Triton / GEMM library calls.",
+        "body_change": "Packed pooler/router weights and shared reduction/top-k/norm epilogues avoid separate processing of completed router/pooler results.",
+        "fusion": "Shared router/top-k/pre-expert norm epilogue; selected widths also share a router/pooler GEMM. Expert GEMMs remain separate.",
+        "applicability": "Shape guards: hidden 8192, 256 experts, top-8 sigmoid, 4096-wide pooler, contiguous BF16 input and FP32 router; at most 64 rows, with joint widths 8/16/24 in this version.",
+        "sources": [
+          {
+            "role": "model routing",
+            "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
+            "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new routing dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+            "before_sha256": null,
+            "after_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new epilogues",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+            "before_sha256": null,
+            "after_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
+        "pipeline": "MXFP4 expert route",
+        "before": "Native-layout FlyDSL grouped experts and per-expert finalize; the MUSE_MOE_BACKEND=flydsl setting is present.",
+        "after": "Compact A4 target-verify experts in Triton, or AITER FlyDSL A4W4 prefill stages, followed by per-expert finalize.",
+        "language": "FlyDSL \u2192 shape-dependent Triton or FlyDSL; Python mxfp4_moe.py is dispatch glue.",
+        "body_change": "Add per-32 MXFP4 activations, compact verify work and preshuffled A4W4 weights; prefill stage 1 emits quantized intermediates/scales.",
+        "fusion": "Activation and quantization staging change, while the required per-expert normalization and route-weighted reduction remain explicit. Do not call the entire MoE one kernel.",
+        "applicability": "Compact verify requires TEP8, 32 local experts, top-8, rows divisible by 8 and no more than 512; prefill A4W4 uses at least 256 rows. Native fallbacks remain.",
+        "sources": [
+          {
+            "role": "existing expert implementation",
+            "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+            "after_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
+            "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
+          },
+          {
+            "role": "new compact experts",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py",
+            "before_sha256": null,
+            "after_sha256": "6a2cd481da888c296c252e116cde2f26745e01a74858276cdc48e167d5031474",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "new dispatch",
+            "before_path": null,
+            "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py",
+            "before_sha256": null,
+            "after_sha256": "39b054665c41c85e6fc85a4fb9e1a706c240a6c90a9b6a5232eb9d229fe08c22",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "evidence/source_diffs/01_to_02.diff"
+        ],
+        "evidence_level": "source_verified"
+      }
+    ],
+    "excluded_attributions": [
+      "The SGLang monokernel interface is present in 1020, but this pair does not pass --monokernel-backend amd and has no AMD plugin execution claim."
+    ],
+    "matched_server_artifacts": [],
+    "top_kernels": null,
+    "gpu_profile_status": "unavailable",
+    "causal_attribution": "not_established",
+    "report": "pairs/tep8_conc16_on_2026-10-16_to_2026-10-22.md"
+  }
+]

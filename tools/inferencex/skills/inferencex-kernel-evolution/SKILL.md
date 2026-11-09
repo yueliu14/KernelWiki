@@ -1,0 +1,47 @@
+---
+name: inferencex-kernel-evolution
+description: Reconstruct InferenceX model performance history by Docker image, compare matching benchmark points, and trace adjacent versions through CI, container sources, kernel dispatch, and fusion evidence into KernelWiki.
+---
+
+# InferenceX kernel evolution
+
+Produce a dated, evidence-linked history from the first available curve to the latest available curve for a model, GPU, and serving framework. Default example: Muse Spark Open, MI355X, SGLang. Store model knowledge under `knowledge/top_model/<model>/` in the user's KernelWiki checkout; use `muse_spark` for this example. Repository prose and code comments are English.
+
+## Establish performance history
+
+1. Discover the dashboard's actual data requests and chart implementation. Prefer structured benchmark records over digitizing pixels. Preserve request URLs, retrieval UTC time, response hashes, dashboard source revision, and raw records. Distinguish benchmark date, CI creation date, and first dashboard appearance.
+2. Enumerate all available dates for the selected model/GPU/framework. Record coverage gaps and whether a historical view shows that day's runs or an accumulated best frontier. A current frontier alone cannot establish the complete history.
+3. Reproduce the selected axes: x = **p90 interactivity**, y = **Output Token Throughput per Chip (tok/s/chip)**. Cite the exact upstream field/formula and units. Do not silently substitute mean interactivity, throughput per GPU node, request throughput, or total-token throughput. Only compute `1000 / p90_TPOT_ms` if this is the dashboard's actual definition.
+4. Join each benchmark point to its configuration, run/job, launch script, and exact container reference. Deduplicate primary version nodes by the fully qualified Docker image name/tag requested by the user. Keep all occurrences, first/last observed dates, per-config representative dates, and repeat-run spread. Record immutable digests separately: a tag with multiple digests is ambiguous and must have distinct source snapshots; different tags sharing one digest remain traceable aliases.
+5. Match points by model revision, hardware/chip count, framework, dtype/quantization, TP, EP, DP, concurrency, ISL, OSL, dataset, and benchmark protocol where available. Preserve the original label (including `tep8`); do not infer its meaning without configuration evidence. Keep launch flags and speculative-decoding settings as explicit explanatory variables. Missing matching points remain missing; interpolation and nearest-neighbor comparisons are separate analyses.
+6. Make the primary output a **configuration × image-version matrix**. Every observed TP/EP + concurrency + offload configuration has a row, including singletons such as TEP8 c2; preserve blank cells for absent measurements. Cells contain `(p90 interactivity, output tok/s/chip)` and link to the source point/CI job. Use a reproducible representative policy (default: earliest valid occurrence for each image + matching configuration), preserving repetitions separately.
+7. Within each full configuration key, connect consecutive **observed** image versions. Record intervening blank columns as skipped versions; never invent measurements there. Retain an adjacent-image-only comparison as a separately labeled view. Report both dates, both `(x,y)` pairs, `100*(x2/x1-1)` and `100*(y2/y1-1)` for each pair. Mark gains, regressions, and tradeoffs. Higher is better for interactivity in tokens/s; verify units first. Never pick each version's best point independently and call it a same-configuration gain.
+
+## Trace CI and container provenance
+
+Visit linked GitHub runs/jobs **before pulling containers**. Fetch run metadata, job steps, logs, artifacts, and workflow/launch/config files at the run's `head_sha`, following reusable workflows and setup scripts. Check the actual checkout SHA in job logs: reusable workflows may execute a different revision, so preserve both and read launch recipes at the effective checkout. Capture the actual image reference and any post-pull checkout, pip install, patch, mount, environment override, or generated configuration. Image contents alone may differ from the code actually benchmarked. Expired logs/artifacts and access errors are explicit evidence gaps.
+
+Resolve/pull the exact image, recording tag, repository digest, platform, image ID, creation date, and relevant package/git versions. Reuse a verified cached image when possible. CPU-only jobs suffice for source inspection: in this user's Spur environment request `-N 1 -n 1 -c 1 --gpus=0`, verify `ReqTRES`, and pass no GPU devices to Docker. Do not impose a runtime CPU quota. If the Docker daemon is unavailable, registry metadata or targeted layer extraction can support a clearly labeled partial inspection; do not claim a pull or execution occurred. Record dirty source trees and actual file bytes: all four pilot images shared the same reported SGLang HEAD despite substantial body differences. Keep large layers, full logs, and traces outside the knowledge Git tree; commit concise evidence extracts and source manifests with hashes and stable upstream links.
+
+## Explain adjacent kernel versions
+
+For each pair, create an individual kernel-change record linked from that configuration's matrix row. Include both exact CI jobs, image digests, x/y changes, kernel paths/symbols, device languages, body changes, fusion before/after, applicability guards, launch/environment changes, and evidence status. Fetch each pair endpoint's own launch log rather than assuming another concurrency shares its settings. Shared source findings can be referenced across pairs, but evaluate applicability for each pair: a TP4-only fusion must not be credited to TEP8, and a kernel added to an image may be bypassed by monokernel execution or shape guards. Record unchanged paths/bodies and excluded attributions explicitly when relevant.
+
+For each `date1 → date2`, then `date2 → date3` edge, track the same workload points. Establish top kernels from compatible GPU traces/profiles, ranked by total GPU time with call counts and percentage. Record phase (prefill/decode/verify), trace coverage, overlap/timing method, and profile configuration. Static source inspection supplies **candidate hot paths**, not measured top kernels. Reprofiling is a separate measurement, not the original CI profile.
+
+For each relevant operator/semantic pipeline, record:
+
+- Actual dispatch/call path, source file and symbol, source SHA256 and git/package revision, and shape/dtype/flag guards. A stable path/name does not imply a stable body; a rename does not prove an implementation change.
+- Implementation language (Triton, Gluon, FlyDSL, HIP/C++, assembly, library call), distinguishing Python wrappers from the device kernel implementation.
+- Body/algorithm changes such as tiling, layout, MFMA, scheduling, vectorization, staging, quantization, precision, and tuning tables. Cite pinned lines/diffs; keep source facts separate from performance hypotheses.
+- **Fusion before/after** as semantic operations and actual launch boundaries. Name which intermediate tensors, memory traffic, or launches disappear or are introduced. Distinguish a fused GPU kernel from a Python wrapper, library API, CUDA/HIP graph, communication overlap, and a sequence of multiple kernels. Cite dispatch plus bodies; use traces to confirm execution and changed launch counts when available.
+
+Classify each conclusion as `measured`, `source_verified`, `hypothesis`, or `unavailable`. An E2E improvement correlated with a source change does not establish that kernel's causal contribution. Record other changes (speculative decoding, clocks, topology, batching, quantization, engine flags) that confound attribution. Never fabricate missing profiles, source bodies, or speedups.
+
+## Persist and validate
+
+Keep a navigable model README with the full matrix as the primary entry, scope, coverage, metric definitions, image timeline, pair index, evidence confidence, and outstanding gaps. Store normalized machine-readable points, image occurrences, pair records, transitions, and provenance manifests alongside it. Keep per-image source inventories and per-pair fusion evidence. In the pilot, `configuration_history.md` links to `pairs/*.md`, `pair_changes.md` indexes them, and `data/pair_records.json` preserves all fields. Add a link from the knowledge index.
+
+Validate raw-to-normalized counts, date coverage, image assignments, comparator uniqueness, chip normalization, axis formulas, and sampled deltas against raw records. Make the crawler rerunnable with cached inputs and explicit selection policy. Finish a pilot with actual retrieved evidence and clearly bounded coverage; do not describe the full kernel history as complete until every claimed edge is supported.
+
+Consult [references/muse-spark-pilot.md](references/muse-spark-pilot.md) for verified endpoints, metric aliases, the executable collector, and CPU source inspection.

@@ -1,0 +1,36 @@
+{
+  "validated_at_utc": "2026-11-09T06:27:50.176583+00:00",
+  "configuration_rows": 27,
+  "representative_points": 38,
+  "pair_records": 11,
+  "adjacent_image_pairs": 10,
+  "skipped_image_pairs": 1,
+  "unique_pair_endpoint_jobs_with_launch_logs": 19,
+  "total_sampled_job_logs": 24,
+  "checks": [
+    "all existing adjacent-image pairs retained",
+    "TEP4 conc16 HiCache gap explicitly represented",
+    "same full configuration at each pair endpoint",
+    "singletons including TEP8 conc2 retained without fabricated pairs",
+    "each endpoint uses its own CI launch log",
+    "source references resolve against endpoint digest inventories",
+    "unchanged QK device body distinguished from modified wrapper guards",
+    "TEP8 c1 versus c4/c8 admission differences preserved",
+    "no monokernel activation attributed to ordinary TEP4 endpoints",
+    "missing source rejected",
+    "generated documents and JSON deterministic on replay",
+    "local Markdown links resolve",
+    "skill validator passed",
+    "git diff --check passed"
+  ],
+  "scripts_sha256": {
+    "build_pair_history.py": "d8dfe004c2d7786147675e10b6cf71495b47077bb996f043e3b5aee41b6e902c",
+    "capture_image_sources.py": "a8b6acc8062030c7dfbb567a27ce747f40155ae206d4ac9bd2af1ce9aed9252f",
+    "collect_history.py": "c5e614b55b0d12afb9fc29422d78eb0ee0080c011900d4973c446226bdb7e27b",
+    "summarize_image_sources.py": "8e83c43d9bf3f4ec9f1a69dfdebbab7ac118a6bb1cb979f6c498465c044a6f19"
+  },
+  "limitations": [
+    "No matching GPU kernel-time traces or causal per-kernel attribution",
+    "Runtime source guards are conditional; client concurrency is not a kernel row count"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "validated_at_utc": "2026-11-09T07:32:11.026582+00:00",
+  "base_commit": "91c955948c7f8ef07668f09b91fc6d8bf27b35e7",
+  "corpus_build_check": "72 generated pages for 23 operators passed",
+  "workload_build_check": "8 cases, 9 decisions, 5 generated pages passed",
+  "repository_tests": "222 passed",
+  "offline_collector_replay": "normalized points, images, comparisons, transitions, coverage and CI metadata reproduced",
+  "pair_renderer_replay": "matrix, index, all 11 pair reports and structured records reproduced",
+  "skill_validator": "passed",
+  "staged_whitespace_check": "passed; archived unified-diff context whitespace preserved via scoped .gitattributes",
+  "scripts_sha256": {
+    "build_pair_history.py": "d8dfe004c2d7786147675e10b6cf71495b47077bb996f043e3b5aee41b6e902c",
+    "capture_image_sources.py": "a8b6acc8062030c7dfbb567a27ce747f40155ae206d4ac9bd2af1ce9aed9252f",
+    "collect_history.py": "2580574fc13a4cfea436d4630c03a9f451ae8328ad8e04c928e7cb9289fb6036",
+    "summarize_image_sources.py": "8e83c43d9bf3f4ec9f1a69dfdebbab7ac118a6bb1cb979f6c498465c044a6f19"
+  },
+  "limits": [
+    "No matching GPU-time traces or causal per-kernel speedup attribution"
+  ]
+}

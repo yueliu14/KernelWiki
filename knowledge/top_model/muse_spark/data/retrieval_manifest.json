@@ -1,0 +1,312 @@
+[
+  {
+    "url": "https://inferencex.semianalysis.com/api/v1/benchmarks?model=Muse-Spark-Open",
+    "retrieved_at_utc": null,
+    "cache_mtime_utc": "2026-11-09T05:48:28.996501+00:00",
+    "sha256": "7435cc2d8df12e3d6b6323a809012f0c715543a7693ad7fac9d9faa6d3b9f16a",
+    "bytes": 351756,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/benchmarks.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/116897688547/logs",
+    "retrieved_at_utc": "2026-11-09T06:21:11.796545+00:00",
+    "sha256": "d6c148275c9987154d84a91f2fdb2de1936ba906c250d66fff13b0a8da3ea44d",
+    "bytes": 165282,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/116897688547.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/116897688634/logs",
+    "retrieved_at_utc": "2026-11-09T06:21:11.845708+00:00",
+    "sha256": "f57c99664e8feafe955626426bc1dc849a2a784d3e6626b24c691b319ae70669",
+    "bytes": 166224,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/116897688634.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/116897688890/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:48.013623+00:00",
+    "sha256": "9878662a7d47058462ccff0b5590c5d482394069d5f109cfff018a9581e0ae55",
+    "bytes": 165931,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/116897688890.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/116897688917/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:47.953695+00:00",
+    "sha256": "2210a498c1858c658f9181aa05792d6d2deec322ec0a19504da89ff2dfaf6238",
+    "bytes": 165841,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/116897688917.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/117132178838/logs",
+    "retrieved_at_utc": "2026-11-09T06:21:12.482289+00:00",
+    "sha256": "d8dcbacc5b98bde0652b8c8f0dfe0398bd4724002287edc18bc429cfb64b957d",
+    "bytes": 168738,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/117132178838.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/117132178956/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:47.965216+00:00",
+    "sha256": "6a0a00cca798f5dbbe6390fe0a1ae96f1eb23e68b7a2a89dd6f815232ab874b2",
+    "bytes": 167173,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/117132178956.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/117132178964/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:47.950370+00:00",
+    "sha256": "03be75d32cbf52b91be579cd74de0e2c8a838c316d2ae542eeb8d2fc46163ccf",
+    "bytes": 166770,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/117132178964.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/117828661400/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:48.549801+00:00",
+    "sha256": "2a9be2067972bd1ec7990e467623cb345f52fd3362de6744106a10c8551e99d2",
+    "bytes": 177560,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/117828661400.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/117828661501/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:48.552809+00:00",
+    "sha256": "10a3e47c82287fa8a3672cb1044a7a2a19ca2b5bdff6ee89fabbc36ddcdd8987",
+    "bytes": 175810,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/117828661501.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/119428436698/logs",
+    "retrieved_at_utc": "2026-11-09T06:21:12.408543+00:00",
+    "sha256": "96497b6fe79bacb6202e8030a7f1ec0af608c9111d84cf6837712108d84aefca",
+    "bytes": 177392,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/119428436698.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/119428436736/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:48.638391+00:00",
+    "sha256": "1bba1e1cadd84abee60d2b5f2dafc7526cee1059a4dba3ff370ac6250839df57",
+    "bytes": 179526,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/119428436736.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/119428436852/logs",
+    "retrieved_at_utc": "2026-11-09T06:21:11.877740+00:00",
+    "sha256": "8323d6d3cb035acbe14531ca03bf81c3c898e3b7a62d12dae642d4a901efe6a7",
+    "bytes": 177759,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/119428436852.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/119428437135/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:48.931393+00:00",
+    "sha256": "e7c2febe168355973db0434d2454a9159e202d804c67e663b1ae1522f36714bf",
+    "bytes": 176291,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/119428437135.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/122910587816/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:49.165864+00:00",
+    "sha256": "d16e6195a65d38c54ac7661602450c4128cbb07413b06859d4fffafe04f961bb",
+    "bytes": 174839,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/122910587816.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/122910587858/logs",
+    "retrieved_at_utc": "2026-11-09T06:21:12.450003+00:00",
+    "sha256": "e938ce4c913e6c5148e441b069e545d648811b89e14fe6c6abf9c5a1c51be0c1",
+    "bytes": 173033,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/122910587858.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/122910587901/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:49.218913+00:00",
+    "sha256": "2b4c5f9d18bd8ad9d001df07b7dbff2f9e5134d0c94644d51598e0749bf31bec",
+    "bytes": 175052,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/122910587901.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/122910588033/logs",
+    "retrieved_at_utc": "2026-11-09T06:21:11.821276+00:00",
+    "sha256": "059c3b31078c7259c15980c03434b3a75af385d426c48f9d0c2b68c875f80ada",
+    "bytes": 173169,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/122910588033.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/122910588046/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:49.262864+00:00",
+    "sha256": "eab7359da53f7772043a39639ab4c5c1714ce13d0b5e66fab9425b32a6c7cc07",
+    "bytes": 174632,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/122910588046.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/122910588087/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:49.523610+00:00",
+    "sha256": "c1a12f27d133ee5511b9e443e80b598858f572b0c247e5451f4bad9ce40ee228",
+    "bytes": 172330,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/122910588087.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/122910588096/logs",
+    "retrieved_at_utc": "2026-11-09T06:21:12.584103+00:00",
+    "sha256": "2b257176a3259eead57c27eaf20b6e2a74c7e3e725926df601ab0c7c3c6a4b13",
+    "bytes": 173959,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/122910588096.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/128469427930/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:49.836778+00:00",
+    "sha256": "29e756e486189f30e1049cd8e6c7a3bcb6ecf9018e23d578fa2c3d0b87901b0e",
+    "bytes": 454287,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/128469427930.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/128469427944/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:49.857171+00:00",
+    "sha256": "3ee322ada92dc7f284c8e7397c16b3555911113512ee2d68700eac8337a2971b",
+    "bytes": 467525,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/128469427944.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/128469428100/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:49.818617+00:00",
+    "sha256": "648a4ac32dd8b8b011024e6b5e114f3b58e314151bdcb56cddc9c7c670ee3931",
+    "bytes": 471044,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/128469428100.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/jobs/128469428179/logs",
+    "retrieved_at_utc": "2026-11-09T05:50:50.092501+00:00",
+    "sha256": "369993f36ea599aaf42fe3b9fcf8f87dab8375128ac8d2ebc254ad76ec464321",
+    "bytes": 438492,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/128469428179.log"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/38877885539/artifacts?per_page=100&page=1",
+    "retrieved_at_utc": "2026-11-09T05:50:22.444325+00:00",
+    "sha256": "45ac27557abc49bd7264bb7dcebe16cfdd62e768baefaabc257388d35fb885c2",
+    "bytes": 37191,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/38877885539.artifacts.1.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/38877885539/jobs?per_page=100&page=1",
+    "retrieved_at_utc": "2026-11-09T05:50:21.993747+00:00",
+    "sha256": "a2989368fb84d051ef4eca921cf2fd92f54d00fd65bb5512d0b02ead92991404",
+    "bytes": 129403,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/38877885539.jobs.1.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/38877885539",
+    "retrieved_at_utc": "2026-11-09T05:50:19.671390+00:00",
+    "sha256": "3ea144ebf7f12fd9d39043247020c022dc28625169bcf4126c78cc2d99a171b7",
+    "bytes": 14147,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/38877885539.run.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/38947852942/artifacts?per_page=100&page=1",
+    "retrieved_at_utc": "2026-11-09T05:50:22.180141+00:00",
+    "sha256": "6a83315c8430c8839144bb38307d1d356d8ef7e9d0b59f45b54eeca7147d118d",
+    "bytes": 37015,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/38947852942.artifacts.1.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/38947852942/jobs?per_page=100&page=1",
+    "retrieved_at_utc": "2026-11-09T05:50:21.801852+00:00",
+    "sha256": "25b2007bec21ff1b1a05b0468df5877985006d540028065be8c455213d531051",
+    "bytes": 128587,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/38947852942.jobs.1.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/38947852942",
+    "retrieved_at_utc": "2026-11-09T05:50:19.635111+00:00",
+    "sha256": "f2ed37640b3fa93f4bff93e6acdb592d11bfb76c105f273999779ed88ca9cb6c",
+    "bytes": 14181,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/38947852942.run.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/39179279826/artifacts?per_page=100&page=1",
+    "retrieved_at_utc": "2026-11-09T05:50:22.031625+00:00",
+    "sha256": "72c14c48b3db75e84d0c73885a607791cfdb7c8dfd5ef43a3801cfaad96f4dfd",
+    "bytes": 47176,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/39179279826.artifacts.1.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/39179279826/jobs?per_page=100&page=1",
+    "retrieved_at_utc": "2026-11-09T05:50:21.660237+00:00",
+    "sha256": "8f7aa6e847192b3d799dc99aec7a380de25054e1f78000b86f605868d583439f",
+    "bytes": 132392,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/39179279826.jobs.1.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/39179279826",
+    "retrieved_at_utc": "2026-11-09T05:50:19.619907+00:00",
+    "sha256": "9ece5514326c84b5b2e974c148e6a19781fbc97ee47382390b7f566811243d2d",
+    "bytes": 14374,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/39179279826.run.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/39659301076/artifacts?per_page=100&page=1",
+    "retrieved_at_utc": "2026-11-09T05:50:24.990041+00:00",
+    "sha256": "4a48b3a4b331aee1210f2f5f692cce67c8f3c7448bf85f515658bcc244118701",
+    "bytes": 38239,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/39659301076.artifacts.1.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/39659301076/jobs?per_page=100&page=1",
+    "retrieved_at_utc": "2026-11-09T05:50:24.632243+00:00",
+    "sha256": "6f12500fdde0ee3e92069146d3e69bb20900e05e915c6d75e2608aa604714c26",
+    "bytes": 113431,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/39659301076.jobs.1.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/39659301076",
+    "retrieved_at_utc": "2026-11-09T05:50:22.386196+00:00",
+    "sha256": "aed530a6fa763979876abe2922b59ec56ece26592392941d385972a7c8d5b678",
+    "bytes": 14182,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/39659301076.run.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/40714803265/artifacts?per_page=100&page=1",
+    "retrieved_at_utc": "2026-11-09T05:50:25.263696+00:00",
+    "sha256": "d6c73ade363c50a6d008ec6d158e25b6c84c0508042b932448aeba642f11f106",
+    "bytes": 51699,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/40714803265.artifacts.1.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/40714803265/jobs?per_page=100&page=1",
+    "retrieved_at_utc": "2026-11-09T05:50:24.948036+00:00",
+    "sha256": "905e427f97fab89cf21a199b430d9a9cb31e10381a7584a0fac9cff589dae626",
+    "bytes": 150490,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/40714803265.jobs.1.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/40714803265",
+    "retrieved_at_utc": "2026-11-09T05:50:22.609187+00:00",
+    "sha256": "3f25bfaa6fed96be55aec603f79bc88c5d616482453b83723113e94413e1c0a3",
+    "bytes": 14043,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/40714803265.run.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/42394597374/artifacts?per_page=100&page=1",
+    "retrieved_at_utc": "2026-11-09T05:50:24.531674+00:00",
+    "sha256": "e0dfeaadcbd4037d3c2a4fb8f3f308cafb1708a31738d3b7cc8cd627e701f304",
+    "bytes": 35667,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/42394597374.artifacts.1.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/42394597374/jobs?per_page=100&page=1",
+    "retrieved_at_utc": "2026-11-09T05:50:24.208423+00:00",
+    "sha256": "67bd5fe2efdea03c3efb10fd485342833287ce9e472d0a8110f6a8f36ee2ba93",
+    "bytes": 127897,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/42394597374.jobs.1.json"
+  },
+  {
+    "url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/runs/42394597374",
+    "retrieved_at_utc": "2026-11-09T05:50:22.784773+00:00",
+    "sha256": "c8699a4dede3a284ea2cfe1166c6bb48598aef2159b64c8068e6df77b96476c6",
+    "bytes": 14313,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/ci/42394597374.run.json"
+  },
+  {
+    "url": "https://inferencex.semianalysis.com/api/v1/benchmarks/history?model=Muse-Spark-Open&benchmarkType=agentic_traces",
+    "retrieved_at_utc": null,
+    "cache_mtime_utc": "2026-11-09T05:48:29.329750+00:00",
+    "sha256": "9abdeace879d1dff1a392344502db7f50801cb7441ef272753df0dc7802753cc",
+    "bytes": 1413609,
+    "cache_file": "/shared_nfs/yueliu14/inferencex_muse_spark_research/raw/history.json"
+  }
+]
