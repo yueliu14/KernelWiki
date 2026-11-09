@@ -127,7 +127,7 @@
       {
         "pipeline": "AMD Muse layer monokernel",
         "before": "Ordinary SGLang attention, projection, routing, experts, residual/norm and collective launches. The monokernel interface alone does not activate the plugin.",
-        "after": "runtime \u2192 Muse spec \u2192 Runner.launch \u2192 build_layer; eligible MXFP4 layers combine attention, K2, K3 and the next eligible layer K1.",
+        "after": "runtime \u2192 Muse spec \u2192 MuseMonoRunner.launch \u2192 build_layer; eligible MXFP4 layers combine attention, K2, K3 and the next eligible layer K1.",
         "language": "Mixed Triton/FlyDSL/library path \u2192 FlyDSL layer kernel (the log/spec name muse_spark_hip does not identify the implementation language).",
         "body_change": "Device mailbox flags connect producer/consumer stages; one launch reuses stage LDS while retaining scratch regions. The first necessary K1 and BF16-expert layers keep separate execution.",
         "fusion": "Merge attention, output norm/gate and projection/reduction, routing/pooler/top-k, experts/finalize/reduction, unpooler/boundary and next-layer QKV preparation across host launch boundaries. Scratch traffic is not assumed eliminated.",

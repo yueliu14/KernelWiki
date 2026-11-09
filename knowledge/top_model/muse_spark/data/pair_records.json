@@ -218,7 +218,42 @@
             "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
             "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
             "path_relation": "different_paths",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/0e3246a8bbd8990f/muse_qk_norm.py",
+              "entrypoints": [
+                {
+                  "name": "_qk_norm_kernel",
+                  "line": 19,
+                  "end_line": 46
+                },
+                {
+                  "name": "fused_qk_norm",
+                  "line": 64,
+                  "end_line": 88
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_qk_rope_cache",
+                  "line": 57,
+                  "end_line": 108
+                },
+                {
+                  "name": "_qkv_epilogue",
+                  "line": 122,
+                  "end_line": 169
+                },
+                {
+                  "name": "qkv_proj_qk_norm_rope_cache",
+                  "line": 233,
+                  "end_line": 297
+                }
+              ]
+            }
           },
           {
             "role": "dispatch",
@@ -227,7 +262,37 @@
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
             "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 434,
+                  "end_line": 469
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 798,
+                  "end_line": 838
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 638,
+                  "end_line": 717
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 1070,
+                  "end_line": 1138
+                }
+              ]
+            }
           },
           {
             "role": "eligibility wrapper",
@@ -236,7 +301,32 @@
             "before_sha256": null,
             "after_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/34933e2895490a37/attention_kv_write.py",
+              "entrypoints": [
+                {
+                  "name": "_attention_shape_ok",
+                  "line": 49,
+                  "end_line": 62
+                },
+                {
+                  "name": "_kv_write_target",
+                  "line": 65,
+                  "end_line": 117
+                },
+                {
+                  "name": "qkv_proj_norm_rope_kv_write",
+                  "line": 126,
+                  "end_line": 166
+                },
+                {
+                  "name": "qk_norm_rope_kv_write",
+                  "line": 169,
+                  "end_line": 203
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -262,7 +352,37 @@
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
             "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 434,
+                  "end_line": 469
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 798,
+                  "end_line": 838
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 638,
+                  "end_line": 717
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 1070,
+                  "end_line": 1138
+                }
+              ]
+            }
           },
           {
             "role": "new routing dispatch",
@@ -271,7 +391,22 @@
             "before_sha256": null,
             "after_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/c570dfbdc9d85dbb/router_pooler.py",
+              "entrypoints": [
+                {
+                  "name": "can_share_router_pooler",
+                  "line": 40,
+                  "end_line": 42
+                },
+                {
+                  "name": "route_with_shared_pooler",
+                  "line": 83,
+                  "end_line": 166
+                }
+              ]
+            }
           },
           {
             "role": "new epilogues",
@@ -280,7 +415,32 @@
             "before_sha256": null,
             "after_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/6c876d2421932de4/router_pooler_topk.py",
+              "entrypoints": [
+                {
+                  "name": "_joint_epilogue",
+                  "line": 127,
+                  "end_line": 184
+                },
+                {
+                  "name": "_joint_fp8_partial",
+                  "line": 426,
+                  "end_line": 470
+                },
+                {
+                  "name": "joint_router_pooler_topk",
+                  "line": 356,
+                  "end_line": 375
+                },
+                {
+                  "name": "joint_router_pooler_topk_fp8",
+                  "line": 494,
+                  "end_line": 522
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -305,7 +465,37 @@
             "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "path_relation": "same_path",
-            "body_relation": "identical_file_bytes"
+            "body_relation": "identical_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 40,
+                  "end_line": 895
+                },
+                {
+                  "name": "launch_muse_moe_gemm",
+                  "line": 898,
+                  "end_line": 969
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 40,
+                  "end_line": 895
+                },
+                {
+                  "name": "launch_muse_moe_gemm",
+                  "line": 898,
+                  "end_line": 969
+                }
+              ]
+            }
           },
           {
             "role": "new compact experts",
@@ -314,7 +504,32 @@
             "before_sha256": null,
             "after_sha256": "63551020e74ad73bae018b34f2562e6f65235492e84913226fb1883f631470a8",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/63551020e74ad73b/mxfp4_compact_a4_moe.py",
+              "entrypoints": [
+                {
+                  "name": "_prepare_a4",
+                  "line": 30,
+                  "end_line": 41
+                },
+                {
+                  "name": "_scatter_a4",
+                  "line": 45,
+                  "end_line": 87
+                },
+                {
+                  "name": "_expert_a4",
+                  "line": 128,
+                  "end_line": 204
+                },
+                {
+                  "name": "compact_a4_experts",
+                  "line": 224,
+                  "end_line": 310
+                }
+              ]
+            }
           },
           {
             "role": "new dispatch",
@@ -323,7 +538,27 @@
             "before_sha256": null,
             "after_sha256": "4dd1c5eff0bd1f913b1bbe31e865141e94449bb24f3dc8ee8fd74e02d18139be",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/4dd1c5eff0bd1f91/mxfp4_moe.py",
+              "entrypoints": [
+                {
+                  "name": "run_compact_a4",
+                  "line": 69,
+                  "end_line": 79
+                },
+                {
+                  "name": "_compact_a4_operands",
+                  "line": 82,
+                  "end_line": 103
+                },
+                {
+                  "name": "run_a4w4",
+                  "line": 140,
+                  "end_line": 204
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -348,7 +583,35 @@
             "before_sha256": "48af597a54827b3e7f9340dada68f74759bee80213df01fbe8f95c4e95fe6d2b",
             "after_sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
             "path_relation": "different_paths",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/48af597a54827b3e/muse_moe_finalize.py",
+              "entrypoints": [
+                {
+                  "name": "build_finalize",
+                  "line": 83,
+                  "end_line": 276
+                },
+                {
+                  "name": "build_splitk_silu",
+                  "line": 14,
+                  "end_line": 80
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8ab37d684c03d806/finalize_allreduce.hip",
+              "entrypoints": [
+                {
+                  "name": "muse_finalize_allreduce_tp4",
+                  "line": 108
+                },
+                {
+                  "name": "muse_finalize_allreduce_fill",
+                  "line": 236
+                }
+              ]
+            }
           },
           {
             "role": "new collective wrapper",
@@ -357,7 +620,27 @@
             "before_sha256": null,
             "after_sha256": "1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/1684029d6e761575/finalize_allreduce.py",
+              "entrypoints": [
+                {
+                  "name": "MuseFinalizeAllreduce",
+                  "line": 139,
+                  "end_line": 243
+                },
+                {
+                  "name": "run_compact_a4_allreduce",
+                  "line": 260,
+                  "end_line": 282
+                },
+                {
+                  "name": "ensure_finalize_allreduce",
+                  "line": 249,
+                  "end_line": 257
+                }
+              ]
+            }
           },
           {
             "role": "model guard",
@@ -366,7 +649,37 @@
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
             "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 434,
+                  "end_line": 469
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 798,
+                  "end_line": 838
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 638,
+                  "end_line": 717
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 1070,
+                  "end_line": 1138
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -392,7 +705,32 @@
             "before_sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
             "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/94d0b45392248de3/fused_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_rms_norm_gate_fwd_kernel",
+                  "line": 43,
+                  "end_line": 95
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/ada56887a3648995/fused_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_rms_norm_gate_fwd_kernel",
+                  "line": 46,
+                  "end_line": 98
+                },
+                {
+                  "name": "FusedRMSNormGate.forward_verify_partials",
+                  "line": 178,
+                  "end_line": 188
+                }
+              ]
+            }
           },
           {
             "role": "new fused reducer",
@@ -401,7 +739,22 @@
             "before_sha256": null,
             "after_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_reduce_norm_gate",
+                  "line": 32,
+                  "end_line": 87
+                },
+                {
+                  "name": "verify_reduce_norm_gate",
+                  "line": 90,
+                  "end_line": 125
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -425,7 +778,32 @@
             "before_sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
             "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/e11bbcae7c1504a0/fused_norm_residual.py",
+              "entrypoints": [
+                {
+                  "name": "_fused_norm_residual_triton_kernel",
+                  "line": 51,
+                  "end_line": 134
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/16edaf5510160b30/fused_norm_residual.py",
+              "entrypoints": [
+                {
+                  "name": "_fused_norm_residual_triton_kernel",
+                  "line": 51,
+                  "end_line": 142
+                },
+                {
+                  "name": "FusedPostNormResidualPreNorm.forward_fp8",
+                  "line": 372,
+                  "end_line": 382
+                }
+              ]
+            }
           },
           {
             "role": "requesting model",
@@ -434,7 +812,37 @@
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
             "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 434,
+                  "end_line": 469
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 798,
+                  "end_line": 838
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 638,
+                  "end_line": 717
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 1070,
+                  "end_line": 1138
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -754,7 +1162,57 @@
             "before_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
             "after_sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/34933e2895490a37/attention_kv_write.py",
+              "entrypoints": [
+                {
+                  "name": "_attention_shape_ok",
+                  "line": 49,
+                  "end_line": 62
+                },
+                {
+                  "name": "_kv_write_target",
+                  "line": 65,
+                  "end_line": 117
+                },
+                {
+                  "name": "qkv_proj_norm_rope_kv_write",
+                  "line": 126,
+                  "end_line": 166
+                },
+                {
+                  "name": "qk_norm_rope_kv_write",
+                  "line": 169,
+                  "end_line": 203
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/a21de58492ca4d4d/attention_kv_write.py",
+              "entrypoints": [
+                {
+                  "name": "_attention_shape_ok",
+                  "line": 50,
+                  "end_line": 63
+                },
+                {
+                  "name": "_kv_write_target",
+                  "line": 66,
+                  "end_line": 118
+                },
+                {
+                  "name": "qkv_proj_norm_rope_kv_write",
+                  "line": 127,
+                  "end_line": 167
+                },
+                {
+                  "name": "qk_norm_rope_kv_write",
+                  "line": 170,
+                  "end_line": 204
+                }
+              ]
+            }
           },
           {
             "role": "device body",
@@ -763,7 +1221,47 @@
             "before_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
             "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
             "path_relation": "same_path",
-            "body_relation": "identical_file_bytes"
+            "body_relation": "identical_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_qk_rope_cache",
+                  "line": 57,
+                  "end_line": 108
+                },
+                {
+                  "name": "_qkv_epilogue",
+                  "line": 122,
+                  "end_line": 169
+                },
+                {
+                  "name": "qkv_proj_qk_norm_rope_cache",
+                  "line": 233,
+                  "end_line": 297
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_qk_rope_cache",
+                  "line": 57,
+                  "end_line": 108
+                },
+                {
+                  "name": "_qkv_epilogue",
+                  "line": 122,
+                  "end_line": 169
+                },
+                {
+                  "name": "qkv_proj_qk_norm_rope_cache",
+                  "line": 233,
+                  "end_line": 297
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -788,7 +1286,33 @@
             "before_sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
             "after_sha256": "20a0a111064e9d1c41ea5a10f0af60c3812d77a6b9631bef62fd4db0d2c3a11b",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8ab37d684c03d806/finalize_allreduce.hip",
+              "entrypoints": [
+                {
+                  "name": "muse_finalize_allreduce_tp4",
+                  "line": 108
+                },
+                {
+                  "name": "muse_finalize_allreduce_fill",
+                  "line": 236
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/20a0a111064e9d1c/finalize_allreduce.hip",
+              "entrypoints": [
+                {
+                  "name": "muse_finalize_allreduce",
+                  "line": 111
+                },
+                {
+                  "name": "muse_finalize_allreduce_fill",
+                  "line": 263
+                }
+              ]
+            }
           },
           {
             "role": "protocol dispatch",
@@ -797,7 +1321,47 @@
             "before_sha256": "1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12",
             "after_sha256": "b27664445f8928ac5b358ba15b82a0bfd3e3d113874200f40ffa922bf978bd92",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/1684029d6e761575/finalize_allreduce.py",
+              "entrypoints": [
+                {
+                  "name": "MuseFinalizeAllreduce",
+                  "line": 139,
+                  "end_line": 243
+                },
+                {
+                  "name": "run_compact_a4_allreduce",
+                  "line": 260,
+                  "end_line": 282
+                },
+                {
+                  "name": "ensure_finalize_allreduce",
+                  "line": 249,
+                  "end_line": 257
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/b27664445f8928ac/finalize_allreduce.py",
+              "entrypoints": [
+                {
+                  "name": "MuseFinalizeAllreduce",
+                  "line": 139,
+                  "end_line": 253
+                },
+                {
+                  "name": "run_compact_a4_allreduce",
+                  "line": 272,
+                  "end_line": 294
+                },
+                {
+                  "name": "ensure_finalize_allreduce",
+                  "line": 259,
+                  "end_line": 269
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -822,7 +1386,37 @@
             "before_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
             "after_sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/c570dfbdc9d85dbb/router_pooler.py",
+              "entrypoints": [
+                {
+                  "name": "can_share_router_pooler",
+                  "line": 40,
+                  "end_line": 42
+                },
+                {
+                  "name": "route_with_shared_pooler",
+                  "line": 83,
+                  "end_line": 166
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/d1e1447d7980b697/router_pooler.py",
+              "entrypoints": [
+                {
+                  "name": "can_share_router_pooler",
+                  "line": 42,
+                  "end_line": 56
+                },
+                {
+                  "name": "route_with_shared_pooler",
+                  "line": 97,
+                  "end_line": 180
+                }
+              ]
+            }
           },
           {
             "role": "router device epilogues",
@@ -831,7 +1425,57 @@
             "before_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
             "after_sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/6c876d2421932de4/router_pooler_topk.py",
+              "entrypoints": [
+                {
+                  "name": "_joint_epilogue",
+                  "line": 127,
+                  "end_line": 184
+                },
+                {
+                  "name": "_joint_fp8_partial",
+                  "line": 426,
+                  "end_line": 470
+                },
+                {
+                  "name": "joint_router_pooler_topk",
+                  "line": 356,
+                  "end_line": 375
+                },
+                {
+                  "name": "joint_router_pooler_topk_fp8",
+                  "line": 494,
+                  "end_line": 522
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8492b6be85065fe9/router_pooler_topk.py",
+              "entrypoints": [
+                {
+                  "name": "_joint_epilogue",
+                  "line": 127,
+                  "end_line": 184
+                },
+                {
+                  "name": "_joint_fp8_partial",
+                  "line": 431,
+                  "end_line": 475
+                },
+                {
+                  "name": "joint_router_pooler_topk",
+                  "line": 356,
+                  "end_line": 375
+                },
+                {
+                  "name": "joint_router_pooler_topk_fp8",
+                  "line": 499,
+                  "end_line": 528
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -855,7 +1499,37 @@
             "before_sha256": "73f8c5b89137e10eaeb8be67a6cf6686194af50a03300a22569764a0af58e471",
             "after_sha256": "cdfa8cadad2f252028875ef1b4e9506281161f7b974f7cfe47326bc49fcf882e",
             "path_relation": "different_paths",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/73f8c5b89137e10e/muse_extend_gluon.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_extend_kernel",
+                  "line": 204,
+                  "end_line": 345
+                },
+                {
+                  "name": "muse_extend_attention",
+                  "line": 360,
+                  "end_line": 401
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/cdfa8cadad2f2520/muse_extend_flydsl.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 117,
+                  "end_line": 625
+                },
+                {
+                  "name": "muse_extend_attention_fly",
+                  "line": 628,
+                  "end_line": 684
+                }
+              ]
+            }
           },
           {
             "role": "backend dispatch",
@@ -864,7 +1538,47 @@
             "before_sha256": "76d2d1732b8e1c765d437504270ecfd885c28fec4db2c7f639c2cd2fbc698d2b",
             "after_sha256": "e8053575975ff7d2de8971c4c47de19699b0251b3f6a60458f8011a5e609db33",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/76d2d1732b8e1c76/aiter_backend.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_verify_attention",
+                  "line": 224,
+                  "end_line": 345
+                },
+                {
+                  "name": "AiterAttnBackend.forward_extend",
+                  "line": 4115,
+                  "end_line": 5128
+                },
+                {
+                  "name": "AiterAttnBackend.forward_decode",
+                  "line": 5130,
+                  "end_line": 5387
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/e8053575975ff7d2/aiter_backend.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_verify_attention",
+                  "line": 237,
+                  "end_line": 376
+                },
+                {
+                  "name": "AiterAttnBackend.forward_extend",
+                  "line": 4165,
+                  "end_line": 5178
+                },
+                {
+                  "name": "AiterAttnBackend.forward_decode",
+                  "line": 5180,
+                  "end_line": 5437
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -889,7 +1603,32 @@
             "before_sha256": null,
             "after_sha256": "7ab7b5084c44fd90cd128ed4304d4e33939bb56b0f5590a9b5dc83563484b19a",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/7ab7b5084c44fd90/muse_verify_balanced.py",
+              "entrypoints": [
+                {
+                  "name": "_plan_kernel",
+                  "line": 33,
+                  "end_line": 91
+                },
+                {
+                  "name": "_seg_reduce",
+                  "line": 113,
+                  "end_line": 200
+                },
+                {
+                  "name": "segmented_reduce_norm_gate",
+                  "line": 229,
+                  "end_line": 233
+                },
+                {
+                  "name": "gqa_verify_flydsl_balanced",
+                  "line": 243,
+                  "end_line": 298
+                }
+              ]
+            }
           },
           {
             "role": "partial kernel",
@@ -898,7 +1637,47 @@
             "before_sha256": "72dc1e2cd6f57fc503904782e2c082745fbc93bd98c2576e53f2a99563b5a651",
             "after_sha256": "3df4cf24bded61346b0dd4b57aa8c2a3ff4851e5a0a614da94131bc4ff771f5c",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/72dc1e2cd6f57fc5/muse_verify_flydsl.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 136,
+                  "end_line": 543
+                },
+                {
+                  "name": "verify_fly_partials",
+                  "line": 546,
+                  "end_line": 607
+                },
+                {
+                  "name": "gqa_verify_flydsl",
+                  "line": 618,
+                  "end_line": 655
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/3df4cf24bded6134/muse_verify_flydsl.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 136,
+                  "end_line": 601
+                },
+                {
+                  "name": "verify_fly_partials",
+                  "line": 604,
+                  "end_line": 668
+                },
+                {
+                  "name": "gqa_verify_flydsl",
+                  "line": 679,
+                  "end_line": 716
+                }
+              ]
+            }
           },
           {
             "role": "fused-reducer dispatch",
@@ -907,7 +1686,37 @@
             "before_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
             "after_sha256": "6e1a6ca9b85aa6bda3fbb18f630a4231ce809b3a9f76cdd35b202081fd8c8b69",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_reduce_norm_gate",
+                  "line": 32,
+                  "end_line": 87
+                },
+                {
+                  "name": "verify_reduce_norm_gate",
+                  "line": 90,
+                  "end_line": 125
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/6e1a6ca9b85aa6bd/verify_reduce_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_reduce_norm_gate",
+                  "line": 32,
+                  "end_line": 87
+                },
+                {
+                  "name": "verify_reduce_norm_gate",
+                  "line": 90,
+                  "end_line": 130
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -1329,7 +2138,57 @@
             "before_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
             "after_sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/34933e2895490a37/attention_kv_write.py",
+              "entrypoints": [
+                {
+                  "name": "_attention_shape_ok",
+                  "line": 49,
+                  "end_line": 62
+                },
+                {
+                  "name": "_kv_write_target",
+                  "line": 65,
+                  "end_line": 117
+                },
+                {
+                  "name": "qkv_proj_norm_rope_kv_write",
+                  "line": 126,
+                  "end_line": 166
+                },
+                {
+                  "name": "qk_norm_rope_kv_write",
+                  "line": 169,
+                  "end_line": 203
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/a21de58492ca4d4d/attention_kv_write.py",
+              "entrypoints": [
+                {
+                  "name": "_attention_shape_ok",
+                  "line": 50,
+                  "end_line": 63
+                },
+                {
+                  "name": "_kv_write_target",
+                  "line": 66,
+                  "end_line": 118
+                },
+                {
+                  "name": "qkv_proj_norm_rope_kv_write",
+                  "line": 127,
+                  "end_line": 167
+                },
+                {
+                  "name": "qk_norm_rope_kv_write",
+                  "line": 170,
+                  "end_line": 204
+                }
+              ]
+            }
           },
           {
             "role": "device body",
@@ -1338,7 +2197,47 @@
             "before_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
             "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
             "path_relation": "same_path",
-            "body_relation": "identical_file_bytes"
+            "body_relation": "identical_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_qk_rope_cache",
+                  "line": 57,
+                  "end_line": 108
+                },
+                {
+                  "name": "_qkv_epilogue",
+                  "line": 122,
+                  "end_line": 169
+                },
+                {
+                  "name": "qkv_proj_qk_norm_rope_cache",
+                  "line": 233,
+                  "end_line": 297
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_qk_rope_cache",
+                  "line": 57,
+                  "end_line": 108
+                },
+                {
+                  "name": "_qkv_epilogue",
+                  "line": 122,
+                  "end_line": 169
+                },
+                {
+                  "name": "qkv_proj_qk_norm_rope_cache",
+                  "line": 233,
+                  "end_line": 297
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -1363,7 +2262,33 @@
             "before_sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
             "after_sha256": "20a0a111064e9d1c41ea5a10f0af60c3812d77a6b9631bef62fd4db0d2c3a11b",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8ab37d684c03d806/finalize_allreduce.hip",
+              "entrypoints": [
+                {
+                  "name": "muse_finalize_allreduce_tp4",
+                  "line": 108
+                },
+                {
+                  "name": "muse_finalize_allreduce_fill",
+                  "line": 236
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/20a0a111064e9d1c/finalize_allreduce.hip",
+              "entrypoints": [
+                {
+                  "name": "muse_finalize_allreduce",
+                  "line": 111
+                },
+                {
+                  "name": "muse_finalize_allreduce_fill",
+                  "line": 263
+                }
+              ]
+            }
           },
           {
             "role": "protocol dispatch",
@@ -1372,7 +2297,47 @@
             "before_sha256": "1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12",
             "after_sha256": "b27664445f8928ac5b358ba15b82a0bfd3e3d113874200f40ffa922bf978bd92",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/1684029d6e761575/finalize_allreduce.py",
+              "entrypoints": [
+                {
+                  "name": "MuseFinalizeAllreduce",
+                  "line": 139,
+                  "end_line": 243
+                },
+                {
+                  "name": "run_compact_a4_allreduce",
+                  "line": 260,
+                  "end_line": 282
+                },
+                {
+                  "name": "ensure_finalize_allreduce",
+                  "line": 249,
+                  "end_line": 257
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/b27664445f8928ac/finalize_allreduce.py",
+              "entrypoints": [
+                {
+                  "name": "MuseFinalizeAllreduce",
+                  "line": 139,
+                  "end_line": 253
+                },
+                {
+                  "name": "run_compact_a4_allreduce",
+                  "line": 272,
+                  "end_line": 294
+                },
+                {
+                  "name": "ensure_finalize_allreduce",
+                  "line": 259,
+                  "end_line": 269
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -1397,7 +2362,37 @@
             "before_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
             "after_sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/c570dfbdc9d85dbb/router_pooler.py",
+              "entrypoints": [
+                {
+                  "name": "can_share_router_pooler",
+                  "line": 40,
+                  "end_line": 42
+                },
+                {
+                  "name": "route_with_shared_pooler",
+                  "line": 83,
+                  "end_line": 166
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/d1e1447d7980b697/router_pooler.py",
+              "entrypoints": [
+                {
+                  "name": "can_share_router_pooler",
+                  "line": 42,
+                  "end_line": 56
+                },
+                {
+                  "name": "route_with_shared_pooler",
+                  "line": 97,
+                  "end_line": 180
+                }
+              ]
+            }
           },
           {
             "role": "router device epilogues",
@@ -1406,7 +2401,57 @@
             "before_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
             "after_sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/6c876d2421932de4/router_pooler_topk.py",
+              "entrypoints": [
+                {
+                  "name": "_joint_epilogue",
+                  "line": 127,
+                  "end_line": 184
+                },
+                {
+                  "name": "_joint_fp8_partial",
+                  "line": 426,
+                  "end_line": 470
+                },
+                {
+                  "name": "joint_router_pooler_topk",
+                  "line": 356,
+                  "end_line": 375
+                },
+                {
+                  "name": "joint_router_pooler_topk_fp8",
+                  "line": 494,
+                  "end_line": 522
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8492b6be85065fe9/router_pooler_topk.py",
+              "entrypoints": [
+                {
+                  "name": "_joint_epilogue",
+                  "line": 127,
+                  "end_line": 184
+                },
+                {
+                  "name": "_joint_fp8_partial",
+                  "line": 431,
+                  "end_line": 475
+                },
+                {
+                  "name": "joint_router_pooler_topk",
+                  "line": 356,
+                  "end_line": 375
+                },
+                {
+                  "name": "joint_router_pooler_topk_fp8",
+                  "line": 499,
+                  "end_line": 528
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -1430,7 +2475,37 @@
             "before_sha256": "73f8c5b89137e10eaeb8be67a6cf6686194af50a03300a22569764a0af58e471",
             "after_sha256": "cdfa8cadad2f252028875ef1b4e9506281161f7b974f7cfe47326bc49fcf882e",
             "path_relation": "different_paths",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/73f8c5b89137e10e/muse_extend_gluon.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_extend_kernel",
+                  "line": 204,
+                  "end_line": 345
+                },
+                {
+                  "name": "muse_extend_attention",
+                  "line": 360,
+                  "end_line": 401
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/cdfa8cadad2f2520/muse_extend_flydsl.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 117,
+                  "end_line": 625
+                },
+                {
+                  "name": "muse_extend_attention_fly",
+                  "line": 628,
+                  "end_line": 684
+                }
+              ]
+            }
           },
           {
             "role": "backend dispatch",
@@ -1439,7 +2514,47 @@
             "before_sha256": "76d2d1732b8e1c765d437504270ecfd885c28fec4db2c7f639c2cd2fbc698d2b",
             "after_sha256": "e8053575975ff7d2de8971c4c47de19699b0251b3f6a60458f8011a5e609db33",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/76d2d1732b8e1c76/aiter_backend.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_verify_attention",
+                  "line": 224,
+                  "end_line": 345
+                },
+                {
+                  "name": "AiterAttnBackend.forward_extend",
+                  "line": 4115,
+                  "end_line": 5128
+                },
+                {
+                  "name": "AiterAttnBackend.forward_decode",
+                  "line": 5130,
+                  "end_line": 5387
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/e8053575975ff7d2/aiter_backend.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_verify_attention",
+                  "line": 237,
+                  "end_line": 376
+                },
+                {
+                  "name": "AiterAttnBackend.forward_extend",
+                  "line": 4165,
+                  "end_line": 5178
+                },
+                {
+                  "name": "AiterAttnBackend.forward_decode",
+                  "line": 5180,
+                  "end_line": 5437
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -1464,7 +2579,32 @@
             "before_sha256": null,
             "after_sha256": "7ab7b5084c44fd90cd128ed4304d4e33939bb56b0f5590a9b5dc83563484b19a",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/7ab7b5084c44fd90/muse_verify_balanced.py",
+              "entrypoints": [
+                {
+                  "name": "_plan_kernel",
+                  "line": 33,
+                  "end_line": 91
+                },
+                {
+                  "name": "_seg_reduce",
+                  "line": 113,
+                  "end_line": 200
+                },
+                {
+                  "name": "segmented_reduce_norm_gate",
+                  "line": 229,
+                  "end_line": 233
+                },
+                {
+                  "name": "gqa_verify_flydsl_balanced",
+                  "line": 243,
+                  "end_line": 298
+                }
+              ]
+            }
           },
           {
             "role": "partial kernel",
@@ -1473,7 +2613,47 @@
             "before_sha256": "72dc1e2cd6f57fc503904782e2c082745fbc93bd98c2576e53f2a99563b5a651",
             "after_sha256": "3df4cf24bded61346b0dd4b57aa8c2a3ff4851e5a0a614da94131bc4ff771f5c",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/72dc1e2cd6f57fc5/muse_verify_flydsl.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 136,
+                  "end_line": 543
+                },
+                {
+                  "name": "verify_fly_partials",
+                  "line": 546,
+                  "end_line": 607
+                },
+                {
+                  "name": "gqa_verify_flydsl",
+                  "line": 618,
+                  "end_line": 655
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/3df4cf24bded6134/muse_verify_flydsl.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 136,
+                  "end_line": 601
+                },
+                {
+                  "name": "verify_fly_partials",
+                  "line": 604,
+                  "end_line": 668
+                },
+                {
+                  "name": "gqa_verify_flydsl",
+                  "line": 679,
+                  "end_line": 716
+                }
+              ]
+            }
           },
           {
             "role": "fused-reducer dispatch",
@@ -1482,7 +2662,37 @@
             "before_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
             "after_sha256": "6e1a6ca9b85aa6bda3fbb18f630a4231ce809b3a9f76cdd35b202081fd8c8b69",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_reduce_norm_gate",
+                  "line": 32,
+                  "end_line": 87
+                },
+                {
+                  "name": "verify_reduce_norm_gate",
+                  "line": 90,
+                  "end_line": 125
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/6e1a6ca9b85aa6bd/verify_reduce_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_reduce_norm_gate",
+                  "line": 32,
+                  "end_line": 87
+                },
+                {
+                  "name": "verify_reduce_norm_gate",
+                  "line": 90,
+                  "end_line": 130
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -1909,7 +3119,57 @@
             "before_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
             "after_sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/34933e2895490a37/attention_kv_write.py",
+              "entrypoints": [
+                {
+                  "name": "_attention_shape_ok",
+                  "line": 49,
+                  "end_line": 62
+                },
+                {
+                  "name": "_kv_write_target",
+                  "line": 65,
+                  "end_line": 117
+                },
+                {
+                  "name": "qkv_proj_norm_rope_kv_write",
+                  "line": 126,
+                  "end_line": 166
+                },
+                {
+                  "name": "qk_norm_rope_kv_write",
+                  "line": 169,
+                  "end_line": 203
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/a21de58492ca4d4d/attention_kv_write.py",
+              "entrypoints": [
+                {
+                  "name": "_attention_shape_ok",
+                  "line": 50,
+                  "end_line": 63
+                },
+                {
+                  "name": "_kv_write_target",
+                  "line": 66,
+                  "end_line": 118
+                },
+                {
+                  "name": "qkv_proj_norm_rope_kv_write",
+                  "line": 127,
+                  "end_line": 167
+                },
+                {
+                  "name": "qk_norm_rope_kv_write",
+                  "line": 170,
+                  "end_line": 204
+                }
+              ]
+            }
           },
           {
             "role": "device body",
@@ -1918,7 +3178,47 @@
             "before_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
             "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
             "path_relation": "same_path",
-            "body_relation": "identical_file_bytes"
+            "body_relation": "identical_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_qk_rope_cache",
+                  "line": 57,
+                  "end_line": 108
+                },
+                {
+                  "name": "_qkv_epilogue",
+                  "line": 122,
+                  "end_line": 169
+                },
+                {
+                  "name": "qkv_proj_qk_norm_rope_cache",
+                  "line": 233,
+                  "end_line": 297
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_qk_rope_cache",
+                  "line": 57,
+                  "end_line": 108
+                },
+                {
+                  "name": "_qkv_epilogue",
+                  "line": 122,
+                  "end_line": 169
+                },
+                {
+                  "name": "qkv_proj_qk_norm_rope_cache",
+                  "line": 233,
+                  "end_line": 297
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -1943,7 +3243,33 @@
             "before_sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
             "after_sha256": "20a0a111064e9d1c41ea5a10f0af60c3812d77a6b9631bef62fd4db0d2c3a11b",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8ab37d684c03d806/finalize_allreduce.hip",
+              "entrypoints": [
+                {
+                  "name": "muse_finalize_allreduce_tp4",
+                  "line": 108
+                },
+                {
+                  "name": "muse_finalize_allreduce_fill",
+                  "line": 236
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/20a0a111064e9d1c/finalize_allreduce.hip",
+              "entrypoints": [
+                {
+                  "name": "muse_finalize_allreduce",
+                  "line": 111
+                },
+                {
+                  "name": "muse_finalize_allreduce_fill",
+                  "line": 263
+                }
+              ]
+            }
           },
           {
             "role": "protocol dispatch",
@@ -1952,7 +3278,47 @@
             "before_sha256": "1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12",
             "after_sha256": "b27664445f8928ac5b358ba15b82a0bfd3e3d113874200f40ffa922bf978bd92",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/1684029d6e761575/finalize_allreduce.py",
+              "entrypoints": [
+                {
+                  "name": "MuseFinalizeAllreduce",
+                  "line": 139,
+                  "end_line": 243
+                },
+                {
+                  "name": "run_compact_a4_allreduce",
+                  "line": 260,
+                  "end_line": 282
+                },
+                {
+                  "name": "ensure_finalize_allreduce",
+                  "line": 249,
+                  "end_line": 257
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/b27664445f8928ac/finalize_allreduce.py",
+              "entrypoints": [
+                {
+                  "name": "MuseFinalizeAllreduce",
+                  "line": 139,
+                  "end_line": 253
+                },
+                {
+                  "name": "run_compact_a4_allreduce",
+                  "line": 272,
+                  "end_line": 294
+                },
+                {
+                  "name": "ensure_finalize_allreduce",
+                  "line": 259,
+                  "end_line": 269
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -1977,7 +3343,37 @@
             "before_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
             "after_sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/c570dfbdc9d85dbb/router_pooler.py",
+              "entrypoints": [
+                {
+                  "name": "can_share_router_pooler",
+                  "line": 40,
+                  "end_line": 42
+                },
+                {
+                  "name": "route_with_shared_pooler",
+                  "line": 83,
+                  "end_line": 166
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/d1e1447d7980b697/router_pooler.py",
+              "entrypoints": [
+                {
+                  "name": "can_share_router_pooler",
+                  "line": 42,
+                  "end_line": 56
+                },
+                {
+                  "name": "route_with_shared_pooler",
+                  "line": 97,
+                  "end_line": 180
+                }
+              ]
+            }
           },
           {
             "role": "router device epilogues",
@@ -1986,7 +3382,57 @@
             "before_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
             "after_sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/6c876d2421932de4/router_pooler_topk.py",
+              "entrypoints": [
+                {
+                  "name": "_joint_epilogue",
+                  "line": 127,
+                  "end_line": 184
+                },
+                {
+                  "name": "_joint_fp8_partial",
+                  "line": 426,
+                  "end_line": 470
+                },
+                {
+                  "name": "joint_router_pooler_topk",
+                  "line": 356,
+                  "end_line": 375
+                },
+                {
+                  "name": "joint_router_pooler_topk_fp8",
+                  "line": 494,
+                  "end_line": 522
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8492b6be85065fe9/router_pooler_topk.py",
+              "entrypoints": [
+                {
+                  "name": "_joint_epilogue",
+                  "line": 127,
+                  "end_line": 184
+                },
+                {
+                  "name": "_joint_fp8_partial",
+                  "line": 431,
+                  "end_line": 475
+                },
+                {
+                  "name": "joint_router_pooler_topk",
+                  "line": 356,
+                  "end_line": 375
+                },
+                {
+                  "name": "joint_router_pooler_topk_fp8",
+                  "line": 499,
+                  "end_line": 528
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -2010,7 +3456,37 @@
             "before_sha256": "73f8c5b89137e10eaeb8be67a6cf6686194af50a03300a22569764a0af58e471",
             "after_sha256": "cdfa8cadad2f252028875ef1b4e9506281161f7b974f7cfe47326bc49fcf882e",
             "path_relation": "different_paths",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/73f8c5b89137e10e/muse_extend_gluon.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_extend_kernel",
+                  "line": 204,
+                  "end_line": 345
+                },
+                {
+                  "name": "muse_extend_attention",
+                  "line": 360,
+                  "end_line": 401
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/cdfa8cadad2f2520/muse_extend_flydsl.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 117,
+                  "end_line": 625
+                },
+                {
+                  "name": "muse_extend_attention_fly",
+                  "line": 628,
+                  "end_line": 684
+                }
+              ]
+            }
           },
           {
             "role": "backend dispatch",
@@ -2019,7 +3495,47 @@
             "before_sha256": "76d2d1732b8e1c765d437504270ecfd885c28fec4db2c7f639c2cd2fbc698d2b",
             "after_sha256": "e8053575975ff7d2de8971c4c47de19699b0251b3f6a60458f8011a5e609db33",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/76d2d1732b8e1c76/aiter_backend.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_verify_attention",
+                  "line": 224,
+                  "end_line": 345
+                },
+                {
+                  "name": "AiterAttnBackend.forward_extend",
+                  "line": 4115,
+                  "end_line": 5128
+                },
+                {
+                  "name": "AiterAttnBackend.forward_decode",
+                  "line": 5130,
+                  "end_line": 5387
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/e8053575975ff7d2/aiter_backend.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_verify_attention",
+                  "line": 237,
+                  "end_line": 376
+                },
+                {
+                  "name": "AiterAttnBackend.forward_extend",
+                  "line": 4165,
+                  "end_line": 5178
+                },
+                {
+                  "name": "AiterAttnBackend.forward_decode",
+                  "line": 5180,
+                  "end_line": 5437
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -2044,7 +3560,32 @@
             "before_sha256": null,
             "after_sha256": "7ab7b5084c44fd90cd128ed4304d4e33939bb56b0f5590a9b5dc83563484b19a",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/7ab7b5084c44fd90/muse_verify_balanced.py",
+              "entrypoints": [
+                {
+                  "name": "_plan_kernel",
+                  "line": 33,
+                  "end_line": 91
+                },
+                {
+                  "name": "_seg_reduce",
+                  "line": 113,
+                  "end_line": 200
+                },
+                {
+                  "name": "segmented_reduce_norm_gate",
+                  "line": 229,
+                  "end_line": 233
+                },
+                {
+                  "name": "gqa_verify_flydsl_balanced",
+                  "line": 243,
+                  "end_line": 298
+                }
+              ]
+            }
           },
           {
             "role": "partial kernel",
@@ -2053,7 +3594,47 @@
             "before_sha256": "72dc1e2cd6f57fc503904782e2c082745fbc93bd98c2576e53f2a99563b5a651",
             "after_sha256": "3df4cf24bded61346b0dd4b57aa8c2a3ff4851e5a0a614da94131bc4ff771f5c",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/72dc1e2cd6f57fc5/muse_verify_flydsl.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 136,
+                  "end_line": 543
+                },
+                {
+                  "name": "verify_fly_partials",
+                  "line": 546,
+                  "end_line": 607
+                },
+                {
+                  "name": "gqa_verify_flydsl",
+                  "line": 618,
+                  "end_line": 655
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/3df4cf24bded6134/muse_verify_flydsl.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 136,
+                  "end_line": 601
+                },
+                {
+                  "name": "verify_fly_partials",
+                  "line": 604,
+                  "end_line": 668
+                },
+                {
+                  "name": "gqa_verify_flydsl",
+                  "line": 679,
+                  "end_line": 716
+                }
+              ]
+            }
           },
           {
             "role": "fused-reducer dispatch",
@@ -2062,7 +3643,37 @@
             "before_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
             "after_sha256": "6e1a6ca9b85aa6bda3fbb18f630a4231ce809b3a9f76cdd35b202081fd8c8b69",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_reduce_norm_gate",
+                  "line": 32,
+                  "end_line": 87
+                },
+                {
+                  "name": "verify_reduce_norm_gate",
+                  "line": 90,
+                  "end_line": 125
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/6e1a6ca9b85aa6bd/verify_reduce_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_reduce_norm_gate",
+                  "line": 32,
+                  "end_line": 87
+                },
+                {
+                  "name": "verify_reduce_norm_gate",
+                  "line": 90,
+                  "end_line": 130
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -2488,7 +4099,42 @@
             "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
             "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
             "path_relation": "different_paths",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/0e3246a8bbd8990f/muse_qk_norm.py",
+              "entrypoints": [
+                {
+                  "name": "_qk_norm_kernel",
+                  "line": 19,
+                  "end_line": 46
+                },
+                {
+                  "name": "fused_qk_norm",
+                  "line": 64,
+                  "end_line": 88
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/df7233ecd09eea43/qk_norm_rope_cache.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_qk_rope_cache",
+                  "line": 57,
+                  "end_line": 108
+                },
+                {
+                  "name": "_qkv_epilogue",
+                  "line": 122,
+                  "end_line": 169
+                },
+                {
+                  "name": "qkv_proj_qk_norm_rope_cache",
+                  "line": 233,
+                  "end_line": 290
+                }
+              ]
+            }
           },
           {
             "role": "dispatch",
@@ -2497,7 +4143,37 @@
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
             "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 434,
+                  "end_line": 469
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 798,
+                  "end_line": 838
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 567,
+                  "end_line": 604
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 934,
+                  "end_line": 971
+                }
+              ]
+            }
           },
           {
             "role": "eligibility wrapper",
@@ -2506,7 +4182,32 @@
             "before_sha256": null,
             "after_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/03180acecee59563/attention_kv_write.py",
+              "entrypoints": [
+                {
+                  "name": "_attention_shape_ok",
+                  "line": 49,
+                  "end_line": 62
+                },
+                {
+                  "name": "_kv_write_target",
+                  "line": 65,
+                  "end_line": 117
+                },
+                {
+                  "name": "qkv_proj_norm_rope_kv_write",
+                  "line": 126,
+                  "end_line": 163
+                },
+                {
+                  "name": "qk_norm_rope_kv_write",
+                  "line": 166,
+                  "end_line": 200
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -2531,7 +4232,37 @@
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
             "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 434,
+                  "end_line": 469
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 798,
+                  "end_line": 838
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 567,
+                  "end_line": 604
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 934,
+                  "end_line": 971
+                }
+              ]
+            }
           },
           {
             "role": "new routing dispatch",
@@ -2540,7 +4271,22 @@
             "before_sha256": null,
             "after_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/5566d9752197d2b0/router_pooler.py",
+              "entrypoints": [
+                {
+                  "name": "can_share_router_pooler",
+                  "line": 31,
+                  "end_line": 56
+                },
+                {
+                  "name": "route_with_shared_pooler",
+                  "line": 59,
+                  "end_line": 103
+                }
+              ]
+            }
           },
           {
             "role": "new epilogues",
@@ -2549,7 +4295,22 @@
             "before_sha256": null,
             "after_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/b82eeb4cc8a9f4a5/router_pooler_topk.py",
+              "entrypoints": [
+                {
+                  "name": "_joint_epilogue",
+                  "line": 107,
+                  "end_line": 149
+                },
+                {
+                  "name": "joint_router_pooler_topk",
+                  "line": 296,
+                  "end_line": 329
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -2573,7 +4334,37 @@
             "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "path_relation": "same_path",
-            "body_relation": "identical_file_bytes"
+            "body_relation": "identical_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 40,
+                  "end_line": 895
+                },
+                {
+                  "name": "launch_muse_moe_gemm",
+                  "line": 898,
+                  "end_line": 969
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 40,
+                  "end_line": 895
+                },
+                {
+                  "name": "launch_muse_moe_gemm",
+                  "line": 898,
+                  "end_line": 969
+                }
+              ]
+            }
           },
           {
             "role": "new compact experts",
@@ -2582,7 +4373,32 @@
             "before_sha256": null,
             "after_sha256": "6a2cd481da888c296c252e116cde2f26745e01a74858276cdc48e167d5031474",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/6a2cd481da888c29/mxfp4_compact_a4_moe.py",
+              "entrypoints": [
+                {
+                  "name": "_prepare_a4",
+                  "line": 26,
+                  "end_line": 73
+                },
+                {
+                  "name": "_scatter_a4",
+                  "line": 77,
+                  "end_line": 98
+                },
+                {
+                  "name": "_expert_a4",
+                  "line": 102,
+                  "end_line": 181
+                },
+                {
+                  "name": "compact_a4_experts",
+                  "line": 199,
+                  "end_line": 265
+                }
+              ]
+            }
           },
           {
             "role": "new dispatch",
@@ -2591,7 +4407,22 @@
             "before_sha256": null,
             "after_sha256": "39b054665c41c85e6fc85a4fb9e1a706c240a6c90a9b6a5232eb9d229fe08c22",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/39b054665c41c85e/mxfp4_moe.py",
+              "entrypoints": [
+                {
+                  "name": "run_compact_a4",
+                  "line": 69,
+                  "end_line": 82
+                },
+                {
+                  "name": "run_a4w4",
+                  "line": 114,
+                  "end_line": 178
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -2846,7 +4677,7 @@
       {
         "pipeline": "AMD Muse layer monokernel",
         "before": "Ordinary SGLang attention, projection, routing, experts, residual/norm and collective launches. The monokernel interface alone does not activate the plugin.",
-        "after": "runtime \u2192 Muse spec \u2192 Runner.launch \u2192 build_layer; eligible MXFP4 layers combine attention, K2, K3 and the next eligible layer K1.",
+        "after": "runtime \u2192 Muse spec \u2192 MuseMonoRunner.launch \u2192 build_layer; eligible MXFP4 layers combine attention, K2, K3 and the next eligible layer K1.",
         "language": "Mixed Triton/FlyDSL/library path \u2192 FlyDSL layer kernel (the log/spec name muse_spark_hip does not identify the implementation language).",
         "body_change": "Device mailbox flags connect producer/consumer stages; one launch reuses stage LDS while retaining scratch regions. The first necessary K1 and BF16-expert layers keep separate execution.",
         "fusion": "Merge attention, output norm/gate and projection/reduction, routing/pooler/top-k, experts/finalize/reduction, unpooler/boundary and next-layer QKV preparation across host launch boundaries. Scratch traffic is not assumed eliminated.",
@@ -2859,7 +4690,37 @@
             "before_sha256": "914e7957ee99f22eef5e1e11a1bf05a0cdc9ae90b6efe7a7ccbf810f5a8f03dc",
             "after_sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/914e7957ee99f22e/runtime.py",
+              "entrypoints": [
+                {
+                  "name": "install_monokernel_forward",
+                  "line": 103,
+                  "end_line": 230
+                },
+                {
+                  "name": "_install_forward",
+                  "line": 306,
+                  "end_line": 342
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/707226c7c205a14f/runtime.py",
+              "entrypoints": [
+                {
+                  "name": "install_monokernel_forward",
+                  "line": 112,
+                  "end_line": 239
+                },
+                {
+                  "name": "_install_forward",
+                  "line": 315,
+                  "end_line": 353
+                }
+              ]
+            }
           },
           {
             "role": "new runner",
@@ -2868,7 +4729,27 @@
             "before_sha256": null,
             "after_sha256": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/267c5b33db7be6ce/runner.py",
+              "entrypoints": [
+                {
+                  "name": "MuseMonoRunner.launch",
+                  "line": 504,
+                  "end_line": 579
+                },
+                {
+                  "name": "MuseMonoRunner.layer_kernel",
+                  "line": 277,
+                  "end_line": 289
+                },
+                {
+                  "name": "MuseMonoRunner.merged",
+                  "line": 335,
+                  "end_line": 338
+                }
+              ]
+            }
           },
           {
             "role": "new device body",
@@ -2877,7 +4758,27 @@
             "before_sha256": null,
             "after_sha256": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/507604a48233c776/layer.py",
+              "entrypoints": [
+                {
+                  "name": "build_layer",
+                  "line": 294,
+                  "end_line": 446
+                },
+                {
+                  "name": "build_k1",
+                  "line": 70,
+                  "end_line": 146
+                },
+                {
+                  "name": "build_kattn",
+                  "line": 193,
+                  "end_line": 270
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -2903,7 +4804,32 @@
             "before_sha256": null,
             "after_sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/f1778a6cbe79a950/draft.py",
+              "entrypoints": [
+                {
+                  "name": "DraftRunner.launch_attn",
+                  "line": 264,
+                  "end_line": 310
+                },
+                {
+                  "name": "DraftRunner.launch",
+                  "line": 312,
+                  "end_line": 323
+                },
+                {
+                  "name": "_Draft.forward",
+                  "line": 393,
+                  "end_line": 434
+                },
+                {
+                  "name": "_shard_fc",
+                  "line": 475,
+                  "end_line": 498
+                }
+              ]
+            }
           },
           {
             "role": "D-pre and D-post device bodies",
@@ -2912,7 +4838,32 @@
             "before_sha256": null,
             "after_sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/d7f558567b18a26b/draft_attn_half.py",
+              "entrypoints": [
+                {
+                  "name": "run_dpre",
+                  "line": 310,
+                  "end_line": 326
+                },
+                {
+                  "name": "run_dpost",
+                  "line": 433,
+                  "end_line": 438
+                },
+                {
+                  "name": "build_dpre",
+                  "line": 470,
+                  "end_line": 518
+                },
+                {
+                  "name": "build_dpost",
+                  "line": 521,
+                  "end_line": 561
+                }
+              ]
+            }
           },
           {
             "role": "D-attn device body",
@@ -2921,7 +4872,22 @@
             "before_sha256": null,
             "after_sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/4a7d829bf604e76d/draft_attn.py",
+              "entrypoints": [
+                {
+                  "name": "run_dattn",
+                  "line": 129,
+                  "end_line": 650
+                },
+                {
+                  "name": "build_dattn",
+                  "line": 708,
+                  "end_line": 761
+                }
+              ]
+            }
           },
           {
             "role": "D-MLP device body",
@@ -2930,7 +4896,22 @@
             "before_sha256": null,
             "after_sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/9fe45862cef73b76/draft_mlp.py",
+              "entrypoints": [
+                {
+                  "name": "run_dmlp",
+                  "line": 500,
+                  "end_line": 529
+                },
+                {
+                  "name": "build_dmlp",
+                  "line": 577,
+                  "end_line": 617
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -2957,7 +4938,32 @@
             "before_sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
             "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/94d0b45392248de3/fused_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_rms_norm_gate_fwd_kernel",
+                  "line": 43,
+                  "end_line": 95
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/ada56887a3648995/fused_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_rms_norm_gate_fwd_kernel",
+                  "line": 46,
+                  "end_line": 98
+                },
+                {
+                  "name": "FusedRMSNormGate.forward_verify_partials",
+                  "line": 178,
+                  "end_line": 188
+                }
+              ]
+            }
           },
           {
             "role": "new fused reducer",
@@ -2966,7 +4972,22 @@
             "before_sha256": null,
             "after_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_reduce_norm_gate",
+                  "line": 32,
+                  "end_line": 87
+                },
+                {
+                  "name": "verify_reduce_norm_gate",
+                  "line": 90,
+                  "end_line": 125
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -2990,7 +5011,32 @@
             "before_sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
             "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/e11bbcae7c1504a0/fused_norm_residual.py",
+              "entrypoints": [
+                {
+                  "name": "_fused_norm_residual_triton_kernel",
+                  "line": 51,
+                  "end_line": 134
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/16edaf5510160b30/fused_norm_residual.py",
+              "entrypoints": [
+                {
+                  "name": "_fused_norm_residual_triton_kernel",
+                  "line": 51,
+                  "end_line": 142
+                },
+                {
+                  "name": "FusedPostNormResidualPreNorm.forward_fp8",
+                  "line": 372,
+                  "end_line": 382
+                }
+              ]
+            }
           },
           {
             "role": "requesting model",
@@ -2999,7 +5045,37 @@
             "before_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 567,
+                  "end_line": 604
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 934,
+                  "end_line": 971
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 638,
+                  "end_line": 717
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 1070,
+                  "end_line": 1138
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -3361,7 +5437,42 @@
             "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
             "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
             "path_relation": "different_paths",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/0e3246a8bbd8990f/muse_qk_norm.py",
+              "entrypoints": [
+                {
+                  "name": "_qk_norm_kernel",
+                  "line": 19,
+                  "end_line": 46
+                },
+                {
+                  "name": "fused_qk_norm",
+                  "line": 64,
+                  "end_line": 88
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/df7233ecd09eea43/qk_norm_rope_cache.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_qk_rope_cache",
+                  "line": 57,
+                  "end_line": 108
+                },
+                {
+                  "name": "_qkv_epilogue",
+                  "line": 122,
+                  "end_line": 169
+                },
+                {
+                  "name": "qkv_proj_qk_norm_rope_cache",
+                  "line": 233,
+                  "end_line": 290
+                }
+              ]
+            }
           },
           {
             "role": "dispatch",
@@ -3370,7 +5481,37 @@
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
             "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 434,
+                  "end_line": 469
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 798,
+                  "end_line": 838
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 567,
+                  "end_line": 604
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 934,
+                  "end_line": 971
+                }
+              ]
+            }
           },
           {
             "role": "eligibility wrapper",
@@ -3379,7 +5520,32 @@
             "before_sha256": null,
             "after_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/03180acecee59563/attention_kv_write.py",
+              "entrypoints": [
+                {
+                  "name": "_attention_shape_ok",
+                  "line": 49,
+                  "end_line": 62
+                },
+                {
+                  "name": "_kv_write_target",
+                  "line": 65,
+                  "end_line": 117
+                },
+                {
+                  "name": "qkv_proj_norm_rope_kv_write",
+                  "line": 126,
+                  "end_line": 163
+                },
+                {
+                  "name": "qk_norm_rope_kv_write",
+                  "line": 166,
+                  "end_line": 200
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -3404,7 +5570,37 @@
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
             "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 434,
+                  "end_line": 469
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 798,
+                  "end_line": 838
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 567,
+                  "end_line": 604
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 934,
+                  "end_line": 971
+                }
+              ]
+            }
           },
           {
             "role": "new routing dispatch",
@@ -3413,7 +5609,22 @@
             "before_sha256": null,
             "after_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/5566d9752197d2b0/router_pooler.py",
+              "entrypoints": [
+                {
+                  "name": "can_share_router_pooler",
+                  "line": 31,
+                  "end_line": 56
+                },
+                {
+                  "name": "route_with_shared_pooler",
+                  "line": 59,
+                  "end_line": 103
+                }
+              ]
+            }
           },
           {
             "role": "new epilogues",
@@ -3422,7 +5633,22 @@
             "before_sha256": null,
             "after_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/b82eeb4cc8a9f4a5/router_pooler_topk.py",
+              "entrypoints": [
+                {
+                  "name": "_joint_epilogue",
+                  "line": 107,
+                  "end_line": 149
+                },
+                {
+                  "name": "joint_router_pooler_topk",
+                  "line": 296,
+                  "end_line": 329
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -3446,7 +5672,37 @@
             "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "path_relation": "same_path",
-            "body_relation": "identical_file_bytes"
+            "body_relation": "identical_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 40,
+                  "end_line": 895
+                },
+                {
+                  "name": "launch_muse_moe_gemm",
+                  "line": 898,
+                  "end_line": 969
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 40,
+                  "end_line": 895
+                },
+                {
+                  "name": "launch_muse_moe_gemm",
+                  "line": 898,
+                  "end_line": 969
+                }
+              ]
+            }
           },
           {
             "role": "new compact experts",
@@ -3455,7 +5711,32 @@
             "before_sha256": null,
             "after_sha256": "6a2cd481da888c296c252e116cde2f26745e01a74858276cdc48e167d5031474",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/6a2cd481da888c29/mxfp4_compact_a4_moe.py",
+              "entrypoints": [
+                {
+                  "name": "_prepare_a4",
+                  "line": 26,
+                  "end_line": 73
+                },
+                {
+                  "name": "_scatter_a4",
+                  "line": 77,
+                  "end_line": 98
+                },
+                {
+                  "name": "_expert_a4",
+                  "line": 102,
+                  "end_line": 181
+                },
+                {
+                  "name": "compact_a4_experts",
+                  "line": 199,
+                  "end_line": 265
+                }
+              ]
+            }
           },
           {
             "role": "new dispatch",
@@ -3464,7 +5745,22 @@
             "before_sha256": null,
             "after_sha256": "39b054665c41c85e6fc85a4fb9e1a706c240a6c90a9b6a5232eb9d229fe08c22",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/39b054665c41c85e/mxfp4_moe.py",
+              "entrypoints": [
+                {
+                  "name": "run_compact_a4",
+                  "line": 69,
+                  "end_line": 82
+                },
+                {
+                  "name": "run_a4w4",
+                  "line": 114,
+                  "end_line": 178
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -3724,7 +6020,7 @@
       {
         "pipeline": "AMD Muse layer monokernel",
         "before": "Ordinary SGLang attention, projection, routing, experts, residual/norm and collective launches. The monokernel interface alone does not activate the plugin.",
-        "after": "runtime \u2192 Muse spec \u2192 Runner.launch \u2192 build_layer; eligible MXFP4 layers combine attention, K2, K3 and the next eligible layer K1.",
+        "after": "runtime \u2192 Muse spec \u2192 MuseMonoRunner.launch \u2192 build_layer; eligible MXFP4 layers combine attention, K2, K3 and the next eligible layer K1.",
         "language": "Mixed Triton/FlyDSL/library path \u2192 FlyDSL layer kernel (the log/spec name muse_spark_hip does not identify the implementation language).",
         "body_change": "Device mailbox flags connect producer/consumer stages; one launch reuses stage LDS while retaining scratch regions. The first necessary K1 and BF16-expert layers keep separate execution.",
         "fusion": "Merge attention, output norm/gate and projection/reduction, routing/pooler/top-k, experts/finalize/reduction, unpooler/boundary and next-layer QKV preparation across host launch boundaries. Scratch traffic is not assumed eliminated.",
@@ -3737,7 +6033,37 @@
             "before_sha256": "914e7957ee99f22eef5e1e11a1bf05a0cdc9ae90b6efe7a7ccbf810f5a8f03dc",
             "after_sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/914e7957ee99f22e/runtime.py",
+              "entrypoints": [
+                {
+                  "name": "install_monokernel_forward",
+                  "line": 103,
+                  "end_line": 230
+                },
+                {
+                  "name": "_install_forward",
+                  "line": 306,
+                  "end_line": 342
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/707226c7c205a14f/runtime.py",
+              "entrypoints": [
+                {
+                  "name": "install_monokernel_forward",
+                  "line": 112,
+                  "end_line": 239
+                },
+                {
+                  "name": "_install_forward",
+                  "line": 315,
+                  "end_line": 353
+                }
+              ]
+            }
           },
           {
             "role": "new runner",
@@ -3746,7 +6072,27 @@
             "before_sha256": null,
             "after_sha256": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/267c5b33db7be6ce/runner.py",
+              "entrypoints": [
+                {
+                  "name": "MuseMonoRunner.launch",
+                  "line": 504,
+                  "end_line": 579
+                },
+                {
+                  "name": "MuseMonoRunner.layer_kernel",
+                  "line": 277,
+                  "end_line": 289
+                },
+                {
+                  "name": "MuseMonoRunner.merged",
+                  "line": 335,
+                  "end_line": 338
+                }
+              ]
+            }
           },
           {
             "role": "new device body",
@@ -3755,7 +6101,27 @@
             "before_sha256": null,
             "after_sha256": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/507604a48233c776/layer.py",
+              "entrypoints": [
+                {
+                  "name": "build_layer",
+                  "line": 294,
+                  "end_line": 446
+                },
+                {
+                  "name": "build_k1",
+                  "line": 70,
+                  "end_line": 146
+                },
+                {
+                  "name": "build_kattn",
+                  "line": 193,
+                  "end_line": 270
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -3781,7 +6147,32 @@
             "before_sha256": null,
             "after_sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/f1778a6cbe79a950/draft.py",
+              "entrypoints": [
+                {
+                  "name": "DraftRunner.launch_attn",
+                  "line": 264,
+                  "end_line": 310
+                },
+                {
+                  "name": "DraftRunner.launch",
+                  "line": 312,
+                  "end_line": 323
+                },
+                {
+                  "name": "_Draft.forward",
+                  "line": 393,
+                  "end_line": 434
+                },
+                {
+                  "name": "_shard_fc",
+                  "line": 475,
+                  "end_line": 498
+                }
+              ]
+            }
           },
           {
             "role": "D-pre and D-post device bodies",
@@ -3790,7 +6181,32 @@
             "before_sha256": null,
             "after_sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/d7f558567b18a26b/draft_attn_half.py",
+              "entrypoints": [
+                {
+                  "name": "run_dpre",
+                  "line": 310,
+                  "end_line": 326
+                },
+                {
+                  "name": "run_dpost",
+                  "line": 433,
+                  "end_line": 438
+                },
+                {
+                  "name": "build_dpre",
+                  "line": 470,
+                  "end_line": 518
+                },
+                {
+                  "name": "build_dpost",
+                  "line": 521,
+                  "end_line": 561
+                }
+              ]
+            }
           },
           {
             "role": "D-attn device body",
@@ -3799,7 +6215,22 @@
             "before_sha256": null,
             "after_sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/4a7d829bf604e76d/draft_attn.py",
+              "entrypoints": [
+                {
+                  "name": "run_dattn",
+                  "line": 129,
+                  "end_line": 650
+                },
+                {
+                  "name": "build_dattn",
+                  "line": 708,
+                  "end_line": 761
+                }
+              ]
+            }
           },
           {
             "role": "D-MLP device body",
@@ -3808,7 +6239,22 @@
             "before_sha256": null,
             "after_sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/9fe45862cef73b76/draft_mlp.py",
+              "entrypoints": [
+                {
+                  "name": "run_dmlp",
+                  "line": 500,
+                  "end_line": 529
+                },
+                {
+                  "name": "build_dmlp",
+                  "line": 577,
+                  "end_line": 617
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -3835,7 +6281,32 @@
             "before_sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
             "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/94d0b45392248de3/fused_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_rms_norm_gate_fwd_kernel",
+                  "line": 43,
+                  "end_line": 95
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/ada56887a3648995/fused_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_rms_norm_gate_fwd_kernel",
+                  "line": 46,
+                  "end_line": 98
+                },
+                {
+                  "name": "FusedRMSNormGate.forward_verify_partials",
+                  "line": 178,
+                  "end_line": 188
+                }
+              ]
+            }
           },
           {
             "role": "new fused reducer",
@@ -3844,7 +6315,22 @@
             "before_sha256": null,
             "after_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_reduce_norm_gate",
+                  "line": 32,
+                  "end_line": 87
+                },
+                {
+                  "name": "verify_reduce_norm_gate",
+                  "line": 90,
+                  "end_line": 125
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -3868,7 +6354,32 @@
             "before_sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
             "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/e11bbcae7c1504a0/fused_norm_residual.py",
+              "entrypoints": [
+                {
+                  "name": "_fused_norm_residual_triton_kernel",
+                  "line": 51,
+                  "end_line": 134
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/16edaf5510160b30/fused_norm_residual.py",
+              "entrypoints": [
+                {
+                  "name": "_fused_norm_residual_triton_kernel",
+                  "line": 51,
+                  "end_line": 142
+                },
+                {
+                  "name": "FusedPostNormResidualPreNorm.forward_fp8",
+                  "line": 372,
+                  "end_line": 382
+                }
+              ]
+            }
           },
           {
             "role": "requesting model",
@@ -3877,7 +6388,37 @@
             "before_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 567,
+                  "end_line": 604
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 934,
+                  "end_line": 971
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 638,
+                  "end_line": 717
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 1070,
+                  "end_line": 1138
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -4246,7 +6787,42 @@
             "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
             "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
             "path_relation": "different_paths",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/0e3246a8bbd8990f/muse_qk_norm.py",
+              "entrypoints": [
+                {
+                  "name": "_qk_norm_kernel",
+                  "line": 19,
+                  "end_line": 46
+                },
+                {
+                  "name": "fused_qk_norm",
+                  "line": 64,
+                  "end_line": 88
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/df7233ecd09eea43/qk_norm_rope_cache.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_qk_rope_cache",
+                  "line": 57,
+                  "end_line": 108
+                },
+                {
+                  "name": "_qkv_epilogue",
+                  "line": 122,
+                  "end_line": 169
+                },
+                {
+                  "name": "qkv_proj_qk_norm_rope_cache",
+                  "line": 233,
+                  "end_line": 290
+                }
+              ]
+            }
           },
           {
             "role": "dispatch",
@@ -4255,7 +6831,37 @@
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
             "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 434,
+                  "end_line": 469
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 798,
+                  "end_line": 838
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 567,
+                  "end_line": 604
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 934,
+                  "end_line": 971
+                }
+              ]
+            }
           },
           {
             "role": "eligibility wrapper",
@@ -4264,7 +6870,32 @@
             "before_sha256": null,
             "after_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/03180acecee59563/attention_kv_write.py",
+              "entrypoints": [
+                {
+                  "name": "_attention_shape_ok",
+                  "line": 49,
+                  "end_line": 62
+                },
+                {
+                  "name": "_kv_write_target",
+                  "line": 65,
+                  "end_line": 117
+                },
+                {
+                  "name": "qkv_proj_norm_rope_kv_write",
+                  "line": 126,
+                  "end_line": 163
+                },
+                {
+                  "name": "qk_norm_rope_kv_write",
+                  "line": 166,
+                  "end_line": 200
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -4289,7 +6920,37 @@
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
             "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 434,
+                  "end_line": 469
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 798,
+                  "end_line": 838
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 567,
+                  "end_line": 604
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 934,
+                  "end_line": 971
+                }
+              ]
+            }
           },
           {
             "role": "new routing dispatch",
@@ -4298,7 +6959,22 @@
             "before_sha256": null,
             "after_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/5566d9752197d2b0/router_pooler.py",
+              "entrypoints": [
+                {
+                  "name": "can_share_router_pooler",
+                  "line": 31,
+                  "end_line": 56
+                },
+                {
+                  "name": "route_with_shared_pooler",
+                  "line": 59,
+                  "end_line": 103
+                }
+              ]
+            }
           },
           {
             "role": "new epilogues",
@@ -4307,7 +6983,22 @@
             "before_sha256": null,
             "after_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/b82eeb4cc8a9f4a5/router_pooler_topk.py",
+              "entrypoints": [
+                {
+                  "name": "_joint_epilogue",
+                  "line": 107,
+                  "end_line": 149
+                },
+                {
+                  "name": "joint_router_pooler_topk",
+                  "line": 296,
+                  "end_line": 329
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -4331,7 +7022,37 @@
             "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "path_relation": "same_path",
-            "body_relation": "identical_file_bytes"
+            "body_relation": "identical_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 40,
+                  "end_line": 895
+                },
+                {
+                  "name": "launch_muse_moe_gemm",
+                  "line": 898,
+                  "end_line": 969
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 40,
+                  "end_line": 895
+                },
+                {
+                  "name": "launch_muse_moe_gemm",
+                  "line": 898,
+                  "end_line": 969
+                }
+              ]
+            }
           },
           {
             "role": "new compact experts",
@@ -4340,7 +7061,32 @@
             "before_sha256": null,
             "after_sha256": "6a2cd481da888c296c252e116cde2f26745e01a74858276cdc48e167d5031474",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/6a2cd481da888c29/mxfp4_compact_a4_moe.py",
+              "entrypoints": [
+                {
+                  "name": "_prepare_a4",
+                  "line": 26,
+                  "end_line": 73
+                },
+                {
+                  "name": "_scatter_a4",
+                  "line": 77,
+                  "end_line": 98
+                },
+                {
+                  "name": "_expert_a4",
+                  "line": 102,
+                  "end_line": 181
+                },
+                {
+                  "name": "compact_a4_experts",
+                  "line": 199,
+                  "end_line": 265
+                }
+              ]
+            }
           },
           {
             "role": "new dispatch",
@@ -4349,7 +7095,22 @@
             "before_sha256": null,
             "after_sha256": "39b054665c41c85e6fc85a4fb9e1a706c240a6c90a9b6a5232eb9d229fe08c22",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/39b054665c41c85e/mxfp4_moe.py",
+              "entrypoints": [
+                {
+                  "name": "run_compact_a4",
+                  "line": 69,
+                  "end_line": 82
+                },
+                {
+                  "name": "run_a4w4",
+                  "line": 114,
+                  "end_line": 178
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -4609,7 +7370,7 @@
       {
         "pipeline": "AMD Muse layer monokernel",
         "before": "Ordinary SGLang attention, projection, routing, experts, residual/norm and collective launches. The monokernel interface alone does not activate the plugin.",
-        "after": "runtime \u2192 Muse spec \u2192 Runner.launch \u2192 build_layer; eligible MXFP4 layers combine attention, K2, K3 and the next eligible layer K1.",
+        "after": "runtime \u2192 Muse spec \u2192 MuseMonoRunner.launch \u2192 build_layer; eligible MXFP4 layers combine attention, K2, K3 and the next eligible layer K1.",
         "language": "Mixed Triton/FlyDSL/library path \u2192 FlyDSL layer kernel (the log/spec name muse_spark_hip does not identify the implementation language).",
         "body_change": "Device mailbox flags connect producer/consumer stages; one launch reuses stage LDS while retaining scratch regions. The first necessary K1 and BF16-expert layers keep separate execution.",
         "fusion": "Merge attention, output norm/gate and projection/reduction, routing/pooler/top-k, experts/finalize/reduction, unpooler/boundary and next-layer QKV preparation across host launch boundaries. Scratch traffic is not assumed eliminated.",
@@ -4622,7 +7383,37 @@
             "before_sha256": "914e7957ee99f22eef5e1e11a1bf05a0cdc9ae90b6efe7a7ccbf810f5a8f03dc",
             "after_sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/914e7957ee99f22e/runtime.py",
+              "entrypoints": [
+                {
+                  "name": "install_monokernel_forward",
+                  "line": 103,
+                  "end_line": 230
+                },
+                {
+                  "name": "_install_forward",
+                  "line": 306,
+                  "end_line": 342
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/707226c7c205a14f/runtime.py",
+              "entrypoints": [
+                {
+                  "name": "install_monokernel_forward",
+                  "line": 112,
+                  "end_line": 239
+                },
+                {
+                  "name": "_install_forward",
+                  "line": 315,
+                  "end_line": 353
+                }
+              ]
+            }
           },
           {
             "role": "new runner",
@@ -4631,7 +7422,27 @@
             "before_sha256": null,
             "after_sha256": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/267c5b33db7be6ce/runner.py",
+              "entrypoints": [
+                {
+                  "name": "MuseMonoRunner.launch",
+                  "line": 504,
+                  "end_line": 579
+                },
+                {
+                  "name": "MuseMonoRunner.layer_kernel",
+                  "line": 277,
+                  "end_line": 289
+                },
+                {
+                  "name": "MuseMonoRunner.merged",
+                  "line": 335,
+                  "end_line": 338
+                }
+              ]
+            }
           },
           {
             "role": "new device body",
@@ -4640,7 +7451,27 @@
             "before_sha256": null,
             "after_sha256": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/507604a48233c776/layer.py",
+              "entrypoints": [
+                {
+                  "name": "build_layer",
+                  "line": 294,
+                  "end_line": 446
+                },
+                {
+                  "name": "build_k1",
+                  "line": 70,
+                  "end_line": 146
+                },
+                {
+                  "name": "build_kattn",
+                  "line": 193,
+                  "end_line": 270
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -4666,7 +7497,32 @@
             "before_sha256": null,
             "after_sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/f1778a6cbe79a950/draft.py",
+              "entrypoints": [
+                {
+                  "name": "DraftRunner.launch_attn",
+                  "line": 264,
+                  "end_line": 310
+                },
+                {
+                  "name": "DraftRunner.launch",
+                  "line": 312,
+                  "end_line": 323
+                },
+                {
+                  "name": "_Draft.forward",
+                  "line": 393,
+                  "end_line": 434
+                },
+                {
+                  "name": "_shard_fc",
+                  "line": 475,
+                  "end_line": 498
+                }
+              ]
+            }
           },
           {
             "role": "D-pre and D-post device bodies",
@@ -4675,7 +7531,32 @@
             "before_sha256": null,
             "after_sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/d7f558567b18a26b/draft_attn_half.py",
+              "entrypoints": [
+                {
+                  "name": "run_dpre",
+                  "line": 310,
+                  "end_line": 326
+                },
+                {
+                  "name": "run_dpost",
+                  "line": 433,
+                  "end_line": 438
+                },
+                {
+                  "name": "build_dpre",
+                  "line": 470,
+                  "end_line": 518
+                },
+                {
+                  "name": "build_dpost",
+                  "line": 521,
+                  "end_line": 561
+                }
+              ]
+            }
           },
           {
             "role": "D-attn device body",
@@ -4684,7 +7565,22 @@
             "before_sha256": null,
             "after_sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/4a7d829bf604e76d/draft_attn.py",
+              "entrypoints": [
+                {
+                  "name": "run_dattn",
+                  "line": 129,
+                  "end_line": 650
+                },
+                {
+                  "name": "build_dattn",
+                  "line": 708,
+                  "end_line": 761
+                }
+              ]
+            }
           },
           {
             "role": "D-MLP device body",
@@ -4693,7 +7589,22 @@
             "before_sha256": null,
             "after_sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/9fe45862cef73b76/draft_mlp.py",
+              "entrypoints": [
+                {
+                  "name": "run_dmlp",
+                  "line": 500,
+                  "end_line": 529
+                },
+                {
+                  "name": "build_dmlp",
+                  "line": 577,
+                  "end_line": 617
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -4720,7 +7631,32 @@
             "before_sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
             "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/94d0b45392248de3/fused_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_rms_norm_gate_fwd_kernel",
+                  "line": 43,
+                  "end_line": 95
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/ada56887a3648995/fused_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_rms_norm_gate_fwd_kernel",
+                  "line": 46,
+                  "end_line": 98
+                },
+                {
+                  "name": "FusedRMSNormGate.forward_verify_partials",
+                  "line": 178,
+                  "end_line": 188
+                }
+              ]
+            }
           },
           {
             "role": "new fused reducer",
@@ -4729,7 +7665,22 @@
             "before_sha256": null,
             "after_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
+              "entrypoints": [
+                {
+                  "name": "_reduce_norm_gate",
+                  "line": 32,
+                  "end_line": 87
+                },
+                {
+                  "name": "verify_reduce_norm_gate",
+                  "line": 90,
+                  "end_line": 125
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -4753,7 +7704,32 @@
             "before_sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
             "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/e11bbcae7c1504a0/fused_norm_residual.py",
+              "entrypoints": [
+                {
+                  "name": "_fused_norm_residual_triton_kernel",
+                  "line": 51,
+                  "end_line": 134
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/16edaf5510160b30/fused_norm_residual.py",
+              "entrypoints": [
+                {
+                  "name": "_fused_norm_residual_triton_kernel",
+                  "line": 51,
+                  "end_line": 142
+                },
+                {
+                  "name": "FusedPostNormResidualPreNorm.forward_fp8",
+                  "line": 372,
+                  "end_line": 382
+                }
+              ]
+            }
           },
           {
             "role": "requesting model",
@@ -4762,7 +7738,37 @@
             "before_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 567,
+                  "end_line": 604
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 934,
+                  "end_line": 971
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 638,
+                  "end_line": 717
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 1070,
+                  "end_line": 1138
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -5141,7 +8147,42 @@
             "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
             "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
             "path_relation": "different_paths",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/0e3246a8bbd8990f/muse_qk_norm.py",
+              "entrypoints": [
+                {
+                  "name": "_qk_norm_kernel",
+                  "line": 19,
+                  "end_line": 46
+                },
+                {
+                  "name": "fused_qk_norm",
+                  "line": 64,
+                  "end_line": 88
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/df7233ecd09eea43/qk_norm_rope_cache.py",
+              "entrypoints": [
+                {
+                  "name": "_muse_qk_rope_cache",
+                  "line": 57,
+                  "end_line": 108
+                },
+                {
+                  "name": "_qkv_epilogue",
+                  "line": 122,
+                  "end_line": 169
+                },
+                {
+                  "name": "qkv_proj_qk_norm_rope_cache",
+                  "line": 233,
+                  "end_line": 290
+                }
+              ]
+            }
           },
           {
             "role": "dispatch",
@@ -5150,7 +8191,37 @@
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
             "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 434,
+                  "end_line": 469
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 798,
+                  "end_line": 838
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 567,
+                  "end_line": 604
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 934,
+                  "end_line": 971
+                }
+              ]
+            }
           },
           {
             "role": "eligibility wrapper",
@@ -5159,7 +8230,32 @@
             "before_sha256": null,
             "after_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/03180acecee59563/attention_kv_write.py",
+              "entrypoints": [
+                {
+                  "name": "_attention_shape_ok",
+                  "line": 49,
+                  "end_line": 62
+                },
+                {
+                  "name": "_kv_write_target",
+                  "line": 65,
+                  "end_line": 117
+                },
+                {
+                  "name": "qkv_proj_norm_rope_kv_write",
+                  "line": 126,
+                  "end_line": 163
+                },
+                {
+                  "name": "qk_norm_rope_kv_write",
+                  "line": 166,
+                  "end_line": 200
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -5184,7 +8280,37 @@
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
             "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "path_relation": "same_path",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 434,
+                  "end_line": 469
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 798,
+                  "end_line": 838
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
+              "entrypoints": [
+                {
+                  "name": "MuseSpark1xAttention.forward",
+                  "line": 567,
+                  "end_line": 604
+                },
+                {
+                  "name": "MuseSpark1xMoE.forward",
+                  "line": 934,
+                  "end_line": 971
+                }
+              ]
+            }
           },
           {
             "role": "new routing dispatch",
@@ -5193,7 +8319,22 @@
             "before_sha256": null,
             "after_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/5566d9752197d2b0/router_pooler.py",
+              "entrypoints": [
+                {
+                  "name": "can_share_router_pooler",
+                  "line": 31,
+                  "end_line": 56
+                },
+                {
+                  "name": "route_with_shared_pooler",
+                  "line": 59,
+                  "end_line": 103
+                }
+              ]
+            }
           },
           {
             "role": "new epilogues",
@@ -5202,7 +8343,22 @@
             "before_sha256": null,
             "after_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/b82eeb4cc8a9f4a5/router_pooler_topk.py",
+              "entrypoints": [
+                {
+                  "name": "_joint_epilogue",
+                  "line": 107,
+                  "end_line": 149
+                },
+                {
+                  "name": "joint_router_pooler_topk",
+                  "line": 296,
+                  "end_line": 329
+                }
+              ]
+            }
           }
         ],
         "evidence": [
@@ -5226,7 +8382,37 @@
             "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "path_relation": "same_path",
-            "body_relation": "identical_file_bytes"
+            "body_relation": "identical_file_bytes",
+            "before_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 40,
+                  "end_line": 895
+                },
+                {
+                  "name": "launch_muse_moe_gemm",
+                  "line": 898,
+                  "end_line": 969
+                }
+              ]
+            },
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
+              "entrypoints": [
+                {
+                  "name": "_launcher",
+                  "line": 40,
+                  "end_line": 895
+                },
+                {
+                  "name": "launch_muse_moe_gemm",
+                  "line": 898,
+                  "end_line": 969
+                }
+              ]
+            }
           },
           {
             "role": "new compact experts",
@@ -5235,7 +8421,32 @@
             "before_sha256": null,
             "after_sha256": "6a2cd481da888c296c252e116cde2f26745e01a74858276cdc48e167d5031474",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/6a2cd481da888c29/mxfp4_compact_a4_moe.py",
+              "entrypoints": [
+                {
+                  "name": "_prepare_a4",
+                  "line": 26,
+                  "end_line": 73
+                },
+                {
+                  "name": "_scatter_a4",
+                  "line": 77,
+                  "end_line": 98
+                },
+                {
+                  "name": "_expert_a4",
+                  "line": 102,
+                  "end_line": 181
+                },
+                {
+                  "name": "compact_a4_experts",
+                  "line": 199,
+                  "end_line": 265
+                }
+              ]
+            }
           },
           {
             "role": "new dispatch",
@@ -5244,7 +8455,22 @@
             "before_sha256": null,
             "after_sha256": "39b054665c41c85e6fc85a4fb9e1a706c240a6c90a9b6a5232eb9d229fe08c22",
             "path_relation": "added",
-            "body_relation": "different_file_bytes"
+            "body_relation": "different_file_bytes",
+            "after_implementation": {
+              "snapshot_path": "kernel_sources/blobs/39b054665c41c85e/mxfp4_moe.py",
+              "entrypoints": [
+                {
+                  "name": "run_compact_a4",
+                  "line": 69,
+                  "end_line": 82
+                },
+                {
+                  "name": "run_a4w4",
+                  "line": 114,
+                  "end_line": 178
+                }
+              ]
+            }
           }
         ],
         "evidence": [

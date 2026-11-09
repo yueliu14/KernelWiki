@@ -77,7 +77,16 @@ def pair_document(pair):
         text += "| Source role | Before path / file SHA256 | After path / file SHA256 | Relation |\n| --- | --- | --- | --- |\n"
         for source in kernel["sources"]:
             def cell(side):
-                return f"`{source[side+'_path']}`<br>`{source[side+'_sha256']}`" if source.get(side + "_path") else "Absent / separate existing operations"
+                if not source.get(side + '_path'):
+                    return 'Absent / separate existing operations'
+                text = f"`{source[side+'_path']}`<br>`{source[side+'_sha256']}`"
+                implementation = source.get(side + '_implementation')
+                if implementation:
+                    path = '../' + implementation['snapshot_path']
+                    text += f'<br>[Complete source]({path})'
+                    for entry in implementation['entrypoints']:
+                        text += f"<br>[{entry['name']}]({path}#L{entry['line']})"
+                return text
             text += f"| {source['role']} | {cell('before')} | {cell('after')} | {source['path_relation']}; {source['body_relation']} |\n"
         text += "\nEvidence: " + ", ".join(f"[{ref}](../{ref})" for ref in kernel["evidence"]) + ".\n"
     if pair["excluded_attributions"]:
@@ -136,6 +145,8 @@ def main():
     server = read(root / "evidence/server_log_extracts.json")
     verified_path = root / 'evidence/verified_runtime_facts.json'
     verified = {f['point_id']: f for f in read(verified_path)} if verified_path.exists() else {}
+    source_index_path = root / 'kernel_sources/manifest.json'
+    source_index = {s['image_digest']: {f['container_path']: f for f in s['files']} for s in read(source_index_path)['snapshots']} if source_index_path.exists() else {}
     groups = defaultdict(list)
     for index, image in enumerate(images):
         for id in image["representative_ids"]:
@@ -168,6 +179,13 @@ def main():
             for kernel in kernels:
                 kernel["evidence_level"] = "source_verified"
                 kernel["sources"] = [source_ref(ref, inventories[a["image_digest"]], inventories[b["image_digest"]]) for ref in kernel["sources"]]
+                for source in kernel['sources']:
+                    for side, point in [('before', a), ('after', b)]:
+                        path = source.get(side + '_path')
+                        if source_index and path:
+                            implementation = source_index[point['image_digest']][path]
+                            assert implementation['sha256'] == source[side + '_sha256']
+                            source[side + '_implementation'] = {k: implementation[k] for k in ['snapshot_path', 'entrypoints']}
             matched_server = []
             for side, point in [("before", a), ("after", b)]:
                 for artifact in server:

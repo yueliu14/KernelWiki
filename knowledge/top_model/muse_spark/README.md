@@ -6,6 +6,7 @@ The retained public AgentX history contains **54 measured points, 6 CI runs and 
 
 - [History by configuration](configuration_history.md): the full matrix, including singletons such as TEP8 c2, missing observations, and links to each pair's kernel changes.
 - [Point-to-point kernel records](pair_changes.md): paths, languages, body/fusion changes, applicability, exact CI differences and evidence for all 11 pairs.
+- [Kernel implementation browser](kernel_implementations.md): direct source and function-line links for each image version, using byte-exact container snapshots.
 - [Endpoint runtime recheck](runtime_verification.md): all 19 pair endpoint artifacts, measurement-window dispatch evidence, function-body checks and DFlash2 draft fusion. The [bounded GPU attempt](gpu_validation/README.md) obtained no allocation and produced no trace.
 - [Every measured point](performance_points.md), including repeat observations of the first image.
 - [Kernel and fusion evolution](kernel_evolution.md): three adjacent transitions, paths, languages, changed bodies, and evidence limits.

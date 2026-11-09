@@ -31,6 +31,8 @@ The latest TEP4 artifacts also show the FP8-pooler joint path during setup, incl
 
 ## Source bodies and applicability
 
+The [implementation browser](kernel_implementations.md) links complete selected kernel files for each image version. Every pair's Before/After source table also links the exact file and relevant functions; paths and hashes identify the corresponding container bytes.
+
 The [source audit](evidence/verified_source_audit.json) verifies the four archive hashes and **all 231 existing relevant-file entries**, then records additional function-source and AST hashes for the dispatch/device modules inspected here. AST equality is a syntax comparison, not proof of identical runtime behavior: globals, callees, launch grids and shapes may change. [Supplemental diffs](evidence/verification_diffs/03_to_04.diff) and [pinned excerpts](evidence/verification_source_excerpts.md) show the exact changes.
 
 | 1027 → 1106 component | Body/path result | Fusion interpretation |
