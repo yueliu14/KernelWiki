@@ -1,0 +1,3967 @@
+{
+  "snapshots": [
+    {
+      "version": 1,
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open",
+      "digest": "sha256:72065dfc0b87818ab415f96c0fc08848233d25f22b002ac8f28c33fad6ec82a4",
+      "verified_existing_source_files": 21,
+      "archive_sha256_verified": true,
+      "files": [],
+      "mono_package_files": {}
+    },
+    {
+      "version": 2,
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1020",
+      "digest": "sha256:7343002d0dc2c1e525c0563f0c5c0377b471f966b3d604343b93a6366c2f7935",
+      "verified_existing_source_files": 34,
+      "archive_sha256_verified": true,
+      "files": [
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+          "sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
+          "bytes": 6709,
+          "symbols": [
+            {
+              "name": "_attention_shape_ok",
+              "line": 49,
+              "end_line": 62,
+              "source_sha256": "5b86b4a7025e61b0fc01148803a3bd4f5f94770828c1258c0d1c6a156a2b5db3",
+              "ast_sha256": "b5c71bbe950a40956174faa2f19d253ed3abf0992aa15f6545ab895f5e025cb1"
+            },
+            {
+              "name": "_kv_write_target",
+              "line": 65,
+              "end_line": 117,
+              "source_sha256": "50dc7489bfcd91167469a812b31ffd9dbcb30704b5fc7b5dd61560484f6269d1",
+              "ast_sha256": "f7776f13a0b209071c0992d7a29749c80f1d660119b9bf1ff35fabca1cf03b9b"
+            },
+            {
+              "name": "_note",
+              "line": 120,
+              "end_line": 123,
+              "source_sha256": "efd57664d7fe1821890aa49a253518a989d47a76eb26a168832a265bf94f0df3",
+              "ast_sha256": "3b8773d1a272aa053a50c211136006ccc295754d36c9c3ec0ec84f8fee265482"
+            },
+            {
+              "name": "qkv_proj_norm_rope_kv_write",
+              "line": 126,
+              "end_line": 163,
+              "source_sha256": "02ed046e1d8ae4bd93c57540c26dfc42f332427c32b78a8f6831f08852a5ad80",
+              "ast_sha256": "18967bd4afff3d9fc72ce6104201d3bfa99aab4bd3e62b29e5414ec910700dcb"
+            },
+            {
+              "name": "qk_norm_rope_kv_write",
+              "line": 166,
+              "end_line": 200,
+              "source_sha256": "7f2a845b42d0bdd2819ff642cc3e0216e1e83c9716561787d2bce0b655657fba",
+              "ast_sha256": "3d4a6f3d506691b13e8d1edca9916bd2b403c37c9a7202f0ef86a6b440b30fd3"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+          "sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
+          "bytes": 5144,
+          "symbols": [
+            {
+              "name": "can_share_router_pooler",
+              "line": 31,
+              "end_line": 56,
+              "source_sha256": "616af3bf74dc4f3f0e4a6d96bf829f54a13318b447da08bd5502e8b82ff43372",
+              "ast_sha256": "3d24c62172748ec5b27d4dc44e6cd4f5482ef62d73539bb025ff91fe47005220"
+            },
+            {
+              "name": "route_with_shared_pooler",
+              "line": 59,
+              "end_line": 103,
+              "source_sha256": "9a66e1c54c5b8360ac8feb4d0f2908c2f4037c756eb51680f1e15f333531b250",
+              "ast_sha256": "13908b18c5361fe2390fcb671c0ab16f8e2f02f31975638a5b96dd00ef187da9"
+            },
+            {
+              "name": "prepare_joint_router_pooler",
+              "line": 107,
+              "end_line": 127,
+              "source_sha256": "d0aa7cc05c84dec728f055e229ba4076c5491547cebb0fddd1830a33ecafda4f",
+              "ast_sha256": "4d3a78684e73d43b3e6bf41e84a59667e65af08848c6d86b4e94ee24fe5c7db3"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+          "sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
+          "bytes": 8651,
+          "symbols": [
+            {
+              "name": "_norm_rope",
+              "line": 21,
+              "end_line": 53,
+              "source_sha256": "108c9d81e28e56fc72d12ef61b86265e45a703f8a0032b6a39134b2cae16bc9c",
+              "ast_sha256": "5d35efdc6bbed97e60b89a3845a4a7c58b51c81d65d715e3a2fa5ac56ff605df"
+            },
+            {
+              "name": "_muse_qk_rope_cache",
+              "line": 57,
+              "end_line": 108,
+              "source_sha256": "3b69bf37155abd28419eefab20ae70da1882defa8ddba4fd4da8dbb1310a12d9",
+              "ast_sha256": "dc751f6b822ef12944e4e74fc46a741e9f01c42dec573037212377a5311edb22"
+            },
+            {
+              "name": "_project_slice",
+              "line": 112,
+              "end_line": 118,
+              "source_sha256": "23326d09ef401f2951c1040b68002b9d1a9ad25ac710fab5687a051a2ee8b720",
+              "ast_sha256": "64d8532ad8b2053b3ad8852cf11e564e836e56eb611d75ce76b53ef46de14e16"
+            },
+            {
+              "name": "_qkv_epilogue",
+              "line": 122,
+              "end_line": 169,
+              "source_sha256": "84c0d711be3036e868771a4b12f1d51c63938bdd3dce310c486fd85accc9b0b8",
+              "ast_sha256": "5fc41f38e19e0cbe6aea228c0fdc292ba63e1dbe5f46406b1325bdc3b801cd25"
+            },
+            {
+              "name": "qk_norm_rope_cache",
+              "line": 172,
+              "end_line": 230,
+              "source_sha256": "63ce73b0598d056b96bf3da343d267418fa949b36c6c8e0d98f249d458c59c13",
+              "ast_sha256": "3a1d2f879517f8b19cedf0d448c088b59a8f7614e81b64b25595038b6365aab6"
+            },
+            {
+              "name": "qkv_proj_qk_norm_rope_cache",
+              "line": 233,
+              "end_line": 290,
+              "source_sha256": "7fe9d78c7fd11d36bbe77ac0950e274be4fa9929c2985cf778fda8a9551396f9",
+              "ast_sha256": "f018682fd44806ded000263ab92c7967385fddfc955987c0d62d5b7938975e3e"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+          "sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
+          "bytes": 10384,
+          "symbols": [
+            {
+              "name": "_reduce_route",
+              "line": 30,
+              "end_line": 69,
+              "source_sha256": "6a6b3a494204acc48d27cc38e7f396cdc517a35420eb91a02c610fd15b6422d8",
+              "ast_sha256": "7f8753d7289c5183f7421a34142b74e33f149fefba5f11777fc28de519715299"
+            },
+            {
+              "name": "_route_preproject_epilogue",
+              "line": 73,
+              "end_line": 103,
+              "source_sha256": "7b26bcb91412b51e90e5e81615cda60bc84a828223b1e534c29bb23adc7bf539",
+              "ast_sha256": "65adfb7f6a91e2b9584c6ca563f0fd3da4dc44e85f0c604a33cd78908321ad2e"
+            },
+            {
+              "name": "_joint_epilogue",
+              "line": 107,
+              "end_line": 149,
+              "source_sha256": "7916d84a6f03ee711bf692cc7c11cc1a627ca6873c89a7358825cc54478a6fa2",
+              "ast_sha256": "300c9f8cee8bc5dcef126e9436e50d8aeeee700237f41af475018a478cbaba36"
+            },
+            {
+              "name": "router_pooler_topk",
+              "line": 152,
+              "end_line": 221,
+              "source_sha256": "55885e0e0ae7ee30f33fdad2e0a3656451cf60f82fd9be3cd317a6b8b21726b2",
+              "ast_sha256": "72b59bf3eefb7bcdf8075da20002b5102fcc84c0cb024a447bafd41905064bf5"
+            },
+            {
+              "name": "_router_topk_completed_pooler",
+              "line": 224,
+              "end_line": 284,
+              "source_sha256": "296c2450b2be226513673491fbaf171f5f0241083f3c89fc15a47bcebd4ede03",
+              "ast_sha256": "f32674742a051f76e05267e5f4c55429f33087e588109a809574389ab6909cc5"
+            },
+            {
+              "name": "pack_joint_router_pooler_weight",
+              "line": 287,
+              "end_line": 293,
+              "source_sha256": "0f13dd97940a20d49a2eeadf7cdfca25864c88736406ce270d4bdd27bbf7d941",
+              "ast_sha256": "50c37d0f1917f07194363309ff43b2f34082edb6606310b7ed67c80732e8b6d0"
+            },
+            {
+              "name": "joint_router_pooler_topk",
+              "line": 296,
+              "end_line": 329,
+              "source_sha256": "1df6bb6b0b2e01b42a6b3f55973897ecac9362434f725effb4d390e37d9142cf",
+              "ast_sha256": "8e49c34fee1514c240b394d7827c379e10e7c500526ba5e1458bd45a9d491980"
+            }
+          ]
+        }
+      ],
+      "mono_package_files": {}
+    },
+    {
+      "version": 3,
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-1027",
+      "digest": "sha256:7184d3ae2bfdc75a5bb8eb497b768e370ef7b213879cb4d97fbaaa3e8e5f5040",
+      "verified_existing_source_files": 87,
+      "archive_sha256_verified": true,
+      "files": [
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+          "sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
+          "bytes": 6885,
+          "symbols": [
+            {
+              "name": "_attention_shape_ok",
+              "line": 49,
+              "end_line": 62,
+              "source_sha256": "b2a8482d27942909c2dd879ecabae733a490f804687e6ac4969193d7b45b93a8",
+              "ast_sha256": "e3e53cf72f6ed702d1d23d222daee3ce9a428fa8b36ae99c5cb0d1b868f74f78"
+            },
+            {
+              "name": "_kv_write_target",
+              "line": 65,
+              "end_line": 117,
+              "source_sha256": "50dc7489bfcd91167469a812b31ffd9dbcb30704b5fc7b5dd61560484f6269d1",
+              "ast_sha256": "f7776f13a0b209071c0992d7a29749c80f1d660119b9bf1ff35fabca1cf03b9b"
+            },
+            {
+              "name": "_note",
+              "line": 120,
+              "end_line": 123,
+              "source_sha256": "efd57664d7fe1821890aa49a253518a989d47a76eb26a168832a265bf94f0df3",
+              "ast_sha256": "3b8773d1a272aa053a50c211136006ccc295754d36c9c3ec0ec84f8fee265482"
+            },
+            {
+              "name": "qkv_proj_norm_rope_kv_write",
+              "line": 126,
+              "end_line": 166,
+              "source_sha256": "fd79514b942b0354b0fc713a417e745253df6e678e36214e4dfddbbd50959466",
+              "ast_sha256": "14ffd1748415663afb61c947c85c1586c044b15ba2b3c5d79a86992cb5c7b4f4"
+            },
+            {
+              "name": "qk_norm_rope_kv_write",
+              "line": 169,
+              "end_line": 203,
+              "source_sha256": "7f2a845b42d0bdd2819ff642cc3e0216e1e83c9716561787d2bce0b655657fba",
+              "ast_sha256": "3d4a6f3d506691b13e8d1edca9916bd2b403c37c9a7202f0ef86a6b440b30fd3"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+          "sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
+          "bytes": 8153,
+          "symbols": [
+            {
+              "name": "can_share_router_pooler",
+              "line": 40,
+              "end_line": 42,
+              "source_sha256": "c5d51a1b212c7a7f09da04892e5e50d745c16b081e9ab29bf9b651d6b82f0b87",
+              "ast_sha256": "b7c10dad62b50b1976749e44dc40c2b34c921f040b2f80238d2c951d8ffc577d"
+            },
+            {
+              "name": "can_route_fp8_joint",
+              "line": 45,
+              "end_line": 54,
+              "source_sha256": "7f6beae2756c9de3ad44b1a66f2977c6e36046e59577ce74b3f8ca221a3d2fc9",
+              "ast_sha256": "821cc06e7182550b4dfb328e4f2f4d5e8655a026b28fa3b44400ac419e3c3839"
+            },
+            {
+              "name": "_routing_front_matches",
+              "line": 57,
+              "end_line": 80,
+              "source_sha256": "ad8aff677a54ac700520ced87320ad40c2ad15da5924f91579a49c1de191c4c8",
+              "ast_sha256": "e40816da4a4760a3dce32c2d92adff7788219de1c263454a7de64fdbd5ecc8d2"
+            },
+            {
+              "name": "route_with_shared_pooler",
+              "line": 83,
+              "end_line": 166,
+              "source_sha256": "c0268bd4ab4745a4c85f440cba855549594d85b9ecd31f5c97e6e7b9851d1438",
+              "ast_sha256": "70cdef76e180fd87915411a4eff2a96d6e9375199cf32728884e043c60170af7"
+            },
+            {
+              "name": "prepare_joint_router_pooler",
+              "line": 170,
+              "end_line": 199,
+              "source_sha256": "791c062d363e3e65a7a6344112ab8b81a5c1519d827111f72b719c74c4a6c44a",
+              "ast_sha256": "904860e9f08641d5a5b0284678730cc4274a837b142e8a9235f951fb104f8642"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+          "sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+          "bytes": 8958,
+          "symbols": [
+            {
+              "name": "_norm_rope",
+              "line": 21,
+              "end_line": 53,
+              "source_sha256": "108c9d81e28e56fc72d12ef61b86265e45a703f8a0032b6a39134b2cae16bc9c",
+              "ast_sha256": "5d35efdc6bbed97e60b89a3845a4a7c58b51c81d65d715e3a2fa5ac56ff605df"
+            },
+            {
+              "name": "_muse_qk_rope_cache",
+              "line": 57,
+              "end_line": 108,
+              "source_sha256": "3b69bf37155abd28419eefab20ae70da1882defa8ddba4fd4da8dbb1310a12d9",
+              "ast_sha256": "dc751f6b822ef12944e4e74fc46a741e9f01c42dec573037212377a5311edb22"
+            },
+            {
+              "name": "_project_slice",
+              "line": 112,
+              "end_line": 118,
+              "source_sha256": "23326d09ef401f2951c1040b68002b9d1a9ad25ac710fab5687a051a2ee8b720",
+              "ast_sha256": "64d8532ad8b2053b3ad8852cf11e564e836e56eb611d75ce76b53ef46de14e16"
+            },
+            {
+              "name": "_qkv_epilogue",
+              "line": 122,
+              "end_line": 169,
+              "source_sha256": "84c0d711be3036e868771a4b12f1d51c63938bdd3dce310c486fd85accc9b0b8",
+              "ast_sha256": "5fc41f38e19e0cbe6aea228c0fdc292ba63e1dbe5f46406b1325bdc3b801cd25"
+            },
+            {
+              "name": "qk_norm_rope_cache",
+              "line": 172,
+              "end_line": 230,
+              "source_sha256": "63ce73b0598d056b96bf3da343d267418fa949b36c6c8e0d98f249d458c59c13",
+              "ast_sha256": "3a1d2f879517f8b19cedf0d448c088b59a8f7614e81b64b25595038b6365aab6"
+            },
+            {
+              "name": "qkv_proj_qk_norm_rope_cache",
+              "line": 233,
+              "end_line": 297,
+              "source_sha256": "53312e164c159b8e3e7e55866b905dc42bff8f94ac396f58d8312f093399d602",
+              "ast_sha256": "b28d38097ef2f63a5fc5b03515ba16176d437024d30bf1a0ef3821d1bc049380"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+          "sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
+          "bytes": 18201,
+          "symbols": [
+            {
+              "name": "_reduce_route",
+              "line": 42,
+              "end_line": 81,
+              "source_sha256": "6a6b3a494204acc48d27cc38e7f396cdc517a35420eb91a02c610fd15b6422d8",
+              "ast_sha256": "7f8753d7289c5183f7421a34142b74e33f149fefba5f11777fc28de519715299"
+            },
+            {
+              "name": "_route_preproject_epilogue",
+              "line": 85,
+              "end_line": 123,
+              "source_sha256": "7209d0b7d5dd13060db2e9302c267dd4e3a5241e30b56daad7f4b429d207d379",
+              "ast_sha256": "75a92d7590c74ec025c1feeea79897566f9f5d0b5a859d089436f0a748a2ee78"
+            },
+            {
+              "name": "_joint_epilogue",
+              "line": 127,
+              "end_line": 184,
+              "source_sha256": "5d690dce08eb610d72fa73c889e5588340a8fb661213fdc57cc210ed110eed07",
+              "ast_sha256": "23362d5b47d9c958b81b6d7f488f17643070d2ca8797b0901fe3066d4f1eface"
+            },
+            {
+              "name": "router_pooler_topk",
+              "line": 187,
+              "end_line": 265,
+              "source_sha256": "61ef466068ea79459a3d60640df1bfd927afc5cc926178f1af99c33e6c5e7921",
+              "ast_sha256": "8c6ae0a35c0f0b34a6b6f6d99e0a14c134b238e9fdaba7681b2fea5c861ffa59"
+            },
+            {
+              "name": "_router_topk_completed_pooler",
+              "line": 268,
+              "end_line": 334,
+              "source_sha256": "dfe976eab468b880fd5fceea4d4cedaa089600d68b9dfec721a49d7866b2a401",
+              "ast_sha256": "d255a062f7cd71762a571aae522d11dcfa399d03cdec448b5dd7294ebb6e928e"
+            },
+            {
+              "name": "pack_joint_router_pooler_weight",
+              "line": 337,
+              "end_line": 343,
+              "source_sha256": "0f13dd97940a20d49a2eeadf7cdfca25864c88736406ce270d4bdd27bbf7d941",
+              "ast_sha256": "50c37d0f1917f07194363309ff43b2f34082edb6606310b7ed67c80732e8b6d0"
+            },
+            {
+              "name": "joint_router_pooler_applies",
+              "line": 346,
+              "end_line": 353,
+              "source_sha256": "dfd2c66a395780eef513135eb0586945f0b80d37dad11a36e08dade3d951d2db",
+              "ast_sha256": "bca43a50c2cfa1fbc38a915486304430502c72b2fd0eddc25155d67228d8db84"
+            },
+            {
+              "name": "joint_router_pooler_topk",
+              "line": 356,
+              "end_line": 375,
+              "source_sha256": "39673548ce0d51633deb59bc567fb80762ec2ac4735cb000cc4f9c3990f70481",
+              "ast_sha256": "6c28087d0a7faf8aa1a391f2e0a88aafcb4b7a77108c6c36308cd23ece8281be"
+            },
+            {
+              "name": "_joint_finish",
+              "line": 382,
+              "end_line": 407,
+              "source_sha256": "da7ebb8be78d92f946cae94b23c6a925a65d245d2f63d840fa1982e221c9ac7c",
+              "ast_sha256": "13adea9eb5b03bf0f325de1927365a3433f946d5de7d04f534258397b56d6c47"
+            },
+            {
+              "name": "_joint_fp8_partial",
+              "line": 426,
+              "end_line": 470,
+              "source_sha256": "09c53ddca4f4a1fd36c53f7f7e044ba3e8cf66a5c6dd11609a237a33b890efb2",
+              "ast_sha256": "f05353c5688abaeec19148e9d0719b0d8c990d5a22bd44f23f14ffe6e6b813c6"
+            },
+            {
+              "name": "quantize_joint_pooler",
+              "line": 473,
+              "end_line": 478,
+              "source_sha256": "f6896744ec8aa2922f006122f6aaaad918a7af8b63246e3de3820314663ae5b5",
+              "ast_sha256": "24bf2b37e001fea325227b5d78a2516053a20ced56a47308eed9605ce759d270"
+            },
+            {
+              "name": "joint_router_pooler_fp8_applies",
+              "line": 481,
+              "end_line": 491,
+              "source_sha256": "225212ba580b4b035d27d0a3458be9ba6e3ad1e5eec2d3782d3462037fc5b71a",
+              "ast_sha256": "fe8dceda56df7f484bfc625b6fcd37a8b3fc5d561e963f41f657882f38ac3916"
+            },
+            {
+              "name": "joint_router_pooler_topk_fp8",
+              "line": 494,
+              "end_line": 522,
+              "source_sha256": "2d422efb6c085b6561ab375040d8a7aea326332c961351cd6da564f1be9eab32",
+              "ast_sha256": "eb8e16a36de54a2104df73189eae86e713afcace1ab52aa96027c36b0f720936"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py",
+          "sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+          "bytes": 27974,
+          "symbols": [
+            {
+              "name": "_mlp_views",
+              "line": 102,
+              "end_line": 111,
+              "source_sha256": "eb11cd845a3a3a90fd0d6b953f8e8b73f69ea14189b98a88d67c2286e78f9763",
+              "ast_sha256": "e2d75d1d890a67a1ef6c3053d067fd5c603b74b8c378b7b4d18abbaebcd64f52"
+            },
+            {
+              "name": "_attn_views",
+              "line": 114,
+              "end_line": 126,
+              "source_sha256": "13ef091202c3860bc7f08817134e34201a718eac8ec64846cb26b62cd7a14537",
+              "ast_sha256": "9978a1efe41dd5213789ca296d7e9376d1f3c5675184a98e2bf0ab0d47ebd0b1"
+            },
+            {
+              "name": "_attn_view_reasons",
+              "line": 129,
+              "end_line": 145,
+              "source_sha256": "85fec555f0cefae1320a8f35cdc86b26b24b9accb12270061c9d73c189c2a455",
+              "ast_sha256": "3b6d3d205351a75813f344e6ef384522031ef725daadbd24d2f565ddba524ec5"
+            },
+            {
+              "name": "_mlp_view_reasons",
+              "line": 148,
+              "end_line": 158,
+              "source_sha256": "667e7a912e20fc7011288af90d0194a557e525cf433451195f434b43bb664654",
+              "ast_sha256": "4231468f5c05194f0cb9e6cafef1a47eb280e22dbd0a9967aa7819d398e1b656"
+            },
+            {
+              "name": "DraftRunner.__init__",
+              "line": 165,
+              "end_line": 204,
+              "source_sha256": "a61bc56d6def88cc4e48155fe408f53799d74cb7692adc43769ea74a8c851f53",
+              "ast_sha256": "81bddec6a28adf278da81fe38c79efd3ab7185b2413b8fcbb60899d2fa86b0ff"
+            },
+            {
+              "name": "DraftRunner.set_deadline",
+              "line": 206,
+              "end_line": 212,
+              "source_sha256": "f0ecbe729ee28dc437df58c56144b425d70f63072e6aa03200beeefc30e56eb5",
+              "ast_sha256": "6f30cf770cbb6c89d0fe49d6fa9e14ac3930845fd6dc7f5dc40d8c22643b1d4a"
+            },
+            {
+              "name": "DraftRunner.kernel",
+              "line": 214,
+              "end_line": 219,
+              "source_sha256": "fc40fde6660e10884b014361b166cafb62bf7e867065fe81bac4b46f7cf83265",
+              "ast_sha256": "555d13d44bf53cee5a767701874ad873256a865a25b9ce2b50f56aa28554e5c9"
+            },
+            {
+              "name": "DraftRunner.attn_kernels",
+              "line": 221,
+              "end_line": 229,
+              "source_sha256": "578c20b8a931e7d555a03f22297a765c20489c49bd769fe9d7692275e1b05de8",
+              "ast_sha256": "c62b0f6f4feff96ce5b30384ef12ba6789c1e2f86611ddfecef6c046e26a7818"
+            },
+            {
+              "name": "DraftRunner.precompile",
+              "line": 231,
+              "end_line": 237,
+              "source_sha256": "14d0545719dd441702d29d7d10b628ffd51d97070d2718a9c4535aaf61519e81",
+              "ast_sha256": "b045be5d0a65d14fcba6eeffea3794a1e736bc18eb4ff3bd18f83f796c5973c4"
+            },
+            {
+              "name": "DraftRunner._backend",
+              "line": 239,
+              "end_line": 244,
+              "source_sha256": "b2858482710888b4ca14dc716b04d915b039f4f0ba1dbb18afb99009acf6cac2",
+              "ast_sha256": "63685c5faf75f822d4c8137168995ee91f06c8c1f8ef27cad5e132e3c67ef82b"
+            },
+            {
+              "name": "DraftRunner._check_cache",
+              "line": 246,
+              "end_line": 262,
+              "source_sha256": "7b0f7a781a306e3f0b52d6eac848d61f9830b019da8a60ecd0d7e6dd2d071516",
+              "ast_sha256": "b65c5b6610bf89934acad61e434fce6af558b3eda5de04f6ca050a14b2b32536"
+            },
+            {
+              "name": "DraftRunner.launch_attn",
+              "line": 264,
+              "end_line": 310,
+              "source_sha256": "c982117065d7f07143204b048a75ef0e07ffca9204d0a414c4cac03182de6d26",
+              "ast_sha256": "d4d1d0cca7c2496ce5453c21560b98bdc0f1163ba0865cd84a5f953fad35a171"
+            },
+            {
+              "name": "DraftRunner.launch_attn.mark",
+              "line": 270,
+              "end_line": 273,
+              "source_sha256": "3f46fdf1c1527a368540bf104f1f155a44421cb028096a32f1ce07cb23b37ae3",
+              "ast_sha256": "d82534c1ca156f6de257c4df088e2998317439c6e97c28cbc8e4a6a0955c14d3"
+            },
+            {
+              "name": "DraftRunner.launch",
+              "line": 312,
+              "end_line": 323,
+              "source_sha256": "4178de11cce420e6339dc037f341667a5b39340bea9faeec4330fb45209c4d07",
+              "ast_sha256": "b37666dd9ca2c1497c8b43365fe56097ad11ef12c54f6061f651a52128c97b26"
+            },
+            {
+              "name": "DraftRunner.end_step",
+              "line": 325,
+              "end_line": 326,
+              "source_sha256": "3261e131c1f940fd06b483f0df1028169ce8b2c89507c30ad60a4bab1fb605db",
+              "ast_sha256": "663354f53f08204dcede1d9c3614401360202562fb210ac1e56e66d958560559"
+            },
+            {
+              "name": "_tokens_per_request",
+              "line": 329,
+              "end_line": 331,
+              "source_sha256": "c6d575c293f3b821cb2ba3a55fcc29cee726164a25b88a18bc5b37c368525230",
+              "ast_sha256": "911b71fa5d5013fc15ef067f78564bed9fb22802f56193ff420f19653adfdc86"
+            },
+            {
+              "name": "_config_disable_reasons",
+              "line": 334,
+              "end_line": 348,
+              "source_sha256": "7372a51268157a3d0fca3d3e4e97cf119d7ef4b9fc080e69010bc3d31838fe01",
+              "ast_sha256": "897f65d53169221f53c7c103018c083787a7498b177c51ec0d20397a47d60f16"
+            },
+            {
+              "name": "_model_disable_reasons",
+              "line": 351,
+              "end_line": 382,
+              "source_sha256": "126a8c08d67dcaf4f4b107609d8ca0751d909db6a86d0b2957f832807ddf48b0",
+              "ast_sha256": "656bf7cbe0edcd1dc8f2765da20b1c74c9fda8d8c45874ae26329589746dbabd"
+            },
+            {
+              "name": "_Draft.__init__",
+              "line": 389,
+              "end_line": 391,
+              "source_sha256": "51a21cb6014d43fcfef91eab3ac9945d6de457547e58018879c95cbcad774b2b",
+              "ast_sha256": "478e4d3cd1816cde959e5becf6197bb6083af6956ae6f236ac36ac094f4d4dc6"
+            },
+            {
+              "name": "_Draft.forward",
+              "line": 393,
+              "end_line": 434,
+              "source_sha256": "8b6186b32895bc099c9440b544a5c978b4bfcf715a25a52308561ad470a89fe7",
+              "ast_sha256": "9cb8ef67fc7fd5921bdd3c3209f4bb44c32da1476a6c31f13c1ce316f5fa23d0"
+            },
+            {
+              "name": "_Draft._attention_reference",
+              "line": 437,
+              "end_line": 448,
+              "source_sha256": "f9770421238a6469a7793c4b648a8fa43c41a660908f7f67d9f725a7db121937",
+              "ast_sha256": "d3dd1b027d23954ff05eaba99fe1d66b14463d8e490aa75315867db1723bd7c8"
+            },
+            {
+              "name": "_Draft._reference",
+              "line": 451,
+              "end_line": 456,
+              "source_sha256": "c07477e4f59eeb324a27afa54920f1387589abde9660632f970342c9d4083203",
+              "ast_sha256": "83950ad7b275623c6f0e277f9e08937c34fb5e6edd8a464826373988bbe7b428"
+            },
+            {
+              "name": "_log_check_pair",
+              "line": 459,
+              "end_line": 464,
+              "source_sha256": "b115067d942c6d9d6afffc4c01ae51ed02b637b8aa38728ead13d8262aff4923",
+              "ast_sha256": "a574c3a749716cb93d0c8e834734537f577bb715fa833d953b7befab5bc70e44"
+            },
+            {
+              "name": "_log_check",
+              "line": 467,
+              "end_line": 472,
+              "source_sha256": "4b2c9d3c8c722c90fae25ea3b39399a41b486623d6329506b2184b8f02469b3d",
+              "ast_sha256": "027f070b6de52b5a9f7de96b69ece509c16546e3e78f37a76c7243c372403c1f"
+            },
+            {
+              "name": "_shard_fc",
+              "line": 475,
+              "end_line": 498,
+              "source_sha256": "e8d109b9e5cd162d6bdbccec8339539fe2ad61a289e48348829ba77225e2fba6",
+              "ast_sha256": "ce7938713f9550a1e84c21c9e57fc432f404821e19b3bbc8d992056a2bd4eff4"
+            },
+            {
+              "name": "_shard_fc.project_target_hidden",
+              "line": 487,
+              "end_line": 495,
+              "source_sha256": "a900df1f5be8fc33bb4b7d329e01296a16e3902ad3568f54d20b7b3cb605993a",
+              "ast_sha256": "dfd8517fea8d807551f35dcb3f51df0a8c3c704bce0ebb7d7f82acc76d5d4f18"
+            },
+            {
+              "name": "_build",
+              "line": 501,
+              "end_line": 518,
+              "source_sha256": "f5e9d6eaccb9926e6569314e4058c63c5c121d1b07a7eac9e9259f3d4848f4d9",
+              "ast_sha256": "5940574617ee0b32ccafb1eaf2c844b07b2a6d2a00ad2fc2036b3a8828e4940e"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
+          "sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+          "bytes": 24704,
+          "symbols": [
+            {
+              "name": "dp_scratch_layout",
+              "line": 91,
+              "end_line": 103,
+              "source_sha256": "9ddb66752cac9f4eb505b0c9ff3031e33b415da7610975d32401dd60495a7006",
+              "ast_sha256": "110289ea152b48220aef58e431a16555d4902a5b885b1de34c9af59030601158"
+            },
+            {
+              "name": "do_scratch_layout",
+              "line": 106,
+              "end_line": 108,
+              "source_sha256": "3a287fc2fe35dd4636ec104eb65bd292f11e9e00288dba777f401e060fa07da6",
+              "ast_sha256": "bfe676a2119cf19048a4a83175f903a43836d3acf36389ec84b5ea94852d88d2"
+            },
+            {
+              "name": "do_sym_layout",
+              "line": 111,
+              "end_line": 113,
+              "source_sha256": "9d63e8622a4467ef9731b1f7744927512ac7eb1d05d08c8407eb068110902d55",
+              "ast_sha256": "ccde182ae5510872b8e40f6dcf089359779f8fb2ce14dab1dbb9f2a707b2d15b"
+            },
+            {
+              "name": "do_sym_bytes",
+              "line": 116,
+              "end_line": 117,
+              "source_sha256": "0877d934bc8e7d2884bd4cc96796c7e5d1291ab3861139a410a1959a7829e7bf",
+              "ast_sha256": "3419cd8741a92d09b8c1b4b9f9940a68c9859fcd9d99089b5b27e6bd122bac02"
+            },
+            {
+              "name": "dp_lds",
+              "line": 120,
+              "end_line": 133,
+              "source_sha256": "b6ac2e3bc222b5599b7af792ec2051fdec21c343b5608647437f473b6e85d4d9",
+              "ast_sha256": "ca6f9ca30d8cbe575edd671252a82776e3dd8930ebdd22f03186bd5dee24e7b3"
+            },
+            {
+              "name": "do_lds",
+              "line": 136,
+              "end_line": 145,
+              "source_sha256": "01a84163f6a598cb85c2bdf0336349ad878a2332b1654382d43ed718cbfa7bab",
+              "ast_sha256": "e83858a31fcbb25ff27ff969944cd88b33726c2c8b609c3816f18d36c65c8aab"
+            },
+            {
+              "name": "_pick",
+              "line": 148,
+              "end_line": 150,
+              "source_sha256": "de8239efc2e3257a6300951e5aedd85b0b23325f19f716c3ee4b3c1ea8e81535",
+              "ast_sha256": "ae347b86261be4a2c6fb0c12f446ef957abeb9a216a0cc2eab513b6bcd89b1b7"
+            },
+            {
+              "name": "_cs",
+              "line": 153,
+              "end_line": 155,
+              "source_sha256": "36f7581afd106ee3983a7156d2d13f93dea6dfb38a4f0fb8983c7d8870367638",
+              "ast_sha256": "5a4b03b94056197d29ec35910e993d3f604dd35648769bbeaeafd648e1523572"
+            },
+            {
+              "name": "stage_norm_in",
+              "line": 160,
+              "end_line": 205,
+              "source_sha256": "2ec9fbaa0f53f711ad76bf5daf34a51114b6c56e58af09ed311c843385120b10",
+              "ast_sha256": "d5f930158047f342e02603ba12a078e68d61cf8f3e9ff867f6be06a070fbaff3"
+            },
+            {
+              "name": "stage_qkv",
+              "line": 209,
+              "end_line": 226,
+              "source_sha256": "91e2e83c299bc9c5c3b0cf677597fa3ce549d5b2b496017e54ea32c59a51ebf4",
+              "ast_sha256": "3c50c9fc3e19735028e7fabedb85d01f28d0a8ca7b3633a0d093c2890a4f5a0f"
+            },
+            {
+              "name": "stage_qkv.tok_of",
+              "line": 216,
+              "end_line": 217,
+              "source_sha256": "215ae0e79ec89d69111c4ec03ec62e6d7b5604e23846bf8ef6cc497b8ad444bc",
+              "ast_sha256": "be81fbaa9b572ebd669caaf0719acde3320c1faf31cf02f15dffcc54a9a71b5c"
+            },
+            {
+              "name": "stage_qkv.k_of",
+              "line": 219,
+              "end_line": 220,
+              "source_sha256": "b3da3cd65af3ced9e43f635cc2198ac4de91addadf1130512f414b49afb4dde8",
+              "ast_sha256": "a6c22c9212fdd1c49c05c16baf3dd02ce8e1cceebc905b70d2e2e9a8ac0405e6"
+            },
+            {
+              "name": "stage_qkv.publish",
+              "line": 222,
+              "end_line": 223,
+              "source_sha256": "a6fc4e504d33394548c002c25e630d66ec5c97ade46367fa2a026742048413fe",
+              "ast_sha256": "bdd9e365e570d96a97f89ad3b967e7ad0086cf60dc06d5c712cf6832735c6b11"
+            },
+            {
+              "name": "stage_heads",
+              "line": 230,
+              "end_line": 306,
+              "source_sha256": "ad3d0249dd7840fee8e2ca91de78325745ddb41baaa9dfd2afabf483e54ec5cd",
+              "ast_sha256": "c1d38e4e2c878b4b628a5f7419a9736bc4da4047dc0c311453f79936e67c70ce"
+            },
+            {
+              "name": "run_dpre",
+              "line": 310,
+              "end_line": 326,
+              "source_sha256": "da2380fc20d2272589c15cfde646a5136e6f5ff73c0992a0b084bbbde6d1f367",
+              "ast_sha256": "1b91dd86fea3b89b4d4b69188053a948093753bdb5622f8293fadaea8b5237e4"
+            },
+            {
+              "name": "stage_o",
+              "line": 331,
+              "end_line": 369,
+              "source_sha256": "82711d4e221a189fe8f372fdade98bb5bca02132d7a4529687b0e16a0c9e4866",
+              "ast_sha256": "29eeb9d82cf7ba2ab8c2227fbd4493098029851afd7410c1a313ddf55a6ee987"
+            },
+            {
+              "name": "stage_post",
+              "line": 373,
+              "end_line": 429,
+              "source_sha256": "23ac9b4895411e696dcb211aa2320dafe53042670cad7a35ca7c60138cd76865",
+              "ast_sha256": "f99d2edb3c2c4b5ed05883b51d0932a09a06fe64656ac229c742dd19357f6669"
+            },
+            {
+              "name": "stage_post.pair_at",
+              "line": 404,
+              "end_line": 405,
+              "source_sha256": "77b66232aab47d4bd7fbff8a3292edb67358b948bf8a181e99940864b004c2d1",
+              "ast_sha256": "3cc74d1b7b8d264cc72bff2f883ddde447e6db720e6634df683dc029a0183053"
+            },
+            {
+              "name": "run_dpost",
+              "line": 433,
+              "end_line": 438,
+              "source_sha256": "1301928142aea5a921d830afad81ff976a0561f7f44b77049671ffdd1fea2e92",
+              "ast_sha256": "eb4b61353b44a5fe30d989baabffbe04f527fce0b2451779e22f11f114bdd9b2"
+            },
+            {
+              "name": "_common",
+              "line": 457,
+              "end_line": 467,
+              "source_sha256": "f55bc9cbad711ab0dcc21bc2be5b56527b524185801617f4e5fa187819c5f874",
+              "ast_sha256": "cdf0adc14c26d496e9bfa42e397ea0847b82d71237309cfc149682645eb3fbe9"
+            },
+            {
+              "name": "build_dpre",
+              "line": 470,
+              "end_line": 518,
+              "source_sha256": "0e3e952496465e76d72526d095a35492376ca98135ee1d25f0f79b1659bb6f92",
+              "ast_sha256": "d1057193e7e91c517a3c0632ac309d1888307172d265e841c505225ccc727f7d"
+            },
+            {
+              "name": "build_dpre.dpre",
+              "line": 487,
+              "end_line": 504,
+              "source_sha256": "afda9324edc33e91024c62f8240a47c4f7b15bfc2b328b52111dd06582524ed6",
+              "ast_sha256": "770c42cc4a3f8aa3b152306074cf0b850d6a2a8c90865a6b5231fc487dde27b2"
+            },
+            {
+              "name": "build_dpre.launch",
+              "line": 507,
+              "end_line": 516,
+              "source_sha256": "f3afee687639ad4578f0c0daec46b5b7aa72c2cc890e1191f7246581870c27a1",
+              "ast_sha256": "b8da30e24ab8ee8a4dc507644ecf500508002db26930c6079fea623b64fab5ae"
+            },
+            {
+              "name": "build_dpost",
+              "line": 521,
+              "end_line": 561,
+              "source_sha256": "146c450f00e7f3ad4cc0ae024bd9693cb0e42c2eb9c1914f1bbddd3a5a33ef81",
+              "ast_sha256": "277dbbb578a6f53a6e02cbb6cfa7baa708cbc913a175efa16b54ab8fa2de1142"
+            },
+            {
+              "name": "build_dpost.dpost",
+              "line": 535,
+              "end_line": 549,
+              "source_sha256": "8773e335518a0fa8788d48390b540b2747449d539885c2f4a0c240efa80734d7",
+              "ast_sha256": "287a4ea5456e05057eb8d0d9d599939d0a55952eadffea5164b89c0c5f474451"
+            },
+            {
+              "name": "build_dpost.launch",
+              "line": 552,
+              "end_line": 559,
+              "source_sha256": "4bb8319186a90e71056542d8d0bab52cf04b171a33b89118c510667e5e510733",
+              "ast_sha256": "eeee3a4a1a3d74fbd5bd3b5dbfd2304accdb80abbab55f18689e83dd42caf1d8"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
+          "sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+          "bytes": 38593,
+          "symbols": [
+            {
+              "name": "attn_rows",
+              "line": 59,
+              "end_line": 60,
+              "source_sha256": "a0d51b310805da211957a4368f92f3f7771b7255e4289ed4938416b383c5fc09",
+              "ast_sha256": "869127db7ed01287ecf5418f69132005060eeec5b1d273c7d147b8b1728f8d3b"
+            },
+            {
+              "name": "dattn_scratch_layout",
+              "line": 63,
+              "end_line": 80,
+              "source_sha256": "4281ff4555693269206052e5d9c65ef4f81556f15ae3204c2978a0939a86ec04",
+              "ast_sha256": "ed3d88d24532350dff898c2e89276768cfe4e229005b3f6b6f1b94d80a168324"
+            },
+            {
+              "name": "comb_floats",
+              "line": 97,
+              "end_line": 99,
+              "source_sha256": "178f21357743e76b3ca802ea13a58564c93081dcc2f1d85fb18b198b234695f2",
+              "ast_sha256": "bf1238d9799426fb64cc4762d18b4249a22b44de57da7a32213d039f4f581dc1"
+            },
+            {
+              "name": "dattn_lds",
+              "line": 102,
+              "end_line": 120,
+              "source_sha256": "fc394325db36e378c3ba663eae2dbb2c8f84ae478280b43f36f433cc2b85359b",
+              "ast_sha256": "7794dccf566931687a45e544a6444b74e8a87efea5a31e1fb2a7e2c3a6143354"
+            },
+            {
+              "name": "lds_views",
+              "line": 123,
+              "end_line": 125,
+              "source_sha256": "b0e0f6a0383bd9ff9e7c7f757c73d63e775135e3c6fb38b8e021d7d65071a51d",
+              "ast_sha256": "7769a380f700bc840c87aeab81593e5d6d93c9363c9812316ed07797b94797b9"
+            },
+            {
+              "name": "run_dattn",
+              "line": 129,
+              "end_line": 650,
+              "source_sha256": "f43d7de71f0170d3b095c918bc0234e3bb1cf55cef84babb14f9e695debcc6d3",
+              "ast_sha256": "316fbe0d91f816566c42dd3999f5b6706f9c974159e1320dc3893e1fdf40e5bb"
+            },
+            {
+              "name": "run_dattn.req_pool_of",
+              "line": 161,
+              "end_line": 163,
+              "source_sha256": "afee1f759171ca09a6bd368177ea632eca81bf1f84bf1c4da98f3475066c749c",
+              "ast_sha256": "72900c0f8a9593c143c189977f2efc7a52b87f58d01a87769e3ecc3e03c7ea71"
+            },
+            {
+              "name": "run_dattn.seq_len_of",
+              "line": 165,
+              "end_line": 174,
+              "source_sha256": "961c62a8efd309c87a990fef6cda192a5c5d79fd9dbc1f6a4ff57c7aae129b3c",
+              "ast_sha256": "ed4bc9a81398f2ebdb8f95810ee851111de8ca397d2493ceab5ecd33aa2b1fb0"
+            },
+            {
+              "name": "run_dattn.chunk_range",
+              "line": 176,
+              "end_line": 183,
+              "source_sha256": "1fbb5af5622b270a657ed0afe79f2cb0e43cdd24b8284cd6599caceaefc0c2c4",
+              "ast_sha256": "f263b19782dadd19cf762931fd8688f62ac8279aebffddda2d06063eecb4cb56"
+            },
+            {
+              "name": "run_dattn.span_of",
+              "line": 188,
+              "end_line": 190,
+              "source_sha256": "37099e7aa45c7691b7c3bf98ef840d0649addd6015368724ca9ff3659443cf5e",
+              "ast_sha256": "ec36100f5cc80d25410783251c6fa414b90e211991201c3dbe7e5f6cd923c2fa"
+            },
+            {
+              "name": "run_dattn.tasks_of",
+              "line": 205,
+              "end_line": 210,
+              "source_sha256": "fd4711d502d3ad895e13dd743f53ffdcead2cac28da23442703a0a9508bc8014",
+              "ast_sha256": "32985268faf497ea3c12fe59de1c6eb05cb2591e369b0212116b69560d941279"
+            },
+            {
+              "name": "run_dattn.n_parts_of",
+              "line": 220,
+              "end_line": 223,
+              "source_sha256": "5f3b900b608e2aba50a48f72ce685bf9b37ac6aece2cc1c51c59e2351646b714",
+              "ast_sha256": "255f2a48e28e72ee7cfbdd7b9e86e39ecc9625c55479d2ed2f7b1fb75ec4ce28"
+            },
+            {
+              "name": "run_dattn.pflag_at",
+              "line": 225,
+              "end_line": 230,
+              "source_sha256": "99e627458711855362a7953fddd8d71314d2d5ceb2bfdd7637ee26e61af6cee8",
+              "ast_sha256": "38d79c53044e3baf4ee588b3f01b72cc1881b383fcc535a226a8cb4ccdfe306a"
+            },
+            {
+              "name": "run_dattn.part_row",
+              "line": 232,
+              "end_line": 234,
+              "source_sha256": "4217fae0e8b4b97bb023fe4a3996c752357e90b1abbb83faa8d353b00d2c28e7",
+              "ast_sha256": "7473ed44f5dffa9dfb00f0f5218a1d961e16c01c670da27592e28db50952fe77"
+            },
+            {
+              "name": "run_dattn.l2_row",
+              "line": 236,
+              "end_line": 238,
+              "source_sha256": "ce27a22a8fe73baf307b79a66cbdd8aa8f9200c2efcdcc885c239c14f1482224",
+              "ast_sha256": "a8a4e6b913a5ada60d2ea42ebf1fb93ade2dd632a6a5610a1c3f162695be5502"
+            },
+            {
+              "name": "run_dattn.fold",
+              "line": 240,
+              "end_line": 246,
+              "source_sha256": "229ef1115ae589e7fbec7687c81b69c0730049696b7218e827e72d134c3eb2a7",
+              "ast_sha256": "ac7729bf42ded674553c0ccfc1004e52b527a69de53c8075fbed98d9242c18c4"
+            },
+            {
+              "name": "run_dattn.attn_task",
+              "line": 249,
+              "end_line": 480,
+              "source_sha256": "e3a0c45f8810233f44aabcbd391c163377093d3b5f004f7cd9b45412b59a4f1b",
+              "ast_sha256": "4220865dc3489eac7c998d7dc7f6a5ec8c6c28088b2a27fd126af4e1c0580e63"
+            },
+            {
+              "name": "run_dattn.attn_task.issue",
+              "line": 309,
+              "end_line": 317,
+              "source_sha256": "b0915022e8ef8ab13ea8e2579608b72c70edfd87d932e5ffd8fa547c9d3c11c4",
+              "ast_sha256": "4ef47da136a96f16146b32805d30c15014e0434ab65aa2ffbd72fb720478d5b5"
+            },
+            {
+              "name": "run_dattn.attn_task.quad_max",
+              "line": 319,
+              "end_line": 324,
+              "source_sha256": "c3da1dabb7e0fe6109f49d82a91b7a5acbc2d24884ac1e9bc265134971b1c910",
+              "ast_sha256": "469a8cfbf91d932b14183aea7d4578040e57ac35aa57c4e05c68ff381efcf185"
+            },
+            {
+              "name": "run_dattn.attn_task.quad_sum",
+              "line": 326,
+              "end_line": 330,
+              "source_sha256": "cdad33f97679d9ea43c29730da8b43790398f9ac73ca61a1460636cbf2b726f6",
+              "ast_sha256": "48b05f1a3d566a96545ec1d2e77874f4f29a552c4597b0ae67ba6525a1174458"
+            },
+            {
+              "name": "run_dattn.attn_task.comb_at",
+              "line": 430,
+              "end_line": 431,
+              "source_sha256": "b1154bba2c95d3537fa44a6f8dc8a1a90d9c364e044a9a969bc283ade0eb2fe0",
+              "ast_sha256": "ae0e39a1fd93aa383a7ea05d3246404ab1637ac187335eb6ee416beec6b2ca05"
+            },
+            {
+              "name": "run_dattn.load_rec",
+              "line": 515,
+              "end_line": 520,
+              "source_sha256": "79206d9a5a8ff93e277aa8faa8aa54ff617ca97563192d6b94fd15fa3117dc88",
+              "ast_sha256": "7a0d440610d590f64a3c1241d83fb2d93b52454f08521d9959057ff8e82acbbf"
+            },
+            {
+              "name": "run_dattn.fold_rec",
+              "line": 522,
+              "end_line": 529,
+              "source_sha256": "53c5613b00a4e4b9f6f84c76650654701db35452f936b849457f367758d746e8",
+              "ast_sha256": "2bc2ef4a681b02ac8224697647b5f64c86658d225f992b9c5a9d4a3d77d4498f"
+            },
+            {
+              "name": "run_dattn.combine_lanes",
+              "line": 531,
+              "end_line": 558,
+              "source_sha256": "96283b14f2c42bbb0e610c5b11b887e3c226ae71daa4b83f14ea131a57bc10b5",
+              "ast_sha256": "de03e77c3bb0a63e0ae12912d86661c8490979404d08c466a17ef256f89643b8"
+            },
+            {
+              "name": "run_dattn.merge_l1",
+              "line": 560,
+              "end_line": 593,
+              "source_sha256": "bde5e68cf0786b1931b2415618526788bc74d08fb5d4f2b06a8f448fa3a0bd34",
+              "ast_sha256": "0aeaaaa1019981b429ba5841d5f3d9a194d4d15e7a7b707f351efbdd88f52d7b"
+            },
+            {
+              "name": "run_dattn.merge_l2",
+              "line": 595,
+              "end_line": 636,
+              "source_sha256": "29061115c9d77ae5463db2d7d74c99128f8fef04782a6981226c8ea97890230a",
+              "ast_sha256": "d7a5eedfaf6e541195dc0d8e90892c3ef98db6d7a6f5738ec6461afc14222307"
+            },
+            {
+              "name": "_attn_views",
+              "line": 681,
+              "end_line": 682,
+              "source_sha256": "af3fad29a453e26f986a8b2e81b7e4de2a23c005f36d359702faab0763616e32",
+              "ast_sha256": "6fd8e939668531d09ea896e83b20c96415b4477d7dd6801578d2c6f4dbfbb12b"
+            },
+            {
+              "name": "dattn_context",
+              "line": 685,
+              "end_line": 705,
+              "source_sha256": "99556d94633a31b6c023212a6c878e200212af37cb7357ebc655ebc6eabf0a7c",
+              "ast_sha256": "d99cb341508927fc4cdd78c8e2976c38b185943798d8b20f99225e2c0a63de47"
+            },
+            {
+              "name": "build_dattn",
+              "line": 708,
+              "end_line": 761,
+              "source_sha256": "876c2e05475c5056beb42bc840e5fcafed90b1ebb5f5ff89920062e98a841a48",
+              "ast_sha256": "2c66b26419f51242440cccf0cedf86803572159f49c51e9fd34f8d9e8a8cf21c"
+            },
+            {
+              "name": "build_dattn.dattn",
+              "line": 733,
+              "end_line": 747,
+              "source_sha256": "7a3acae531a5ccfc2d080164fb53caa224372b5285fbe8ed75de2d715c615ce5",
+              "ast_sha256": "954b46e05679d69aa75e730ca37e8b6342cda21b57eec239cc2244cb0eb9a238"
+            },
+            {
+              "name": "build_dattn.launch",
+              "line": 750,
+              "end_line": 759,
+              "source_sha256": "a999f361d332fc7ba2df539858d8356169f124f3ea609a8b65eb18de738800bc",
+              "ast_sha256": "31b7240b22057327394992adffc387bc74b93705e856193f330f2b4b57b5c397"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
+          "sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+          "bytes": 27252,
+          "symbols": [
+            {
+              "name": "dm_scratch_layout",
+              "line": 84,
+              "end_line": 99,
+              "source_sha256": "3cf339789adf16d8da6c2232597b665f81ffca8ca8debf35275c857c7d8bef72",
+              "ast_sha256": "389378e0e19f7d0d79dce77f71da9ee1538dcb4f914887c79b4741f5b78c9767"
+            },
+            {
+              "name": "dm_sym_layout",
+              "line": 102,
+              "end_line": 104,
+              "source_sha256": "7146e5a84b461572428e83059bead945d835cd698bc697f1d9d584a84d545be5",
+              "ast_sha256": "1ae234d578de2ca0005390a3927d1114f8ef5d9f1805238d9176c23dbf28767d"
+            },
+            {
+              "name": "dm_sym_bytes",
+              "line": 107,
+              "end_line": 108,
+              "source_sha256": "72b9658d5a3eafea1d944886ce530b4fa3b1dafd8ccbe9015adb30b8620abc9d",
+              "ast_sha256": "ca4274f483ea2ec48709174c1c0b6d5f4abbf91b319a1191b6b369a92f42892b"
+            },
+            {
+              "name": "dm_lds",
+              "line": 111,
+              "end_line": 124,
+              "source_sha256": "a8218ff68c15057616d05506737c450bb1085bfbab169c557de8e7cb8591cfdc",
+              "ast_sha256": "d2e181ac69aacb9a9a88b45370db60a4203c5301c0512db399eab738bb2a9128"
+            },
+            {
+              "name": "dm_lds_bytes",
+              "line": 127,
+              "end_line": 129,
+              "source_sha256": "9397b0594f9f2ca5026b814758459c3f3300d359197550f5a097018cd08b4ea6",
+              "ast_sha256": "f51b64491868fd50084a0f8ccfb6378b3d64b7033e8c7003190637755938f955"
+            },
+            {
+              "name": "gemv_k",
+              "line": 133,
+              "end_line": 134,
+              "source_sha256": "d47bae5207eaa7eca9a4b3e813ebedbc0a41fe6f72e98c06880a66fc45190743",
+              "ast_sha256": "33dce5dd20a3f684c276ac9c67219f04fa06d790823e3364818585d563d2dce2"
+            },
+            {
+              "name": "w_loads",
+              "line": 137,
+              "end_line": 153,
+              "source_sha256": "e8e37ae6d552d197a78d8bcd9b76f9c88c64eea28c932e1b39bd54d4c1657250",
+              "ast_sha256": "cb299f89516109faee449ce2448629619badfe7d12073cb29cb6ad23bf869f49"
+            },
+            {
+              "name": "gemv_tiles",
+              "line": 157,
+              "end_line": 180,
+              "source_sha256": "410104033776689d944ec4df85661b2d22ce9f5572b0f1254cd671e9205df500",
+              "ast_sha256": "6c753bfb3713974e15ef5743c085eebdeadc5bf51b2a1374ad2ca923b8ec52bb"
+            },
+            {
+              "name": "lds_b",
+              "line": 183,
+              "end_line": 191,
+              "source_sha256": "6263ab2293eb270c232e383dbd629b09eb6e7581500d8ae990077a933d18423b",
+              "ast_sha256": "254e2a3d40fc731df458ffb21c2a8c6dffc816a23148836f876d7e1cdc354faa"
+            },
+            {
+              "name": "lds_b.xb_of",
+              "line": 187,
+              "end_line": 189,
+              "source_sha256": "9bab4ac72782130b30ce524940f63c4e9fc851a2b026eb0787bbbeeaca1a7ad4",
+              "ast_sha256": "01797f9a6f1319b77638b8c4f0c2f0eefb90d1f3e4409f1d6fefcdd85540d47f"
+            },
+            {
+              "name": "stage_norm",
+              "line": 196,
+              "end_line": 242,
+              "source_sha256": "a546d28c320d28c59b2c1c310c807b3e036834ad1e58e7ec45e8a994d10b303c",
+              "ast_sha256": "ce8fbf6abfab57ccbe0f990e759cf27071e7103339b92c6288526a12f5670e55"
+            },
+            {
+              "name": "stage_coef",
+              "line": 246,
+              "end_line": 261,
+              "source_sha256": "b75eb8d2d47ea70786f5062a08e6e945768afbc5fd6468ccd347cddfc1e72427",
+              "ast_sha256": "6409ccd42c421e6129977fd384100e7abbef2e20849b1311f848c009d3f7fe1b"
+            },
+            {
+              "name": "stage_coef.tok_of",
+              "line": 252,
+              "end_line": 253,
+              "source_sha256": "215ae0e79ec89d69111c4ec03ec62e6d7b5604e23846bf8ef6cc497b8ad444bc",
+              "ast_sha256": "be81fbaa9b572ebd669caaf0719acde3320c1faf31cf02f15dffcc54a9a71b5c"
+            },
+            {
+              "name": "stage_coef.k_of",
+              "line": 255,
+              "end_line": 256,
+              "source_sha256": "b3da3cd65af3ced9e43f635cc2198ac4de91addadf1130512f414b49afb4dde8",
+              "ast_sha256": "a6c22c9212fdd1c49c05c16baf3dd02ce8e1cceebc905b70d2e2e9a8ac0405e6"
+            },
+            {
+              "name": "stage_coef.publish",
+              "line": 258,
+              "end_line": 259,
+              "source_sha256": "5c42d3cac13a67938d44c3f502be1ab9a75c58d1760c0f2502e8a26bca4c7588",
+              "ast_sha256": "0feba0037f8470718b9158cd471cac0a57b1dc87fec74c97d49b0a3a0958128f"
+            },
+            {
+              "name": "stage_coef_reduce",
+              "line": 266,
+              "end_line": 285,
+              "source_sha256": "477711d656c81e8d16a21dfd6459b601fdd31fde957b2ca9bdf9616cf91fd874",
+              "ast_sha256": "805a1f0d438699a590f30547c3f82e92f2753caa0c1c02c8938d3d9ace29abc1"
+            },
+            {
+              "name": "stage_conv0",
+              "line": 290,
+              "end_line": 334,
+              "source_sha256": "a85991da21db89278886ccf9762850f34bd61a70fd7385b0daf621316e9d4426",
+              "ast_sha256": "20a752eedece0e09eb870a618485658043dda91438c379bf7e88bb9657cb3216"
+            },
+            {
+              "name": "stage_gu",
+              "line": 338,
+              "end_line": 363,
+              "source_sha256": "7625c4c49e9e1fba7e87823c48a0b0eae954fdfcf72d84604401b5070887229a",
+              "ast_sha256": "bf2e5a960435fdab7d2d9fe26facc87a515b3778783f842dca7196797be2b42d"
+            },
+            {
+              "name": "stage_gu.tok_of",
+              "line": 346,
+              "end_line": 347,
+              "source_sha256": "215ae0e79ec89d69111c4ec03ec62e6d7b5604e23846bf8ef6cc497b8ad444bc",
+              "ast_sha256": "be81fbaa9b572ebd669caaf0719acde3320c1faf31cf02f15dffcc54a9a71b5c"
+            },
+            {
+              "name": "stage_gu.k_of",
+              "line": 349,
+              "end_line": 350,
+              "source_sha256": "b3da3cd65af3ced9e43f635cc2198ac4de91addadf1130512f414b49afb4dde8",
+              "ast_sha256": "a6c22c9212fdd1c49c05c16baf3dd02ce8e1cceebc905b70d2e2e9a8ac0405e6"
+            },
+            {
+              "name": "stage_gu.publish",
+              "line": 358,
+              "end_line": 359,
+              "source_sha256": "6eb239937674a803218b380bcb4c3009b5a37c506341ad6a94d066c27600fffe",
+              "ast_sha256": "c86260fe1d7c505e4cb75c993217156bc7f1cd7e83ddf55e7804160e520bfd67"
+            },
+            {
+              "name": "stage_act",
+              "line": 368,
+              "end_line": 395,
+              "source_sha256": "2a37b54204d9340cd2fe039ea85a07bbaeb19e7bab95873f82209fe0751b8e27",
+              "ast_sha256": "cfe3b6b6f86aa08dcb9debe3e215dd5449a32a2e3330384c5975cda30e09ac38"
+            },
+            {
+              "name": "stage_down",
+              "line": 400,
+              "end_line": 431,
+              "source_sha256": "8c188bbe30ace045accf620d84521f718430ace3d1efa9fab0fcbc9d65554197",
+              "ast_sha256": "e2273d615f2eb67f431347163bbe69dcf9bc15d50f697c583b4bdadcdc332c0e"
+            },
+            {
+              "name": "stage_down.xb_of",
+              "line": 409,
+              "end_line": 419,
+              "source_sha256": "27952c2b3586bb3887be650cb003b3501e05ef816592a7fcf8659b8465e3921a",
+              "ast_sha256": "d3696c391ea7f47f2cd6d3da1424198f66e43365aad9a28ba6e0254e78fe8710"
+            },
+            {
+              "name": "stage_down.publish",
+              "line": 426,
+              "end_line": 427,
+              "source_sha256": "10f09a86060205aa90d20cc899ef323bf8babf712b6b87b9fe79bcd3e753a553",
+              "ast_sha256": "d580a0dff851bd3a0aa4c134025627b0c490a866f96aeb37a2bdf64dcca5178a"
+            },
+            {
+              "name": "stage_out",
+              "line": 436,
+              "end_line": 495,
+              "source_sha256": "f1082bfb19d3862cc5c370adbdcd3a1825e2c0a3e14c16ff2e3666f052283cd7",
+              "ast_sha256": "51235fb450d0153111b18586c8702ae3e322330405889af9885a56da1c218722"
+            },
+            {
+              "name": "stage_out.pair_at",
+              "line": 469,
+              "end_line": 470,
+              "source_sha256": "77b66232aab47d4bd7fbff8a3292edb67358b948bf8a181e99940864b004c2d1",
+              "ast_sha256": "3cc74d1b7b8d264cc72bff2f883ddde447e6db720e6634df683dc029a0183053"
+            },
+            {
+              "name": "run_dmlp",
+              "line": 500,
+              "end_line": 529,
+              "source_sha256": "daeb38b6acead1afa3e656ad165222b1b81fb549f74eb568c22ed5e7e800f874",
+              "ast_sha256": "5444342c9cf5b32f3f2e44af4ddfd89a344d755006d64aab79dc7674f7018ede"
+            },
+            {
+              "name": "dmlp_context",
+              "line": 541,
+              "end_line": 574,
+              "source_sha256": "945ab16d7eaff1aaf778ed9c6c81a8003f9c84fd3149624eb388d88504b07198",
+              "ast_sha256": "9c887da508239704cbb08813456e667ede5efc062d85ee565f853a15c31e05ba"
+            },
+            {
+              "name": "build_dmlp",
+              "line": 577,
+              "end_line": 617,
+              "source_sha256": "7ac1f229c337c073f0b2d164c8a20ca89fe15d24cd0f29ee936325c4001deb2b",
+              "ast_sha256": "8c099ff1b3c752eda00fa943e3dd20eabe8a78dee3a1393af085b60ea02b8675"
+            },
+            {
+              "name": "build_dmlp.dmlp",
+              "line": 593,
+              "end_line": 604,
+              "source_sha256": "000abd897755a7b880c83d1960ebef107dcc0b541d5ff618d26fd35158befaa1",
+              "ast_sha256": "2020c9a5802db7111c363a5ba7dc8a926b92a015ae2863503cb74bb071092d0f"
+            },
+            {
+              "name": "build_dmlp.launch",
+              "line": 607,
+              "end_line": 615,
+              "source_sha256": "39464715d79177d05132c6bd5dde3f055758f2f7dc096a024dc2e2a45d12c9f4",
+              "ast_sha256": "cef40b4431a943e931a6563de5fbd7955e3a9662b97acef143511a488e312862"
+            }
+          ]
+        }
+      ],
+      "mono_package_files": {
+        "opt/sgl-amd-mono/sgl_amd_mono/__init__.py": "5734abfe6e08db2ab30e980ceace9e1117568e94d4551d79cfafaad2a8594f8b",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/__init__.py": "86e69172e17dc4c10a6aafd4d341635f0844f74b3f64f9b18053bf0f0b1f21e8",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/epoch.py": "3261659a1e2e022569308cab76cc47b08b569d6527ceecd84c75fa331f31f8b3",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/guard.py": "ebfe7b416d9ae2d4ad2d79b44120598f70f4c4d54cffab29bccc7680f67a0e8f",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/mx.py": "4e5b1f940eff505b1831d209e120837771575f72d4b9d1b953a0ede94de27e13",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/ops.py": "2b0aea365fe90d16b1407b681510e5454baaba25966146067977388d85191cb6",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/peer.py": "9a2bbea591cc5a62d111b68d9c3f7b7f6dda002201d95faa56cdf2eaef88cc6b",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/plan.py": "4c916f61bb05fb4e40fd8b0eed676a9626895424f888b6b0b9d53220de8925ff",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/sync.py": "16755ac1bddd64ac2bb63acd8c879a1b89b5c5f261fc9c4540d328b6c1e0bb56",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/__init__.py": "a7b7f190eabd5ba70e65d263ad90122ff47e56cd8b13ec709c67322493df267a",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/draft.py": "7d799c428a8fed0c8bf6d15975c07c66c4a1527e8ea84461d006970344636edd",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/spec.py": "d668c34a1e6352012ccae38aef22b42db35ccb21aaa017262ea2c4ed5520caf9",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/__init__.py": "d7926b731b99a2142082bd7dcc6299c891b053c7f192c5113191a130006d4bfd",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/layer.py": "2c87f641904aff372b078ffab25769976a41a8845950a8580019a5ec9b9640fd",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/runner.py": "576fb66a03a3cbc12d0ca1092d0a4ae005fe41a296b41e4c6a1aac748ddb9b17",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/weights.py": "c1bf5279cae36b6dedae33d61cabb764f5b85d962a8e662db51542ec649da372",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/attention/__init__.py": "d3144dc3773e81d26f2aa42629840606f5f187ec8e2e30a80633e0315caed134",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/attention/back.py": "7a5a36d2aa8d184c3cab0f4e5ab67a3f6487e50ff90a0a7d3906b23c9f6bee62",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/attention/device.py": "66052a948362b5c7362060f71430b2b62bf6d44c9564eff9b7d8439571511d5e",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/attention/front.py": "4c27e4dd9f41949dfb4c4b787ba67270f24c5015875ad8fd9236a770d7570088",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/attention/gemv.py": "a22461baacc1dafa28a2cf6a34b0a7256c5cd759c701f0f6059ba54fa294ea75",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/attention/plan.py": "9fafc4ccd662734cd6b6b487ea8e6dc6829a1279c7dcd84ed6191ab02a368acd",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/__init__.py": "f1df04a48b26c4cd23f5e38943085bbd54c16107ae711f0fafeb6949cea3429e",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/candidate_table.py": "1973fa617c7776254d90735f8ad1dc90bbc5f05302efafcae8888b3e27109ee8",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/index_plan.py": "be9450fa151cd2f609f1a684c60838b70d15e5e53c72dbf1b92c20026a5ed219",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/k2i.py": "c66c5db9086e68ceac2d4cdd1a0250554dc297a33a18b6daa93ac5ddd85c5018",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/runner.py": "97aa4d00f9e65f006185dc775586ff0bd905f4f85dc3ff7e0c2e49e168fdeb33",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/score_fp4.py": "ba5fa9eaea728227896fc7a0a3c7406c5c83a8629d93a404f17670e751d9ce43",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/walk_plan.py": "ec61a6e4ac52d905322759c990f915c887cd09521e431bcc89e08ce9a19cc38e",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/__init__.py": "3f58beae13b7c76a32b73da5129dc062781ba2236bca7d20ec7ac14662353dd0",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/dims.py": "c409b05c8b2665dbd4c575537264c249d75f2cd06ad0ee21c806f9563c89bbaa",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/gemv.py": "92f329f4a750f65a161f054acbf2727dd21885f56652076df9ac8670ef143eec",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/moe.py": "6e471b0b08bb8bbb3ab09e5af842fa8462476f4e4d668176dee11f83cb34afa1",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/moe_plan.py": "85766a123653a242de1011cafa51ed2415ed145daaab39370d49dd75ed317c67",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/moe_shape.py": "c78b0d908e805024e96dfc744bddf66864fbe959f6744d14dadf4b09913a3fbe",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/router.py": "9a8a258241ccde661f4731132781f8c7713db47847f8b5a23559e5dfd3d873fb",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/seam.py": "69beee9d0939587caba7ab231607fdc425589c312d41a19dbf72b36b001f3632",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/__init__.py": "e251d7fe1dc6a7a6d3a31f29c9de1d5db1e7367bf1439528a0b866e43118d92c",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/check.py": "2ebbc6505fac105edd99a973560809544083fc16ba82452bca17c53cb477234b",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/spec.py": "2b2e1fc514452092d745d6afe530319ad6737918857ce80f73b3180c129e7373",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/__init__.py": "1b7e4091b4c633fc9b986f55cb614b8543d563cfc9d2e7f9acc37a4a2f074ab3",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/config.py": "204a6153d8db5f2f09bda6144a411943cae6c80f58b6eb2600f4db4d9a5a6b09",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/kernel.py": "0e45e039412d111c0d92403268ecfc8dc9aa747250e3353c28e8f212c212f7ec",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/layout.py": "c00376701c81bbd32b5d46de18a9bba16b0abfe3c622f4631add79a400581789",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/packing.py": "340ef05482f2a46ae9361e168311ccd66549b9a9a7682aa6ccaa5aeb3245dda6",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/runner.py": "b32844c11af27727c9b5373bc2d889d77134cff1ca039fd59e86fc79b106582a",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/tiles.py": "bd74925ea02368637a12fad96afaa1fa9df4b4c2ffc263050bebc1891dc7d934",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/weights.py": "206e44c9033c7d8be507ca2145daa1fe9bd7b21f1b95b0e5074a1505fdb9ff7c",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/__init__.py": "1190cd68f60053e83f4b786197bfe121236a1fc922a851a033678cdcdf2f152b",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/check.py": "7ac300d0a4684782e4e905bbc7ad85deb206e4aaca125807de956016f71641ed",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/spec.py": "556c1668afa56b12426e0fc654eb23e5696a96bf2358c79e4d3c04ec1c595cb6",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/__init__.py": "84d8b57e73830fb5a3cd19b347fefec4ae3d3a461115b57fd5eab4b4c6c4686c",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/config.py": "7ab38fd44c4cee2938e97b5b52191bffc76239109dd71f21540d40fca0aed667",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/kernel.py": "bd38726412473fd2a231b7ec29454f96e6ead3cae0114a124af770ed7e41275f",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/layout.py": "600ae03aabe3221b0b364febad54decd2be2f59a1bb4dff5765b5ae26613158e",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/packing.py": "f55b764694ad1790276826177a4972aa87032747257894f4891b59533623f583",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/runner.py": "99f62472541960884a471a7534bd0f09281eba3cbba5b60d115585739dd0027a",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/tiles.py": "fd6180e4d16c86d4f74623f6008222b5cc7ed5bc3f846ed616dcbf7146060dcf",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/weights.py": "c29f75438e34d315cf33cdbd2b93a506a514449cae7d2c27e5cc46e88ca72d96",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/__init__.py": "6957b49533fdcdde0353e13bdd7956df2ffe10d01d760377bcea98a45186d133",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/metadata.py": "23ab2ac13bff1b34b78c1f661e18cfe996216ab313091d0ff569610f07b0f194",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/spec.py": "0184afc3703a0371728251a4349559a658b5e878a773cd843846594fc904bccb",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/weights.py": "fe3fcff069286f2f093bb7eac70cfb468f0825fee359ec9a4345ca468a79aba7",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/__init__.py": "9ac046214353e25813206d801edd8fe966a781367f6e0d88c673fb001e545c0a",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/config.py": "cb161519cea013ba48a53de590a82ecd5b247aec8ede1722a4ebfaec2ca8f151",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/device.py": "bed1a20365bf9283823bce36cf0f12094da7800247279257ba5bbd93e5b4b01b",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/index_score.py": "b82580d74d122727c032bd8344724a7b8641d62c0658d8ed0069bd5273877e53",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/layout.py": "910996c7b86cc5d5f88038845285cfd4b02048c68b570b8d58088b9673ba5cec",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/post_attn.py": "4dd6b695e36c6e88c81e81528653771309d43c3909ce7c9fff4eecb0cd6336ca",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/pre_attn.py": "3163aa7918ee8663281a56d7bcc69c064df72b704d50aa9960a6318bc9405f0b",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/reduction.py": "a76b389d23f94dfe2f2d1b64cf5f9922a7f9143bab0e03d70260bf15b258ea1e",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/runner.py": "ddaac73d36fb5aa9ea48af4de4dc1a6048fd123eefe78aba277ab4e9cfba73b2",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/select.py": "a2e73754aaac005cf8e68f88f2ce241118907fb64b3f9c0f98ce0346cc55b316",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/__init__.py": "e9dbdede1fd4a9b86f15e47e67de55355de9ce016e41bf8035d07cbf804f1221",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/fp8_quant.py": "ad84614f4f66061425d0679a42b025e55ed256ba434e42b514d2e10adee95b48",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/mxfp4_quant.py": "cf3b77d8e909b47875fe3a2a4bd28c25e8d022fc621ede703d5aa1980966d93c",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/spec.py": "a6b921f327a40d8588f4087484c26793c551bdce9e834bd9ab29b5b68605d7c4",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/weights.py": "607b709be8e4375546d6c95574404a2f1438018f7b9876a97a7e7688f79c824a",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/__init__.py": "a960c2f1cd6cc202ee71533b46bdb3b305e9715139756ee17e6f9d6045996037",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/build_k2.py": "3fd4e787686c80752948efd051c2cf06b6a7944f49c6ab08b085c3beb4b05a85",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/build_k3.py": "0b756db6577c77b27ca4a49b261567960808be95eb0e71297466df5100ab0c13",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/compat.py": "9ed102db2f4894e2407241a144d7fdfd35fc19d75707974611027862bbd7d381",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/config.py": "adb901724d7f96bdd7199c58fda5793bcf27a80c4d92dac2e42702441226590f",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/device.py": "89089913ff6ca0d459fcb5920a726b1d31466534a14b8620e52aa07667c25368",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layer.py": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layout.py": "f1d3b5b5f5e951f4881a444ef4ed39fa3218c90fbb57c68f80603478b6a6850d",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/runner.py": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/__init__.py": "6795ecc42a33f12957fdeec8ccbe7e588f47357e9cbbbb4ee0ef1a5cc9fd7d7c",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/attention.py": "82507e89e504bcf175f472c8a742d90b2e6e3346928bcdd5d17fd8bd167032a2",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/ffn.py": "a842cbbe262f3b8bad17bea9caa985bec9f909b0e53445a1e3454e5a1621466c",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/mxfp4.py": "70f8ea1d0bf97cf423977904dcfd992f99850d666a1ec674d5cb5953d9f91b0c",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/post_attn.py": "c318d2c768a509055116908b69deb5695656aae31089b8c6e0549baad85b1a16",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/pre_attn.py": "642c33cfb11e766d5d455998d2c5f56e7d8dcff2c87ad8b3fba7a6dcf4269472"
+      }
+    },
+    {
+      "version": 4,
+      "image_name": "lmsysorg/sglang-rocm:muse-spark-open-mi355-1106",
+      "digest": "sha256:d231181df079a5b271a0459d024492c84a36caf8cb26ee019abad29e17eea4d2",
+      "verified_existing_source_files": 89,
+      "archive_sha256_verified": true,
+      "files": [
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+          "sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
+          "bytes": 6991,
+          "symbols": [
+            {
+              "name": "_attention_shape_ok",
+              "line": 50,
+              "end_line": 63,
+              "source_sha256": "b2a8482d27942909c2dd879ecabae733a490f804687e6ac4969193d7b45b93a8",
+              "ast_sha256": "e3e53cf72f6ed702d1d23d222daee3ce9a428fa8b36ae99c5cb0d1b868f74f78"
+            },
+            {
+              "name": "_kv_write_target",
+              "line": 66,
+              "end_line": 118,
+              "source_sha256": "5a9c288d4ee08b12766a99f328239facd509c506a6edfc8545b3a4d657146976",
+              "ast_sha256": "a844eca5ed529365f459ba06fd3c67943f903871360007d925ed31041dad53be"
+            },
+            {
+              "name": "_note",
+              "line": 121,
+              "end_line": 124,
+              "source_sha256": "efd57664d7fe1821890aa49a253518a989d47a76eb26a168832a265bf94f0df3",
+              "ast_sha256": "3b8773d1a272aa053a50c211136006ccc295754d36c9c3ec0ec84f8fee265482"
+            },
+            {
+              "name": "qkv_proj_norm_rope_kv_write",
+              "line": 127,
+              "end_line": 167,
+              "source_sha256": "fd79514b942b0354b0fc713a417e745253df6e678e36214e4dfddbbd50959466",
+              "ast_sha256": "14ffd1748415663afb61c947c85c1586c044b15ba2b3c5d79a86992cb5c7b4f4"
+            },
+            {
+              "name": "qk_norm_rope_kv_write",
+              "line": 170,
+              "end_line": 204,
+              "source_sha256": "7632cceb84f7ca4cb5ec09658a7536c29a149fd2acd022acb447b45c10f3e844",
+              "ast_sha256": "547cd50de4fb5d118422e970e8d0d35725d79ba2fe25bab50bc923875f3666ce"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+          "sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
+          "bytes": 8767,
+          "symbols": [
+            {
+              "name": "can_share_router_pooler",
+              "line": 42,
+              "end_line": 56,
+              "source_sha256": "a5c1c15ac672e45266de854996fd9340322ec5f430c740c80ed54fa36940caad",
+              "ast_sha256": "7bf49d064f226a51b343de443abc109c2595d3098255376989461d374f635da8"
+            },
+            {
+              "name": "can_route_fp8_joint",
+              "line": 59,
+              "end_line": 68,
+              "source_sha256": "7f6beae2756c9de3ad44b1a66f2977c6e36046e59577ce74b3f8ca221a3d2fc9",
+              "ast_sha256": "821cc06e7182550b4dfb328e4f2f4d5e8655a026b28fa3b44400ac419e3c3839"
+            },
+            {
+              "name": "_routing_front_matches",
+              "line": 71,
+              "end_line": 94,
+              "source_sha256": "ad8aff677a54ac700520ced87320ad40c2ad15da5924f91579a49c1de191c4c8",
+              "ast_sha256": "e40816da4a4760a3dce32c2d92adff7788219de1c263454a7de64fdbd5ecc8d2"
+            },
+            {
+              "name": "route_with_shared_pooler",
+              "line": 97,
+              "end_line": 180,
+              "source_sha256": "c0268bd4ab4745a4c85f440cba855549594d85b9ecd31f5c97e6e7b9851d1438",
+              "ast_sha256": "70cdef76e180fd87915411a4eff2a96d6e9375199cf32728884e043c60170af7"
+            },
+            {
+              "name": "prepare_joint_router_pooler",
+              "line": 184,
+              "end_line": 213,
+              "source_sha256": "791c062d363e3e65a7a6344112ab8b81a5c1519d827111f72b719c74c4a6c44a",
+              "ast_sha256": "904860e9f08641d5a5b0284678730cc4274a837b142e8a9235f951fb104f8642"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+          "sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+          "bytes": 8958,
+          "symbols": [
+            {
+              "name": "_norm_rope",
+              "line": 21,
+              "end_line": 53,
+              "source_sha256": "108c9d81e28e56fc72d12ef61b86265e45a703f8a0032b6a39134b2cae16bc9c",
+              "ast_sha256": "5d35efdc6bbed97e60b89a3845a4a7c58b51c81d65d715e3a2fa5ac56ff605df"
+            },
+            {
+              "name": "_muse_qk_rope_cache",
+              "line": 57,
+              "end_line": 108,
+              "source_sha256": "3b69bf37155abd28419eefab20ae70da1882defa8ddba4fd4da8dbb1310a12d9",
+              "ast_sha256": "dc751f6b822ef12944e4e74fc46a741e9f01c42dec573037212377a5311edb22"
+            },
+            {
+              "name": "_project_slice",
+              "line": 112,
+              "end_line": 118,
+              "source_sha256": "23326d09ef401f2951c1040b68002b9d1a9ad25ac710fab5687a051a2ee8b720",
+              "ast_sha256": "64d8532ad8b2053b3ad8852cf11e564e836e56eb611d75ce76b53ef46de14e16"
+            },
+            {
+              "name": "_qkv_epilogue",
+              "line": 122,
+              "end_line": 169,
+              "source_sha256": "84c0d711be3036e868771a4b12f1d51c63938bdd3dce310c486fd85accc9b0b8",
+              "ast_sha256": "5fc41f38e19e0cbe6aea228c0fdc292ba63e1dbe5f46406b1325bdc3b801cd25"
+            },
+            {
+              "name": "qk_norm_rope_cache",
+              "line": 172,
+              "end_line": 230,
+              "source_sha256": "63ce73b0598d056b96bf3da343d267418fa949b36c6c8e0d98f249d458c59c13",
+              "ast_sha256": "3a1d2f879517f8b19cedf0d448c088b59a8f7614e81b64b25595038b6365aab6"
+            },
+            {
+              "name": "qkv_proj_qk_norm_rope_cache",
+              "line": 233,
+              "end_line": 297,
+              "source_sha256": "53312e164c159b8e3e7e55866b905dc42bff8f94ac396f58d8312f093399d602",
+              "ast_sha256": "b28d38097ef2f63a5fc5b03515ba16176d437024d30bf1a0ef3821d1bc049380"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+          "sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
+          "bytes": 18593,
+          "symbols": [
+            {
+              "name": "_reduce_route",
+              "line": 42,
+              "end_line": 81,
+              "source_sha256": "6a6b3a494204acc48d27cc38e7f396cdc517a35420eb91a02c610fd15b6422d8",
+              "ast_sha256": "7f8753d7289c5183f7421a34142b74e33f149fefba5f11777fc28de519715299"
+            },
+            {
+              "name": "_route_preproject_epilogue",
+              "line": 85,
+              "end_line": 123,
+              "source_sha256": "7209d0b7d5dd13060db2e9302c267dd4e3a5241e30b56daad7f4b429d207d379",
+              "ast_sha256": "75a92d7590c74ec025c1feeea79897566f9f5d0b5a859d089436f0a748a2ee78"
+            },
+            {
+              "name": "_joint_epilogue",
+              "line": 127,
+              "end_line": 184,
+              "source_sha256": "5d690dce08eb610d72fa73c889e5588340a8fb661213fdc57cc210ed110eed07",
+              "ast_sha256": "23362d5b47d9c958b81b6d7f488f17643070d2ca8797b0901fe3066d4f1eface"
+            },
+            {
+              "name": "router_pooler_topk",
+              "line": 187,
+              "end_line": 265,
+              "source_sha256": "61ef466068ea79459a3d60640df1bfd927afc5cc926178f1af99c33e6c5e7921",
+              "ast_sha256": "8c6ae0a35c0f0b34a6b6f6d99e0a14c134b238e9fdaba7681b2fea5c861ffa59"
+            },
+            {
+              "name": "_router_topk_completed_pooler",
+              "line": 268,
+              "end_line": 334,
+              "source_sha256": "dfe976eab468b880fd5fceea4d4cedaa089600d68b9dfec721a49d7866b2a401",
+              "ast_sha256": "d255a062f7cd71762a571aae522d11dcfa399d03cdec448b5dd7294ebb6e928e"
+            },
+            {
+              "name": "pack_joint_router_pooler_weight",
+              "line": 337,
+              "end_line": 343,
+              "source_sha256": "0f13dd97940a20d49a2eeadf7cdfca25864c88736406ce270d4bdd27bbf7d941",
+              "ast_sha256": "50c37d0f1917f07194363309ff43b2f34082edb6606310b7ed67c80732e8b6d0"
+            },
+            {
+              "name": "joint_router_pooler_applies",
+              "line": 346,
+              "end_line": 353,
+              "source_sha256": "dfd2c66a395780eef513135eb0586945f0b80d37dad11a36e08dade3d951d2db",
+              "ast_sha256": "bca43a50c2cfa1fbc38a915486304430502c72b2fd0eddc25155d67228d8db84"
+            },
+            {
+              "name": "joint_router_pooler_topk",
+              "line": 356,
+              "end_line": 375,
+              "source_sha256": "39673548ce0d51633deb59bc567fb80762ec2ac4735cb000cc4f9c3990f70481",
+              "ast_sha256": "6c28087d0a7faf8aa1a391f2e0a88aafcb4b7a77108c6c36308cd23ece8281be"
+            },
+            {
+              "name": "_joint_finish",
+              "line": 382,
+              "end_line": 407,
+              "source_sha256": "da7ebb8be78d92f946cae94b23c6a925a65d245d2f63d840fa1982e221c9ac7c",
+              "ast_sha256": "13adea9eb5b03bf0f325de1927365a3433f946d5de7d04f534258397b56d6c47"
+            },
+            {
+              "name": "_joint_fp8_partial",
+              "line": 431,
+              "end_line": 475,
+              "source_sha256": "15f44c154f23366d4d5d8a9f4c4c74bb844dbbb80d0ae00a5413f8c8e1f97655",
+              "ast_sha256": "908c0f9493809c2ef792d0af9d700a17d40b4b8e5803ecfcb9cc567a61852915"
+            },
+            {
+              "name": "quantize_joint_pooler",
+              "line": 478,
+              "end_line": 483,
+              "source_sha256": "f6896744ec8aa2922f006122f6aaaad918a7af8b63246e3de3820314663ae5b5",
+              "ast_sha256": "24bf2b37e001fea325227b5d78a2516053a20ced56a47308eed9605ce759d270"
+            },
+            {
+              "name": "joint_router_pooler_fp8_applies",
+              "line": 486,
+              "end_line": 496,
+              "source_sha256": "225212ba580b4b035d27d0a3458be9ba6e3ad1e5eec2d3782d3462037fc5b71a",
+              "ast_sha256": "fe8dceda56df7f484bfc625b6fcd37a8b3fc5d561e963f41f657882f38ac3916"
+            },
+            {
+              "name": "joint_router_pooler_topk_fp8",
+              "line": 499,
+              "end_line": 528,
+              "source_sha256": "da643f79eb7de45e36dd230c48f16179fc5d65ab0bef34b47a8b432d37080f96",
+              "ast_sha256": "1b30ebc15e019338dbf6a994281e9d705ec67df21b9c63811ef5a2e3fe544a9f"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py",
+          "sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+          "bytes": 27974,
+          "symbols": [
+            {
+              "name": "_mlp_views",
+              "line": 102,
+              "end_line": 111,
+              "source_sha256": "eb11cd845a3a3a90fd0d6b953f8e8b73f69ea14189b98a88d67c2286e78f9763",
+              "ast_sha256": "e2d75d1d890a67a1ef6c3053d067fd5c603b74b8c378b7b4d18abbaebcd64f52"
+            },
+            {
+              "name": "_attn_views",
+              "line": 114,
+              "end_line": 126,
+              "source_sha256": "13ef091202c3860bc7f08817134e34201a718eac8ec64846cb26b62cd7a14537",
+              "ast_sha256": "9978a1efe41dd5213789ca296d7e9376d1f3c5675184a98e2bf0ab0d47ebd0b1"
+            },
+            {
+              "name": "_attn_view_reasons",
+              "line": 129,
+              "end_line": 145,
+              "source_sha256": "85fec555f0cefae1320a8f35cdc86b26b24b9accb12270061c9d73c189c2a455",
+              "ast_sha256": "3b6d3d205351a75813f344e6ef384522031ef725daadbd24d2f565ddba524ec5"
+            },
+            {
+              "name": "_mlp_view_reasons",
+              "line": 148,
+              "end_line": 158,
+              "source_sha256": "667e7a912e20fc7011288af90d0194a557e525cf433451195f434b43bb664654",
+              "ast_sha256": "4231468f5c05194f0cb9e6cafef1a47eb280e22dbd0a9967aa7819d398e1b656"
+            },
+            {
+              "name": "DraftRunner.__init__",
+              "line": 165,
+              "end_line": 204,
+              "source_sha256": "a61bc56d6def88cc4e48155fe408f53799d74cb7692adc43769ea74a8c851f53",
+              "ast_sha256": "81bddec6a28adf278da81fe38c79efd3ab7185b2413b8fcbb60899d2fa86b0ff"
+            },
+            {
+              "name": "DraftRunner.set_deadline",
+              "line": 206,
+              "end_line": 212,
+              "source_sha256": "f0ecbe729ee28dc437df58c56144b425d70f63072e6aa03200beeefc30e56eb5",
+              "ast_sha256": "6f30cf770cbb6c89d0fe49d6fa9e14ac3930845fd6dc7f5dc40d8c22643b1d4a"
+            },
+            {
+              "name": "DraftRunner.kernel",
+              "line": 214,
+              "end_line": 219,
+              "source_sha256": "fc40fde6660e10884b014361b166cafb62bf7e867065fe81bac4b46f7cf83265",
+              "ast_sha256": "555d13d44bf53cee5a767701874ad873256a865a25b9ce2b50f56aa28554e5c9"
+            },
+            {
+              "name": "DraftRunner.attn_kernels",
+              "line": 221,
+              "end_line": 229,
+              "source_sha256": "578c20b8a931e7d555a03f22297a765c20489c49bd769fe9d7692275e1b05de8",
+              "ast_sha256": "c62b0f6f4feff96ce5b30384ef12ba6789c1e2f86611ddfecef6c046e26a7818"
+            },
+            {
+              "name": "DraftRunner.precompile",
+              "line": 231,
+              "end_line": 237,
+              "source_sha256": "14d0545719dd441702d29d7d10b628ffd51d97070d2718a9c4535aaf61519e81",
+              "ast_sha256": "b045be5d0a65d14fcba6eeffea3794a1e736bc18eb4ff3bd18f83f796c5973c4"
+            },
+            {
+              "name": "DraftRunner._backend",
+              "line": 239,
+              "end_line": 244,
+              "source_sha256": "b2858482710888b4ca14dc716b04d915b039f4f0ba1dbb18afb99009acf6cac2",
+              "ast_sha256": "63685c5faf75f822d4c8137168995ee91f06c8c1f8ef27cad5e132e3c67ef82b"
+            },
+            {
+              "name": "DraftRunner._check_cache",
+              "line": 246,
+              "end_line": 262,
+              "source_sha256": "7b0f7a781a306e3f0b52d6eac848d61f9830b019da8a60ecd0d7e6dd2d071516",
+              "ast_sha256": "b65c5b6610bf89934acad61e434fce6af558b3eda5de04f6ca050a14b2b32536"
+            },
+            {
+              "name": "DraftRunner.launch_attn",
+              "line": 264,
+              "end_line": 310,
+              "source_sha256": "c982117065d7f07143204b048a75ef0e07ffca9204d0a414c4cac03182de6d26",
+              "ast_sha256": "d4d1d0cca7c2496ce5453c21560b98bdc0f1163ba0865cd84a5f953fad35a171"
+            },
+            {
+              "name": "DraftRunner.launch_attn.mark",
+              "line": 270,
+              "end_line": 273,
+              "source_sha256": "3f46fdf1c1527a368540bf104f1f155a44421cb028096a32f1ce07cb23b37ae3",
+              "ast_sha256": "d82534c1ca156f6de257c4df088e2998317439c6e97c28cbc8e4a6a0955c14d3"
+            },
+            {
+              "name": "DraftRunner.launch",
+              "line": 312,
+              "end_line": 323,
+              "source_sha256": "4178de11cce420e6339dc037f341667a5b39340bea9faeec4330fb45209c4d07",
+              "ast_sha256": "b37666dd9ca2c1497c8b43365fe56097ad11ef12c54f6061f651a52128c97b26"
+            },
+            {
+              "name": "DraftRunner.end_step",
+              "line": 325,
+              "end_line": 326,
+              "source_sha256": "3261e131c1f940fd06b483f0df1028169ce8b2c89507c30ad60a4bab1fb605db",
+              "ast_sha256": "663354f53f08204dcede1d9c3614401360202562fb210ac1e56e66d958560559"
+            },
+            {
+              "name": "_tokens_per_request",
+              "line": 329,
+              "end_line": 331,
+              "source_sha256": "c6d575c293f3b821cb2ba3a55fcc29cee726164a25b88a18bc5b37c368525230",
+              "ast_sha256": "911b71fa5d5013fc15ef067f78564bed9fb22802f56193ff420f19653adfdc86"
+            },
+            {
+              "name": "_config_disable_reasons",
+              "line": 334,
+              "end_line": 348,
+              "source_sha256": "7372a51268157a3d0fca3d3e4e97cf119d7ef4b9fc080e69010bc3d31838fe01",
+              "ast_sha256": "897f65d53169221f53c7c103018c083787a7498b177c51ec0d20397a47d60f16"
+            },
+            {
+              "name": "_model_disable_reasons",
+              "line": 351,
+              "end_line": 382,
+              "source_sha256": "126a8c08d67dcaf4f4b107609d8ca0751d909db6a86d0b2957f832807ddf48b0",
+              "ast_sha256": "656bf7cbe0edcd1dc8f2765da20b1c74c9fda8d8c45874ae26329589746dbabd"
+            },
+            {
+              "name": "_Draft.__init__",
+              "line": 389,
+              "end_line": 391,
+              "source_sha256": "51a21cb6014d43fcfef91eab3ac9945d6de457547e58018879c95cbcad774b2b",
+              "ast_sha256": "478e4d3cd1816cde959e5becf6197bb6083af6956ae6f236ac36ac094f4d4dc6"
+            },
+            {
+              "name": "_Draft.forward",
+              "line": 393,
+              "end_line": 434,
+              "source_sha256": "8b6186b32895bc099c9440b544a5c978b4bfcf715a25a52308561ad470a89fe7",
+              "ast_sha256": "9cb8ef67fc7fd5921bdd3c3209f4bb44c32da1476a6c31f13c1ce316f5fa23d0"
+            },
+            {
+              "name": "_Draft._attention_reference",
+              "line": 437,
+              "end_line": 448,
+              "source_sha256": "f9770421238a6469a7793c4b648a8fa43c41a660908f7f67d9f725a7db121937",
+              "ast_sha256": "d3dd1b027d23954ff05eaba99fe1d66b14463d8e490aa75315867db1723bd7c8"
+            },
+            {
+              "name": "_Draft._reference",
+              "line": 451,
+              "end_line": 456,
+              "source_sha256": "c07477e4f59eeb324a27afa54920f1387589abde9660632f970342c9d4083203",
+              "ast_sha256": "83950ad7b275623c6f0e277f9e08937c34fb5e6edd8a464826373988bbe7b428"
+            },
+            {
+              "name": "_log_check_pair",
+              "line": 459,
+              "end_line": 464,
+              "source_sha256": "b115067d942c6d9d6afffc4c01ae51ed02b637b8aa38728ead13d8262aff4923",
+              "ast_sha256": "a574c3a749716cb93d0c8e834734537f577bb715fa833d953b7befab5bc70e44"
+            },
+            {
+              "name": "_log_check",
+              "line": 467,
+              "end_line": 472,
+              "source_sha256": "4b2c9d3c8c722c90fae25ea3b39399a41b486623d6329506b2184b8f02469b3d",
+              "ast_sha256": "027f070b6de52b5a9f7de96b69ece509c16546e3e78f37a76c7243c372403c1f"
+            },
+            {
+              "name": "_shard_fc",
+              "line": 475,
+              "end_line": 498,
+              "source_sha256": "e8d109b9e5cd162d6bdbccec8339539fe2ad61a289e48348829ba77225e2fba6",
+              "ast_sha256": "ce7938713f9550a1e84c21c9e57fc432f404821e19b3bbc8d992056a2bd4eff4"
+            },
+            {
+              "name": "_shard_fc.project_target_hidden",
+              "line": 487,
+              "end_line": 495,
+              "source_sha256": "a900df1f5be8fc33bb4b7d329e01296a16e3902ad3568f54d20b7b3cb605993a",
+              "ast_sha256": "dfd8517fea8d807551f35dcb3f51df0a8c3c704bce0ebb7d7f82acc76d5d4f18"
+            },
+            {
+              "name": "_build",
+              "line": 501,
+              "end_line": 518,
+              "source_sha256": "f5e9d6eaccb9926e6569314e4058c63c5c121d1b07a7eac9e9259f3d4848f4d9",
+              "ast_sha256": "5940574617ee0b32ccafb1eaf2c844b07b2a6d2a00ad2fc2036b3a8828e4940e"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
+          "sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+          "bytes": 24704,
+          "symbols": [
+            {
+              "name": "dp_scratch_layout",
+              "line": 91,
+              "end_line": 103,
+              "source_sha256": "9ddb66752cac9f4eb505b0c9ff3031e33b415da7610975d32401dd60495a7006",
+              "ast_sha256": "110289ea152b48220aef58e431a16555d4902a5b885b1de34c9af59030601158"
+            },
+            {
+              "name": "do_scratch_layout",
+              "line": 106,
+              "end_line": 108,
+              "source_sha256": "3a287fc2fe35dd4636ec104eb65bd292f11e9e00288dba777f401e060fa07da6",
+              "ast_sha256": "bfe676a2119cf19048a4a83175f903a43836d3acf36389ec84b5ea94852d88d2"
+            },
+            {
+              "name": "do_sym_layout",
+              "line": 111,
+              "end_line": 113,
+              "source_sha256": "9d63e8622a4467ef9731b1f7744927512ac7eb1d05d08c8407eb068110902d55",
+              "ast_sha256": "ccde182ae5510872b8e40f6dcf089359779f8fb2ce14dab1dbb9f2a707b2d15b"
+            },
+            {
+              "name": "do_sym_bytes",
+              "line": 116,
+              "end_line": 117,
+              "source_sha256": "0877d934bc8e7d2884bd4cc96796c7e5d1291ab3861139a410a1959a7829e7bf",
+              "ast_sha256": "3419cd8741a92d09b8c1b4b9f9940a68c9859fcd9d99089b5b27e6bd122bac02"
+            },
+            {
+              "name": "dp_lds",
+              "line": 120,
+              "end_line": 133,
+              "source_sha256": "b6ac2e3bc222b5599b7af792ec2051fdec21c343b5608647437f473b6e85d4d9",
+              "ast_sha256": "ca6f9ca30d8cbe575edd671252a82776e3dd8930ebdd22f03186bd5dee24e7b3"
+            },
+            {
+              "name": "do_lds",
+              "line": 136,
+              "end_line": 145,
+              "source_sha256": "01a84163f6a598cb85c2bdf0336349ad878a2332b1654382d43ed718cbfa7bab",
+              "ast_sha256": "e83858a31fcbb25ff27ff969944cd88b33726c2c8b609c3816f18d36c65c8aab"
+            },
+            {
+              "name": "_pick",
+              "line": 148,
+              "end_line": 150,
+              "source_sha256": "de8239efc2e3257a6300951e5aedd85b0b23325f19f716c3ee4b3c1ea8e81535",
+              "ast_sha256": "ae347b86261be4a2c6fb0c12f446ef957abeb9a216a0cc2eab513b6bcd89b1b7"
+            },
+            {
+              "name": "_cs",
+              "line": 153,
+              "end_line": 155,
+              "source_sha256": "36f7581afd106ee3983a7156d2d13f93dea6dfb38a4f0fb8983c7d8870367638",
+              "ast_sha256": "5a4b03b94056197d29ec35910e993d3f604dd35648769bbeaeafd648e1523572"
+            },
+            {
+              "name": "stage_norm_in",
+              "line": 160,
+              "end_line": 205,
+              "source_sha256": "2ec9fbaa0f53f711ad76bf5daf34a51114b6c56e58af09ed311c843385120b10",
+              "ast_sha256": "d5f930158047f342e02603ba12a078e68d61cf8f3e9ff867f6be06a070fbaff3"
+            },
+            {
+              "name": "stage_qkv",
+              "line": 209,
+              "end_line": 226,
+              "source_sha256": "91e2e83c299bc9c5c3b0cf677597fa3ce549d5b2b496017e54ea32c59a51ebf4",
+              "ast_sha256": "3c50c9fc3e19735028e7fabedb85d01f28d0a8ca7b3633a0d093c2890a4f5a0f"
+            },
+            {
+              "name": "stage_qkv.tok_of",
+              "line": 216,
+              "end_line": 217,
+              "source_sha256": "215ae0e79ec89d69111c4ec03ec62e6d7b5604e23846bf8ef6cc497b8ad444bc",
+              "ast_sha256": "be81fbaa9b572ebd669caaf0719acde3320c1faf31cf02f15dffcc54a9a71b5c"
+            },
+            {
+              "name": "stage_qkv.k_of",
+              "line": 219,
+              "end_line": 220,
+              "source_sha256": "b3da3cd65af3ced9e43f635cc2198ac4de91addadf1130512f414b49afb4dde8",
+              "ast_sha256": "a6c22c9212fdd1c49c05c16baf3dd02ce8e1cceebc905b70d2e2e9a8ac0405e6"
+            },
+            {
+              "name": "stage_qkv.publish",
+              "line": 222,
+              "end_line": 223,
+              "source_sha256": "a6fc4e504d33394548c002c25e630d66ec5c97ade46367fa2a026742048413fe",
+              "ast_sha256": "bdd9e365e570d96a97f89ad3b967e7ad0086cf60dc06d5c712cf6832735c6b11"
+            },
+            {
+              "name": "stage_heads",
+              "line": 230,
+              "end_line": 306,
+              "source_sha256": "ad3d0249dd7840fee8e2ca91de78325745ddb41baaa9dfd2afabf483e54ec5cd",
+              "ast_sha256": "c1d38e4e2c878b4b628a5f7419a9736bc4da4047dc0c311453f79936e67c70ce"
+            },
+            {
+              "name": "run_dpre",
+              "line": 310,
+              "end_line": 326,
+              "source_sha256": "da2380fc20d2272589c15cfde646a5136e6f5ff73c0992a0b084bbbde6d1f367",
+              "ast_sha256": "1b91dd86fea3b89b4d4b69188053a948093753bdb5622f8293fadaea8b5237e4"
+            },
+            {
+              "name": "stage_o",
+              "line": 331,
+              "end_line": 369,
+              "source_sha256": "82711d4e221a189fe8f372fdade98bb5bca02132d7a4529687b0e16a0c9e4866",
+              "ast_sha256": "29eeb9d82cf7ba2ab8c2227fbd4493098029851afd7410c1a313ddf55a6ee987"
+            },
+            {
+              "name": "stage_post",
+              "line": 373,
+              "end_line": 429,
+              "source_sha256": "23ac9b4895411e696dcb211aa2320dafe53042670cad7a35ca7c60138cd76865",
+              "ast_sha256": "f99d2edb3c2c4b5ed05883b51d0932a09a06fe64656ac229c742dd19357f6669"
+            },
+            {
+              "name": "stage_post.pair_at",
+              "line": 404,
+              "end_line": 405,
+              "source_sha256": "77b66232aab47d4bd7fbff8a3292edb67358b948bf8a181e99940864b004c2d1",
+              "ast_sha256": "3cc74d1b7b8d264cc72bff2f883ddde447e6db720e6634df683dc029a0183053"
+            },
+            {
+              "name": "run_dpost",
+              "line": 433,
+              "end_line": 438,
+              "source_sha256": "1301928142aea5a921d830afad81ff976a0561f7f44b77049671ffdd1fea2e92",
+              "ast_sha256": "eb4b61353b44a5fe30d989baabffbe04f527fce0b2451779e22f11f114bdd9b2"
+            },
+            {
+              "name": "_common",
+              "line": 457,
+              "end_line": 467,
+              "source_sha256": "f55bc9cbad711ab0dcc21bc2be5b56527b524185801617f4e5fa187819c5f874",
+              "ast_sha256": "cdf0adc14c26d496e9bfa42e397ea0847b82d71237309cfc149682645eb3fbe9"
+            },
+            {
+              "name": "build_dpre",
+              "line": 470,
+              "end_line": 518,
+              "source_sha256": "0e3e952496465e76d72526d095a35492376ca98135ee1d25f0f79b1659bb6f92",
+              "ast_sha256": "d1057193e7e91c517a3c0632ac309d1888307172d265e841c505225ccc727f7d"
+            },
+            {
+              "name": "build_dpre.dpre",
+              "line": 487,
+              "end_line": 504,
+              "source_sha256": "afda9324edc33e91024c62f8240a47c4f7b15bfc2b328b52111dd06582524ed6",
+              "ast_sha256": "770c42cc4a3f8aa3b152306074cf0b850d6a2a8c90865a6b5231fc487dde27b2"
+            },
+            {
+              "name": "build_dpre.launch",
+              "line": 507,
+              "end_line": 516,
+              "source_sha256": "f3afee687639ad4578f0c0daec46b5b7aa72c2cc890e1191f7246581870c27a1",
+              "ast_sha256": "b8da30e24ab8ee8a4dc507644ecf500508002db26930c6079fea623b64fab5ae"
+            },
+            {
+              "name": "build_dpost",
+              "line": 521,
+              "end_line": 561,
+              "source_sha256": "146c450f00e7f3ad4cc0ae024bd9693cb0e42c2eb9c1914f1bbddd3a5a33ef81",
+              "ast_sha256": "277dbbb578a6f53a6e02cbb6cfa7baa708cbc913a175efa16b54ab8fa2de1142"
+            },
+            {
+              "name": "build_dpost.dpost",
+              "line": 535,
+              "end_line": 549,
+              "source_sha256": "8773e335518a0fa8788d48390b540b2747449d539885c2f4a0c240efa80734d7",
+              "ast_sha256": "287a4ea5456e05057eb8d0d9d599939d0a55952eadffea5164b89c0c5f474451"
+            },
+            {
+              "name": "build_dpost.launch",
+              "line": 552,
+              "end_line": 559,
+              "source_sha256": "4bb8319186a90e71056542d8d0bab52cf04b171a33b89118c510667e5e510733",
+              "ast_sha256": "eeee3a4a1a3d74fbd5bd3b5dbfd2304accdb80abbab55f18689e83dd42caf1d8"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
+          "sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+          "bytes": 38593,
+          "symbols": [
+            {
+              "name": "attn_rows",
+              "line": 59,
+              "end_line": 60,
+              "source_sha256": "a0d51b310805da211957a4368f92f3f7771b7255e4289ed4938416b383c5fc09",
+              "ast_sha256": "869127db7ed01287ecf5418f69132005060eeec5b1d273c7d147b8b1728f8d3b"
+            },
+            {
+              "name": "dattn_scratch_layout",
+              "line": 63,
+              "end_line": 80,
+              "source_sha256": "4281ff4555693269206052e5d9c65ef4f81556f15ae3204c2978a0939a86ec04",
+              "ast_sha256": "ed3d88d24532350dff898c2e89276768cfe4e229005b3f6b6f1b94d80a168324"
+            },
+            {
+              "name": "comb_floats",
+              "line": 97,
+              "end_line": 99,
+              "source_sha256": "178f21357743e76b3ca802ea13a58564c93081dcc2f1d85fb18b198b234695f2",
+              "ast_sha256": "bf1238d9799426fb64cc4762d18b4249a22b44de57da7a32213d039f4f581dc1"
+            },
+            {
+              "name": "dattn_lds",
+              "line": 102,
+              "end_line": 120,
+              "source_sha256": "fc394325db36e378c3ba663eae2dbb2c8f84ae478280b43f36f433cc2b85359b",
+              "ast_sha256": "7794dccf566931687a45e544a6444b74e8a87efea5a31e1fb2a7e2c3a6143354"
+            },
+            {
+              "name": "lds_views",
+              "line": 123,
+              "end_line": 125,
+              "source_sha256": "b0e0f6a0383bd9ff9e7c7f757c73d63e775135e3c6fb38b8e021d7d65071a51d",
+              "ast_sha256": "7769a380f700bc840c87aeab81593e5d6d93c9363c9812316ed07797b94797b9"
+            },
+            {
+              "name": "run_dattn",
+              "line": 129,
+              "end_line": 650,
+              "source_sha256": "f43d7de71f0170d3b095c918bc0234e3bb1cf55cef84babb14f9e695debcc6d3",
+              "ast_sha256": "316fbe0d91f816566c42dd3999f5b6706f9c974159e1320dc3893e1fdf40e5bb"
+            },
+            {
+              "name": "run_dattn.req_pool_of",
+              "line": 161,
+              "end_line": 163,
+              "source_sha256": "afee1f759171ca09a6bd368177ea632eca81bf1f84bf1c4da98f3475066c749c",
+              "ast_sha256": "72900c0f8a9593c143c189977f2efc7a52b87f58d01a87769e3ecc3e03c7ea71"
+            },
+            {
+              "name": "run_dattn.seq_len_of",
+              "line": 165,
+              "end_line": 174,
+              "source_sha256": "961c62a8efd309c87a990fef6cda192a5c5d79fd9dbc1f6a4ff57c7aae129b3c",
+              "ast_sha256": "ed4bc9a81398f2ebdb8f95810ee851111de8ca397d2493ceab5ecd33aa2b1fb0"
+            },
+            {
+              "name": "run_dattn.chunk_range",
+              "line": 176,
+              "end_line": 183,
+              "source_sha256": "1fbb5af5622b270a657ed0afe79f2cb0e43cdd24b8284cd6599caceaefc0c2c4",
+              "ast_sha256": "f263b19782dadd19cf762931fd8688f62ac8279aebffddda2d06063eecb4cb56"
+            },
+            {
+              "name": "run_dattn.span_of",
+              "line": 188,
+              "end_line": 190,
+              "source_sha256": "37099e7aa45c7691b7c3bf98ef840d0649addd6015368724ca9ff3659443cf5e",
+              "ast_sha256": "ec36100f5cc80d25410783251c6fa414b90e211991201c3dbe7e5f6cd923c2fa"
+            },
+            {
+              "name": "run_dattn.tasks_of",
+              "line": 205,
+              "end_line": 210,
+              "source_sha256": "fd4711d502d3ad895e13dd743f53ffdcead2cac28da23442703a0a9508bc8014",
+              "ast_sha256": "32985268faf497ea3c12fe59de1c6eb05cb2591e369b0212116b69560d941279"
+            },
+            {
+              "name": "run_dattn.n_parts_of",
+              "line": 220,
+              "end_line": 223,
+              "source_sha256": "5f3b900b608e2aba50a48f72ce685bf9b37ac6aece2cc1c51c59e2351646b714",
+              "ast_sha256": "255f2a48e28e72ee7cfbdd7b9e86e39ecc9625c55479d2ed2f7b1fb75ec4ce28"
+            },
+            {
+              "name": "run_dattn.pflag_at",
+              "line": 225,
+              "end_line": 230,
+              "source_sha256": "99e627458711855362a7953fddd8d71314d2d5ceb2bfdd7637ee26e61af6cee8",
+              "ast_sha256": "38d79c53044e3baf4ee588b3f01b72cc1881b383fcc535a226a8cb4ccdfe306a"
+            },
+            {
+              "name": "run_dattn.part_row",
+              "line": 232,
+              "end_line": 234,
+              "source_sha256": "4217fae0e8b4b97bb023fe4a3996c752357e90b1abbb83faa8d353b00d2c28e7",
+              "ast_sha256": "7473ed44f5dffa9dfb00f0f5218a1d961e16c01c670da27592e28db50952fe77"
+            },
+            {
+              "name": "run_dattn.l2_row",
+              "line": 236,
+              "end_line": 238,
+              "source_sha256": "ce27a22a8fe73baf307b79a66cbdd8aa8f9200c2efcdcc885c239c14f1482224",
+              "ast_sha256": "a8a4e6b913a5ada60d2ea42ebf1fb93ade2dd632a6a5610a1c3f162695be5502"
+            },
+            {
+              "name": "run_dattn.fold",
+              "line": 240,
+              "end_line": 246,
+              "source_sha256": "229ef1115ae589e7fbec7687c81b69c0730049696b7218e827e72d134c3eb2a7",
+              "ast_sha256": "ac7729bf42ded674553c0ccfc1004e52b527a69de53c8075fbed98d9242c18c4"
+            },
+            {
+              "name": "run_dattn.attn_task",
+              "line": 249,
+              "end_line": 480,
+              "source_sha256": "e3a0c45f8810233f44aabcbd391c163377093d3b5f004f7cd9b45412b59a4f1b",
+              "ast_sha256": "4220865dc3489eac7c998d7dc7f6a5ec8c6c28088b2a27fd126af4e1c0580e63"
+            },
+            {
+              "name": "run_dattn.attn_task.issue",
+              "line": 309,
+              "end_line": 317,
+              "source_sha256": "b0915022e8ef8ab13ea8e2579608b72c70edfd87d932e5ffd8fa547c9d3c11c4",
+              "ast_sha256": "4ef47da136a96f16146b32805d30c15014e0434ab65aa2ffbd72fb720478d5b5"
+            },
+            {
+              "name": "run_dattn.attn_task.quad_max",
+              "line": 319,
+              "end_line": 324,
+              "source_sha256": "c3da1dabb7e0fe6109f49d82a91b7a5acbc2d24884ac1e9bc265134971b1c910",
+              "ast_sha256": "469a8cfbf91d932b14183aea7d4578040e57ac35aa57c4e05c68ff381efcf185"
+            },
+            {
+              "name": "run_dattn.attn_task.quad_sum",
+              "line": 326,
+              "end_line": 330,
+              "source_sha256": "cdad33f97679d9ea43c29730da8b43790398f9ac73ca61a1460636cbf2b726f6",
+              "ast_sha256": "48b05f1a3d566a96545ec1d2e77874f4f29a552c4597b0ae67ba6525a1174458"
+            },
+            {
+              "name": "run_dattn.attn_task.comb_at",
+              "line": 430,
+              "end_line": 431,
+              "source_sha256": "b1154bba2c95d3537fa44a6f8dc8a1a90d9c364e044a9a969bc283ade0eb2fe0",
+              "ast_sha256": "ae0e39a1fd93aa383a7ea05d3246404ab1637ac187335eb6ee416beec6b2ca05"
+            },
+            {
+              "name": "run_dattn.load_rec",
+              "line": 515,
+              "end_line": 520,
+              "source_sha256": "79206d9a5a8ff93e277aa8faa8aa54ff617ca97563192d6b94fd15fa3117dc88",
+              "ast_sha256": "7a0d440610d590f64a3c1241d83fb2d93b52454f08521d9959057ff8e82acbbf"
+            },
+            {
+              "name": "run_dattn.fold_rec",
+              "line": 522,
+              "end_line": 529,
+              "source_sha256": "53c5613b00a4e4b9f6f84c76650654701db35452f936b849457f367758d746e8",
+              "ast_sha256": "2bc2ef4a681b02ac8224697647b5f64c86658d225f992b9c5a9d4a3d77d4498f"
+            },
+            {
+              "name": "run_dattn.combine_lanes",
+              "line": 531,
+              "end_line": 558,
+              "source_sha256": "96283b14f2c42bbb0e610c5b11b887e3c226ae71daa4b83f14ea131a57bc10b5",
+              "ast_sha256": "de03e77c3bb0a63e0ae12912d86661c8490979404d08c466a17ef256f89643b8"
+            },
+            {
+              "name": "run_dattn.merge_l1",
+              "line": 560,
+              "end_line": 593,
+              "source_sha256": "bde5e68cf0786b1931b2415618526788bc74d08fb5d4f2b06a8f448fa3a0bd34",
+              "ast_sha256": "0aeaaaa1019981b429ba5841d5f3d9a194d4d15e7a7b707f351efbdd88f52d7b"
+            },
+            {
+              "name": "run_dattn.merge_l2",
+              "line": 595,
+              "end_line": 636,
+              "source_sha256": "29061115c9d77ae5463db2d7d74c99128f8fef04782a6981226c8ea97890230a",
+              "ast_sha256": "d7a5eedfaf6e541195dc0d8e90892c3ef98db6d7a6f5738ec6461afc14222307"
+            },
+            {
+              "name": "_attn_views",
+              "line": 681,
+              "end_line": 682,
+              "source_sha256": "af3fad29a453e26f986a8b2e81b7e4de2a23c005f36d359702faab0763616e32",
+              "ast_sha256": "6fd8e939668531d09ea896e83b20c96415b4477d7dd6801578d2c6f4dbfbb12b"
+            },
+            {
+              "name": "dattn_context",
+              "line": 685,
+              "end_line": 705,
+              "source_sha256": "99556d94633a31b6c023212a6c878e200212af37cb7357ebc655ebc6eabf0a7c",
+              "ast_sha256": "d99cb341508927fc4cdd78c8e2976c38b185943798d8b20f99225e2c0a63de47"
+            },
+            {
+              "name": "build_dattn",
+              "line": 708,
+              "end_line": 761,
+              "source_sha256": "876c2e05475c5056beb42bc840e5fcafed90b1ebb5f5ff89920062e98a841a48",
+              "ast_sha256": "2c66b26419f51242440cccf0cedf86803572159f49c51e9fd34f8d9e8a8cf21c"
+            },
+            {
+              "name": "build_dattn.dattn",
+              "line": 733,
+              "end_line": 747,
+              "source_sha256": "7a3acae531a5ccfc2d080164fb53caa224372b5285fbe8ed75de2d715c615ce5",
+              "ast_sha256": "954b46e05679d69aa75e730ca37e8b6342cda21b57eec239cc2244cb0eb9a238"
+            },
+            {
+              "name": "build_dattn.launch",
+              "line": 750,
+              "end_line": 759,
+              "source_sha256": "a999f361d332fc7ba2df539858d8356169f124f3ea609a8b65eb18de738800bc",
+              "ast_sha256": "31b7240b22057327394992adffc387bc74b93705e856193f330f2b4b57b5c397"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
+          "sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+          "bytes": 27252,
+          "symbols": [
+            {
+              "name": "dm_scratch_layout",
+              "line": 84,
+              "end_line": 99,
+              "source_sha256": "3cf339789adf16d8da6c2232597b665f81ffca8ca8debf35275c857c7d8bef72",
+              "ast_sha256": "389378e0e19f7d0d79dce77f71da9ee1538dcb4f914887c79b4741f5b78c9767"
+            },
+            {
+              "name": "dm_sym_layout",
+              "line": 102,
+              "end_line": 104,
+              "source_sha256": "7146e5a84b461572428e83059bead945d835cd698bc697f1d9d584a84d545be5",
+              "ast_sha256": "1ae234d578de2ca0005390a3927d1114f8ef5d9f1805238d9176c23dbf28767d"
+            },
+            {
+              "name": "dm_sym_bytes",
+              "line": 107,
+              "end_line": 108,
+              "source_sha256": "72b9658d5a3eafea1d944886ce530b4fa3b1dafd8ccbe9015adb30b8620abc9d",
+              "ast_sha256": "ca4274f483ea2ec48709174c1c0b6d5f4abbf91b319a1191b6b369a92f42892b"
+            },
+            {
+              "name": "dm_lds",
+              "line": 111,
+              "end_line": 124,
+              "source_sha256": "a8218ff68c15057616d05506737c450bb1085bfbab169c557de8e7cb8591cfdc",
+              "ast_sha256": "d2e181ac69aacb9a9a88b45370db60a4203c5301c0512db399eab738bb2a9128"
+            },
+            {
+              "name": "dm_lds_bytes",
+              "line": 127,
+              "end_line": 129,
+              "source_sha256": "9397b0594f9f2ca5026b814758459c3f3300d359197550f5a097018cd08b4ea6",
+              "ast_sha256": "f51b64491868fd50084a0f8ccfb6378b3d64b7033e8c7003190637755938f955"
+            },
+            {
+              "name": "gemv_k",
+              "line": 133,
+              "end_line": 134,
+              "source_sha256": "d47bae5207eaa7eca9a4b3e813ebedbc0a41fe6f72e98c06880a66fc45190743",
+              "ast_sha256": "33dce5dd20a3f684c276ac9c67219f04fa06d790823e3364818585d563d2dce2"
+            },
+            {
+              "name": "w_loads",
+              "line": 137,
+              "end_line": 153,
+              "source_sha256": "e8e37ae6d552d197a78d8bcd9b76f9c88c64eea28c932e1b39bd54d4c1657250",
+              "ast_sha256": "cb299f89516109faee449ce2448629619badfe7d12073cb29cb6ad23bf869f49"
+            },
+            {
+              "name": "gemv_tiles",
+              "line": 157,
+              "end_line": 180,
+              "source_sha256": "410104033776689d944ec4df85661b2d22ce9f5572b0f1254cd671e9205df500",
+              "ast_sha256": "6c753bfb3713974e15ef5743c085eebdeadc5bf51b2a1374ad2ca923b8ec52bb"
+            },
+            {
+              "name": "lds_b",
+              "line": 183,
+              "end_line": 191,
+              "source_sha256": "6263ab2293eb270c232e383dbd629b09eb6e7581500d8ae990077a933d18423b",
+              "ast_sha256": "254e2a3d40fc731df458ffb21c2a8c6dffc816a23148836f876d7e1cdc354faa"
+            },
+            {
+              "name": "lds_b.xb_of",
+              "line": 187,
+              "end_line": 189,
+              "source_sha256": "9bab4ac72782130b30ce524940f63c4e9fc851a2b026eb0787bbbeeaca1a7ad4",
+              "ast_sha256": "01797f9a6f1319b77638b8c4f0c2f0eefb90d1f3e4409f1d6fefcdd85540d47f"
+            },
+            {
+              "name": "stage_norm",
+              "line": 196,
+              "end_line": 242,
+              "source_sha256": "a546d28c320d28c59b2c1c310c807b3e036834ad1e58e7ec45e8a994d10b303c",
+              "ast_sha256": "ce8fbf6abfab57ccbe0f990e759cf27071e7103339b92c6288526a12f5670e55"
+            },
+            {
+              "name": "stage_coef",
+              "line": 246,
+              "end_line": 261,
+              "source_sha256": "b75eb8d2d47ea70786f5062a08e6e945768afbc5fd6468ccd347cddfc1e72427",
+              "ast_sha256": "6409ccd42c421e6129977fd384100e7abbef2e20849b1311f848c009d3f7fe1b"
+            },
+            {
+              "name": "stage_coef.tok_of",
+              "line": 252,
+              "end_line": 253,
+              "source_sha256": "215ae0e79ec89d69111c4ec03ec62e6d7b5604e23846bf8ef6cc497b8ad444bc",
+              "ast_sha256": "be81fbaa9b572ebd669caaf0719acde3320c1faf31cf02f15dffcc54a9a71b5c"
+            },
+            {
+              "name": "stage_coef.k_of",
+              "line": 255,
+              "end_line": 256,
+              "source_sha256": "b3da3cd65af3ced9e43f635cc2198ac4de91addadf1130512f414b49afb4dde8",
+              "ast_sha256": "a6c22c9212fdd1c49c05c16baf3dd02ce8e1cceebc905b70d2e2e9a8ac0405e6"
+            },
+            {
+              "name": "stage_coef.publish",
+              "line": 258,
+              "end_line": 259,
+              "source_sha256": "5c42d3cac13a67938d44c3f502be1ab9a75c58d1760c0f2502e8a26bca4c7588",
+              "ast_sha256": "0feba0037f8470718b9158cd471cac0a57b1dc87fec74c97d49b0a3a0958128f"
+            },
+            {
+              "name": "stage_coef_reduce",
+              "line": 266,
+              "end_line": 285,
+              "source_sha256": "477711d656c81e8d16a21dfd6459b601fdd31fde957b2ca9bdf9616cf91fd874",
+              "ast_sha256": "805a1f0d438699a590f30547c3f82e92f2753caa0c1c02c8938d3d9ace29abc1"
+            },
+            {
+              "name": "stage_conv0",
+              "line": 290,
+              "end_line": 334,
+              "source_sha256": "a85991da21db89278886ccf9762850f34bd61a70fd7385b0daf621316e9d4426",
+              "ast_sha256": "20a752eedece0e09eb870a618485658043dda91438c379bf7e88bb9657cb3216"
+            },
+            {
+              "name": "stage_gu",
+              "line": 338,
+              "end_line": 363,
+              "source_sha256": "7625c4c49e9e1fba7e87823c48a0b0eae954fdfcf72d84604401b5070887229a",
+              "ast_sha256": "bf2e5a960435fdab7d2d9fe26facc87a515b3778783f842dca7196797be2b42d"
+            },
+            {
+              "name": "stage_gu.tok_of",
+              "line": 346,
+              "end_line": 347,
+              "source_sha256": "215ae0e79ec89d69111c4ec03ec62e6d7b5604e23846bf8ef6cc497b8ad444bc",
+              "ast_sha256": "be81fbaa9b572ebd669caaf0719acde3320c1faf31cf02f15dffcc54a9a71b5c"
+            },
+            {
+              "name": "stage_gu.k_of",
+              "line": 349,
+              "end_line": 350,
+              "source_sha256": "b3da3cd65af3ced9e43f635cc2198ac4de91addadf1130512f414b49afb4dde8",
+              "ast_sha256": "a6c22c9212fdd1c49c05c16baf3dd02ce8e1cceebc905b70d2e2e9a8ac0405e6"
+            },
+            {
+              "name": "stage_gu.publish",
+              "line": 358,
+              "end_line": 359,
+              "source_sha256": "6eb239937674a803218b380bcb4c3009b5a37c506341ad6a94d066c27600fffe",
+              "ast_sha256": "c86260fe1d7c505e4cb75c993217156bc7f1cd7e83ddf55e7804160e520bfd67"
+            },
+            {
+              "name": "stage_act",
+              "line": 368,
+              "end_line": 395,
+              "source_sha256": "2a37b54204d9340cd2fe039ea85a07bbaeb19e7bab95873f82209fe0751b8e27",
+              "ast_sha256": "cfe3b6b6f86aa08dcb9debe3e215dd5449a32a2e3330384c5975cda30e09ac38"
+            },
+            {
+              "name": "stage_down",
+              "line": 400,
+              "end_line": 431,
+              "source_sha256": "8c188bbe30ace045accf620d84521f718430ace3d1efa9fab0fcbc9d65554197",
+              "ast_sha256": "e2273d615f2eb67f431347163bbe69dcf9bc15d50f697c583b4bdadcdc332c0e"
+            },
+            {
+              "name": "stage_down.xb_of",
+              "line": 409,
+              "end_line": 419,
+              "source_sha256": "27952c2b3586bb3887be650cb003b3501e05ef816592a7fcf8659b8465e3921a",
+              "ast_sha256": "d3696c391ea7f47f2cd6d3da1424198f66e43365aad9a28ba6e0254e78fe8710"
+            },
+            {
+              "name": "stage_down.publish",
+              "line": 426,
+              "end_line": 427,
+              "source_sha256": "10f09a86060205aa90d20cc899ef323bf8babf712b6b87b9fe79bcd3e753a553",
+              "ast_sha256": "d580a0dff851bd3a0aa4c134025627b0c490a866f96aeb37a2bdf64dcca5178a"
+            },
+            {
+              "name": "stage_out",
+              "line": 436,
+              "end_line": 495,
+              "source_sha256": "f1082bfb19d3862cc5c370adbdcd3a1825e2c0a3e14c16ff2e3666f052283cd7",
+              "ast_sha256": "51235fb450d0153111b18586c8702ae3e322330405889af9885a56da1c218722"
+            },
+            {
+              "name": "stage_out.pair_at",
+              "line": 469,
+              "end_line": 470,
+              "source_sha256": "77b66232aab47d4bd7fbff8a3292edb67358b948bf8a181e99940864b004c2d1",
+              "ast_sha256": "3cc74d1b7b8d264cc72bff2f883ddde447e6db720e6634df683dc029a0183053"
+            },
+            {
+              "name": "run_dmlp",
+              "line": 500,
+              "end_line": 529,
+              "source_sha256": "daeb38b6acead1afa3e656ad165222b1b81fb549f74eb568c22ed5e7e800f874",
+              "ast_sha256": "5444342c9cf5b32f3f2e44af4ddfd89a344d755006d64aab79dc7674f7018ede"
+            },
+            {
+              "name": "dmlp_context",
+              "line": 541,
+              "end_line": 574,
+              "source_sha256": "945ab16d7eaff1aaf778ed9c6c81a8003f9c84fd3149624eb388d88504b07198",
+              "ast_sha256": "9c887da508239704cbb08813456e667ede5efc062d85ee565f853a15c31e05ba"
+            },
+            {
+              "name": "build_dmlp",
+              "line": 577,
+              "end_line": 617,
+              "source_sha256": "7ac1f229c337c073f0b2d164c8a20ca89fe15d24cd0f29ee936325c4001deb2b",
+              "ast_sha256": "8c099ff1b3c752eda00fa943e3dd20eabe8a78dee3a1393af085b60ea02b8675"
+            },
+            {
+              "name": "build_dmlp.dmlp",
+              "line": 593,
+              "end_line": 604,
+              "source_sha256": "000abd897755a7b880c83d1960ebef107dcc0b541d5ff618d26fd35158befaa1",
+              "ast_sha256": "2020c9a5802db7111c363a5ba7dc8a926b92a015ae2863503cb74bb071092d0f"
+            },
+            {
+              "name": "build_dmlp.launch",
+              "line": 607,
+              "end_line": 615,
+              "source_sha256": "39464715d79177d05132c6bd5dde3f055758f2f7dc096a024dc2e2a45d12c9f4",
+              "ast_sha256": "cef40b4431a943e931a6563de5fbd7955e3a9662b97acef143511a488e312862"
+            }
+          ]
+        }
+      ],
+      "mono_package_files": {
+        "opt/sgl-amd-mono/sgl_amd_mono/__init__.py": "5734abfe6e08db2ab30e980ceace9e1117568e94d4551d79cfafaad2a8594f8b",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/__init__.py": "86e69172e17dc4c10a6aafd4d341635f0844f74b3f64f9b18053bf0f0b1f21e8",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/epoch.py": "3261659a1e2e022569308cab76cc47b08b569d6527ceecd84c75fa331f31f8b3",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/guard.py": "ebfe7b416d9ae2d4ad2d79b44120598f70f4c4d54cffab29bccc7680f67a0e8f",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/mx.py": "4e5b1f940eff505b1831d209e120837771575f72d4b9d1b953a0ede94de27e13",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/ops.py": "2b0aea365fe90d16b1407b681510e5454baaba25966146067977388d85191cb6",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/peer.py": "9a2bbea591cc5a62d111b68d9c3f7b7f6dda002201d95faa56cdf2eaef88cc6b",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/plan.py": "4c916f61bb05fb4e40fd8b0eed676a9626895424f888b6b0b9d53220de8925ff",
+        "opt/sgl-amd-mono/sgl_amd_mono/common/sync.py": "16755ac1bddd64ac2bb63acd8c879a1b89b5c5f261fc9c4540d328b6c1e0bb56",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/__init__.py": "a7b7f190eabd5ba70e65d263ad90122ff47e56cd8b13ec709c67322493df267a",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/draft.py": "7d799c428a8fed0c8bf6d15975c07c66c4a1527e8ea84461d006970344636edd",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/spec.py": "d668c34a1e6352012ccae38aef22b42db35ccb21aaa017262ea2c4ed5520caf9",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/__init__.py": "d7926b731b99a2142082bd7dcc6299c891b053c7f192c5113191a130006d4bfd",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/layer.py": "2c87f641904aff372b078ffab25769976a41a8845950a8580019a5ec9b9640fd",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/runner.py": "576fb66a03a3cbc12d0ca1092d0a4ae005fe41a296b41e4c6a1aac748ddb9b17",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/weights.py": "c1bf5279cae36b6dedae33d61cabb764f5b85d962a8e662db51542ec649da372",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/attention/__init__.py": "d3144dc3773e81d26f2aa42629840606f5f187ec8e2e30a80633e0315caed134",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/attention/back.py": "7a5a36d2aa8d184c3cab0f4e5ab67a3f6487e50ff90a0a7d3906b23c9f6bee62",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/attention/device.py": "66052a948362b5c7362060f71430b2b62bf6d44c9564eff9b7d8439571511d5e",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/attention/front.py": "4c27e4dd9f41949dfb4c4b787ba67270f24c5015875ad8fd9236a770d7570088",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/attention/gemv.py": "a22461baacc1dafa28a2cf6a34b0a7256c5cd759c701f0f6059ba54fa294ea75",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/attention/plan.py": "9fafc4ccd662734cd6b6b487ea8e6dc6829a1279c7dcd84ed6191ab02a368acd",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/__init__.py": "f1df04a48b26c4cd23f5e38943085bbd54c16107ae711f0fafeb6949cea3429e",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/candidate_table.py": "1973fa617c7776254d90735f8ad1dc90bbc5f05302efafcae8888b3e27109ee8",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/index_plan.py": "be9450fa151cd2f609f1a684c60838b70d15e5e53c72dbf1b92c20026a5ed219",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/k2i.py": "c66c5db9086e68ceac2d4cdd1a0250554dc297a33a18b6daa93ac5ddd85c5018",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/runner.py": "97aa4d00f9e65f006185dc775586ff0bd905f4f85dc3ff7e0c2e49e168fdeb33",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/score_fp4.py": "ba5fa9eaea728227896fc7a0a3c7406c5c83a8629d93a404f17670e751d9ce43",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/indexer/walk_plan.py": "ec61a6e4ac52d905322759c990f915c887cd09521e431bcc89e08ce9a19cc38e",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/__init__.py": "3f58beae13b7c76a32b73da5129dc062781ba2236bca7d20ec7ac14662353dd0",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/dims.py": "c409b05c8b2665dbd4c575537264c249d75f2cd06ad0ee21c806f9563c89bbaa",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/gemv.py": "92f329f4a750f65a161f054acbf2727dd21885f56652076df9ac8670ef143eec",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/moe.py": "6e471b0b08bb8bbb3ab09e5af842fa8462476f4e4d668176dee11f83cb34afa1",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/moe_plan.py": "85766a123653a242de1011cafa51ed2415ed145daaab39370d49dd75ed317c67",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/moe_shape.py": "c78b0d908e805024e96dfc744bddf66864fbe959f6744d14dadf4b09913a3fbe",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/router.py": "9a8a258241ccde661f4731132781f8c7713db47847f8b5a23559e5dfd3d873fb",
+        "opt/sgl-amd-mono/sgl_amd_mono/deepseek_v41/gfx950/stages/seam.py": "69beee9d0939587caba7ab231607fdc425589c312d41a19dbf72b36b001f3632",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/__init__.py": "e251d7fe1dc6a7a6d3a31f29c9de1d5db1e7367bf1439528a0b866e43118d92c",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/check.py": "2ebbc6505fac105edd99a973560809544083fc16ba82452bca17c53cb477234b",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/spec.py": "2b2e1fc514452092d745d6afe530319ad6737918857ce80f73b3180c129e7373",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/__init__.py": "1b7e4091b4c633fc9b986f55cb614b8543d563cfc9d2e7f9acc37a4a2f074ab3",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/config.py": "204a6153d8db5f2f09bda6144a411943cae6c80f58b6eb2600f4db4d9a5a6b09",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/kernel.py": "0e45e039412d111c0d92403268ecfc8dc9aa747250e3353c28e8f212c212f7ec",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/layout.py": "c00376701c81bbd32b5d46de18a9bba16b0abfe3c622f4631add79a400581789",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/packing.py": "340ef05482f2a46ae9361e168311ccd66549b9a9a7682aa6ccaa5aeb3245dda6",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/runner.py": "b32844c11af27727c9b5373bc2d889d77134cff1ca039fd59e86fc79b106582a",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/tiles.py": "bd74925ea02368637a12fad96afaa1fa9df4b4c2ffc263050bebc1891dc7d934",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53/gfx950/weights.py": "206e44c9033c7d8be507ca2145daa1fe9bd7b21f1b95b0e5074a1505fdb9ff7c",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/__init__.py": "1190cd68f60053e83f4b786197bfe121236a1fc922a851a033678cdcdf2f152b",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/check.py": "7ac300d0a4684782e4e905bbc7ad85deb206e4aaca125807de956016f71641ed",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/spec.py": "556c1668afa56b12426e0fc654eb23e5696a96bf2358c79e4d3c04ec1c595cb6",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/__init__.py": "84d8b57e73830fb5a3cd19b347fefec4ae3d3a461115b57fd5eab4b4c6c4686c",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/config.py": "7ab38fd44c4cee2938e97b5b52191bffc76239109dd71f21540d40fca0aed667",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/kernel.py": "bd38726412473fd2a231b7ec29454f96e6ead3cae0114a124af770ed7e41275f",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/layout.py": "600ae03aabe3221b0b364febad54decd2be2f59a1bb4dff5765b5ae26613158e",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/packing.py": "f55b764694ad1790276826177a4972aa87032747257894f4891b59533623f583",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/runner.py": "99f62472541960884a471a7534bd0f09281eba3cbba5b60d115585739dd0027a",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/tiles.py": "fd6180e4d16c86d4f74623f6008222b5cc7ed5bc3f846ed616dcbf7146060dcf",
+        "opt/sgl-amd-mono/sgl_amd_mono/glm53_flash/gfx950/weights.py": "c29f75438e34d315cf33cdbd2b93a506a514449cae7d2c27e5cc46e88ca72d96",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/__init__.py": "6957b49533fdcdde0353e13bdd7956df2ffe10d01d760377bcea98a45186d133",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/metadata.py": "23ab2ac13bff1b34b78c1f661e18cfe996216ab313091d0ff569610f07b0f194",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/spec.py": "0184afc3703a0371728251a4349559a658b5e878a773cd843846594fc904bccb",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/weights.py": "fe3fcff069286f2f093bb7eac70cfb468f0825fee359ec9a4345ca468a79aba7",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/__init__.py": "9ac046214353e25813206d801edd8fe966a781367f6e0d88c673fb001e545c0a",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/config.py": "cb161519cea013ba48a53de590a82ecd5b247aec8ede1722a4ebfaec2ca8f151",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/device.py": "bed1a20365bf9283823bce36cf0f12094da7800247279257ba5bbd93e5b4b01b",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/index_score.py": "b82580d74d122727c032bd8344724a7b8641d62c0658d8ed0069bd5273877e53",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/layout.py": "910996c7b86cc5d5f88038845285cfd4b02048c68b570b8d58088b9673ba5cec",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/post_attn.py": "4dd6b695e36c6e88c81e81528653771309d43c3909ce7c9fff4eecb0cd6336ca",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/pre_attn.py": "3163aa7918ee8663281a56d7bcc69c064df72b704d50aa9960a6318bc9405f0b",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/reduction.py": "a76b389d23f94dfe2f2d1b64cf5f9922a7f9143bab0e03d70260bf15b258ea1e",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/runner.py": "ddaac73d36fb5aa9ea48af4de4dc1a6048fd123eefe78aba277ab4e9cfba73b2",
+        "opt/sgl-amd-mono/sgl_amd_mono/minimax_m3/gfx950/select.py": "a2e73754aaac005cf8e68f88f2ce241118907fb64b3f9c0f98ce0346cc55b316",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/__init__.py": "e9dbdede1fd4a9b86f15e47e67de55355de9ce016e41bf8035d07cbf804f1221",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/fp8_quant.py": "ad84614f4f66061425d0679a42b025e55ed256ba434e42b514d2e10adee95b48",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/mxfp4_quant.py": "cf3b77d8e909b47875fe3a2a4bd28c25e8d022fc621ede703d5aa1980966d93c",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/spec.py": "a6b921f327a40d8588f4087484c26793c551bdce9e834bd9ab29b5b68605d7c4",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/weights.py": "607b709be8e4375546d6c95574404a2f1438018f7b9876a97a7e7688f79c824a",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/__init__.py": "a960c2f1cd6cc202ee71533b46bdb3b305e9715139756ee17e6f9d6045996037",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/build_k2.py": "3fd4e787686c80752948efd051c2cf06b6a7944f49c6ab08b085c3beb4b05a85",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/build_k3.py": "0b756db6577c77b27ca4a49b261567960808be95eb0e71297466df5100ab0c13",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/compat.py": "9ed102db2f4894e2407241a144d7fdfd35fc19d75707974611027862bbd7d381",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/config.py": "adb901724d7f96bdd7199c58fda5793bcf27a80c4d92dac2e42702441226590f",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/device.py": "89089913ff6ca0d459fcb5920a726b1d31466534a14b8620e52aa07667c25368",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layer.py": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layout.py": "f1d3b5b5f5e951f4881a444ef4ed39fa3218c90fbb57c68f80603478b6a6850d",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/runner.py": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/__init__.py": "6795ecc42a33f12957fdeec8ccbe7e588f47357e9cbbbb4ee0ef1a5cc9fd7d7c",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/attention.py": "82507e89e504bcf175f472c8a742d90b2e6e3346928bcdd5d17fd8bd167032a2",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/ffn.py": "a842cbbe262f3b8bad17bea9caa985bec9f909b0e53445a1e3454e5a1621466c",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/mxfp4.py": "70f8ea1d0bf97cf423977904dcfd992f99850d666a1ec674d5cb5953d9f91b0c",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/post_attn.py": "c318d2c768a509055116908b69deb5695656aae31089b8c6e0549baad85b1a16",
+        "opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/stages/pre_attn.py": "642c33cfb11e766d5d455998d2c5f56e7d8dcff2c87ad8b3fba7a6dcf4269472"
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "from_version": 1,
+      "to_version": 2,
+      "files": [
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+          "before_sha256": null,
+          "after_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
+          "symbols": [
+            {
+              "name": "_attention_shape_ok",
+              "relation": "added"
+            },
+            {
+              "name": "_kv_write_target",
+              "relation": "added"
+            },
+            {
+              "name": "_note",
+              "relation": "added"
+            },
+            {
+              "name": "qk_norm_rope_kv_write",
+              "relation": "added"
+            },
+            {
+              "name": "qkv_proj_norm_rope_kv_write",
+              "relation": "added"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+          "before_sha256": null,
+          "after_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
+          "symbols": [
+            {
+              "name": "can_share_router_pooler",
+              "relation": "added"
+            },
+            {
+              "name": "prepare_joint_router_pooler",
+              "relation": "added"
+            },
+            {
+              "name": "route_with_shared_pooler",
+              "relation": "added"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+          "before_sha256": null,
+          "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
+          "symbols": [
+            {
+              "name": "_muse_qk_rope_cache",
+              "relation": "added"
+            },
+            {
+              "name": "_norm_rope",
+              "relation": "added"
+            },
+            {
+              "name": "_project_slice",
+              "relation": "added"
+            },
+            {
+              "name": "_qkv_epilogue",
+              "relation": "added"
+            },
+            {
+              "name": "qk_norm_rope_cache",
+              "relation": "added"
+            },
+            {
+              "name": "qkv_proj_qk_norm_rope_cache",
+              "relation": "added"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+          "before_sha256": null,
+          "after_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
+          "symbols": [
+            {
+              "name": "_joint_epilogue",
+              "relation": "added"
+            },
+            {
+              "name": "_reduce_route",
+              "relation": "added"
+            },
+            {
+              "name": "_route_preproject_epilogue",
+              "relation": "added"
+            },
+            {
+              "name": "_router_topk_completed_pooler",
+              "relation": "added"
+            },
+            {
+              "name": "joint_router_pooler_topk",
+              "relation": "added"
+            },
+            {
+              "name": "pack_joint_router_pooler_weight",
+              "relation": "added"
+            },
+            {
+              "name": "router_pooler_topk",
+              "relation": "added"
+            }
+          ]
+        }
+      ],
+      "mono_package_identical": false,
+      "dispatch_device_diff": "evidence/verification_diffs/01_to_02.diff"
+    },
+    {
+      "from_version": 2,
+      "to_version": 3,
+      "files": [
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+          "before_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
+          "after_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
+          "symbols": [
+            {
+              "name": "_attention_shape_ok",
+              "relation": "changed_ast"
+            },
+            {
+              "name": "_kv_write_target",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_note",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "qk_norm_rope_kv_write",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "qkv_proj_norm_rope_kv_write",
+              "relation": "changed_ast"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+          "before_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
+          "after_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
+          "symbols": [
+            {
+              "name": "_routing_front_matches",
+              "relation": "added"
+            },
+            {
+              "name": "can_route_fp8_joint",
+              "relation": "added"
+            },
+            {
+              "name": "can_share_router_pooler",
+              "relation": "changed_ast"
+            },
+            {
+              "name": "prepare_joint_router_pooler",
+              "relation": "changed_ast"
+            },
+            {
+              "name": "route_with_shared_pooler",
+              "relation": "changed_ast"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+          "before_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
+          "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+          "symbols": [
+            {
+              "name": "_muse_qk_rope_cache",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_norm_rope",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_project_slice",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_qkv_epilogue",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "qk_norm_rope_cache",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "qkv_proj_qk_norm_rope_cache",
+              "relation": "changed_ast"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+          "before_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
+          "after_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
+          "symbols": [
+            {
+              "name": "_joint_epilogue",
+              "relation": "changed_ast"
+            },
+            {
+              "name": "_joint_finish",
+              "relation": "added"
+            },
+            {
+              "name": "_joint_fp8_partial",
+              "relation": "added"
+            },
+            {
+              "name": "_reduce_route",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_route_preproject_epilogue",
+              "relation": "changed_ast"
+            },
+            {
+              "name": "_router_topk_completed_pooler",
+              "relation": "changed_ast"
+            },
+            {
+              "name": "joint_router_pooler_applies",
+              "relation": "added"
+            },
+            {
+              "name": "joint_router_pooler_fp8_applies",
+              "relation": "added"
+            },
+            {
+              "name": "joint_router_pooler_topk",
+              "relation": "changed_ast"
+            },
+            {
+              "name": "joint_router_pooler_topk_fp8",
+              "relation": "added"
+            },
+            {
+              "name": "pack_joint_router_pooler_weight",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "quantize_joint_pooler",
+              "relation": "added"
+            },
+            {
+              "name": "router_pooler_topk",
+              "relation": "changed_ast"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py",
+          "before_sha256": null,
+          "after_sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+          "symbols": [
+            {
+              "name": "DraftRunner.__init__",
+              "relation": "added"
+            },
+            {
+              "name": "DraftRunner._backend",
+              "relation": "added"
+            },
+            {
+              "name": "DraftRunner._check_cache",
+              "relation": "added"
+            },
+            {
+              "name": "DraftRunner.attn_kernels",
+              "relation": "added"
+            },
+            {
+              "name": "DraftRunner.end_step",
+              "relation": "added"
+            },
+            {
+              "name": "DraftRunner.kernel",
+              "relation": "added"
+            },
+            {
+              "name": "DraftRunner.launch",
+              "relation": "added"
+            },
+            {
+              "name": "DraftRunner.launch_attn",
+              "relation": "added"
+            },
+            {
+              "name": "DraftRunner.launch_attn.mark",
+              "relation": "added"
+            },
+            {
+              "name": "DraftRunner.precompile",
+              "relation": "added"
+            },
+            {
+              "name": "DraftRunner.set_deadline",
+              "relation": "added"
+            },
+            {
+              "name": "_Draft.__init__",
+              "relation": "added"
+            },
+            {
+              "name": "_Draft._attention_reference",
+              "relation": "added"
+            },
+            {
+              "name": "_Draft._reference",
+              "relation": "added"
+            },
+            {
+              "name": "_Draft.forward",
+              "relation": "added"
+            },
+            {
+              "name": "_attn_view_reasons",
+              "relation": "added"
+            },
+            {
+              "name": "_attn_views",
+              "relation": "added"
+            },
+            {
+              "name": "_build",
+              "relation": "added"
+            },
+            {
+              "name": "_config_disable_reasons",
+              "relation": "added"
+            },
+            {
+              "name": "_log_check",
+              "relation": "added"
+            },
+            {
+              "name": "_log_check_pair",
+              "relation": "added"
+            },
+            {
+              "name": "_mlp_view_reasons",
+              "relation": "added"
+            },
+            {
+              "name": "_mlp_views",
+              "relation": "added"
+            },
+            {
+              "name": "_model_disable_reasons",
+              "relation": "added"
+            },
+            {
+              "name": "_shard_fc",
+              "relation": "added"
+            },
+            {
+              "name": "_shard_fc.project_target_hidden",
+              "relation": "added"
+            },
+            {
+              "name": "_tokens_per_request",
+              "relation": "added"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
+          "before_sha256": null,
+          "after_sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+          "symbols": [
+            {
+              "name": "_common",
+              "relation": "added"
+            },
+            {
+              "name": "_cs",
+              "relation": "added"
+            },
+            {
+              "name": "_pick",
+              "relation": "added"
+            },
+            {
+              "name": "build_dpost",
+              "relation": "added"
+            },
+            {
+              "name": "build_dpost.dpost",
+              "relation": "added"
+            },
+            {
+              "name": "build_dpost.launch",
+              "relation": "added"
+            },
+            {
+              "name": "build_dpre",
+              "relation": "added"
+            },
+            {
+              "name": "build_dpre.dpre",
+              "relation": "added"
+            },
+            {
+              "name": "build_dpre.launch",
+              "relation": "added"
+            },
+            {
+              "name": "do_lds",
+              "relation": "added"
+            },
+            {
+              "name": "do_scratch_layout",
+              "relation": "added"
+            },
+            {
+              "name": "do_sym_bytes",
+              "relation": "added"
+            },
+            {
+              "name": "do_sym_layout",
+              "relation": "added"
+            },
+            {
+              "name": "dp_lds",
+              "relation": "added"
+            },
+            {
+              "name": "dp_scratch_layout",
+              "relation": "added"
+            },
+            {
+              "name": "run_dpost",
+              "relation": "added"
+            },
+            {
+              "name": "run_dpre",
+              "relation": "added"
+            },
+            {
+              "name": "stage_heads",
+              "relation": "added"
+            },
+            {
+              "name": "stage_norm_in",
+              "relation": "added"
+            },
+            {
+              "name": "stage_o",
+              "relation": "added"
+            },
+            {
+              "name": "stage_post",
+              "relation": "added"
+            },
+            {
+              "name": "stage_post.pair_at",
+              "relation": "added"
+            },
+            {
+              "name": "stage_qkv",
+              "relation": "added"
+            },
+            {
+              "name": "stage_qkv.k_of",
+              "relation": "added"
+            },
+            {
+              "name": "stage_qkv.publish",
+              "relation": "added"
+            },
+            {
+              "name": "stage_qkv.tok_of",
+              "relation": "added"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
+          "before_sha256": null,
+          "after_sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+          "symbols": [
+            {
+              "name": "_attn_views",
+              "relation": "added"
+            },
+            {
+              "name": "attn_rows",
+              "relation": "added"
+            },
+            {
+              "name": "build_dattn",
+              "relation": "added"
+            },
+            {
+              "name": "build_dattn.dattn",
+              "relation": "added"
+            },
+            {
+              "name": "build_dattn.launch",
+              "relation": "added"
+            },
+            {
+              "name": "comb_floats",
+              "relation": "added"
+            },
+            {
+              "name": "dattn_context",
+              "relation": "added"
+            },
+            {
+              "name": "dattn_lds",
+              "relation": "added"
+            },
+            {
+              "name": "dattn_scratch_layout",
+              "relation": "added"
+            },
+            {
+              "name": "lds_views",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.attn_task",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.attn_task.comb_at",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.attn_task.issue",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.attn_task.quad_max",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.attn_task.quad_sum",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.chunk_range",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.combine_lanes",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.fold",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.fold_rec",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.l2_row",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.load_rec",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.merge_l1",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.merge_l2",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.n_parts_of",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.part_row",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.pflag_at",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.req_pool_of",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.seq_len_of",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.span_of",
+              "relation": "added"
+            },
+            {
+              "name": "run_dattn.tasks_of",
+              "relation": "added"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
+          "before_sha256": null,
+          "after_sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+          "symbols": [
+            {
+              "name": "build_dmlp",
+              "relation": "added"
+            },
+            {
+              "name": "build_dmlp.dmlp",
+              "relation": "added"
+            },
+            {
+              "name": "build_dmlp.launch",
+              "relation": "added"
+            },
+            {
+              "name": "dm_lds",
+              "relation": "added"
+            },
+            {
+              "name": "dm_lds_bytes",
+              "relation": "added"
+            },
+            {
+              "name": "dm_scratch_layout",
+              "relation": "added"
+            },
+            {
+              "name": "dm_sym_bytes",
+              "relation": "added"
+            },
+            {
+              "name": "dm_sym_layout",
+              "relation": "added"
+            },
+            {
+              "name": "dmlp_context",
+              "relation": "added"
+            },
+            {
+              "name": "gemv_k",
+              "relation": "added"
+            },
+            {
+              "name": "gemv_tiles",
+              "relation": "added"
+            },
+            {
+              "name": "lds_b",
+              "relation": "added"
+            },
+            {
+              "name": "lds_b.xb_of",
+              "relation": "added"
+            },
+            {
+              "name": "run_dmlp",
+              "relation": "added"
+            },
+            {
+              "name": "stage_act",
+              "relation": "added"
+            },
+            {
+              "name": "stage_coef",
+              "relation": "added"
+            },
+            {
+              "name": "stage_coef.k_of",
+              "relation": "added"
+            },
+            {
+              "name": "stage_coef.publish",
+              "relation": "added"
+            },
+            {
+              "name": "stage_coef.tok_of",
+              "relation": "added"
+            },
+            {
+              "name": "stage_coef_reduce",
+              "relation": "added"
+            },
+            {
+              "name": "stage_conv0",
+              "relation": "added"
+            },
+            {
+              "name": "stage_down",
+              "relation": "added"
+            },
+            {
+              "name": "stage_down.publish",
+              "relation": "added"
+            },
+            {
+              "name": "stage_down.xb_of",
+              "relation": "added"
+            },
+            {
+              "name": "stage_gu",
+              "relation": "added"
+            },
+            {
+              "name": "stage_gu.k_of",
+              "relation": "added"
+            },
+            {
+              "name": "stage_gu.publish",
+              "relation": "added"
+            },
+            {
+              "name": "stage_gu.tok_of",
+              "relation": "added"
+            },
+            {
+              "name": "stage_norm",
+              "relation": "added"
+            },
+            {
+              "name": "stage_out",
+              "relation": "added"
+            },
+            {
+              "name": "stage_out.pair_at",
+              "relation": "added"
+            },
+            {
+              "name": "w_loads",
+              "relation": "added"
+            }
+          ]
+        }
+      ],
+      "mono_package_identical": false,
+      "dispatch_device_diff": "evidence/verification_diffs/02_to_03.diff"
+    },
+    {
+      "from_version": 3,
+      "to_version": 4,
+      "files": [
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
+          "before_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
+          "after_sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
+          "symbols": [
+            {
+              "name": "_attention_shape_ok",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_kv_write_target",
+              "relation": "changed_ast"
+            },
+            {
+              "name": "_note",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "qk_norm_rope_kv_write",
+              "relation": "changed_ast"
+            },
+            {
+              "name": "qkv_proj_norm_rope_kv_write",
+              "relation": "identical_ast"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
+          "before_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
+          "after_sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
+          "symbols": [
+            {
+              "name": "_routing_front_matches",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "can_route_fp8_joint",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "can_share_router_pooler",
+              "relation": "changed_ast"
+            },
+            {
+              "name": "prepare_joint_router_pooler",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "route_with_shared_pooler",
+              "relation": "identical_ast"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
+          "before_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+          "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
+          "symbols": [
+            {
+              "name": "_muse_qk_rope_cache",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_norm_rope",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_project_slice",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_qkv_epilogue",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "qk_norm_rope_cache",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "qkv_proj_qk_norm_rope_cache",
+              "relation": "identical_ast"
+            }
+          ]
+        },
+        {
+          "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
+          "before_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
+          "after_sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
+          "symbols": [
+            {
+              "name": "_joint_epilogue",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_joint_finish",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_joint_fp8_partial",
+              "relation": "changed_ast"
+            },
+            {
+              "name": "_reduce_route",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_route_preproject_epilogue",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_router_topk_completed_pooler",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "joint_router_pooler_applies",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "joint_router_pooler_fp8_applies",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "joint_router_pooler_topk",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "joint_router_pooler_topk_fp8",
+              "relation": "changed_ast"
+            },
+            {
+              "name": "pack_joint_router_pooler_weight",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "quantize_joint_pooler",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "router_pooler_topk",
+              "relation": "identical_ast"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py",
+          "before_sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+          "after_sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+          "symbols": [
+            {
+              "name": "DraftRunner.__init__",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "DraftRunner._backend",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "DraftRunner._check_cache",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "DraftRunner.attn_kernels",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "DraftRunner.end_step",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "DraftRunner.kernel",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "DraftRunner.launch",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "DraftRunner.launch_attn",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "DraftRunner.launch_attn.mark",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "DraftRunner.precompile",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "DraftRunner.set_deadline",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_Draft.__init__",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_Draft._attention_reference",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_Draft._reference",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_Draft.forward",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_attn_view_reasons",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_attn_views",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_build",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_config_disable_reasons",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_log_check",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_log_check_pair",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_mlp_view_reasons",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_mlp_views",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_model_disable_reasons",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_shard_fc",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_shard_fc.project_target_hidden",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_tokens_per_request",
+              "relation": "identical_ast"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
+          "before_sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+          "after_sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+          "symbols": [
+            {
+              "name": "_common",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_cs",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "_pick",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "build_dpost",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "build_dpost.dpost",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "build_dpost.launch",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "build_dpre",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "build_dpre.dpre",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "build_dpre.launch",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "do_lds",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "do_scratch_layout",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "do_sym_bytes",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "do_sym_layout",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "dp_lds",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "dp_scratch_layout",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dpost",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dpre",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_heads",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_norm_in",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_o",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_post",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_post.pair_at",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_qkv",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_qkv.k_of",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_qkv.publish",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_qkv.tok_of",
+              "relation": "identical_ast"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
+          "before_sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+          "after_sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+          "symbols": [
+            {
+              "name": "_attn_views",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "attn_rows",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "build_dattn",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "build_dattn.dattn",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "build_dattn.launch",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "comb_floats",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "dattn_context",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "dattn_lds",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "dattn_scratch_layout",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "lds_views",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.attn_task",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.attn_task.comb_at",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.attn_task.issue",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.attn_task.quad_max",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.attn_task.quad_sum",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.chunk_range",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.combine_lanes",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.fold",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.fold_rec",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.l2_row",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.load_rec",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.merge_l1",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.merge_l2",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.n_parts_of",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.part_row",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.pflag_at",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.req_pool_of",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.seq_len_of",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.span_of",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dattn.tasks_of",
+              "relation": "identical_ast"
+            }
+          ]
+        },
+        {
+          "path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
+          "before_sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+          "after_sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+          "symbols": [
+            {
+              "name": "build_dmlp",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "build_dmlp.dmlp",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "build_dmlp.launch",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "dm_lds",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "dm_lds_bytes",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "dm_scratch_layout",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "dm_sym_bytes",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "dm_sym_layout",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "dmlp_context",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "gemv_k",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "gemv_tiles",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "lds_b",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "lds_b.xb_of",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "run_dmlp",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_act",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_coef",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_coef.k_of",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_coef.publish",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_coef.tok_of",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_coef_reduce",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_conv0",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_down",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_down.publish",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_down.xb_of",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_gu",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_gu.k_of",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_gu.publish",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_gu.tok_of",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_norm",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_out",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "stage_out.pair_at",
+              "relation": "identical_ast"
+            },
+            {
+              "name": "w_loads",
+              "relation": "identical_ast"
+            }
+          ]
+        }
+      ],
+      "mono_package_identical": true,
+      "dispatch_device_diff": "evidence/verification_diffs/03_to_04.diff"
+    }
+  ],
+  "limits": "AST identity omits comments/locations but includes the function syntax. Identical function bodies can behave differently because globals, guards, callees, launch grids, flags or shapes change. File bytes and package file sets are recorded separately. Source inspection cannot rank GPU time."
+}

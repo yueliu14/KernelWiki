@@ -447,11 +447,137 @@
       "No intermediate TEP4 conc16 HiCache point exists for 1020; the measured change spans both source transitions.",
       "The 1027 image has an AMD monokernel plugin, but this TEP4 endpoint does not enable it."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12073589026,
+        "exact_job_link_verified": true
+      },
+      {
+        "side": "after",
+        "artifact_id": 12867050699,
+        "exact_job_link_verified": true
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
-    "report": "pairs/tep4_conc16_on_2026-10-16_to_2026-10-30.md"
+    "report": "pairs/tep4_conc16_on_2026-10-16_to_2026-10-30.md",
+    "verified_runtime": {
+      "before": {
+        "artifact_id": 12073589026,
+        "point_id": "445167",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=2, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      },
+      "after": {
+        "artifact_id": 12867050699,
+        "point_id": "446938",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  21
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  1
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler (FP8 pooler) active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  24,
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16,
+                  40,
+                  48,
+                  56,
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=2, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "Muse fused finalize + TP4 all-reduce enabled (rank *)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      }
+    }
   },
   {
     "id": "tep4_conc28_on_2026-10-30_to_2026-11-08",
@@ -795,11 +921,239 @@
       "Both endpoints are ordinary TEP4 serving: the AMD layer monokernel is not enabled by either CLI. Its captured Muse bodies are unchanged between these image digests.",
       "TP8 finalize/all-reduce eligibility is not a new TP4 optimization."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12861779008,
+        "exact_job_link_verified": true
+      },
+      {
+        "side": "after",
+        "artifact_id": 13586270677,
+        "exact_job_link_verified": true
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
-    "report": "pairs/tep4_conc28_on_2026-10-30_to_2026-11-08.md"
+    "report": "pairs/tep4_conc28_on_2026-10-30_to_2026-11-08.md",
+    "verified_runtime": {
+      "before": {
+        "artifact_id": 12861779008,
+        "point_id": "446940",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  21
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  1
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler (FP8 pooler) active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  24,
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16,
+                  40,
+                  48,
+                  56,
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=2, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "Muse fused finalize + TP4 all-reduce enabled (rank *)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      },
+      "after": {
+        "artifact_id": 13586270677,
+        "point_id": "447695",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  448
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  1
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler (FP8 pooler) active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  24,
+                  32,
+                  40,
+                  48,
+                  56,
+                  64,
+                  80,
+                  96,
+                  112,
+                  128,
+                  144,
+                  160,
+                  176,
+                  192,
+                  208,
+                  224,
+                  240,
+                  256,
+                  320,
+                  352,
+                  384,
+                  416,
+                  448
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "benchmark_warmup": {
+                "observed_rows": [
+                  48
+                ]
+              },
+              "e2e_measurement": {
+                "observed_rows": [
+                  76,
+                  77,
+                  78,
+                  82,
+                  85
+                ]
+              },
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16,
+                  46
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=2, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "Muse fused finalize + TP4 all-reduce enabled (rank *)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      }
+    }
   },
   {
     "id": "tep4_conc36_on_2026-10-30_to_2026-11-08",
@@ -1142,11 +1496,239 @@
       "Both endpoints are ordinary TEP4 serving: the AMD layer monokernel is not enabled by either CLI. Its captured Muse bodies are unchanged between these image digests.",
       "TP8 finalize/all-reduce eligibility is not a new TP4 optimization."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12861899940,
+        "exact_job_link_verified": true
+      },
+      {
+        "side": "after",
+        "artifact_id": 13585814389,
+        "exact_job_link_verified": true
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
-    "report": "pairs/tep4_conc36_on_2026-10-30_to_2026-11-08.md"
+    "report": "pairs/tep4_conc36_on_2026-10-30_to_2026-11-08.md",
+    "verified_runtime": {
+      "before": {
+        "artifact_id": 12861899940,
+        "point_id": "446941",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  21
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  1
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler (FP8 pooler) active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  24,
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16,
+                  40,
+                  48,
+                  56,
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=2, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "Muse fused finalize + TP4 all-reduce enabled (rank *)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      },
+      "after": {
+        "artifact_id": 13585814389,
+        "point_id": "447696",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  512
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  1
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler (FP8 pooler) active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  24,
+                  32,
+                  40,
+                  48,
+                  56,
+                  64,
+                  80,
+                  96,
+                  112,
+                  128,
+                  144,
+                  160,
+                  176,
+                  192,
+                  208,
+                  224,
+                  240,
+                  256,
+                  320,
+                  352,
+                  384,
+                  416,
+                  448,
+                  480,
+                  512
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "benchmark_warmup": {
+                "observed_rows": [
+                  46
+                ]
+              },
+              "e2e_measurement": {
+                "observed_rows": [
+                  36,
+                  77,
+                  80,
+                  83
+                ]
+              },
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=2, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "Muse fused finalize + TP4 all-reduce enabled (rank *)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      }
+    }
   },
   {
     "id": "tep4_conc40_on_2026-10-30_to_2026-11-08",
@@ -1497,17 +2079,251 @@
     "matched_server_artifacts": [
       {
         "side": "before",
-        "artifact_id": 12862296844
+        "artifact_id": 12862296844,
+        "exact_job_link_verified": true
       },
       {
         "side": "after",
-        "artifact_id": 13586307366
+        "artifact_id": 13586307366,
+        "exact_job_link_verified": true
       }
     ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
-    "report": "pairs/tep4_conc40_on_2026-10-30_to_2026-11-08.md"
+    "report": "pairs/tep4_conc40_on_2026-10-30_to_2026-11-08.md",
+    "verified_runtime": {
+      "before": {
+        "artifact_id": 12862296844,
+        "point_id": "446942",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  21
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  1
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler (FP8 pooler) active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  24,
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16,
+                  40,
+                  48,
+                  56,
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=2, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "Muse fused finalize + TP4 all-reduce enabled (rank *)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      },
+      "after": {
+        "artifact_id": 13586307366,
+        "point_id": "447697",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  512
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "e2e_measurement": {
+                "observed_rows": [
+                  28
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  1
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler (FP8 pooler) active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  24,
+                  32,
+                  40,
+                  48,
+                  56,
+                  64,
+                  80,
+                  96,
+                  112,
+                  128,
+                  144,
+                  160,
+                  176,
+                  192,
+                  208,
+                  224,
+                  240,
+                  256,
+                  320,
+                  352,
+                  384,
+                  416,
+                  448,
+                  480,
+                  512
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "e2e_measurement": {
+                "observed_rows": [
+                  39,
+                  63,
+                  74,
+                  80,
+                  81,
+                  90,
+                  91,
+                  101,
+                  102,
+                  113,
+                  114,
+                  121
+                ]
+              },
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16,
+                  46
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=2, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "Muse fused finalize + TP4 all-reduce enabled (rank *)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      }
+    }
   },
   {
     "id": "tep8_conc1_off_2026-10-16_to_2026-10-22",
@@ -1787,11 +2603,113 @@
     "excluded_attributions": [
       "The SGLang monokernel interface is present in 1020, but this pair does not pass --monokernel-backend amd and has no AMD plugin execution claim."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12042267751,
+        "exact_job_link_verified": true
+      },
+      {
+        "side": "after",
+        "artifact_id": 12379757183,
+        "exact_job_link_verified": true
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
-    "report": "pairs/tep8_conc1_off_2026-10-16_to_2026-10-22.md"
+    "report": "pairs/tep8_conc1_off_2026-10-16_to_2026-10-22.md",
+    "verified_runtime": {
+      "before": {
+        "artifact_id": 12042267751,
+        "point_id": "445154",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      },
+      "after": {
+        "artifact_id": 12379757183,
+        "point_id": "446033",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  1
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16,
+                  24
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      }
+    }
   },
   {
     "id": "tep8_conc1_off_2026-10-22_to_2026-10-30",
@@ -1970,6 +2888,60 @@
         "evidence_level": "source_verified"
       },
       {
+        "pipeline": "DFlash2 draft stage-2 fusion and sharded context projection",
+        "before": "The draft uses the ordinary SGLang model forward; fused KV materialization is already present and is not newly attributed to 1027.",
+        "after": "The AMD plugin attaches DFlash2 at stage 2. Each of five draft layers has D-pre, D-attn, D-post and D-MLP launches; the context projection is TP-sharded (1024 output rows per rank) followed by all-gather.",
+        "language": "Ordinary Triton/library operators \u2192 FlyDSL device kernels via Python launch wrappers. The _hip spec name is not the device language.",
+        "body_change": "D-pre folds residual/input norm, convolution coefficients and conv0, QKV projection, per-head Q/K norm, RoPE and FP8 KV stores. D-post folds O projection, TP sum and conv1. D-MLP folds post norm/residual, convolutions, gate/up/down and TP sum. D-attn is a separate block-attention kernel.",
+        "fusion": "Four launches per eligible draft layer in the source call graph, not one whole-draft kernel; draft embedding/final norm, context projection/all-gather and token selection remain separate. Historical logs confirm attachment/build during setup; realized measurement launch counts remain unavailable.",
+        "applicability": "Only the new endpoint enables monokernel-backend=amd. Exact c1/c4/c8 server artifacts report stage 2; graph widths are [8] for c1 and [8,16] for c4/c8. Eight-token DFLASH block, TP8/EP8, matching draft architecture/cache guards. Do not extend to TEP4 endpoints without the plugin flag.",
+        "sources": [
+          {
+            "role": "draft routing and four launch boundaries",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py",
+            "before_sha256": null,
+            "after_sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "D-pre and D-post device bodies",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
+            "before_sha256": null,
+            "after_sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "D-attn device body",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
+            "before_sha256": null,
+            "after_sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "D-MLP device body",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
+            "before_sha256": null,
+            "after_sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "runtime_verification.md#draft-fusion",
+          "evidence/verified_runtime_facts.json",
+          "evidence/verified_source_audit.json",
+          "evidence/verification_source_excerpts.md"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
         "pipeline": "Ordinary verify merge with output norm/gate",
         "before": "The attention partials are merged, then the existing output norm-gate kernel runs.",
         "after": "VerifyReduceDeferral hands partials to forward_verify_partials \u2192 _reduce_norm_gate.",
@@ -2039,11 +3011,192 @@
     "excluded_attributions": [
       "The new standalone TP4 finalize/all-reduce kernel is outside this TEP8 configuration; do not list it as this pair\u2019s executed fusion."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12379757183,
+        "exact_job_link_verified": true
+      },
+      {
+        "side": "after",
+        "artifact_id": 12862227056,
+        "exact_job_link_verified": true
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
-    "report": "pairs/tep8_conc1_off_2026-10-22_to_2026-10-30.md"
+    "report": "pairs/tep8_conc1_off_2026-10-22_to_2026-10-30.md",
+    "verified_runtime": {
+      "before": {
+        "artifact_id": 12379757183,
+        "point_id": "446033",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  1
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16,
+                  24
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      },
+      "after": {
+        "artifact_id": 12862227056,
+        "point_id": "446944",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  7
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "benchmark_warmup": {
+                "observed_rows": [
+                  16
+                ]
+              },
+              "phase_boundary_uncertain": {
+                "observed_rows": [
+                  16
+                ]
+              },
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "monokernel muse_spark_dflash2_draft_hip on gfx950: widths [8] built (timing/size omitted)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "monokernel muse_spark_hip on gfx950: widths [8] built (timing/size omitted)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "monokernel: muse_spark DFlash2 draft attached at stage 2 (D-pre, D-attn, D-post and D-MLP launches a layer)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "monokernel: muse_spark DFlash2 draft: the context projection TP-sharded (1024 rows a rank)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      }
+    }
   },
   {
     "id": "tep8_conc4_off_2026-10-16_to_2026-10-22",
@@ -2323,11 +3476,113 @@
     "excluded_attributions": [
       "The SGLang monokernel interface is present in 1020, but this pair does not pass --monokernel-backend amd and has no AMD plugin execution claim."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12041232346,
+        "exact_job_link_verified": true
+      },
+      {
+        "side": "after",
+        "artifact_id": 12380495812,
+        "exact_job_link_verified": true
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
-    "report": "pairs/tep8_conc4_off_2026-10-16_to_2026-10-22.md"
+    "report": "pairs/tep8_conc4_off_2026-10-16_to_2026-10-22.md",
+    "verified_runtime": {
+      "before": {
+        "artifact_id": 12041232346,
+        "point_id": "445155",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      },
+      "after": {
+        "artifact_id": 12380495812,
+        "point_id": "446037",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  1
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16,
+                  24
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      }
+    }
   },
   {
     "id": "tep8_conc4_off_2026-10-22_to_2026-10-30",
@@ -2511,6 +3766,60 @@
         "evidence_level": "source_verified"
       },
       {
+        "pipeline": "DFlash2 draft stage-2 fusion and sharded context projection",
+        "before": "The draft uses the ordinary SGLang model forward; fused KV materialization is already present and is not newly attributed to 1027.",
+        "after": "The AMD plugin attaches DFlash2 at stage 2. Each of five draft layers has D-pre, D-attn, D-post and D-MLP launches; the context projection is TP-sharded (1024 output rows per rank) followed by all-gather.",
+        "language": "Ordinary Triton/library operators \u2192 FlyDSL device kernels via Python launch wrappers. The _hip spec name is not the device language.",
+        "body_change": "D-pre folds residual/input norm, convolution coefficients and conv0, QKV projection, per-head Q/K norm, RoPE and FP8 KV stores. D-post folds O projection, TP sum and conv1. D-MLP folds post norm/residual, convolutions, gate/up/down and TP sum. D-attn is a separate block-attention kernel.",
+        "fusion": "Four launches per eligible draft layer in the source call graph, not one whole-draft kernel; draft embedding/final norm, context projection/all-gather and token selection remain separate. Historical logs confirm attachment/build during setup; realized measurement launch counts remain unavailable.",
+        "applicability": "Only the new endpoint enables monokernel-backend=amd. Exact c1/c4/c8 server artifacts report stage 2; graph widths are [8] for c1 and [8,16] for c4/c8. Eight-token DFLASH block, TP8/EP8, matching draft architecture/cache guards. Do not extend to TEP4 endpoints without the plugin flag.",
+        "sources": [
+          {
+            "role": "draft routing and four launch boundaries",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py",
+            "before_sha256": null,
+            "after_sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "D-pre and D-post device bodies",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
+            "before_sha256": null,
+            "after_sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "D-attn device body",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
+            "before_sha256": null,
+            "after_sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "D-MLP device body",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
+            "before_sha256": null,
+            "after_sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "runtime_verification.md#draft-fusion",
+          "evidence/verified_runtime_facts.json",
+          "evidence/verified_source_audit.json",
+          "evidence/verification_source_excerpts.md"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
         "pipeline": "Ordinary verify merge with output norm/gate",
         "before": "The attention partials are merged, then the existing output norm-gate kernel runs.",
         "after": "VerifyReduceDeferral hands partials to forward_verify_partials \u2192 _reduce_norm_gate.",
@@ -2580,11 +3889,199 @@
     "excluded_attributions": [
       "The new standalone TP4 finalize/all-reduce kernel is outside this TEP8 configuration; do not list it as this pair\u2019s executed fusion."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12380495812,
+        "exact_job_link_verified": true
+      },
+      {
+        "side": "after",
+        "artifact_id": 12860679821,
+        "exact_job_link_verified": true
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
-    "report": "pairs/tep8_conc4_off_2026-10-22_to_2026-10-30.md"
+    "report": "pairs/tep8_conc4_off_2026-10-22_to_2026-10-30.md",
+    "verified_runtime": {
+      "before": {
+        "artifact_id": 12380495812,
+        "point_id": "446037",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  1
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16,
+                  24
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      },
+      "after": {
+        "artifact_id": 12860679821,
+        "point_id": "446945",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  16
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "benchmark_warmup": {
+                "observed_rows": [
+                  18
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  14
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "e2e_measurement": {
+                "observed_rows": [
+                  8
+                ]
+              },
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "monokernel muse_spark_dflash2_draft_hip on gfx950: widths [8, 16] built (timing/size omitted)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "monokernel muse_spark_hip on gfx950: widths [8, 16] built (timing/size omitted)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "monokernel: muse_spark DFlash2 draft attached at stage 2 (D-pre, D-attn, D-post and D-MLP launches a layer)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "monokernel: muse_spark DFlash2 draft: the context projection TP-sharded (1024 rows a rank)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      }
+    }
   },
   {
     "id": "tep8_conc8_off_2026-10-16_to_2026-10-22",
@@ -2867,17 +4364,110 @@
     "matched_server_artifacts": [
       {
         "side": "before",
-        "artifact_id": 12043393913
+        "artifact_id": 12043393913,
+        "exact_job_link_verified": true
       },
       {
         "side": "after",
-        "artifact_id": 12384514175
+        "artifact_id": 12384514175,
+        "exact_job_link_verified": true
       }
     ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
-    "report": "pairs/tep8_conc8_off_2026-10-16_to_2026-10-22.md"
+    "report": "pairs/tep8_conc8_off_2026-10-16_to_2026-10-22.md",
+    "verified_runtime": {
+      "before": {
+        "artifact_id": 12043393913,
+        "point_id": "445156",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      },
+      "after": {
+        "artifact_id": 12384514175,
+        "point_id": "446039",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  14
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16,
+                  24
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      }
+    }
   },
   {
     "id": "tep8_conc8_off_2026-10-22_to_2026-10-30",
@@ -3061,6 +4651,60 @@
         "evidence_level": "source_verified"
       },
       {
+        "pipeline": "DFlash2 draft stage-2 fusion and sharded context projection",
+        "before": "The draft uses the ordinary SGLang model forward; fused KV materialization is already present and is not newly attributed to 1027.",
+        "after": "The AMD plugin attaches DFlash2 at stage 2. Each of five draft layers has D-pre, D-attn, D-post and D-MLP launches; the context projection is TP-sharded (1024 output rows per rank) followed by all-gather.",
+        "language": "Ordinary Triton/library operators \u2192 FlyDSL device kernels via Python launch wrappers. The _hip spec name is not the device language.",
+        "body_change": "D-pre folds residual/input norm, convolution coefficients and conv0, QKV projection, per-head Q/K norm, RoPE and FP8 KV stores. D-post folds O projection, TP sum and conv1. D-MLP folds post norm/residual, convolutions, gate/up/down and TP sum. D-attn is a separate block-attention kernel.",
+        "fusion": "Four launches per eligible draft layer in the source call graph, not one whole-draft kernel; draft embedding/final norm, context projection/all-gather and token selection remain separate. Historical logs confirm attachment/build during setup; realized measurement launch counts remain unavailable.",
+        "applicability": "Only the new endpoint enables monokernel-backend=amd. Exact c1/c4/c8 server artifacts report stage 2; graph widths are [8] for c1 and [8,16] for c4/c8. Eight-token DFLASH block, TP8/EP8, matching draft architecture/cache guards. Do not extend to TEP4 endpoints without the plugin flag.",
+        "sources": [
+          {
+            "role": "draft routing and four launch boundaries",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py",
+            "before_sha256": null,
+            "after_sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "D-pre and D-post device bodies",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
+            "before_sha256": null,
+            "after_sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "D-attn device body",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
+            "before_sha256": null,
+            "after_sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          },
+          {
+            "role": "D-MLP device body",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
+            "before_sha256": null,
+            "after_sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
+          }
+        ],
+        "evidence": [
+          "runtime_verification.md#draft-fusion",
+          "evidence/verified_runtime_facts.json",
+          "evidence/verified_source_audit.json",
+          "evidence/verification_source_excerpts.md"
+        ],
+        "evidence_level": "source_verified"
+      },
+      {
         "pipeline": "Ordinary verify merge with output norm/gate",
         "before": "The attention partials are merged, then the existing output norm-gate kernel runs.",
         "after": "VerifyReduceDeferral hands partials to forward_verify_partials \u2192 _reduce_norm_gate.",
@@ -3133,17 +4777,191 @@
     "matched_server_artifacts": [
       {
         "side": "before",
-        "artifact_id": 12384514175
+        "artifact_id": 12384514175,
+        "exact_job_link_verified": true
       },
       {
         "side": "after",
-        "artifact_id": 12861992663
+        "artifact_id": 12861992663,
+        "exact_job_link_verified": true
       }
     ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
-    "report": "pairs/tep8_conc8_off_2026-10-22_to_2026-10-30.md"
+    "report": "pairs/tep8_conc8_off_2026-10-22_to_2026-10-30.md",
+    "verified_runtime": {
+      "before": {
+        "artifact_id": 12384514175,
+        "point_id": "446039",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  14
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16,
+                  24
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      },
+      "after": {
+        "artifact_id": 12861992663,
+        "point_id": "446946",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  16
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "benchmark_warmup": {
+                "observed_rows": [
+                  17
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  14
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "monokernel muse_spark_dflash2_draft_hip on gfx950: widths [8, 16] built (timing/size omitted)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "monokernel muse_spark_hip on gfx950: widths [8, 16] built (timing/size omitted)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "monokernel: muse_spark DFlash2 draft attached at stage 2 (D-pre, D-attn, D-post and D-MLP launches a layer)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "monokernel: muse_spark DFlash2 draft: the context projection TP-sharded (1024 rows a rank)",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      }
+    }
   },
   {
     "id": "tep8_conc16_on_2026-10-16_to_2026-10-22",
@@ -3438,10 +5256,112 @@
     "excluded_attributions": [
       "The SGLang monokernel interface is present in 1020, but this pair does not pass --monokernel-backend amd and has no AMD plugin execution claim."
     ],
-    "matched_server_artifacts": [],
+    "matched_server_artifacts": [
+      {
+        "side": "before",
+        "artifact_id": 12074444466,
+        "exact_job_link_verified": true
+      },
+      {
+        "side": "after",
+        "artifact_id": 12383066550,
+        "exact_job_link_verified": true
+      }
+    ],
     "top_kernels": null,
     "gpu_profile_status": "unavailable",
     "causal_attribution": "not_established",
-    "report": "pairs/tep8_conc16_on_2026-10-16_to_2026-10-22.md"
+    "report": "pairs/tep8_conc16_on_2026-10-16_to_2026-10-22.md",
+    "verified_runtime": {
+      "before": {
+        "artifact_id": 12074444466,
+        "point_id": "445172",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      },
+      "after": {
+        "artifact_id": 12383066550,
+        "point_id": "446032",
+        "evidence": "evidence/verified_runtime_facts.json",
+        "families": [
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse fast path: shared router/preproject epilogue",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  1
+                ]
+              }
+            }
+          },
+          {
+            "kind": "dispatch",
+            "family": "Muse joint router/pooler active",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": [
+                  8,
+                  16,
+                  24
+                ]
+              }
+            }
+          },
+          {
+            "kind": "initialization",
+            "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+            "phases": {
+              "server_setup_or_graph_warmup": {
+                "observed_rows": []
+              }
+            }
+          }
+        ]
+      }
+    }
   }
 ]

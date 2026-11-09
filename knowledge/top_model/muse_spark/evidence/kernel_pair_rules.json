@@ -156,6 +156,43 @@
         ]
       },
       {
+        "pipeline": "DFlash2 draft stage-2 fusion and sharded context projection",
+        "before": "The draft uses the ordinary SGLang model forward; fused KV materialization is already present and is not newly attributed to 1027.",
+        "after": "The AMD plugin attaches DFlash2 at stage 2. Each of five draft layers has D-pre, D-attn, D-post and D-MLP launches; the context projection is TP-sharded (1024 output rows per rank) followed by all-gather.",
+        "language": "Ordinary Triton/library operators \u2192 FlyDSL device kernels via Python launch wrappers. The _hip spec name is not the device language.",
+        "body_change": "D-pre folds residual/input norm, convolution coefficients and conv0, QKV projection, per-head Q/K norm, RoPE and FP8 KV stores. D-post folds O projection, TP sum and conv1. D-MLP folds post norm/residual, convolutions, gate/up/down and TP sum. D-attn is a separate block-attention kernel.",
+        "fusion": "Four launches per eligible draft layer in the source call graph, not one whole-draft kernel; draft embedding/final norm, context projection/all-gather and token selection remain separate. Historical logs confirm attachment/build during setup; realized measurement launch counts remain unavailable.",
+        "applicability": "Only the new endpoint enables monokernel-backend=amd. Exact c1/c4/c8 server artifacts report stage 2; graph widths are [8] for c1 and [8,16] for c4/c8. Eight-token DFLASH block, TP8/EP8, matching draft architecture/cache guards. Do not extend to TEP4 endpoints without the plugin flag.",
+        "sources": [
+          {
+            "role": "draft routing and four launch boundaries",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py"
+          },
+          {
+            "role": "D-pre and D-post device bodies",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py"
+          },
+          {
+            "role": "D-attn device body",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py"
+          },
+          {
+            "role": "D-MLP device body",
+            "before_path": null,
+            "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py"
+          }
+        ],
+        "evidence": [
+          "runtime_verification.md#draft-fusion",
+          "evidence/verified_runtime_facts.json",
+          "evidence/verified_source_audit.json",
+          "evidence/verification_source_excerpts.md"
+        ]
+      },
+      {
         "pipeline": "Ordinary verify merge with output norm/gate",
         "before": "The attention partials are merged, then the existing output norm-gate kernel runs.",
         "after": "VerifyReduceDeferral hands partials to forward_verify_partials \u2192 _reduce_norm_gate.",

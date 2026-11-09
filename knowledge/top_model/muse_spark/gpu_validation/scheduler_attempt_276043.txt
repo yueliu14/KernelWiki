@@ -1,0 +1,21 @@
+JobId=276043 JobName=muse-pair-c1-verify
+   UserId=yueliu14 Account=amd-burst
+   Partition=amd-spur-v2 QOS=amd-burst-qos
+   JobState=CANCELLED Reason=Priority Dependency=(null)
+   Requeue=0 Restarts=0 BatchFlag=1 Exclusive=0
+   RunTime=00:00:00 TimeLimit=01:30:00 TimeMin=N/A
+   SubmitTime=2026-11-09T09:36:18 EligibleTime=2026-11-09T09:36:18 AccrueTime=2026-11-09T09:36:18
+   StartTime=N/A EndTime=2026-11-09T09:36:23 Deadline=2026-11-09T09:41:18
+   LastSchedEval=2026-11-09T09:36:22
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=(null)
+   NumNodes=1 NumTasks=1 CPUs/Task=1
+   ReqTRES=cpu=1,node=1,gres/gpu=8
+   TresPerJob=gpu:8 ReqGPUs=8
+   MinCPUsNode=1 MinMemoryNode=0
+   Features=(null)
+   WorkDir=/shared_nfs/yueliu14
+   StdOut=/shared_nfs/yueliu14/inferencex_muse_spark_research/gpu_validation/20261109_c1/scheduler.out StdErr=/shared_nfs/yueliu14/inferencex_muse_spark_research/gpu_validation/20261109_c1/scheduler.err
+   Command=set -euo pipefail
+   SubmitLine=sbatch --parsable -A amd-burst -q amd-burst-qos -p amd-spur-v2 -N 1 -n 1 -c 1 --gpus 8 --time 01:30:00 --deadline 2026-11-09T09:41:18Z -J muse-pair-c1-verify -o /shared_nfs/yueliu14/inferencex_muse_spark_research/gpu_validation/20261109_c1/scheduler.out -e /shared_nfs/yueliu14/inferencex_muse_spark_research/gpu_validation/20261109_c1/scheduler.err /shared_nfs/yueliu14/inferencex_muse_spark_research/gpu_validation/20261109_c1/job.sh
+   ExitCode=-1:0 DerivedExitCode=0:0 Priority=1110

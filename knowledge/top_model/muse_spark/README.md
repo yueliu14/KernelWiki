@@ -6,6 +6,7 @@ The retained public AgentX history contains **54 measured points, 6 CI runs and 
 
 - [History by configuration](configuration_history.md): the full matrix, including singletons such as TEP8 c2, missing observations, and links to each pair's kernel changes.
 - [Point-to-point kernel records](pair_changes.md): paths, languages, body/fusion changes, applicability, exact CI differences and evidence for all 11 pairs.
+- [Endpoint runtime recheck](runtime_verification.md): all 19 pair endpoint artifacts, measurement-window dispatch evidence, function-body checks and DFlash2 draft fusion. The [bounded GPU attempt](gpu_validation/README.md) obtained no allocation and produced no trace.
 - [Every measured point](performance_points.md), including repeat observations of the first image.
 - [Kernel and fusion evolution](kernel_evolution.md): three adjacent transitions, paths, languages, changed bodies, and evidence limits.
 - [Structured evolution edges](evidence/evolution_edges.json): adjacent image nodes, performance pairs, fusion findings and evidence status.
@@ -55,10 +56,12 @@ TEP8 c10 has only one retained observation: **2026-11-08, x=373.134, y=64.960**,
 ## What the container inspection established
 
 - **Baseline → 1020:** additional QKV/QK norm/RoPE/FP8 cache epilogues, router/pooler and FFN-boundary fusion, and new A4 expert paths.
-- **1020 → 1027:** the AMD FlyDSL Muse monokernel and a separate HIP MoE-finalize/all-reduce fusion. The monokernel combines attention, projections, routing, expert work, communication and the next eligible layer's QKV preparation across former launch boundaries.
+- **1020 → 1027:** the AMD FlyDSL Muse target monokernel, DFlash2 stage-2 draft fusion, and a separate HIP MoE-finalize/all-reduce fusion. The target monokernel combines attention, projections, routing, expert work, communication and the next eligible layer's QKV preparation across former launch boundaries. The draft uses four launches per eligible layer, not one whole-draft kernel.
 - **1027 → 1106:** the captured Muse monokernel package bodies are unchanged. Ordinary paths add full-attention FlyDSL prefill, balanced verify scheduling and broader existing fusion support, including TP8 finalize/all-reduce and larger QK/cache shapes.
 
 All images report the same SGLang Git HEAD `c722c0a160981f21c81cffaab7bbcc117089a2a6`, while source hashes differ substantially. The digest and exported file hashes are the source identity used for this report. A server “enabled/built” message confirms initialization; GPU traces are still needed for time shares and realized launch counts.
+
+The follow-up verified all 231 relevant source-file entries and found all 97 captured monokernel package files identical from 1027 to 1106. Exact latest TEP4 c28/c36/c40 logs show joint router/pooler dispatch during measurement, including shapes above the former 64-row guard. The underlying ordinary joint epilogue remains unchanged; expanded dispatch coverage and FP8 producer changes are recorded separately in the [runtime recheck](runtime_verification.md).
 
 ## Coverage, provenance and reproduction
 
