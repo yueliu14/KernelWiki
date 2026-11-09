@@ -1,4 +1,4 @@
 interface:
   display_name: "InferenceX Kernel Evolution"
   short_description: "Trace image-deduplicated performance and kernel evolution"
-  default_prompt: "Use $inferencex-kernel-evolution to compare a model's dated InferenceX curves and trace adjacent Docker images to kernel and fusion changes in KernelWiki."
+  default_prompt: "Use $inferencex-kernel-evolution to inspect MI355X coverage, select vLLM or SGLang, compare a model's dated InferenceX curves and trace adjacent Docker images to kernel and fusion changes in KernelWiki."

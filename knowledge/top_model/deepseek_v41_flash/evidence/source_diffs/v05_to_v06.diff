@@ -1,0 +1,2744 @@
+--- V05:vllm/model_executor/kernels/mhc/__init__.py
++++ V06:vllm/model_executor/kernels/mhc/__init__.py
+@@ -13,6 +13,7 @@
+     "hc_head_fused_kernel_cuda",
+     "mhc_pre_aiter",
+     "mhc_pre_delayed_aiter",
++    "mhc_fused_post_pre_delayed_rms_norm_aiter",
+     "mhc_post_aiter",
+     "mhc_fused_post_pre_aiter",
+     "hc_head_fused_aiter",
+--- V05:vllm/model_executor/kernels/mhc/aiter.py
++++ V06:vllm/model_executor/kernels/mhc/aiter.py
+@@ -207,6 +207,79 @@
+     )
+ 
+ 
++def mhc_fused_post_pre_delayed_rms_norm_aiter(
++    residual: torch.Tensor,
++    fn: torch.Tensor,
++    hc_scale: torch.Tensor,
++    hc_base: torch.Tensor,
++    rms_eps: float,
++    hc_pre_eps: float,
++    hc_sinkhorn_eps: float,
++    hc_post_mult_value: float,
++    sinkhorn_repeat: int,
++    pre_mix: torch.Tensor | None,
++    sublayer_out: torch.Tensor | None,
++    post_layer_mix: torch.Tensor | None,
++    comb_res_mix: torch.Tensor | None,
++    norm_weight: torch.Tensor,
++    norm_eps: float,
++    residual_out: torch.Tensor | None,
++) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
++    """:func:`mhc_pre_delayed_aiter` with the RMSNorm of the collapse folded in:
++    ``layer_input`` comes back normalised with ``norm_weight`` / ``norm_eps``."""
++    from vllm._aiter_ops import rocm_aiter_ops
++
++    return rocm_aiter_ops.mhc_fused_post_pre_delayed_rms_norm(
++        residual,
++        fn,
++        hc_scale,
++        hc_base,
++        rms_eps,
++        hc_pre_eps,
++        hc_sinkhorn_eps,
++        hc_post_mult_value,
++        sinkhorn_repeat,
++        pre_mix,
++        sublayer_out,
++        post_layer_mix,
++        comb_res_mix,
++        norm_weight,
++        norm_eps,
++        residual_out,
++    )
++
++
++def _mhc_fused_post_pre_delayed_rms_norm_aiter_fake(
++    residual: torch.Tensor,
++    fn: torch.Tensor,
++    hc_scale: torch.Tensor,
++    hc_base: torch.Tensor,
++    rms_eps: float,
++    hc_pre_eps: float,
++    hc_sinkhorn_eps: float,
++    hc_post_mult_value: float,
++    sinkhorn_repeat: int,
++    pre_mix: torch.Tensor | None,
++    sublayer_out: torch.Tensor | None,
++    post_layer_mix: torch.Tensor | None,
++    comb_res_mix: torch.Tensor | None,
++    norm_weight: torch.Tensor,
++    norm_eps: float,
++    residual_out: torch.Tensor | None,
++) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
++    return _mhc_pre_delayed_aiter_fake(
++        residual,
++        fn,
++        hc_scale,
++        hc_base,
++        rms_eps,
++        hc_pre_eps,
++        hc_sinkhorn_eps,
++        hc_post_mult_value,
++        sinkhorn_repeat,
++    )
++
++
+ def mhc_post_aiter(
+     x: torch.Tensor,
+     residual: torch.Tensor,
+@@ -336,6 +409,12 @@
+     fake_impl=_mhc_pre_delayed_aiter_fake,
+ )
+ direct_register_custom_op(
++    op_name="mhc_fused_post_pre_delayed_rms_norm_aiter",
++    op_func=mhc_fused_post_pre_delayed_rms_norm_aiter,
++    mutates_args=["residual_out"],
++    fake_impl=_mhc_fused_post_pre_delayed_rms_norm_aiter_fake,
++)
++direct_register_custom_op(
+     op_name="mhc_post_aiter",
+     op_func=mhc_post_aiter,
+     mutates_args=[],
+--- V05:vllm/model_executor/kernels/mhc/cpu.py
++++ V06:vllm/model_executor/kernels/mhc/cpu.py
+@@ -81,7 +81,7 @@
+     hc_eps: float,
+ ) -> torch.Tensor:
+     """CPU-ported HC head reduction (see `test_hc_head_cpu` in
+-    tests/kernels/test_mhc_kernels.py for the eager reference this is tested
++    tests/kernels/mhc/test_mhc_kernels.py for the eager reference this is tested
+     against).
+ 
+     The ported kernel's C++ signature takes `(hc_eps, norm_eps)` -- the
+--- V05:vllm/model_executor/layers/mhc.py
++++ V06:vllm/model_executor/layers/mhc.py
+@@ -59,9 +59,21 @@
+     return False
+ 
+ 
++def _has_aiter_mhc_fused_post_pre_delayed_rms_norm() -> bool:
++    if not HAS_AITER_MHC:
++        return False
++    from vllm.platforms.rocm import on_gfx950
++
++    # The fused delayed seam kernel is only validated on gfx950.
++    return on_gfx950()
++
++
+ HAS_AITER_MHC_FUSED = _has_aiter_mhc_fused()
+ HAS_AITER_MHC_PRE_NORM = _aiter_mhc_op_accepts_norm("mhc_pre")
+ HAS_AITER_MHC_FUSED_NORM = _aiter_mhc_op_accepts_norm("mhc_fused_post_pre")
++HAS_AITER_MHC_FUSED_POST_PRE_DELAYED_RMS_NORM = (
++    _has_aiter_mhc_fused_post_pre_delayed_rms_norm()
++)
+ 
+ 
+ def _aiter_mhc_supported(
+@@ -388,10 +400,42 @@
+         post_layer_mix: torch.Tensor | None = None,
+         comb_res_mix: torch.Tensor | None = None,
+     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+-        # The AITER delayed path drives mhc_pre_gemm_sqrsum against `residual`
+-        # and folds no RMSNorm, so it cannot serve the model-entry broadcast
+-        # (which projects a narrower `x`) or a fused norm. Both are handled by
+-        # TileLang, or by the reference when TileLang is unavailable.
++        # aiter's fused delayed seam: post-mix, gate projection, and the
++        # collapse with the carried pre-mix and its RMSNorm. It always applies
++        # the norm and projects `residual` itself.
++        if (
++            HAS_AITER_MHC_FUSED_POST_PRE_DELAYED_RMS_NORM
++            and x is None
++            and norm_weight is not None
++            and _aiter_mhc_supported(residual, norm_weight, supports_norm=True)
++        ):
++            residual_out = (
++                torch.empty_like(residual) if sublayer_out is not None else None
++            )
++            rest = torch.ops.vllm.mhc_fused_post_pre_delayed_rms_norm_aiter(
++                residual,
++                fn,
++                hc_scale,
++                hc_base,
++                rms_eps,
++                hc_pre_eps,
++                hc_sinkhorn_eps,
++                hc_post_mult_value,
++                sinkhorn_repeat,
++                pre_mix,
++                sublayer_out,
++                post_layer_mix,
++                comb_res_mix,
++                norm_weight,
++                norm_eps,
++                residual_out,
++            )
++            return (residual if residual_out is None else residual_out), *rest
++        # The unfused AITER delayed path drives mhc_pre_gemm_sqrsum against
++        # `residual` and folds no RMSNorm, so it cannot serve the model-entry
++        # broadcast (which projects a narrower `x`) or a fused norm the branch
++        # above did not take. Both are handled by TileLang, or by the reference
++        # when TileLang is unavailable.
+         if (
+             x is None
+             and norm_weight is None
+--- V05:vllm/models/deepseek_v41/amd/model.py
++++ V06:vllm/models/deepseek_v41/amd/model.py
+@@ -22,7 +22,11 @@
+ )
+ from vllm.model_executor.layers.layernorm import RMSNorm
+ from vllm.model_executor.layers.logits_processor import LogitsProcessor
+-from vllm.model_executor.layers.mhc import MHCPostOp, MHCPreDelayedOp
++from vllm.model_executor.layers.mhc import (
++    HAS_AITER_MHC_FUSED_POST_PRE_DELAYED_RMS_NORM,
++    MHCPostOp,
++    MHCPreDelayedOp,
++)
+ from vllm.model_executor.layers.quantization import QuantizationConfig
+ from vllm.model_executor.layers.vocab_parallel_embedding import (
+     ParallelLMHead,
+@@ -61,12 +65,8 @@
+ from vllm.v1.attention.backends.registry import AttentionBackendEnum
+ from vllm.v1.worker.ubatching import dbo_current_ubatch_id
+ 
+-from ..common.engram import EngramLayout, NgramHashState
++from ..common.engram import Engram, EngramLayout, NgramHashState
+ from ..common.mm_preprocess import IMAGE_SENTINEL_BASE_ID, image_sentinel_mask
+-
+-# Engram host offload and its prefetch stream are neither ROCm- nor
+-# NVIDIA-specific, so they are imported rather than duplicated.
+-from ..nvidia.engram import Engram
+ 
+ if typing.TYPE_CHECKING:
+     from vllm.v1.attention.backends.mla.sparse_swa import DeepseekSparseSWAMetadata
+@@ -251,6 +251,10 @@
+         )
+         self.mhc_pre_delayed = MHCPreDelayedOp()
+         self.mhc_post = MHCPostOp()
++        # Where aiter's fused seam kernel runs (gfx950), it folds the following
++        # attn_norm / ffn_norm into its collapse, so the separate norms are
++        # skipped for the seams it takes.
++        self.fuse_seam_norm = HAS_AITER_MHC_FUSED_POST_PRE_DELAYED_RMS_NORM
+ 
+     @staticmethod
+     def _hc_collapse(x: torch.Tensor, pre_mix: torch.Tensor) -> torch.Tensor:
+@@ -269,6 +273,11 @@
+         engram_hashes: torch.Tensor | None = None,
+         engram_mask: torch.Tensor | None = None,
+     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
++        # Layer 0's attention seam projects the 2-D embedding with the folded
++        # hc_attn_fn_broadcast instead of the 4-stream residual with hc_attn_fn.
++        # The fused kernel only takes the latter, so that seam keeps the
++        # separate attn_norm.
++        fuse_attn_norm = self.fuse_seam_norm and not (residual is None and x.dim() == 2)
+         # The reference collapses each sublayer's input with the *previous*
+         # sublayer's pre-mix: attention uses the pre-mix carried in (identity
+         # for the first layer), the FFN uses this layer's attention pre-mix.
+@@ -303,6 +312,8 @@
+                     self.hc_post_alpha,
+                     self.hc_sinkhorn_iters,
+                     pre_mix=pre_mix,
++                    norm_weight=self.attn_norm.weight if self.fuse_seam_norm else None,
++                    norm_eps=self.attn_norm.variance_epsilon,
+                 )
+         else:
+             pre_args = (
+@@ -328,7 +339,11 @@
+                     engram_mask,
+                 )
+                 residual, post_mix, res_mix, x, attn_pre = self.mhc_pre_delayed(
+-                    residual, *pre_args, pre_mix=pre_mix
++                    residual,
++                    *pre_args,
++                    pre_mix=pre_mix,
++                    norm_weight=self.attn_norm.weight if self.fuse_seam_norm else None,
++                    norm_eps=self.attn_norm.variance_epsilon,
+                 )
+             else:
+                 (
+@@ -344,8 +359,11 @@
+                     sublayer_out=x,
+                     post_layer_mix=post_mix,
+                     comb_res_mix=res_mix,
+-                )
+-        x = self.attn_norm(x)
++                    norm_weight=self.attn_norm.weight if self.fuse_seam_norm else None,
++                    norm_eps=self.attn_norm.variance_epsilon,
++                )
++        if not fuse_attn_norm:
++            x = self.attn_norm(x)
+ 
+         if self.use_sequence_parallel:
+             x = sp_all_gather(x)[: positions.shape[0]]
+@@ -368,8 +386,11 @@
+             sublayer_out=x,
+             post_layer_mix=post_mix,
+             comb_res_mix=res_mix,
+-        )
+-        x = self.ffn_norm(x)
++            norm_weight=self.ffn_norm.weight if self.fuse_seam_norm else None,
++            norm_eps=self.ffn_norm.variance_epsilon,
++        )
++        if not self.fuse_seam_norm:
++            x = self.ffn_norm(x)
+         x = self.ffn(x, input_ids)
+         return x, residual, post_mix, res_mix, ffn_pre
+ 
+@@ -895,6 +916,11 @@
+             # renames the engram fp8 table but not its scale; route the
+             # scale explicitly to the same module.
+             re.compile(r"(engram\.embed)\.scale$"): r"\1_tokens.weight_scale_inv",
++            # Quark exports spell the same tensor ``embed.weight_scale``,
++            # which the ``\.scale$`` rules never match.
++            re.compile(
++                r"(engram\.embed)\.weight_scale$"
++            ): r"\1_tokens.weight_scale_inv",
+             re.compile(r"\.scale$"): f".{linear_scale_name}",
+         }
+     else:
+@@ -908,6 +934,11 @@
+             ): r"\1.weight_scale_inv",
+             # Same engram reroute as the fp4 branch above.
+             re.compile(r"(engram\.embed)\.scale$"): r"\1_tokens.weight_scale_inv",
++            # Quark exports spell the same tensor ``embed.weight_scale``,
++            # which the ``\.scale$`` rules never match.
++            re.compile(
++                r"(engram\.embed)\.weight_scale$"
++            ): r"\1_tokens.weight_scale_inv",
+             re.compile(r"\.scale$"): f".{linear_scale_name}",
+         }
+     return WeightsMapper(
+--- V05:vllm/models/deepseek_v41/amd/rocm.py
++++ V06:vllm/models/deepseek_v41/amd/rocm.py
+@@ -2,8 +2,9 @@
+ # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+ 
+ import functools
++from collections.abc import Callable
+ from dataclasses import dataclass
+-from typing import cast
++from typing import Any, cast
+ 
+ import torch
+ 
+@@ -15,8 +16,14 @@
+ from vllm.logger import init_logger
+ from vllm.model_executor.layers.fusion.quant_activation import QuantizedActivation
+ from vllm.model_executor.layers.quantization.utils.quant_utils import kMxfp8Dynamic
++from vllm.model_executor.layers.rocm_paged_mxfp4_indexer import (
++    RocmSparseAttnIndexer,
++    RocmSparseMQAIndexer,
++)
+ from vllm.models.deepseek_v41.attention import (
+     DeepseekV4Attention,
++    DeepseekV4Indexer,
++    DeepseekV4IndexerCache,
+     _replace_layer_index,
+ )
+ from vllm.models.deepseek_v41.common.ops import dequantize_and_gather_k_cache
+@@ -29,14 +36,17 @@
+ from vllm.platforms import current_platform
+ from vllm.platforms.rocm import _ON_GFX950
+ from vllm.triton_utils import tl, triton
++from vllm.utils.multi_stream_utils import execute_in_parallel
+ from vllm.v1.attention.backend import (
+     CommonAttentionMetadata,
++    MultipleOf,
+ )
+ from vllm.v1.attention.backends.mla.sparse_swa import (
+     DeepseekSparseSWABackend,
+     DeepseekSparseSWAMetadata,
+ )
+ from vllm.v1.attention.ops.rocm_aiter_mla_sparse import (
++    build_prefill_topk_ragged_indices,
+     build_ragged_indices_from_dense,
+     rocm_inv_rope_einsum,
+     rocm_inverse_rope_mxfp8_rows,
+@@ -44,6 +54,9 @@
+     rocm_mxfp8_wo_a_bmm,
+     rocm_sparse_attn_decode,
+     rocm_sparse_attn_prefill,
++)
++from vllm.v1.attention.ops.rocm_paged_mxfp4_indexer import (
++    rocm_paged_mxfp4_cache_layout,
+ )
+ from vllm.v1.worker.workspace import current_workspace_manager
+ 
+@@ -61,6 +74,22 @@
+         and not has_kv_transfer
+         and has_extra_cache
+     )
++
++
++def _aiter_sparse_mla_enabled(has_kv_transfer: bool) -> bool:
++    from vllm._aiter_ops import rocm_aiter_ops
++
++    if not rocm_aiter_ops.is_triton_sparse_mla_enabled():
++        return False
++    # The aiter kernel does not scrub NaNs, so like the trust check above it
++    # needs a cache only the canonical writer has touched.
++    if has_kv_transfer:
++        logger.warning_once(
++            "VLLM_ROCM_USE_AITER_TRITON_SPARSE_MLA is ignored with a KV "
++            "connector; DeepSeek V4 keeps the Triton sparse attention."
++        )
++        return False
++    return True
+ 
+ 
+ def _build_indptr_from_lengths(lengths: torch.Tensor) -> torch.Tensor:
+@@ -407,6 +436,9 @@
+ class DeepseekV4ROCMAiterSparseSWAMetadata(DeepseekSparseSWAMetadata):
+     decode_swa_ragged_indices: torch.Tensor | None = None
+     decode_swa_ragged_indptr: torch.Tensor | None = None
++    # Built only for the aiter prefill, which reads the SWA cache in place.
++    prefill_swa_ragged_indices: torch.Tensor | None = None
++    prefill_swa_ragged_indptr: torch.Tensor | None = None
+ 
+ 
+ class DeepseekV4ROCMAiterSparseSWAMetadataBuilder(DeepseekV41SparseSWAMetadataBuilder):
+@@ -430,6 +462,9 @@
+             max_tokens + 1,
+             dtype=torch.int32,
+             device=self.device,
++        )
++        self._use_aiter_sparse_mla = _aiter_sparse_mla_enabled(
++            self.vllm_config.kv_transfer_config is not None
+         )
+ 
+     def build(
+@@ -446,6 +481,22 @@
+             replay_start=replay_start,
+         )
+ 
++        prefill_ragged_indices = None
++        prefill_ragged_indptr = None
++        if (
++            self._use_aiter_sparse_mla
++            and base.num_prefill_tokens > 0
++            and base.prefill_swa_indices is not None
++            and base.prefill_swa_lens is not None
++        ):
++            # Paged-coordinate rows, so every layer's prefill shares one build.
++            prefill_ragged_indices, prefill_ragged_indptr = (
++                build_ragged_indices_from_dense(
++                    base.prefill_swa_indices.reshape(base.num_prefill_tokens, -1),
++                    base.prefill_swa_lens,
++                )
++            )
++
+         ragged_indices = None
+         ragged_indptr = None
+         if (
+@@ -472,7 +523,135 @@
+             **vars(base),
+             decode_swa_ragged_indices=ragged_indices,
+             decode_swa_ragged_indptr=ragged_indptr,
+-        )
++            prefill_swa_ragged_indices=prefill_ragged_indices,
++            prefill_swa_ragged_indptr=prefill_ragged_indptr,
++        )
++
++
++@functools.cache
++def _aiter_indexer_cache_ops() -> tuple[Callable[..., None], Callable[..., tuple]]:
++    """The aiter indexer key writer and query quantizer."""
++    from aiter.ops.triton.fusions.k_norm_rope_mxfp4_cache import (
++        k_norm_rope_mxfp4_cache,
++    )
++    from aiter.ops.triton.rope.q_rope_mxfp4_quant import q_rope_mxfp4_quant
++
++    return k_norm_rope_mxfp4_cache, q_rope_mxfp4_quant
++
++
++def rocm_mxfp4_indexer_k_store(
++    k_pre: torch.Tensor,
++    positions: torch.Tensor,
++    cos_sin_cache: torch.Tensor,
++    rms_norm_weight: torch.Tensor,
++    rms_norm_eps: float,
++    k_cache: torch.Tensor,
++    kv_slot_mapping: torch.Tensor,
++    compress_ratio: int,
++    use_fp4_cache: bool,
++    *,
++    num_heads: int,
++) -> None:
++    """`indexer_k_norm_rope_store` for the ROCm MXFP4 cache: aiter's cache op
++    writes the key in the order its MQA-logits kernel reads with ``num_heads``
++    query heads."""
++    assert use_fp4_cache, "the ROCm indexer cache op writes MXFP4 only"
++    layout = rocm_paged_mxfp4_cache_layout(num_heads, k_pre.shape[1], k_cache.shape[1])
++    k_norm_rope_mxfp4_cache, _ = _aiter_indexer_cache_ops()
++    k_norm_rope_mxfp4_cache(
++        k_pre,
++        positions,
++        cos_sin_cache,
++        rms_norm_weight,
++        rms_norm_eps,
++        k_cache,
++        kv_slot_mapping,
++        compress_ratio,
++        shuffle=layout,
++    )
++
++
++def rocm_mxfp4_indexer_q_quant(
++    positions: torch.Tensor,
++    index_q: torch.Tensor,
++    index_q_cos_sin_cache: torch.Tensor,
++    index_weights: torch.Tensor,
++    index_weights_softmax_scale: float,
++    index_weights_head_scale: float,
++    use_fp4: bool = True,
++    weights_out_dtype: torch.dtype = torch.float32,
++) -> tuple[tuple[torch.Tensor, torch.Tensor], torch.Tensor]:
++    """`fused_indexer_q_rope_quant` for the ROCm MXFP4 indexer, on aiter's op:
++    ((packed [T, H, D // 2], e8m0 as one int32 per head [T, H]), fp32
++    weights)."""
++    assert use_fp4 and weights_out_dtype == torch.float32, (
++        "the ROCm indexer quantizes Q to MXFP4 and scores with fp32 weights"
++    )
++    _, q_rope_mxfp4_quant = _aiter_indexer_cache_ops()
++    q_packed, q_scale, weights_out = q_rope_mxfp4_quant(
++        index_q,
++        positions,
++        index_q_cos_sin_cache,
++        index_weights,
++        index_weights_softmax_scale * index_weights_head_scale,
++    )
++    return (q_packed, q_scale.view(torch.int32).squeeze(-1)), weights_out
++
++
++class DeepseekV41RocmMxfp4Indexer(DeepseekV4Indexer):
++    """The indexer on aiter's paged MXFP4 cache: its K store and Q quant write
++    in the order aiter's MQA-logits kernel reads, and its layers score with it.
++    ``_produce_k`` and ``forward_q`` mirror ``DeepseekV4Indexer``'s except for
++    those two calls."""
++
++    mqa_cls = RocmSparseMQAIndexer
++    attn_cls = RocmSparseAttnIndexer
++
++    def _produce_k(
++        self,
++        latent: torch.Tensor | None,
++        positions: torch.Tensor,
++        rotary_emb: torch.nn.Module,
++    ) -> None:
++        attn_metadata = get_forward_context().attn_metadata
++        if not isinstance(attn_metadata, dict) or latent is None:
++            return
++        assert self.owns_k
++        indexer_metadata = cast(Any, attn_metadata[self.k_cache.prefix])
++        k_pre, _ = self.wk(latent)
++        rocm_mxfp4_indexer_k_store(
++            k_pre,
++            positions,
++            rotary_emb.cos_sin_cache,
++            self.k_norm.weight,
++            self.k_norm.variance_epsilon,
++            self.k_cache.kv_cache,
++            indexer_metadata.slot_mapping,
++            self.compress_ratio,
++            self.use_fp4_kv,
++            num_heads=self.n_head,
++        )
++
++    def forward_q(
++        self,
++        qr: torch.Tensor | QuantizedActivation,
++        qr_scale: torch.Tensor | None,
++        indexer_weights: torch.Tensor,
++        positions: torch.Tensor,
++        rotary_emb: torch.nn.Module,
++    ) -> tuple[torch.Tensor | None, torch.Tensor | None, torch.Tensor | None]:
++        q = self._wq_b_proj(qr, qr_scale).view(-1, self.n_head, self.head_dim)
++        (q, q_scale), weights = rocm_mxfp4_indexer_q_quant(
++            positions,
++            q,
++            rotary_emb.cos_sin_cache,
++            indexer_weights,
++            self.softmax_scale,
++            self.n_head**-0.5,
++            use_fp4=self.use_fp4_kv,
++            weights_out_dtype=self.indexer_weights_dtype,
++        )
++        return q, q_scale, weights
+ 
+ 
+ class DeepseekV4ROCMAiterMLASparseBackend(DeepseekV4SparseMLABackend):
+@@ -481,6 +660,10 @@
+         return "ROCM_FLASHMLA_SPARSE_DSV4"
+ 
+     @staticmethod
++    def get_supported_kernel_block_sizes(kv_cache_spec=None) -> list[int | MultipleOf]:
++        return [64, 128]
++
++    @staticmethod
+     def get_builder_cls() -> type[DeepseekV4SparseMLAMetadataBuilder]:
+         return DeepseekV4SparseMLAMetadataBuilder
+ 
+@@ -496,6 +679,14 @@
+ 
+     backend_cls = DeepseekV4ROCMAiterMLASparseBackend
+     swa_backend_cls = DeepseekV41ROCMAiterSparseSWABackend
++    _use_aiter_sparse_mla = False
++
++    def _indexer_cls(
++        self, k_cache: DeepseekV4IndexerCache | None
++    ) -> type[DeepseekV4Indexer]:
++        if k_cache is not None and k_cache.rocm_mxfp4:
++            return DeepseekV41RocmMxfp4Indexer
++        return super()._indexer_cls(k_cache)
+ 
+     def __init__(self, *args, **kwargs):
+         vllm_config = args[0] if args else kwargs["vllm_config"]
+@@ -517,6 +708,9 @@
+         # same thing. The source owns one cache per compress ratio, refreshed
+         # when it runs; consumers below it read through.
+         self._topk_ragged_cache: dict[int, _TopkRagged] = {}
++        self._prefill_topk_ragged_cache: dict[
++            str, tuple[torch.Tensor, torch.Tensor]
++        ] = {}
+         self._index_source_prefix: str | None = None
+         if self.compress_ratio > 0:
+             assert self.index_source_layer_id is not None
+@@ -529,6 +723,10 @@
+                     "this rank; PP splits inside a v4.1 index-sharing group "
+                     "are not supported."
+                 )
++        self._use_aiter_sparse_mla = _aiter_sparse_mla_enabled(self._has_kv_transfer)
++        if self.compressor is None and self.indexer is None:
++            # Dense layers have nothing to overlap; keep the base serial path.
++            self.aux_stream_list = None
+ 
+     @classmethod
+     def get_padded_num_q_heads(cls, num_heads: int) -> int:
+@@ -600,7 +798,177 @@
+     def _run_parallel_input_projections(
+         self, hidden_states: torch.Tensor
+     ) -> tuple[torch.Tensor, torch.Tensor | None, torch.Tensor | None]:
++        if self.indexer is not None and self.compressor is None:
++            # Serial: qr must sit on the default stream before the q-side
++            # fork below can consume it (ROCm).
++            aux_streams = self.aux_stream_list
++            self.aux_stream_list = None
++            try:
++                return super()._run_parallel_input_projections(hidden_states)
++            finally:
++                self.aux_stream_list = aux_streams
+         return super()._run_parallel_input_projections(hidden_states)
++
++    def forward(
++        self,
++        positions: torch.Tensor,
++        hidden_states: torch.Tensor,
++        llama_4_scaling: torch.Tensor | None = None,
++    ) -> torch.Tensor:
++        if (
++            self.indexer is None
++            or self._prepare_and_attn_fn == self._prepare_and_attn_eager
++            or not current_platform.enable_multi_stream_overlap(
++                self.aux_stream_list, get_forward_context().attn_metadata
++            )
++        ):
++            # Sequential fallback: no forks outside the capture region, where
++            # HIP event sync is unreliable; MRV1 keeps the input prep in its
++            # wide eager region (#51430).
++            aux_streams = self.aux_stream_list
++            self.aux_stream_list = None
++            try:
++                return super().forward(positions, hidden_states, llama_4_scaling)
++            finally:
++                self.aux_stream_list = aux_streams
++
++        attn_out = self._alloc_attn_out(hidden_states.shape[0], hidden_states)
++        if self.compressor is not None:
++            q, kv, index_q, index_q_scale, index_weights = self._forward_csa2_full(
++                hidden_states, positions
++            )
++        else:
++            q, kv, index_q, index_q_scale, index_weights = self._forward_csa2_reindex(
++                hidden_states, positions
++            )
++        self._sparse_indexer_and_attn(
++            hidden_states,
++            index_q,
++            index_q_scale,
++            index_weights,
++            q,
++            kv,
++            positions,
++            attn_out,
++        )
++        return self._o_proj(attn_out, positions)
++
++    def _forward_csa2_full(
++        self, hidden_states: torch.Tensor, positions: torch.Tensor
++    ) -> tuple[
++        torch.Tensor,
++        torch.Tensor,
++        torch.Tensor | None,
++        torch.Tensor | None,
++        torch.Tensor | None,
++    ]:
++        """CSA layers: one fork replaces the base pipeline's three.
++
++        Each fork/join is a HIP event pair per side stream on ROCm, so the
++        base three-fork pipeline is expensive there; the compressor chain and
++        the indexer weights projection run fully in parallel with the default
++        chain. The indexer K write and q-side stay serial after the join:
++        ``wk`` consumes the aux-0 latent and the q-side's wq_b consumes the
++        default-stream qr.
++        """
++        attn_metadata = get_forward_context().attn_metadata
++        compressor = self.compressor
++        indexer = self.indexer
++        assert compressor is not None and indexer is not None
++        aux_streams = self.aux_stream_list
++        assert aux_streams is not None and len(aux_streams) >= 2
++
++        def default_chain():
++            qr_kv = self._fused_wqa_wkv_gemm(hidden_states)
++            qr, qr_scale, kv = self._split_qkv_and_norm(qr_kv)
++            q = self._wq_b_proj(qr, qr_scale).view(
++                -1, self.n_local_heads, self.head_dim
++            )
++            return (
++                self._fused_qnorm_rope_kv_insert(q, kv, positions, attn_metadata),
++                qr,
++                qr_scale,
++                kv,
++            )
++
++        def compressor_chain():
++            kv_score = torch.mm(
++                hidden_states,
++                compressor.fused_wkv_wgate.weight.T,
++                out_dtype=torch.float32,
++            )
++            latent = compressor(kv_score, positions)
++            compressor.insert_cache(latent, positions, self.rotary_emb)
++            return latent
++
++        def indexer_weights_chain():
++            # ReplicatedLinear returns (output, bias); bias is None.
++            weights, _ = indexer.weights_proj(hidden_states)
++            return weights
++
++        (q, qr, qr_scale, kv), (latent, indexer_weights) = execute_in_parallel(
++            default_chain,
++            [compressor_chain, indexer_weights_chain],
++            self.ln_events[0],
++            self.ln_events[1:3],
++            aux_streams[:2],
++            enable=True,
++            default_first=True,
++        )
++
++        indexer._produce_k(latent, positions, self.indexer_rotary_emb)
++        index_q, index_q_scale, index_weights_out = indexer.forward_q(
++            qr, qr_scale, indexer_weights, positions, self.indexer_rotary_emb
++        )
++        return q, kv, index_q, index_q_scale, index_weights_out
++
++    def _forward_csa2_reindex(
++        self, hidden_states: torch.Tensor, positions: torch.Tensor
++    ) -> tuple[
++        torch.Tensor,
++        torch.Tensor,
++        torch.Tensor | None,
++        torch.Tensor | None,
++        torch.Tensor | None,
++    ]:
++        """Indexer-only layers: the q-side overlaps the SWA q path.
++
++        The input projections run serial first: the q-side consumes qr, so
++        it can only overlap the SWA q projection and KV insert.
++        """
++        indexer = self.indexer
++        assert indexer is not None
++        attn_metadata = get_forward_context().attn_metadata
++        # Serial on these layers via the _run_parallel_input_projections
++        # override: qr must sit on the default stream before the fork.
++        qr_kv, _, indexer_weights = self._run_parallel_input_projections(hidden_states)
++        assert indexer_weights is not None
++        qr, qr_scale, kv = self._split_qkv_and_norm(qr_kv)
++
++        def swa_q_chain():
++            q = self._wq_b_proj(qr, qr_scale).view(
++                -1, self.n_local_heads, self.head_dim
++            )
++            return self._fused_qnorm_rope_kv_insert(q, kv, positions, attn_metadata)
++
++        def indexer_q_chain():
++            return indexer.forward_q(
++                qr, qr_scale, indexer_weights, positions, self.indexer_rotary_emb
++            )
++
++        aux_streams = self.aux_stream_list
++        assert aux_streams is not None
++        q, aux_results = execute_in_parallel(
++            swa_q_chain,
++            [indexer_q_chain],
++            self.ln_events[0],
++            self.ln_events[1:2],
++            aux_streams[:1],
++            enable=True,
++            default_first=True,
++        )
++        index_q, index_q_scale, index_weights_out = aux_results[0]
++        return q, kv, index_q, index_q_scale, index_weights_out
+ 
+     @functools.cached_property
+     def _wq_b_uses_aiter_block_scaled(self) -> bool:
+@@ -741,9 +1109,10 @@
+         attn_metadata = forward_context.attn_metadata
+ 
+         if attn_metadata is None:
+-            # Warmup dummy run: no real metadata. Reserve the same bf16
+-            # gather workspace _forward_prefill would; the dequantize / topk
+-            # / sparse_fwd kernels are skipped this step.
++            # Warmup dummy run: no real metadata. Reserve the workspace
++            # _forward_prefill would; the dequantize / topk / sparse_fwd kernels
++            # are skipped this step. The aiter prefill reads the caches in place,
++            # so it asks only for the bf16 rows of the MXFP8 output.
+             swa_only = self.compress_ratio == 0
+             N = (
+                 0
+@@ -752,9 +1121,14 @@
+                 // self.compress_ratio
+             )
+             M = N + self.window_size + self.max_num_batched_tokens
+-            current_workspace_manager().get_simultaneous(
+-                *self._prefill_workspace_shapes(M, self.max_num_batched_tokens, q)
+-            )
++            shapes = self._prefill_workspace_shapes(
++                M,
++                self.max_num_batched_tokens,
++                q,
++                gather=not self._use_aiter_sparse_mla,
++            )
++            if shapes:
++                current_workspace_manager().get_simultaneous(*shapes)
+             if mxfp8_out is None:
+                 output.zero_()
+             else:
+@@ -913,6 +1287,38 @@
+                 num_decode_tokens=num_decode_tokens,
+             )
+ 
++        if self._use_aiter_sparse_mla:
++            assert swa_metadata.decode_swa_ragged_indices is not None
++            assert swa_metadata.decode_swa_ragged_indptr is not None
++            out = output
++            if output_mxfp8 is not None:
++                # The aiter kernel has no MXFP8 epilogue: write bf16 rows, then
++                # rotate and quantize them as the decode reduce would have.
++                out = self._mxfp8_bf16_rows(q.shape[0], q)
++            assert out is not None
++            self._aiter_sparse_mla(
++                q,
++                out,
++                self.swa_cache_layer.kv_cache,
++                swa_metadata.decode_swa_ragged_indices,
++                swa_metadata.decode_swa_ragged_indptr,
++                kv_cache,
++                topk_ragged_indices,
++                topk_ragged_indptr,
++            )
++            if output_mxfp8 is not None:
++                rocm_inverse_rope_mxfp8_rows(
++                    out,
++                    positions,
++                    self.rotary_emb.cos_sin_cache,
++                    self.rope_head_dim,
++                    output_mxfp8[0],
++                    output_mxfp8[1],
++                )
++                return q.shape[0]
++            # The aiter kernel leaves the inverse RoPE to the caller.
++            return 0
++
+         return rocm_sparse_attn_decode(
+             q=q,
+             kv_cache=kv_cache,
+@@ -958,9 +1364,21 @@
+         With ``mxfp8_out`` the rows go to a bf16 workspace first and are then
+         inverse-RoPE'd and quantized into it in one pass.
+         """
++        if self._use_aiter_sparse_mla:
++            self._forward_prefill_aiter(
++                q=q,
++                positions=positions,
++                compressed_k_cache=compressed_k_cache,
++                swa_k_cache=swa_k_cache,
++                output=output,
++                attn_metadata=attn_metadata,
++                swa_metadata=swa_metadata,
++                mxfp8_out=mxfp8_out,
++            )
++            return
++
+         swa_only = attn_metadata is None
+ 
+-        num_prefills = swa_metadata.num_prefills
+         num_prefill_tokens = swa_metadata.num_prefill_tokens
+         num_decodes = swa_metadata.num_decodes
+         num_decode_tokens = swa_metadata.num_decode_tokens
+@@ -989,21 +1407,23 @@
+             N = 0
+ 
+         M = N + self.window_size + self.max_num_batched_tokens
+-        num_chunks = (num_prefills + self.PREFILL_CHUNK_SIZE - 1) // (
+-            self.PREFILL_CHUNK_SIZE
+-        )
++        chunk_plan = swa_metadata.get_prefill_chunk_plan(
++            compress_ratio=self.compress_ratio,
++            prefill_chunk_size=self.PREFILL_CHUNK_SIZE,
++            has_compressed=not swa_only,
++        )
++        assert chunk_plan, "prefill chunk plan must be non-empty when num_prefills > 0"
+ 
+         workspace = current_workspace_manager().get_simultaneous(
+             *self._prefill_workspace_shapes(M, num_prefill_tokens, q)
+         )
+-        kv = workspace[0]
++        kv_rows = workspace[0].view(-1, q.shape[-1])
+         if mxfp8_out is not None:
+             output = workspace[1]
+         assert output is not None
+-        for chunk_idx in range(num_chunks):
+-            chunk_start = chunk_idx * self.PREFILL_CHUNK_SIZE
+-            chunk_end = min(chunk_start + self.PREFILL_CHUNK_SIZE, num_prefills)
++        for chunk_start, chunk_end, chunk_N, chunk_M in chunk_plan:
+             chunk_size = chunk_end - chunk_start
++            kv = kv_rows[: chunk_size * chunk_M].view(chunk_size, chunk_M, -1)
+             if not swa_only:
+                 assert attn_metadata is not None
+                 assert compressed_k_cache is not None
+@@ -1028,7 +1448,7 @@
+                 gather_lens=gather_lens[chunk_start:chunk_end],
+                 block_table=swa_block_table[chunk_start:chunk_end],
+                 block_size=swa_metadata.block_size,
+-                offset=N,
++                offset=chunk_N,
+                 use_fnuz=current_platform.is_fp8_fnuz(),
+             )
+ 
+@@ -1049,8 +1469,8 @@
+                 self.window_size,
+                 self.compress_ratio,
+                 top_k,
+-                M,
+-                N,
++                chunk_M,
++                chunk_N,
+             )
+             rocm_sparse_attn_prefill(
+                 q=q[query_start:query_end],
+@@ -1075,15 +1495,17 @@
+             )
+ 
+     def _prefill_workspace_shapes(
+-        self, M: int, num_prefill_tokens: int, q: torch.Tensor
++        self, M: int, num_prefill_tokens: int, q: torch.Tensor, gather: bool = True
+     ) -> list[tuple[tuple[int, ...], torch.dtype]]:
+         """The prefill gather buffer, plus bf16 rows for the MXFP8 output.
+ 
+         One ``get_simultaneous`` call: separate calls alias the same memory.
++        ``gather=False`` leaves out the gather buffer, which the aiter kernel,
++        reading the caches in place, never needs.
+         """
+-        shapes: list[tuple[tuple[int, ...], torch.dtype]] = [
+-            ((self.PREFILL_CHUNK_SIZE, M, q.shape[-1]), torch.bfloat16)
+-        ]
++        shapes: list[tuple[tuple[int, ...], torch.dtype]] = []
++        if gather:
++            shapes.append(((self.PREFILL_CHUNK_SIZE, M, q.shape[-1]), torch.bfloat16))
+         if _ON_GFX950:
+             shapes.append(
+                 (
+@@ -1092,3 +1514,136 @@
+                 )
+             )
+         return shapes
++
++    def _prefill_topk_ragged(
++        self,
++        swa_metadata: DeepseekV4ROCMAiterSparseSWAMetadata,
++        attn_metadata: DeepseekV4FlashMLAMetadata,
++        compressed_k_cache: torch.Tensor,
++    ) -> tuple[torch.Tensor, torch.Tensor]:
++        """Prefill counterpart of ``_decode_topk_ragged``: layers that share an
++        index source and a compressed cache reuse one build per step."""
++        assert swa_metadata.token_to_req_indices is not None
++        assert swa_metadata.query_start_loc is not None
++        assert swa_metadata.seq_lens is not None
++        assert swa_metadata.is_valid_token is not None
++        assert self.topk_indices_buffer is not None
++        assert self._index_source_prefix is not None
++        assert self.compressed_cache_prefix is not None
++
++        source = self._static_forward_context[self._index_source_prefix]
++        if source is self:
++            source._prefill_topk_ragged_cache = {}
++        cached = source._prefill_topk_ragged_cache.get(self.compressed_cache_prefix)
++        if cached is not None:
++            return cached
++
++        num_decode_tokens = swa_metadata.num_decode_tokens
++        num_prefill_tokens = swa_metadata.num_prefill_tokens
++        built = build_prefill_topk_ragged_indices(
++            self.topk_indices_buffer[
++                num_decode_tokens : num_decode_tokens + num_prefill_tokens
++            ],
++            swa_metadata.token_to_req_indices,
++            swa_metadata.query_start_loc,
++            swa_metadata.seq_lens,
++            swa_metadata.is_valid_token,
++            attn_metadata.block_table,
++            block_size=attn_metadata.block_size // self.compress_ratio,
++            compress_ratio=self.compress_ratio,
++            num_compressed=(self.max_model_len + self.compress_ratio - 1)
++            // self.compress_ratio,
++            token_offset=num_decode_tokens,
++            num_rows=compressed_k_cache.shape[0] * compressed_k_cache.shape[1],
++        )
++        source._prefill_topk_ragged_cache[self.compressed_cache_prefix] = built
++        return built
++
++    def _forward_prefill_aiter(
++        self,
++        q: torch.Tensor,
++        positions: torch.Tensor,
++        compressed_k_cache: torch.Tensor | None,
++        swa_k_cache: torch.Tensor,
++        output: torch.Tensor | None,
++        attn_metadata: DeepseekV4FlashMLAMetadata | None,
++        swa_metadata: DeepseekV4ROCMAiterSparseSWAMetadata,
++        mxfp8_out: tuple[torch.Tensor, torch.Tensor] | None = None,
++    ) -> None:
++        """Prefill straight off the paged caches, with no bf16 gather.
++
++        With ``mxfp8_out`` the kernel writes bf16 rows to the workspace, which
++        are then inverse-RoPE'd and quantized into it as ``_forward_prefill``
++        does.
++        """
++        num_prefill_tokens = swa_metadata.num_prefill_tokens
++        assert swa_metadata.prefill_swa_ragged_indices is not None
++        assert swa_metadata.prefill_swa_ragged_indptr is not None
++
++        topk_indices = None
++        topk_indptr = None
++        if attn_metadata is None:
++            compressed_k_cache = None
++        else:
++            assert compressed_k_cache is not None
++            topk_indices, topk_indptr = self._prefill_topk_ragged(
++                swa_metadata, attn_metadata, compressed_k_cache
++            )
++
++        if mxfp8_out is not None:
++            output = self._mxfp8_bf16_rows(num_prefill_tokens, q)
++        assert output is not None
++        self._aiter_sparse_mla(
++            q[:num_prefill_tokens],
++            output[:num_prefill_tokens],
++            swa_k_cache,
++            swa_metadata.prefill_swa_ragged_indices,
++            swa_metadata.prefill_swa_ragged_indptr,
++            compressed_k_cache,
++            topk_indices,
++            topk_indptr,
++        )
++        if mxfp8_out is not None:
++            rocm_inverse_rope_mxfp8_rows(
++                output[:num_prefill_tokens],
++                positions[:num_prefill_tokens],
++                self.rotary_emb.cos_sin_cache,
++                self.rope_head_dim,
++                mxfp8_out[0][:num_prefill_tokens],
++                mxfp8_out[1][:num_prefill_tokens],
++            )
++
++    def _mxfp8_bf16_rows(self, num_tokens: int, q: torch.Tensor) -> torch.Tensor:
++        """bf16 attention rows for the aiter kernel to write when the layer's
++        output is MXFP8, taken from the workspace the warmup reserved."""
++        shapes = self._prefill_workspace_shapes(0, num_tokens, q, gather=False)
++        assert shapes, "an MXFP8 attention output is gfx950-only"
++        return current_workspace_manager().get_simultaneous(*shapes)[0]
++
++    def _aiter_sparse_mla(
++        self,
++        q: torch.Tensor,
++        output: torch.Tensor,
++        swa_k_cache: torch.Tensor,
++        swa_indices: torch.Tensor,
++        swa_indptr: torch.Tensor,
++        compressed_k_cache: torch.Tensor | None,
++        topk_indices: torch.Tensor | None,
++        topk_indptr: torch.Tensor | None,
++    ) -> None:
++        from vllm._aiter_ops import rocm_aiter_ops
++
++        # Both fp8 caches are read in place: the SWA window as the main segment,
++        # the top-k compressed tokens as the extra one.
++        rocm_aiter_ops.triton_sparse_mla_fwd(
++            q,
++            swa_k_cache,
++            output,
++            self.scale,
++            swa_indptr,
++            swa_indices,
++            attn_sink=self.attn_sink[: q.shape[1]],
++            extra_kv_buffer=compressed_k_cache,
++            extra_kv_indptr=topk_indptr,
++            extra_kv_indices=topk_indices,
++        )
+--- V05:vllm/models/deepseek_v41/amd/vl_model.py
++++ V06:vllm/models/deepseek_v41/amd/vl_model.py
+@@ -79,20 +79,22 @@
+     types: Annotated[torch.Tensor, TensorShape("ns", dynamic_dims={"ns"})]
+ 
+ 
++_VL_PREFIX_MAPPING: dict[str, str | None] = {
++    "layers.": "language_model.model.layers.",
++    "embed.": "language_model.model.embed.",
++    "norm.": "language_model.model.norm.",
++    "hc_head": "language_model.model.hc_head",
++    "mtp.": "language_model.model.mtp.",
++}
++
++
+ def _make_deepseek_v4_vl_weights_mapper(
+     expert_dtype: str, linear_scale_name: str
+ ) -> WeightsMapper:
+     """Text-checkpoint mapping rules re-rooted under ``language_model.``."""
+     base = _make_deepseek_v4_weights_mapper(expert_dtype, linear_scale_name)
+-    orig_to_new_prefix: dict[str, str | None] = {
+-        "layers.": "language_model.model.layers.",
+-        "embed.": "language_model.model.embed.",
+-        "norm.": "language_model.model.norm.",
+-        "hc_head": "language_model.model.hc_head",
+-        "mtp.": "language_model.model.mtp.",
+-    }
+     return WeightsMapper(
+-        orig_to_new_prefix=orig_to_new_prefix,
++        orig_to_new_prefix=dict(_VL_PREFIX_MAPPING),
+         orig_to_new_regex=base.orig_to_new_regex,
+         orig_to_new_suffix={
+             "head.weight": "language_model.lm_head.weight",
+@@ -130,6 +132,22 @@
+     """
+ 
+     supports_encoder_tp_data = True
++
++    # Both of these are read off the *class* by
++    # ``configure_quant_config``/``SupportsQuant``, before ``__init__`` runs,
++    # to translate a quantization config's checkpoint-style module names into
++    # runtime prefixes. ``__init__`` later overwrites the instance
++    # ``hf_to_vllm_mapper`` with the full weight-loading mapper; only the
++    # prefix rules matter here. Without the class attributes, per-layer specs
++    # naming ``layers.N.attn.wq_a`` never match this wrapper's
++    # ``language_model.model.layers.N.attn.wq_a`` and silently fall back to
++    # the global spec.
++    packed_modules_mapping = DeepseekV41LLMForCausalLM.packed_modules_mapping
++
++    hf_to_vllm_mapper = WeightsMapper(
++        orig_to_new_prefix=dict(_VL_PREFIX_MAPPING),
++        orig_to_new_substr={".shared_experts.w2": ".shared_experts.down_proj"},
++    )
+ 
+     # The MoE router needs raw token ids to detect image-span tokens
+     # (all carrying image_token_id, see common/mm_preprocess.py) and apply
+--- V05:vllm/models/deepseek_v41/attention.py
++++ V06:vllm/models/deepseek_v41/attention.py
+@@ -35,6 +35,9 @@
+ 
+ if TYPE_CHECKING:
+     from vllm.model_executor.kernels.linear.cute_dsl.gemm_rs_ar import GemmRsAr
++    from vllm.model_executor.layers.rocm_paged_mxfp4_indexer import (
++        RocmSparseMQAIndexer,
++    )
+     from vllm.v1.attention.backends.mla.sparse_swa import (
+         DeepseekSparseSWAMetadata,
+     )
+@@ -261,6 +264,13 @@
+         """Return whether this instance stores fp8 KV in fp8_ds_mla layout."""
+         return self.use_fp8_ds_mla_layout
+ 
++    def _indexer_cls(
++        self, k_cache: "DeepseekV4IndexerCache | None"
++    ) -> type["DeepseekV4Indexer"]:
++        """The indexer for this layer's index K cache. A platform subclass
++        returns one that writes and scores its own cache layout."""
++        return DeepseekV4Indexer
++
+     def __init__(
+         self,
+         vllm_config: VllmConfig,
+@@ -449,7 +459,7 @@
+                     )
+             is_candidate_source = layer_id == self.candidate_source_layer
+             uses_candidates = 0 <= self.candidate_source_layer < layer_id
+-            self.indexer = DeepseekV4Indexer(
++            self.indexer = self._indexer_cls(index_k_cache)(
+                 vllm_config,
+                 config=config,
+                 hidden_size=self.hidden_size,
+@@ -478,7 +488,6 @@
+             # graph and MRV1 produces garbage (#51430).
+             self._prepare_and_attn_fn = self._prepare_and_attn_eager
+ 
+-        # Will be None on ROCm for now.
+         self.aux_stream_list = aux_stream_list
+         # [0]: GEMM start / post-GEMM event0. [1..3]: GEMM done events;
+         # [1] doubles as post-GEMM event1. Reuse is safe: GEMM fully joins
+@@ -697,7 +706,7 @@
+         else:
+             gemm_rs.warn_incompatible_projection()
+ 
+-    def _wo_b_proj(self, z: torch.Tensor) -> torch.Tensor:
++    def _wo_b_proj(self, z: torch.Tensor | QuantizedActivation) -> torch.Tensor:
+         """Apply ``wo_b``; with GEMM-RS bound, also reduce-scatter the result.
+ 
+         Every ``_o_proj`` implementation projects through this so the decoder
+@@ -707,7 +716,7 @@
+         """
+         if self.gemm_rs is None:
+             return self.wo_b(z)
+-        if self.gemm_rs.should_run(z):
++        if isinstance(z, torch.Tensor) and self.gemm_rs.should_run(z):
+             return self.gemm_rs.apply(z, self.wo_b)
+         # Small batches stay on the unfused path, which is faster there.
+         return sp_reduce_scatter(self.wo_b(z))
+@@ -1153,6 +1162,10 @@
+         self.compress_ratio = compress_ratio
+         vllm_config = get_current_vllm_config()
+         self.sparse_logits = vllm_config.attention_config.indexer_sparse_logits
++        # aiter's paged MXFP4 kernels write this cache and read it in place.
++        self.rocm_mxfp4 = current_platform.is_rocm() and dsa_indexer_uses_fp4(
++            vllm_config
++        )
+         compilation_config = vllm_config.compilation_config
+         if prefix in compilation_config.static_forward_context:
+             raise ValueError(f"Duplicate layer name: {prefix}")
+@@ -1191,13 +1204,21 @@
+             # it 512B-aligned; the main KV record read from the same blocks
+             # needs its own TMA stride, so keep both.
+             block_stride_alignment=(
+-                math.lcm(512, page_alignment) if self.sparse_logits else None
++                math.lcm(512, page_alignment)
++                if self.sparse_logits and not self.rocm_mxfp4
++                else None
+             ),
+         )
+ 
+     def forward(self): ...
+ 
+     def get_attn_backend(self) -> type[AttentionBackend]:
++        if self.rocm_mxfp4:
++            from vllm.v1.attention.backends.mla.rocm_paged_mxfp4_indexer import (
++                DeepseekV41RocmMxfp4IndexerBackend,
++            )
++
++            return DeepseekV41RocmMxfp4IndexerBackend
+         if self.sparse_logits:
+             return DeepseekV41SparseIndexerBackend
+         return DeepseekV41IndexerBackend
+@@ -1218,6 +1239,12 @@
+     ``candidate_block_size`` compressed positions (``candidate_write``);
+     later indexers mask their scores to those blocks before their own top-k.
+     """
++
++    # The scoring layers; a platform subclass swaps in its own.
++    mqa_cls: ClassVar[type["SparseMQAIndexer | RocmSparseMQAIndexer"]] = (
++        SparseMQAIndexer
++    )
++    attn_cls: ClassVar[type[SparseAttnIndexer]] = SparseAttnIndexer
+ 
+     def __init__(
+         self,
+@@ -1306,7 +1333,7 @@
+             and candidate_block_buffer is not None
+             and not candidate_write
+         )
+-        self.indexer_op: SparseAttnIndexer | SparseMQAIndexer
++        self.indexer_op: SparseAttnIndexer | SparseMQAIndexer | RocmSparseMQAIndexer
+         if use_sparse_logits:
+             if not self.use_fp4_kv:
+                 raise ValueError(
+@@ -1315,7 +1342,7 @@
+                 )
+             assert candidate_block_buffer is not None
+             assert topk_indices_buffer is not None
+-            self.indexer_op = SparseMQAIndexer(
++            self.indexer_op = self.mqa_cls(
+                 self.k_cache,
+                 self.topk_tokens,
+                 self.head_dim,
+@@ -1325,7 +1352,7 @@
+                 candidate_block_size,
+             )
+         else:
+-            self.indexer_op = SparseAttnIndexer(
++            self.indexer_op = self.attn_cls(
+                 self.k_cache,
+                 self.quant_block_size,
+                 self.scale_fmt,
+@@ -1344,7 +1371,7 @@
+         # The fused Q kernel writes the per-head weights in the dtype the
+         # scoring kernels take, so no cast runs per step.
+         self.indexer_weights_dtype = (
+-            SparseMQAIndexer.weights_dtype if use_sparse_logits else torch.float32
++            self.mqa_cls.weights_dtype if use_sparse_logits else torch.float32
+         )
+ 
+     def _produce_k(
+@@ -1380,6 +1407,37 @@
+             self.compress_ratio,
+             self.use_fp4_kv,
+         )
++
++    def forward_q(
++        self,
++        qr: torch.Tensor | QuantizedActivation,
++        qr_scale: torch.Tensor | None,
++        indexer_weights: torch.Tensor,
++        positions: torch.Tensor,
++        rotary_emb: nn.Module,
++    ) -> tuple[torch.Tensor | None, torch.Tensor | None, torch.Tensor | None]:
++        """Build the indexer queries: wq_b over qr plus fused RoPE/quant.
++
++        Split out so the ROCm layer can schedule it apart from
++        ``_produce_k`` (e.g. on an aux stream once ``qr`` is ready).
++        """
++        q = self._wq_b_proj(qr, qr_scale)
++        q = q.view(-1, self.n_head, self.head_dim)
++        q_quant, weights = fused_indexer_q_rope_quant(
++            positions,
++            q,
++            rotary_emb.cos_sin_cache,
++            indexer_weights,
++            self.softmax_scale,
++            self.n_head**-0.5,
++            use_fp4=self.use_fp4_kv,
++            weights_out_dtype=self.indexer_weights_dtype,
++        )
++        if isinstance(q_quant, tuple):
++            q, q_scale = q_quant
++        else:
++            q, q_scale = q_quant, None
++        return q, q_scale, weights
+ 
+     def forward(
+         self,
+@@ -1422,23 +1480,7 @@
+             # (skip_k_cache_insert=True).
+             self._produce_k(latent, positions, rotary_emb)
+ 
+-        q = self._wq_b_proj(qr, qr_scale)
+-        q = q.view(-1, self.n_head, self.head_dim)
+-        q_quant, weights = fused_indexer_q_rope_quant(
+-            positions,
+-            q,
+-            rotary_emb.cos_sin_cache,
+-            indexer_weights,
+-            self.softmax_scale,
+-            self.n_head**-0.5,
+-            use_fp4=self.use_fp4_kv,
+-            weights_out_dtype=self.indexer_weights_dtype,
+-        )
+-        if isinstance(q_quant, tuple):
+-            q, q_scale = q_quant
+-        else:
+-            q, q_scale = q_quant, None
+-        return q, q_scale, weights
++        return self.forward_q(qr, qr_scale, indexer_weights, positions, rotary_emb)
+ 
+     def _wq_b_proj(
+         self,
+--- V05:vllm/models/deepseek_v41/common/engram.py
++++ V06:vllm/models/deepseek_v41/common/engram.py
+@@ -34,28 +34,58 @@
+   cache for the rest.
+ """
+ 
++import ctypes
++import mmap
++import os
++import tempfile
+ import weakref
++from contextlib import ExitStack
+ 
+ import numpy as np
+ import torch
+ from torch import nn
+ 
++from vllm.compilation.breakable_cudagraph import eager_break_during_capture
+ from vllm.config import VllmConfig, get_current_vllm_config
+ from vllm.distributed import (
++    get_dp_group,
++    get_engram_dp_group,
++    get_engram_dp_size,
+     get_tensor_model_parallel_rank,
+     get_tensor_model_parallel_world_size,
+     tensor_model_parallel_all_gather,
+ )
++from vllm.distributed.device_communicators.shm_broadcast import (
++    SHM_PATH,
++    check_shm_free_space,
++)
++from vllm.distributed.parallel_state import GroupCoordinator
++from vllm.forward_context import get_forward_context, is_forward_context_available
+ from vllm.logger import init_logger
+-from vllm.model_executor.layers.linear import ReplicatedLinear
++from vllm.model_executor.layers.linear import ColumnParallelLinear
+ from vllm.model_executor.layers.quantization import QuantizationConfig
+ from vllm.model_executor.utils import set_weight_attrs
++from vllm.platforms import current_platform
+ from vllm.triton_utils import tl, triton
++from vllm.utils.platform_utils import is_uva_available
++from vllm.utils.torch_utils import get_accelerator_view_from_cpu_tensor
+ 
+ logger = init_logger(__name__)
+ 
+ # Cache value for tokens that take no part in an n-gram (image spans).
+ DEAD_ID = -1
++
++
++def _engram_lookup_thresholds(device: torch.device) -> tuple[int | None, int | None]:
++    """Host lookup thresholds on `device`: the rows from which to sort, and the
++    tokens (max over DP ranks) from which to run inline. None disables that path."""
++    if current_platform.is_cuda() and current_platform.is_device_capability_family(
++        100, device.index or 0
++    ):
++        # Measured on GB200.
++        return 36864, 4096
++    # TODO: Add hand-tuned thresholds for other GPU families.
++    return None, None
+ 
+ 
+ def _is_prime(n: int) -> bool:
+@@ -583,12 +613,14 @@
+         "ids_stride_t",
+         "ids_stride_h",
+         "GRID",
++        "SORTED",
+     ]
+ )
+ def _engram_lookup_kernel(
+     weight,
+     scales,
+     ids,
++    sorted_dst,
+     out,
+     vocab_start,
+     vocab_end,
+@@ -602,27 +634,37 @@
+     QUANT_BLOCK: tl.constexpr,
+     BLOCK_R: tl.constexpr,
+     GRID,
++    SORTED,
+ ):
+     """Gather fp8 rows, apply their ue8m0 block scales, write bf16.
+ 
+     Only this rank's heads are read; padded heads write zeros for all-gather.
+-    `weight`/`scales` may address pinned host memory through UVA.
++    `weight`/`scales` may address pinned host memory through UVA. If SORTED,
++    `ids` holds rows relative to vocab_start in table order and `sorted_dst`
++    their output rows.
+     """
+     cols = tl.arange(0, DIM)
+     scale_cols = cols // QUANT_BLOCK
+     for base in tl.range(tl.program_id(0) * BLOCK_R, num_rows, GRID * BLOCK_R):
+         rows = base + tl.arange(0, BLOCK_R)
+         valid = rows < num_rows
+-        head = HEAD_START + rows % LOCAL_HEADS
+-        token = (rows // LOCAL_HEADS).to(tl.int64)
+-        index = tl.load(
+-            ids + token * ids_stride_t + head * ids_stride_h,
+-            mask=valid & (head < TOTAL_HEADS),
+-            other=-1,
+-        ).to(tl.int64)
+-        owned = valid & (head < TOTAL_HEADS)
+-        owned &= (index >= vocab_start) & (index < vocab_end)
+-        local = tl.where(owned, index - vocab_start, 0)
++        if SORTED:
++            local = tl.load(ids + rows, mask=valid, other=-1).to(tl.int64)
++            dst = tl.load(sorted_dst + rows, mask=valid, other=0).to(tl.int32)
++            owned = (local >= 0) & (local < vocab_end - vocab_start)
++        else:
++            head = HEAD_START + rows % LOCAL_HEADS
++            token = (rows // LOCAL_HEADS).to(tl.int64)
++            index = tl.load(
++                ids + token * ids_stride_t + head * ids_stride_h,
++                mask=valid & (head < TOTAL_HEADS),
++                other=-1,
++            ).to(tl.int64)
++            dst = rows
++            owned = valid & (head < TOTAL_HEADS)
++            owned &= (index >= vocab_start) & (index < vocab_end)
++            local = index - vocab_start
++        local = tl.where(owned, local, 0)
+         values = tl.load(
+             weight + local[:, None] * DIM + cols[None, :],
+             mask=owned[:, None],
+@@ -636,16 +678,240 @@
+         # ue8m0 is a power of two, so its byte *is* the fp32 exponent field.
+         scale = (scale.to(tl.int32) << 23).to(tl.float32, bitcast=True)
+         tl.store(
+-            out + rows[:, None] * DIM + cols[None, :],
++            out + dst[:, None] * DIM + cols[None, :],
+             (values.to(tl.float32) * scale).to(tl.bfloat16),
+             mask=valid[:, None],
+         )
+ 
+ 
++def engram_head_shard_rank() -> int:
++    """This rank's slot among the hash-head shards of one engram table.
++
++    TP-major, so the shards a DP gather brings in are contiguous heads and
++    the following TP gather completes the head order.
++    """
++    dp_group = get_engram_dp_group()
++    dp_size = dp_group.world_size if dp_group is not None else 1
++    dp_rank = dp_group.rank_in_group if dp_group is not None else 0
++    return get_tensor_model_parallel_rank() * dp_size + dp_rank
++
++
++def engram_gathered_num_tokens() -> int:
++    """Per-replica token slot for the node-local Engram DP group."""
++    dp_metadata = get_forward_context().dp_metadata
++    if dp_metadata is None:
++        raise RuntimeError("a DP-shared engram table needs DP token metadata")
++    group = get_engram_dp_group()
++    assert group is not None
++    # Engram groups are contiguous slices of the full DP group.
++    start = get_dp_group().rank_in_group - group.rank_in_group
++    return int(
++        dp_metadata.num_tokens_across_dp_cpu[start : start + group.world_size].max()
++    )
++
++
++def gather_engram_hashes(
++    hash_ids: torch.Tensor, *, dp_shared_memory: bool = False
++) -> torch.Tensor:
++    """Collect the n-gram ids of every DP replica sharing one table.
++
++    Replicas are padded to a common token slot, so the gathered shape is
++    static under CUDA graph capture (where DP already pads alike).
++    """
++    dp_group = get_engram_dp_group()
++    if dp_group is None or dp_shared_memory:
++        return hash_ids
++    slot = engram_gathered_num_tokens()
++    if hash_ids.shape[0] > slot:
++        raise ValueError("Engram token count exceeds the DP token slot")
++    if hash_ids.shape[0] < slot:
++        pad = hash_ids.new_full(
++            (slot - hash_ids.shape[0], *hash_ids.shape[1:]), DEAD_ID
++        )
++        hash_ids = torch.cat((hash_ids, pad))
++    return dp_group.all_gather(hash_ids, dim=0)
++
++
++class DPSharedEngramStorage:
++    """Registered host weights shared by a node-local DP group with one writer."""
++
++    def __init__(
++        self, num_rows: int, dim: int, block_size: int, group: GroupCoordinator
++    ) -> None:
++        self.group = group
++        weight_bytes = num_rows * dim
++        storage = self._allocate(weight_bytes + weight_bytes // block_size)
++        self.weight = storage[:weight_bytes].view(torch.float8_e4m3fn).view(-1, dim)
++        self.weight_scale_inv = storage[weight_bytes:].view(-1, dim // block_size)
++        self._views: tuple[torch.Tensor, torch.Tensor] | None = None
++
++    def _allocate(self, num_bytes: int) -> torch.Tensor:
++        """Map and register one physical allocation across a node-local DP group."""
++        group = self.group
++        with ExitStack() as stack:
++            path = error = None
++            if group.rank_in_group == 0:
++                try:
++                    check_shm_free_space(num_bytes)
++                    backing_file = stack.enter_context(
++                        tempfile.NamedTemporaryFile(prefix="vllm_engram_", dir=SHM_PATH)
++                    )
++                    backing_file.truncate(num_bytes)
++                    path = backing_file.name
++                except Exception as exc:
++                    error = f"{type(exc).__name__}: {exc}"
++            path, error = group.broadcast_object((path, error))
++            if error is not None:
++                raise RuntimeError(
++                    "Engram shared-memory creation failed on EDP rank 0: " + error
++                )
++
++            mapping = owner = tensor = None
++            try:
++                with open(path, "r+b") as file:
++                    mapping = mmap.mmap(file.fileno(), num_bytes, flags=mmap.MAP_SHARED)
++                owner = np.frombuffer(mapping, dtype=np.uint8)
++                pointer = owner.ctypes.data
++                tensor = torch.from_numpy(owner)
++                result = torch.cuda.cudart().cudaHostRegister(pointer, num_bytes, 0)
++                if result.value != 0:
++                    raise RuntimeError(f"cudaHostRegister failed: {result}")
++                finalizer = weakref.finalize(owner, self._unregister, mapping, pointer)
++                finalizer.atexit = False  # type: ignore[misc]
++                # The UVA helper otherwise allocates a private pinned copy.
++                if not tensor.is_pinned():
++                    raise RuntimeError(
++                        "cudaHostRegister did not pin the shared Engram mapping"
++                    )
++            except Exception as exc:
++                error = f"{type(exc).__name__}: {exc}"
++
++            # Also fences peer mappings before the leader unlinks the file.
++            errors: list[str | None] = [None] * group.world_size
++            torch.distributed.all_gather_object(errors, error, group=group.cpu_group)
++            failures = "; ".join(
++                f"EDP rank {rank}: {error}"
++                for rank, error in enumerate(errors)
++                if error is not None
++            )
++            if failures:
++                # Dropping the owner runs the finalizer; the mapping then unmaps.
++                del tensor, owner, mapping
++                raise RuntimeError(
++                    "Engram shared-memory initialization failed: " + failures
++                )
++            assert tensor is not None
++            return tensor
++
++    @staticmethod
++    def _unregister(mapping: mmap.mmap, pointer: int) -> None:
++        # Torch storage retains the numpy owner, including through cached UVA views.
++        # Keep its mmap alive until CUDA has released the registration.
++        result = torch.cuda.cudart().cudaHostUnregister(pointer)
++        if result.value != 0:
++            logger.warning("Engram cudaHostUnregister failed: %s", result)
++
++    def load_weight(
++        self, param: torch.nn.Parameter, loaded_weight: torch.Tensor
++    ) -> None:
++        if self.group.rank_in_group == 0:
++            _engram_head_shard_weight_loader(param, loaded_weight)
++        # Read order may differ across ranks. Equal load counts ensure all shared
++        # weights are ready after the last weight-loader call returns.
++        torch.distributed.barrier(group=self.group.cpu_group)
++
++    def get_views(
++        self, weight: torch.Tensor, scales: torch.Tensor
++    ) -> tuple[torch.Tensor, torch.Tensor]:
++        if (weight.data_ptr(), scales.data_ptr()) != (
++            self.weight.data_ptr(),
++            self.weight_scale_inv.data_ptr(),
++        ):
++            raise RuntimeError("Shared Engram parameter storage must not be replaced")
++        if self._views is None:
++            self._views = (
++                get_accelerator_view_from_cpu_tensor(self.weight),
++                get_accelerator_view_from_cpu_tensor(self.weight_scale_inv),
++            )
++        return self._views
++
++
++def can_share_engram_tables(layout: EngramLayout, block_size: int = 32) -> bool:
++    """Whether co-located DP replicas exist and /dev/shm can hold the full tables."""
++    if get_engram_dp_size() == 1:
++        logger.warning_once(
++            "Engram DP replicas are not co-located on one node; "
++            "storing the offloaded tables per rank instead of sharing them."
++        )
++        return False
++    num_bytes = sum(layout.num_embeddings) * (
++        layout.head_dim + layout.head_dim // block_size
++    )
++    group = get_engram_dp_group()
++    assert group is not None
++    # Only the leader allocates, so every replica follows its check.
++    error = None
++    if group.rank_in_group == 0:
++        if not os.path.isdir(SHM_PATH):
++            error = f"{SHM_PATH} is not mounted"
++        else:
++            try:
++                check_shm_free_space(num_bytes, allocation_name="Engram tables")
++            except Exception as exc:
++                error = f"{type(exc).__name__}: {exc}"
++    error = group.broadcast_object(error)
++    if error is not None:
++        logger.warning_once(
++            "Sharding the offloaded Engram tables across DP replicas: %s", error
++        )
++    return error is None
++
++
++def _allocate_huge_page_storage(num_bytes: int) -> torch.Tensor | None:
++    """Register prefaulted huge pages, or return None for pinned-memory fallback."""
++    try:
++        mapping = mmap.mmap(-1, num_bytes, flags=mmap.MAP_PRIVATE | mmap.MAP_ANONYMOUS)
++        mapping.madvise(mmap.MADV_HUGEPAGE)
++    except OSError as exc:
++        logger.warning(
++            "Engram huge-page allocation failed (%s); using pinned memory.", exc
++        )
++        return None
++
++    owner = np.frombuffer(mapping, dtype=np.uint8)
++    # Fault the pages in before CUDA pins them, so they can be huge.
++    owner[:: mmap.PAGESIZE] = 0
++    tensor = torch.from_numpy(owner)
++    pointer = tensor.data_ptr()
++    result = torch.cuda.cudart().cudaHostRegister(pointer, num_bytes, 0)
++    if result.value != 0:
++        logger.warning(
++            "Engram cudaHostRegister failed (%s); using pinned memory.", result
++        )
++        return None
++    # Tensor views retain owner; its finalizer retains mapping until unregister.
++    finalizer = weakref.finalize(
++        owner, DPSharedEngramStorage._unregister, mapping, pointer
++    )
++    finalizer.atexit = False  # type: ignore[misc]
++    if not tensor.is_pinned():
++        logger.warning(
++            "CUDA did not recognize Engram registration; using pinned memory."
++        )
++        return None
++    return tensor
++
++
+ class ParallelEngramEmbedding(nn.Module):
+-    """TP-sharded hash heads with FP8 rows and per-block E8M0 scales."""
++    """Hash heads with FP8 rows and per-block E8M0 scales.
++
++    Heads are TP-sharded, and additionally DP-sharded across a node-local
++    group unless the table lives in (DP-shared) pinned host memory.
++    """
+ 
+     _weight_loader = staticmethod(_engram_head_shard_weight_loader)
++    _shared_memory: DPSharedEngramStorage | None = None
++    _packed: torch.Tensor | None = None
+ 
+     def __init__(
+         self,
+@@ -653,10 +919,32 @@
+         dim: int,
+         head_sizes: tuple[int, ...],
+         block_size: int = 32,
++        cpu_offload: bool = False,
++        dp_shared_memory: bool = False,
++        use_thp: bool = False,
+     ) -> None:
+         super().__init__()
+         assert head_sizes and all(size > 0 for size in head_sizes)
+         assert sum(head_sizes) <= num_embeddings
++        self.cpu_offload = cpu_offload
++        self.dp_shared_memory = dp_shared_memory
++        self.use_thp = use_thp
++        self.dp_size = get_engram_dp_size()
++        if dp_shared_memory:
++            if not cpu_offload:
++                raise ValueError("dp_shared_memory requires cpu_offload=True")
++            if self.dp_size <= 1:
++                raise ValueError(
++                    "dp_shared_memory requires a node-local Engram DP "
++                    f"group with size > 1; effective Engram DP size is {self.dp_size}. "
++                    "Check that the node layout and rank placement allow complete "
++                    "DP replicas to be co-located."
++                )
++            self.dp_size = 1
++        if cpu_offload and not is_uva_available():
++            raise RuntimeError("Engram CPU offload requires UVA support")
++        self._views: tuple[torch.Tensor, torch.Tensor] | None = None
++        self._view_src: tuple[int, int] | None = None
+         self.num_embeddings = num_embeddings
+         self.dim = dim
+         self.block_size = block_size
+@@ -688,20 +976,99 @@
+                     "engram_vocab_start": self.vocab_start_idx,
+                 },
+             )
++        if cpu_offload:
++            # Constant dummy values avoid randomizing huge CPU lookup tables.
++            set_weight_attrs(self.weight, {"dummy_weight_value": 1.0})
++            # The ue8m0 encoding of scale 1.0 is exponent byte 127.
++            set_weight_attrs(self.weight_scale_inv, {"dummy_weight_value": 127})
++            logger.info(
++                "Engram table offloaded to pinned host memory: %d rows x %d, "
++                "%.2f GiB %s",
++                self.part_num_embeddings,
++                dim,
++                self.part_num_embeddings * (dim + dim // block_size) / 1024**3,
++                "shared across DP replicas" if dp_shared_memory else "per rank",
++            )
+ 
+     def _get_shard_info(self) -> tuple[int, int]:
+-        return self.tp_size, get_tensor_model_parallel_rank()
++        if self.dp_size == 1:
++            return self.tp_size, get_tensor_model_parallel_rank()
++        return self.tp_size * self.dp_size, engram_head_shard_rank()
+ 
+     def _allocate_weights(self) -> tuple[torch.Tensor, torch.Tensor]:
++        if self.dp_shared_memory:
++            group = get_engram_dp_group()
++            assert group is not None
++            storage = DPSharedEngramStorage(
++                self.part_num_embeddings, self.dim, self.block_size, group
++            )
++            self._shared_memory = storage
++            self._weight_loader = storage.load_weight
++            return storage.weight, storage.weight_scale_inv
++        scale_dim = self.dim // self.block_size
++        if not self.cpu_offload:
++            return (
++                torch.empty(
++                    self.part_num_embeddings, self.dim, dtype=torch.float8_e4m3fn
++                ),
++                torch.empty(self.part_num_embeddings, scale_dim, dtype=torch.uint8),
++            )
++        if self.use_thp:
++            weight_bytes = self.part_num_embeddings * self.dim
++            packed = _allocate_huge_page_storage(
++                weight_bytes + weight_bytes // self.block_size
++            )
++            if packed is not None:
++                self._packed = packed
++                return (
++                    packed[:weight_bytes].view(torch.float8_e4m3fn).view(-1, self.dim),
++                    packed[weight_bytes:].view(-1, scale_dim),
++                )
++        # Model initialization may be inside a CUDA device context.
+         return (
+-            torch.empty(self.part_num_embeddings, self.dim, dtype=torch.float8_e4m3fn),
+             torch.empty(
+-                self.part_num_embeddings, self.dim // self.block_size, dtype=torch.uint8
++                self.part_num_embeddings,
++                self.dim,
++                dtype=torch.float8_e4m3fn,
++                device="cpu",
++                pin_memory=True,
+             ),
+-        )
++            torch.empty(
++                self.part_num_embeddings,
++                scale_dim,
++                dtype=torch.uint8,
++                device="cpu",
++                pin_memory=True,
++            ),
++        )
++
++    def collapse_huge_pages(self) -> None:
++        """Best-effort MADV_COLLAPSE (Linux >= 6.1) of pages that faulted small."""
++        if self._packed is None:
++            return
++        addr, num_bytes = self._packed.data_ptr(), self._packed.nbytes
++        libc = ctypes.CDLL(None, use_errno=True)
++        libc.madvise.argtypes = (ctypes.c_void_p, ctypes.c_size_t, ctypes.c_int)
++        if libc.madvise(addr, num_bytes, 25) != 0:
++            logger.warning(
++                "Engram MADV_COLLAPSE failed; keeping existing pages: %s",
++                os.strerror(ctypes.get_errno()),
++            )
+ 
+     def _storage(self) -> tuple[torch.Tensor, torch.Tensor]:
+-        return self.weight.data, self.weight_scale_inv.data
++        if self._shared_memory is not None:
++            return self._shared_memory.get_views(self.weight, self.weight_scale_inv)
++        if not self.cpu_offload:
++            return self.weight.data, self.weight_scale_inv.data
++        src = (self.weight.data_ptr(), self.weight_scale_inv.data_ptr())
++        if self._view_src != src:
++            self._views = (
++                get_accelerator_view_from_cpu_tensor(self.weight.data),
++                get_accelerator_view_from_cpu_tensor(self.weight_scale_inv.data),
++            )
++            self._view_src = src
++        assert self._views is not None
++        return self._views
+ 
+     def lookup(
+         self, indices: torch.Tensor, out: torch.Tensor, background: bool = False
+@@ -714,6 +1081,24 @@
+         if not rows:
+             return
+         weight, scales = self._storage()
++        ids_stride_t, ids_stride_h = indices.stride()
++        sort_min_rows, _ = _engram_lookup_thresholds(indices.device)
++        sort = (
++            self.cpu_offload
++            and self._packed is None
++            and sort_min_rows is not None
++            and rows >= sort_min_rows
++        )
++        dst = indices
++        if sort:
++            # Small-page host tables miss the TLB per row; in table order, rows on
++            # one page share it.
++            head_end = self.head_start + self.part_n_hash_cols
++            local = indices[:, self.head_start : head_end] - self.vocab_start_idx
++            if (pad := self.part_n_hash_cols - local.shape[1]) > 0:
++                local = nn.functional.pad(local, (0, pad), value=-1)
++            indices, dst = local.flatten().sort()
++            dst = dst.int()
+         # The table dwarfs TLB reach, so a persistent grid near the SM count
+         # beats one program per row; halve it to leave SMs for the main stream.
+         tiles = triton.cdiv(rows, 16)
+@@ -722,12 +1107,13 @@
+             weight,
+             scales,
+             indices,
++            dst,
+             out,
+             self.vocab_start_idx,
+             self.vocab_end_idx,
+             rows,
+-            indices.stride(0),
+-            indices.stride(1),
++            ids_stride_t,
++            ids_stride_h,
+             HEAD_START=self.head_start,
+             LOCAL_HEADS=self.part_n_hash_cols,
+             TOTAL_HEADS=self.n_hash_cols,
+@@ -735,17 +1121,23 @@
+             QUANT_BLOCK=self.block_size,
+             BLOCK_R=16,
+             GRID=grid,
++            SORTED=sort,
+         )
+ 
+     def forward(self, indices: torch.Tensor) -> torch.Tensor:
+         """indices: [num_tokens, n_hash_cols] -> [num_tokens, n_hash_cols, dim]
+         bf16, gathered from all shards for this replica's tokens."""
++        num_tokens = indices.shape[0]
++        if self.dp_size > 1:
++            indices = gather_engram_hashes(indices)
+         out = torch.empty(
+             (indices.shape[0], self.part_n_hash_cols, self.dim),
+             dtype=torch.bfloat16,
+             device=indices.device,
+         )
+         self.lookup(indices, out)
++        if self.dp_size > 1:
++            out = _gather_engram_rows(out, num_tokens)
+         if self.tp_size > 1:
+             out = tensor_model_parallel_all_gather(out, dim=1)
+         return out[:, : self.n_hash_cols]
+@@ -891,6 +1283,25 @@
+     )
+ 
+ 
++def _gather_engram_rows(staged: torch.Tensor, num_tokens: int) -> torch.Tensor:
++    """Exchange DP tokens for heads, retaining only this replica's tokens."""
++    dp_group = get_engram_dp_group()
++    assert dp_group is not None
++    slot, remainder = divmod(staged.shape[0], dp_group.world_size)
++    assert remainder == 0 and 0 <= num_tokens <= slot
++    gathered = dp_group.all_gather(staged, dim=0)
++    local_heads, dim = staged.shape[1:]
++    rows = staged.new_empty((num_tokens, dp_group.world_size * local_heads, dim))
++    _engram_select_rows(
++        gathered,
++        rows,
++        staged.shape[0],
++        dp_group.rank_in_group * slot,
++        local_heads * dim,
++    )
++    return rows
++
++
+ class Engram(nn.Module):
+     """Writes an n-gram lookup into the residual stream, gated by how well it
+     matches that stream.
+@@ -900,6 +1311,9 @@
+     stream against the key, signed-sqrt'ed before the sigmoid (matching the
+     training kernel).
+     """
++
++    _prefetch_stream: torch.cuda.Stream | None = None
++    _prefetch_done: torch.cuda.Event | None = None
+ 
+     def __init__(
+         self,
+@@ -909,8 +1323,12 @@
+         layer_hash_index: int,
+         use_sequence_parallel: bool,
+         prefix: str,
++        prefetch_stream: torch.cuda.Stream | None = None,
+     ) -> None:
+         super().__init__()
++        # Layers sharing one stream serialize their offloaded lookups, so they
++        # take turns instead of jointly starving decoder compute of SMs.
++        self._prefetch_stream = prefetch_stream
+         self.layer_hash_index = layer_hash_index
+         self.dim = config.hidden_size
+         self.hc_mult = config.hc_mult
+@@ -923,13 +1341,17 @@
+         # suffix rule.
+         self.embed_tokens = self._create_embedding(layout, layer_hash_index)
+         n_hash_cols = (layout.max_ngram_size - 1) * layout.n_heads
+-        self.wkv = ReplicatedLinear(
++        # Without sequence parallelism every TP rank holds every token, so
++        # shard the output columns instead of replicating the projection.
++        self.wkv = ColumnParallelLinear(
+             n_hash_cols * layout.head_dim,
+             self.dim * (self.hc_mult + 1),
+             bias=False,
++            gather_output=True,
+             quant_config=quant_config,
+             return_bias=False,
+             prefix=f"{prefix}.wkv",
++            disable_tp=use_sequence_parallel,
+         )
+         self.q_weight = nn.Parameter(
+             torch.empty(self.hc_mult, self.dim, dtype=torch.bfloat16),
+@@ -946,28 +1368,78 @@
+     def _create_embedding(
+         self, layout: EngramLayout, layer_hash_index: int
+     ) -> ParallelEngramEmbedding:
++        engram_config = get_current_vllm_config().engram_config
++        assert engram_config is not None
+         return ParallelEngramEmbedding(
+             layout.num_embeddings[layer_hash_index],
+             layout.head_dim,
+             tuple(size for order in layout.primes[layer_hash_index] for size in order),
++            cpu_offload=engram_config.cpu_offload,
++            dp_shared_memory=bool(engram_config.dp_shared_memory),
++            use_thp=engram_config.use_thp,
+         )
+ 
+     def _init_staging(self, max_tokens: int, head_dim: int) -> None:
+         # Persistent storage keeps lookup addresses stable across graph replays.
+         self.staged_rows = torch.empty(
+-            max_tokens,
++            max_tokens * self.embed_tokens.dp_size,
+             self.embed_tokens.part_n_hash_cols,
+             head_dim,
+             dtype=torch.bfloat16,
+         )
++        if not self.embed_tokens.cpu_offload:
++            self._prefetch_stream = None
++            return
++        if self._prefetch_stream is None:
++            self._prefetch_stream = torch.cuda.Stream(device=self.staged_rows.device)
++        self._prefetch_done = torch.cuda.Event()
+ 
+     def prepare_embeddings(self, hash_ids: torch.Tensor) -> None:
+-        """Look up rows before the decoder layers consume them."""
++        """Look up, or prefetch from host memory, rows before the decoder layers
++        consume them; DP-sharded tables take the group's gathered hash IDs."""
+         rows = self.staged_rows[: hash_ids.shape[0]]
+         assert rows.shape[0] == hash_ids.shape[0], "engram staging buffer too small"
+-        self.embed_tokens.lookup(hash_ids, rows)
++        if self._prefetch_stream is None:
++            self.embed_tokens.lookup(hash_ids, rows)
++        else:
++            self._start_prefetch(hash_ids, rows)
++
++    @eager_break_during_capture
++    def _start_prefetch(self, hash_ids: torch.Tensor, rows: torch.Tensor) -> None:
++        # Eager boundaries let the lookup span piecewise graph segments, and
++        # decide per replay (on the replay stream) whether it runs inline.
++        num_tokens = hash_ids.shape[0]
++        # All DP ranks must agree, or EP collectives wait on the slowest one.
++        if is_forward_context_available() and (dp := get_forward_context().dp_metadata):
++            num_tokens = int(dp.num_tokens_across_dp_cpu.max())
++        current = stream = torch.cuda.current_stream()
++        # Big lookups stall persistent main-stream kernels anyway: run them inline.
++        _, inline_min_tokens = _engram_lookup_thresholds(hash_ids.device)
++        if inline_min_tokens is not None and num_tokens >= inline_min_tokens:
++            self.embed_tokens.lookup(hash_ids, rows)
++        else:
++            stream = self._prefetch_stream
++            assert stream is not None
++            stream.wait_stream(current)
++            # Keep temporary hash storage alive until lookup finishes reading it.
++            hash_ids.record_stream(stream)
++            with torch.cuda.stream(stream):
++                self.embed_tokens.lookup(hash_ids, rows, background=True)
++        assert self._prefetch_done is not None
++        self._prefetch_done.record(stream)
++
++    @eager_break_during_capture
++    def _finish_prefetch(self, event: torch.cuda.Event) -> None:
++        # Wait for this layer's lookup only, not for later layers on the stream.
++        torch.cuda.current_stream().wait_event(event)
+ 
+     def _ready_rows(self, num_tokens: int) -> torch.Tensor:
++        if self._prefetch_done is not None:
++            self._finish_prefetch(self._prefetch_done)
++        if self.embed_tokens.dp_size > 1:
++            slot = engram_gathered_num_tokens()
++            staged = self.staged_rows[: slot * self.embed_tokens.dp_size]
++            return _gather_engram_rows(staged, num_tokens)
+         return self.staged_rows[:num_tokens]
+ 
+     def embed(self, hash_ids: torch.Tensor) -> torch.Tensor:
+--- V05:vllm/models/deepseek_v41/common/mm_preprocess.py
++++ V06:vllm/models/deepseek_v41/common/mm_preprocess.py
+@@ -275,15 +275,28 @@
+         hf_config = self.get_hf_config()
+         patch_size = hf_config.vision_patch_size
+         downsample_ratio = hf_config.vision_downsample_ratio
+-        # A square maximizes the ViT patch count (area) within the token
+-        # budget; solve the budget-derived size directly to keep the dummy
+-        # image small.
+         budget = hf_config.vision_max_n_token
+-        side = budget * patch_size * downsample_ratio
+-        best_h, best_w = solve_resize_ratio(
+-            side, side, patch_size, downsample_ratio, budget
+-        )
+-        return ImageSize(width=best_w, height=best_h)
++        max_wh_ratio = hf_config.vision_max_wh_ratio
++        best_h = best_w = 0
++        # Each LLM row costs an extra newline token. Maximize the ViT grid,
++        # including the patch rounding after the optional aspect-ratio clamp.
++        for n_llm_h in range(1, (budget - 2) // 2 + 1):
++            n_vit_h = n_llm_h * downsample_ratio
++            n_vit_w = ((budget - 2) // n_llm_h - 1) * downsample_ratio
++            if max_wh_ratio is not None:
++                n_vit_w = min(n_vit_w, math.ceil(n_vit_h * max_wh_ratio))
++            if n_vit_h * n_vit_w > best_h * best_w:
++                best_h, best_w = n_vit_h, n_vit_w
++        if best_h == 0:
++            raise ValueError(
++                "Image token budget and aspect ratio allow no image patches"
++            )
++        height, width = best_h * patch_size, best_w * patch_size
++        # Avoid the min-pixels upscaler perturbing the selected aspect ratio.
++        scale = 1
++        while height * width * scale * scale < hf_config.vision_min_pixels:
++            scale *= 2
++        return ImageSize(width=width * scale, height=height * scale)
+ 
+ 
+ class DeepseekV4VLDummyInputsBuilder(
+--- V05:vllm/models/deepseek_v41/common/vl_cudagraph.py
++++ V06:vllm/models/deepseek_v41/common/vl_cudagraph.py
+@@ -25,6 +25,7 @@
+     build_packed_merge_metadata,
+     build_packed_vit_metadata,
+ )
++from vllm.utils.torch_utils import async_tensor_h2d
+ from vllm.v1.worker.encoder_cudagraph_defs import (
+     EncoderCudaGraphCaptureInputs,
+     EncoderCudaGraphConfig,
+@@ -370,18 +371,23 @@
+         r = self.config.vision_downsample_ratio
+         vit_grid = self._get_grid_list(batch_mm_kwargs, "vit_grid")
+         llm_grid = self._get_grid_list(batch_mm_kwargs, "llm_grid")
+-        types = batch_mm_kwargs["types"].to(aligner_out.device)
++        types = batch_mm_kwargs["types"]
+ 
+         n_rows = sum(-(-h // r) * (-(-w // r)) for h, w in vit_grid)
+         span_lens = [lh * (lw + 1) + 2 for lh, lw in llm_grid]
+ 
+-        # Batched span assembly: one masked fill per role across all items.
+-        dtype = aligner_out.dtype
+-        span = aligner_out.new_empty(sum(span_lens), self.config.hidden_size)
+-        span[types == IMAGE] = aligner_out[:n_rows]
+-        span[types == IMAGE_START] = self.image_start.to(dtype)
+-        span[types == IMAGE_END] = self.image_end.to(dtype)
+-        span[types == IMAGE_NEW_LINE] = self.image_newline.to(dtype)
++        # Batched span assembly: one gather over [aligner rows, START,
++        # NEW_LINE, END] for all items. The index is built from the host-side
++        # ``types`` so that neither the copy nor the gather syncs.
++        is_image = types == IMAGE
++        src_idx = torch.where(
++            is_image,
++            is_image.cumsum(0) - 1,
++            n_rows + (types == IMAGE_NEW_LINE).long() + 2 * (types == IMAGE_END).long(),
++        )
++        delims = torch.stack([self.image_start, self.image_newline, self.image_end])
++        src = torch.cat([aligner_out[:n_rows], delims.to(aligner_out.dtype)])
++        span = src[async_tensor_h2d(src_idx, aligner_out.device)]
+ 
+         # Freshly allocated, so later replays cannot clobber the results.
+         offset = 0
+--- V05:vllm/models/deepseek_v41/compressor.py
++++ V06:vllm/models/deepseek_v41/compressor.py
+@@ -57,7 +57,7 @@
+     token_to_req_indices: torch.Tensor  # [num_tokens]
+ 
+ 
+-@triton.jit
++@triton.jit(do_not_specialize=["block_table_stride", "num_actual_tokens", "num_tokens"])
+ def _ring_slot_mapping_kernel(
+     slot_mapping_ptr,
+     block_table_ptr,
+--- V05:vllm/models/deepseek_v41/decoder_replay_layers.py
++++ V06:vllm/models/deepseek_v41/decoder_replay_layers.py
+@@ -0,0 +1,67 @@
++# SPDX-License-Identifier: Apache-2.0
++# SPDX-FileCopyrightText: Copyright contributors to the vLLM project
++"""Decoder-side SWA bounded replay: running the replay layers on their batch.
++
++The layers past the last KV-source layer own nothing but sliding-window KV, so
++in eager prefill steps they run on each request's last ``window`` rows only.
++``DeepseekV41ModelState`` prepares those rows as a sub-batch with attention
++metadata and a forward context of its own, like a microbatch;
++``DecoderReplayLayers`` gathers the layer inputs by its rows, runs the layers
++under that context and scatters the outputs back to batch rows. Steps that run
++in a CUDA graph keep the layers on the whole batch, inside the graph.
++"""
++
++from collections.abc import Callable
++
++import torch
++
++from vllm.forward_context import ForwardContext, override_forward_context
++from vllm.model_executor.layers.fused_moe.moe_output import MoEOutput
++
++
++class DecoderReplayLayers:
++    """Runs the replay layers on the step's replay batch.
++
++    ``run_layers`` takes a batch's layer inputs and returns its per-row
++    outputs. ``row_buffers`` hold per-row results the source layer's indexer
++    publishes for the layers after it; they are compacted to the replay rows
++    in place.
++    """
++
++    def __init__(
++        self,
++        window: int,
++        run_layers: Callable[..., tuple[torch.Tensor, ...]],
++        row_buffers: list[torch.Tensor],
++    ) -> None:
++        self.window = window
++        self.run_layers = run_layers
++        self.row_buffers = row_buffers
++        # The replay batch, set by the model state every step: its rows of the
++        # batch and its forward context. None runs the layers on the batch.
++        self.rows: torch.Tensor | None = None
++        self.forward_context: ForwardContext | None = None
++
++    def __call__(
++        self, hidden_states: torch.Tensor | MoEOutput, *states: torch.Tensor | None
++    ) -> tuple[torch.Tensor, ...]:
++        rows = self.rows
++        if rows is None:
++            return self.run_layers(hidden_states, *states)
++        # A trimming step holds a prefill longer than the window, more tokens
++        # than any step whose MoE leaves its finalize to the next layer.
++        assert isinstance(hidden_states, torch.Tensor)
++        num_rows = rows.shape[0]
++        for buf in self.row_buffers:
++            buf[:num_rows].copy_(buf.index_select(0, rows))
++        with override_forward_context(self.forward_context):
++            row_outputs = self.run_layers(
++                hidden_states.index_select(0, rows),
++                *(None if t is None else t.index_select(0, rows) for t in states),
++            )
++        # The trimmed rows' outputs stay zero; nothing reads them.
++        num_tokens = hidden_states.shape[0]
++        return tuple(
++            out.new_zeros((num_tokens, *out.shape[1:])).index_copy_(0, rows, out)
++            for out in row_outputs
++        )
+--- V05:vllm/models/deepseek_v41/quant_config.py
++++ V06:vllm/models/deepseek_v41/quant_config.py
+@@ -139,15 +139,17 @@
+     def override_quantization_method(
+         cls, hf_quant_cfg, user_quant, hf_config=None
+     ) -> QuantizationMethods | None:
++        # Quark checkpoints are always handled by QuarkConfig, which knows
++        # how to dispatch each per-layer scheme (MXFP4, MXFP8, etc.).
++        # ``from_config`` below rewrites the config into a single global FP8
++        # scheme, which would discard per-layer specs — so never claim Quark.
++        if isinstance(hf_quant_cfg, dict) and (
++            hf_quant_cfg.get("quant_method") == "quark"
++        ):
++            return None
+         if not (
+             isinstance(hf_quant_cfg, dict)
+-            and (
+-                hf_quant_cfg.get("quant_method") in ("fp8", "deepseek_v4_fp8")
+-                or (
+-                    hf_quant_cfg.get("quant_method") == "quark"
+-                    and cls._is_quark_mxfp4_ocp(hf_quant_cfg)
+-                )
+-            )
++            and hf_quant_cfg.get("quant_method") in ("fp8", "deepseek_v4_fp8")
+         ):
+             return None
+         model_type = getattr(hf_config, "model_type", None)
+--- V05:vllm/v1/attention/backends/mla/rocm_aiter_mla_sparse.py
++++ V06:vllm/v1/attention/backends/mla/rocm_aiter_mla_sparse.py
+@@ -70,6 +70,50 @@
+     )
+ 
+ 
++@triton.jit
++def _fit_kpool_indices_kernel(
++    token_indices_ptr,  # int32 [num_tokens, NUM_TOPK_TOKENS + TAIL_WIDTH]
++    out_ptr,  # int32 [num_tokens, NUM_TOPK_TOKENS]
++    ti_stride0,
++    ti_stride1,
++    out_stride0,
++    out_stride1,
++    NUM_TOPK_TOKENS: tl.constexpr,
++    TAIL_WIDTH: tl.constexpr,
++    BLOCK_T: tl.constexpr,
++    BLOCK_TAIL: tl.constexpr,
++):
++    row_ptr = token_indices_ptr + tl.program_id(0) * ti_stride0
++    columns = tl.arange(0, BLOCK_T)
++    column_mask = columns < NUM_TOPK_TOKENS
++    history = tl.load(row_ptr + columns * ti_stride1, mask=column_mask, other=-1)
++
++    tail_columns = tl.arange(0, BLOCK_TAIL)
++    tail = tl.load(
++        row_ptr + (NUM_TOPK_TOKENS + tail_columns) * ti_stride1,
++        mask=tail_columns < TAIL_WIDTH,
++        other=-1,
++    )
++
++    valid_history = tl.sum((history >= 0).to(tl.int32))
++    valid_tail = tl.sum((tail >= 0).to(tl.int32))
++    keep_history = tl.minimum(valid_history, NUM_TOPK_TOKENS - valid_tail)
++
++    tail_offsets = columns - keep_history
++    tail_values = tl.load(
++        row_ptr + (NUM_TOPK_TOKENS + tail_offsets) * ti_stride1,
++        mask=column_mask & (tail_offsets >= 0) & (tail_offsets < TAIL_WIDTH),
++        other=-1,
++    )
++    fitted = tl.where(columns < keep_history, history, tail_values)
++    fitted = tl.where(columns < keep_history + valid_tail, fitted, -1)
++    tl.store(
++        out_ptr + tl.program_id(0) * out_stride0 + columns * out_stride1,
++        fitted,
++        mask=column_mask,
++    )
++
++
+ def fit_kpool_indices_to_aiter(
+     token_indices: torch.Tensor, topk_tokens: int
+ ) -> torch.Tensor:
+@@ -79,20 +123,29 @@
+     if token_indices.shape[1] == topk_tokens:
+         return token_indices
+ 
+-    history = token_indices[:, :topk_tokens]
+-    tail = token_indices[:, topk_tokens:]
+-    valid_history = (history >= 0).sum(dim=1)
+-    valid_tail = (tail >= 0).sum(dim=1)
+-    keep_history = torch.minimum(valid_history, topk_tokens - valid_tail)
+-
+-    columns = torch.arange(topk_tokens, device=token_indices.device).unsqueeze(0)
+-    tail_offsets = columns - keep_history.unsqueeze(1)
+-    tail_values = torch.gather(
+-        tail, 1, tail_offsets.clamp(min=0, max=tail.shape[1] - 1)
+-    )
+-    output = torch.where(columns < keep_history.unsqueeze(1), history, tail_values)
+-    valid_output = columns < (keep_history + valid_tail).unsqueeze(1)
+-    return torch.where(valid_output, output, -1)
++    num_tokens, width = token_indices.shape
++    tail_width = width - topk_tokens
++    output = torch.empty(
++        (num_tokens, topk_tokens),
++        dtype=token_indices.dtype,
++        device=token_indices.device,
++    )
++    if num_tokens == 0:
++        return output
++
++    _fit_kpool_indices_kernel[(num_tokens,)](
++        token_indices,
++        output,
++        token_indices.stride(0),
++        token_indices.stride(1),
++        output.stride(0),
++        output.stride(1),
++        NUM_TOPK_TOKENS=topk_tokens,
++        TAIL_WIDTH=tail_width,
++        BLOCK_T=triton.next_power_of_2(topk_tokens),
++        BLOCK_TAIL=triton.next_power_of_2(tail_width),
++    )
++    return output
+ 
+ 
+ @triton.jit
+@@ -396,9 +449,11 @@
+         attention_context = vllm_config.compilation_config.static_forward_context
+         # Sink decode must use AITER's nonpersistent path. In particular,
+         # gfx942 has no persistent+LSE kernel, and its metadata heuristic
+-        # terminates for HY-V4's TP1 H64 shape.
++        # terminates for HY-V4's TP1 H64 shape. The Triton sparse MLA kernel
++        # never reads the persistent metadata either.
+         self._use_persistent_metadata = all(
+             getattr(attention_context[name].impl, "sinks", None) is None
++            and not getattr(attention_context[name].impl, "use_aiter_sparse_mla", False)
+             for name in layer_names
+         )
+         # Bounds the KV-split heuristic (see `_sparse_decode_max_split`).
+@@ -716,6 +771,7 @@
+     is_sparse = True
+     supports_dense_mha_prefill = False
+     supports_dcp = False
++    use_aiter_sparse_mla = False
+ 
+     def __init__(
+         self,
+@@ -765,6 +821,32 @@
+         (self.q_concat_buffer,) = current_workspace_manager().get_simultaneous(
+             (q_concat_shape, vllm_config.model_config.dtype),
+         )
++        self.qk_rope_head_dim: int = mla_args["qk_rope_head_dim"]
++
++        if rocm_aiter_ops.is_triton_sparse_mla_enabled():
++            reason = self._aiter_sparse_mla_unsupported_reason(vllm_config)
++            if reason is None:
++                self.use_aiter_sparse_mla = True
++            else:
++                logger.warning_once(
++                    "VLLM_ROCM_USE_AITER_TRITON_SPARSE_MLA is set, but %s; "
++                    "using the default sparse MLA path instead.",
++                    reason,
++                )
++
++    def _aiter_sparse_mla_unsupported_reason(
++        self, vllm_config: VllmConfig
++    ) -> str | None:
++        model_dtype = vllm_config.model_config.dtype
++        if model_dtype != torch.bfloat16:
++            return f"the model dtype is {model_dtype}, not bfloat16"
++        cache_dtype = self.kv_cache_dtype
++        if cache_dtype not in ("auto", "bfloat16", "fp8", "fp8_e4m3"):
++            return f"kv-cache dtype {cache_dtype!r} is neither bfloat16 nor e4m3 fp8"
++        # Context parallelism merges each rank's partials with a per-token LSE.
++        if self.dcp_world_size > 1 or self.pcp_world_size > 1:
++            return "context parallelism is not supported"
++        return None
+ 
+     def record_logical_topk_ready(self) -> None:
+         # This impl shares the top-k indices buffer via SharedTopkIndicesBuffer
+@@ -975,6 +1057,43 @@
+ 
+         return output, lse
+ 
++    def _forward_mla_aiter(
++        self,
++        layer: AttentionLayer,
++        q: torch.Tensor,  # [sq, heads, d_qk], not head-padded
++        kv_c_and_k_pe_cache: torch.Tensor,
++        attn_metadata: ROCMAiterMLASparseMetadata,
++    ) -> torch.Tensor:
++        """_forward_mla on aiter's Triton sparse MLA kernel.
++
++        Reads the same index stream, but needs no q head padding and no
++        persistent metadata, and its launch depends on shapes only, so it is
++        CUDA-graph capturable.
++        """
++        num_actual_tokens = attn_metadata.num_actual_tokens
++        output = torch.empty(
++            [q.shape[0], self.num_heads, self.kv_lora_rank],
++            dtype=attn_metadata.attn_out_dtype,
++            device=q.device,
++        )
++        rocm_aiter_ops.triton_sparse_mla_fwd(
++            q[:num_actual_tokens],
++            kv_c_and_k_pe_cache.view(-1, 1, 1, q.shape[-1]),
++            output[:num_actual_tokens],
++            self.scale,
++            attn_metadata.paged_kv_indptr,
++            attn_metadata.paged_kv_indices,
++            kv_lora_rank=self.kv_lora_rank,
++            qk_rope_head_dim=self.qk_rope_head_dim,
++            q_scale=layer._q_scale,
++            kv_scale=layer._k_scale,
++            attn_sink=self.sinks,
++            # triton_convert_req_index_to_global_index writes 0, never -1,
++            # for an invalid top-k entry, so no slot in the stream is negative.
++            has_invalid=False,
++        )
++        return output
++
+     def forward_mqa(
+         self,
+         q: torch.Tensor | tuple[torch.Tensor, torch.Tensor],
+@@ -1026,6 +1145,11 @@
+                 original_q_shape = q.shape
+                 q, _ = ops.scaled_fp8_quant(q.view(q.shape[0], -1), layer._q_scale)
+                 q = q.view(original_q_shape)
++        if self.use_aiter_sparse_mla:
++            output = self._forward_mla_aiter(
++                layer, q, kv_c_and_k_pe_cache, attn_metadata
++            )
++            return output, None
+         mla_padded_q = AiterMLAHelper.get_mla_padded_q(self.num_heads, q)
+         return self._forward_mla(
+             layer, mla_padded_q, kv_c_and_k_pe_cache, attn_metadata
+--- V05:vllm/v1/attention/ops/rocm_aiter_mla_sparse.py
++++ V06:vllm/v1/attention/ops/rocm_aiter_mla_sparse.py
+@@ -2017,7 +2017,48 @@
+ 
+ 
+ @triton.jit
+-def _pack_dense_prefix_to_ragged_kernel(
++def _count_valid_row_entries_kernel(
++    indices_ptr,
++    lengths_ptr,
++    counts_ptr,
++    indptr_ptr,
++    indices_stride0,
++    num_rows_limit,
++    num_queries,
++    row_width,
++    BLOCK_R: tl.constexpr,
++    BLOCK_W: tl.constexpr,
++):
++    pid = tl.program_id(0)
++    # The scan fills indptr[1:], so write indptr[0] here and skip a zero fill.
++    if pid == 0:
++        tl.store(indptr_ptr, 0)
++
++    rows = pid * BLOCK_R + tl.arange(0, BLOCK_R)
++    row_ok = rows < num_queries
++    row_len = tl.load(lengths_ptr + rows, mask=row_ok, other=0)
++
++    acc = tl.zeros((BLOCK_R,), dtype=tl.int32)
++    for start in range(0, row_width, BLOCK_W):
++        cols = start + tl.arange(0, BLOCK_W)
++        in_row = cols[None, :] < row_width
++        vals = tl.load(
++            indices_ptr + rows[:, None] * indices_stride0 + cols[None, :],
++            mask=row_ok[:, None] & in_row,
++            other=-1,
++        ).to(tl.int32)
++        keep = (
++            row_ok[:, None] & in_row & (cols[None, :] < row_len[:, None]) & (vals >= 0)
++        )
++        if num_rows_limit >= 0:
++            keep = keep & (vals < num_rows_limit)
++        acc += tl.sum(keep.to(tl.int32), axis=1)
++
++    tl.store(counts_ptr + rows, acc, mask=row_ok)
++
++
++@triton.jit
++def _compact_dense_row_to_ragged_kernel(
+     indices_ptr,
+     lengths_ptr,
+     indptr_ptr,
+@@ -2025,28 +2066,25 @@
+     indices_stride0,
+     num_rows_limit,
+     row_width,
+-    BLOCK_SIZE: tl.constexpr,
++    BLOCK_W: tl.constexpr,
+ ):
+     row_idx = tl.program_id(0)
+-    block_idx = tl.program_id(1)
+-    offsets = block_idx * BLOCK_SIZE + tl.arange(0, BLOCK_SIZE)
+-
+     row_len = tl.load(lengths_ptr + row_idx)
+-    if block_idx * BLOCK_SIZE >= row_len:
+-        return
+-
+-    mask = offsets < row_len
+-    safe_offsets = tl.where(offsets < row_width, offsets, 0)
+-    vals = tl.load(
+-        indices_ptr + row_idx * indices_stride0 + safe_offsets,
+-        mask=mask & (offsets < row_width),
+-        other=-1,
+-    ).to(tl.int32)
+-    if num_rows_limit >= 0:
+-        vals = tl.where((vals >= 0) & (vals < num_rows_limit), vals, -1)
+-
+     out_start = tl.load(indptr_ptr + row_idx)
+-    tl.store(out_ptr + out_start + offsets, vals, mask=mask)
++
++    written = 0
++    for start in range(0, row_width, BLOCK_W):
++        cols = start + tl.arange(0, BLOCK_W)
++        in_row = cols < row_width
++        vals = tl.load(
++            indices_ptr + row_idx * indices_stride0 + cols, mask=in_row, other=-1
++        ).to(tl.int32)
++        keep = in_row & (cols < row_len) & (vals >= 0)
++        if num_rows_limit >= 0:
++            keep = keep & (vals < num_rows_limit)
++        rank = tl.cumsum(keep.to(tl.int32), axis=0) - 1
++        tl.store(out_ptr + out_start + written + rank, vals, mask=keep)
++        written += tl.sum(keep.to(tl.int32), axis=0)
+ 
+ 
+ def build_ragged_indices_from_dense(
+@@ -2061,10 +2099,40 @@
+     )
+ 
+     max_width = indices.shape[1] if indices.ndim == 2 else 0
+-    lengths = lengths.clamp(min=0, max=max_width).contiguous()
+-
+-    indptr = torch.zeros(indices.shape[0] + 1, dtype=torch.int32, device=indices.device)
+-    torch.cumsum(lengths, dim=0, out=indptr[1:])
++    # Both kernels bound the row by row_width and row_len, so no clamp needed.
++    lengths = lengths.contiguous()
++
++    # Dense rows reserve slots they may not fill, leaving -1 anywhere in the
++    # first `lengths` entries. Keep only the valid ones, since the consumers
++    # index the KV pool without checking the sign.
++    num_queries = indices.shape[0]
++    # max_width is whatever the caller packed (align(topk + window, 128) for the
++    # V4.1 indexer) and nothing caps it, so loop the row rather than size the
++    # block by it.
++    block = min(triton.next_power_of_2(max_width), 1024) if max_width > 0 else 1
++    counts = torch.empty(num_queries, dtype=torch.int32, device=indices.device)
++    indptr = torch.empty(num_queries + 1, dtype=torch.int32, device=indices.device)
++    if num_queries > 0 and max_width > 0:
++        # A program per row only gets row_width elements, which is launch
++        # bound for narrow rows. Tile rows to fill the block.
++        block_r = max(1, 1024 // block)
++        _count_valid_row_entries_kernel[(triton.cdiv(num_queries, block_r),)](
++            indices,
++            lengths,
++            counts,
++            indptr,
++            indices.stride(0),
++            int(num_rows),
++            num_queries,
++            max_width,
++            BLOCK_R=block_r,
++            BLOCK_W=block,
++        )
++    else:
++        counts.zero_()
++        indptr.zero_()
++
++    torch.cumsum(counts, dim=0, out=indptr[1:])
+ 
+     if indices.numel() == 0:
+         flat = torch.empty(0, dtype=torch.int32, device=indices.device)
+@@ -2075,10 +2143,7 @@
+             device=indices.device,
+         )
+         if flat.numel() > 0:
+-            block_size = 128
+-            _pack_dense_prefix_to_ragged_kernel[
+-                (indices.shape[0], triton.cdiv(max_width, block_size))
+-            ](
++            _compact_dense_row_to_ragged_kernel[(indices.shape[0],)](
+                 indices,
+                 lengths,
+                 indptr,
+@@ -2086,7 +2151,7 @@
+                 indices.stride(0),
+                 int(num_rows),
+                 max_width,
+-                BLOCK_SIZE=block_size,
++                BLOCK_W=block,
+             )
+ 
+     return flat, indptr
+@@ -4241,3 +4306,99 @@
+     if direct_out is None:
+         output.copy_(attn_out.to(output.dtype))
+     return output.shape[0] if inv_rope_positions is not None else 0
++
++
++@triton.jit(do_not_specialize=["token_offset"])
++def _prefill_topk_global_slots_kernel(
++    out_ptr,
++    lens_ptr,
++    topk_ptr,
++    topk_stride,
++    token_to_req_ptr,
++    query_start_loc_ptr,
++    seq_lens_ptr,
++    is_valid_token_ptr,
++    block_table_ptr,
++    block_table_stride,
++    token_offset,
++    num_compressed,
++    TOPK: tl.constexpr,
++    COMPRESS_RATIO: tl.constexpr,
++    BLOCK_SIZE: tl.constexpr,
++    BLOCK_W: tl.constexpr,
++):
++    row = tl.program_id(0)
++    token = row + token_offset
++    req = tl.load(token_to_req_ptr + token)
++    query_start = tl.load(query_start_loc_ptr + req)
++    query_len = tl.load(query_start_loc_ptr + req + 1) - query_start
++    pos = tl.load(seq_lens_ptr + req) - query_len + token - query_start
++    # Only (pos + 1) // ratio compressed tokens exist yet; the rest of the row
++    # can hold stale indices.
++    row_len = tl.minimum((pos + 1) // COMPRESS_RATIO, TOPK)
++    row_len = tl.where(tl.load(is_valid_token_ptr + token), row_len, 0)
++
++    for start in range(0, TOPK, BLOCK_W):
++        cols = start + tl.arange(0, BLOCK_W)
++        live = cols < row_len
++        local = tl.load(topk_ptr + row * topk_stride + cols, mask=live, other=-1)
++        valid = live & (local >= 0) & (local < num_compressed)
++        local = tl.where(valid, local, 0)
++        block = tl.load(
++            block_table_ptr + req * block_table_stride + local // BLOCK_SIZE,
++            mask=valid,
++            other=0,
++        )
++        slot = tl.where(valid, block * BLOCK_SIZE + local % BLOCK_SIZE, -1)
++        tl.store(out_ptr + row * TOPK + cols, slot, mask=cols < TOPK)
++    tl.store(lens_ptr + row, row_len)
++
++
++def build_prefill_topk_ragged_indices(
++    topk_indices: torch.Tensor,
++    token_to_req_indices: torch.Tensor,
++    query_start_loc: torch.Tensor,
++    seq_lens: torch.Tensor,
++    is_valid_token: torch.Tensor,
++    block_table: torch.Tensor,
++    block_size: int,
++    compress_ratio: int,
++    num_compressed: int,
++    token_offset: int,
++    num_rows: int = -1,
++) -> tuple[torch.Tensor, torch.Tensor]:
++    """Map prefill top-k rows to a ragged stream of compressed-cache slots.
++
++    ``topk_indices`` holds local compressed positions for the prefill tokens,
++    which sit at ``token_offset`` in the batch; ``token_to_req_indices``,
++    ``query_start_loc``, ``seq_lens`` and ``block_table`` are batch-wide.
++    ``block_size`` is the compressed cache's, i.e. already divided by the ratio.
++    """
++    topk_indices = topk_indices.reshape(topk_indices.shape[0], -1)
++    num_tokens, width = topk_indices.shape
++    dense = torch.empty(
++        (num_tokens, width), dtype=torch.int32, device=topk_indices.device
++    )
++    lens = torch.empty(num_tokens, dtype=torch.int32, device=topk_indices.device)
++    if num_tokens > 0 and width > 0:
++        _prefill_topk_global_slots_kernel[(num_tokens,)](
++            dense,
++            lens,
++            topk_indices,
++            topk_indices.stride(0),
++            token_to_req_indices,
++            query_start_loc,
++            seq_lens,
++            is_valid_token,
++            block_table,
++            block_table.stride(0),
++            token_offset,
++            num_compressed,
++            TOPK=width,
++            COMPRESS_RATIO=compress_ratio,
++            BLOCK_SIZE=block_size,
++            BLOCK_W=min(triton.next_power_of_2(width), 1024),
++        )
++    else:
++        lens.zero_()
++    return build_ragged_indices_from_dense(dense, lens, num_rows=num_rows)

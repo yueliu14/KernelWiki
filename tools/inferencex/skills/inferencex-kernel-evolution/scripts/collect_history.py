@@ -84,6 +84,7 @@ def normalize(row):
         "id": row["id"], "date": row["date"], "run_started_at": row["run_started_at"],
         "curve_date": row.get("curve_date"), "curve_workflow_run_id": row.get("curve_workflow_run_id"),
         "github_run_id": match.group(1), "run_url": row["run_url"],
+        "github_run_attempt": int(row["run_url"].split("/attempts/")[1].split("/")[0]) if "/attempts/" in row["run_url"] else None,
         "image_name": image.split("@")[0], "image_reference": image,
         "image_digest": image.split("@", 1)[1] if "@" in image else None,
         "recipe_fingerprint": row.get("recipe_fingerprint"), "config": config,
@@ -171,15 +172,17 @@ def build_history(rows):
     return points, images, comparisons, transitions
 
 
-def collect_ci(run_id, cache, offline):
+def collect_ci(run_id, cache, offline, model_keys):
     base = f"https://api.github.com/repos/{REPO}/actions/runs/{run_id}"
     run = fetch(base, cache / "ci" / f"{run_id}.run.json", offline)
     jobs, artifacts = [], []
     for endpoint, target in [("jobs", jobs), ("artifacts", artifacts)]:
         page = 1
         while True:
-            data = fetch(f"{base}/{endpoint}?per_page=100&page={page}",
-                         cache / "ci" / f"{run_id}.{endpoint}.{page}.json", offline)
+            suffix = "&filter=all" if endpoint == "jobs" else ""
+            cache_kind = "jobs.all" if endpoint == "jobs" else endpoint
+            data = fetch(f"{base}/{endpoint}?per_page=100&page={page}{suffix}",
+                         cache / "ci" / f"{run_id}.{cache_kind}.{page}.json", offline)
             target.extend(data[endpoint])
             if len(target) >= data["total_count"]:
                 break
@@ -189,10 +192,55 @@ def collect_ci(run_id, cache, offline):
     return {"run_id": run_id, "name": run["name"], "head_sha": run["head_sha"],
             "created_at": run["created_at"], "head_branch": run["head_branch"], "path": run["path"],
             "run_url": run["html_url"], "conclusion": run["conclusion"],
-            "muse_jobs": [{key: job.get(key) for key in ["id", "name", "html_url", "started_at", "completed_at", "conclusion"]}
-                          for job in jobs if "musespark" in job["name"].lower() or "muse-spark" in job["name"].lower()],
+            "model_jobs": [{key: job.get(key) for key in ["id", "name", "html_url", "started_at", "completed_at", "conclusion", "run_attempt"]}
+                           for job in jobs if any(re.search(rf"\b{re.escape(model)}\b", job["name"], re.I) for model in model_keys)],
             "artifacts": [{key: item.get(key) for key in ["id", "name", "size_in_bytes", "expired", "archive_download_url"]}
                           for item in artifacts]}
+
+
+def discover_framework(raw, latest, hardware, requested):
+    coverage = []
+    for framework in sorted({r["framework"] for r in raw if r["hardware"] == hardware}):
+        rows = [r for r in raw if r["hardware"] == hardware and r["framework"] == framework]
+        current = [r for r in latest if r["hardware"] == hardware and r["framework"] == framework]
+        coverage.append({"framework": framework, "history_rows": len(rows),
+                         "unique_points": len({r['id'] for r in rows}),
+                         "first_date": min(r["date"] for r in rows), "last_date": max(r["date"] for r in rows),
+                         "current_points": len(current), "current_latest_date": max((r["date"] for r in current), default=None)})
+    if requested != "auto":
+        selected, reason = requested, "explicit framework selection"
+    else:
+        eligible = [c for c in coverage if c["framework"] in ("vllm", "sglang")]
+        if not eligible:
+            raise ValueError("No MI355X vLLM/SGLang history found; inspect framework coverage explicitly")
+        chosen = max(eligible, key=lambda c: (c["current_latest_date"] or c["last_date"], c["unique_points"], c["framework"]))
+        selected, reason = chosen["framework"], "newest published curve; historical point coverage breaks ties"
+    return selected, {"hardware": hardware, "requested_framework": requested, "selected_framework": selected,
+                      "selection_reason": reason, "available_frameworks": coverage}
+
+
+def matching_jobs(point, jobs):
+    config = point["config"]
+    candidates = []
+    for job in jobs:
+        name = job["name"]
+        aliases = {"sglang": ("sglang", "sgl"), "vllm": ("vllm",)}.get(config["framework"], (config["framework"],))
+        framework_matches = any(re.search(rf"(?<![a-z0-9]){re.escape(alias)}(?![a-z0-9])", name.lower()) for alias in aliases)
+        tp = re.search(r"\bTP(\d+)(?:/EP(\d+))?\b", name)
+        if ("eval" in name.lower() or job["conclusion"] != "success" or not tp
+            or int(tp[1]) != config["decode_tp"] or int(tp[2] or 1) != config["decode_ep"]
+            or not re.search(rf" c{config['conc']}$", name)
+            or config["hardware"] not in name
+            or not framework_matches
+            or ("dram KV offload" in name) != (config["offload_mode"] == "on")):
+            continue
+        if point["github_run_attempt"] and job.get("run_attempt") and job["run_attempt"] > point["github_run_attempt"]:
+            continue
+        candidates.append(job)
+    if candidates:
+        newest = max(j.get("run_attempt") or 1 for j in candidates)
+        candidates = [j for j in candidates if (j.get("run_attempt") or 1) == newest]
+    return candidates
 
 
 def main():
@@ -201,7 +249,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--model", default="Muse-Spark-Open")
     parser.add_argument("--hardware", default="mi355x")
-    parser.add_argument("--framework", default="sglang")
+    parser.add_argument("--framework", default="auto", help="auto selects MI355X vLLM/SGLang from published coverage; an explicit name overrides")
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--ci", action="store_true")
     args = parser.parse_args()
@@ -210,11 +258,13 @@ def main():
     history_url = ORIGIN + "/api/v1/benchmarks/history?" + query + "&benchmarkType=agentic_traces"
     raw = fetch(history_url, args.cache / "history.json", args.offline)
     latest = fetch(ORIGIN + "/api/v1/benchmarks?" + query, args.cache / "benchmarks.json", args.offline)
-    selected = [r for r in raw if r["hardware"] == args.hardware and r["framework"] == args.framework]
+    framework, discovery = discover_framework(raw, latest, args.hardware, args.framework)
+    save_json(args.output / "framework_discovery.json", discovery)
+    selected = [r for r in raw if r["hardware"] == args.hardware and r["framework"] == framework]
     if not selected:
         raise ValueError("No selected history rows")
     points, images, comparisons, transitions = build_history(selected)
-    selected_latest = [r for r in latest if r["hardware"] == args.hardware and r["framework"] == args.framework]
+    selected_latest = [r for r in latest if r["hardware"] == args.hardware and r["framework"] == framework]
     assert {r["id"] for r in selected_latest} <= {p["id"] for p in points}
     for name, value in [("raw_selected_history.json", selected), ("raw_selected_latest.json", selected_latest),
                         ("points.json", points), ("images.json", images), ("transitions.json", transitions)]:
@@ -227,16 +277,12 @@ def main():
     if args.ci:
         run_ids = list(dict.fromkeys(p["github_run_id"] for p in points))
         with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
-            manifests = list(pool.map(lambda run: collect_ci(run, args.cache, args.offline), run_ids))
+            manifests = list(pool.map(lambda run: collect_ci(run, args.cache, args.offline, {r["model"] for r in selected}), run_ids))
         save_json(args.output / "ci_manifest.json", manifests)
         by_run = {run["run_id"]: run for run in manifests}
         for point in points:
             config = point["config"]
-            candidates = [job for job in by_run[point["github_run_id"]]["muse_jobs"]
-                          if "eval" not in job["name"]
-                          and f"TP{config['decode_tp']}/EP{config['decode_ep']} " in job["name"]
-                          and re.search(rf" c{config['conc']}$", job["name"])
-                          and ("dram KV offload" in job["name"]) == (config["offload_mode"] == "on")]
+            candidates = matching_jobs(point, by_run[point["github_run_id"]]["model_jobs"])
             point["github_job_match"] = "unique" if len(candidates) == 1 else "unresolved"
             if len(candidates) == 1:
                 job = candidates[0]
@@ -246,7 +292,7 @@ def main():
     receipts = [json.loads(p.read_text()) | {"cache_file": str(p).removesuffix(".meta.json")}
                 for p in sorted(args.cache.rglob("*.meta.json"))]
     save_json(args.output / "retrieval_manifest.json", receipts)
-    summary = {"model": args.model, "hardware": args.hardware, "framework": args.framework,
+    summary = {"model": args.model, "hardware": args.hardware, "framework": framework,
                "history_total_rows": len(raw), "selected_snapshot_rows": len(selected), "unique_points": len(points),
                "image_versions": len(images), "run_count": len({p['github_run_id'] for p in points}),
                "first_date": points[0]["date"], "latest_date": max(p["date"] for p in points),

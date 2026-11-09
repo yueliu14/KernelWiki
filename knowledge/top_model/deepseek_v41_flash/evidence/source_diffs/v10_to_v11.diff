@@ -1,0 +1,4442 @@
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/model_executor/kernels/mhc/triton.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/model_executor/kernels/mhc/triton.py
+@@ -1,10 +1,20 @@
+ # SPDX-License-Identifier: Apache-2.0
+ # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
++from dataclasses import dataclass
++from typing import Any
++
+ import torch
+ import torch.nn.functional as F
+ from torch import Tensor
+ 
++from vllm.model_executor.warmup.jit_warmup import kernel_launcher
++from vllm.model_executor.warmup.jit_warmup_triton_helper import (
++    LaunchSpec,
++    TritonWarmupTensor,
++    VllmTritonJitKernel,
++)
+ from vllm.triton_utils import tl, triton
++from vllm.utils.math_utils import next_power_of_2
+ from vllm.utils.torch_utils import direct_register_custom_op
+ 
+ 
+@@ -139,6 +149,174 @@
+ 
+ def _hc_collapse_triton_fake(x: Tensor, pre_mix: Tensor) -> Tensor:
+     return torch.empty(x.shape[0], x.shape[2], dtype=x.dtype, device=x.device)
++
++
++@triton.jit
++def _mhc_post_stream(post_mix_ptr, comb_mix_ptr, t, j, xt, f0, f1, f2, f3):
++    comb = comb_mix_ptr + t * 16 + j  # comb is [source h, destination j]
++    return (
++        tl.load(post_mix_ptr + t * 4 + j) * xt
++        + tl.load(comb) * f0
++        + tl.load(comb + 4) * f1
++        + tl.load(comb + 8) * f2
++        + tl.load(comb + 12) * f3
++    ).to(tl.bfloat16)
++
++
++@triton.jit
++def _mhc_post_collapse_rms_norm_kernel(
++    residual_ptr,
++    x_ptr,
++    post_mix_ptr,
++    comb_mix_ptr,
++    pre_mix_ptr,
++    weight_ptr,
++    residual_out_ptr,
++    out_ptr,
++    norm_eps,
++    H: tl.constexpr,
++    BLOCK_H: tl.constexpr,
++):
++    """The post-mix and collapse keep the expression order of aiter's
++    ``_mhc_fused_post_pre_delayed_rmsnorm_main_kernel``, so the new residual is
++    bit-identical to it."""
++    t = tl.program_id(0).to(tl.int64)
++    cols = tl.arange(0, BLOCK_H)
++    mask = cols < H
++    res = residual_ptr + t * 4 * H + cols
++    f0 = tl.load(res, mask=mask, other=0.0).to(tl.float32)
++    f1 = tl.load(res + H, mask=mask, other=0.0).to(tl.float32)
++    f2 = tl.load(res + 2 * H, mask=mask, other=0.0).to(tl.float32)
++    f3 = tl.load(res + 3 * H, mask=mask, other=0.0).to(tl.float32)
++    xt = tl.load(x_ptr + t * H + cols, mask=mask, other=0.0).to(tl.float32)
++    g0 = _mhc_post_stream(post_mix_ptr, comb_mix_ptr, t, 0, xt, f0, f1, f2, f3)
++    g1 = _mhc_post_stream(post_mix_ptr, comb_mix_ptr, t, 1, xt, f0, f1, f2, f3)
++    g2 = _mhc_post_stream(post_mix_ptr, comb_mix_ptr, t, 2, xt, f0, f1, f2, f3)
++    g3 = _mhc_post_stream(post_mix_ptr, comb_mix_ptr, t, 3, xt, f0, f1, f2, f3)
++    out_res = residual_out_ptr + t * 4 * H + cols
++    tl.store(out_res, g0, mask=mask)
++    tl.store(out_res + H, g1, mask=mask)
++    tl.store(out_res + 2 * H, g2, mask=mask)
++    tl.store(out_res + 3 * H, g3, mask=mask)
++    pre = pre_mix_ptr + t * 4
++    x1 = (
++        tl.load(pre) * g0.to(tl.float32)
++        + tl.load(pre + 1) * g1.to(tl.float32)
++        + tl.load(pre + 2) * g2.to(tl.float32)
++        + tl.load(pre + 3) * g3.to(tl.float32)
++    ).to(tl.bfloat16)
++    x1f = x1.to(tl.float32)
++    rstd = tl.math.rsqrt(tl.sum(x1f * x1f, 0) * (1.0 / H) + norm_eps)
++    w = tl.load(weight_ptr + cols, mask=mask, other=0.0).to(tl.float32)
++    tl.store(out_ptr + t * H + cols, ((x1f * rstd) * w).to(tl.bfloat16), mask=mask)
++
++
++class MHCPostCollapseRMSNormKernel(
++    VllmTritonJitKernel["MHCPostCollapseRMSNormKernel.CompileKey"]
++):
++    @dataclass(frozen=True)
++    class CompileKey:
++        hidden_size: int
++        block_h: int
++        weight_dtype: torch.dtype
++
++    kernel = staticmethod(_mhc_post_collapse_rms_norm_kernel)
++
++    def dispatch(  # type: ignore[override]
++        self, *, hidden_size: int, weight_dtype: torch.dtype
++    ) -> CompileKey:
++        return self.CompileKey(
++            hidden_size=hidden_size,
++            block_h=next_power_of_2(hidden_size),
++            weight_dtype=weight_dtype,
++        )
++
++    def get_warmup_keys(
++        self, *, hidden_size: int, weight_dtype: torch.dtype
++    ) -> list[CompileKey]:
++        return self._trace_dispatch(self.dispatch)(
++            hidden_size=hidden_size, weight_dtype=weight_dtype
++        )
++
++    def warmup_inputs(self, compile_key: CompileKey) -> dict[str, Any]:
++        H = compile_key.hidden_size
++        return dict(
++            residual=TritonWarmupTensor(torch.bfloat16, shape=(1, 4, H)),
++            x=TritonWarmupTensor(torch.bfloat16, shape=(1, H)),
++            post_mix=TritonWarmupTensor(torch.float32, shape=(1, 4, 1)),
++            comb_mix=TritonWarmupTensor(torch.float32, shape=(1, 4, 4)),
++            pre_mix=TritonWarmupTensor(torch.float32, shape=(1, 4)),
++            weight=TritonWarmupTensor(compile_key.weight_dtype, shape=(H,)),
++            residual_out=TritonWarmupTensor(torch.bfloat16, shape=(1, 4, H)),
++            out=TritonWarmupTensor(torch.bfloat16, shape=(1, H)),
++            norm_eps=1e-6,
++        )
++
++    @kernel_launcher
++    def __call__(
++        self,
++        residual: Tensor,
++        x: Tensor,
++        post_mix: Tensor,
++        comb_mix: Tensor,
++        pre_mix: Tensor,
++        weight: Tensor,
++        residual_out: Tensor,
++        out: Tensor,
++        norm_eps: float,
++    ) -> LaunchSpec:
++        H = residual.shape[2]
++        return (residual.shape[0],), dict(H=H, BLOCK_H=next_power_of_2(H), num_warps=16)
++
++
++MHC_POST_COLLAPSE_RMS_NORM_KERNEL = MHCPostCollapseRMSNormKernel()
++
++
++def mhc_post_collapse_rms_norm_triton(
++    residual: Tensor,
++    sublayer_out: Tensor,
++    post_layer_mix: Tensor,
++    comb_res_mix: Tensor,
++    pre_mix: Tensor,
++    norm_weight: Tensor,
++    norm_eps: float,
++) -> tuple[Tensor, Tensor]:
++    """The layer-input half of a delayed mHC seam, without the gate projection.
++
++    Applies the post block and returns the new residual and the RMSNorm of its
++    collapse with the carried ``pre_mix``, which is what
++    ``mhc_fused_post_pre_delayed_rms_norm_aiter`` returns besides the gates.
++
++    Args:
++        residual: [T, 4, H] bf16 residual streams entering the seam.
++        sublayer_out: [T, H] bf16 output of the sublayer before the seam.
++        post_layer_mix: [T, 4, 1] fp32 post gate of the previous seam.
++        comb_res_mix: [T, 4, 4] fp32 residual comb of the previous seam.
++        pre_mix: [T, 4] fp32 pre gate carried from the previous seam.
++        norm_weight: [H] RMSNorm weight.
++        norm_eps: RMSNorm epsilon.
++
++    Returns:
++        The [T, 4, H] bf16 new residual and the [T, H] bf16 layer input.
++
++    """
++    T, hc_mult, H = residual.shape
++    assert hc_mult == 4 and residual.dtype == torch.bfloat16
++    residual_out = torch.empty_like(residual)
++    out = torch.empty(T, H, dtype=residual.dtype, device=residual.device)
++    if T:
++        MHC_POST_COLLAPSE_RMS_NORM_KERNEL(
++            residual.contiguous(),
++            sublayer_out.contiguous(),
++            post_layer_mix.contiguous(),
++            comb_res_mix.contiguous(),
++            pre_mix.contiguous(),
++            norm_weight,
++            residual_out,
++            out,
++            norm_eps,
++        )
++    return residual_out, out
+ 
+ 
+ @triton.jit
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/dspark.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/dspark.py
+@@ -31,6 +31,9 @@
+ from vllm.model_executor.layers.vocab_parallel_embedding import (
+     ParallelLMHead,
+     VocabParallelEmbedding,
++)
++from vllm.model_executor.model_loader.mtp_validation import (
++    is_mtp_completeness_check_enabled,
+ )
+ from vllm.model_executor.model_loader.weight_utils import default_weight_loader
+ from vllm.model_executor.models.qwen3_dspark import (
+@@ -510,16 +513,14 @@
+                 weight_loader(param, loaded_weight)
+                 loaded_params.add(name)
+ 
+-        if self.model.confidence_head is not None and not loaded_confidence_head:
++        if (
++            self.model.confidence_head is not None
++            and not loaded_confidence_head
++            and is_mtp_completeness_check_enabled()
++        ):
+             self.model.confidence_head = None
+-        self.process_weights_after_loading()
+         logger.info_once("DSpark draft model loaded: %d params", len(loaded_params))
+         return loaded_params
+-
+-    def process_weights_after_loading(self) -> None:
+-        # ROCm linears and fused-MoE runners finalize their own quantized
+-        # parameters. NVIDIA-only MegaMoE/WO-A requantization is not needed.
+-        return
+ 
+     def _remap_dspark_name(self, name: str) -> str | None:
+         """Map a checkpoint ``mtp.{i}.*`` name to this model's parameter path.
+--- V10:vllm/models/deepseek_v41/amd/engram.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/engram.py
+@@ -0,0 +1,281 @@
++# SPDX-License-Identifier: Apache-2.0
++# SPDX-FileCopyrightText: Copyright contributors to the vLLM project
++"""Engram with a TP-sharded gate on gfx942 and gfx950."""
++
++import torch
++
++from vllm.distributed import (
++    get_tensor_model_parallel_rank,
++    get_tensor_model_parallel_world_size,
++    tensor_model_parallel_all_gather,
++)
++from vllm.model_executor.layers.linear import (
++    ColumnParallelLinear,
++    MergedColumnParallelLinear,
++)
++from vllm.model_executor.layers.quantization import QuantizationConfig
++from vllm.models.deepseek_v41.common.engram import Engram
++from vllm.platforms.rocm import get_cdna_version
++from vllm.triton_utils import tl, triton
++
++
++def _shards_engram_gate() -> bool:
++    """Whether TP ranks keep a dim slice of `wkv` and exchange gate partial sums."""
++    return get_cdna_version() in (3, 4)
++
++
++@triton.jit
++def _engram_gate_partials_kernel(
++    hidden_states,
++    kv,
++    q_weight,
++    k_weight,
++    send,
++    send_f32,
++    hidden_stride_t,
++    hidden_stride_h,
++    hidden_stride_d,
++    kv_stride_t,
++    kv_stride_d,
++    q_stride_h,
++    q_stride_d,
++    k_stride_h,
++    k_stride_d,
++    send_stride_t,
++    send_f32_stride_t,
++    dim_start,
++    WIDTH: tl.constexpr,
++    HC_MULT: tl.constexpr,
++    BLOCK_SIZE: tl.constexpr,
++):
++    """Pack one token's value slice and per-hc gate partial sums into `send`.
++
++    `kv` holds this rank's `WIDTH` columns of every key and of the value. The
++    row of `send` is the value slice followed by (sum key^2, sum hidden*q*k*key)
++    as FP32 pairs, one per hc copy. Each program handles one hc copy, or the
++    value slice, of one token.
++    """
++    program_idx = tl.program_id(0)
++    token_idx = (program_idx // (HC_MULT + 1)).to(tl.int64)
++    hc_idx = program_idx % (HC_MULT + 1)
++    offsets = tl.arange(0, BLOCK_SIZE)
++    valid = offsets < WIDTH
++    if hc_idx == HC_MULT:
++        value = tl.load(
++            kv + token_idx * kv_stride_t + (HC_MULT * WIDTH + offsets) * kv_stride_d,
++            mask=valid,
++        )
++        tl.store(send + token_idx * send_stride_t + offsets, value, mask=valid)
++    else:
++        hidden = tl.load(
++            hidden_states
++            + token_idx * hidden_stride_t
++            + hc_idx * hidden_stride_h
++            + (dim_start + offsets) * hidden_stride_d,
++            mask=valid,
++            other=0.0,
++        ).to(tl.float32)
++        key = tl.load(
++            kv + token_idx * kv_stride_t + (hc_idx * WIDTH + offsets) * kv_stride_d,
++            mask=valid,
++            other=0.0,
++        ).to(tl.float32)
++        q = tl.load(
++            q_weight + hc_idx * q_stride_h + (dim_start + offsets) * q_stride_d,
++            mask=valid,
++            other=0.0,
++        ).to(tl.float32)
++        k = tl.load(
++            k_weight + hc_idx * k_stride_h + (dim_start + offsets) * k_stride_d,
++            mask=valid,
++            other=0.0,
++        ).to(tl.float32)
++        partials = send_f32 + token_idx * send_f32_stride_t + WIDTH // 2 + 2 * hc_idx
++        tl.store(partials, tl.sum(key * key, axis=0))
++        tl.store(partials + 1, tl.sum(hidden * q * k * key, axis=0))
++
++
++@triton.jit(do_not_specialize=["num_tokens"])
++def _engram_gate_finish_kernel(
++    hidden_states,
++    gathered,
++    gathered_f32,
++    token_mask,
++    output,
++    num_tokens,
++    hidden_stride_t,
++    hidden_stride_h,
++    hidden_stride_d,
++    gathered_stride_t,
++    gathered_f32_stride_t,
++    mask_stride,
++    output_stride_t,
++    output_stride_h,
++    output_stride_d,
++    eps,
++    clamp_value,
++    DIM: tl.constexpr,
++    WIDTH: tl.constexpr,
++    TP_SIZE: tl.constexpr,
++    HC_MULT: tl.constexpr,
++    BLOCK_SIZE: tl.constexpr,
++    HAS_MASK: tl.constexpr,
++):
++    """`_fused_engram_post_wkv_kernel` on the rank-major rows the partials
++    kernel packed, all-gathered along tokens."""
++    program_idx = tl.program_id(0)
++    token_idx = (program_idx // HC_MULT).to(tl.int64)
++    hc_idx = program_idx % HC_MULT
++    dim_offsets = tl.arange(0, BLOCK_SIZE)
++    dim_valid = dim_offsets < DIM
++    hidden = tl.load(
++        hidden_states
++        + token_idx * hidden_stride_t
++        + hc_idx * hidden_stride_h
++        + dim_offsets * hidden_stride_d,
++        mask=dim_valid,
++        other=0.0,
++    ).to(tl.float32)
++
++    key_sq = 0.0
++    dot = 0.0
++    for rank in tl.static_range(TP_SIZE):
++        partials = (
++            gathered_f32
++            + (rank * num_tokens + token_idx) * gathered_f32_stride_t
++            + WIDTH // 2
++            + 2 * hc_idx
++        )
++        key_sq += tl.load(partials)
++        dot += tl.load(partials + 1)
++
++    hidden_rms = tl.rsqrt(tl.sum(hidden * hidden, axis=0) / DIM + eps)
++    key_rms = tl.rsqrt(key_sq / DIM + eps)
++    dot *= hidden_rms * key_rms * tl.rsqrt(DIM * 1.0)
++    gate_input = tl.sqrt(tl.maximum(tl.abs(dot), clamp_value))
++    gate_input = tl.where(dot < 0.0, -gate_input, gate_input)
++    gate = tl.sigmoid(gate_input)
++    if HAS_MASK:
++        active = tl.load(token_mask + token_idx * mask_stride)
++        gate = tl.where(active, gate, 0.0)
++
++    value_rank = dim_offsets // WIDTH
++    value = tl.load(
++        gathered
++        + (value_rank * num_tokens + token_idx) * gathered_stride_t
++        + dim_offsets % WIDTH,
++        mask=dim_valid,
++        other=0.0,
++    ).to(tl.float32)
++    tl.store(
++        output
++        + token_idx * output_stride_t
++        + hc_idx * output_stride_h
++        + dim_offsets * output_stride_d,
++        hidden + gate * value,
++        mask=dim_valid,
++    )
++
++
++class RocmEngram(Engram):
++    """`Engram` whose TP ranks each keep one dim slice of every key and of the
++    value. The gate only needs per-token sums over dim, so the ranks exchange
++    those and their value slices instead of the whole projection."""
++
++    # Ranks whose dim slices make up one `wkv` output row.
++    kv_shards: int = 1
++
++    def _create_wkv(
++        self, input_size: int, quant_config: QuantizationConfig | None, prefix: str
++    ) -> ColumnParallelLinear:
++        tp_size = get_tensor_model_parallel_world_size()
++        if not _shards_engram_gate() or tp_size == 1 or self.use_sequence_parallel:
++            return super()._create_wkv(input_size, quant_config, prefix)
++        self.kv_shards = tp_size
++        return MergedColumnParallelLinear(
++            input_size,
++            [self.dim] * (self.hc_mult + 1),
++            bias=False,
++            gather_output=False,
++            quant_config=quant_config,
++            return_bias=False,
++            prefix=prefix,
++        )
++
++    def _post_wkv(
++        self,
++        hidden_states: torch.Tensor,
++        kv: torch.Tensor,
++        token_mask: torch.Tensor | None,
++        num_kv_tokens: int,
++    ) -> torch.Tensor:
++        if self.kv_shards == 1:
++            return super()._post_wkv(hidden_states, kv, token_mask, num_kv_tokens)
++        # One all-gather of each rank's value slice and gate partial sums
++        # replaces the gather of the whole projection.
++        num_tokens, hc_mult, dim = hidden_states.shape
++        width = dim // self.kv_shards
++        assert kv.shape == (num_tokens, (hc_mult + 1) * width)
++        assert token_mask is None or token_mask.shape == (num_tokens,)
++        output = torch.empty_like(hidden_states)
++        if num_tokens == 0:
++            return output
++
++        # [value slice | FP32 (sum key^2, sum hidden*q*k*key) per hc] per token.
++        send = kv.new_empty(num_tokens, width + 4 * hc_mult)
++        send_f32 = send.view(torch.float32)
++        _engram_gate_partials_kernel[(num_tokens * (hc_mult + 1),)](
++            hidden_states,
++            kv,
++            self.q_weight,
++            self.k_weight,
++            send,
++            send_f32,
++            hidden_states.stride(0),
++            hidden_states.stride(1),
++            hidden_states.stride(2),
++            kv.stride(0),
++            kv.stride(1),
++            self.q_weight.stride(0),
++            self.q_weight.stride(1),
++            self.k_weight.stride(0),
++            self.k_weight.stride(1),
++            send.stride(0),
++            send_f32.stride(0),
++            get_tensor_model_parallel_rank() * width,
++            WIDTH=width,
++            HC_MULT=hc_mult,
++            BLOCK_SIZE=triton.next_power_of_2(width),
++            num_warps=4,
++        )
++        gathered = tensor_model_parallel_all_gather(send, dim=0)
++        gathered_f32 = gathered.view(torch.float32)
++
++        block_size = triton.next_power_of_2(dim)
++        _engram_gate_finish_kernel[(num_tokens * hc_mult,)](
++            hidden_states,
++            gathered,
++            gathered_f32,
++            token_mask if token_mask is not None else hidden_states,
++            output,
++            num_tokens,
++            hidden_states.stride(0),
++            hidden_states.stride(1),
++            hidden_states.stride(2),
++            gathered.stride(0),
++            gathered_f32.stride(0),
++            token_mask.stride(0) if token_mask is not None else 0,
++            output.stride(0),
++            output.stride(1),
++            output.stride(2),
++            self.eps,
++            self.clamp_value,
++            DIM=dim,
++            WIDTH=width,
++            TP_SIZE=self.kv_shards,
++            HC_MULT=hc_mult,
++            BLOCK_SIZE=block_size,
++            HAS_MASK=token_mask is not None,
++            num_warps=8 if block_size >= 2048 else 4,
++        )
++        return output
+--- V10:vllm/models/deepseek_v41/amd/mhc.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mhc.py
+@@ -0,0 +1,140 @@
++# SPDX-License-Identifier: Apache-2.0
++# SPDX-FileCopyrightText: Copyright contributors to the vLLM project
++"""Overlap the DSV4.1 mHC gate projection with the next sublayer on ROCm."""
++
++import torch
++
++from vllm.config import VllmConfig
++from vllm.model_executor.kernels.mhc.triton import mhc_post_collapse_rms_norm_triton
++from vllm.model_executor.layers.mhc import (
++    HAS_AITER_MHC_FUSED_POST_PRE_DELAYED_RMS_NORM,
++    MHCPreDelayedOp,
++)
++from vllm.platforms.rocm import get_cdna_version
++from vllm.utils.torch_utils import aux_stream
++
++MHC_OVERLAP_MAX_TOKENS = 128
++
++
++def supports_mhc_overlap(vllm_config: VllmConfig) -> bool:
++    config = vllm_config.model_config.hf_config
++    return (
++        get_cdna_version() == 4
++        and HAS_AITER_MHC_FUSED_POST_PRE_DELAYED_RMS_NORM
++        and config.hc_mult == 4
++        and not vllm_config.parallel_config.use_ubatching
++    )
++
++
++class MHCOverlapStream:
++    """The global aux stream with the fork and join events of the overlap.
++
++    Every fork and join waits on its event before the next records it, so all
++    layers share the two events.
++    """
++
++    def __init__(self) -> None:
++        stream = aux_stream()
++        assert stream is not None
++        self.stream = stream
++        self._fork_event = torch.cuda.Event()
++        self._join_event = torch.cuda.Event()
++
++    def fork(self) -> None:
++        self._fork_event.record()
++        self.stream.wait_event(self._fork_event)
++
++    def join(self) -> None:
++        self._join_event.record(self.stream)
++        torch.cuda.current_stream().wait_event(self._join_event)
++
++
++def mhc_pre_delayed_overlap(
++    pre_delayed: MHCPreDelayedOp,
++    residual: torch.Tensor,
++    fn: torch.Tensor,
++    hc_scale: torch.Tensor,
++    hc_base: torch.Tensor,
++    rms_eps: float,
++    hc_pre_eps: float,
++    hc_sinkhorn_eps: float,
++    hc_post_mult_value: float,
++    sinkhorn_repeat: int,
++    pre_mix: torch.Tensor | None = None,
++    x: torch.Tensor | None = None,
++    norm_weight: torch.Tensor | None = None,
++    norm_eps: float = 1e-6,
++    sublayer_out: torch.Tensor | None = None,
++    post_layer_mix: torch.Tensor | None = None,
++    comb_res_mix: torch.Tensor | None = None,
++    *,
++    overlap: MHCOverlapStream,
++) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
++    """``pre_delayed`` with the gate projection moved onto ``overlap.stream``.
++
++    Returns residual, post_mix, comb_mix, layer_input, next_pre_mix. Only the
++    residual and layer input are ready on the caller stream; call
++    ``overlap.join()`` before using the gates. Seams without a post block, a
++    carried pre-mix or a fused norm run ``pre_delayed`` on the caller stream.
++    """
++    main = torch.cuda.current_stream()
++    if (
++        x is not None
++        or pre_mix is None
++        or norm_weight is None
++        or sublayer_out is None
++        or post_layer_mix is None
++        or comb_res_mix is None
++    ):
++        # Fork anyway: the caller joins after every seam, and a join needs the
++        # stream to be part of the capture.
++        overlap.fork()
++        return pre_delayed(
++            residual,
++            fn,
++            hc_scale,
++            hc_base,
++            rms_eps,
++            hc_pre_eps,
++            hc_sinkhorn_eps,
++            hc_post_mult_value,
++            sinkhorn_repeat,
++            pre_mix=pre_mix,
++            x=x,
++            norm_weight=norm_weight,
++            norm_eps=norm_eps,
++            sublayer_out=sublayer_out,
++            post_layer_mix=post_layer_mix,
++            comb_res_mix=comb_res_mix,
++        )
++    residual, layer_input = mhc_post_collapse_rms_norm_triton(
++        residual,
++        sublayer_out,
++        post_layer_mix,
++        comb_res_mix,
++        pre_mix,
++        norm_weight,
++        norm_eps,
++    )
++    stream = overlap.stream
++    overlap.fork()
++    with torch.cuda.stream(stream):
++        _, post_mix, comb_mix, _, next_pre_mix = pre_delayed(
++            residual,
++            fn,
++            hc_scale,
++            hc_base,
++            rms_eps,
++            hc_pre_eps,
++            hc_sinkhorn_eps,
++            hc_post_mult_value,
++            sinkhorn_repeat,
++            pre_mix=pre_mix,
++            norm_weight=norm_weight,
++            norm_eps=norm_eps,
++        )
++    for tensor in (residual, pre_mix):
++        tensor.record_stream(stream)
++    for tensor in (post_mix, comb_mix, next_pre_mix):
++        tensor.record_stream(main)
++    return residual, post_mix, comb_mix, layer_input, next_pre_mix
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/model.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/model.py
+@@ -2,6 +2,7 @@
+ # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+ import typing
+ from collections.abc import Callable, Iterable
++from functools import partial
+ from itertools import islice
+ 
+ import regex as re
+@@ -15,8 +16,13 @@
+     get_tensor_model_parallel_world_size,
+     tensor_model_parallel_all_reduce,
+ )
+-from vllm.forward_context import get_forward_context, is_forward_context_available
++from vllm.forward_context import (
++    get_forward_context,
++    in_piecewise_cudagraph,
++    is_forward_context_available,
++)
+ from vllm.logger import init_logger
++from vllm.model_executor.kernels.mhc.triton import MHC_POST_COLLAPSE_RMS_NORM_KERNEL
+ from vllm.model_executor.layers.fused_moe import (
+     fused_moe_make_expert_params_mapping,
+ )
+@@ -59,6 +65,13 @@
+     DeepseekV4MoE as DeepseekV4MoEBase,
+ )
+ from vllm.models.deepseek_v4.common.spec_decode import needs_mtp_hidden_buffer
++from vllm.models.deepseek_v41.amd.engram import RocmEngram
++from vllm.models.deepseek_v41.amd.mhc import (
++    MHC_OVERLAP_MAX_TOKENS,
++    MHCOverlapStream,
++    mhc_pre_delayed_overlap,
++    supports_mhc_overlap,
++)
+ from vllm.models.deepseek_v41.amd.mono_decode import MonoDecodeLayer
+ from vllm.models.deepseek_v41.amd.rocm import DeepseekV41ROCMAiterMLAAttention
+ from vllm.models.deepseek_v41.attention import DeepseekV4Attention
+@@ -188,17 +201,19 @@
+         aux_stream_list: list[torch.cuda.Stream] | None = None,
+         candidate_block_buffer: torch.Tensor | None = None,
+         engram_layout: EngramLayout | None = None,
++        mhc_overlap: MHCOverlapStream | None = None,
+     ):
+         super().__init__()
+         config = vllm_config.model_config.hf_config
+         self.hidden_size = config.hidden_size
++        self.mhc_overlap = mhc_overlap
+         self.use_sequence_parallel = _use_sequence_parallel(vllm_config)
+ 
+         self.engram: Engram | None = None
+         if engram_layout is not None:
+             layer_id = extract_layer_index(prefix)
+             if layer_id in engram_layout.layer_ids:
+-                self.engram = Engram(
++                self.engram = RocmEngram(
+                     config,
+                     vllm_config.quant_config,
+                     engram_layout,
+@@ -276,6 +291,10 @@
+         )
+         self.mhc_pre_delayed = MHCPreDelayedOp()
+         self.mhc_post = MHCPostOp()
++        if mhc_overlap is not None:
++            MHC_POST_COLLAPSE_RMS_NORM_KERNEL.register_warmup(
++                hidden_size=self.hidden_size, weight_dtype=self.ffn_norm.weight.dtype
++            )
+         # Where aiter's fused seam kernel runs (gfx950), it folds the following
+         # attn_norm / ffn_norm into its collapse, so the separate norms are
+         # skipped for the seams it takes.
+@@ -323,6 +342,20 @@
+         # The fused kernel only takes the latter, so that seam keeps the
+         # separate attn_norm.
+         fuse_attn_norm = self.fuse_seam_norm and not (residual is None and x.dim() == 2)
++        mhc_overlap = self.mhc_overlap
++        if mhc_overlap is not None and (
++            in_piecewise_cudagraph()
++            or not 0 < positions.shape[0] <= MHC_OVERLAP_MAX_TOKENS
++            or not torch.cuda.is_current_stream_capturing()
++        ):
++            # Fork only inside FULL graph capture, where the joins become graph
++            # edges; HIP event waits at runtime are unreliable here.
++            mhc_overlap = None
++        mhc_pre = (
++            partial(mhc_pre_delayed_overlap, self.mhc_pre_delayed, overlap=mhc_overlap)
++            if mhc_overlap is not None
++            else self.mhc_pre_delayed
++        )
+         # The reference collapses each sublayer's input with the *previous*
+         # sublayer's pre-mix: attention uses the pre-mix carried in (identity
+         # for the first layer), the FFN uses this layer's attention pre-mix.
+@@ -342,7 +375,7 @@
+                 # form. The folded form has no AITER kernel on gfx942 and runs
+                 # the eager reference instead, about 120 small kernels a step.
+                 unfolded = self.mono is not None and self.mono.unfolded_entry
+-                residual, post_mix, res_mix, x, attn_pre = self.mhc_pre_delayed(
++                residual, post_mix, res_mix, x, attn_pre = mhc_pre(
+                     residual,
+                     self.hc_attn_fn if unfolded else self.hc_attn_fn_broadcast,
+                     self.hc_attn_scale,
+@@ -356,7 +389,7 @@
+                 )
+             else:
+                 residual = x
+-                residual, post_mix, res_mix, x, attn_pre = self.mhc_pre_delayed(
++                residual, post_mix, res_mix, x, attn_pre = mhc_pre(
+                     residual,
+                     self.hc_attn_fn,
+                     self.hc_attn_scale,
+@@ -393,7 +426,7 @@
+                     engram_hashes[:, self.engram.layer_hash_index],
+                     engram_mask,
+                 )
+-                residual, post_mix, res_mix, x, attn_pre = self.mhc_pre_delayed(
++                residual, post_mix, res_mix, x, attn_pre = mhc_pre(
+                     residual,
+                     *pre_args,
+                     pre_mix=pre_mix,
+@@ -407,7 +440,7 @@
+                     res_mix,
+                     x,
+                     attn_pre,
+-                ) = self.mhc_pre_delayed(
++                ) = mhc_pre(
+                     residual,
+                     *pre_args,
+                     pre_mix=pre_mix,
+@@ -424,6 +457,8 @@
+             x = sp_all_gather(x)[: positions.shape[0]]
+ 
+         x = self.attn(positions, x, None)
++        if mhc_overlap is not None:
++            mhc_overlap.join()
+         if self.use_sequence_parallel:
+             x = sp_reduce_scatter(x)
+         elif self.mono is not None and self.mono.ffn_only:
+@@ -432,7 +467,7 @@
+                 return out
+             x = tensor_model_parallel_all_reduce(x)
+ 
+-        residual, post_mix, res_mix, x, ffn_pre = self.mhc_pre_delayed(
++        residual, post_mix, res_mix, x, ffn_pre = mhc_pre(
+             residual,
+             self.hc_ffn_fn,
+             self.hc_ffn_scale,
+@@ -452,6 +487,8 @@
+         if not self.fuse_seam_norm:
+             x = self.ffn_norm(x)
+         x = self.ffn(x, input_ids)
++        if mhc_overlap is not None:
++            mhc_overlap.join()
+         return x, residual, post_mix, res_mix, ffn_pre
+ 
+     def write_kv(
+@@ -519,6 +556,7 @@
+         # (compressor kv_score, indexer.weights_proj). fused_wqa_wkv stays on
+         # the default stream.
+         aux_stream_list = [torch.cuda.Stream() for _ in range(3)]
++        mhc_overlap = MHCOverlapStream() if supports_mhc_overlap(vllm_config) else None
+ 
+         # Reserved topk indices buffer for all Indexer layers to reuse.
+         self.topk_indices_buffer = torch.empty(
+@@ -571,11 +609,14 @@
+                 aux_stream_list=aux_stream_list,
+                 candidate_block_buffer=self.candidate_block_buffer,
+                 engram_layout=self.engram_layout,
++                mhc_overlap=mhc_overlap,
+             ),
+             prefix=f"{prefix}.layers",
+         )
+ 
+-        # Config flag is the switch: ROCm forces swa_cache_layer.bounded_replay off.
++        # Config flag is the switch. On ROCm, attention forces
++        # swa_cache_layer.bounded_replay off unless the CDNA version
++        # is compatible.
+         self.decoder_replay_layers: DecoderReplayLayers | None = None
+         self.decoder_replay_start = self.end_layer
+         cut = max(config.kv_source_layer_ids)
+@@ -1447,9 +1488,7 @@
+ 
+     def load_weights(self, weights: Iterable[tuple[str, torch.Tensor]]) -> set[str]:
+         loader = AutoWeightsLoader(self)
+-        loaded_params = loader.load_weights(weights, mapper=self.hf_to_vllm_mapper)
+-        self.process_weights_after_loading()
+-        return loaded_params
++        return loader.load_weights(weights, mapper=self.hf_to_vllm_mapper)
+ 
+     def process_weights_after_loading(self) -> None:
+         self.model.finalize_mega_moe_weights()
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/attention/back.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/attention/back.py
+@@ -67,6 +67,7 @@
+ )
+ from .gemv import RED, gemv_loads, gemv_mfmas, lds_row, row_sum, rows_loads, rows_store
+ from .plan import (
++    COPIES,
+     DATA,
+     HALF,
+     HEAD_DIM,
+@@ -77,9 +78,13 @@
+     ROWS,
+     WOA_ROWS,
+     Dims,
++    ardy_tiles,
+     back_scratch,
+     cdiv,
++    flag_copy,
++    flag_stride,
+     front_end,
++    on_copy,
+     tile_rows,
+     token_tiles,
+ )
+@@ -104,6 +109,7 @@
+     tp: int
+     ratio: int  # 0: window only; 1 / 2: top-k over a compressed cache
+     timeline: bool = False
++    tuned: bool = False  # a tuned build's paths (``layer.MonoBuild.tuned``)
+ 
+ 
+ def plus(t0, v):
+@@ -139,11 +145,16 @@
+ 
+ 
+ @traced
+-def publish(c, region, i):
+-    """This CTA's stores visible device-wide, then the flag pair (region, i)."""
++def publish(c, region, i, stride=0):
++    """This CTA's stores visible device-wide, then the flag pair (region, i);
++    a tuned build with ``stride``: each of its copies, ``stride`` pairs apart
++    (``plan.COPIES``; thread j stores copy j)."""
+     rocdl.s_waitcnt(vmcnt=0)
+     gpu.barrier()
+-    if c["tid"] == 0:
++    if const_expr(c["tuned"] and stride):
++        if c["tid"] < COPIES:
++            c["mb"].put(region, c["tid"] * stride + i, fx.Int32(1))
++    elif c["tid"] == 0:
+         c["mb"].put(region, i, fx.Int32(1))
+ 
+ 
+@@ -478,7 +489,11 @@
+         stamp(c, 6)
+         # partial[t][ch][head][dim] bf16: lane (r16, g) holds C rows 4 g + i ->
+         # dims 64 w + 16 g + 4 i + dt of head ht2 * 16 + r16: 32 contiguous
+-        # bytes, two 16 B stores (4 lanes fill a 128 B line)
++        # bytes, two 16 B stores (4 lanes fill a 128 B line). Tuned, whole
++        # 64 B sectors: store j of lane g takes dims 32 j + 8 g .. from lane
++        # 2 j + g // 2 of its row (its words 4 (g % 2) ..)
++        if const_expr(c["tuned"]):
++            odd = (g % 2) == 1
+         for ht2 in range_constexpr(d.head_tiles):
+             hh = ht2 * HEAD_TILE + r16
+             words = []
+@@ -488,6 +503,23 @@
+                 )
+                 w2 = v4.to(fx.BFloat16).bitcast(fx.Int32)
+                 words += [w2[0], w2[1]]
++            if const_expr(c["tuned"]):
++                row = ((t * nchunk + ch) * d.heads + hh) * HEAD_DIM + dbase
++                for j in range_constexpr(2):
++                    src = r16 + 16 * (2 * j + g // 2)
++                    out = [
++                        odd.select(
++                            lane_gather(words[4 + e], src), lane_gather(words[e], src)
++                        )
++                        for e in range(4)
++                    ]
++                    bo.buffer_store(
++                        fx.Vector.from_elements(out, fx.Int32),
++                        rsrc(c["part"]),
++                        (row + 32 * j + 8 * g) // 2,
++                        cache_modifier=CM_DEV,
++                    )
++                continue
+             off = (((t * nchunk + ch) * d.heads + hh) * HEAD_DIM + dbase + 16 * g) // 2
+ 
+             def store_part(off=off, words=words):
+@@ -610,18 +642,22 @@
+             t * (d.q_rows // 32) + (h * HEAD_DIM + d0) // 32,
+             cache_modifier=CM_DEV,
+         )
+-    publish(c, c["crdy"], t * hg_n + hg)
++    publish(c, c["crdy"], t * hg_n + hg, flag_stride(s * hg_n))
+ 
+ 
+ # ---------------------------------------------------------------- wo_a / wo_b
+ 
+ 
+ @traced
+-def stage_woa(c, task, ops, t0, n):
+-    """Rows 32 task .. of wo_a -> bf16 -> vLLM's MXFP8 of the 32 -> X8B."""
++def stage_woa(c, task, ops, t0, n, settle=False):
++    """Rows 32 task .. of wo_a -> bf16 -> vLLM's MXFP8 of the 32 -> X8B
++    (``settle``: the next token tile's rows, in flight, landed first, so this
++    tile's LDS stores do not wait behind them)."""
+     tid, red, d, lane = c["tid"], c["red"], c["d"], c["lane"]
+     split = WOA_SPLIT_K
+     gemv_mfmas(c, d.group_k, c["xl"], c["xsl"], red, ops, split, tiled=True, rows=n)
++    if const_expr(settle):
++        rocdl.s_waitcnt(vmcnt=0)
+     gpu.barrier()
+     mine = tid < WOA_ROWS * n
+     tl = fx.min(tid // WOA_ROWS, n - 1)
+@@ -670,14 +706,17 @@
+ 
+ 
+ @traced
+-def stage_wob(c, task, ops, task2, ops2, has2, t0, n, mark=False):
++def stage_wob(c, task, ops, task2, ops2, has2, t0, n, mark=False, settle=False):
+     """Rows 16 task .. (and 16 task2 .., ``has2``) of wo_b -> bf16 -> out, or
+-    (``c["wob_out"]``, the mono layer) the caller's hook with each bf16 pair."""
++    (``c["wob_out"]``, the mono layer) the caller's hook with each bf16 pair
++    (``settle``: as ``stage_woa``'s)."""
+     tid, red = c["tid"], c["red"]
+     o_rows = c["d"].o_rows
+     a = c["args"]
+     gemv_mfmas(c, o_rows, c["xl"], c["xsl"], red, ops, rows=n)
+     gemv_mfmas(c, o_rows, c["xl"], c["xsl"], red + RED, ops2, rows=n)
++    if const_expr(settle):
++        rocdl.s_waitcnt(vmcnt=0)
+     gpu.barrier()
+     if const_expr(mark):
+         stamp(c, 15)
+@@ -764,6 +803,7 @@
+         "xsl": gml.xsl.ptr,
+         "d": d,
+         "ratio": key.ratio,
++        "tuned": key.tuned,
+         "mb": Mailbox(tag),
+         "nchunk": back_plan(key)[0],
+         "sl": {"q": spl.q.ptr, "raw": spl.raw.ptr, "p": spl.p.ptr, "st": spl.st.ptr},
+@@ -869,10 +909,18 @@
+         rocdl.s_waitcnt(vmcnt=0)
+         gpu.barrier()
+     stamp(c, 8)
+-    # wo_a: every token tile of its group's XO rows, the next tile's in flight
++    # wo_a: every token tile of its group's XO rows, the next tile's in flight;
++    # tuned at some widths (``plan.ardy_tiles``) a tile once its own tokens' XO
++    # is in, its flags published at its end, wo_b taking it once every task did
++    ntiles = ardy_tiles(s, c["tuned"])
++    per_tile = ntiles > 1
++    hpc = heads // COMB_HEADS
++    ccopy = flag_copy(c, bid, flag_stride(s * hpc))
++    acopy = flag_copy(c, bid, woa_tasks * ntiles)
+     if has_woa:
+         grp = woa_t // (woa_tasks // groups)
+-        await_flags(c, c["crdy"], s, lambda u: u * (heads // COMB_HEADS) + grp)
++        n0 = tiles[0][1] if per_tile else s
++        await_flags(c, c["crdy"], n0, lambda u: on_copy(ccopy, u * hpc) + grp)
+         stamp(c, 9)
+         xo = (
+             c["xo"],
+@@ -887,18 +935,30 @@
+         regs = rows_loads(c, *xo, *tiles[0])
+         for ti in range_constexpr(len(tiles)):
+             t0, n = tiles[ti]
++            if const_expr(per_tile and ti > 0):
++                await_flags(
++                    c,
++                    c["crdy"],
++                    n,
++                    lambda u, t0=t0: on_copy(ccopy, (t0 + u) * hpc) + grp,
++                )
++                regs = rows_loads(c, *xo, t0, n)
+             rows_store(c, regs, group_k // 4, group_k // 32, c["xl"], c["xsl"], n)
+-            if const_expr(ti + 1 < len(tiles)):
++            ahead = ti + 1 < len(tiles) and not per_tile
++            if const_expr(ahead):
+                 regs = rows_loads(c, *xo, *tiles[ti + 1])
+-            stage_woa(c, woa_t, ops, t0, n)
++            stage_woa(c, woa_t, ops, t0, n, settle=c["tuned"] and ahead)
++            if const_expr(per_tile):
++                publish(c, c["ardy"], ti * woa_tasks + woa_t, woa_tasks * ntiles)
+         stamp(c, 10)
+-        publish(c, c["ardy"], woa_t)
++        if const_expr(not per_tile):
++            publish(c, c["ardy"], woa_t, woa_tasks)
+     stamp(c, 3)
+     # wo_b
+     if const_expr(not early_wob):
+         ops1, ops2 = wob_weights()
+     stamp(c, 11)
+-    await_flags(c, c["ardy"], woa_tasks, lambda u: u)
++    await_flags(c, c["ardy"], woa_tasks, lambda u: on_copy(acopy, u))
+     stamp(c, 12)
+     x8b = (
+         c["x8b"],
+@@ -913,10 +973,19 @@
+     regs = rows_loads(c, *x8b, *tiles[0])
+     for ti in range_constexpr(len(tiles)):
+         t0, n = tiles[ti]
++        if const_expr(per_tile and ti > 0):
++            await_flags(
++                c,
++                c["ardy"],
++                woa_tasks,
++                lambda u, ti=ti: on_copy(acopy, ti * woa_tasks + u),
++            )
++            regs = rows_loads(c, *x8b, t0, n)
+         rows_store(c, regs, o_rows // 4, o_rows // 32, c["xl"], c["xsl"], n)
+         if const_expr(ti == 0):
+             stamp(c, 14)
+-        if const_expr(ti + 1 < len(tiles)):
++        ahead = ti + 1 < len(tiles) and not per_tile
++        if const_expr(ahead):
+             regs = rows_loads(c, *x8b, *tiles[ti + 1])
+         stage_wob(
+             c,
+@@ -928,6 +997,7 @@
+             t0,
+             n,
+             mark=ti == 0,
++            settle=c["tuned"] and ahead,
+         )
+         if const_expr(ti == 0):
+             stamp(c, 13)
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/attention/front.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/attention/front.py
+@@ -64,6 +64,7 @@
+ )
+ from .gemv import RED, gemv_loads, gemv_mfmas, lds_row, row_sum, rows_loads, rows_store
+ from .plan import (
++    COPIES,
+     DATA,
+     EPS,
+     HALF,
+@@ -82,7 +83,10 @@
+     WQKV_KPARTS,
+     WQKV_TASKS,
+     Dims,
++    flag_copy,
++    flag_stride,
+     front_scratch,
++    on_copy,
+     tile_rows,
+     token_tiles,
+ )
+@@ -108,6 +112,7 @@
+     ratio: int  # the layer's compress ratio (0: no top-k keys)
+     timeline: bool = False
+     swa_width: int = WINDOW  # the SWA index rows' width (the DSpark draft's: wider)
++    tuned: bool = False  # a tuned build's paths (``layer.MonoBuild.tuned``)
+ 
+ 
+ def plus(t0, v):
+@@ -115,11 +120,15 @@
+ 
+ 
+ @traced
+-def publish(c, region, i):
+-    """This CTA's stores visible device-wide, then the flag pair (region, i)."""
++def publish(c, region, i, stride=0):
++    """This CTA's stores visible device-wide, then the flag pair (region, i);
++    a tuned build with ``stride``: each of its copies (``back.publish``)."""
+     rocdl.s_waitcnt(vmcnt=0)
+     gpu.barrier()
+-    if c["tid"] == 0:
++    if const_expr(c["tuned"] and stride):
++        if c["tid"] < COPIES:
++            c["mb"].put(region, c["tid"] * stride + i, fx.Int32(1))
++    elif c["tid"] == 0:
+         c["mb"].put(region, i, fx.Int32(1))
+ 
+ 
+@@ -278,11 +287,14 @@
+ 
+ 
+ @traced
+-def stage_wqkv(c, task, part, ops, t0, n, live):
++def stage_wqkv(c, task, part, ops, t0, n, live, settle=False):
+     """Rows 16 task .. of wqkv over K half ``part`` against tokens t0 .. t0 + n
+-    -> fp32 partials QKVP[part] (``live``: a CTA with a wqkv part)."""
++    -> fp32 partials QKVP[part] (``live``: a CTA with a wqkv part; ``settle``:
++    ``back.stage_woa``'s)."""
+     tid, red = c["tid"], c["red"]
+     gemv_mfmas(c, HIDDEN, c["xl"], c["xsl"], red, ops, rows=n, nsteps=KSTEPS)
++    if const_expr(settle):
++        rocdl.s_waitcnt(vmcnt=0)
+     gpu.barrier()
+     if (tid < ROWS * n) & live:
+         r = tid % ROWS
+@@ -317,18 +329,35 @@
+     jj = fx.max(jr, 0)
+     cs = is_rope.select(ld_f32(a["cos_sin"], pos * ROPE + jj), fx.Float32(1.0))
+     sn = is_rope.select(ld_f32(a["cos_sin"], pos * ROPE + HALF + jj), fx.Float32(0.0))
+-    specs = []
+-    for p in range_constexpr(2):
+-        specs += [(c["qkvp"], (p * s + t) * QKV_ROWS + qc[j], 1) for j in range(8)]
+-        specs += [
+-            (c["qkvp"], (p * s + t) * QKV_ROWS + Q_RANK + tt * 2 + j, 1)
+-            for j in range(2)
++    if const_expr(c["tuned"]):
++        # the partials as 16 B (two-pair) loads: one poll batch, one round trip
++        # (threads past the q columns read the last ones, their values unused)
++        q0 = fx.min(tt * 8, Q_RANK - 8)
++        specs = []
++        for p in range_constexpr(2):
++            r = (p * s + t) * QKV_ROWS
++            specs += [(c["qkvp"], r + q0 + 2 * m, 2) for m in range(4)]
++            specs += [(c["qkvp"], r + Q_RANK + tt * 2, 2)]
++        got = [w for pair in c["mb"].poll(specs) for w in pair]  # [p][10 words]
++        vals = [
++            bf16_round(got[j].bitcast(fx.Float32) + got[10 + j].bitcast(fx.Float32))
++            for j in range(10)
+         ]
+-    got = c["mb"].poll(specs)
+-    vals = [
+-        bf16_round(got[j][0].bitcast(fx.Float32) + got[10 + j][0].bitcast(fx.Float32))
+-        for j in range(10)
+-    ]
++    else:
++        specs = []
++        for p in range_constexpr(2):
++            specs += [(c["qkvp"], (p * s + t) * QKV_ROWS + qc[j], 1) for j in range(8)]
++            specs += [
++                (c["qkvp"], (p * s + t) * QKV_ROWS + Q_RANK + tt * 2 + j, 1)
++                for j in range(2)
++            ]
++        got = c["mb"].poll(specs)
++        vals = [
++            bf16_round(
++                got[j][0].bitcast(fx.Float32) + got[10 + j][0].bitcast(fx.Float32)
++            )
++            for j in range(10)
++        ]
+     xq = [((tt * 8 + j) < Q_RANK).select(vals[j], fx.Float32(0.0)) for j in range(8)]
+     xk = vals[8:10]
+     ssq = xq[0] * xq[0]
+@@ -391,6 +420,10 @@
+                 t * (Q_RANK // 32) + tt // 4,
+                 cache_modifier=CM_DEV,
+             )
++    if const_expr(c["tuned"]):
++        # QX8 is all wq_b waits on: its flags before the kv record (K2 reads
++        # that, past the launch boundary), whose quant and stores follow
++        publish(c, c["qrdy"], t, flag_stride(c["S"]))
+     # kv: this thread's pair (2 tt, 2 tt + 1)
+     kn = [bf16_round((xk[j] * rk) * kw[j]) for j in range(2)]
+     e0 = bf16_round(kn[0] * cs - kn[1] * sn)
+@@ -437,7 +470,8 @@
+             w1 = sb[4] | (sb[5] << 8) | (sb[6] << 16)
+             sc = base + fx.Int64(blk * DATA + soff * 8)
+             gstore(sc, fx.Vector.from_elements([w0, w1], fx.Int32), words=2)
+-    publish(c, c["qrdy"], t)
++    if const_expr(not c["tuned"]):
++        publish(c, c["qrdy"], t)
+ 
+ 
+ # ---------------------------------------------------------------- wq_b
+@@ -465,15 +499,17 @@
+ 
+ 
+ @traced
+-def stage_wqb(c, task0, bops, t0, n, rope):
++def stage_wqb(c, task0, bops, t0, n, rope, settle=False):
+     """Rows 16 (task0 + BLOCKS k) .. of the rank's H x 512 query rows, every
+     task k of the CTA: GEMVs -> bf16 -> GPT-J RoPE of a head's dims 448..
+-    (fp32) -> bf16 -> q."""
++    (fp32) -> bf16 -> q (``settle``: ``back.stage_woa``'s)."""
+     tid, red, d = c["tid"], c["red"], c["d"]
+     a = c["args"]
+     nt = len(bops)
+     for k in range_constexpr(nt):
+         gemv_mfmas(c, Q_RANK, c["qxl"], c["qxsl"], red + k * RED, bops[k], rows=n)
++    if const_expr(settle):
++        rocdl.s_waitcnt(vmcnt=0)
+     gpu.barrier()
+     per = ROWS * n // 2  # bf16 pairs a task
+     if tid < nt * per:
+@@ -538,6 +574,7 @@
+         "d": d,
+         "ratio": key.ratio,
+         "swa_width": key.swa_width,
++        "tuned": key.tuned,
+         "ldbf": lambda ptr, i: fx.Float32(
+             fx.BFloat16(bo.buffer_load(rsrc(ptr), i, vec_width=1, dtype=T.bf16))
+         ),
+@@ -564,7 +601,10 @@
+     n_wqkv = WQKV_TASKS * WQKV_KPARTS  # 224
+     assert n_wqkv <= BLOCKS
+     n_free = BLOCKS - n_wqkv  # CTAs without a wqkv part: xq, kt
+-    QKV0 = 0  # on wqkv CTAs
++    # The q / kv norms run on wqkv CTAs, their partials' wait behind the wq_b
++    # weights that are due by then anyway; tuned on the CTAs without a wqkv
++    # part, whose wq_b weights land long before the partials.
++    QKV0 = n_wqkv if key.tuned else 0
+     WQB0 = 0
+     in_cta_quant = s <= TILE and not x8_given
+     xq_stage = s > TILE and not x8_given
+@@ -576,8 +616,8 @@
+     # critical loads before its later stages' weights: a wqkv CTA its first
+     # input tile and its wqkv part, the next tiles while it quantizes, then
+     # its wq_b tasks; a CTA with a key-table task those after that work.
+-    # The q / kv norms run on wqkv CTAs, their partials' wait behind the
+-    # wq_b weights that are due by then anyway.
++    # Tuned, the wq_b weights are issued once a CTA's wqkv part is done (past
++    # one token tile): any earlier wait would also take them.
+     wqkv_unit = first_task(bid, 0)
+     has_wqkv = wqkv_unit < n_wqkv
+     task = fx.min(wqkv_unit, n_wqkv - 1) % WQKV_TASKS
+@@ -616,10 +656,12 @@
+                 )
+             rocdl.s_waitcnt(vmcnt=0)
+             gpu.barrier()
+-            if tid < xq_per:
+-                u = free + n_free * tid
++            # tuned: thread j xq_per + i copy j's flag of unit i
++            if tid < xq_per * (COPIES if key.tuned else 1):
++                u = free + n_free * (tid % xq_per if key.tuned else tid)
+                 if u < xq_units:
+-                    c["mb"].put(c["xrdy"], u, fx.Int32(1))
++                    cp = tid // xq_per * flag_stride(xq_units) if key.tuned else 0
++                    c["mb"].put(c["xrdy"], on_copy(cp, u), fx.Int32(1))
+     if const_expr(not c.get("index", False)):
+         # an index source's top-k comes after this launch: K2 builds its table
+         for t in range(is_free.select(free, fx.Int32(s)), s, n_free):
+@@ -641,6 +683,27 @@
+         bops = wqb_weights()
+         if has_wqkv:
+             stage_wqkv(c, task, part, kops, *tiles[0], has_wqkv)
++    elif const_expr(key.tuned):
++        # only a CTA with a wqkv part waits on X8 (its copy of the flags), and
++        # the wq_b weights go out past its part: loads complete in issue
++        # order, so the rows' or the wqkv weights' wait would also take them
++        if has_wqkv:
++            xcopy = flag_copy(c, bid, flag_stride(xq_units))
++            await_flags(
++                c, c["xrdy"], s, lambda u: on_copy(xcopy, WQKV_KPARTS * u) + part
++            )
++            xw = (c["x8"], c["x8s"], X_WORDS, part * KWORDS)
++            xg = (KWORDS, X_GROUPS, part * KGROUPS, KGROUPS)
++            regs = rows_loads(c, *xw, *xg, tiles[0][0], tiles[0][1], pred=has_wqkv)
++            for ti in range_constexpr(len(tiles)):
++                t0, n = tiles[ti]
++                rows_store(c, regs, KWORDS, KGROUPS, c["xl"], c["xsl"], n)
++                if const_expr(ti + 1 < len(tiles)):
++                    t1, n1 = tiles[ti + 1]
++                    regs = rows_loads(c, *xw, *xg, t1, n1, pred=has_wqkv)
++                settle = ti + 1 < len(tiles)
++                stage_wqkv(c, task, part, kops, t0, n, has_wqkv, settle=settle)
++        bops = wqb_weights()
+     else:
+         await_flags(c, c["xrdy"], s, lambda u: WQKV_KPARTS * u + part)
+         xr = (
+@@ -675,7 +738,8 @@
+     # ---- wq_b: every task's rows of a token tile at a time, the next
+     # tile's rows in flight
+     ropes = [wqb_rope(c, wqb_task, poss[ti], tiles[ti][1]) for ti in range(len(tiles))]
+-    await_flags(c, c["qrdy"], s, lambda u: u)
++    qcopy = flag_copy(c, bid, flag_stride(s))
++    await_flags(c, c["qrdy"], s, lambda u: on_copy(qcopy, u))
+     qx = (c["qx8"], c["qx8s"], QX_WORDS, 0, QX_WORDS, Q_RANK // 32, 0, Q_RANK // 32)
+     regs = rows_loads(c, *qx, *tiles[0])
+     for ti in range_constexpr(len(tiles)):
+@@ -683,5 +747,6 @@
+         rows_store(c, regs, QX_WORDS, Q_RANK // 32, c["qxl"], c["qxsl"], n)
+         if const_expr(ti + 1 < len(tiles)):
+             regs = rows_loads(c, *qx, *tiles[ti + 1])
+-        stage_wqb(c, wqb_task, bops, t0, n, ropes[ti])
++        settle = key.tuned and ti + 1 < len(tiles)
++        stage_wqb(c, wqb_task, bops, t0, n, ropes[ti], settle=settle)
+     stamp(c, 4)
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/attention/plan.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/attention/plan.py
+@@ -42,6 +42,35 @@
+ GROUPS = HEAD_DIM // COLS  # 16
+ 
+ PAIR = 8  # a mailbox (value, tag) pair
++# A tuned build (``layer.MonoBuild.tuned``) publishes the flags every CTA polls
++# (XRDY, QRDY, CRDY, ARDY) into COPIES copies on lines of their own, and CTA b
++# polls copy b % COPIES: 256 CTAs spinning on one region's lines serialize.
++COPIES = 8
++# Tuned, from this many rows at widths ending in a partial token tile: wo_a's
++# ready flags a (task, token tile), wo_b taking a tile once every task
++# published it (18 / 24 rows measured a loss).
++ARDY_MIN_S = 30
++
++
++def flag_stride(n: int) -> int:
++    """Pairs a copy of an n-flag region: whole 128 B lines."""
++    return -(-n // 16) * 16
++
++
++def flag_copy(c, bid, stride):
++    """The first pair of the flag copy CTA ``bid`` polls (generic: 0)."""
++    return bid % COPIES * stride if c["tuned"] else 0
++
++
++def on_copy(copy, i):
++    """Flag ``i`` of the copy at pair ``copy`` (``flag_copy``)."""
++    return i if isinstance(copy, int) and copy == 0 else copy + i
++
++
++def ardy_tiles(s: int, tuned: bool = False) -> int:
++    """Token tiles wo_a publishes ready flags for (1: one flag a task)."""
++    nt = len(token_tiles(s))
++    return nt if tuned and nt > 1 and s >= ARDY_MIN_S and s % TILE != 0 else 1
+ 
+ 
+ def cdiv(a, b):
+@@ -137,29 +166,33 @@
+     return out
+ 
+ 
+-def front_scratch(s: int, d: Dims) -> dict:
++def front_scratch(s: int, d: Dims, tuned: bool = False) -> dict:
+     """K1's scratch regions -> (byte offset, bytes): published data (plain
+-    words behind a flag) and mailbox pairs."""
++    words behind a flag) and mailbox pairs (``tuned``: the polled flags'
++    copies)."""
++    xrdy = WQKV_KPARTS * s  # a flag a (token, K half)
+     return byte_layout(
+         [
+             ("x8", s * HIDDEN),  # e4m3 words (S > 16: quantized once, shared)
+             ("x8s", s * HIDDEN // 32 * 4),  # an i32 code a group
+-            ("xrdy", WQKV_KPARTS * s * PAIR),  # a flag a (token, K half)
++            ("xrdy", (COPIES * flag_stride(xrdy) if tuned else xrdy) * PAIR),
+             ("qkvp", WQKV_KPARTS * s * QKV_ROWS * PAIR),
+             ("qx8", s * Q_RANK),  # e4m3 words
+             ("qx8s", s * Q_RANK // 32 * 4),  # an i32 code a group
+-            ("qrdy", s * PAIR),
++            ("qrdy", (COPIES * flag_stride(s) if tuned else s) * PAIR),
+         ]
+     )
+ 
+ 
+-def back_scratch(s: int, d: Dims, start: int = 0) -> dict:
++def back_scratch(s: int, d: Dims, start: int = 0, tuned: bool = False) -> dict:
+     """K2's scratch regions, laid out past ``start``: published data (plain)
+-    and flag pairs."""
++    and flag pairs (``tuned``: the polled flags' copies)."""
+     ck = (
+         64 if GFX942 or (d.head_tiles == 2 and s * cdiv(KEYS, 64) <= 256) else 128
+     )  # back.chunk_keys
+     nchunk = cdiv(KEYS, ck)
++    crdy = s * d.heads // 8
++    ardy = (COPIES * ardy_tiles(s, True) if tuned else 1) * d.woa_tasks
+     return byte_layout(
+         [
+             ("part", s * nchunk * d.heads * HEAD_DIM * 2),  # bf16 partials
+@@ -167,10 +200,10 @@
+             ("srdy", s * nchunk * PAIR),
+             ("xo", s * d.q_rows),  # e4m3 words
+             ("xos", s * d.q_rows // 32 * 4),  # an i32 code a group
+-            ("crdy", s * d.heads // 8 * PAIR),
++            ("crdy", (COPIES * flag_stride(crdy) if tuned else crdy) * PAIR),
+             ("x8b", s * d.o_rows),
+             ("x8bs", s * d.o_rows // 32 * 4),
+-            ("ardy", d.woa_tasks * PAIR),
++            ("ardy", ardy * PAIR),
+         ],
+         start=start,
+     )
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/common/mx.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/common/mx.py
+@@ -15,7 +15,7 @@
+ from flydsl.expr.typing import T
+ 
+ from vllm.models.deepseek_v41.amd.mono.common.arch import GFX942
+-from vllm.models.deepseek_v41.amd.mono.common.ops import CM_NT
++from vllm.models.deepseek_v41.amd.mono.common.ops import CM_NT, rsrc
+ 
+ # gfx942 quantizes to FNUZ with 224: the same bytes as OCP with 448 and a scale
+ # code one higher (common/gfx942.py).
+@@ -46,23 +46,58 @@
+     return ((254 - code) << 23).bitcast(fx.Float32)
+ 
+ 
+-def scale_index(row, col, cols):
++def scale_index(row, col, cols, sm=False):
+     """Byte of e8m0 scale (row, col) in aiter's ``shuffle_scale`` layout:
+-    ``view(rows/32, 2, 16, cols/8, 2, 4).permute(0, 3, 5, 2, 4, 1)``."""
+-    r32, a, b = row // 32, (row // 16) % 2, row % 16
+-    c8, d, e = col // 8, (col // 4) % 2, col % 4
++    ``view(rows/32, 2, 16, cols/8, 2, 4).permute(0, 3, 5, 2, 4, 1)`` (``sm``:
++    in shifts and masks, ``udiv``)."""
++    r32, a, b = udiv(row, 32, sm), umod(udiv(row, 16, sm), 2, sm), umod(row, 16, sm)
++    c8, d, e = udiv(col, 8, sm), umod(udiv(col, 4, sm), 2, sm), umod(col, 4, sm)
+     return ((((r32 * (cols // 8) + c8) * 4 + e) * 16 + b) * 2 + d) * 2 + a
+ 
+ 
+-def fp4_tile_load(r_w, base, rg, k, st, at):
++def udiv(x, d, unsigned=True):
++    """``x // d`` by a constant ``d > 0`` as a shift (``d`` a power of two, any
++    sign) or an unsigned division (``x >= 0``), where a traced ``//`` is a
++    signed floor division with its fix-ups. ``unsigned`` false: ``//``."""
++    if isinstance(x, int) or not unsigned:
++        return x // d
++    if d & (d - 1) == 0:
++        return x >> (d.bit_length() - 1)
++    return fx.Int32(fx.Uint32(x) // d)
++
++
++def umod(x, d, unsigned=True):
++    """``x % d`` as a mask or an unsigned remainder (``udiv``)."""
++    if isinstance(x, int) or not unsigned:
++        return x % d
++    if d & (d - 1) == 0:
++        return x & (d - 1)
++    return fx.Int32(fx.Uint32(x) % d)
++
++
++# a load with ``live`` false (``oob``) reads past this many bytes of its buffer
++# (``oob_rsrc``): out of range, no memory traffic, zeros never used
++OOB_RECORDS = 0x60000000
++OOB_DWORD = 0x1C000000
++
++
++def oob(live, i):
++    return i if live is None else live.select(i, fx.Int32(OOB_DWORD))
++
++
++def oob_rsrc(addr, live):
++    return rsrc(addr) if live is None else rsrc(addr, OOB_RECORDS)
++
++
++def fp4_tile_load(r_w, base, rg, k, st, at, live=None):
+     """A lane's 16 B of an FP4 weight's (16, 16)-shuffled 16-row group ``rg``
+     (K = ``k``) at 128-k step ``st``: dword ``base`` + the group's 2 k + 256 a
+     step + ``at`` (``lane * 4``: 32 fp4, K block lane / 16 of row lane % 16).
+-    Nontemporal: a weight a step reads once."""
++    Nontemporal: a weight a step reads once. ``live``: ``oob``."""
+     return fx.Vector(
+         bo.buffer_load(
+             r_w,
+-            base + rg * (2 * k) + st * 256 + at,
++            oob(live, base + rg * (2 * k) + st * 256 + at),
+             vec_width=4,
+             dtype=T.i32,
+             cache_modifier=CM_NT,
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/layer.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/layer.py
+@@ -34,10 +34,19 @@
+     memrealtime,
+     rsrc,
+ )
+-from .attention.plan import HIDDEN, WINDOW, Dims, back_scratch, front_scratch
++from .attention.plan import (
++    COPIES,
++    HIDDEN,
++    WINDOW,
++    Dims,
++    back_scratch,
++    flag_stride,
++    front_scratch,
++)
++from .common.arch import GFX942
+ from .common.mx import clamp_fp8
+-from .common.ops import butterfly, fp8_pack4, peer_bases, traced
+-from .common.plan import WAVES, first_task, key_tuple
++from .common.ops import bf16_pair, butterfly, fp8_pack4, peer_bases, traced
++from .common.plan import first_task, key_tuple
+ from .common.sync import Mailbox, preg, publish, sreg
+ from .sources import SOURCES
+ from .stages import moe, seam
+@@ -89,6 +98,24 @@
+     topk: int = TOPK
+     ug_groups: int = 2
+     swa_width: int = WINDOW
++    # the generic code where the tuned paths would apply (the tests' reference)
++    generic: bool = False
++
++    @property
++    def tuned(self) -> bool:
++        """A target layer of compress ratio 2 at TP2 on gfx950: its tuned paths
++        are on (bit-exact against the generic ones), every other build compiles
++        the generic code. Its scratch layout is its own (``scratch_layout``)."""
++        return (
++            not GFX942
++            and not self.generic
++            and self.tp == 2
++            and self.ratio == 2
++            and (self.experts, self.topk, self.ug_groups, self.swa_width)
++            == (EXPERTS, TOPK, 2, WINDOW)
++            # the shared offload needs that many CTAs (``moe.DSH_RANKS``)
++            and moe.DSH_RANKS <= BLOCKS
++        )
+ 
+ 
+ def _moe_key(key: MonoBuild) -> MoeBuild:
+@@ -98,6 +125,7 @@
+         topk=key.topk,
+         tp=key.tp,
+         ug_groups=key.ug_groups,
++        tuned=key.tuned,
+     )
+ 
+ 
+@@ -113,7 +141,7 @@
+ 
+ def _front_key(key: MonoBuild):
+     return mb_front.FrontBuild(
+-        key.tokens, key.tp, key.ratio, key.timeline, key.swa_width
++        key.tokens, key.tp, key.ratio, key.timeline, key.swa_width, key.tuned
+     )
+ 
+ 
+@@ -132,11 +160,16 @@
+ 
+ 
+ def _back_key(key: MonoBuild):
+-    return mb_back.BackBuild(key.tokens, key.tp, key.ratio, key.timeline)
++    return mb_back.BackBuild(key.tokens, key.tp, key.ratio, key.timeline, key.tuned)
+ 
+ 
+ def scratch_layout(
+-    s: int, tp: int, experts: int = EXPERTS, topk: int = TOPK, ug_groups: int = 2
++    s: int,
++    tp: int,
++    experts: int = EXPERTS,
++    topk: int = TOPK,
++    ug_groups: int = 2,
++    tuned: bool = False,
+ ) -> dict:
+     """Every region of step width s's launches -> (byte offset, bytes), disjoint:
+     K1's front and seam, K2's back, the MoE's regions, the normed rows and their
+@@ -145,7 +178,9 @@
+     which a poll may take for a current tag. The MoE's counters, whose slots
+     outlive a step width, are in the epoch buffer. The MoE regions follow the
+     runner's routing and FP4 groups of an ug task: with one group a task (the
+-    DSpark draft's runner) the ug flags take twice the room of two groups."""
++    DSpark draft's runner) the ug flags take twice the room of two groups.
++    ``tuned``: a tuned build's layout (``MonoBuild.tuned``), in a scratch of its
++    own."""
+     d = Dims(tp)
+     out: dict = {}
+     off = 0
+@@ -159,12 +194,13 @@
+         off = max(off, base + max(o + n for o, n in regions.values()))
+         off = -(-off // 256) * 256
+ 
+-    place(front_scratch(s, d))
++    place(front_scratch(s, d, tuned))
+     place(seam.scratch_layout(s))
+-    place(back_scratch(s, d, start=0))
+-    regions = moe.scratch_layout(
+-        _moe_key(MonoBuild(s, tp, 1, experts=experts, topk=topk, ug_groups=ug_groups))
+-    ).items()
++    place(back_scratch(s, d, start=0, tuned=tuned))
++    mkey = MoeBuild(
++        tokens=s, experts=experts, topk=topk, tp=tp, ug_groups=ug_groups, tuned=tuned
++    )
++    regions = moe.scratch_layout(mkey).items()
+     mr = {n: v for n, v in regions if n not in COUNTERS}
+     lo = min(o for o, _ in mr.values())
+     place({n: (o - lo, n_) for n, (o, n_) in mr.items()})
+@@ -179,8 +215,9 @@
+     experts: int = EXPERTS,
+     topk: int = TOPK,
+     ug_groups: int = 2,
++    tuned: bool = False,
+ ) -> int:
+-    layout = scratch_layout(s, tp, experts, topk, ug_groups)
++    layout = scratch_layout(s, tp, experts, topk, ug_groups, tuned)
+     return max(o + n for o, n in layout.values())
+ 
+ 
+@@ -226,7 +263,12 @@
+     """Token t's two XRDY flags (one a wqkv K half) once its X8 / X8S landed."""
+     rocdl.s_waitcnt(vmcnt=0)
+     gpu.barrier()
+-    if c["tid"] < 2:
++    if const_expr(c["tuned"]):
++        # every copy (``plan.COPIES``): thread 2 j + h copy j's flag of half h
++        if c["tid"] < 2 * COPIES:
++            at = c["tid"] // 2 * flag_stride(2 * c["S"]) + 2 * t + c["tid"] % 2
++            c["mb"].put(c["xrdy"], at, fx.Int32(1))
++    elif c["tid"] < 2:
+         c["mb"].put(c["xrdy"], 2 * t + c["tid"], fx.Int32(1))
+     gpu.barrier()
+ 
+@@ -234,16 +276,21 @@
+ def build_mono_k1(key: MonoBuild):
+     s, tp = key.tokens, key.tp
+     assert 1 <= s <= MAX_TOKENS
+-    layout = scratch_layout(s, tp, key.experts, key.topk, key.ug_groups)
++    layout = scratch_layout(s, tp, key.experts, key.topk, key.ug_groups, key.tuned)
+     fkey = _front_key(key)
+     FrontLds = mb_front.front_lds(s, Dims(tp))
+     NORM0 = SLICES  # the norms on the CTAs past the slices: the wqkv waits on them
+     GATE0 = SLICES + s
++    n_wqkv = mb_front.WQKV_TASKS * mb_front.WQKV_KPARTS
++    if key.tuned and n_wqkv + 2 * s <= BLOCKS:
++        # the gates on CTAs without a wqkv part (past the front's key-table /
++        # qkv CTAs) while they fit: on a wqkv CTA a gate holds up its partials
++        GATE0 = n_wqkv + s
+     assert GATE0 + s <= BLOCKS
+ 
+     @fx.struct
+     class SeamLds:
+-        red: fx.Array[fx.Float32, WAVES * 2 * 64 * 4, 16]
++        red: fx.Array[fx.Float32, seam.red_words(s, key.tuned), 16]
+         rl: fx.Array[fx.Float32, s * seam.KT, 16]
+         fl: fx.Array[fx.Float32, seam.MIX * seam.KT, 16]
+ 
+@@ -340,7 +387,7 @@
+             "klen": klen,
+             "qr_out": qr_out,
+         }
+-        flayout = {n: layout[n] for n in front_scratch(s, Dims(tp))}
++        flayout = {n: layout[n] for n in front_scratch(s, Dims(tp), key.tuned)}
+         c = mb_front.front_context(fkey, lds.front.peek(), fargs, scratch, tag, flayout)
+         c["index"] = key.index
+         amb = Mailbox(tag)
+@@ -375,6 +422,7 @@
+             },
+             "d": StageDims(tp),
+             "fold": key.fold,
++            "tuned": key.tuned,
+         }
+         for region in ("lin", "pmix"):
+             ca[region] = sreg(scratch, layout[region][0], region)
+@@ -383,13 +431,18 @@
+ 
+         def seam_slice():
+             for task in range(first_task(bid, 0), SLICES, BLOCKS):
+-                seam.stage_slice(ca, task)
++                if const_expr(key.tuned and key.fold):
++                    # the fold and the slice fused, a thread's columns in
++                    # registers throughout
++                    seam.stage_reduce_slice(ca, task, reduce=False)
++                else:
++                    seam.stage_slice(ca, task)
+             gpu.barrier()
+ 
+         def store(*v):
+             store_x8(c, *v)
+             if const_expr(key.index):
+-                store_normed(normed_out, *v)
++                store_normed(normed_out, *v, wide=key.tuned)
+ 
+         def seam_rest():
+             for t in range(first_task(bid, NORM0), s, BLOCKS):
+@@ -498,10 +551,22 @@
+ 
+ 
+ @traced
+-def store_normed(normed, t, col, ys, live):
++def store_normed(normed, t, col, ys, live, wide=False):
+     """The FFN seam's norm output -> the MoE input row (bf16, device scope:
+-    this launch reads it)."""
+-    if live:
++    this launch reads it). ``wide``: the 8 values as one 16-byte store (a store
++    each kept the publish's drain behind 24 of them)."""
++    if const_expr(wide):  # noqa: SIM102 (a build-time and a run-time test)
++        if live:
++            words = [
++                bf16_pair(ys[2 * j], ys[2 * j + 1]).bitcast(fx.Int32) for j in range(4)
++            ]
++            bo.buffer_store(
++                fx.Vector.from_elements(words, fx.Int32),
++                rsrc(normed),
++                (t * HIDDEN + col) // 2,
++                cache_modifier=CM_DEV,
++            )
++    elif live:
+         for j in range_constexpr(8):
+             bo.buffer_store(
+                 ys[j].to(fx.BFloat16),
+@@ -511,10 +576,11 @@
+             )
+ 
+ 
+-def _seam_lds(s):
++def _seam_lds(s, tuned=False):
+     @fx.struct
+     class SeamLds:
+-        red: fx.Array[fx.Float32, WAVES * 2 * 64 * 4, 16]
++        # a token tile's mix partials, tuned every tile's (``seam.slice_mix_all``)
++        red: fx.Array[fx.Float32, seam.red_words(s, tuned), 16]
+         rl: fx.Array[fx.Float32, s * seam.KT, 16]
+         fl: fx.Array[fx.Float32, seam.MIX * seam.KT, 16]
+         pl: fx.Array[fx.Float32, s * seam.COLS, 16]
+@@ -538,7 +604,7 @@
+     # the target's runner, also for a gfx942 draft layer, so it reads the
+     # target's layout.
+     if const_expr(part is None):
+-        layout = scratch_layout(s, tp, key.experts, key.topk, key.ug_groups)
++        layout = scratch_layout(s, tp, key.experts, key.topk, key.ug_groups, key.tuned)
+     else:
+         layout = scratch_layout(s, tp)
+     mkey = _moe_key(key)
+@@ -590,6 +656,7 @@
+         "fl": sl.fl.ptr,
+         "red": sl.red.ptr,
+         "pend_lds": sl.pl.ptr,
++        "tuned": key.tuned,
+         "put": amb.put,
+         "put_bf": amb.put_bf,
+         "put_words": amb.put_words,
+@@ -631,6 +698,7 @@
+         s, rs, lds.moe.peek(), amb, bases, mlayout, scratch, margs, rank, own
+     )
+     cb["x_cm"], cb["x_ready"] = CM_DEV, True
++    cb["push_bases"] = a.get("push_bases") if tp == 4 else None
+     cb["tag"] = ep & 255
+     for i, region in enumerate(COUNTERS):
+         cb[region] = sreg(a["epoch"], 4 * (EPOCH_COUNTERS + i * moe.TAGS), region)
+@@ -638,18 +706,42 @@
+     # attention, so it stamps its own start here.
+     if const_expr(part is not None):
+         mark(0)
+-    for task in range(first_task(bid, 0), SLICES, BLOCKS):
+-        if const_expr(part is not None):
+-            seam.stage_push(ca, task, part)
+-        seam.stage_reduce(ca, task)
+-        seam.stage_slice(ca, task)
+-    mark(K2_SEAM_POINT)
+-    for t in range(first_task(bid, GATE0), s, BLOCKS):
+-        seam.stage_gate(ca, t)
+-    mark(K2_SEAM_POINT + 1)
+-    for t in range(first_task(bid, NORM0), s, BLOCKS):
+-        seam.stage_norm(ca, t, lambda *v: store_normed(normed, *v))
+-        publish(cb["put"], cb["xrdy"], t, 1, tid == 0)
++    if const_expr(key.tuned):
++        # reduce and slice fused, then the norms (the MoE waits on them), then
++        # the gates, whose outputs nothing in this launch waits on: past one
++        # router group on the route CTAs after the route (``after_route``)
++        for task in range(first_task(bid, 0), SLICES, BLOCKS):
++            if const_expr(part is not None):
++                seam.stage_push(ca, task, part)
++            seam.stage_reduce_slice(ca, task)
++        mark(K2_SEAM_POINT)
++        for t in range(first_task(bid, NORM0), s, BLOCKS):
++            seam.stage_norm(
++                ca,
++                t,
++                lambda *v: store_normed(normed, *v, wide=True),
++                tail_barrier=False,
++            )
++            publish(cb["put"], cb["xrdy"], t, 1, tid == 0)
++        mark(K2_SEAM_POINT + 1)
++        if const_expr(rs.router_groups[0] > 1):
++            cb["after_route"] = lambda t: seam.stage_gate(ca, t)
++        else:
++            for t in range(first_task(bid, GATE0), s, BLOCKS):
++                seam.stage_gate(ca, t)
++    else:
++        for task in range(first_task(bid, 0), SLICES, BLOCKS):
++            if const_expr(part is not None):
++                seam.stage_push(ca, task, part)
++            seam.stage_reduce(ca, task)
++            seam.stage_slice(ca, task)
++        mark(K2_SEAM_POINT)
++        for t in range(first_task(bid, GATE0), s, BLOCKS):
++            seam.stage_gate(ca, t)
++        mark(K2_SEAM_POINT + 1)
++        for t in range(first_task(bid, NORM0), s, BLOCKS):
++            seam.stage_norm(ca, t, lambda *v: store_normed(normed, *v))
++            publish(cb["put"], cb["xrdy"], t, 1, tid == 0)
+     gpu.barrier()
+     mark(K2_SEAM_POINT + 2)
+ 
+@@ -671,7 +763,7 @@
+ def build_mono_k2(key: MonoBuild):
+     s, tp = key.tokens, key.tp
+     assert 1 <= s <= MAX_TOKENS
+-    layout = scratch_layout(s, tp, key.experts, key.topk, key.ug_groups)
++    layout = scratch_layout(s, tp, key.experts, key.topk, key.ug_groups, key.tuned)
+     bkey = _back_key(key)
+     mkey = _moe_key(key)
+     rs = route_shape(mkey)
+@@ -681,7 +773,7 @@
+     MoeLds = moe.moe_smem(s, rs, False)
+     half = peer_half_bytes(tp)
+     assert SLICES + 2 * s <= BLOCKS
+-    SeamLds = _seam_lds(s)
++    SeamLds = _seam_lds(s, key.tuned)
+ 
+     @fx.union
+     class K2Lds:
+@@ -788,7 +880,9 @@
+             "out_stride": 0,
+             "zrec": zrec,
+         }
+-        blayout = {n: layout[n] for n in back_scratch(s, Dims(tp), start=0)}
++        blayout = {
++            n: layout[n] for n in back_scratch(s, Dims(tp), start=0, tuned=key.tuned)
++        }
+         views = {"split": lds.split.peek(), "gemv": lds.gemv.peek()}
+         c = mb_back.back_context(bkey, views, bargs, scratch, tag, blayout)
+         amb = Mailbox(tag)
+@@ -859,6 +953,7 @@
+             out=out,
+             scratch=scratch,
+             epoch=epoch,
++            push_bases=lambda: [b + par for b in peer_bases(peers, tp)],
+         )
+         run_ffn(
+             key, lds, ffn, amb, bases, own, rank, ep, tl=tl if key.timeline else None
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/runner.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/runner.py
+@@ -196,6 +196,7 @@
+         topk: int = TOPK,
+         ug_groups: int = 2,
+         swa_width: int = WINDOW,
++        generic: bool = False,
+     ):
+         _ensure_writable_flydsl_cache()
+         from .common.peer_memory import PeerBuffer
+@@ -215,9 +216,10 @@
+         # rows) or the DSpark draft's, which has a runner of its own
+         self.experts, self.topk, self.ug_groups = experts, topk, ug_groups
+         self.swa_width = swa_width
++        self.generic = generic  # every build generic (``MonoBuild.generic``)
+         self.d = Dims(tp)
+         dev = self.device = torch.device(device)
+-        self._scratch: dict[int, torch.Tensor] = {}
++        self._scratch: dict[tuple[int, bool], torch.Tensor] = {}
+         # [epoch, -, -, -, a mark per CTA, the MoE's counters]
+         self.epoch = torch.zeros(EPOCH_WORDS, dtype=torch.int32, device=dev)
+         self.q = torch.zeros(
+@@ -248,12 +250,14 @@
+             .item()
+         )
+         self._kernels: dict = {}
+-
+-    def scratch(self, tokens: int) -> torch.Tensor:
++        self._tuned_flags: dict = {}  # (width, ratio) -> ``MonoBuild.tuned``
++
++    def scratch(self, tokens: int, tuned: bool = False) -> torch.Tensor:
+         """Step width ``tokens``'s scratch: a width's layout has memory of its own
+-        (``layer.scratch_layout``). Allocated at the width's first step, which is
+-        eager: vLLM runs every graph's batch eagerly before capturing it."""
+-        buf = self._scratch.get(tokens)
++        (``layer.scratch_layout``), and so has a tuned build's. Allocated at the
++        width's first step, which is eager: vLLM runs every graph's batch
++        eagerly before capturing it."""
++        buf = self._scratch.get((tokens, tuned))
+         if buf is None:
+             if torch.cuda.is_current_stream_capturing():
+                 raise RuntimeError(
+@@ -261,11 +265,13 @@
+                     "a CUDA graph capture"
+                 )
+             buf = torch.zeros(
+-                scratch_bytes(tokens, self.tp, self.experts, self.topk, self.ug_groups),
++                scratch_bytes(
++                    tokens, self.tp, self.experts, self.topk, self.ug_groups, tuned
++                ),
+                 dtype=torch.uint8,
+                 device=self.device,
+             )
+-            self._scratch[tokens] = buf
++            self._scratch[(tokens, tuned)] = buf
+         return buf
+ 
+     def first_pre_mix(self, tokens: int) -> torch.Tensor:
+@@ -274,6 +280,24 @@
+     @staticmethod
+     def supports(tokens: int) -> bool:
+         return 1 <= tokens <= MAX_TOKENS
++
++    def tuned(self, tokens: int, ratio: int) -> bool:
++        """Whether this runner's layer builds are tuned (``MonoBuild.tuned``),
++        looked up once per (width, ratio) and cached: ``forward`` calls it on
++        every step, the runners that are never tuned included."""
++        key = (tokens, ratio)
++        if key not in self._tuned_flags:
++            self._tuned_flags[key] = MonoBuild(
++                tokens,
++                self.tp,
++                ratio,
++                experts=self.experts,
++                topk=self.topk,
++                ug_groups=self.ug_groups,
++                swa_width=self.swa_width,
++                generic=self.generic,
++            ).tuned
++        return self._tuned_flags[key]
+ 
+     def kernels(self, tokens: int, ratio: int, fold: bool = True, index: bool = False):
+         key = (tokens, ratio, fold, index)
+@@ -289,6 +313,7 @@
+                 topk=self.topk,
+                 ug_groups=self.ug_groups,
+                 swa_width=self.swa_width,
++                generic=self.generic,
+             )
+             # On gfx942, keylist.launch writes an index source's keys between
+             # vLLM's indexer and K2 (forward), so its K2 is the one without
+@@ -356,6 +381,7 @@
+         index = select is not None
+         assert not index or ratio
+         k1, k2 = self.kernels(M, ratio, fold, index)
++        scratch = self.scratch(M, self.tuned(M, ratio))
+         st = torch.cuda.current_stream()
+         if outs is None:
+             outs = self._outs(M, residual)
+@@ -427,7 +453,7 @@
+             self.klen.data_ptr(),
+             self.normed.data_ptr(),
+             self.qr.data_ptr(),
+-            self.scratch(M).data_ptr(),
++            scratch.data_ptr(),
+             self.epoch.data_ptr(),
+             self.tl1.data_ptr() if self.timeline else 0,
+             st,
+@@ -503,7 +529,7 @@
+             w.sw2.data_ptr(),
+             w.sw2_s.data_ptr(),
+             out.data_ptr(),
+-            self.scratch(M).data_ptr(),
++            scratch.data_ptr(),
+             self.peer.local,
+             self.peer.addresses.data_ptr(),
+             self.rank,
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/stages/gemv.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/stages/gemv.py
+@@ -50,6 +50,13 @@
+     return fx.Float32(
+         fx.BFloat16(bo.buffer_load(rsrc(ptr), i, vec_width=1, dtype=T.bf16))
+     )
++
++
++def ld_vec(ptr, i, n, f32=False, cm=0):
++    """``n`` 32-bit elements (i32, or ``f32``) of ``ptr`` from element ``i``."""
++    dtype = T.f32 if f32 else T.i32
++    v = bo.buffer_load(rsrc(ptr), i, vec_width=n, dtype=dtype, cache_modifier=cm)
++    return fx.Vector(v) if n > 1 else v
+ 
+ 
+ def token_tiles(s):
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/stages/moe.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/stages/moe.py
+@@ -65,8 +65,12 @@
+     code_ceil,
+     fp4_tile_load,
+     mfma_scaled,
++    oob,
++    oob_rsrc,
+     rcp_pow2,
+     scale_index,
++    udiv,
++    umod,
+ )
+ from vllm.models.deepseek_v41.amd.mono.common.ops import (
+     CM_DEV,
+@@ -90,6 +94,7 @@
+     rsrc,
+     sum_partials,
+     traced,
++    uniform,
+ )
+ from vllm.models.deepseek_v41.amd.mono.common.ops import stamp as stamp_lds
+ from vllm.models.deepseek_v41.amd.mono.common.plan import (
+@@ -112,6 +117,7 @@
+     gemv_fp8_loads,
+     gemv_fp8_mfmas,
+     ld_f32,
++    ld_vec,
+     lds_row,
+     lds_tail,
+     plus,
+@@ -144,6 +150,16 @@
+ DOWN_R_MAX = 2
+ # a down slot's K steps on this many independent MFMA accumulators
+ DOWN_CHAINS = 2
++DOWN_PIPE_PICKS = 72
++# tuned, past DOWN_PIPE_PICKS: a CTA of this many down tasks pipelines its rounds
++# through LDS (``down_rounds_pipe``)
++DOWN_PIPE_N = (2,)
++# tuned: the shared down rows of the two-task CTAs' tiles are computed by the
++# next one-task CTAs to arrive and handed over through SDX (``dsh_offload``)
++DSH_UNITS = 2 * (DOWN_TASKS - BLOCKS)
++# the CTAs it needs: arrival ranks 0 .. DSH_RANKS - 1 (two-task CTAs, then the
++# units' CTAs and the helpers they wait on)
++DSH_RANKS = 3 * (DOWN_TASKS - BLOCKS)
+ # a reduce task's columns: at 128 a thread polled 6 pairs at 48 rows, each
+ # pass a round trip in series (32: 1-2 passes, S=48 -1 us)
+ RED_COLS = 32
+@@ -224,6 +240,11 @@
+         # the down stage's arrival count, a word a tag (``take_down_rank``)
+         "dq": TAGS // 2,
+     }
++    if key.tuned:
++        # an offloaded shared down unit's rows, [unit][token][16 rows], and
++        # each two-task CTA's own tile by its rank (``dsh_offload``)
++        pairs["sdx"] = DSH_UNITS * tokens * ROWS
++        pairs["dpb"] = DOWN_TASKS - BLOCKS
+     return pair_layout(pairs.items())
+ 
+ 
+@@ -344,8 +365,19 @@
+ 
+ 
+ # ---------------------------------------------------------------- router
+-@traced
+-def stage_router(c, task):
++def router_task_weights(c, task):
++    """``stage_router``'s weight operands of task ``task``: loads only, issued
++    before the x wait (the gate weight needs nothing of this step)."""
++    experts = c["rs"].experts
++    per_group = experts // ROWS * ROUTER_PARTS
++    tile, part = task % per_group // ROUTER_PARTS, task % ROUTER_PARTS
++    return router_weight_loads(
++        c["args"]["gate_w"], tile, part, c["lane"], c["wave"], CM_NT
++    )
++
++
++@traced
++def stage_router(c, task, wvs=None):
+     """Router task (token group, row tile, K part): K part ``part`` of rows
+     16 ``tile`` .. of the bf16 gate weight [experts, 5120] times the group's
+     tokens (``RouteShape.router_groups``), a token tile at a time -- the
+@@ -371,7 +403,8 @@
+         )
+         for j0 in range(0, per, TILE)
+     ]
+-    wvs = router_weight_loads(a["gate_w"], tile, part, lane, wave, CM_NT)
++    if const_expr(wvs is None):
++        wvs = router_weight_loads(a["gate_w"], tile, part, lane, wave, CM_NT)
+     xs = [router_x_loads(a["x"], part, n, lane, wave, c["x_cm"], t0) for t0, n in tiles]
+     for (t0, n), xvs in zip(tiles, xs):
+         router_tile_mfma(wvs, xvs, lane, wave, red)
+@@ -411,6 +444,9 @@
+     a = c["args"]
+     if wave == 0:
+         ept = experts // 64
++        if const_expr(c["rs"].tuned):
++            # the bias in flight before the logits' wait
++            bias = [ld_f32(a["bias"], lane + 64 * i) for i in range(ept)]
+         # each logit's router part sums, added in part order (vLLM's gate: f32 out)
+         assert ROUTER_PARTS == 4
+         got = c["poll"](
+@@ -434,7 +470,8 @@
+             sc = _score(logits[i])
+             # aiter's NaN guards: a NaN score weighs 0 and never wins
+             orig.append(fx.Float32(fx.isnan(sc).select(fx.Float32(0.0), sc)))
+-            val = fx.max(sc + ld_f32(a["bias"], e), neg)
++            b = bias[i] if c["rs"].tuned else ld_f32(a["bias"], e)
++            val = fx.max(sc + b, neg)
+             vals.append(fx.isnan(val).select(neg, val))
+             idxs.append(fx.Int32(e))
+         for p, q in c["rs"].sort_net:
+@@ -613,7 +650,7 @@
+ 
+ 
+ @traced
+-def stage_shared(c, task, gops, t0, n):
++def stage_shared(c, task, gops, t0, n, uops=None):
+     """Gate rows 16 task .. (weights ``gops``), up rows 576 + 16 task .. against
+     tokens t0 .. t0 + n (their x in LDS; ``n`` traced: a tile a CTA picks at run
+     time) -> bf16 -> silu x up -> SMID; an odd task then quantizes its group of
+@@ -627,9 +664,10 @@
+     if tid < ROWS * n:
+         gate = row_sum(red, tid % ROWS, tid // ROWS)
+     gpu.barrier()
+-    uops = gemv_fp8_loads(
+-        c, a["sgu"], a["sgu_s"], HIDDEN, d.shared_tasks + task, row_major=True
+-    )
++    if const_expr(uops is None):
++        uops = gemv_fp8_loads(
++            c, a["sgu"], a["sgu_s"], HIDDEN, d.shared_tasks + task, row_major=True
++        )
+     gemv_fp8_mfmas(c, HIDDEN, c["xl"], c["xsl"], red, uops, rows=rows)
+     gpu.barrier()
+     if tid < ROWS * n:
+@@ -685,6 +723,7 @@
+     a task share x, so a wave a tile over all of K read it once a tile.
+     """
+     lane, wave = c["lane"], c["wave"]
++    tuned = c["rs"].tuned
+     sl = c["wsl"] + wave * wsl_words(c["d"])
+     slices = c["rs"].ug_k_slices
+     rounds = ug_rounds(k, ks, slices)
+@@ -705,9 +744,13 @@
+                 lds_u8(
+                     sl,
+                     scale_index(
+-                        t * 16 + lane % 16, (st0 + i) * 4 + lane // 16, scale_cols
++                        t * 16 + lane % 16,
++                        (st0 + i) * 4 + lane // 16,
++                        scale_cols,
++                        tuned,
+                     )
+                     - 128 * sc0,
++                    tuned,
+                 )
+                 for i in range(n)
+             ]
+@@ -752,7 +795,7 @@
+     a lane) and both tiles' weight operands of steps st0 .. st0 + n. Loads
+     only."""
+     lane = c["lane"]
+-    block = (e * n_rows + rg0 * 16) // 32 * (scale_cols * 8)
++    block = udiv(e * n_rows + rg0 * 16, 32, c["rs"].tuned) * (scale_cols * 8)
+     words = sc_steps // 2
+     sv = bo.buffer_load(
+         rsrc(ws),
+@@ -765,7 +808,7 @@
+     return sv, [fp4_tile_weights(c, w, e, n_rows, k, rg0 + t, st0, n) for t in range(2)]
+ 
+ 
+-def scale_block_loads(c, ws, first_row, scale_cols):
++def scale_block_loads(c, ws, first_row, scale_cols, live=None):
+     """The loads of the 32-row e8m0 block holding ``first_row``: in aiter's
+     shuffle_scale order a block is contiguous (both 16-row halves, all of K), so
+     a few 16-byte loads a lane fetch it, where a byte load a K step doubled the
+@@ -773,12 +816,12 @@
+     lane past the block re-reads its last 16 bytes."""
+     lane = c["lane"]
+     words = scale_cols * 8
+-    block = first_row // 32 * words
++    block = udiv(first_row, 32, live is not None) * words
+     return [
+         fx.Vector(
+             bo.buffer_load(
+-                rsrc(ws),
+-                block + fx.min(256 * i + lane * 4, words - 4),
++                oob_rsrc(ws, live),
++                oob(live, block + fx.min(256 * i + lane * 4, words - 4)),
+                 vec_width=4,
+                 dtype=T.i32,
+                 cache_modifier=CM_NT,
+@@ -822,11 +865,31 @@
+     return out
+ 
+ 
+-def lds_u8(ptr, i):
+-    return (fx.ptr_load(ptr + i // 4) >> (i % 4 * 8)) & 0xFF
+-
+-
+-def fp4_tile_weights(c, w, e, n_rows, k, rg, st0, blk, k_real=None):
++def lds_scales_half(sl, half, lane, blk):
++    """``lds_scales(sl, half * 16 + lane % 16, lane, 0, blk, cols)`` bit for bit:
++    step i's byte is byte (i % 2) * 2 + half of word 64 (i // 2) + 16 (lane >>
++    4) + (lane & 15), an immediate offset from one lane address."""
++    at = sl + ((lane >> 4) * 16 + (lane & 15))
++    sh = half * 8
++    out, word = [], None
++    for i in range(blk):
++        if i % 2 == 0:
++            word = fx.ptr_load(at + (i // 2) * 64)
++        out.append((word >> ((i % 2) * 16 + sh)) & 0xFF)
++    return out
++
++
++def task_half(task):
++    """``task % 2`` of a task id >= 0 (traced: a mask, not a signed remainder)."""
++    return task % 2 if isinstance(task, int) else task & 1
++
++
++def lds_u8(ptr, i, sm=False):
++    """Byte ``i`` of LDS words ``ptr`` (``sm``: ``udiv``'s shifts and masks)."""
++    return (fx.ptr_load(ptr + udiv(i, 4, sm)) >> (umod(i, 4, sm) * 8)) & 0xFF
++
++
++def fp4_tile_weights(c, w, e, n_rows, k, rg, st0, blk, k_real=None, live=None):
+     """The weight operands of expert e's 16-row tile rg, K steps st0 .. st0 +
+     blk: loads only, nothing waits on them here. ``k_real``: a lane whose 32
+     columns lie past it (zero weights) reads its row group's first lane's
+@@ -841,7 +904,7 @@
+             at = real.select(lane * 4, lane % 16 * 4)
+         else:
+             at = lane * 4
+-        v = fp4_tile_load(rsrc(w), base, rg, k, st0 + i, at)
++        v = fp4_tile_load(oob_rsrc(w, live), base, rg, k, st0 + i, at, live)
+         if const_expr(past):
+             v = fx.Vector.from_elements(
+                 [real.select(v[q], fx.Int32(0)) for q in range(4)], fx.Int32
+@@ -857,7 +920,7 @@
+     lane = c["lane"]
+     x_row = lds_row(k // 4)
+     s_row = lds_row(k // 32)
+-    j = lane // 16
++    j = udiv(lane, 16, c["rs"].tuned)
+     accs = list(accs)
+     for i in range_constexpr(n):
+         bv = fp8_operand(
+@@ -921,16 +984,23 @@
+     epilogue and the stage-2 input quant). Past one: ``stage_ug_tile``."""
+     s, tid, lane, tab = c["S"], c["tid"], c["lane"], c["tab"]
+     rs = c["rs"]
+-    ug_parts = rs.ug_parts
+-    u = task // ug_parts
++    ug_parts, tuned = rs.ug_parts, rs.tuned
++    u = udiv(task, ug_parts, tuned)
+     if u < c["rs"].n_union(tab, s):
+         e = c["rs"].union_expert(tab, s, u)
+         # the slot's picks, a column each (a column past them repeats the last);
+         # every token's row is in LDS: a column reads its pick's token's
+         first = c["rs"].slot_first(tab, u)
+         count = c["rs"].slot_first(tab, u + 1) - first
+-        pick = c["rs"].pick_at(tab, first + fx.min(lane % 16, count - 1))
+-        ug_pass(c, e, task % ug_parts * rs.ug_groups, first, count, pick // rs.topk)
++        pick = c["rs"].pick_at(tab, first + fx.min(umod(lane, 16, tuned), count - 1))
++        ug_pass(
++            c,
++            e,
++            umod(task, ug_parts, tuned) * rs.ug_groups,
++            first,
++            count,
++            udiv(pick, rs.topk, tuned),
++        )
+         publish(c["put"], c["ugf"], task, 1, tid == 0)
+     gpu.barrier()
+ 
+@@ -942,10 +1012,16 @@
+     tile; b = 2 (part0 + p) + bb), one 32-row scale block -- over K slice ks =
+     wave / 2 % slices (``gemv_fp4_pair``): (p, 2 b, ks, whether the group is in
+     the real width)."""
+-    wave, slices = c["wave"], c["rs"].ug_k_slices
+-    p = wave // (2 * slices)
+-    b = (part0 + p) * 2 + wave % 2
+-    return p, 2 * b, wave // 2 % slices, part0 + p < c["d"].inter_real // UG_PART
++    wave, slices, tuned = c["wave"], c["rs"].ug_k_slices, c["rs"].tuned
++    p = udiv(wave, 2 * slices, tuned)
++    b = (part0 + p) * 2 + umod(wave, 2, tuned)
++    two_b = 2 * b
++    return (
++        p,
++        two_b,
++        umod(udiv(wave, 2, tuned), slices, tuned),
++        part0 + p < c["d"].inter_real // UG_PART,
++    )
+ 
+ 
+ def ug_red_slot(rs, p, bb, ks, t):
+@@ -1043,7 +1119,7 @@
+             col,
+         )
+     for t in range_constexpr(2):
+-        slot = ug_red_slot(rs, p, wave % 2, ks, t)
++        slot = ug_red_slot(rs, p, umod(wave, 2, rs.tuned), ks, t)
+         fx.ptr_store(
+             fx.Vector.from_elements([acc[4 * t + q] for q in range(4)], fx.Float32),
+             red + (slot * 64 + lane) * 4,
+@@ -1069,23 +1145,59 @@
+     if tid < TILE:
+         c["poll"]([(c["x8rdy"], token_of(fx.min(tid, live - 1)), 1)])
+     gpu.barrier()
++    tuned = c["rs"].tuned
++    if const_expr(tuned and isinstance(live, int)):
++        load_x8_rows_all(c, words_mb, codes_mb, xl, xsl, token_of, live)
++        gpu.barrier()
++        return
++    got, x8all = [], c["push_bases"] and not GFX942 and isinstance(live, int)
+     for mb, width, dst in ((words_mb, X8_WORDS, xl), (codes_mb, HIDDEN // 32, xsl)):
+         quads = width // 4
+-        for i in range_constexpr(-(-TILE * quads // THREADS)):
++        for i in range_constexpr(-(-live * quads // THREADS) if x8all else 0):
++            q = fx.Uint32(fx.min(tid + THREADS * i, live * quads - 1))
++            row = fx.Int32(q // quads)
++            r, off = rsrc(c[mb].value), token_of(row) * width + fx.Int32(q % quads) * 4
++            x = fx.Vector(bo.buffer_load(r, off, dtype=T.i32, cache_modifier=CM_DEV))
++            got.append((tid + THREADS * i, row, x, dst, lds_row(width), quads))
++        for i in range_constexpr(0 if x8all else -(-TILE * quads // THREADS)):
+             q = tid + THREADS * i
+-            row = q // quads
++            row = udiv(q, quads, tuned)
+             if (q < TILE * quads) & (row < live):
+                 v = fx.Vector(
+                     bo.buffer_load(
+                         rsrc(c[mb].value),
+-                        token_of(row) * width + q % quads * 4,
++                        token_of(row) * width + umod(q, quads, tuned) * 4,
+                         vec_width=4,
+                         dtype=T.i32,
+                         cache_modifier=CM_DEV,
+                     )
+                 )
+-                fx.ptr_store(v, dst + (row * lds_row(width) + q % quads * 4))
++                fx.ptr_store(
++                    v, dst + (row * lds_row(width) + umod(q, quads, tuned) * 4)
++                )
++    for q, row, x, dst, stride, quads in got:
++        if q < live * quads:
++            fx.ptr_store(x, dst + (row * stride + fx.Int32(fx.Uint32(q) % quads) * 4))
+     gpu.barrier()
++
++
++@traced
++def load_x8_rows_all(c, words_mb, codes_mb, xl, xsl, token_of, live):
++    """``load_x8_rows`` of every token (``live`` a Python int): every load
++    issued before the first store, not one round trip a branch in series."""
++    tid = c["tid"]
++    got = []
++    for mb, width, dst in ((words_mb, X8_WORDS, xl), (codes_mb, HIDDEN // 32, xsl)):
++        quads = width // 4
++        for i in range_constexpr(-(-live * quads // THREADS)):
++            q = fx.min(tid + THREADS * i, live * quads - 1)
++            at = token_of(udiv(q, quads)) * width + umod(q, quads) * 4
++            v = ld_vec(c[mb].value, at, 4, cm=CM_DEV)
++            got.append((tid + THREADS * i, udiv(q, quads), v, dst, width, quads))
++    for gi in range_constexpr(len(got)):
++        q, row, v, dst, width, quads = got[gi]
++        if q < live * quads:
++            fx.ptr_store(v, dst + (row * lds_row(width) + umod(q, quads) * 4))
+ 
+ 
+ def gather_x8r(c, first, count):
+@@ -1095,7 +1207,8 @@
+     tab, topk = c["tab"], c["rs"].topk
+ 
+     def token(j):
+-        return c["rs"].pick_at(tab, first + fx.min(j, count - 1)) // topk
++        pick = c["rs"].pick_at(tab, first + fx.min(j, count - 1))
++        return udiv(pick, topk, c["rs"].tuned)
+ 
+     load_x8_rows(c, "x8r", "x8rs", c["x8rl"], c["x8rsl"], token, fx.min(count, TILE))
+ 
+@@ -1106,18 +1219,18 @@
+     column), the group's MXFP8 scale, its byte of MID (the pick's row, ``first``
+     + j in the pick order)."""
+     lane, red, d, rs = c["lane"], c["red"], c["d"], c["rs"]
+-    cols = rs.tile_picks
++    cols, tuned = rs.tile_picks, rs.tuned
+     if idx < rs.ug_groups * cols * UG_PART:
+-        p = idx // (cols * UG_PART)
++        p = udiv(idx, cols * UG_PART, tuned)
+         part = part0 + p
+-        t = idx % (cols * UG_PART) // UG_PART
+-        i = idx % UG_PART
+-        tile = i // 16
+-        r = i % 16
++        t = udiv(umod(idx, cols * UG_PART, tuned), UG_PART, tuned)
++        i = umod(idx, UG_PART, tuned)
++        tile = udiv(i, 16, tuned)
++        r = umod(i, 16, tuned)
+         if const_expr(GFX942):
+             g, up = ug_gate_up_942(red, rs, p, tile, r, t)
+         else:
+-            at = (16 * (r // 4) + t) * 4 + r % 4
++            at = (16 * udiv(r, 4, tuned) + t) * 4 + umod(r, 4, tuned)
+             g, up = [
+                 pairwise_sum(
+                     [
+@@ -1149,10 +1262,10 @@
+             ]
+             # 4 threads' bytes -> one word
+             word = fp8_pack4(q8, *nb)
+-            if (i % 4 == 0) & (t < count):
+-                st_dev(word, c["mid"], row * d.mid_words + part * 8 + i // 4)
++            if (umod(i, 4, tuned) == 0) & (t < count):
++                st_dev(word, c["mid"], row * d.mid_words + part * 8 + udiv(i, 4, tuned))
+             if (i == 0) & (t < count):
+-                st_dev(code, c["mids"], mid_code_index(d, row, part))
++                st_dev(code, c["mids"], mid_code_index(d, row, part, tuned))
+ 
+ 
+ # ---------------------------------------------------------------- gfx942 routed
+@@ -1543,11 +1656,12 @@
+ 
+ # ---------------------------------------------------------------- down
+ @traced
+-def stage_down(c, tasks):
++def stage_down(c, tasks, dsh_rank=None):
+     """Rows 16 task .. of the hidden output for each of ``tasks`` (a CTA's one or
+     two, run together: a second pass would double the CTA's time): routed
+     experts of U (a wave each, round robin), the shared expert, their sum ->
+-    pushed to every rank."""
++    pushed to every rank. ``dsh_rank``: tuned, the shared rows offloaded
++    (``dsh_offload`` ran them; ``dsh_fill`` takes a two-task CTA's)."""
+     if const_expr(GFX942):
+         stage_down_942(c, tasks)
+         return
+@@ -1562,7 +1676,12 @@
+     # the shared expert's down projection first: its input is ready long
+     # before the routed results, which a CTA mostly waits on here; after the
+     # rounds it sat on the path past the last ug task
+-    down_shared(c, tasks)
++    if const_expr(dsh_rank is None):
++        down_shared(c, tasks)
++    if const_expr(down_pipe(c["rs"]) and n in DOWN_PIPE_N):
++        down_rounds_pipe(c, tasks, nu, sl, sw, slots, per_round)
++        down_sums(c, tasks, dsh_rank)
++        return
+     for rnd in range(0, (nu + per_round - 1) // per_round, 1):
+         # the round's slots of U (wave, wave + WAVES, ...), every load of them
+         # and of every task in flight before the first wait: the weights and
+@@ -1611,10 +1730,214 @@
+                                 avs[j * slots + i],
+                                 us[i] < nu,
+                             )
++    down_sums(c, tasks, dsh_rank)
++
++
++def down_sums(c, tasks, dsh_rank):
++    """``stage_down``'s end: each task's routed and shared rows summed."""
++    c = dict(c, peer_addr=c["push_bases"]().__getitem__) if c["push_bases"] else c
+     gpu.barrier()
+-    for t0, nn in token_tiles(s):
+-        for j in range_constexpr(n):
++    if const_expr(dsh_rank is not None):
++        dsh_fill(c, dsh_rank)
++    for t0, nn in token_tiles(c["S"]):
++        for j in range_constexpr(len(tasks)):
+             down_combine(c, tasks[j], j, t0, nn)
++
++
++def mid_rows_to_lds(c, row0, rows, r0, live):
++    """MID and MIDS rows row0 .. row0 + rows (a slot's picks) -> LDS ``dmid`` /
++    ``dmids`` at row - r0, 16 bytes a lane, at device scope. ``live``: a slot
++    of U."""
++    d = c["d"]
++    rows_to_lds(c, c["mid"], c["dmid"], d.mid_words * 4, row0, rows, r0, live)
++    rows_to_lds(c, c["mids"], c["dmids"], d.inter // 32 * 4, row0, rows, r0, live)
++
++
++@traced
++def rows_to_lds(c, region, lds, rb, row0, rows, r0, live):
++    lane = c["lane"]
++    base = uniform(fx.Int32(fx.ptrtoint(lds)) + (row0 - r0) * rb)
++    nbytes = rows * rb
++    for k in range(0, udiv(nbytes + 1023, 1024), 1):
++        off = k * 1024 + lane * 16
++        if live & (off < nbytes):
++            ptr = fx.inttoptr(
++                fx.PointerType.get(T.i8, fx.AddressSpace.Shared),
++                fx.Int64(base + uniform(k * 1024)),
++            )
++            at, z = row0 * rb + off, fx.Int32(0)
++            rocdl.raw_ptr_buffer_load_lds(
++                rsrc(region.value), fx.to_llvm_ptr(ptr), fx.Int32(16), at, z, z, CM_DEV
++            )
++
++
++@traced
++def down_rounds_pipe(c, tasks, nu, sl, sw, slots, per_round):
++    """``stage_down``'s rounds past ``DOWN_PIPE_PICKS``, pipelined: round r + 1's
++    weights and the first load of its ug flags go out past round r's MID copy
++    into LDS (``down_slot``), streaming across its MFMAs. Two rounds an
++    iteration, the weights in alternate registers (one loop-carried set is a
++    copy at the loop head, which waits for every load of it); a round past
++    the last loads and stores nothing. The same MFMAs in the same order."""
++    nr = (nu + per_round - 1) // per_round
++    w = down_weight_loads(c, tasks, down_experts(c, 0, slots, nu))
++    pk = ug_flags_peek(c, down_round_ucs(c, 0, slots, nu))
++    for rp in range(0, (nr + 1) // 2, 1):
++        wb, pkb = down_round_pipe(c, tasks, nu, sl, sw, slots, per_round, 2 * rp, w, pk)
++        w, pk = down_round_pipe(
++            c, tasks, nu, sl, sw, slots, per_round, 2 * rp + 1, wb, pkb
++        )
++
++
++@traced
++def down_round_pipe(c, tasks, nu, sl, sw, slots, per_round, rnd, w, pk):
++    """Round ``rnd`` of ``down_rounds_pipe`` on weights ``w`` and the flags'
++    early load ``pk``: the next round's (weights, flags' load)."""
++    s, wave, tab = c["S"], c["wave"], c["tab"]
++    n = len(tasks)
++    cap = c["pipe_picks"]
++    svs, avs = w
++    us = [wave + WAVES * (slots * rnd + i) for i in range(slots)]
++    ucs = [fx.min(u, nu - 1) for u in us]
++    firsts = [c["rs"].slot_first(tab, u) for u in ucs]
++    # every wave past the last round's reads of the block
++    gpu.barrier()
++    # the round's ug flags: their first load went out a round ago
++    ug_flags_settle(c, ucs, pk)
++    counts = [c["rs"].slot_first(tab, u + 1) - f for u, f in zip(ucs, firsts)]
++    r0 = uniform(c["rs"].slot_first(tab, fx.min(per_round * rnd, nu)))
++    r1 = uniform(c["rs"].slot_first(tab, fx.min(per_round * (rnd + 1), nu)))
++    # the next weights' expert ids before the copy (LLVM waits for an LDS
++    # copy before any later LDS read)
++    es = down_experts(c, rnd + 1, slots, nu)
++    npk = ug_flags_peek(c, down_round_ucs(c, rnd + 1, slots, nu))
++    # this round's scale blocks (loaded a round ago) before the copy: an
++    # LDS store past an LDS copy waits for every load before it
++    for q in range_constexpr(len(svs)):
++        scale_block_store(c, svs[q], sl + q * sw)
++    fits = r1 - r0 <= cap
++    if fits:
++        for i in range_constexpr(slots):
++            mid_rows_to_lds(c, uniform(firsts[i]), uniform(counts[i]), r0, us[i] < nu)
++    # one issue point for both paths (a load issued in each branch is a
++    # register copy at the join, which waits for every load of it)
++    nw = down_weight_loads(c, tasks, es)
++    # issued here, not sunk into the MFMAs below
++    rocdl.sched_barrier(0)
++    for i in range_constexpr(slots):
++        sls = [sl + (j * slots + i) * sw for j in range(n)]
++        ais = [avs[j * slots + i] for j in range(n)]
++        for j0 in range_constexpr(0, s, TILE):
++            tile = (c, tasks, sls, ais, plus(j0, firsts[i]), counts[i] - j0, r0)
++            if const_expr(j0 == 0) or j0 < counts[i]:
++                down_slot_pick_tile(*tile, us[i] < nu, fits)
++    return nw, npk
++
++
++def down_round_ucs(c, rnd, slots, nu):
++    wave = c["wave"]
++    return [fx.min(wave + WAVES * (slots * rnd + i), nu - 1) for i in range(slots)]
++
++
++def ug_flags_peek(c, ucs, flags=None):
++    """The first load of a down round's ug flags (``down_ug_flags``), issued a
++    round early: ``ug_flags_settle`` re-loads only while any is stale."""
++    flags = down_ug_flags(c, ucs) if flags is None else flags
++    ws = [ld_vec(c["ugf"].value, f * 2, 2, cm=CM_DEV) for f in flags]
++    return fx.Vector.from_elements([w[e] for w in ws for e in range(2)], fx.Int32)
++
++
++@traced
++def ug_flags_settle(c, ucs, v):
++    """``c["poll"]`` of the round's ug flags from their early load ``v``: the
++    same loads re-issued while a tag is stale."""
++    flags = down_ug_flags(c, ucs)
++    tag = c["poll"].__self__.tag
++
++    def pending(x):
++        bad = x[1] != tag
++        for e in range_constexpr(3, 2 * len(flags), 2):
++            bad = bad | (x[e] != tag)
++        return bad
++
++    while pending(v):
++        rocdl.s_sleep(1)
++        v = ug_flags_peek(c, ucs, flags)
++
++
++@traced
++def down_slot_pick_tile(c, tasks, sls, avs, first, count, r0, live, fits):
++    if fits:  # the round's rows in the LDS block, else from MID in chunks
++        down_slot(c, tasks, sls, avs, first, count, live, r0)
++    else:
++        down_slot(c, tasks, sls, avs, first, count, live)
++
++
++DOWN_REG_CHUNK = 3  # K steps of MID operands a chunk (``down_slot``)
++
++
++@traced
++def down_slot(c, tasks, sls, avs, first, count, live, r0=None):
++    """``down_mfma`` of each of ``tasks`` on one slot, the same MFMAs on the
++    same words in the same order: its picks' B operands read from the round's
++    LDS block at row - ``r0`` (``mid_rows_to_lds``) a K step at a time, or
++    (``r0`` None) loaded from MID ``DOWN_REG_CHUNK`` K steps at a time."""
++    lane, tab, d = c["lane"], c["tab"], c["d"]
++    n, steps, lds = len(tasks), d.inter // 128, r0 is not None
++    sas = [lds_scales_half(sls[j], task_half(tasks[j]), lane, steps) for j in range(n)]
++    jj, g = umod(lane, 16), udiv(lane, 16)
++    col = fx.min(jj, count - 1)
++    row = first + col - r0 if lds else first + col
++    lane_word = row * d.mid_words + g * 4
++    lane_word = lane_word if lds else fresh(lane_word)
++    cbase = mid_code_index(d, row, g, True)
++    zero = fx.Vector.filled(4, 0.0, fx.Float32)
++    accs = [[zero for _ in range(DOWN_CHAINS)] for _ in range(n)]
++
++    def operand(st):
++        halves = []
++        for h in range_constexpr(2):
++            at = lane_word + (st * 32 + 16 * h)
++            if const_expr(lds):
++                v4 = fx.Vector.make_type(4, fx.Int32)
++                v = fx.Vector(fx.ptr_load(c["dmid"] + at, result_type=v4))
++            else:
++                v = ld_vec(c["mid"].value, at, 4, cm=CM_DEV)
++            if const_expr(st * 128 + 64 * h + 48 >= d.inter_real):
++                past = st * 128 + 64 * h + 16 * g >= d.inter_real
++                v = fx.Vector.from_elements(
++                    [past.select(fx.Int32(0), v[q]) for q in range(4)], fx.Int32
++                )
++            halves.append(v)
++        bv = fp8_operand(halves)
++        if const_expr(lds):
++            sb = fx.ptr_load(c["dmids"] + (cbase + st))
++        else:
++            sb = fx.Int32(ld_vec(c["mids"].value, cbase + st, 1, cm=CM_DEV))
++        if const_expr((st + 1) * 128 > d.inter_real):
++            past = (4 * st + g) * 32 >= d.inter_real
++            sb = past.select(fx.Int32(UNIT_SCALE), sb)
++        return bv, sb
++
++    chunk = 1 if lds else DOWN_REG_CHUNK
++    for c0 in range_constexpr(0, steps, chunk):
++        sts = list(range(c0, min(steps, c0 + chunk)))
++        ops = [operand(st) for st in sts]
++        for (bv, sb), st in zip(ops, sts):
++            for j in range_constexpr(n):
++                hh = st % DOWN_CHAINS
++                accs[j][hh] = mfma_scaled(
++                    avs[j][st], bv, accs[j][hh], sas[j][st], sb, FP4, FP8
++                )
++    pick = c["rs"].pick_at(tab, first + col)
++    for j in range_constexpr(n):
++        acc = accs[j][0]
++        for hh in range_constexpr(1, DOWN_CHAINS):
++            acc = acc + accs[j][hh]
++        for q in range_constexpr(4):
++            r = 4 * udiv(lane, 16) + q
++            if live & (jj < count):
++                contrib_store(c, j, pick * 16 + r, acc[q])
+ 
+ 
+ @traced
+@@ -1653,14 +1976,40 @@
+     return svs, avs
+ 
+ 
++def down_experts(c, rnd, slots, nu):
++    """Round ``rnd``'s (expert, slot of U) of this wave's slots
++    (``down_weights``; a slot past U: the last's, not live)."""
++    s, wave, tab = c["S"], c["wave"], c["tab"]
++    us = [wave + WAVES * (slots * rnd + i) for i in range(slots)]
++    return [(c["rs"].union_expert(tab, s, fx.min(u, nu - 1)), u < nu) for u in us]
++
++
++def down_weight_loads(c, tasks, es):
++    """``down_weights``' loads for (expert, live) ``es``; a slot past U loads
++    nothing (``oob``)."""
++    a, d = c["args"], c["d"]
++    svs = [
++        scale_block_loads(c, a["w2_s"], e * HIDDEN + t * 16, d.down_scale_cols, live)
++        for t in tasks
++        for e, live in es
++    ]
++    k, ss = d.inter, d.inter // 128
++    avs = [
++        fp4_tile_weights(c, a["w2"], e, HIDDEN, k, t, 0, ss, d.inter_real, live)
++        for t in tasks
++        for e, live in es
++    ]
++    return svs, avs
++
++
+ def mid_operands(c, first, count):
+     """The MFMA B operands of picks first .. first + min(count, 16) (column
+     lane % 16 the pick, past them the last): each K step's two 16-byte halves
+     of the lane's MID row and its group's code, loaded at device scope straight into
+     registers -- no LDS block a slot, so a round holds more slots."""
+-    lane, d = c["lane"], c["d"]
+-    j = lane // 16
+-    row = first + fx.min(lane % 16, count - 1)
++    lane, d, tuned = c["lane"], c["d"], c["rs"].tuned
++    j = udiv(lane, 16, tuned)
++    row = first + fx.min(umod(lane, 16, tuned), count - 1)
+     steps = d.inter // 128
+     # the step's constant after an opaque lane word folds into the immediate
+     # offset; summed with j * 4 it was a hoisted VGPR a step (spill)
+@@ -1691,7 +2040,7 @@
+     # this lane's codes, one a K step: contiguous in MIDS (``mid_code_index``),
+     # 4 a load -- a load a step was 5 of a slot's 16 load instructions, and the
+     # stage is load-issue bound (probe ``harness/down_probe.py``: -8 %)
+-    base = mid_code_index(d, row, j)
++    base = mid_code_index(d, row, j, tuned)
+     sbs = []
+     for w0 in range_constexpr(0, steps, 4):
+         n = min(4, steps - w0)
+@@ -1715,12 +2064,17 @@
+     return bvs, sbs
+ 
+ 
+-def mid_code_index(d, row, group):
++def mid_code_index(d, row, group, unsigned=False):
+     """MIDS word of pick row ``row``'s MXFP8 group ``group`` (32 columns): a K
+     step's 4 groups apart, so the steps of one group % 4 lie together
+-    (``mid_operands``' lane j reads groups j, j + 4, ..)."""
++    (``mid_operands``' lane j reads groups j, j + 4, ..). ``unsigned``: the
++    index math as shifts and masks (``udiv``)."""
+     steps = d.inter // 128
+-    return row * (d.inter // 32) + group % 4 * steps + group // 4
++    return (
++        row * (d.inter // 32)
++        + umod(group, 4, unsigned) * steps
++        + udiv(group, 4, unsigned)
++    )
+ 
+ 
+ def down_ug_flags(c, ucs):
+@@ -1740,27 +2094,30 @@
+ 
+ def _down_ug_flag(c, ucs, f, per_slot):
+     rs, tab = c["rs"], c["tab"]
+-    ug_parts = rs.ug_parts
++    ug_parts, tuned = rs.ug_parts, rs.tuned
+     mine = ucs[0]
+     for i in range_constexpr(1, len(ucs)):
+-        mine = (f // per_slot == i).select(ucs[i], mine)
++        mine = (udiv(f, per_slot, tuned) == i).select(ucs[i], mine)
+     if const_expr(not rs.multi):
+-        return mplan.ug_flag(mine, f % ug_parts, ug_parts)
++        return mplan.ug_flag(mine, umod(f, ug_parts, tuned), ug_parts)
+     tile0 = rs.tile_first(tab, mine)
+     tiles = rs.tile_first(tab, mine + 1) - tile0
+     return mplan.ug_flag(
+-        mplan.polled_tile(tile0, tiles, f % per_slot // ug_parts),
+-        f % ug_parts,
++        mplan.polled_tile(
++            tile0, tiles, udiv(umod(f, per_slot, tuned), ug_parts, tuned)
++        ),
++        umod(f, ug_parts, tuned),
+         ug_parts,
+     )
+ 
+ 
+ @traced
+-def down_shared(c, tasks):
++def down_shared(c, tasks, put_unit=None):
+     """Each of ``tasks``' rows of the shared expert's down projection
+     (its MXFP8 intermediate, ``load_smid_tile``) for every
+     token, bf16 -> LDS ``sdl[task][token][16 rows]`` (``down_combine``):
+-    every task's weights in flight first."""
++    every task's weights in flight first. ``put_unit``: the last task's rows
++    also to SDX unit ``put_unit`` (``dsh_offload``)."""
+     s, tid, red, d = c["S"], c["tid"], c["red"], c["d"]
+     a = c["args"]
+     shops = [
+@@ -1775,9 +2132,20 @@
+             )
+             gpu.barrier()
+             if tid < ROWS * nn:
+-                v = row_sum(red, tid % ROWS, tid // ROWS)
+-                at = (j * s + plus(t0, tid // ROWS)) * ROWS + tid % ROWS
++                if const_expr(c["rs"].tuned):
++                    rr, tt = umod(tid, ROWS), udiv(tid, ROWS)
++                    v = row_sum(red, rr, tt)
++                    at = (j * s + plus(t0, tt)) * ROWS + rr
++                else:
++                    v = row_sum(red, tid % ROWS, tid // ROWS)
++                    at = (j * s + plus(t0, tid // ROWS)) * ROWS + tid % ROWS
+                 fx.ptr_store(bf16_round(v).bitcast(fx.Int32), c["sdl"] + at)
++                if const_expr(put_unit is not None and j == len(tasks) - 1):
++                    c["put"](
++                        c["sdx"],
++                        (put_unit * s + plus(t0, tt)) * ROWS + rr,
++                        bf16_round(v),
++                    )
+             gpu.barrier()
+ 
+ 
+@@ -1787,10 +2155,10 @@
+     contributions summed in bf16 in each token's top-k order, plus the shared expert's
+     (``down_shared``), the sum pushed to every rank."""
+     s, tid, d, tab = c["S"], c["tid"], c["d"], c["tab"]
+-    topk = c["rs"].topk
++    topk, tuned = c["rs"].topk, c["rs"].tuned
+     if tid < ROWS * n:
+-        r = tid % ROWS
+-        tl = tid // ROWS
++        r = umod(tid, ROWS, tuned)
++        tl = udiv(tid, ROWS, tuned)
+         t = plus(t0, tl)
+         shared = fx.ptr_load(c["sdl"] + ((j * s + t) * ROWS + r)).bitcast(fx.Float32)
+         # aiter's stage 2 adds each bf16(v * w) into a bf16 buffer: a rounding
+@@ -1807,8 +2175,8 @@
+         fx.ptr_store(bf16_round(routed + shared), c["pair"] + tid)
+     gpu.barrier()
+     if tid < ROWS * n // 2:
+-        rp = tid % (ROWS // 2)
+-        tl = tid // (ROWS // 2)
++        rp = umod(tid, ROWS // 2, tuned)
++        tl = udiv(tid, ROWS // 2, tuned)
+         t = plus(t0, tl)
+         v0 = fx.ptr_load(c["pair"] + (tl * ROWS + 2 * rp))
+         v1 = fx.ptr_load(c["pair"] + (tl * ROWS + 2 * rp + 1))
+@@ -1825,10 +2193,14 @@
+     picks first .. first + min(count, 16) (their B operands ``mid``:
+     ``mid_operands``; the scale block in ``sl``), each pick's contribution."""
+     lane, tab, d = c["lane"], c["tab"], c["d"]
+-    sas = lds_scales(
+-        sl, task % 2 * 16 + lane % 16, lane, 0, d.inter // 128, d.down_scale_cols
+-    )
+-    jj = lane % 16
++    if const_expr(c["rs"].tuned):
++        sas = lds_scales_half(sl, task_half(task), lane, d.inter // 128)
++        jj = umod(lane, 16)
++    else:
++        sas = lds_scales(
++            sl, task % 2 * 16 + lane % 16, lane, 0, d.inter // 128, d.down_scale_cols
++        )
++        jj = lane % 16
+     col = fx.min(jj, count - 1)
+     bvs, sbs = mid
+     # the K steps on DOWN_CHAINS accumulators in turn, summed in order: one
+@@ -1845,6 +2217,54 @@
+         r = 4 * (lane // 16) + q
+         if live & (jj < count):
+             contrib_store(c, j, pick * 16 + r, acc[q])
++
++
++@traced
++def dsh_fill(c, rank):
++    """A two-task CTA (arrival ``rank`` < extra) of the shared offload: both its
++    tiles' shared rows (its own: unit extra + rank, its extra: unit rank) polled
++    from SDX into LDS ``sdl`` [j][token][16 rows], one batch."""
++    s, tid = c["S"], c["tid"]
++    extra = DOWN_TASKS - BLOCKS
++    per = s * ROWS
++    if rank < extra:
++        idxs = [plus(pas, tid) for pas in range(0, 2 * per, THREADS)]
++        specs = []
++        for idx in idxs:
++            ic = fx.min(idx, 2 * per - 1)
++            unit = (ic < per).select(rank + extra, rank)
++            specs.append((c["sdx"], unit * per + umod(ic, per), 1))
++        got = c["poll"](specs)
++        for i in range_constexpr(len(idxs)):
++            if idxs[i] < 2 * per:
++                fx.ptr_store(fx.Int32(got[i][0]), c["sdl"] + idxs[i])
++    gpu.barrier()
++
++
++@traced
++def dsh_offload(c, own, rank):
++    """The shared offload by arrival rank: a two-task CTA publishes its own
++    tile (DPB); a one-task CTA of rank extra .. 3 extra runs its own tile's
++    shared rows and offloaded unit rank - extra (-> SDX); the rest their own."""
++    tid = c["tid"]
++    extra = DOWN_TASKS - BLOCKS
++    u = rank - extra
++    if rank < extra:
++        if tid == 0:
++            c["put"](c["dpb"], rank, own)
++    elif u < DSH_UNITS:
++        if tid == 0:
++            fx.ptr_store((fx.Int32(BLOCKS) + u).bitcast(fx.Float32), c["pair"])
++        if u >= extra:
++            got = c["poll"]([(c["dpb"], fx.max(u - extra, 0), 1)])
++            if tid == 0:
++                fx.ptr_store(got[0][0].bitcast(fx.Float32), c["pair"])
++        gpu.barrier()
++        off = fx.ptr_load(c["pair"]).bitcast(fx.Int32)
++        gpu.barrier()
++        down_shared(c, [own, off], put_unit=u)
++    else:
++        down_shared(c, [own])
+ 
+ 
+ def contrib_store(c, j, i, v):
+@@ -1917,8 +2337,9 @@
+     s, tp = c["S"], c["d"].tp
+     a = c["args"]
+     if idx < s * RED_COLS // 2:
+-        t = idx // (RED_COLS // 2)
+-        col = task * RED_COLS + 2 * (idx % (RED_COLS // 2))
++        tuned = c["rs"].tuned
++        t = udiv(idx, RED_COLS // 2, tuned)
++        col = task * RED_COLS + 2 * umod(idx, RED_COLS // 2, tuned)
+         own = preg(c["sym"], c["ffn_off"], "ffn")
+         acc0, acc1 = sum_partials(
+             c["poll"], own, lambda src: region_pair(src, t, s, col), tp
+@@ -1946,6 +2367,18 @@
+         tls: fx.Array[fx.Int64, TL_POINTS if timeline else 1, 16]
+ 
+     return Smem
++
++
++def down_pipe(rs) -> bool:
++    """Whether a ``DOWN_PIPE_N`` CTA's rounds run ``down_rounds_pipe``."""
++    return rs.tuned and rs.picks > DOWN_PIPE_PICKS
++
++
++def pipe_mids_words(rs, p):
++    """``down_rounds_pipe``'s MIDS block of ``p`` picks: a word a code
++    (``mid_code_index``)."""
++    d = rs.dims
++    return -(-p * (d.inter // 32) // 4) * 4
+ 
+ 
+ def stage_lds(s, rs):
+@@ -1984,7 +2417,30 @@
+         "ug": wsl + x8 + groups,
+         "down": wsl + shared_xl + shared_xsl + contrib + 2 * s * ROWS,
+     }
+-    return {"offsets": offsets, "words": {"all": max(words.values())}}
++    if not rs.tuned:
++        return {"offsets": offsets, "words": {"all": max(words.values())}}
++    # tuned, the down stage: the contributions and shared rows, then the shared
++    # intermediate tile, whose words a pipelined round's MID block takes over
++    # past it (``down_rounds_pipe``): as many picks as fit the other stages'
++    sdl = wsl + contrib
++    sh0 = -(-(sdl + 2 * s * ROWS) // 32) * 32
++    picks = 0
++    while (
++        down_pipe(rs)
++        and (picks + 1) * d.mid_words + pipe_mids_words(rs, picks + 1)
++        <= wsl + x8 + groups - sh0
++    ):
++        picks += 1
++    mid = picks * d.mid_words
++    offsets.update(contrib=wsl, sdl=sdl, shared_xl=sh0, shared_xsl=sh0 + shared_xl)
++    offsets.update(dmid=sh0, dmids=sh0 + mid)
++    down = sh0 + max(shared_xl + shared_xsl, mid + pipe_mids_words(rs, picks))
++    words["down"] = down
++    return {
++        "offsets": offsets,
++        "words": {"all": max(words.values())},
++        "pipe_picks": picks,
++    }
+ 
+ 
+ def moe_context(s, rs, lds, mb, bases, layout, scratch, args, rank, sym):
+@@ -2016,9 +2472,12 @@
+         # x (``ffn_normed``) before this launch: plain loads, no readiness wait
+         "x_cm": 0,
+         "x_ready": False,
++        # TP4 K2: the push's peer bases, loaded late; also batches the X8 copies
++        "push_bases": None,
+     }
+     for name, off in stage_lds(s, rs)["offsets"].items():
+         c[name] = lds.stage.ptr + off
++    c["pipe_picks"] = stage_lds(s, rs).get("pipe_picks", 0)
+     for region, (off, _) in layout.items():
+         c[region] = sreg(scratch, off, region)
+     return c
+@@ -2061,11 +2520,19 @@
+     stamp(timeline, tls, tid, tl0 + 1)
+     multi = len(token_tiles(s)) > 1
+     for task in range(first_task(bid, c["rs"].router0), router_tasks, BLOCKS):
++        # tuned: the gate weights in flight before x's wait
++        wvs = router_task_weights(c, task) if key.tuned else None
+         await_x(c, list(range(s)))
+-        stage_router(c, task)
++        stage_router(c, task, wvs)
+     stamp(timeline, tls, tid, tl0 + 2)
+     for t in range(first_task(bid, route0), s, BLOCKS):
+         stage_route(c, t)
++    after_route = c.get("after_route")
++    if const_expr(after_route is not None):
++        # the caller's work nothing in this launch waits on: on the route
++        # CTAs, past the route, not in front of it
++        for t in range(first_task(bid, route0), s, BLOCKS):
++            after_route(t)
+     stamp(timeline, tls, tid, tl0 + 3)
+     c["xl"], c["xsl"] = c["x8l"], c["x8sl"]
+     # a CTA's one shared unit (task, token tile) at most: straight-line code,
+@@ -2080,14 +2547,19 @@
+         gops = gemv_fp8_loads(
+             c, a["sgu"], a["sgu_s"], HIDDEN, unit % shared_tasks, row_major=True
+         )
++        # tuned, past one tile: the up rows' too (the HBM latencies overlapped)
++        uops = None
++        if const_expr(key.tuned and multi):
++            up = shared_tasks + unit % shared_tasks
++            uops = gemv_fp8_loads(c, a["sgu"], a["sgu_s"], HIDDEN, up, row_major=True)
+         if const_expr(not multi):
+             load_x8_rows(c, "x8", "x8s", c["x8l"], c["x8sl"], lambda j: j, s)
+-            stage_shared(c, unit, gops, 0, s)
++            stage_shared(c, unit, gops, 0, s, uops)
+         else:
+             t0 = unit // shared_tasks * TILE
+             n = fx.min(fx.Int32(TILE), s - t0)
+             load_x8_rows(c, "x8", "x8s", c["x8l"], c["x8sl"], lambda j: t0 + j, n)
+-            stage_shared(c, unit % shared_tasks, gops, t0, n)
++            stage_shared(c, unit % shared_tasks, gops, t0, n, uops)
+     stamp(timeline, tls, tid, tl0 + 4)
+     c["xl"], c["xsl"] = c["x8rl"], c["x8rsl"]
+     if const_expr(multi):
+@@ -2127,10 +2599,14 @@
+     # two tiles and ended the stage)
+     down_task = first_task(bid, DOWN0)
+     rank = take_down_rank(c)
++    dsh = rank if key.tuned else None
++    if const_expr(key.tuned):
++        # the two-task CTAs' shared rows offloaded (``dsh_offload``)
++        dsh_offload(c, down_task, rank)
+     if rank < DOWN_TASKS - BLOCKS:
+-        stage_down(c, [down_task, BLOCKS + rank])
++        stage_down(c, [down_task, BLOCKS + rank], dsh)
+     else:
+-        stage_down(c, [down_task])
++        stage_down(c, [down_task], dsh)
+     stamp(timeline, tls, tid, tl0 + 6)
+     for task in range(first_task(bid, RED0), RED_TASKS, BLOCKS):
+         stage_reduce(c, task)
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/stages/moe_shape.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/stages/moe_shape.py
+@@ -53,6 +53,8 @@
+     timeline: bool = field(default=False, metadata={"sym": "tl"})
+     # FP4 groups an ug task (``RouteShape.ug_groups``)
+     ug_groups: int = 2
++    # a tuned build's paths (``layer.MonoBuild.tuned``)
++    tuned: bool = False
+ 
+ 
+ @dataclass(frozen=True)
+@@ -73,6 +75,7 @@
+     # closer together: faster at the draft's widths (40 rows -4 us), slower at
+     # the target's (48 rows +3 us; the runners pick)
+     ug_groups: int = 2
++    tuned: bool = False  # ``MoeBuild.tuned``
+ 
+     @property
+     def dims(self) -> Dims:
+@@ -232,4 +235,6 @@
+ 
+ 
+ def route_shape(key: MoeBuild) -> RouteShape:
+-    return RouteShape(key.experts, key.topk, key.tokens, key.tp, key.ug_groups)
++    return RouteShape(
++        key.experts, key.topk, key.tokens, key.tp, key.ug_groups, key.tuned
++    )
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/stages/seam.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/mono/stages/seam.py
+@@ -33,6 +33,8 @@
+ 
+ from vllm.models.deepseek_v41.amd.mono.common.ops import (
+     batched_rounds,
++    bf2_f32,
++    bf16_pair,
+     bf16_round,
+     bf_hi,
+     bf_lo,
+@@ -50,6 +52,7 @@
+ from vllm.models.deepseek_v41.amd.mono.stages.gemv import (
+     ld_bf,
+     ld_f32,
++    ld_vec,
+     plus,
+     token_tiles,
+ )
+@@ -243,6 +246,171 @@
+         for w in range_constexpr(WAVES):
+             tot = tot + fx.ptr_load(red + (((w * 2 + h) * 64 + ln) * 4 + j % 4))
+         c["put"](c["pmix"], (task * s + t) * PART + j, tot)
++    gpu.barrier()
++
++
++# ---------------------------------------------------------------- reduce + slice
++QUAD = 4  # columns a thread of ``stage_reduce_slice``
++
++
++@traced
++def stage_reduce_slice(c, task, reduce=True):
++    """``stage_reduce`` then ``stage_slice`` (fold), the same values (tuned
++    builds; ``reduce`` False: K1's seam, its pend row for the TP partials). A
++    thread takes four columns of a token through the TP sum (rank order), R_new
++    of the four streams and the layer input in registers, every operand that
++    does not depend on the partials (residual, mixes, fn weights) loaded before
++    their poll: the layer input leaves as soon as the partials land."""
++    s, tid, a = c["S"], c["tid"], c["args"]
++    c0 = task * COLS
++    n = s * COLS // QUAD
++    assert n <= THREADS
++    fs = []
++    for i in range_constexpr(-(-MIX * KT // THREADS)):
++        e = fx.min(tid + THREADS * i, MIX * KT - 1)
++        j, o = e // KT, (e % KT) // COLS
++        fs.append(ld_f32(a["hc_fn"], j * K_MIX + o * HIDDEN + c0 + e % COLS))
++    idx = fx.min(tid, n - 1)
++    t = idx // (COLS // QUAD)
++    col = c0 + QUAD * (idx % (COLS // QUAD))
++    rw = [ld_vec(a["res_in"], ((t * HC + h) * HIDDEN + col) // 2, 2) for h in range(HC)]
++    cmv = [ld_vec(a["comb_in"], (t * HC + h) * HC, 4, True) for h in range(HC)]
++    postv = ld_vec(a["post_in"], t * HC, 4, True)
++    prev = ld_vec(a["pre_in"], t * HC, 4, True)
++    if const_expr(reduce):
++        if tid < n:
++            own = preg(c["sym"], 0, "attn")
++            ws = [
++                (own, attn_region_pair(src, t, s, col), 2) for src in range(c["d"].tp)
++            ]
++            reduce_slice_quad(c, task, t, col, c["poll"](ws), rw, cmv, postv, prev)
++    else:
++        # K1: the owed post's sublayer output is the caller's ``pend`` row
++        pw = ld_vec(a["pend"], (t * HIDDEN + col) // 2, 2)
++        if tid < n:
++            reduce_slice_quad(c, task, t, col, None, rw, cmv, postv, prev, pw)
++    # the fn weights as the original's two bf16 MFMAs take them: hi = bf16(fn),
++    # lo = bf16(fn - hi), their sum exact in fp32
++    for i in range_constexpr(len(fs)):
++        if tid + THREADS * i < MIX * KT:
++            hi = bf16_round(fs[i])
++            fx.ptr_store(hi + bf16_round(fs[i] - hi), c["fl"] + (tid + THREADS * i))
++    gpu.barrier()
++    slice_rest(c, task)
++
++
++@traced
++def reduce_slice_quad(c, task, t, col, ws, rw, cmv, postv, prev, pw=None):
++    """A thread's (token t, columns col .. col + 3) of ``stage_reduce_slice``
++    (``ws``: the TP partials' words; None: ``pw``, the pend row's)."""
++    rl, a = c["rl"], c["args"]
++    if const_expr(ws is None):
++        pend = [x for p in range(2) for x in bf2_f32(fx.Int32(pw[p]))]
++    else:
++        pend = []
++        for p in range_constexpr(2):
++            acc0, acc1 = bf2_f32(ws[0][p])
++            for src in range_constexpr(1, len(ws)):
++                lo, hi = bf2_f32(ws[src][p])
++                acc0, acc1 = acc0 + lo, acc1 + hi
++            pend += [bf16_round(acc0), bf16_round(acc1)]
++    cc = col - task * COLS
++    r = [[x for q in range(2) for x in bf2_f32(fx.Int32(rw[h][q]))] for h in range(HC)]
++    rows = []
++    for o in range_constexpr(HC):
++        cm = [fx.Float32(cmv[h][o]) for h in range(HC)]
++        post = fx.Float32(postv[o])
++        vs = []
++        for k in range_constexpr(QUAD):
++            v = post * pend[k] + (r[0][k] * cm[0])
++            for h in range_constexpr(1, HC - 1):
++                v = v + cm[h] * r[h][k]
++            v = bf16_round(fma(cm[HC - 1], r[HC - 1][k], v))
++            fx.ptr_store(v, rl + (t * KT + o * COLS + cc + k))
++            vs.append(v)
++        w = [bf16_pair(vs[2 * m], vs[2 * m + 1]).bitcast(fx.Int32) for m in range(2)]
++        at = ((t * HC + o) * HIDDEN + col) // 2
++        bo.buffer_store(fx.Vector.from_elements(w, fx.Int32), rsrc(a["res_out"]), at)
++        rows.append(vs)
++    outs = []
++    for k in range_constexpr(QUAD):
++        acc = fx.Float32(0.0)
++        for h in range_constexpr(HC):
++            acc = acc + fx.Float32(prev[h]) * rows[h][k]
++        outs.append(acc)
++    c["put_bf"](c["lin"], t * HIDDEN + col, outs)
++
++
++@traced
++def slice_rest(c, task):
++    """``stage_slice`` past the layer input: the sums of squares and the mix
++    projection partials (``fl`` filled, ``rl`` complete)."""
++    s, lane, wave = c["S"], c["lane"], c["wave"]
++    rl = c["rl"]
++    for t in range_constexpr(s):
++        if wave == t % WAVES:
++            x0 = fx.ptr_load(rl + (t * KT + 2 * lane))
++            x1 = fx.ptr_load(rl + (t * KT + 2 * lane + 1))
++            sq = butterfly(x0 * x0 + x1 * x1, (32, 16, 8, 4, 2, 1))
++            if lane == 0:
++                c["put"](c["pmix"], (task * s + t) * PART + MIX, sq)
++    slice_mix_all(c, task)
++
++
++RED_TILE = WAVES * 2 * 64 * 4  # ``slice_mix``'s MFMA partials of a token tile
++
++
++def red_words(s, tuned=False):
++    """The seam's LDS ``red``: ``slice_mix``'s partials of a token tile, or
++    (``tuned``) ``slice_mix_all``'s of every token tile."""
++    return RED_TILE * (len(token_tiles(s)) if tuned else 1)
++
++
++@traced
++def slice_mix_all(c, task):
++    """``slice_mix`` of every token tile, the same sums: all tiles' MFMAs, one
++    barrier, then all tiles' wave sums (two barriers in all, not two a tile)."""
++    s, tid, lane, wave = c["S"], c["tid"], c["lane"], c["wave"]
++    rl, fl, red = c["rl"], c["fl"], c["red"]
++    kw = KT // WAVES
++    tiles = token_tiles(s)
++    for ti in range_constexpr(len(tiles)):
++        t0, n = tiles[ti]
++        tok = plus(t0, fx.min(lane % 16, n - 1))
++        cs = [fx.Vector.filled(4, 0.0, fx.Float32) for _ in range(2)]
++        for kk in range_constexpr(kw // 4):
++            colk = wave * kw + lane // 16 + 4 * kk
++            b = fx.ptr_load(rl + (tok * KT + colk))
++            for h in range_constexpr(2):
++                row = h * 16 + lane % 16
++                av = fx.ptr_load(fl + (fx.min(row, MIX - 1) * KT + colk))
++                av = (row < MIX).select(av, fx.Float32(0.0))
++                ops = rocdl._split_mfma_operands([av, b, cs[h], 0, 0, 0])
++                cs[h] = fx.Vector(
++                    rocdl.mfma_f32_16x16x4f32(T.vec(4, T.f32), *ops).result
++                )
++        for h in range_constexpr(2):
++            fx.ptr_store(
++                cs[h], red + (ti * RED_TILE + ((wave * 2 + h) * 64 + lane) * 4)
++            )
++    gpu.barrier()
++    total = MIX * s
++    for pas in range_constexpr(0, total, THREADS):
++        u = pas + tid
++        if u < total:
++            ti = u // (MIX * 16)
++            loc = u % (MIX * 16)
++            tl = loc // MIX
++            j = loc % MIX
++            t = ti * 16 + tl
++            h = j // 16
++            ln = 16 * ((j % 16) // 4) + tl
++            tot = fx.Float32(0.0)
++            for w in range_constexpr(WAVES):
++                tot = tot + fx.ptr_load(
++                    red + (ti * RED_TILE + ((w * 2 + h) * 64 + ln) * 4 + j % 4)
++                )
++            c["put"](c["pmix"], (task * s + t) * PART + j, tot)
+     gpu.barrier()
+ 
+ 
+@@ -324,7 +492,7 @@
+ 
+ # ---------------------------------------------------------------- norm
+ @traced
+-def stage_norm(c, t, store):
++def stage_norm(c, t, store, tail_barrier=True):
+     """Token t's RMSNorm (rstd = rsq(fma(sum, 1/H, eps)), bf16((x rstd) w));
+     256 threads, 3 chunks of 8 at 8 t + 2048 c, each chunk's bf16 values handed
+     to ``store(t, col, ys, live)`` by every thread (``live``: a thread's chunk
+@@ -335,9 +503,24 @@
+     mine = tid < 256
+     cols = [tt * 8 + 2048 * ch for ch in range(3)]
+     xs = []
++    if const_expr(c["tuned"]):
++        # the norm weights in flight before the row's wait (they do not depend
++        # on it), then the three chunks' pairs in one poll batch: one round trip
++        at = [fx.min(cols[ch], HIDDEN - 8) for ch in range(3)]
++        wv = [ld_vec(a["norm_w"], at[ch] // 2, 4) for ch in range(3)]
++        got = c["poll"](
++            [
++                (c["lin"], (t * HIDDEN + at[ch]) // 2 + k, 1)
++                for ch in range(3)
++                for k in range(4)
++            ]
++        )
+     for ch in range_constexpr(3):
+         base = t * HIDDEN + fx.min(cols[ch], HIDDEN - 8)
+-        words = c["poll"]([(c["lin"], base // 2 + k, 1) for k in range(4)])
++        if const_expr(c["tuned"]):
++            words = got[4 * ch : 4 * ch + 4]
++        else:
++            words = c["poll"]([(c["lin"], base // 2 + k, 1) for k in range(4)])
+         v = []
+         for k in range_constexpr(4):
+             v += [bf_lo(words[k][0]), bf_hi(words[k][0])]
+@@ -354,11 +537,18 @@
+     r = hw_rsq(fma(tot, fx.Float32(1.0 / HIDDEN), fx.Float32(EPS)))
+     for ch in range_constexpr(3):
+         col = fx.min(cols[ch], HIDDEN - 8)
+-        ys = [
+-            bf16_round((xs[ch][j] * r) * ld_bf(a["norm_w"], col + j)) for j in range(8)
+-        ]
++        if const_expr(c["tuned"]):
++            nw = [f(fx.Int32(wv[ch][k])) for k in range(4) for f in (bf_lo, bf_hi)]
++            ys = [bf16_round((xs[ch][j] * r) * nw[j]) for j in range(8)]
++        else:
++            ys = [
++                bf16_round((xs[ch][j] * r) * ld_bf(a["norm_w"], col + j))
++                for j in range(8)
++            ]
+         store(t, col, ys, mine & (cols[ch] < HIDDEN))
+-    gpu.barrier()
++    if const_expr(tail_barrier):
++        # (a caller that publishes next has the drain's barrier instead)
++        gpu.barrier()
+ 
+ 
+ # ---------------------------------------------------------------- reduce
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/ops/__init__.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/ops/__init__.py
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: Apache-2.0
+ # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+ """gfx942 (MI300X, MI325X) decode helpers for DeepSeek-V4.1. swa_decode_meta
+-also runs on gfx950 (MI355X).
++and fused_markov also run on gfx950 (MI355X).
+ 
+ ``topk`` holds the sparse indexer's top-512 hooks, built from
+ ``topk512_gfx942.cu``, and ``cand_logits`` the indexer logits of the DSpark
+@@ -10,7 +10,8 @@
+ attention metadata, ``fused_markov`` is DSpark's Markov sampling in one
+ launch, and ``draft_lm_head`` keeps the DSpark draft's 5-row logits GEMM off
+ wvSplitK. All of them run only when ``enabled()`` is true, except
+-``swa_decode_meta``, which runs when ``swa_decode_meta_enabled()`` is true.
++``swa_decode_meta`` and ``fused_markov``, which run when
++``monokernel_cdna3_or_4()`` is true.
+ """
+ 
+ import functools
+@@ -30,7 +31,7 @@
+     global _monokernel
+     _monokernel = bool(vllm_config.kernel_config.monokernel)
+     enabled.cache_clear()
+-    swa_decode_meta_enabled.cache_clear()
++    monokernel_cdna3_or_4.cache_clear()
+ 
+ 
+ @functools.cache
+@@ -38,7 +39,7 @@
+     """True with --monokernel on a gfx942 GPU. Every helper keeps the result
+     of vLLM's op it replaces, so each one returns False for a call it cannot
+     take and vLLM then runs its own op. gfx950 keeps vLLM's ops here, except
+-    for swa_decode_meta (swa_decode_meta_enabled)."""
++    for swa_decode_meta and fused_markov (monokernel_cdna3_or_4)."""
+     if not _monokernel or not current_platform.is_rocm():
+         return False
+     from vllm.platforms.rocm import on_gfx942
+@@ -47,10 +48,9 @@
+ 
+ 
+ @functools.cache
+-def swa_decode_meta_enabled() -> bool:
++def monokernel_cdna3_or_4() -> bool:
+     """True with --monokernel on a CDNA3 (gfx942) or CDNA4 (gfx950) GPU.
+-    swa_decode_meta is plain Triton and writes the buffers that the attention
+-    of both reads."""
++    swa_decode_meta and fused_markov are plain Triton and run on both."""
+     if not _monokernel or not current_platform.is_rocm():
+         return False
+     from vllm.platforms.rocm import get_cdna_version
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/ops/fused_markov.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/ops/fused_markov.py
+@@ -25,16 +25,16 @@
+ the draft proposes, not the target's output, because the rejection sampler
+ verifies every draft token against the target's own distribution.
+ 
+-It runs on gfx942 with --monokernel (``ops.enabled()``). The speculator asks
+-the draft model's ``sample_sequential`` (dspark.py) before its loop, and that
+-calls ``sample_sequential`` here.
++It runs on gfx942 and gfx950 with --monokernel (``ops.monokernel_cdna3_or_4()``).
++The speculator asks the draft model's ``sample_sequential`` (dspark.py)
++before its loop, and that calls ``sample_sequential`` here.
+ tests/kernels/models/amd/test_dsv41_gfx942_fused_markov.py compares it with vLLM's loop.
+ """
+ 
+ import torch
+ 
+ from vllm.logger import init_logger
+-from vllm.models.deepseek_v41.amd.ops import enabled
++from vllm.models.deepseek_v41.amd.ops import monokernel_cdna3_or_4
+ from vllm.triton_utils import tl, triton
+ from vllm.v1.worker.gpu.sample.gumbel import gumbel_noised_argmax, spec_step_seed
+ 
+@@ -50,6 +50,8 @@
+ # The step launch unrolls its loop over the rows (requests) of a step, so it
+ # is built for at most this many. A larger step takes vLLM's loop.
+ MAX_ROWS = 8
++# gfx950: vLLM's loop is faster from 6 rows, where its Markov GEMV leaves wvSplitK.
++MAX_ROWS_GFX950 = 5
+ 
+ 
+ @triton.jit
+@@ -217,7 +219,10 @@
+         return "the confidence head"
+     if spec.acceptance_estimator is not None:
+         return "the acceptance estimator"
+-    if not 1 <= num_reqs <= MAX_ROWS:
++    from vllm.platforms.rocm import get_cdna_version
++
++    max_rows = MAX_ROWS_GFX950 if get_cdna_version() == 4 else MAX_ROWS
++    if not 1 <= num_reqs <= max_rows:
+         return f"{num_reqs} requests"
+     w1 = head.markov_w1.weight
+     w2 = head.markov_w2.weight
+@@ -235,7 +240,7 @@
+ def sample_sequential(spec, num_reqs: int, head_hidden: torch.Tensor) -> bool:
+     """DSparkSpeculator._sample_sequential with the fused launches. Returns
+     False, having done nothing, when this step takes vLLM's loop."""
+-    if not enabled():
++    if not monokernel_cdna3_or_4():
+         return False
+     why = _why_not(spec, num_reqs)
+     if why is not None:
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/ops/swa_decode_meta.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/ops/swa_decode_meta.py
+@@ -23,7 +23,7 @@
+ is 3 more builds of 8 launches after every target step.
+ 
+ On gfx942 and gfx950 with --monokernel
+-(``ops.swa_decode_meta_enabled()``), decode batches of up to MAX_ROWS rows,
++(``ops.monokernel_cdna3_or_4()``), decode batches of up to MAX_ROWS rows,
+ causal or the draft block, use it. Other batches take the rest of
+ DeepseekV41ROCMAiterSparseSWAMetadataBuilder.build.
+ tests/kernels/models/amd/test_dsv41_gfx942_decode_meta.py compares it with the vLLM ops
+@@ -32,7 +32,7 @@
+ 
+ import torch
+ 
+-from vllm.models.deepseek_v41.amd.ops import swa_decode_meta_enabled
++from vllm.models.deepseek_v41.amd.ops import monokernel_cdna3_or_4
+ from vllm.triton_utils import tl, triton
+ 
+ # One program holds all rows of the batch in registers, as a ROWS x WIDTH
+@@ -183,7 +183,7 @@
+     """Return the ROCm SWA metadata of a decode batch, causal or the DSpark
+     draft block, built with one launch, or None when the batch needs the rest
+     of DeepseekV41ROCMAiterSparseSWAMetadataBuilder.build."""
+-    if not swa_decode_meta_enabled():
++    if not monokernel_cdna3_or_4():
+         return None
+     from vllm.v1.attention.backends.mla import sparse_swa
+     from vllm.v1.attention.backends.utils import split_decodes_and_prefills
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/vl_model.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/amd/vl_model.py
+@@ -39,9 +39,9 @@
+ from vllm.models.deepseek_v4.common.vision import (
+     DeepseekV4Aligner,
+     DeepseekV4ViT,
++    encode_images,
+     run_dp_sharded_vision_tower,
+ )
+-from vllm.models.deepseek_v4.common.vl_model import stream_language_model_first
+ from vllm.multimodal import MULTIMODAL_REGISTRY
+ from vllm.utils.tensor_schema import TensorSchema, TensorShape
+ 
+@@ -50,6 +50,7 @@
+     DeepseekV4VLDummyInputsBuilder,
+     DeepseekV4VLMultiModalProcessor,
+     DeepseekV4VLProcessingInfo,
++    num_image_tokens,
+ )
+ from ..common.vl_cudagraph import DeepseekV4VLEncoderCudaGraphMixin
+ from ..decoder_replay_layers import DecoderReplayLayers
+@@ -158,7 +159,7 @@
+ 
+     @classmethod
+     def get_placeholder_str(cls, modality: str, i: int) -> str | None:
+-        if modality == "image":
++        if modality.startswith("image"):
+             return IMAGE_PLACEHOLDER
+         raise ValueError(f"Unsupported modality: {modality!r}")
+ 
+@@ -238,16 +239,9 @@
+                 self.vision, self.aligner, patches, vit_grid
+             )
+         else:
+-            image_embeds_list = []
+-            vit_offset = 0
+-            for n_vit_h, n_vit_w in vit_grid:
+-                n_vit = n_vit_h * n_vit_w
+-                image_embeds_list.append(
+-                    self._encode_image(
+-                        patches[vit_offset : vit_offset + n_vit], n_vit_h, n_vit_w
+-                    )
+-                )
+-                vit_offset += n_vit
++            image_embeds_list = encode_images(
++                self.vision, self.aligner, patches, vit_grid
++            )
+ 
+         embeds: list[torch.Tensor] = []
+         span_offset = 0
+@@ -265,6 +259,13 @@
+         return tuple(embeds)
+ 
+     def embed_multimodal(self, **kwargs: object) -> MultiModalEmbeddings:
++        image_embeds = kwargs.get("image_embeds")
++        if image_embeds is not None:
++            llm_grid = kwargs["llm_grid"]
++            assert isinstance(image_embeds, torch.Tensor)
++            assert isinstance(llm_grid, torch.Tensor)
++            sizes = [num_image_tokens(h, w) for h, w in llm_grid.tolist()]
++            return image_embeds.split(sizes)
+         image_input = self._parse_and_validate_image_input(**kwargs)
+         if image_input is None:
+             return []
+@@ -336,19 +337,5 @@
+         return self.language_model.get_mtp_target_hidden_states()
+ 
+     def load_weights(self, weights: Iterable[tuple[str, torch.Tensor]]) -> set[str]:
+-        # The child finalizes in load_weights, so its weights must reach it as
+-        # one contiguous group.
+-        mapped = stream_language_model_first(self.hf_to_vllm_mapper.apply(weights))
+         loader = AutoWeightsLoader(self)
+-        loaded_params = loader.load_weights(mapped)
+-        # The child's load_weights already ran its post-load finalization.
+-        self._weights_finalized = True
+-        return loaded_params
+-
+-    def process_weights_after_loading(self) -> None:
+-        # Model-level post-load hook (called by the loader after any load
+-        # format). Under DummyModelLoader the child's load_weights — and
+-        # hence its finalize step — is bypassed, so run it here instead.
+-        if getattr(self, "_weights_finalized", False):
+-            return
+-        self.language_model.process_weights_after_loading()
++        return loader.load_weights(self.hf_to_vllm_mapper.apply(weights))
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/attention.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/attention.py
+@@ -60,6 +60,14 @@
+ from vllm.model_executor.layers.layernorm import RMSNorm
+ from vllm.model_executor.layers.quantization import QuantizationConfig
+ from vllm.model_executor.models.utils import extract_layer_index
++from vllm.model_executor.warmup.jit_warmup_triton_helper import (
++    DispatchSpec,
++    TritonWarmupTensor,
++    triton_kernel_dispatcher_with_warmup,
++)
++from vllm.models.deepseek_v4.attention import fill_short_context_topk_indices
++from vllm.models.deepseek_v4.common.grouped_wo_a import DeepseekV4GroupedWoA
++from vllm.models.deepseek_v41.common.ops.fused_layout import Q_CHUNK
+ from vllm.models.deepseek_v41.common.rope import build_deepseek_v4_rope
+ from vllm.models.deepseek_v41.compressor import DeepseekCompressor
+ from vllm.platforms import current_platform
+@@ -90,6 +98,78 @@
+ # shard per TP rank and all-gathers the result.
+ _SHARD_FUSED_WQA_WKV_MIN_TOKENS = 2048
+ 
++# From this many tokens, eager steps build the padded interleaved Q with
++# _pad_interleaved_q instead of in the fused KV-insert op. Set from a
++# 64-16384-token sweep on B300: by GPU time alone the copy wins from about
++# 256 tokens, but it costs one extra eager launch, and with that launch gap
++# fully exposed the crossover moves to about 2048. This value keeps the
++# large-step win without betting on launch overlap.
++_Q_PAD_COPY_MIN_TOKENS = 2048
++
++
++@triton.jit
++def _pad_interleaved_q_kernel(
++    q_ptr,
++    out_ptr,
++    num_rows,
++    LIVE: tl.constexpr,
++    PAD: tl.constexpr,
++    BLOCK_ROWS: tl.constexpr,
++):
++    # One row per (token, 16-dim chunk): LIVE copied elements, then PAD zeros.
++    pid = tl.program_id(0)
++    rows = pid.to(tl.int64) * BLOCK_ROWS + tl.arange(0, BLOCK_ROWS).to(tl.int64)
++    row_mask = rows[:, None] < num_rows
++    cols = tl.arange(0, LIVE)
++    x = tl.load(q_ptr + rows[:, None] * LIVE + cols[None, :], mask=row_mask)
++    out_rows = out_ptr + rows[:, None] * (LIVE + PAD)
++    tl.store(out_rows + cols[None, :], x, mask=row_mask)
++    pad_cols = tl.arange(0, PAD)
++    tl.store(
++        out_rows + LIVE + pad_cols[None, :],
++        tl.zeros([BLOCK_ROWS, PAD], dtype=x.dtype),
++        mask=row_mask,
++    )
++
++
++def _pad_interleaved_q_warmup_inputs(
++    *,
++    live_heads: int,
++    padded_heads: int,
++    head_dim: int,
++    dtype: torch.dtype,
++) -> dict[str, object]:
++    return dict(
++        q=TritonWarmupTensor(dtype, shape=(1, live_heads, head_dim)),
++        out=TritonWarmupTensor(dtype, shape=(1, padded_heads, head_dim)),
++    )
++
++
++@triton_kernel_dispatcher_with_warmup(
++    kernel=_pad_interleaved_q_kernel,
++    warmup_inputs=_pad_interleaved_q_warmup_inputs,
++)
++def _pad_interleaved_q(q: torch.Tensor, out: torch.Tensor) -> DispatchSpec:
++    """Copy chunk-interleaved ``q`` [N, H, D] into ``out`` [N, HP, D].
++
++    Writes the fused KV-insert op's interleaved Q layout: in each 16-dim chunk,
++    the H live heads copied bit for bit, then +0.0 in the HP - H padding slots.
++    Both tensors are dense and share a dtype; ``16 * H`` and ``16 * (HP - H)``
++    must be powers of two.
++    """
++    num_tokens, live_heads, head_dim = q.shape
++    padded_heads = out.shape[1]
++    assert out.shape == (num_tokens, padded_heads, head_dim) and out.dtype == q.dtype
++    num_rows = num_tokens * (head_dim // Q_CHUNK)
++    block_rows = 4
++    return (triton.cdiv(num_rows, block_rows),), dict(
++        num_rows=num_rows,
++        LIVE=live_heads * Q_CHUNK,
++        PAD=(padded_heads - live_heads) * Q_CHUNK,
++        BLOCK_ROWS=block_rows,
++        num_warps=4,
++    )
++
+ 
+ def _replace_layer_index(prefix: str, layer_id: int) -> str:
+     """Swap the layer index inside a ``...layers.<idx>...`` prefix."""
+@@ -107,25 +187,6 @@
+     # NOTE(yifan): FP8 indexer cache uses the same layout as V3.2:
+     # head_dim bytes = 128 fp8 + 4 fp32 scale = 132.
+     return index_head_dim + index_head_dim // 128 * 4
+-
+-
+-@triton.jit
+-def _fill_short_context_topk_indices(
+-    output,
+-    positions,
+-    TOP_K: tl.constexpr,
+-    COMPRESS_RATIO: tl.constexpr,
+-    PADDED_TOP_K: tl.constexpr,
+-):
+-    # small triton kernel that selects every candidate, -1 otherwise
+-    row = tl.program_id(0)
+-    offsets = tl.arange(0, PADDED_TOP_K)
+-    num_compressed = (tl.load(positions + row) + 1) // COMPRESS_RATIO
+-    tl.store(
+-        output + row * TOP_K + offsets,
+-        tl.where(offsets < num_compressed, offsets, -1),
+-        mask=offsets < TOP_K,
+-    )
+ 
+ 
+ # Which packed fp8_ds_mla record a V4.1 layer writes. FlashMLA decodes
+@@ -387,9 +448,10 @@
+         )
+ 
+         self.kv_norm = RMSNorm(self.head_dim, self.eps)
+-        self.wo_a = ColumnParallelLinear(
++        self.wo_a = DeepseekV4GroupedWoA(
+             self.n_heads * self.head_dim // self.n_groups,
+             self.n_groups * self.o_lora_rank,
++            n_groups=self.n_groups,
+             bias=False,
+             quant_config=quant_config,
+             return_bias=False,
+@@ -550,15 +612,20 @@
+         ):
+             logger.warning_once("SWA bounded replay with PCP requires prefix caching.")
+             swa_bounded_replay = False
++        # Replay relies on the AITER sparse-MLA and Triton gather paths
++        # clamping to replay_start, validated on a compatible CDNA version
++        # only. The import is ROCm-only: it resolves the GPU arch and fails
++        # with no GPU visible.
+         if swa_bounded_replay and current_platform.is_rocm():
+-            logger.warning_once(
+-                "Prefix-cache SWA replay is off on ROCm (the sparse SWA "
+-                "metadata builders forward replay_start, but the window clamp "
+-                "it relies on lives in the FlashInfer and FlashMLA prefill "
+-                "kernels, so the padded slots fault); the sliding-window cache "
+-                "takes part in prefix caching instead."
+-            )
+-            swa_bounded_replay = False
++            from vllm.platforms.rocm import get_cdna_version
++
++            if get_cdna_version() not in (3, 4):
++                logger.warning_once(
++                    "Prefix-cache SWA replay is only enabled on a compatible "
++                    "ROCm CDNA version; the sliding-window cache takes part "
++                    "in prefix caching instead."
++                )
++                swa_bounded_replay = False
+         self.swa_cache_layer = DeepseekV4SWACache(
+             head_dim=self.head_dim,
+             window_size=self.window_size,
+@@ -614,6 +681,15 @@
+         else:
+             self.compressed_cache_prefix = None
+ 
++        # _pad_interleaved_q needs power-of-two chunk widths: 32 live heads of
++        # 64 (e.g. TP2) qualify, 16 or 8 (768 or 896 pad columns) do not.
++        self._pads_q_by_copy = (
++            self.accepts_unnormed_unroped_query
++            and self.n_local_heads == 32
++            and self.padded_heads == 64
++            and self.max_num_batched_tokens >= _Q_PAD_COPY_MIN_TOKENS
++        )
++
+         if vllm_config.kernel_config.enable_jit_warmup:
+             from vllm.v1.attention.backends.mla.sparse_swa import (
+                 _COMPUTE_PREFILL_METADATA_KERNEL,
+@@ -625,6 +701,14 @@
+                 window_size=self.window_size,
+                 block_size=self.swa_cache_layer.block_size,
+             )
++
++            if self._pads_q_by_copy:
++                _pad_interleaved_q.register_warmup(
++                    live_heads=self.n_local_heads,
++                    padded_heads=self.padded_heads,
++                    head_dim=self.head_dim,
++                    dtype=vllm_config.model_config.dtype,
++                )
+ 
+             if self.compress_ratio > 1:
+                 from vllm.v1.attention.backends.mla.compressor_utils import (
+@@ -1001,11 +1085,7 @@
+             compressor = self.compressor
+ 
+             def compressor_kv_score() -> torch.Tensor:
+-                return torch.mm(
+-                    hidden_states,
+-                    compressor.fused_wkv_wgate.weight.T,
+-                    out_dtype=torch.float32,
+-                )
++                return compressor.fused_wkv_wgate(hidden_states)
+ 
+             aux_fns[0] = compressor_kv_score
+ 
+@@ -1072,6 +1152,8 @@
+         attention kernel norms and rotates Q itself and reads it in its own
+         chunk-interleaved layout, so the Q half of the launch is a zero-pad to
+         ``padded_heads`` -- and nothing at all once the shard is that wide.
++        On large eager steps of a ``_pads_q_by_copy`` layer, a KV-only launch
++        leaves that pad to ``_pad_interleaved_q``.
+         """
+         if not isinstance(attn_metadata, dict):
+             # Profile run: kernel doesn't fire; produce a padded tensor so
+@@ -1137,6 +1219,12 @@
+                 and self.n_local_heads == self.padded_heads
+                 else self.padded_heads
+             )
++            # Captured graphs keep the fused pad.
++            copy_q = (
++                self._pads_q_by_copy
++                and q.shape[0] >= _Q_PAD_COPY_MIN_TOKENS
++                and not torch.cuda.is_current_stream_capturing()
++            )
+             q_padded = torch.ops._C.fused_deepseek_v4_qnorm_rope_kv_rope_quant_insert(
+                 q,
+                 kv,
+@@ -1144,7 +1232,7 @@
+                 slot_mapping,
+                 positions,
+                 cos_sin_cache,
+-                pad_to,
++                0 if copy_q else pad_to,
+                 self.eps,
+                 swa_metadata.block_size,
+                 False,  # apply_q_norm: qr is normed before wq_b
+@@ -1152,6 +1240,10 @@
+                 not self.accepts_unnormed_unroped_query,  # apply_q_rope
+                 self.accepts_unnormed_unroped_query,  # is_q_interleaved
+             )
++            if copy_q:
++                out = q.new_empty((q.shape[0], self.padded_heads, q.shape[2]))
++                _pad_interleaved_q(q, out)
++                return out
+             return q if pad_to == 0 else q_padded
+ 
+         assert not self.accepts_unnormed_unroped_query, (
+@@ -1577,7 +1669,7 @@
+                     + indexer_metadata.num_prefill_tokens
+                 )
+                 if num_tokens > 0:
+-                    _fill_short_context_topk_indices[(num_tokens,)](
++                    fill_short_context_topk_indices[(num_tokens,)](
+                         self.topk_indices_buffer,
+                         positions,
+                         TOP_K=self.topk_tokens,
+@@ -1604,3 +1696,18 @@
+         # ReplicatedLinear returns (output, bias); bias is None.
+         q, _ = self.wq_b(qr)
+         return q
++
++
++def autotune_indexer_wq_b(model: nn.Module, num_tokens: int) -> None:
++    """Short-context dummy runs skip wq_b, so tune it directly."""
++    for module in model.modules():
++        if isinstance(module, DeepseekV4Indexer):
++            # Run every wq_b: FlashInfer keys on op, runner, shapes and dtype,
++            # and skips profiling on a cache hit, so duplicates are cheap.
++            qr = torch.randn(
++                num_tokens,
++                module.q_lora_rank,
++                dtype=module.vllm_config.model_config.dtype,
++                device=next(module.weights_proj.parameters()).device,
++            )
++            module.wq_b(qr)
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/common/engram.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/common/engram.py
+@@ -1701,29 +1701,36 @@
+         # suffix rule.
+         self.embed_tokens = self._create_embedding(layout, layer_hash_index)
+         n_hash_cols = (layout.max_ngram_size - 1) * layout.n_heads
++        self.wkv = self._create_wkv(
++            n_hash_cols * layout.head_dim, quant_config, f"{prefix}.wkv"
++        )
++        self.q_weight = nn.Parameter(
++            torch.empty(self.hc_mult, self.dim, dtype=torch.bfloat16),
++            requires_grad=False,
++        )
++        self.k_weight = nn.Parameter(
++            torch.empty(self.hc_mult, self.dim, dtype=torch.bfloat16),
++            requires_grad=False,
++        )
++
++        max_tokens = get_current_vllm_config().scheduler_config.max_num_batched_tokens
++        self._init_staging(max_tokens, layout.head_dim)
++
++    def _create_wkv(
++        self, input_size: int, quant_config: QuantizationConfig | None, prefix: str
++    ) -> ColumnParallelLinear:
+         # Without sequence parallelism every TP rank holds every token, so
+         # shard the output columns instead of replicating the projection.
+-        self.wkv = ColumnParallelLinear(
+-            n_hash_cols * layout.head_dim,
++        return ColumnParallelLinear(
++            input_size,
+             self.dim * (self.hc_mult + 1),
+             bias=False,
+             gather_output=True,
+             quant_config=quant_config,
+             return_bias=False,
+-            prefix=f"{prefix}.wkv",
+-            disable_tp=use_sequence_parallel,
+-        )
+-        self.q_weight = nn.Parameter(
+-            torch.empty(self.hc_mult, self.dim, dtype=torch.bfloat16),
+-            requires_grad=False,
+-        )
+-        self.k_weight = nn.Parameter(
+-            torch.empty(self.hc_mult, self.dim, dtype=torch.bfloat16),
+-            requires_grad=False,
+-        )
+-
+-        max_tokens = get_current_vllm_config().scheduler_config.max_num_batched_tokens
+-        self._init_staging(max_tokens, layout.head_dim)
++            prefix=prefix,
++            disable_tp=self.use_sequence_parallel,
++        )
+ 
+     def _create_embedding(
+         self, layout: EngramLayout, layer_hash_index: int
+@@ -1849,6 +1856,16 @@
+             if token_mask is not None:
+                 token_mask = token_mask[start : start + num_kv_tokens]
+ 
++        return self._post_wkv(hidden_states, kv, token_mask, num_kv_tokens)
++
++    def _post_wkv(
++        self,
++        hidden_states: torch.Tensor,
++        kv: torch.Tensor,
++        token_mask: torch.Tensor | None,
++        num_kv_tokens: int,
++    ) -> torch.Tensor:
++        """The gated update from the `wkv` output of `num_kv_tokens` tokens."""
+         num_tokens, hc_mult, dim = hidden_states.shape
+         assert hc_mult == self.hc_mult and dim == self.dim
+         assert kv.ndim == 2 and kv.shape[1] == (hc_mult + 1) * dim
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/common/mm_preprocess.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/common/mm_preprocess.py
+@@ -29,7 +29,12 @@
+ from vllm.config.multimodal import MultiModalDummyOptions
+ from vllm.inputs import MultiModalDataDict
+ from vllm.multimodal.inputs import MultiModalFieldConfig, MultiModalKwargsItems
+-from vllm.multimodal.parse import ImageSize, MultiModalDataItems
++from vllm.multimodal.parse import (
++    DictEmbeddingItems,
++    ImageSize,
++    MultiModalDataItems,
++    MultiModalDataParser,
++)
+ from vllm.multimodal.processing import (
+     BaseDummyInputsBuilder,
+     BaseMultiModalProcessor,
+@@ -246,14 +251,61 @@
+         )
+ 
+ 
++def _get_image_fields(
++    inputs: Mapping[str, torch.Tensor],
++) -> Mapping[str, MultiModalFieldConfig]:
++    vit_grid = inputs.get("vit_grid")
++    llm_grid = inputs.get("llm_grid")
++    empty = torch.empty(0, dtype=torch.long)
++    patch_sizes = empty if vit_grid is None else vit_grid.prod(-1)
++    span_sizes = (
++        empty if llm_grid is None else llm_grid[:, 0] * (llm_grid[:, 1] + 1) + 2
++    )
++    return {
++        "patches": MultiModalFieldConfig.flat_from_sizes("image", patch_sizes),
++        "vit_grid": MultiModalFieldConfig.batched("image", keep_on_cpu=True),
++        "llm_grid": MultiModalFieldConfig.batched("image", keep_on_cpu=True),
++        "types": MultiModalFieldConfig.flat_from_sizes(
++            "image", span_sizes, keep_on_cpu=True
++        ),
++        "image_embeds": MultiModalFieldConfig.flat_from_sizes("image", span_sizes),
++    }
++
++
++class DeepseekV4VLMultiModalDataParser(MultiModalDataParser):
++    embedding_fields = {
++        "image": {"image_embeds": "values", "llm_grid": "metadata"},
++    }
++
++    def _parse_image_data(self, data):
++        if isinstance(data, dict):
++            required, optional = self.embedding_field_sets("image")
++            return DictEmbeddingItems(
++                data,
++                modality="image",
++                required_fields=required,
++                optional_fields=optional,
++                fields_factory=_get_image_fields,
++            )
++        return super()._parse_image_data(data)
++
++
+ class DeepseekV4VLProcessingInfo(BaseProcessingInfo):
+     def get_hf_config(self) -> DeepseekV41Config:
+         return self.ctx.get_hf_config(DeepseekV41Config)
+ 
+-    def get_hf_processor(self, **kwargs: object) -> DeepseekV4VLProcessor:
++    def get_hf_processor(  # type: ignore[override]
++        self, **kwargs: object
++    ) -> DeepseekV4VLProcessor:
+         if kwargs:
+             raise ValueError(f"Unexpected processor kwargs: {sorted(kwargs)}")
+         return DeepseekV4VLProcessor(self.get_hf_config())
++
++    def get_data_parser(self) -> DeepseekV4VLMultiModalDataParser:
++        return DeepseekV4VLMultiModalDataParser(
++            expected_hidden_size=self._get_expected_hidden_size(),
++            allow_missing_mm_embeddings=self.allow_missing_mm_embeddings,
++        )
+ 
+     def get_supported_mm_limits(self) -> Mapping[str, int | None]:
+         return {"image": None}
+@@ -330,25 +382,7 @@
+         hf_inputs: BatchFeature,
+         hf_processor_mm_kwargs: Mapping[str, object],
+     ) -> Mapping[str, MultiModalFieldConfig]:
+-        vit_grid = hf_inputs.get("vit_grid")
+-        llm_grid = hf_inputs.get("llm_grid")
+-
+-        if vit_grid is None or llm_grid is None:
+-            empty = torch.empty(0, dtype=torch.long)
+-            patch_sizes = types_sizes = empty
+-        else:
+-            patch_sizes = vit_grid.prod(-1)
+-            n_llm_h, n_llm_w = llm_grid[:, 0], llm_grid[:, 1]
+-            types_sizes = n_llm_h * (n_llm_w + 1) + 2
+-
+-        return {
+-            "patches": MultiModalFieldConfig.flat_from_sizes("image", patch_sizes),
+-            "vit_grid": MultiModalFieldConfig.batched("image", keep_on_cpu=True),
+-            "llm_grid": MultiModalFieldConfig.batched("image", keep_on_cpu=True),
+-            "types": MultiModalFieldConfig.flat_from_sizes(
+-                "image", types_sizes, keep_on_cpu=True
+-            ),
+-        }
++        return _get_image_fields(hf_inputs)
+ 
+     def _get_prompt_updates(
+         self,
+@@ -360,11 +394,11 @@
+         validate_image_sentinel_ids(self.info.get_tokenizer())
+ 
+         def get_image_replacement(item_idx: int) -> PromptUpdateDetails:
+-            types: torch.Tensor = out_mm_kwargs["image"][item_idx]["types"].data
++            grid: torch.Tensor = out_mm_kwargs["image"][item_idx]["llm_grid"].data
+             # Every span position carries image_token_id; the roles live in
+             # ``types``. All of them are embed positions (delimiters get the
+             # learned vectors from embed_multimodal, not the embed table).
+-            full = [image_token_id] * types.numel()
++            full = [image_token_id] * num_image_tokens(*grid.tolist())
+             return PromptUpdateDetails.select_token_id(full, image_token_id)
+ 
+         return [
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/common/ops/cache_utils.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/common/ops/cache_utils.py
+@@ -29,6 +29,10 @@
+ from vllm.model_executor.warmup.jit_warmup_triton_helper import (
+     TritonPointerInputVariant,
+     TritonWarmupTensor,
++)
++from vllm.models.deepseek_v4.common.ops.cache_utils import (
++    quantize_and_insert_k_kernel,
++    remap_flashinfer_index,
+ )
+ from vllm.platforms import current_platform
+ from vllm.transformers_utils.deepseek_v4_utils import get_compress_ratios
+@@ -54,131 +58,6 @@
+ V41_NVFP4_BYTES_PER_TOKEN = 288
+ V41_NVFP4_QUANT_BLOCK = 16
+ V41_NVFP4_NUM_SCALES = 512 // V41_NVFP4_QUANT_BLOCK  # 32
+-
+-
+-@triton.jit
+-def quantize_and_insert_k_kernel(
+-    # Input tensors
+-    k_ptr,  # [num_tokens, 512] bf16
+-    slot_mapping_ptr,  # [num_tokens] int64
+-    # Output tensor
+-    k_cache_ptr,  # [num_blocks, block_bytes] as uint8 (flattened view)
+-    # Dimensions
+-    num_tokens,
+-    input_dim: tl.constexpr,  # 512
+-    fp8_dim: tl.constexpr,  # 448
+-    bf16_dim: tl.constexpr,  # 64
+-    scale_dim: tl.constexpr,  # 8
+-    quant_block: tl.constexpr,  # 64 (quantization block size)
+-    cache_block_size: tl.constexpr,  # 64 (paged cache block size)
+-    token_data_size: tl.constexpr,  # 576 bytes per token data
+-    block_stride: tl.constexpr,  # total bytes per block (padded)
+-    fp8_max: tl.constexpr,
+-    n_quant_blocks: tl.constexpr,  # 8 (7 real + 1 padding)
+-    use_fnuz: tl.constexpr = False,
+-):
+-    """Quantize K tensor and insert into paged K cache.
+-
+-    K Cache block layout (block_size=64 tokens):
+-    - [0, 64*576): Token data, each token has 448 fp8 + 128 bf16
+-    - [64*576, 64*576 + 64*8): Scales, each token has 8 uint8 scales
+-    - [64*576 + 64*8, block_stride): Padding
+-
+-    One program per token.
+-
+-    ``use_fnuz=True`` selects FNUZ (``tl.float8e4b8``); default OCP
+-    (``tl.float8e4nv``) matches every production caller.
+-    """
+-    pid = tl.program_id(0)
+-
+-    if pid >= num_tokens:
+-        return
+-
+-    # Get slot mapping
+-    slot_idx = tl.load(slot_mapping_ptr + pid)
+-    if slot_idx == -1:
+-        return
+-
+-    block_idx = slot_idx // cache_block_size
+-    pos_in_block = slot_idx % cache_block_size
+-
+-    # Input pointer for this token
+-    input_row_ptr = k_ptr + pid * input_dim
+-
+-    # int64: block_idx * block_stride can exceed 2^31 with many KV-cache blocks
+-    # (e.g. >= 57K at block_stride ~37K). Matches gather path below.
+-    cache_block_ptr = k_cache_ptr + block_idx.to(tl.int64) * block_stride
+-
+-    # Token data pointer: token data is stored contiguously at start of block
+-    # Each token's data is at offset pos_in_block * token_data_size
+-    token_data_ptr = cache_block_ptr + pos_in_block * token_data_size
+-
+-    # Scale pointer: scales are stored after ALL token data in the block
+-    # Scale for this token is at offset (64 * 576) + pos_in_block * 8
+-    token_scale_ptr = (
+-        cache_block_ptr + cache_block_size * token_data_size + pos_in_block * scale_dim
+-    )
+-
+-    # Token data layout: [0:448] fp8, [448:576] bf16
+-    token_fp8_ptr = token_data_ptr
+-    token_bf16_ptr = token_data_ptr + fp8_dim
+-
+-    # ========== Quantize and store FP8 portion (first 448 elements) ==========
+-    # Using UE8M0 quantization strategy (scale is power of 2, stored as uint8 exponent)
+-    for qblock_idx in tl.static_range(n_quant_blocks):
+-        qblock_start = qblock_idx * quant_block
+-
+-        if qblock_start < fp8_dim:
+-            offsets = qblock_start + tl.arange(0, quant_block)
+-            mask = offsets < fp8_dim
+-
+-            # Load bf16 input
+-            x = tl.load(input_row_ptr + offsets, mask=mask, other=0.0)
+-
+-            # Compute absmax scale (same as CUDA kernel)
+-            abs_x = tl.abs(x)
+-            block_max = tl.max(abs_x, axis=0)
+-            block_max = tl.maximum(block_max, 1e-4)  # Match CUDA: fmaxf(amax, 1e-4)
+-
+-            # UE8M0: Round scale UP to next power of 2
+-            # scale = 2^ceil(log2(block_max / fp8_max))
+-            raw_scale = block_max / fp8_max
+-            log_scale = tl.log2(raw_scale)
+-            exponent = tl.ceil(log_scale)  # Round UP to next integer exponent
+-            scale = tl.exp2(exponent)  # scale = 2^exponent (power of 2)
+-
+-            # Quantize to fp8: fp8_value = bf16_value / scale
+-            x_scaled = x / scale
+-            x_clamped = tl.clamp(x_scaled, -fp8_max, fp8_max)
+-
+-            # Convert to fp8 (FNUZ on gfx942, OCP elsewhere), then bitcast to uint8.
+-            if use_fnuz:
+-                x_fp8 = x_clamped.to(tl.float8e4b8)
+-            else:
+-                x_fp8 = x_clamped.to(tl.float8e4nv)
+-            x_uint8 = x_fp8.to(tl.uint8, bitcast=True)
+-
+-            # Store as uint8 (1 byte each)
+-            tl.store(token_fp8_ptr + offsets, x_uint8, mask=mask)
+-
+-            # UE8M0 scale encoding: stored_value = exponent + 127 (bias)
+-            # During dequant: scale = 2^(stored_value - 127)
+-            encoded_scale = exponent + 127.0
+-            encoded_scale = tl.maximum(tl.minimum(encoded_scale, 255.0), 0.0)
+-            tl.store(token_scale_ptr + qblock_idx, encoded_scale.to(tl.uint8))
+-
+-    # Padding scale at index 7
+-    tl.store(token_scale_ptr + 7, tl.zeros((), dtype=tl.uint8))
+-
+-    # ========== Store BF16 portion (last 64 elements, no quantization) ==========
+-    bf16_input_offset = fp8_dim
+-
+-    # Process bf16 in chunks of 16
+-    bf16_out_ptr = token_bf16_ptr.to(tl.pointer_type(tl.bfloat16))
+-    for i in tl.static_range(bf16_dim // 16):
+-        chunk_offsets = i * 16 + tl.arange(0, 16)
+-        bf16_vals = tl.load(input_row_ptr + bf16_input_offset + chunk_offsets)
+-        tl.store(bf16_out_ptr + chunk_offsets, bf16_vals)
+ 
+ 
+ @triton.jit
+@@ -1016,12 +895,6 @@
+ )
+ 
+ 
+-def _hf_config_int(vllm_config: Any, name: str, default: int) -> int:
+-    model_config = getattr(vllm_config, "model_config", None)
+-    hf_config = getattr(model_config, "hf_config", None)
+-    return int(getattr(hf_config, name, default) or default)
+-
+-
+ def _combine_topk_swa_warmup_inputs(vllm_config: Any) -> _WarmupInputRows:
+     """One warmup row per v4.1 layer type (compress ratio) in the model.
+ 
+@@ -1029,21 +902,15 @@
+     padded width is the same for all rows; SWA-only layers (ratio 0) pass
+     ``TOP_K=0``.
+     """
+-    model_config = getattr(vllm_config, "model_config", None)
+-    hf_config = getattr(model_config, "hf_config", None)
++    hf_config = vllm_config.model_config.hf_config
+     compress_ratios = get_compress_ratios(hf_config) or [0]
+-    topk = _hf_config_int(vllm_config, "index_topk", 0)
++    topk = hf_config.index_topk
+     return zip_inputs(
+         *(
+             dict(compress_ratio=ratio, topk=topk if ratio > 0 else 0, topk_width=topk)
+             for ratio in sorted({int(ratio) for ratio in compress_ratios})
+         )
+     )
+-
+-
+-def _scheduler_config_int(vllm_config: Any, name: str, default: int) -> int:
+-    scheduler_config = getattr(vllm_config, "scheduler_config", None)
+-    return int(getattr(scheduler_config, name, default) or default)
+ 
+ 
+ class CombineTopkSwaIndicesKernel(
+@@ -1180,10 +1047,7 @@
+         )
+ 
+     def get_warmup_keys(self, vllm_config: Any) -> list[CompileKey]:
+-        if _scheduler_config_int(vllm_config, "max_num_batched_tokens", 0) <= 0:
+-            return []
+-
+-        window_size = _hf_config_int(vllm_config, "sliding_window", 128)
++        window_size = vllm_config.model_config.hf_config.sliding_window
+         return self._trace_dispatch(self.dispatch)(
+             _combine_topk_swa_warmup_inputs(vllm_config),
+             _COMBINE_TOPK_SWA_POINTER_INPUTS,
+@@ -1397,18 +1261,6 @@
+         num_warps=num_warps,
+     )
+     return sparse_indices, sparse_topk_lens
+-
+-
+-@triton.jit
+-def _remap_flashinfer_index(values, block_size, block_span):
+-    # FlashInfer's DSv4 kernel indexes sparse KV by physical token stride, so
+-    # packed pages (#44577) need block*block_size+off -> block*block_span+off.
+-    # The launcher declares these indices with sparse_indices_are_storage_offsets=True.
+-    is_valid = values >= 0
+-    safe_values = tl.where(is_valid, values, 0)
+-    values = (safe_values // block_size) * block_span
+-    values += safe_values % block_size
+-    return tl.where(is_valid, values, -1)
+ 
+ 
+ @triton.jit(
+@@ -1475,7 +1327,7 @@
+                 mask=mask,
+                 other=-1,
+             )
+-            values = _remap_flashinfer_index(values, swa_block_size, swa_block_span)
++            values = remap_flashinfer_index(values, swa_block_size, swa_block_span)
+             tl.store(
+                 sparse_indices_ptr + token_idx * sparse_indices_stride + offset,
+                 values,
+@@ -1509,7 +1361,7 @@
+                 values = block_numbers * compressed_block_size + block_offsets
+                 values = tl.where(is_valid, values, -1)
+                 compressed_len += tl.sum((is_valid & token_valid).to(tl.int32), axis=0)
+-            values = _remap_flashinfer_index(
++            values = remap_flashinfer_index(
+                 values, compressed_block_size, compressed_block_span
+             )
+             tl.store(
+@@ -1564,7 +1416,7 @@
+         block_offsets = pos_offset % swa_block_size
+         slot_ids = block_numbers * swa_block_size + block_offsets
+         slot_ids = tl.where(offset < swa_len, slot_ids, -1)
+-        slot_ids = _remap_flashinfer_index(slot_ids, swa_block_size, swa_block_span)
++        slot_ids = remap_flashinfer_index(slot_ids, swa_block_size, swa_block_span)
+         tl.store(
+             sparse_indices_ptr + token_idx * sparse_indices_stride + offset,
+             slot_ids,
+@@ -1591,7 +1443,7 @@
+         block_offsets = local_idx % compressed_block_size
+         slot_ids = block_numbers * compressed_block_size + block_offsets
+         slot_ids = tl.where((offset < topk_len) & is_valid, slot_ids, -1)
+-        slot_ids = _remap_flashinfer_index(
++        slot_ids = remap_flashinfer_index(
+             slot_ids, compressed_block_size, compressed_block_span
+         )
+         tl.store(
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/common/ops/query_quant.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/common/ops/query_quant.py
+@@ -50,12 +50,20 @@
+     KV_SIZE: tl.constexpr,
+     BLOCK: tl.constexpr,
+     LAUNCH_PDL: tl.constexpr,
++    TRIGGER_FIRST: tl.constexpr,
+ ):
+     row = tl.program_id(0).to(tl.int64)
+     cols = tl.arange(0, BLOCK)
+     if LAUNCH_PDL:
++        # Dependents read the outputs only after their own grid-dependency
++        # wait, so triggering first only lets them launch sooner: a decode
++        # step's query projection then loads its weights while this kernel
++        # waits for its input.
++        if TRIGGER_FIRST:
++            tl.extra.cuda.gdc_launch_dependents()
+         tl.extra.cuda.gdc_wait()
+-        tl.extra.cuda.gdc_launch_dependents()
++        if not TRIGGER_FIRST:
++            tl.extra.cuda.gdc_launch_dependents()
+     if tl.program_id(1) == 0:
+         groups = tl.arange(0, BLOCK // 32)
+         if row < num_tokens:
+@@ -93,8 +101,12 @@
+     q_weight: torch.Tensor,
+     kv_weight: torch.Tensor,
+     eps: float,
++    early_trigger: bool = False,
+ ) -> tuple[QuantizedActivation, torch.Tensor]:
+-    """Normalize Q/KV and quantize Q with FlashInfer's swizzled MXFP8 scales."""
++    """Normalize Q/KV and quantize Q with FlashInfer's swizzled MXFP8 scales.
++    With ``early_trigger``, the kernel triggers its PDL dependents before its
++    own grid-dependency wait, for a caller whose query projection loads its
++    weights before its wait."""
+     assert qr.ndim == kv.ndim == 2 and qr.shape[0] == kv.shape[0]
+     assert qr.stride(-1) == kv.stride(-1) == 1
+     assert q_weight.is_contiguous() and kv_weight.is_contiguous()
+@@ -126,6 +138,7 @@
+             kv_size,
+             block,
+             launch_pdl,
++            launch_pdl and early_trigger,
+             num_warps=8 if block >= 2048 else 4,
+             launch_pdl=launch_pdl,
+         )
+@@ -140,12 +153,19 @@
+         FlashInferCutedslMxfp8LinearKernel,
+         FlashInferCutlassMxfp8LinearKernel,
+     )
++    from vllm.model_executor.kernels.linear.mxfp8.pytorch import (
++        TorchMxFp8LinearKernel,
++    )
+ 
+     # QuantKey does not encode scale layout; restrict this producer to the
+     # consumers that accept F8_128x4 swizzled scales.
+     return all(
+         get_input_quant_key(linear) == kMxfp8Dynamic
+         and type(getattr(getattr(linear, "quant_method", None), "kernel", None))
+-        in (FlashInferCutedslMxfp8LinearKernel, FlashInferCutlassMxfp8LinearKernel)
++        in (
++            FlashInferCutedslMxfp8LinearKernel,
++            FlashInferCutlassMxfp8LinearKernel,
++            TorchMxFp8LinearKernel,
++        )
+         for linear in linears
+     )
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/compressor.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/models/deepseek_v41/compressor.py
+@@ -12,7 +12,7 @@
+ from vllm.forward_context import get_forward_context
+ from vllm.model_executor.layers.attention_layer_base import AttentionLayerBase
+ from vllm.model_executor.layers.layernorm import RMSNorm
+-from vllm.model_executor.layers.linear import MergedColumnParallelLinear
++from vllm.models.deepseek_v4.compressor import DeepseekV4CompressorKVScoreLinear
+ from vllm.models.deepseek_v41.common.ops.fused_compress_quant_cache import (
+     fused_save_compress_norm,
+     rope_quant_insert,
+@@ -321,7 +321,7 @@
+         wkv_wgate_sizes = (
+             [self.head_dim, self.head_dim] if self.has_gate else [self.head_dim]
+         )
+-        self.fused_wkv_wgate = MergedColumnParallelLinear(
++        self.fused_wkv_wgate = DeepseekV4CompressorKVScoreLinear(
+             self.hidden_size,
+             wkv_wgate_sizes,
+             bias=False,
+--- V10:/usr/local/lib/python3.12/dist-packages/vllm/v1/attention/ops/rocm_aiter_mla_sparse.py
++++ V11:/usr/local/lib/python3.12/dist-packages/vllm/v1/attention/ops/rocm_aiter_mla_sparse.py
+@@ -23,12 +23,22 @@
+ from vllm.v1.worker.workspace import current_workspace_manager
+ 
+ if current_platform.is_rocm():
+-    from vllm.platforms.rocm import _ON_GFX942, _ON_GFX950, _ON_GFX1151, _ON_RDNA
++    from vllm.platforms.rocm import (
++        _ON_GFX942,
++        _ON_GFX950,
++        _ON_GFX1151,
++        _ON_RDNA,
++        get_cdna_version,
++    )
+ else:
+     _ON_GFX942 = False
+     _ON_GFX950 = False
+     _ON_GFX1151 = False
+     _ON_RDNA = False
++
++    def get_cdna_version() -> int:
++        return 0
++
+ 
+ logger = init_logger(__name__)
+ 
+@@ -52,6 +62,24 @@
+ # Conservative perf gate, not a correctness bound: OPUS is correct for any query
+ # count, but Triton stays faster below this measured crossover.
+ _GFX950_AITER_SPARSE_PREFILL_OPUS_MIN_QUERIES = 1024
++# gfx942 gate against the in-tree ragged prefill, not the gfx950 OPUS
++# crossover. MI325, H=16, D=512, bf16: from 512 rows AITER is ahead at
++# top-k 128, 512, and 2048. At 256 rows and top-k 128 the ratio is 1.04,
++# on a flat ~0.025 ms.
++_GFX942_AITER_PA_PREFILL_SPARSE_MIN_QUERIES = 512
++
++
++def _can_use_aiter_pa_prefill_sparse(q: torch.Tensor, kv: torch.Tensor) -> bool:
++    """Cheap gate. The AITER import runs only after this passes."""
++    from vllm._aiter_ops import rocm_aiter_ops
++
++    return (
++        get_cdna_version() == 3
++        and rocm_aiter_ops.is_mla_enabled()
++        and q.shape[0] >= _GFX942_AITER_PA_PREFILL_SPARSE_MIN_QUERIES
++        and q.dtype in (torch.bfloat16, torch.float16)
++        and kv.dtype == q.dtype
++    )
+ 
+ 
+ def _indexer_k_is_c4a_block_flat(compress_ratio: int) -> bool:
+@@ -3843,6 +3871,39 @@
+     return True
+ 
+ 
++def _rocm_sparse_attn_prefill_aiter(
++    pa_prefill_sparse: Callable[..., torch.Tensor],
++    q: torch.Tensor,
++    kv: torch.Tensor,
++    indices: torch.Tensor,
++    indptr: torch.Tensor,
++    scale: float,
++    attn_sink: torch.Tensor | None,
++    output: torch.Tensor,
++) -> None:
++    """gfx942 path. One KV pool; the extend sources stay unset."""
++    logger.info_once("Using AITER pa_prefill_sparse for sparse MLA prefill on gfx942")
++    indices = _as_int32_contiguous_1d(indices)
++    indptr = _as_int32_contiguous_1d(indptr)
++    inplace = (
++        output.shape == q.shape and output.dtype == q.dtype and output.is_contiguous()
++    )
++    written = pa_prefill_sparse(
++        q,
++        kv,
++        indices,
++        indptr,
++        None,
++        None,
++        None,
++        attn_sink,
++        float(scale),
++        out=output if inplace else None,
++    )
++    if written.data_ptr() != output.data_ptr():
++        output.copy_(written[..., : output.shape[-1]])
++
++
+ @functools.lru_cache
+ def _decode_cu_count() -> int:
+     try:
+@@ -4608,6 +4669,31 @@
+         ):
+             return
+ 
++    if _can_use_aiter_pa_prefill_sparse(q, kv):
++        from aiter.ops.triton.attention.pa_prefill_sparse import pa_prefill_sparse
++
++        if ragged_indices is None or ragged_indptr is None:
++            assert indices is not None
++            indices_2d = indices.reshape(indices.shape[0], -1)
++            ragged_indices, ragged_indptr = build_ragged_indices_from_dense(
++                indices_2d,
++                topk_length
++                if topk_length is not None
++                else (indices_2d >= 0).sum(dim=-1, dtype=torch.int32),
++                num_rows=kv.shape[0],
++            )
++        _rocm_sparse_attn_prefill_aiter(
++            pa_prefill_sparse,
++            q=q,
++            kv=kv.squeeze(1),
++            indices=ragged_indices,
++            indptr=ragged_indptr,
++            scale=scale,
++            attn_sink=opus_attn_sink,
++            output=output,
++        )
++        return
++
+     if ragged_indices is not None and ragged_indptr is not None:
+         _rocm_sparse_attn_prefill_ragged_triton(
+             q=q,

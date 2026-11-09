@@ -1,0 +1,18 @@
+{
+  "model": "DeepSeek-V4.1-Flash",
+  "hardware": "mi355x",
+  "framework": "vllm",
+  "history_total_rows": 1239,
+  "selected_snapshot_rows": 154,
+  "unique_points": 154,
+  "image_versions": 11,
+  "run_count": 13,
+  "first_date": "2026-09-12",
+  "latest_date": "2026-11-09",
+  "adjacent_matched_pairs": 101,
+  "latest_point_count": 10,
+  "source": "https://inferencex.semianalysis.com/api/v1/benchmarks/history?model=DeepSeek-V4.1-Flash&benchmarkType=agentic_traces",
+  "coverage": "currently retained published AgentX curve snapshots, not all CI runs ever executed",
+  "policy": "earliest valid observation per image name and dashboard configuration; preserve every repetition",
+  "causal_kernel_attribution": "not established"
+}
