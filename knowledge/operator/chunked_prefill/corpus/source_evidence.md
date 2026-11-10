@@ -28,69 +28,53 @@ The scope language supplies the host/helper backend context. Explicitly decorate
 
 ## Observations
 
-### jit_cache
+Observations are grouped by snapshot and file. The displayed `src_…` suffix combines with that section's snapshot to form the full reference; existing full-reference anchors are retained.
 
-| reference | language | source | observed construct |
-|---|---|---|---|
-| <a id="aiter_b3ad6c46-src_9ac04682437fd846"></a><code>aiter_b3ad6c46:src_9ac04682437fd846</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:320](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L320) | <code>@functools.lru_cache(maxsize=1024) def _get_config</code> |
+### `aiter_b3ad6c46` / `aiter/ops/triton/_triton_kernels/attention/extend_attention.py`
 
-### mfma_intrinsic
-
-| reference | language | source | observed construct |
-|---|---|---|---|
-| <a id="aiter_b3ad6c46-src_d85824aeff6bfc7a"></a><code>aiter_b3ad6c46:src_d85824aeff6bfc7a</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:168](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L168) | <code>tl.dot(</code> |
-| <a id="aiter_b3ad6c46-src_409cbfb780dceb61"></a><code>aiter_b3ad6c46:src_409cbfb780dceb61</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:180](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L180) | <code>tl.dot(</code> |
-| <a id="aiter_b3ad6c46-src_c83ac5e01a2063bd"></a><code>aiter_b3ad6c46:src_c83ac5e01a2063bd</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:215](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L215) | <code>tl.dot(</code> |
-| <a id="aiter_b3ad6c46-src_154bf7732bd512e2"></a><code>aiter_b3ad6c46:src_154bf7732bd512e2</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:240](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L240) | <code>tl.dot(</code> |
-| <a id="aiter_b3ad6c46-src_f383ff95365efdcd"></a><code>aiter_b3ad6c46:src_f383ff95365efdcd</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:252](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L252) | <code>tl.dot(</code> |
-| <a id="aiter_b3ad6c46-src_3cb03cfd76d20cd6"></a><code>aiter_b3ad6c46:src_3cb03cfd76d20cd6</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:296](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L296) | <code>tl.dot(</code> |
-
-### persistent
-
-| reference | language | source | observed construct |
-|---|---|---|---|
-| <a id="aiter_b3ad6c46-src_20fc7a734eadca43"></a><code>aiter_b3ad6c46:src_20fc7a734eadca43</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:94](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L94) | <code>NUM_XCDS:</code> |
-
-### symbol_declaration
-
-| reference | language | source | observed construct |
-|---|---|---|---|
-| <a id="aiter_b3ad6c46-src_77fdd041c1e25e15"></a><code>aiter_b3ad6c46:src_77fdd041c1e25e15</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:54](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L54-L317) | <code>def _fwd_kernel(</code> |
-| <a id="aiter_b3ad6c46-src_b838d8edc262844c"></a><code>aiter_b3ad6c46:src_b838d8edc262844c</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:321](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L321-L329) | <code>def _get_config(HEAD_SIZE, dtype):</code> |
-
-### tunable_param
-
-| reference | language | source | observed construct |
-|---|---|---|---|
-| <a id="aiter_b3ad6c46-src_d605789aa205589b"></a><code>aiter_b3ad6c46:src_d605789aa205589b</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:80](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L80) | <code>logit_cap: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_1d66bc7b9a8d080a"></a><code>aiter_b3ad6c46:src_1d66bc7b9a8d080a</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:81](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L81) | <code>Lq: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_8e1841022a35c893"></a><code>aiter_b3ad6c46:src_8e1841022a35c893</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:82](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L82) | <code>Lv: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_a891a6b9bad4be86"></a><code>aiter_b3ad6c46:src_a891a6b9bad4be86</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:83](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L83) | <code>BLOCK_DMODEL: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_61b9957064456af1"></a><code>aiter_b3ad6c46:src_61b9957064456af1</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:84](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L84) | <code>BLOCK_DPE: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_9f25f57eee16ee77"></a><code>aiter_b3ad6c46:src_9f25f57eee16ee77</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:85](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L85) | <code>BLOCK_DV: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_a829baf389ea2ff6"></a><code>aiter_b3ad6c46:src_a829baf389ea2ff6</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:86](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L86) | <code>BLOCK_M: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_c3c24a7664ba5a78"></a><code>aiter_b3ad6c46:src_c3c24a7664ba5a78</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:87](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L87) | <code>BLOCK_N: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_f92c839359992c47"></a><code>aiter_b3ad6c46:src_f92c839359992c47</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:88](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L88) | <code>USE_CUSTOM_MASK: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_56da3b0fd39c7bb6"></a><code>aiter_b3ad6c46:src_56da3b0fd39c7bb6</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:89](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L89) | <code>IS_CAUSAL: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_38dce6a3d59cc465"></a><code>aiter_b3ad6c46:src_38dce6a3d59cc465</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:90](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L90) | <code>SKIP_PREFIX_CUSTOM_MASK: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_015b35e62add318c"></a><code>aiter_b3ad6c46:src_015b35e62add318c</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:91](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L91) | <code>STORE_TRANSPOSE: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_8c353e92a0d26564"></a><code>aiter_b3ad6c46:src_8c353e92a0d26564</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:92](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L92) | <code>NUM_Q_HEADS: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_43ecccfa9c89cda3"></a><code>aiter_b3ad6c46:src_43ecccfa9c89cda3</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:93](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L93) | <code>NUM_BLOCKS: tl.constexpr,</code> |
-| <a id="aiter_b3ad6c46-src_830e5e9a608e5aa7"></a><code>aiter_b3ad6c46:src_830e5e9a608e5aa7</code> | triton | [aiter/ops/triton/_triton_kernels/attention/extend_attention.py:94](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L94) | <code>NUM_XCDS: tl.constexpr,</code> |
+| reference suffix | category | language | lines | observed construct |
+|---|---|---|---|---|
+| <a id="aiter_b3ad6c46-src_77fdd041c1e25e15"></a><code>src_77fdd041c1e25e15</code> | symbol_declaration | triton | [L54–L317](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L54-L317) | <code>def _fwd_kernel(</code> |
+| <a id="aiter_b3ad6c46-src_b838d8edc262844c"></a><code>src_b838d8edc262844c</code> | symbol_declaration | triton | [L321–L329](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L321-L329) | <code>def _get_config(HEAD_SIZE, dtype):</code> |
+| <a id="aiter_b3ad6c46-src_d85824aeff6bfc7a"></a><code>src_d85824aeff6bfc7a</code> | mfma_intrinsic | triton | [L168](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L168) | <code>tl.dot(</code> |
+| <a id="aiter_b3ad6c46-src_409cbfb780dceb61"></a><code>src_409cbfb780dceb61</code> | mfma_intrinsic | triton | [L180](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L180) | <code>tl.dot(</code> |
+| <a id="aiter_b3ad6c46-src_c83ac5e01a2063bd"></a><code>src_c83ac5e01a2063bd</code> | mfma_intrinsic | triton | [L215](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L215) | <code>tl.dot(</code> |
+| <a id="aiter_b3ad6c46-src_154bf7732bd512e2"></a><code>src_154bf7732bd512e2</code> | mfma_intrinsic | triton | [L240](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L240) | <code>tl.dot(</code> |
+| <a id="aiter_b3ad6c46-src_f383ff95365efdcd"></a><code>src_f383ff95365efdcd</code> | mfma_intrinsic | triton | [L252](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L252) | <code>tl.dot(</code> |
+| <a id="aiter_b3ad6c46-src_3cb03cfd76d20cd6"></a><code>src_3cb03cfd76d20cd6</code> | mfma_intrinsic | triton | [L296](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L296) | <code>tl.dot(</code> |
+| <a id="aiter_b3ad6c46-src_20fc7a734eadca43"></a><code>src_20fc7a734eadca43</code> | persistent | triton | [L94](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L94) | <code>NUM_XCDS:</code> |
+| <a id="aiter_b3ad6c46-src_d605789aa205589b"></a><code>src_d605789aa205589b</code> | tunable_param | triton | [L80](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L80) | <code>logit_cap: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_1d66bc7b9a8d080a"></a><code>src_1d66bc7b9a8d080a</code> | tunable_param | triton | [L81](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L81) | <code>Lq: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_8e1841022a35c893"></a><code>src_8e1841022a35c893</code> | tunable_param | triton | [L82](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L82) | <code>Lv: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_a891a6b9bad4be86"></a><code>src_a891a6b9bad4be86</code> | tunable_param | triton | [L83](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L83) | <code>BLOCK_DMODEL: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_61b9957064456af1"></a><code>src_61b9957064456af1</code> | tunable_param | triton | [L84](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L84) | <code>BLOCK_DPE: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_9f25f57eee16ee77"></a><code>src_9f25f57eee16ee77</code> | tunable_param | triton | [L85](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L85) | <code>BLOCK_DV: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_a829baf389ea2ff6"></a><code>src_a829baf389ea2ff6</code> | tunable_param | triton | [L86](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L86) | <code>BLOCK_M: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_c3c24a7664ba5a78"></a><code>src_c3c24a7664ba5a78</code> | tunable_param | triton | [L87](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L87) | <code>BLOCK_N: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_f92c839359992c47"></a><code>src_f92c839359992c47</code> | tunable_param | triton | [L88](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L88) | <code>USE_CUSTOM_MASK: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_56da3b0fd39c7bb6"></a><code>src_56da3b0fd39c7bb6</code> | tunable_param | triton | [L89](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L89) | <code>IS_CAUSAL: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_38dce6a3d59cc465"></a><code>src_38dce6a3d59cc465</code> | tunable_param | triton | [L90](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L90) | <code>SKIP_PREFIX_CUSTOM_MASK: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_015b35e62add318c"></a><code>src_015b35e62add318c</code> | tunable_param | triton | [L91](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L91) | <code>STORE_TRANSPOSE: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_8c353e92a0d26564"></a><code>src_8c353e92a0d26564</code> | tunable_param | triton | [L92](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L92) | <code>NUM_Q_HEADS: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_43ecccfa9c89cda3"></a><code>src_43ecccfa9c89cda3</code> | tunable_param | triton | [L93](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L93) | <code>NUM_BLOCKS: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_830e5e9a608e5aa7"></a><code>src_830e5e9a608e5aa7</code> | tunable_param | triton | [L94](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L94) | <code>NUM_XCDS: tl.constexpr,</code> |
+| <a id="aiter_b3ad6c46-src_9ac04682437fd846"></a><code>src_9ac04682437fd846</code> | jit_cache | triton | [L320](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/_triton_kernels/attention/extend_attention.py#L320) | <code>@functools.lru_cache(maxsize=1024) def _get_config</code> |
 
 ## Shared source references
 
-The evidence stays in its owner; only references are listed here.
+The evidence stays in its owner. Exact references are linked at each decision's use site.
 
-| reference | owner |
-|---|---|
-| [aiter_b3ad6c46:src_49cb5bdc816cb102](../../attention_decode_paged/corpus/source_evidence.md#aiter_b3ad6c46-src_49cb5bdc816cb102) | attention_decode_paged |
+| owner | referenced observations |
+|---|---:|
+| [attention_decode_paged](../../attention_decode_paged/corpus/source_evidence.md) | 1 |
 
+<a id="coverage-limits"></a>
 ## Coverage limits
 
 - Source observations and conditioned candidates for chunked prefill; source presence is not a measured winner.
 - No new GPU measurements or binary disassembly are included.
 
+<a id="upstream-correctness-references"></a>
 ## Upstream correctness references
 
 These are test sources at pinned revisions, not results from executing the tests.

@@ -30,12 +30,12 @@ A required trait must be established for the actual design before the card appli
 | [flydsl-hgemm-config-space](#flydsl-hgemm-config-space) | performance_candidate | reviewed | Which tile, warp and split-K values will the FlyDSL HGEMM family actually accept, and how does a shape narrow them? |
 | [flydsl-xor16-lds-layout-consistency](#flydsl-xor16-lds-layout-consistency) | performance_candidate | reviewed | How should a FlyDSL GEMM apply an XOR16 LDS layout without making stores and loads disagree? |
 | [flydsl-preshuffle-b-layout-contract](#flydsl-preshuffle-b-layout-contract) | performance_candidate | reviewed | What does enabling B preshuffle on a FlyDSL HGEMM actually require? |
-| [gemm-shape-regime-routing](#gemm-shape-regime-routing) | performance_candidate | reviewed | For each shape bucket, which backend did AITER&#x27;s own tuner ship, and what does that imply for a FlyDSL kernel? |
-| [gemm-default-backend-routing](#gemm-default-backend-routing) | performance_candidate | reviewed | Which backend does AITER&#x27;s own dispatch pick when no tuned row exists, and how does that differ between gfx942 and gfx950? |
-| [gemm-asm-tile-inventory-and-selection](#gemm-asm-tile-inventory-and-selection) | performance_candidate | blocked | Which tiles and split-K capabilities does AITER&#x27;s hand-written ASM ship per architecture, and how does its launcher choose among them for a shape? |
-| [flydsl-mfma-fragment-lane-layout](#flydsl-mfma-fragment-lane-layout) | semantic | reviewed | Which lane holds which row and column of a 16x16 MFMA fragment in AITER&#x27;s FlyDSL kernels, and what does that fix for loads, in-register scaling and stores? |
+| [gemm-shape-regime-routing](#gemm-shape-regime-routing) | performance_candidate | reviewed | For each shape bucket, which backend did AITER's own tuner ship, and what does that imply for a FlyDSL kernel? |
+| [gemm-default-backend-routing](#gemm-default-backend-routing) | performance_candidate | reviewed | Which backend does AITER's own dispatch pick when no tuned row exists, and how does that differ between gfx942 and gfx950? |
+| [gemm-asm-tile-inventory-and-selection](#gemm-asm-tile-inventory-and-selection) | performance_candidate | blocked | Which tiles and split-K capabilities does AITER's hand-written ASM ship per architecture, and how does its launcher choose among them for a shape? |
+| [flydsl-mfma-fragment-lane-layout](#flydsl-mfma-fragment-lane-layout) | semantic | reviewed | Which lane holds which row and column of a 16x16 MFMA fragment in AITER's FlyDSL kernels, and what does that fix for loads, in-register scaling and stores? |
 | [flydsl-host-launch-contract](#flydsl-host-launch-contract) | constraint | reviewed | What does the host side of a FlyDSL GEMM have to provide in AITER — compile cache, launch grid, per-stream state and kernel name? |
-| [flydsl-test-parity-gate](#flydsl-test-parity-gate) | constraint | reviewed | Which parity does AITER&#x27;s own FlyDSL GEMM test demand, where does it relax it, and what does that say about validating an authored kernel? |
+| [flydsl-test-parity-gate](#flydsl-test-parity-gate) | constraint | reviewed | Which parity does AITER's own FlyDSL GEMM test demand, where does it relax it, and what does that say about validating an authored kernel? |
 | [gemm-streamed-operand-cache-policy](#gemm-streamed-operand-cache-policy) | performance_candidate | reviewed | Which operand loads and output stores should carry a streaming (non-temporal) cache policy, and which should keep the default? |
 | [flydsl-lds-pipeline-depth](#flydsl-lds-pipeline-depth) | performance_candidate | reviewed | How many LDS stages should the K loop keep in flight, and what does each one cost? |
 | [gemm-host-plan-cache](#gemm-host-plan-cache) | performance_candidate | unresolved | When should a GEMM wrapper cache launch plans or temporary storage? |
@@ -1473,7 +1473,7 @@ Follow these references for the full conditions, alternatives and source evidenc
 | [flydsl-splitk-reduction-contract](../../splitk_streamk_gemm/corpus/decisions.md#flydsl-splitk-reduction-contract) | splitk_streamk_gemm | How does the FlyDSL split-K HGEMM combine partial results, and what does that impose on the launcher? |
 | [gemm-blockscale-k-loop-scale-application](../../scaled_quant_gemm/corpus/decisions.md#gemm-blockscale-k-loop-scale-application) | scaled_quant_gemm | How does a 128x128 block-scale GEMM apply its scales inside the K loop, and what does that fix about tile_k and the scale indexing? |
 | [gemm-blockscale-shipped-bucket-structure](../../scaled_quant_gemm/corpus/decisions.md#gemm-blockscale-shipped-bucket-structure) | scaled_quant_gemm | Which configuration does the Triton block-scale baseline run for each case, and what does AITER ship instead where it tuned small and large M separately? |
-| [gemm-skinny-decode-wave-split](../../skinny_gemv_decode/corpus/decisions.md#gemm-skinny-decode-wave-split) | skinny_gemv_decode | How does AITER&#x27;s hand-written HIP skinny GEMM organise work for M &lt;= 16, and what can a FlyDSL decode kernel take from it? |
+| [gemm-skinny-decode-wave-split](../../skinny_gemv_decode/corpus/decisions.md#gemm-skinny-decode-wave-split) | skinny_gemv_decode | How does AITER's hand-written HIP skinny GEMM organise work for M &lt;= 16, and what can a FlyDSL decode kernel take from it? |
 | [gemm-split-k-when-grid-underfills](../../splitk_streamk_gemm/corpus/decisions.md#gemm-split-k-when-grid-underfills) | splitk_streamk_gemm | When does a GEMM case need split-K to fill the machine, and what does choosing it commit the rest of the kernel to? |
 
 ## Coupled decisions
@@ -1502,37 +1502,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 [Owned configuration and backend-selection groups](seeds.md)
 
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for dense gemm; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/flydsl_tests/test_gemm_a16w16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/flydsl_tests/test_gemm_a16w16.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_gemm_a16w16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_gemm_a16w16.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_gemm_a16w16_gated.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_gemm_a16w16_gated.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_gemm_a16w16_gating.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_gemm_a16w16_gating.py) (`aiter_b3ad6c46`).
-- [op_tests/test_deepgemm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_deepgemm.py) (`aiter_b3ad6c46`).
-- [op_tests/test_f4gemm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_f4gemm.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_hgemm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_hgemm.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_a16w16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_a16w16.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_codegen.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_codegen.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_group32_interface.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_group32_interface.py) (`aiter_b3ad6c46`).
-- [op_tests/test_opus_a16w16_gemm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_opus_a16w16_gemm.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/__init__.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/__init__.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/basic/__init__.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/basic/__init__.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/basic/test_gemm_a16w16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/basic/test_gemm_a16w16.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/basic/test_gemm_a16w16_gated.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/basic/test_gemm_a16w16_gated.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/batched/__init__.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/batched/__init__.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/fused/__init__.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/fused/__init__.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/grouped/__init__.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/grouped/__init__.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/grouped/test_gmm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/grouped/test_gmm.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/torch_compile/test_compile_gemm_a16w16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/torch_compile/test_compile_gemm_a16w16.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

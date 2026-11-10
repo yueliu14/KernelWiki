@@ -28,74 +28,53 @@ The scope language supplies the host/helper backend context. Explicitly decorate
 
 ## Observations
 
-### arch_gate
+Observations are grouped by snapshot and file. The displayed `src_…` suffix combines with that section's snapshot to form the full reference; existing full-reference anchors are retained.
 
-| reference | language | source | observed construct |
-|---|---|---|---|
-| <a id="aiter_b3ad6c46-src_31582887cf0152ea"></a><code>aiter_b3ad6c46:src_31582887cf0152ea</code> | triton | [aiter/ops/triton/attention/unified_attention.py:54](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L54) | <code>in (&quot;gfx1250&quot;</code> |
+### `aiter_b3ad6c46` / `aiter/ops/triton/attention/unified_attention.py`
 
-### config_limit
-
-| reference | language | source | observed construct |
-|---|---|---|---|
-| <a id="aiter_b3ad6c46-src_961f38ef952f6e5c"></a><code>aiter_b3ad6c46:src_961f38ef952f6e5c</code> | triton | [aiter/ops/triton/attention/unified_attention.py:827](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L827) | <code>MAX_INT32 = 2</code> |
-| <a id="aiter_b3ad6c46-src_90b991b2e8caf879"></a><code>aiter_b3ad6c46:src_90b991b2e8caf879</code> | triton | [aiter/ops/triton/attention/unified_attention.py:1064](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L1064) | <code>MAX_INT32 = 2</code> |
-
-### config_space
-
-| reference | language | source | observed construct |
-|---|---|---|---|
-| <a id="aiter_b3ad6c46-src_df656c703150d5cd"></a><code>aiter_b3ad6c46:src_df656c703150d5cd</code> | triton | [aiter/ops/triton/attention/unified_attention.py:57](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L57) | <code>_GLUON_SUPPORTED_ARCHS = (</code> |
-
-### scale_operand
-
-| reference | language | source | observed construct |
-|---|---|---|---|
-| <a id="aiter_b3ad6c46-src_7117330b801e04fc"></a><code>aiter_b3ad6c46:src_7117330b801e04fc</code> | triton | [aiter/ops/triton/attention/unified_attention.py:359](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L359) | <code>block_scales_size=</code> |
-
-### symbol_declaration
-
-| reference | language | source | observed construct |
-|---|---|---|---|
-| <a id="aiter_b3ad6c46-src_8991d0d60a392a3e"></a><code>aiter_b3ad6c46:src_8991d0d60a392a3e</code> | triton | [aiter/ops/triton/attention/unified_attention.py:63](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L63-L64) | <code>def _is_gluon_available():</code> |
-| <a id="aiter_b3ad6c46-src_1ae1d84244f6eca6"></a><code>aiter_b3ad6c46:src_1ae1d84244f6eca6</code> | triton | [aiter/ops/triton/attention/unified_attention.py:127](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L127-L147) | <code>def _gfx950_gluon_supported(params: _UAParams):</code> |
-| <a id="aiter_b3ad6c46-src_9b6f0ef32b8cbf99"></a><code>aiter_b3ad6c46:src_9b6f0ef32b8cbf99</code> | triton | [aiter/ops/triton/attention/unified_attention.py:150](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L150-L158) | <code>def _gfx950_split_params(params: _UAParams):</code> |
-| <a id="aiter_b3ad6c46-src_73ba1fbe317806f4"></a><code>aiter_b3ad6c46:src_73ba1fbe317806f4</code> | triton | [aiter/ops/triton/attention/unified_attention.py:161](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L161-L171) | <code>def _gfx950_split_grid(params: _UAParams):</code> |
-| <a id="aiter_b3ad6c46-src_f671176cd68311e5"></a><code>aiter_b3ad6c46:src_f671176cd68311e5</code> | triton | [aiter/ops/triton/attention/unified_attention.py:174](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L174-L201) | <code>def use_2d_kernel(params: _UAParams, backend: str = &quot;triton&quot;):</code> |
-| <a id="aiter_b3ad6c46-src_f5f02b63eec3263c"></a><code>aiter_b3ad6c46:src_f5f02b63eec3263c</code> | triton | [aiter/ops/triton/attention/unified_attention.py:204](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L204-L500) | <code>def unified_attention(</code> |
-| <a id="aiter_b3ad6c46-src_25a1f1020225758b"></a><code>aiter_b3ad6c46:src_25a1f1020225758b</code> | triton | [aiter/ops/triton/attention/unified_attention.py:503](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L503-L522) | <code>def is_2d_gluon_available(params: _UAParams, backend: str):</code> |
-| <a id="aiter_b3ad6c46-src_ca2e6effd0a0d73f"></a><code>aiter_b3ad6c46:src_ca2e6effd0a0d73f</code> | triton | [aiter/ops/triton/attention/unified_attention.py:525](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L525-L538) | <code>def is_3d_gluon_available(params: _UAParams, backend: str):</code> |
-| <a id="aiter_b3ad6c46-src_712282302c3c4346"></a><code>aiter_b3ad6c46:src_712282302c3c4346</code> | triton | [aiter/ops/triton/attention/unified_attention.py:541](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L541-L559) | <code>def is_reduce_gluon_available(params: _UAParams, NUM_SEGMENTS, backend: str):</code> |
-| <a id="aiter_b3ad6c46-src_517fc47a1e4f396d"></a><code>aiter_b3ad6c46:src_517fc47a1e4f396d</code> | triton | [aiter/ops/triton/attention/unified_attention.py:562](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L562-L637) | <code>def _unified_attention_2d_triton(params: _UAParams):</code> |
-| <a id="aiter_b3ad6c46-src_140c10660a89257b"></a><code>aiter_b3ad6c46:src_140c10660a89257b</code> | triton | [aiter/ops/triton/attention/unified_attention.py:640](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L640-L719) | <code>def _unified_attention_3d_triton(</code> |
-| <a id="aiter_b3ad6c46-src_96cdf34fdd892678"></a><code>aiter_b3ad6c46:src_96cdf34fdd892678</code> | triton | [aiter/ops/triton/attention/unified_attention.py:722](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L722-L755) | <code>def _reduce_segments_triton(</code> |
-| <a id="aiter_b3ad6c46-src_bb30a7a448f50a6c"></a><code>aiter_b3ad6c46:src_bb30a7a448f50a6c</code> | triton | [aiter/ops/triton/attention/unified_attention.py:788](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L788-L880) | <code>def _unified_attention_2d_gfx1250(params: _UAParams):</code> |
-| <a id="aiter_b3ad6c46-src_1e62e9026a87d1a3"></a><code>aiter_b3ad6c46:src_1e62e9026a87d1a3</code> | triton | [aiter/ops/triton/attention/unified_attention.py:883](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L883-L975) | <code>def _unified_attention_3d_gfx1250(</code> |
-| <a id="aiter_b3ad6c46-src_2b58a069005fb9f5"></a><code>aiter_b3ad6c46:src_2b58a069005fb9f5</code> | triton | [aiter/ops/triton/attention/unified_attention.py:978](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L978-L1012) | <code>def _reduce_segments_gfx1250(</code> |
-| <a id="aiter_b3ad6c46-src_d6494b3c97615219"></a><code>aiter_b3ad6c46:src_d6494b3c97615219</code> | triton | [aiter/ops/triton/attention/unified_attention.py:1015](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L1015-L1126) | <code>def _unified_attention_gfx950(</code> |
-| <a id="aiter_b3ad6c46-src_edcffc277f25d2f7"></a><code>aiter_b3ad6c46:src_edcffc277f25d2f7</code> | triton | [aiter/ops/triton/attention/unified_attention.py:1129](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L1129-L1140) | <code>def _unified_attention_2d_gfx950(params: _UAParams):</code> |
-| <a id="aiter_b3ad6c46-src_9bf529e24c83e1a3"></a><code>aiter_b3ad6c46:src_9bf529e24c83e1a3</code> | triton | [aiter/ops/triton/attention/unified_attention.py:1143](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L1143-L1180) | <code>def _unified_attention_3d_gfx950(</code> |
-
-### waves
-
-| reference | language | source | observed construct |
-|---|---|---|---|
-| <a id="aiter_b3ad6c46-src_d17d83b1526b25e6"></a><code>aiter_b3ad6c46:src_d17d83b1526b25e6</code> | triton | [aiter/ops/triton/attention/unified_attention.py:55](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L55) | <code>WARP_SIZE = 32</code> |
+| reference suffix | category | language | lines | observed construct |
+|---|---|---|---|---|
+| <a id="aiter_b3ad6c46-src_8991d0d60a392a3e"></a><code>src_8991d0d60a392a3e</code> | symbol_declaration | triton | [L63–L64](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L63-L64) | <code>def _is_gluon_available():</code> |
+| <a id="aiter_b3ad6c46-src_1ae1d84244f6eca6"></a><code>src_1ae1d84244f6eca6</code> | symbol_declaration | triton | [L127–L147](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L127-L147) | <code>def _gfx950_gluon_supported(params: _UAParams):</code> |
+| <a id="aiter_b3ad6c46-src_9b6f0ef32b8cbf99"></a><code>src_9b6f0ef32b8cbf99</code> | symbol_declaration | triton | [L150–L158](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L150-L158) | <code>def _gfx950_split_params(params: _UAParams):</code> |
+| <a id="aiter_b3ad6c46-src_73ba1fbe317806f4"></a><code>src_73ba1fbe317806f4</code> | symbol_declaration | triton | [L161–L171](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L161-L171) | <code>def _gfx950_split_grid(params: _UAParams):</code> |
+| <a id="aiter_b3ad6c46-src_f671176cd68311e5"></a><code>src_f671176cd68311e5</code> | symbol_declaration | triton | [L174–L201](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L174-L201) | <code>def use_2d_kernel(params: _UAParams, backend: str = "triton"):</code> |
+| <a id="aiter_b3ad6c46-src_f5f02b63eec3263c"></a><code>src_f5f02b63eec3263c</code> | symbol_declaration | triton | [L204–L500](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L204-L500) | <code>def unified_attention(</code> |
+| <a id="aiter_b3ad6c46-src_25a1f1020225758b"></a><code>src_25a1f1020225758b</code> | symbol_declaration | triton | [L503–L522](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L503-L522) | <code>def is_2d_gluon_available(params: _UAParams, backend: str):</code> |
+| <a id="aiter_b3ad6c46-src_ca2e6effd0a0d73f"></a><code>src_ca2e6effd0a0d73f</code> | symbol_declaration | triton | [L525–L538](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L525-L538) | <code>def is_3d_gluon_available(params: _UAParams, backend: str):</code> |
+| <a id="aiter_b3ad6c46-src_712282302c3c4346"></a><code>src_712282302c3c4346</code> | symbol_declaration | triton | [L541–L559](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L541-L559) | <code>def is_reduce_gluon_available(params: _UAParams, NUM_SEGMENTS, backend: str):</code> |
+| <a id="aiter_b3ad6c46-src_517fc47a1e4f396d"></a><code>src_517fc47a1e4f396d</code> | symbol_declaration | triton | [L562–L637](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L562-L637) | <code>def _unified_attention_2d_triton(params: _UAParams):</code> |
+| <a id="aiter_b3ad6c46-src_140c10660a89257b"></a><code>src_140c10660a89257b</code> | symbol_declaration | triton | [L640–L719](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L640-L719) | <code>def _unified_attention_3d_triton(</code> |
+| <a id="aiter_b3ad6c46-src_96cdf34fdd892678"></a><code>src_96cdf34fdd892678</code> | symbol_declaration | triton | [L722–L755](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L722-L755) | <code>def _reduce_segments_triton(</code> |
+| <a id="aiter_b3ad6c46-src_bb30a7a448f50a6c"></a><code>src_bb30a7a448f50a6c</code> | symbol_declaration | triton | [L788–L880](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L788-L880) | <code>def _unified_attention_2d_gfx1250(params: _UAParams):</code> |
+| <a id="aiter_b3ad6c46-src_1e62e9026a87d1a3"></a><code>src_1e62e9026a87d1a3</code> | symbol_declaration | triton | [L883–L975](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L883-L975) | <code>def _unified_attention_3d_gfx1250(</code> |
+| <a id="aiter_b3ad6c46-src_2b58a069005fb9f5"></a><code>src_2b58a069005fb9f5</code> | symbol_declaration | triton | [L978–L1012](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L978-L1012) | <code>def _reduce_segments_gfx1250(</code> |
+| <a id="aiter_b3ad6c46-src_d6494b3c97615219"></a><code>src_d6494b3c97615219</code> | symbol_declaration | triton | [L1015–L1126](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L1015-L1126) | <code>def _unified_attention_gfx950(</code> |
+| <a id="aiter_b3ad6c46-src_edcffc277f25d2f7"></a><code>src_edcffc277f25d2f7</code> | symbol_declaration | triton | [L1129–L1140](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L1129-L1140) | <code>def _unified_attention_2d_gfx950(params: _UAParams):</code> |
+| <a id="aiter_b3ad6c46-src_9bf529e24c83e1a3"></a><code>src_9bf529e24c83e1a3</code> | symbol_declaration | triton | [L1143–L1180](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L1143-L1180) | <code>def _unified_attention_3d_gfx950(</code> |
+| <a id="aiter_b3ad6c46-src_d17d83b1526b25e6"></a><code>src_d17d83b1526b25e6</code> | waves | triton | [L55](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L55) | <code>WARP_SIZE = 32</code> |
+| <a id="aiter_b3ad6c46-src_961f38ef952f6e5c"></a><code>src_961f38ef952f6e5c</code> | config_limit | triton | [L827](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L827) | <code>MAX_INT32 = 2</code> |
+| <a id="aiter_b3ad6c46-src_90b991b2e8caf879"></a><code>src_90b991b2e8caf879</code> | config_limit | triton | [L1064](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L1064) | <code>MAX_INT32 = 2</code> |
+| <a id="aiter_b3ad6c46-src_31582887cf0152ea"></a><code>src_31582887cf0152ea</code> | arch_gate | triton | [L54](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L54) | <code>in ("gfx1250"</code> |
+| <a id="aiter_b3ad6c46-src_df656c703150d5cd"></a><code>src_df656c703150d5cd</code> | config_space | triton | [L57](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L57) | <code>_GLUON_SUPPORTED_ARCHS = (</code> |
+| <a id="aiter_b3ad6c46-src_7117330b801e04fc"></a><code>src_7117330b801e04fc</code> | scale_operand | triton | [L359](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/aiter/ops/triton/attention/unified_attention.py#L359) | <code>block_scales_size=</code> |
 
 ## Shared source references
 
-The evidence stays in its owner; only references are listed here.
+The evidence stays in its owner. Exact references are linked at each decision's use site.
 
-| reference | owner |
-|---|---|
-| [aiter_b3ad6c46:src_49cb5bdc816cb102](../../attention_decode_paged/corpus/source_evidence.md#aiter_b3ad6c46-src_49cb5bdc816cb102) | attention_decode_paged |
-| [aiter_b3ad6c46:src_77fdd041c1e25e15](../../chunked_prefill/corpus/source_evidence.md#aiter_b3ad6c46-src_77fdd041c1e25e15) | chunked_prefill |
+| owner | referenced observations |
+|---|---:|
+| [attention_decode_paged](../../attention_decode_paged/corpus/source_evidence.md) | 1 |
+| [chunked_prefill](../../chunked_prefill/corpus/source_evidence.md) | 1 |
 
+<a id="coverage-limits"></a>
 ## Coverage limits
 
 - Source observations and conditioned candidates for sliding window attention; source presence is not a measured winner.
 - No new GPU measurements or binary disassembly are included.
 
+<a id="upstream-correctness-references"></a>
 ## Upstream correctness references
 
 These are test sources at pinned revisions, not results from executing the tests.

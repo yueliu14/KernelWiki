@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import argparse
-from collections import Counter
+from collections import Counter, defaultdict
 from html import escape
 import json
 import os
@@ -23,7 +23,7 @@ def anchor(ref):
 
 
 def cell(value):
-    return escape(str(value)).replace("|", "&#124;").replace("\n", " ")
+    return escape(str(value), quote=False).replace("|", "&#124;").replace("\n", " ")
 
 
 def code(value):
@@ -78,9 +78,9 @@ def references_and_limits(catalog, op, page):
                 "A negative result applies to its stated context; it is not a permanent prohibition.", "",
                 link("Canonical decisions", catalog.general["path"] / "decisions.yaml", page), ""]
     bundle = catalog.operators[op]
-    out = ["## Coverage limits", ""]
+    out = ['<a id="coverage-limits"></a>', "## Coverage limits", ""]
     out += [f"- {text}" for text in bundle["scope"].get("coverage_notes", [])]
-    out += ["", "## Upstream correctness references", "",
+    out += ["", '<a id="upstream-correctness-references"></a>', "## Upstream correctness references", "",
             "These are test sources at pinned revisions, not results from executing the tests.", ""]
     for row in bundle["scope"].get("validation_sources", []):
         out.append(f"- [{row['file']}]({catalog.source_url(row)}) (`{row['snapshot']}`).")
@@ -168,7 +168,13 @@ def render_decisions(catalog, op):
                        ", ".join(card_link(catalog, ref, page) for ref in d.get("decision_refs", [])))
     if bundle.get("tuning", {}).get("records"):
         out += ["", "## Shipped starting points", "", link("Owned configuration and backend-selection groups", bundle["path"] / "seeds.md", page), ""]
-    out += [""] + references_and_limits(catalog, op, page)
+    if op == "general":
+        out += [""] + references_and_limits(catalog, op, page)
+    else:
+        out += ["", "## Coverage and validation sources", "",
+                link("Extraction limits", bundle["path"] / "source_evidence.md", page, "coverage-limits") + " · " +
+                link("Pinned test definitions (not test results)", bundle["path"] / "source_evidence.md", page,
+                     "upstream-correctness-references"), ""]
     return page, "\n".join(out)
 
 
@@ -190,29 +196,56 @@ def render_source(catalog, op):
         out.append(f"| {row['snapshot']} | {row['language']} | [{row['file']}]({catalog.source_url(row)}) | {row['evidence_records']} |")
     out += ["", "The scope language supplies the host/helper backend context. Explicitly decorated "
             "kernels in mixed Python files retain their own language.", "", "## Observations", ""]
-    for category in sorted({r["category"] for r in rows}):
-        out += [f"### {category}", "", "| reference | language | source | observed construct |", "|---|---|---|---|"]
-        for row in rows:
-            if row["category"] != category:
-                continue
+    files = defaultdict(list)
+    for row in rows:
+        files[(row["snapshot"], row["file"])].append(row)
+    out += ["Observations are grouped by snapshot and file. The displayed `src_…` suffix combines with "
+            "that section's snapshot to form the full reference; existing full-reference anchors are retained.", ""]
+    for (snapshot, file), observations in sorted(files.items()):
+        out += [f"### `{snapshot}` / `{file}`", "",
+                "| reference suffix | category | language | lines | observed construct |", "|---|---|---|---|---|"]
+        for row in observations:
             ref = qualified(row)
-            location = f"{row['file']}:{row['line']}"
-            out.append(f'| <a id="{anchor(ref)}"></a>{code(ref)} | {row["language"]} | '
+            location = f"L{row['line']}" + (f"–L{row['end_line']}" if row.get("end_line") else "")
+            out.append(f'| <a id="{anchor(ref)}"></a>{code(row["evidence_id"])} | {row["category"]} | {row["language"]} | '
                        f'[{location}]({catalog.source_url(row)}) | {code(row["match"])} |')
         out.append("")
     out += ["## Shared source references", "",
-            "The evidence stays in its owner; only references are listed here.", "",
-            "| reference | owner |", "|---|---|"]
-    for ref in borrowed:
-        out.append(f"| {source_link(catalog, ref, page)} | {catalog.source_owners[ref]} |")
+            "The evidence stays in its owner. Exact references are linked at each decision's use site.", "",
+            "| owner | referenced observations |", "|---|---:|"]
+    for owner, count in sorted(Counter(catalog.source_owners[ref] for ref in borrowed).items()):
+        out.append(f"| {link(owner, catalog.operators[owner]['path'] / 'source_evidence.md', page)} | {count} |")
     if not borrowed:
-        out.append("| — | No borrowed source observations. |")
+        out.append("| No borrowed source observations. | 0 |")
     if bundle["evidence"].get("missing"):
         out += ["", "## Recorded extraction gaps", ""]
         for row in bundle["evidence"]["missing"]:
             out.append(f"- `{row['snapshot']}` / `{row['subtree']}`: {row['why']}")
     out += [""] + references_and_limits(catalog, op, page)
     return page, "\n".join(out)
+
+
+def seed_groups(records):
+    """Factor only identical, explicitly present fields within an exact source set.
+
+    Snapshot, file order and JSON value types remain significant. Combining the
+    shared fields with a member's remaining fields reconstructs the original row.
+    """
+    groups = defaultdict(list)
+    for row in records:
+        groups[(row["snapshot"], tuple(row["source_files"]))].append(row)
+    for (snapshot, files), members in groups.items():
+        common = {}
+        for key, value in members[0].items():
+            if key in {"snapshot", "source_files", "config_id", "selection_id", "m_bucket"}:
+                continue
+            serialized = json.dumps(value, sort_keys=True)
+            if all(key in row and json.dumps(row[key], sort_keys=True) == serialized for row in members):
+                common[key] = value
+        yield snapshot, files, common, [
+            {key: value for key, value in row.items() if key not in common and key not in {"snapshot", "source_files"}}
+            for row in members
+        ]
 
 
 def render_seeds(catalog, op):
@@ -227,17 +260,23 @@ def render_seeds(catalog, op):
            "are not inferred defaults. JSON null remains distinct from a missing field or a string.", "",
            link("Development decisions", bundle["path"] / "decisions.md", page) + " · " +
            link("Machine-readable records", bundle["path"] / "tuned_configs.yaml", page), ""]
-    for row in bundle["tuning"]["records"]:
-        ref = qualified(row)
-        out += [f'<a id="{anchor(ref)}"></a>', f"## {ref}", "",
-                f"**Kind:** `{row['kind']}` · **GPU:** `{row.get('gfx', '')}` · **Bucket:** `{row.get('m_bucket', '')}`", ""]
-        for key in ("tags", "cu_num", "db_kind", "family", "dtype", "shape_configs", "rows", "knobs",
-                    "same_across_configs", "varies_by_shape", "partially_specified", "selected_backend_rows"):
-            if key in row:
-                out.append(f"- `{key}`: " + code(json.dumps(row[key], ensure_ascii=False, sort_keys=True)))
-        out += ["", "Sources:", ""]
-        for file in row["source_files"]:
-            out.append(f"- [{file}]({catalog.source_url(dict(snapshot=row['snapshot'], file=file))})")
+    out += ["Groups share an exact snapshot and source-file list. **Shared fields** are explicitly present "
+            "and identical in every listed record; combine them with each row's fields. They are neither "
+            "inferred defaults nor agreement across unlisted shapes. Full configuration anchors remain stable.", ""]
+    for number, (snapshot, files, common, members) in enumerate(seed_groups(bundle["tuning"]["records"]), 1):
+        out += [f"## Source group {number} — `{snapshot}`", "", "Sources:", ""]
+        for file in files:
+            out.append(f"- [{file}]({catalog.source_url(dict(snapshot=snapshot, file=file))})")
+        out += ["", "Shared fields:", ""]
+        out += [f"- `{key}`: " + code(json.dumps(value, ensure_ascii=False, sort_keys=True))
+                for key, value in common.items()]
+        out += ["", "| reference | bucket | record fields |", "|---|---|---|"]
+        for row in members:
+            ref = qualified(dict(snapshot=snapshot, **row))
+            fields = {key: value for key, value in row.items() if key not in {"config_id", "selection_id", "m_bucket"}}
+            bucket = code(json.dumps(row["m_bucket"])) if "m_bucket" in row else "(absent)"
+            out.append(f'| <a id="{anchor(ref)}"></a>{code(ref)} | {bucket} | '
+                       + code(json.dumps(fields, ensure_ascii=False, sort_keys=True)) + " |")
         out.append("")
     if bundle["tuning"].get("missing"):
         out += ["## Recorded gaps", ""]

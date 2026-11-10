@@ -887,13 +887,13 @@ Follow these references for the full conditions, alternatives and source evidenc
 | [flydsl-gfx942-path-gates](../../dense_gemm/corpus/decisions.md#flydsl-gfx942-path-gates) | dense_gemm | Which FlyDSL GEMM paths does gfx942 (MI300X) actually give you, and which does it silently switch or refuse? |
 | [flydsl-host-launch-contract](../../dense_gemm/corpus/decisions.md#flydsl-host-launch-contract) | dense_gemm | What does the host side of a FlyDSL GEMM have to provide in AITER — compile cache, launch grid, per-stream state and kernel name? |
 | [flydsl-lds-pipeline-depth](../../dense_gemm/corpus/decisions.md#flydsl-lds-pipeline-depth) | dense_gemm | How many LDS stages should the K loop keep in flight, and what does each one cost? |
-| [flydsl-mfma-fragment-lane-layout](../../dense_gemm/corpus/decisions.md#flydsl-mfma-fragment-lane-layout) | dense_gemm | Which lane holds which row and column of a 16x16 MFMA fragment in AITER&#x27;s FlyDSL kernels, and what does that fix for loads, in-register scaling and stores? |
+| [flydsl-mfma-fragment-lane-layout](../../dense_gemm/corpus/decisions.md#flydsl-mfma-fragment-lane-layout) | dense_gemm | Which lane holds which row and column of a 16x16 MFMA fragment in AITER's FlyDSL kernels, and what does that fix for loads, in-register scaling and stores? |
 | [flydsl-splitk-hot-loop-schedule-bundle](../../splitk_streamk_gemm/corpus/decisions.md#flydsl-splitk-hot-loop-schedule-bundle) | splitk_streamk_gemm | What explicit instruction-order bundle can seed a hand-scheduled FlyDSL split-K GEMM hot loop? |
 | [flydsl-xor16-lds-layout-consistency](../../dense_gemm/corpus/decisions.md#flydsl-xor16-lds-layout-consistency) | dense_gemm | How should a FlyDSL GEMM apply an XOR16 LDS layout without making stores and loads disagree? |
-| [gemm-asm-tile-inventory-and-selection](../../dense_gemm/corpus/decisions.md#gemm-asm-tile-inventory-and-selection) | dense_gemm | Which tiles and split-K capabilities does AITER&#x27;s hand-written ASM ship per architecture, and how does its launcher choose among them for a shape? |
-| [gemm-default-backend-routing](../../dense_gemm/corpus/decisions.md#gemm-default-backend-routing) | dense_gemm | Which backend does AITER&#x27;s own dispatch pick when no tuned row exists, and how does that differ between gfx942 and gfx950? |
-| [gemm-shape-regime-routing](../../dense_gemm/corpus/decisions.md#gemm-shape-regime-routing) | dense_gemm | For each shape bucket, which backend did AITER&#x27;s own tuner ship, and what does that imply for a FlyDSL kernel? |
-| [gemm-skinny-decode-wave-split](../../skinny_gemv_decode/corpus/decisions.md#gemm-skinny-decode-wave-split) | skinny_gemv_decode | How does AITER&#x27;s hand-written HIP skinny GEMM organise work for M &lt;= 16, and what can a FlyDSL decode kernel take from it? |
+| [gemm-asm-tile-inventory-and-selection](../../dense_gemm/corpus/decisions.md#gemm-asm-tile-inventory-and-selection) | dense_gemm | Which tiles and split-K capabilities does AITER's hand-written ASM ship per architecture, and how does its launcher choose among them for a shape? |
+| [gemm-default-backend-routing](../../dense_gemm/corpus/decisions.md#gemm-default-backend-routing) | dense_gemm | Which backend does AITER's own dispatch pick when no tuned row exists, and how does that differ between gfx942 and gfx950? |
+| [gemm-shape-regime-routing](../../dense_gemm/corpus/decisions.md#gemm-shape-regime-routing) | dense_gemm | For each shape bucket, which backend did AITER's own tuner ship, and what does that imply for a FlyDSL kernel? |
+| [gemm-skinny-decode-wave-split](../../skinny_gemv_decode/corpus/decisions.md#gemm-skinny-decode-wave-split) | skinny_gemv_decode | How does AITER's hand-written HIP skinny GEMM organise work for M &lt;= 16, and what can a FlyDSL decode kernel take from it? |
 | [gemm-split-k-when-grid-underfills](../../splitk_streamk_gemm/corpus/decisions.md#gemm-split-k-when-grid-underfills) | splitk_streamk_gemm | When does a GEMM case need split-K to fill the machine, and what does choosing it commit the rest of the kernel to? |
 | [gemm-streamed-operand-cache-policy](../../dense_gemm/corpus/decisions.md#gemm-streamed-operand-cache-policy) | dense_gemm | Which operand loads and output stores should carry a streaming (non-temporal) cache policy, and which should keep the default? |
 | [gemm-workgroup-xcd-mapping](../../dense_gemm/corpus/decisions.md#gemm-workgroup-xcd-mapping) | dense_gemm | How should a FlyDSL GEMM map workgroup IDs onto output tiles and XCDs, and where does AITER already do it? |
@@ -914,50 +914,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 [Owned configuration and backend-selection groups](seeds.md)
 
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for scaled quant gemm; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/flydsl_tests/bench_flydsl_gemm_a16wfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/flydsl_tests/bench_flydsl_gemm_a16wfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/flydsl_tests/test_flydsl_gemm_a16wfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/flydsl_tests/test_flydsl_gemm_a16wfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/hip/bench_gemm_mixed_mxfp.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/hip/bench_gemm_mixed_mxfp.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_gemm_a16w8_blockscale.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_gemm_a16w8_blockscale.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_gemm_a8w8.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_gemm_a8w8.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_gemm_a8w8_blockscale.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_gemm_a8w8_blockscale.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_gemm_a8w8_per_token_scale.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_gemm_a8w8_per_token_scale.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_gemm_a8wfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_gemm_a8wfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_gemm_afp4wfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_gemm_afp4wfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_gemm_afp8wfp8.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_gemm_afp8wfp8.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_a16w8_asm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_a16w8_asm.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_a4w4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_a4w4.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_a4w6.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_a4w6.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_a6w4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_a6w4.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_a6w6.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_a6w6.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_a8w8.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_a8w8.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_a8w8_blockscale.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_a8w8_blockscale.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_a8w8_blockscale_cktile_aq_rowmajor.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_a8w8_blockscale_cktile_aq_rowmajor.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_a8w8_blockscale_fallback.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_a8w8_blockscale_fallback.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_a8w8_bpreshuffle_pad_k.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_a8w8_bpreshuffle_pad_k.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gemm_a8w8_mxfp8_bpreshuffle.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_a8w8_mxfp8_bpreshuffle.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mxfp8fp4gemm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mxfp8fp4gemm.py) (`aiter_b3ad6c46`).
-- [op_tests/test_quant_mxfp4_gemm_fused.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_quant_mxfp4_gemm_fused.py) (`aiter_b3ad6c46`).
-- [op_tests/test_quant_mxfp6_gemm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_quant_mxfp6_gemm.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/basic/test_gemm_a16w8_blockscale.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/basic/test_gemm_a16w8_blockscale.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/basic/test_gemm_a16wfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/basic/test_gemm_a16wfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/basic/test_gemm_a8w8.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/basic/test_gemm_a8w8.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/basic/test_gemm_a8w8_blockscale.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/basic/test_gemm_a8w8_blockscale.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/basic/test_gemm_a8w8_per_token_scale.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/basic/test_gemm_a8w8_per_token_scale.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/basic/test_gemm_a8wfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/basic/test_gemm_a8wfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/basic/test_gemm_afp4wfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/basic/test_gemm_afp4wfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/basic/test_gemm_afp8wfp8.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/basic/test_gemm_afp8wfp8.py) (`aiter_b3ad6c46`).
-- [op_tests/tuning_tests/test_gemm_a8w8_blockscale_cktile_instances.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/tuning_tests/test_gemm_a8w8_blockscale_cktile_instances.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

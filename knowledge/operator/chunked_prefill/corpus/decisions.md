@@ -74,20 +74,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 | [attention-paged-kv-addressing](../../attention_decode_paged/corpus/decisions.md#attention-paged-kv-addressing) | attention_decode_paged | What must remain consistent when loading a paged KV cache? |
 | [attention-window-prefix-boundaries](../../sliding_window_attention/corpus/decisions.md#attention-window-prefix-boundaries) | sliding_window_attention | How do cached prefixes and sliding windows change the causal boundary? |
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for chunked prefill; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/triton_tests/attention/test_extend_attention.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_extend_attention.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/attention/test_pa_prefill.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_pa_prefill.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/attention/test_unified_attention.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_unified_attention.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

@@ -79,21 +79,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 | [moe-two-stage-intermediate](../../grouped_gemm_moe/corpus/decisions.md#moe-two-stage-intermediate) | grouped_gemm_moe | What must match at the gate/up to down-projection boundary? |
 | [moe-weighted-gather-dropped-routes](../../moe_dispatch_combine/corpus/decisions.md#moe-weighted-gather-dropped-routes) | moe_dispatch_combine | Where are route weights applied, and how are dropped routes excluded? |
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for fused moe grouped gemm; source presence is not a measured winner.
-- TP and EP communication contracts are distinct; source availability does not establish topology support.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/multigpu_tests/test_comm_fused_moe.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/multigpu_tests/test_comm_fused_moe.py) (`aiter_b3ad6c46`).
-- [op_tests/multigpu_tests/test_mega_moe_tp.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/multigpu_tests/test_mega_moe_tp.py) (`aiter_b3ad6c46`).
-- [op_tests/tuners/tune_comm_fused_moe.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/tuners/tune_comm_fused_moe.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

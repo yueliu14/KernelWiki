@@ -1,5 +1,12 @@
 # Corpus production and validation
 
+Reading pages keep one copy of shared metadata. Source observations are grouped by snapshot/file
+with full-reference anchors and direct pinned line links. Configuration pages group identical source
+lists and factor only explicitly present, identically typed fields; each original record can be
+reconstructed from the shared fields and its row. Canonical YAML, IDs and ownership remain authoritative.
+Operator overview imports live in adjacent `geak_reference.md` pages with their historical provenance;
+the operator README owns current navigation and the contract summary.
+
 Knowledge lives in `knowledge/operator/<operator>/corpus/`. The
 [`catalog`](../../knowledge/operator/catalog.yaml) declares operator directories, aliases, workload
 groups and source snapshots; the generated [corpus index](../../knowledge/operator/CORPUS.md)

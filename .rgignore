@@ -6,3 +6,5 @@ knowledge/top_model/*/kernel_sources/
 knowledge/top_model/*/gpu_validation/*.json
 knowledge/top_model/*/gpu_validation/*.txt
 knowledge/top_model/*/gpu_validation/*.sh
+# Historical operator overviews remain linked from the current operator entry.
+knowledge/operator/*/geak_reference.md

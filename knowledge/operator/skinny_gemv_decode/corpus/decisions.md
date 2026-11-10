@@ -23,7 +23,7 @@ A required trait must be established for the actual design before the card appli
 | card | type | PR review | question |
 |---|---|---|---|
 | [flydsl-small-m-hgemm-family](#flydsl-small-m-hgemm-family) | performance_candidate | reviewed | What does AITER do differently when M is a handful of rows, and which knobs does that open? |
-| [gemm-skinny-decode-wave-split](#gemm-skinny-decode-wave-split) | performance_candidate | blocked | How does AITER&#x27;s hand-written HIP skinny GEMM organise work for M &lt;= 16, and what can a FlyDSL decode kernel take from it? |
+| [gemm-skinny-decode-wave-split](#gemm-skinny-decode-wave-split) | performance_candidate | blocked | How does AITER's hand-written HIP skinny GEMM organise work for M &lt;= 16, and what can a FlyDSL decode kernel take from it? |
 
 <a id="flydsl-small-m-hgemm-family"></a>
 ### What does AITER do differently when M is a handful of rows, and which knobs does that open?
@@ -38,7 +38,7 @@ A required trait must be established for the actual design before the card appli
 - `target_languages`: <code>flydsl</code>
 - `dtypes`: <code>bf16</code>
 - `exclude_gfx`: <code>gfx942</code>
-- `shape`: <code>{&quot;m_max&quot;: 16}</code>
+- `shape`: <code>{"m_max": 16}</code>
 
 #### Use when
 
@@ -199,15 +199,15 @@ Follow these references for the full conditions, alternatives and source evidenc
 | [flydsl-hgemm-tiling-validity](../../dense_gemm/corpus/decisions.md#flydsl-hgemm-tiling-validity) | dense_gemm | Which FlyDSL HGEMM configurations will fail to build at all, before any of them can be slow? |
 | [flydsl-host-launch-contract](../../dense_gemm/corpus/decisions.md#flydsl-host-launch-contract) | dense_gemm | What does the host side of a FlyDSL GEMM have to provide in AITER — compile cache, launch grid, per-stream state and kernel name? |
 | [flydsl-lds-pipeline-depth](../../dense_gemm/corpus/decisions.md#flydsl-lds-pipeline-depth) | dense_gemm | How many LDS stages should the K loop keep in flight, and what does each one cost? |
-| [flydsl-mfma-fragment-lane-layout](../../dense_gemm/corpus/decisions.md#flydsl-mfma-fragment-lane-layout) | dense_gemm | Which lane holds which row and column of a 16x16 MFMA fragment in AITER&#x27;s FlyDSL kernels, and what does that fix for loads, in-register scaling and stores? |
+| [flydsl-mfma-fragment-lane-layout](../../dense_gemm/corpus/decisions.md#flydsl-mfma-fragment-lane-layout) | dense_gemm | Which lane holds which row and column of a 16x16 MFMA fragment in AITER's FlyDSL kernels, and what does that fix for loads, in-register scaling and stores? |
 | [flydsl-preshuffle-b-layout-contract](../../dense_gemm/corpus/decisions.md#flydsl-preshuffle-b-layout-contract) | dense_gemm | What does enabling B preshuffle on a FlyDSL HGEMM actually require? |
 | [flydsl-splitk-hot-loop-schedule-bundle](../../splitk_streamk_gemm/corpus/decisions.md#flydsl-splitk-hot-loop-schedule-bundle) | splitk_streamk_gemm | What explicit instruction-order bundle can seed a hand-scheduled FlyDSL split-K GEMM hot loop? |
 | [flydsl-splitk-reduction-contract](../../splitk_streamk_gemm/corpus/decisions.md#flydsl-splitk-reduction-contract) | splitk_streamk_gemm | How does the FlyDSL split-K HGEMM combine partial results, and what does that impose on the launcher? |
-| [flydsl-test-parity-gate](../../dense_gemm/corpus/decisions.md#flydsl-test-parity-gate) | dense_gemm | Which parity does AITER&#x27;s own FlyDSL GEMM test demand, where does it relax it, and what does that say about validating an authored kernel? |
+| [flydsl-test-parity-gate](../../dense_gemm/corpus/decisions.md#flydsl-test-parity-gate) | dense_gemm | Which parity does AITER's own FlyDSL GEMM test demand, where does it relax it, and what does that say about validating an authored kernel? |
 | [flydsl-xor16-lds-layout-consistency](../../dense_gemm/corpus/decisions.md#flydsl-xor16-lds-layout-consistency) | dense_gemm | How should a FlyDSL GEMM apply an XOR16 LDS layout without making stores and loads disagree? |
-| [gemm-asm-tile-inventory-and-selection](../../dense_gemm/corpus/decisions.md#gemm-asm-tile-inventory-and-selection) | dense_gemm | Which tiles and split-K capabilities does AITER&#x27;s hand-written ASM ship per architecture, and how does its launcher choose among them for a shape? |
-| [gemm-default-backend-routing](../../dense_gemm/corpus/decisions.md#gemm-default-backend-routing) | dense_gemm | Which backend does AITER&#x27;s own dispatch pick when no tuned row exists, and how does that differ between gfx942 and gfx950? |
-| [gemm-shape-regime-routing](../../dense_gemm/corpus/decisions.md#gemm-shape-regime-routing) | dense_gemm | For each shape bucket, which backend did AITER&#x27;s own tuner ship, and what does that imply for a FlyDSL kernel? |
+| [gemm-asm-tile-inventory-and-selection](../../dense_gemm/corpus/decisions.md#gemm-asm-tile-inventory-and-selection) | dense_gemm | Which tiles and split-K capabilities does AITER's hand-written ASM ship per architecture, and how does its launcher choose among them for a shape? |
+| [gemm-default-backend-routing](../../dense_gemm/corpus/decisions.md#gemm-default-backend-routing) | dense_gemm | Which backend does AITER's own dispatch pick when no tuned row exists, and how does that differ between gfx942 and gfx950? |
+| [gemm-shape-regime-routing](../../dense_gemm/corpus/decisions.md#gemm-shape-regime-routing) | dense_gemm | For each shape bucket, which backend did AITER's own tuner ship, and what does that imply for a FlyDSL kernel? |
 | [gemm-split-k-when-grid-underfills](../../splitk_streamk_gemm/corpus/decisions.md#gemm-split-k-when-grid-underfills) | splitk_streamk_gemm | When does a GEMM case need split-K to fill the machine, and what does choosing it commit the rest of the kernel to? |
 | [gemm-streamed-operand-cache-policy](../../dense_gemm/corpus/decisions.md#gemm-streamed-operand-cache-policy) | dense_gemm | Which operand loads and output stores should carry a streaming (non-temporal) cache policy, and which should keep the default? |
 
@@ -215,18 +215,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 
 - **small_m_routes_to_a_family**: Small M can route to a distinct family with fixed M tile and different N/K, persistence and occupancy axes — or, by default, to another backend's decode kernels that split K across lanes instead of workgroups; architecture availability is checked first. [flydsl-small-m-hgemm-family](decisions.md#flydsl-small-m-hgemm-family), [gemm-skinny-decode-wave-split](decisions.md#gemm-skinny-decode-wave-split)
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for skinny gemv decode; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/test_gemm_a16w16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gemm_a16w16.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

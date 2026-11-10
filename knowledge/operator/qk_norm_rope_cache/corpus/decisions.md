@@ -131,36 +131,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 |---|---|---|
 | — | — | No shared cards declared. |
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for qk norm rope cache; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/multigpu_tests/test_fused_qknorm_ar.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/multigpu_tests/test_fused_qknorm_ar.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fused_qk_norm_rope_gate_fp8_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_qk_norm_rope_gate_fp8_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fused_qk_norm_rope_group_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_qk_norm_rope_group_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fused_reduce_qk_norm_rope_swa_write.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_reduce_qk_norm_rope_swa_write.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_qk_norm_rope_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_qk_norm_rope_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/test_fused_qk_norm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_fused_qk_norm.py) (`aiter_b3ad6c46`).
-- [op_tests/test_fused_qk_norm_mrope_cache_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_fused_qk_norm_mrope_cache_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/test_fused_qk_norm_rope_1way_perhead.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_fused_qk_norm_rope_1way_perhead.py) (`aiter_b3ad6c46`).
-- [op_tests/test_fused_qk_norm_rope_2way_perhead.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_fused_qk_norm_rope_2way_perhead.py) (`aiter_b3ad6c46`).
-- [op_tests/test_fused_qk_norm_rope_cache_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_fused_qk_norm_rope_cache_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/test_fused_qk_norm_rope_group_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_fused_qk_norm_rope_group_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/test_fused_qk_rmsnorm_group_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_fused_qk_rmsnorm_group_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/test_fused_qk_rmsnorm_per_token_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_fused_qk_rmsnorm_per_token_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/test_fused_qknorm_idxrqknorm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_fused_qknorm_idxrqknorm.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/fusions/test_fused_qk_norm_rope_group_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/fusions/test_fused_qk_norm_rope_group_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/fusions/test_fused_reduce_qk_norm_rope_swa_write.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/fusions/test_fused_reduce_qk_norm_rope_swa_write.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/rope/test_fused_qk_norm_rope_cached.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/rope/test_fused_qk_norm_rope_cached.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/rope/test_fused_qk_norm_rope_gate_fp8_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/rope/test_fused_qk_norm_rope_gate_fp8_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/rope/test_fused_qkv_split_qk_rope.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/rope/test_fused_qkv_split_qk_rope.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

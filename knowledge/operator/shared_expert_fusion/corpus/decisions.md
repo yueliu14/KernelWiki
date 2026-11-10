@@ -21,7 +21,7 @@ A required trait must be established for the actual design before the card appli
 | card | type | PR review | question |
 |---|---|---|---|
 | [moe-shared-expert-readiness](#moe-shared-expert-readiness) | constraint | reviewed | When may a fused collective consume the shared-expert partial? |
-| [shared-expert-padded-partial-layout](#shared-expert-padded-partial-layout) | constraint | reviewed | How is a shared-expert partial adapted to the communication runner&#x27;s row layout? |
+| [shared-expert-padded-partial-layout](#shared-expert-padded-partial-layout) | constraint | reviewed | How is a shared-expert partial adapted to the communication runner's row layout? |
 
 <a id="moe-shared-expert-readiness"></a>
 ### When may a fused collective consume the shared-expert partial?
@@ -208,20 +208,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 
 - **shared-ready**: Wait for shared partials before the collective that consumes them. [moe-shared-expert-readiness](decisions.md#moe-shared-expert-readiness)
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for shared expert fusion; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/test_fhmoe.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_fhmoe.py) (`aiter_b3ad6c46`).
-- [op_tests/test_moe_dp_share_expert.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_moe_dp_share_expert.py) (`aiter_b3ad6c46`).
-- [op_tests/tuners/tune_fhmoe.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/tuners/tune_fhmoe.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

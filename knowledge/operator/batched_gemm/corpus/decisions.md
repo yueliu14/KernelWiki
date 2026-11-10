@@ -154,40 +154,10 @@ Follow these references for the full conditions, alternatives and source evidenc
 | [flydsl-gfx942-path-gates](../../dense_gemm/corpus/decisions.md#flydsl-gfx942-path-gates) | dense_gemm | Which FlyDSL GEMM paths does gfx942 (MI300X) actually give you, and which does it silently switch or refuse? |
 | [flydsl-half-mfma-call-forms](../../dense_gemm/corpus/decisions.md#flydsl-half-mfma-call-forms) | dense_gemm | Which legal MFMA call forms can seed a FlyDSL f16/bf16 GEMM? |
 | [flydsl-xor16-lds-layout-consistency](../../dense_gemm/corpus/decisions.md#flydsl-xor16-lds-layout-consistency) | dense_gemm | How should a FlyDSL GEMM apply an XOR16 LDS layout without making stores and loads disagree? |
-| [gemm-shape-regime-routing](../../dense_gemm/corpus/decisions.md#gemm-shape-regime-routing) | dense_gemm | For each shape bucket, which backend did AITER&#x27;s own tuner ship, and what does that imply for a FlyDSL kernel? |
+| [gemm-shape-regime-routing](../../dense_gemm/corpus/decisions.md#gemm-shape-regime-routing) | dense_gemm | For each shape bucket, which backend did AITER's own tuner ship, and what does that imply for a FlyDSL kernel? |
 | [gemm-streamed-operand-cache-policy](../../dense_gemm/corpus/decisions.md#gemm-streamed-operand-cache-policy) | dense_gemm | Which operand loads and output stores should carry a streaming (non-temporal) cache policy, and which should keep the default? |
 | [gemm-workgroup-xcd-mapping](../../dense_gemm/corpus/decisions.md#gemm-workgroup-xcd-mapping) | dense_gemm | How should a FlyDSL GEMM map workgroup IDs onto output tiles and XCDs, and where does AITER already do it? |
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for batched gemm; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/op_benchmarks/triton/bench_batched_gemm_a16wfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_batched_gemm_a16wfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_batched_gemm_a8w8.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_batched_gemm_a8w8.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_batched_gemm_afp4wfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_batched_gemm_afp4wfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_batched_gemm_bf16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_batched_gemm_bf16.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fused_bmm_rope_kv_cache.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_bmm_rope_kv_cache.py) (`aiter_b3ad6c46`).
-- [op_tests/test_batched_gemm_a8w8.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_batched_gemm_a8w8.py) (`aiter_b3ad6c46`).
-- [op_tests/test_batched_gemm_a8w8_mxscale_bpreshuffle.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_batched_gemm_a8w8_mxscale_bpreshuffle.py) (`aiter_b3ad6c46`).
-- [op_tests/test_batched_gemm_bf16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_batched_gemm_bf16.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_batched_gemm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_batched_gemm.py) (`aiter_b3ad6c46`).
-- [op_tests/test_opus_a8w8_bmm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_opus_a8w8_bmm.py) (`aiter_b3ad6c46`).
-- [op_tests/test_opus_a8w8_interface.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_opus_a8w8_interface.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/fusions/test_fused_bmm_rope_kv_cache.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/fusions/test_fused_bmm_rope_kv_cache.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/batched/test_batched_gemm_a16w8.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/batched/test_batched_gemm_a16w8.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/batched/test_batched_gemm_a16wfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/batched/test_batched_gemm_a16wfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/batched/test_batched_gemm_a8w8.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/batched/test_batched_gemm_a8w8.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/batched/test_batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/batched/test_batched_gemm_a8w8_a_per_token_group_prequant_w_per_batched_tensor_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/batched/test_batched_gemm_afp4wfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/batched/test_batched_gemm_afp4wfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/batched/test_batched_gemm_bf16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/batched/test_batched_gemm_bf16.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

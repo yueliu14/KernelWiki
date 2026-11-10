@@ -10,7 +10,7 @@ A per-token quantized input can be referenced through that map when quantization
 
 Gate/up results depend on expert weights. Their post-activation quantized values and scales must retain the slot identity expected by the down projection and output combination. Equal tensor dimensions do not make a per-token buffer interchangeable with a per-slot buffer.
 
-The [Muse Spark dataflow case](cases/muse_spark_decode_dataflow.md) shows this directly: input quantization uses `M` rows, expert activations use `8*M` slot rows, and the consumer selects its row with `slot // 8` or `slot` respectively.
+See the [Muse Spark case](cases/muse_spark_decode_dataflow.md#inspected-dataflow) for concrete layouts and consumer row indices.
 
 ## Memory lifetime and state
 
@@ -22,6 +22,6 @@ Track each buffer from its producer through its final consumer, including outsta
 - Do not assume every row of an allocated slot buffer was written. Nonlocal and padded slots may be unspecified; downstream consumers must preserve the ownership/mask contract.
 - Graph capture and concurrent invocations constrain scratch reuse. Record stable addresses, capture buckets and event dependencies before introducing a shared workspace. An `empty` allocation in source does not by itself prove a per-replay allocation cost.
 
-In the Muse Spark source, the finalizer checks expert ownership before reading each per-slot row. A consumer that reads every allocated row would violate that contract. The existing case documents allocations and lifetimes; it does not claim that workspace reuse was implemented or measured.
+The case's [buffer table](cases/muse_spark_decode_dataflow.md#buffer-ownership-and-lifetime) records its allocations, ownership checks and last consumers.
 
 Related: [scheduling](scheduling.md), [measurement](measurement.md), [quantized GEMM](../../operator/scaled_quant_gemm/README.md), [dispatch/combine](../../operator/moe_dispatch_combine/README.md).

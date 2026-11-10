@@ -23,7 +23,7 @@ A required trait must be established for the actual design before the card appli
 |---|---|---|---|
 | [indexer-mqa-score-semantics](#indexer-mqa-score-semantics) | semantic | reviewed | What does the DeepSeek-style MQA indexer compute before top-k? |
 | [indexer-fp8-architecture-format](#indexer-fp8-architecture-format) | constraint | reviewed | Which FP8 format conversions does the contiguous FlyDSL MQA logits path require? |
-| [indexer-window-and-clean-output](#indexer-window-and-clean-output) | constraint | reviewed | Who initializes logits outside each query&#x27;s valid window? |
+| [indexer-window-and-clean-output](#indexer-window-and-clean-output) | constraint | reviewed | Who initializes logits outside each query's valid window? |
 | [indexer-paged-mxfp4-layout](#indexer-paged-mxfp4-layout) | constraint | blocked | Which packed payload, scale and tile constraints accompany paged MXFP4 scoring? |
 | [indexer-minimax-page-max-score](#indexer-minimax-page-max-score) | semantic | blocked | How does MiniMax block scoring differ from per-token MQA logits? |
 | [indexer-score-work-partition](#indexer-score-work-partition) | performance_candidate | reviewed | How should scoring work be partitioned across short decode and long prefill rows? |
@@ -605,34 +605,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 - **packed-scales**: Packed payload and scale addressing form one ABI. [indexer-paged-mxfp4-layout](decisions.md#indexer-paged-mxfp4-layout)
 - **rank-padding**: Rank-major ownership, losing padding scores and physical-slot conversion must agree. [indexer-dcp-merge-ownership](decisions.md#indexer-dcp-merge-ownership)
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for attention indexer; source presence is not a measured winner.
-- Weighted-ReLU logits, page-max scores and top-k have different contracts; no stable tie or runtime-dispatch guarantee is inferred.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/multigpu_tests/test_msa_block_select_cp.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/multigpu_tests/test_msa_block_select_cp.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fp8_mqa_logits.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fp8_mqa_logits.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_pa_mqa_logits_mxfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_pa_mqa_logits_mxfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_dcp_topk_merge.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_dcp_topk_merge.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_fp8_mqa_logits.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_fp8_mqa_logits.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_fp8_paged_mqa_logits.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_fp8_paged_mqa_logits.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_minimax_m3_index_score.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_minimax_m3_index_score.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_pa_mqa_logits_fp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_pa_mqa_logits_fp4.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_pa_mqa_logits_fp4_prefill.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_pa_mqa_logits_fp4_prefill.py) (`aiter_b3ad6c46`).
-- [op_tests/test_msa_block_select.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_msa_block_select.py) (`aiter_b3ad6c46`).
-- [op_tests/test_pa_mqa_logits_mxfp4_opus.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_pa_mqa_logits_mxfp4_opus.py) (`aiter_b3ad6c46`).
-- [op_tests/test_pa_mqa_logits_offset.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_pa_mqa_logits_offset.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/attention/test_fp8_mqa_logits.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_fp8_mqa_logits.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/attention/test_pa_mqa_logits_2d_context_lens.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_pa_mqa_logits_2d_context_lens.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/attention/test_pa_mqa_logits_mxfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_pa_mqa_logits_mxfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/utils/pa_mqa_logits_mxfp4_ref.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/utils/pa_mqa_logits_mxfp4_ref.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

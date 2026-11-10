@@ -278,21 +278,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 - **route-combine**: Forward/inverse maps and weight placement must agree through combine. [moe-route-map-capacity](decisions.md#moe-route-map-capacity), [moe-weighted-gather-dropped-routes](decisions.md#moe-weighted-gather-dropped-routes)
 - **fused-scales**: Fusing quant/scatter also fixes the consumer scale layout. [moe-route-quant-scatter-fusion](decisions.md#moe-route-quant-scatter-fusion)
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for moe dispatch combine; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/multigpu_tests/test_dispatch_combine.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/multigpu_tests/test_dispatch_combine.py) (`aiter_b3ad6c46`).
-- [op_tests/multigpu_tests/test_mori_all2all.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/multigpu_tests/test_mori_all2all.py) (`aiter_b3ad6c46`).
-- [op_tests/multigpu_tests/test_sp_head_exchange.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/multigpu_tests/test_sp_head_exchange.py) (`aiter_b3ad6c46`).
-- [op_tests/test_all2all_manager_lifecycle.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_all2all_manager_lifecycle.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

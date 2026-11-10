@@ -29,7 +29,7 @@ The gate/up kernel computes `SiLU(gate) * up`, rounds the activation to BF16 and
 
 Other boundaries remain too: route metadata between prepare/scatter/expert stages, BF16 per-token/per-slot down-projection output, and the final local result. The finalizer applies expert normalization and routing weights; the cross-rank reduction is outside `run_compact_a4`. Removing the local finalizer or collective requires analysis beyond the GEMM body.
 
-The source predicate requires `M` to be a multiple of eight with `0 < M <= 512`, hidden width 4096, top-8 routing and 32 local experts, with native packed weight/scale layouts. These are source applicability limits; they do not imply that every row count was observed in this c8 workload. The extraction used reconstructed routing and synthetic MXFP4 weights. That evidence does not establish behavior under every real expert-imbalance or cache-residency pattern.
+Use the companion case's [dispatch and coverage contract](muse_spark_decode_dataflow.md#dispatch-evidence-and-proposed-measurement) for exact row/layout eligibility and synthetic extraction limits. Fusion observations apply only within that scope.
 
 **Reusable lesson:** describe fusion at each boundary of the MoE pipeline. A multi-launch MoE callable can contain meaningful activation/quantization and finalizer fusion while retaining staging buffers and communication. Related operators: [grouped GEMM / MoE](../../../operator/grouped_gemm_moe/README.md), [quantized GEMM](../../../operator/scaled_quant_gemm/README.md), [dispatch/combine](../../../operator/moe_dispatch_combine/README.md).
 

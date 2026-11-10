@@ -10,7 +10,7 @@ Dispatch selects a complete execution path whose preparation, expert backend and
 | Caller dispatch | Actual model/backend caller and flags | Does the serving path choose it, and which fallback handles other inputs? |
 | Observed workload coverage | Per-phase call/shape/routing records | What fraction of the measured workload actually takes that path? |
 
-In the [Muse Spark example](cases/muse_spark_decode_dataflow.md), the compact source accepts positive multiples of eight up to 512 rows and specific packed local-expert weights. The local extraction records target-verification buckets such as `M=8,16,24`. The source's upper bound does not establish that all supported sizes were observed or that prefill uses the same route. The wrapper raises on ineligible input; a serving fallback requires inspection of its caller.
+The [Muse Spark case](cases/muse_spark_decode_dataflow.md#dispatch-evidence-and-proposed-measurement) records these separately: the source predicate, extracted verification buckets and an unestablished caller fallback. Supported sizes do not establish observed coverage or a prefill route.
 
 ## Selecting and comparing paths
 

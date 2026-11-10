@@ -81,20 +81,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 |---|---|---|
 | [attention-split-kv-merge](../../mla_attention/corpus/decisions.md#attention-split-kv-merge) | mla_attention | When splitting KV work, what information must the merge preserve? |
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for context parallel attention; source presence is not a measured winner.
-- Native MLA interface and rank-local reference coverage; binary instructions and end-to-end multi-GPU execution are not validated.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/multigpu_tests/test_msa_block_select_cp.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/multigpu_tests/test_msa_block_select_cp.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_persistent_round_robin.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_persistent_round_robin.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)
