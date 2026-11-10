@@ -188,47 +188,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 
 - **partition-merge**: A KV split must preserve and merge the normalization statistics. [attention-split-kv-merge](decisions.md#attention-split-kv-merge)
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for mla attention; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/op_benchmarks/triton/bench_fused_mla_prefill_qkv_fp8.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_mla_prefill_qkv_fp8.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fused_qk_cat_and_cache_mla.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_qk_cat_and_cache_mla.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_mla.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_mla.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_mla_decode.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_mla_decode.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_mla_decode_rope.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_mla_decode_rope.py) (`aiter_b3ad6c46`).
-- [op_tests/test_concat_cache_mla.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_concat_cache_mla.py) (`aiter_b3ad6c46`).
-- [op_tests/test_concat_cache_mla_seg.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_concat_cache_mla_seg.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_gather_kv_b_proj.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_gather_kv_b_proj.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_mla_reduce.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_mla_reduce.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_decode_gate.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_decode_gate.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_decode_pagesize64.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_decode_pagesize64.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_flydsl.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_flydsl.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_ltx.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_ltx.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_persistent.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_persistent.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_persistent_round_robin.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_persistent_round_robin.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_prefill_ps.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_prefill_ps.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_reduce.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_reduce.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_sparse.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_sparse.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_stage2_merge.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_stage2_merge.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_v40_persistent.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_v40_persistent.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_v4_kargpreld.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_v4_kargpreld.py) (`aiter_b3ad6c46`).
-- [op_tests/test_mla_v4_nm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_mla_v4_nm.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/attention/test_mla.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_mla.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/attention/test_mla_decode_rope.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_mla_decode_rope.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/attention/test_mla_v4_triton.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_mla_v4_triton.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/fusions/test_fused_mla_prefill_qkv_fp8.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/fusions/test_fused_mla_prefill_qkv_fp8.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/test_gather_kv_b_proj.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/test_gather_kv_b_proj.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/utils/mla_decode_ref.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/utils/mla_decode_ref.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/utils/mla_extend_ref.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/utils/mla_extend_ref.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

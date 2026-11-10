@@ -50,18 +50,7 @@ The ordinary joint router/pooler consists of a packed projection partial produce
 
 The earlier pair records emphasized the target layer monokernel but omitted an additional change on **1020 → 1027 TEP8 c1/c4/c8**: the exact server artifacts report `muse_spark DFlash2 draft attached at stage 2`, plus a TP-sharded context projection with 1024 output rows per rank. These initialization messages occur before measurement. Their source is `sgl_amd_mono/muse_spark/draft.py`; the device implementations import FlyDSL. The `_hip` spec names do not identify the implementation language.
 
-The source launch boundaries for each of the five eligible draft layers are:
-
-| Launch | Combined operations | Device body |
-| --- | --- | --- |
-| D-pre | Residual/input norm, convolution coefficients and conv0, QKV projection, per-head Q/K norm, table RoPE, Q output and FP8 K/V stores | `gfx950/draft_attn_half.py` |
-| D-attn | Block attention over the compact windowed KV cache | `gfx950/draft_attn.py` |
-| D-post | O projection, TP sum and conv1 | `gfx950/draft_attn_half.py` |
-| D-MLP | Post-norm/residual, convolutions, gate/up/down and TP sum | `gfx950/draft_mlp.py` |
-
-`DraftRunner.launch_attn` explicitly invokes pre, attention and post, and `_Draft.forward` then invokes the MLP launch. This is **four source-level launch boundaries per eligible layer**, not one fused draft or one fused model. Context projection/all-gather, embedding/final norm and token selection remain outside those layer launches. Existing DFLASH fused KV materialization also appears in baseline artifacts and must not be credited as a new 1027 optimization.
-
-The three TEP8 pair records now include these paths, file hashes, languages, semantics and guards. The launch-count statement is `source_verified`; actual graph-replay counts, draft/target time shares and historical GPU-time leaders remain `unavailable`. Stage 0/1 and unsupported-shape fallback behavior must remain separate if later profiling uses different settings.
+The four source-level launch boundaries (D-pre, D-attn, D-post and D-MLP), guards and exact implementation links are maintained in the [shared 1020→1027 draft change](changes/v02_to_v03_tp8_ep8.md#kernel-2). `DraftRunner.launch_attn` invokes three launches and `_Draft.forward` then invokes the MLP launch; this is not one whole-draft kernel. The [source excerpts](evidence/verification_source_excerpts.md) and [phase facts](evidence/verified_runtime_facts.json) are the independent evidence. Runtime launch counts and draft/target time shares remain unavailable.
 
 ## Reproduce the recheck
 
@@ -82,4 +71,4 @@ python3 tools/inferencex/skills/inferencex-kernel-evolution/scripts/build_pair_h
 
 The collector reuses cached archives or downloads missing ones through `gh api`. Processing time and cache mtime are recorded separately; cached artifacts are not assigned a fabricated fresh retrieval timestamp. Full phase events are stored externally with hashes. No scripts in this sequence submit a GPU job.
 
-Validation: all endpoint dates/metrics match the previously committed pairs, delta formulas and exact artifact membership pass, all 19 phase windows are complete, report links resolve, and pair/matrix regeneration is idempotent. Repository checks pass: **222 tests**, corpus generated-page check, and workload generated-page check. These checks do not validate GPU execution.
+Current code-validation status belongs to repository CI; historical collection checks do not establish GPU execution.

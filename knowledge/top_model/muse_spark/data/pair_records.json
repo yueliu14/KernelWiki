@@ -216,9 +216,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
             "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
-            "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
-            "path_relation": "different_paths",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/0e3246a8bbd8990f/muse_qk_norm.py",
               "entrypoints": [
@@ -234,6 +231,7 @@
                 }
               ]
             },
+            "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
               "entrypoints": [
@@ -253,16 +251,15 @@
                   "end_line": 297
                 }
               ]
-            }
+            },
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
-            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
               "entrypoints": [
@@ -278,6 +275,7 @@
                 }
               ]
             },
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
               "entrypoints": [
@@ -292,7 +290,9 @@
                   "end_line": 1138
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "eligibility wrapper",
@@ -300,8 +300,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
             "before_sha256": null,
             "after_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/34933e2895490a37/attention_kv_write.py",
               "entrypoints": [
@@ -326,7 +324,9 @@
                   "end_line": 203
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -350,9 +350,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
-            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
               "entrypoints": [
@@ -368,6 +365,7 @@
                 }
               ]
             },
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
               "entrypoints": [
@@ -382,7 +380,9 @@
                   "end_line": 1138
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new routing dispatch",
@@ -390,8 +390,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
             "before_sha256": null,
             "after_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/c570dfbdc9d85dbb/router_pooler.py",
               "entrypoints": [
@@ -406,7 +404,9 @@
                   "end_line": 166
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new epilogues",
@@ -414,8 +414,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
             "before_sha256": null,
             "after_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/6c876d2421932de4/router_pooler_topk.py",
               "entrypoints": [
@@ -440,7 +438,9 @@
                   "end_line": 522
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -463,9 +463,6 @@
             "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
             "after_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
             "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
-            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
-            "path_relation": "same_path",
-            "body_relation": "identical_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
               "entrypoints": [
@@ -481,6 +478,7 @@
                 }
               ]
             },
+            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
               "entrypoints": [
@@ -495,7 +493,9 @@
                   "end_line": 969
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
           },
           {
             "role": "new compact experts",
@@ -503,8 +503,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py",
             "before_sha256": null,
             "after_sha256": "63551020e74ad73bae018b34f2562e6f65235492e84913226fb1883f631470a8",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/63551020e74ad73b/mxfp4_compact_a4_moe.py",
               "entrypoints": [
@@ -529,7 +527,9 @@
                   "end_line": 310
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new dispatch",
@@ -537,8 +537,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py",
             "before_sha256": null,
             "after_sha256": "4dd1c5eff0bd1f913b1bbe31e865141e94449bb24f3dc8ee8fd74e02d18139be",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/4dd1c5eff0bd1f91/mxfp4_moe.py",
               "entrypoints": [
@@ -558,7 +556,9 @@
                   "end_line": 204
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -581,9 +581,6 @@
             "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_finalize.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
             "before_sha256": "48af597a54827b3e7f9340dada68f74759bee80213df01fbe8f95c4e95fe6d2b",
-            "after_sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
-            "path_relation": "different_paths",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/48af597a54827b3e/muse_moe_finalize.py",
               "entrypoints": [
@@ -599,6 +596,7 @@
                 }
               ]
             },
+            "after_sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/8ab37d684c03d806/finalize_allreduce.hip",
               "entrypoints": [
@@ -611,7 +609,9 @@
                   "line": 236
                 }
               ]
-            }
+            },
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new collective wrapper",
@@ -619,8 +619,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
             "before_sha256": null,
             "after_sha256": "1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/1684029d6e761575/finalize_allreduce.py",
               "entrypoints": [
@@ -640,16 +638,15 @@
                   "end_line": 257
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "model guard",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
-            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
               "entrypoints": [
@@ -665,6 +662,7 @@
                 }
               ]
             },
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
               "entrypoints": [
@@ -679,7 +677,9 @@
                   "end_line": 1138
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -703,9 +703,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
             "before_sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
-            "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/94d0b45392248de3/fused_norm_gate.py",
               "entrypoints": [
@@ -716,6 +713,7 @@
                 }
               ]
             },
+            "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/ada56887a3648995/fused_norm_gate.py",
               "entrypoints": [
@@ -730,7 +728,9 @@
                   "end_line": 188
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new fused reducer",
@@ -738,8 +738,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
             "before_sha256": null,
             "after_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
               "entrypoints": [
@@ -754,7 +752,9 @@
                   "end_line": 125
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -776,9 +776,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
             "before_sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
-            "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/e11bbcae7c1504a0/fused_norm_residual.py",
               "entrypoints": [
@@ -789,6 +786,7 @@
                 }
               ]
             },
+            "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/16edaf5510160b30/fused_norm_residual.py",
               "entrypoints": [
@@ -803,16 +801,15 @@
                   "end_line": 382
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "requesting model",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
-            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
               "entrypoints": [
@@ -828,6 +825,7 @@
                 }
               ]
             },
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
               "entrypoints": [
@@ -842,7 +840,9 @@
                   "end_line": 1138
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -851,6 +851,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v01_to_v03_tp4_ep4.md",
     "excluded_attributions": [
       "No intermediate TEP4 conc16 HiCache point exists for 1020; the measured change spans both source transitions.",
       "The 1027 image has an AMD monokernel plugin, but this TEP4 endpoint does not enable it."
@@ -1160,9 +1161,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
             "before_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
-            "after_sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/34933e2895490a37/attention_kv_write.py",
               "entrypoints": [
@@ -1188,6 +1186,7 @@
                 }
               ]
             },
+            "after_sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/a21de58492ca4d4d/attention_kv_write.py",
               "entrypoints": [
@@ -1212,16 +1211,15 @@
                   "end_line": 204
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "device body",
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
             "before_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
-            "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
-            "path_relation": "same_path",
-            "body_relation": "identical_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
               "entrypoints": [
@@ -1242,6 +1240,7 @@
                 }
               ]
             },
+            "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
               "entrypoints": [
@@ -1261,7 +1260,9 @@
                   "end_line": 297
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
           }
         ],
         "evidence": [
@@ -1284,9 +1285,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
             "before_sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
-            "after_sha256": "20a0a111064e9d1c41ea5a10f0af60c3812d77a6b9631bef62fd4db0d2c3a11b",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/8ab37d684c03d806/finalize_allreduce.hip",
               "entrypoints": [
@@ -1300,6 +1298,7 @@
                 }
               ]
             },
+            "after_sha256": "20a0a111064e9d1c41ea5a10f0af60c3812d77a6b9631bef62fd4db0d2c3a11b",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/20a0a111064e9d1c/finalize_allreduce.hip",
               "entrypoints": [
@@ -1312,16 +1311,15 @@
                   "line": 263
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "protocol dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
             "before_sha256": "1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12",
-            "after_sha256": "b27664445f8928ac5b358ba15b82a0bfd3e3d113874200f40ffa922bf978bd92",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/1684029d6e761575/finalize_allreduce.py",
               "entrypoints": [
@@ -1342,6 +1340,7 @@
                 }
               ]
             },
+            "after_sha256": "b27664445f8928ac5b358ba15b82a0bfd3e3d113874200f40ffa922bf978bd92",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/b27664445f8928ac/finalize_allreduce.py",
               "entrypoints": [
@@ -1361,7 +1360,9 @@
                   "end_line": 269
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -1384,9 +1385,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
             "before_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
-            "after_sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/c570dfbdc9d85dbb/router_pooler.py",
               "entrypoints": [
@@ -1402,6 +1400,7 @@
                 }
               ]
             },
+            "after_sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/d1e1447d7980b697/router_pooler.py",
               "entrypoints": [
@@ -1416,16 +1415,15 @@
                   "end_line": 180
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "router device epilogues",
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
             "before_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
-            "after_sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/6c876d2421932de4/router_pooler_topk.py",
               "entrypoints": [
@@ -1451,6 +1449,7 @@
                 }
               ]
             },
+            "after_sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/8492b6be85065fe9/router_pooler_topk.py",
               "entrypoints": [
@@ -1475,7 +1474,9 @@
                   "end_line": 528
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -1497,9 +1498,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_gluon.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_flydsl.py",
             "before_sha256": "73f8c5b89137e10eaeb8be67a6cf6686194af50a03300a22569764a0af58e471",
-            "after_sha256": "cdfa8cadad2f252028875ef1b4e9506281161f7b974f7cfe47326bc49fcf882e",
-            "path_relation": "different_paths",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/73f8c5b89137e10e/muse_extend_gluon.py",
               "entrypoints": [
@@ -1515,6 +1513,7 @@
                 }
               ]
             },
+            "after_sha256": "cdfa8cadad2f252028875ef1b4e9506281161f7b974f7cfe47326bc49fcf882e",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/cdfa8cadad2f2520/muse_extend_flydsl.py",
               "entrypoints": [
@@ -1529,16 +1528,15 @@
                   "end_line": 684
                 }
               ]
-            }
+            },
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "backend dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
             "before_sha256": "76d2d1732b8e1c765d437504270ecfd885c28fec4db2c7f639c2cd2fbc698d2b",
-            "after_sha256": "e8053575975ff7d2de8971c4c47de19699b0251b3f6a60458f8011a5e609db33",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/76d2d1732b8e1c76/aiter_backend.py",
               "entrypoints": [
@@ -1559,6 +1557,7 @@
                 }
               ]
             },
+            "after_sha256": "e8053575975ff7d2de8971c4c47de19699b0251b3f6a60458f8011a5e609db33",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/e8053575975ff7d2/aiter_backend.py",
               "entrypoints": [
@@ -1578,7 +1577,9 @@
                   "end_line": 5437
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -1602,8 +1603,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_balanced.py",
             "before_sha256": null,
             "after_sha256": "7ab7b5084c44fd90cd128ed4304d4e33939bb56b0f5590a9b5dc83563484b19a",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/7ab7b5084c44fd90/muse_verify_balanced.py",
               "entrypoints": [
@@ -1628,16 +1627,15 @@
                   "end_line": 298
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "partial kernel",
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
             "before_sha256": "72dc1e2cd6f57fc503904782e2c082745fbc93bd98c2576e53f2a99563b5a651",
-            "after_sha256": "3df4cf24bded61346b0dd4b57aa8c2a3ff4851e5a0a614da94131bc4ff771f5c",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/72dc1e2cd6f57fc5/muse_verify_flydsl.py",
               "entrypoints": [
@@ -1658,6 +1656,7 @@
                 }
               ]
             },
+            "after_sha256": "3df4cf24bded61346b0dd4b57aa8c2a3ff4851e5a0a614da94131bc4ff771f5c",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/3df4cf24bded6134/muse_verify_flydsl.py",
               "entrypoints": [
@@ -1677,16 +1676,15 @@
                   "end_line": 716
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "fused-reducer dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
             "before_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
-            "after_sha256": "6e1a6ca9b85aa6bda3fbb18f630a4231ce809b3a9f76cdd35b202081fd8c8b69",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
               "entrypoints": [
@@ -1702,6 +1700,7 @@
                 }
               ]
             },
+            "after_sha256": "6e1a6ca9b85aa6bda3fbb18f630a4231ce809b3a9f76cdd35b202081fd8c8b69",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/6e1a6ca9b85aa6bd/verify_reduce_norm_gate.py",
               "entrypoints": [
@@ -1716,7 +1715,9 @@
                   "end_line": 130
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -1726,6 +1727,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04_tp4_ep4.md",
     "excluded_attributions": [
       "Both endpoints are ordinary TEP4 serving: the AMD layer monokernel is not enabled by either CLI. Its captured Muse bodies are unchanged between these image digests.",
       "TP8 finalize/all-reduce eligibility is not a new TP4 optimization."
@@ -2136,9 +2138,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
             "before_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
-            "after_sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/34933e2895490a37/attention_kv_write.py",
               "entrypoints": [
@@ -2164,6 +2163,7 @@
                 }
               ]
             },
+            "after_sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/a21de58492ca4d4d/attention_kv_write.py",
               "entrypoints": [
@@ -2188,16 +2188,15 @@
                   "end_line": 204
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "device body",
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
             "before_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
-            "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
-            "path_relation": "same_path",
-            "body_relation": "identical_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
               "entrypoints": [
@@ -2218,6 +2217,7 @@
                 }
               ]
             },
+            "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
               "entrypoints": [
@@ -2237,7 +2237,9 @@
                   "end_line": 297
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
           }
         ],
         "evidence": [
@@ -2260,9 +2262,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
             "before_sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
-            "after_sha256": "20a0a111064e9d1c41ea5a10f0af60c3812d77a6b9631bef62fd4db0d2c3a11b",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/8ab37d684c03d806/finalize_allreduce.hip",
               "entrypoints": [
@@ -2276,6 +2275,7 @@
                 }
               ]
             },
+            "after_sha256": "20a0a111064e9d1c41ea5a10f0af60c3812d77a6b9631bef62fd4db0d2c3a11b",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/20a0a111064e9d1c/finalize_allreduce.hip",
               "entrypoints": [
@@ -2288,16 +2288,15 @@
                   "line": 263
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "protocol dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
             "before_sha256": "1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12",
-            "after_sha256": "b27664445f8928ac5b358ba15b82a0bfd3e3d113874200f40ffa922bf978bd92",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/1684029d6e761575/finalize_allreduce.py",
               "entrypoints": [
@@ -2318,6 +2317,7 @@
                 }
               ]
             },
+            "after_sha256": "b27664445f8928ac5b358ba15b82a0bfd3e3d113874200f40ffa922bf978bd92",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/b27664445f8928ac/finalize_allreduce.py",
               "entrypoints": [
@@ -2337,7 +2337,9 @@
                   "end_line": 269
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -2360,9 +2362,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
             "before_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
-            "after_sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/c570dfbdc9d85dbb/router_pooler.py",
               "entrypoints": [
@@ -2378,6 +2377,7 @@
                 }
               ]
             },
+            "after_sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/d1e1447d7980b697/router_pooler.py",
               "entrypoints": [
@@ -2392,16 +2392,15 @@
                   "end_line": 180
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "router device epilogues",
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
             "before_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
-            "after_sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/6c876d2421932de4/router_pooler_topk.py",
               "entrypoints": [
@@ -2427,6 +2426,7 @@
                 }
               ]
             },
+            "after_sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/8492b6be85065fe9/router_pooler_topk.py",
               "entrypoints": [
@@ -2451,7 +2451,9 @@
                   "end_line": 528
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -2473,9 +2475,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_gluon.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_flydsl.py",
             "before_sha256": "73f8c5b89137e10eaeb8be67a6cf6686194af50a03300a22569764a0af58e471",
-            "after_sha256": "cdfa8cadad2f252028875ef1b4e9506281161f7b974f7cfe47326bc49fcf882e",
-            "path_relation": "different_paths",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/73f8c5b89137e10e/muse_extend_gluon.py",
               "entrypoints": [
@@ -2491,6 +2490,7 @@
                 }
               ]
             },
+            "after_sha256": "cdfa8cadad2f252028875ef1b4e9506281161f7b974f7cfe47326bc49fcf882e",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/cdfa8cadad2f2520/muse_extend_flydsl.py",
               "entrypoints": [
@@ -2505,16 +2505,15 @@
                   "end_line": 684
                 }
               ]
-            }
+            },
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "backend dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
             "before_sha256": "76d2d1732b8e1c765d437504270ecfd885c28fec4db2c7f639c2cd2fbc698d2b",
-            "after_sha256": "e8053575975ff7d2de8971c4c47de19699b0251b3f6a60458f8011a5e609db33",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/76d2d1732b8e1c76/aiter_backend.py",
               "entrypoints": [
@@ -2535,6 +2534,7 @@
                 }
               ]
             },
+            "after_sha256": "e8053575975ff7d2de8971c4c47de19699b0251b3f6a60458f8011a5e609db33",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/e8053575975ff7d2/aiter_backend.py",
               "entrypoints": [
@@ -2554,7 +2554,9 @@
                   "end_line": 5437
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -2578,8 +2580,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_balanced.py",
             "before_sha256": null,
             "after_sha256": "7ab7b5084c44fd90cd128ed4304d4e33939bb56b0f5590a9b5dc83563484b19a",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/7ab7b5084c44fd90/muse_verify_balanced.py",
               "entrypoints": [
@@ -2604,16 +2604,15 @@
                   "end_line": 298
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "partial kernel",
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
             "before_sha256": "72dc1e2cd6f57fc503904782e2c082745fbc93bd98c2576e53f2a99563b5a651",
-            "after_sha256": "3df4cf24bded61346b0dd4b57aa8c2a3ff4851e5a0a614da94131bc4ff771f5c",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/72dc1e2cd6f57fc5/muse_verify_flydsl.py",
               "entrypoints": [
@@ -2634,6 +2633,7 @@
                 }
               ]
             },
+            "after_sha256": "3df4cf24bded61346b0dd4b57aa8c2a3ff4851e5a0a614da94131bc4ff771f5c",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/3df4cf24bded6134/muse_verify_flydsl.py",
               "entrypoints": [
@@ -2653,16 +2653,15 @@
                   "end_line": 716
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "fused-reducer dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
             "before_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
-            "after_sha256": "6e1a6ca9b85aa6bda3fbb18f630a4231ce809b3a9f76cdd35b202081fd8c8b69",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
               "entrypoints": [
@@ -2678,6 +2677,7 @@
                 }
               ]
             },
+            "after_sha256": "6e1a6ca9b85aa6bda3fbb18f630a4231ce809b3a9f76cdd35b202081fd8c8b69",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/6e1a6ca9b85aa6bd/verify_reduce_norm_gate.py",
               "entrypoints": [
@@ -2692,7 +2692,9 @@
                   "end_line": 130
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -2702,6 +2704,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04_tp4_ep4.md",
     "excluded_attributions": [
       "Both endpoints are ordinary TEP4 serving: the AMD layer monokernel is not enabled by either CLI. Its captured Muse bodies are unchanged between these image digests.",
       "TP8 finalize/all-reduce eligibility is not a new TP4 optimization."
@@ -3117,9 +3120,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
             "before_sha256": "34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf",
-            "after_sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/34933e2895490a37/attention_kv_write.py",
               "entrypoints": [
@@ -3145,6 +3145,7 @@
                 }
               ]
             },
+            "after_sha256": "a21de58492ca4d4d59bbbb2d57d168aa5f77cb2a696e236277e1ce25d32548c0",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/a21de58492ca4d4d/attention_kv_write.py",
               "entrypoints": [
@@ -3169,16 +3170,15 @@
                   "end_line": 204
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "device body",
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
             "before_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
-            "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
-            "path_relation": "same_path",
-            "body_relation": "identical_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
               "entrypoints": [
@@ -3199,6 +3199,7 @@
                 }
               ]
             },
+            "after_sha256": "3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py",
               "entrypoints": [
@@ -3218,7 +3219,9 @@
                   "end_line": 297
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
           }
         ],
         "evidence": [
@@ -3241,9 +3244,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip",
             "before_sha256": "8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77",
-            "after_sha256": "20a0a111064e9d1c41ea5a10f0af60c3812d77a6b9631bef62fd4db0d2c3a11b",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/8ab37d684c03d806/finalize_allreduce.hip",
               "entrypoints": [
@@ -3257,6 +3257,7 @@
                 }
               ]
             },
+            "after_sha256": "20a0a111064e9d1c41ea5a10f0af60c3812d77a6b9631bef62fd4db0d2c3a11b",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/20a0a111064e9d1c/finalize_allreduce.hip",
               "entrypoints": [
@@ -3269,16 +3270,15 @@
                   "line": 263
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "protocol dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py",
             "before_sha256": "1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12",
-            "after_sha256": "b27664445f8928ac5b358ba15b82a0bfd3e3d113874200f40ffa922bf978bd92",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/1684029d6e761575/finalize_allreduce.py",
               "entrypoints": [
@@ -3299,6 +3299,7 @@
                 }
               ]
             },
+            "after_sha256": "b27664445f8928ac5b358ba15b82a0bfd3e3d113874200f40ffa922bf978bd92",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/b27664445f8928ac/finalize_allreduce.py",
               "entrypoints": [
@@ -3318,7 +3319,9 @@
                   "end_line": 269
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -3341,9 +3344,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
             "before_sha256": "c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166",
-            "after_sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/c570dfbdc9d85dbb/router_pooler.py",
               "entrypoints": [
@@ -3359,6 +3359,7 @@
                 }
               ]
             },
+            "after_sha256": "d1e1447d7980b69734bc17e7f49fc106dafc2042adb2f5f6ff4f474d949362d5",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/d1e1447d7980b697/router_pooler.py",
               "entrypoints": [
@@ -3373,16 +3374,15 @@
                   "end_line": 180
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "router device epilogues",
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
             "before_sha256": "6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e",
-            "after_sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/6c876d2421932de4/router_pooler_topk.py",
               "entrypoints": [
@@ -3408,6 +3408,7 @@
                 }
               ]
             },
+            "after_sha256": "8492b6be85065fe9dab1863e2624bf94583f328f513c65f7b018fe931b758131",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/8492b6be85065fe9/router_pooler_topk.py",
               "entrypoints": [
@@ -3432,7 +3433,9 @@
                   "end_line": 528
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -3454,9 +3457,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_gluon.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_extend_flydsl.py",
             "before_sha256": "73f8c5b89137e10eaeb8be67a6cf6686194af50a03300a22569764a0af58e471",
-            "after_sha256": "cdfa8cadad2f252028875ef1b4e9506281161f7b974f7cfe47326bc49fcf882e",
-            "path_relation": "different_paths",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/73f8c5b89137e10e/muse_extend_gluon.py",
               "entrypoints": [
@@ -3472,6 +3472,7 @@
                 }
               ]
             },
+            "after_sha256": "cdfa8cadad2f252028875ef1b4e9506281161f7b974f7cfe47326bc49fcf882e",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/cdfa8cadad2f2520/muse_extend_flydsl.py",
               "entrypoints": [
@@ -3486,16 +3487,15 @@
                   "end_line": 684
                 }
               ]
-            }
+            },
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "backend dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/layers/attention/aiter_backend.py",
             "before_sha256": "76d2d1732b8e1c765d437504270ecfd885c28fec4db2c7f639c2cd2fbc698d2b",
-            "after_sha256": "e8053575975ff7d2de8971c4c47de19699b0251b3f6a60458f8011a5e609db33",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/76d2d1732b8e1c76/aiter_backend.py",
               "entrypoints": [
@@ -3516,6 +3516,7 @@
                 }
               ]
             },
+            "after_sha256": "e8053575975ff7d2de8971c4c47de19699b0251b3f6a60458f8011a5e609db33",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/e8053575975ff7d2/aiter_backend.py",
               "entrypoints": [
@@ -3535,7 +3536,9 @@
                   "end_line": 5437
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -3559,8 +3562,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_balanced.py",
             "before_sha256": null,
             "after_sha256": "7ab7b5084c44fd90cd128ed4304d4e33939bb56b0f5590a9b5dc83563484b19a",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/7ab7b5084c44fd90/muse_verify_balanced.py",
               "entrypoints": [
@@ -3585,16 +3586,15 @@
                   "end_line": 298
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "partial kernel",
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/muse_verify_flydsl.py",
             "before_sha256": "72dc1e2cd6f57fc503904782e2c082745fbc93bd98c2576e53f2a99563b5a651",
-            "after_sha256": "3df4cf24bded61346b0dd4b57aa8c2a3ff4851e5a0a614da94131bc4ff771f5c",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/72dc1e2cd6f57fc5/muse_verify_flydsl.py",
               "entrypoints": [
@@ -3615,6 +3615,7 @@
                 }
               ]
             },
+            "after_sha256": "3df4cf24bded61346b0dd4b57aa8c2a3ff4851e5a0a614da94131bc4ff771f5c",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/3df4cf24bded6134/muse_verify_flydsl.py",
               "entrypoints": [
@@ -3634,16 +3635,15 @@
                   "end_line": 716
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "fused-reducer dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
             "before_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
-            "after_sha256": "6e1a6ca9b85aa6bda3fbb18f630a4231ce809b3a9f76cdd35b202081fd8c8b69",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
               "entrypoints": [
@@ -3659,6 +3659,7 @@
                 }
               ]
             },
+            "after_sha256": "6e1a6ca9b85aa6bda3fbb18f630a4231ce809b3a9f76cdd35b202081fd8c8b69",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/6e1a6ca9b85aa6bd/verify_reduce_norm_gate.py",
               "entrypoints": [
@@ -3673,7 +3674,9 @@
                   "end_line": 130
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -3683,6 +3686,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04_tp4_ep4.md",
     "excluded_attributions": [
       "Both endpoints are ordinary TEP4 serving: the AMD layer monokernel is not enabled by either CLI. Its captured Muse bodies are unchanged between these image digests.",
       "TP8 finalize/all-reduce eligibility is not a new TP4 optimization."
@@ -4097,9 +4101,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
             "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
-            "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
-            "path_relation": "different_paths",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/0e3246a8bbd8990f/muse_qk_norm.py",
               "entrypoints": [
@@ -4115,6 +4116,7 @@
                 }
               ]
             },
+            "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/df7233ecd09eea43/qk_norm_rope_cache.py",
               "entrypoints": [
@@ -4134,16 +4136,15 @@
                   "end_line": 290
                 }
               ]
-            }
+            },
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
-            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
               "entrypoints": [
@@ -4159,6 +4160,7 @@
                 }
               ]
             },
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
               "entrypoints": [
@@ -4173,7 +4175,9 @@
                   "end_line": 971
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "eligibility wrapper",
@@ -4181,8 +4185,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
             "before_sha256": null,
             "after_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/03180acecee59563/attention_kv_write.py",
               "entrypoints": [
@@ -4207,7 +4209,9 @@
                   "end_line": 200
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -4230,9 +4234,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
-            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
               "entrypoints": [
@@ -4248,6 +4249,7 @@
                 }
               ]
             },
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
               "entrypoints": [
@@ -4262,7 +4264,9 @@
                   "end_line": 971
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new routing dispatch",
@@ -4270,8 +4274,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
             "before_sha256": null,
             "after_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/5566d9752197d2b0/router_pooler.py",
               "entrypoints": [
@@ -4286,7 +4288,9 @@
                   "end_line": 103
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new epilogues",
@@ -4294,8 +4298,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
             "before_sha256": null,
             "after_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/b82eeb4cc8a9f4a5/router_pooler_topk.py",
               "entrypoints": [
@@ -4310,7 +4312,9 @@
                   "end_line": 329
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -4332,9 +4336,6 @@
             "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
             "after_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
             "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
-            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
-            "path_relation": "same_path",
-            "body_relation": "identical_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
               "entrypoints": [
@@ -4350,6 +4351,7 @@
                 }
               ]
             },
+            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
               "entrypoints": [
@@ -4364,7 +4366,9 @@
                   "end_line": 969
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
           },
           {
             "role": "new compact experts",
@@ -4372,8 +4376,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py",
             "before_sha256": null,
             "after_sha256": "6a2cd481da888c296c252e116cde2f26745e01a74858276cdc48e167d5031474",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/6a2cd481da888c29/mxfp4_compact_a4_moe.py",
               "entrypoints": [
@@ -4398,7 +4400,9 @@
                   "end_line": 265
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new dispatch",
@@ -4406,8 +4410,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py",
             "before_sha256": null,
             "after_sha256": "39b054665c41c85e6fc85a4fb9e1a706c240a6c90a9b6a5232eb9d229fe08c22",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/39b054665c41c85e/mxfp4_moe.py",
               "entrypoints": [
@@ -4422,7 +4424,9 @@
                   "end_line": 178
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -4431,6 +4435,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v01_to_v02_tp8_ep8.md",
     "excluded_attributions": [
       "The SGLang monokernel interface is present in 1020, but this pair does not pass --monokernel-backend amd and has no AMD plugin execution claim."
     ],
@@ -4688,9 +4693,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
             "before_sha256": "914e7957ee99f22eef5e1e11a1bf05a0cdc9ae90b6efe7a7ccbf810f5a8f03dc",
-            "after_sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/914e7957ee99f22e/runtime.py",
               "entrypoints": [
@@ -4706,6 +4708,7 @@
                 }
               ]
             },
+            "after_sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/707226c7c205a14f/runtime.py",
               "entrypoints": [
@@ -4720,7 +4723,9 @@
                   "end_line": 353
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new runner",
@@ -4728,8 +4733,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/runner.py",
             "before_sha256": null,
             "after_sha256": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/267c5b33db7be6ce/runner.py",
               "entrypoints": [
@@ -4749,7 +4752,9 @@
                   "end_line": 338
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new device body",
@@ -4757,8 +4762,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layer.py",
             "before_sha256": null,
             "after_sha256": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/507604a48233c776/layer.py",
               "entrypoints": [
@@ -4778,7 +4781,9 @@
                   "end_line": 270
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -4803,8 +4808,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py",
             "before_sha256": null,
             "after_sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/f1778a6cbe79a950/draft.py",
               "entrypoints": [
@@ -4829,7 +4832,9 @@
                   "end_line": 498
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "D-pre and D-post device bodies",
@@ -4837,8 +4842,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
             "before_sha256": null,
             "after_sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/d7f558567b18a26b/draft_attn_half.py",
               "entrypoints": [
@@ -4863,7 +4866,9 @@
                   "end_line": 561
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "D-attn device body",
@@ -4871,8 +4876,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
             "before_sha256": null,
             "after_sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/4a7d829bf604e76d/draft_attn.py",
               "entrypoints": [
@@ -4887,7 +4890,9 @@
                   "end_line": 761
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "D-MLP device body",
@@ -4895,8 +4900,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
             "before_sha256": null,
             "after_sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/9fe45862cef73b76/draft_mlp.py",
               "entrypoints": [
@@ -4911,7 +4914,9 @@
                   "end_line": 617
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -4936,9 +4941,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
             "before_sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
-            "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/94d0b45392248de3/fused_norm_gate.py",
               "entrypoints": [
@@ -4949,6 +4951,7 @@
                 }
               ]
             },
+            "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/ada56887a3648995/fused_norm_gate.py",
               "entrypoints": [
@@ -4963,7 +4966,9 @@
                   "end_line": 188
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new fused reducer",
@@ -4971,8 +4976,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
             "before_sha256": null,
             "after_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
               "entrypoints": [
@@ -4987,7 +4990,9 @@
                   "end_line": 125
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -5009,9 +5014,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
             "before_sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
-            "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/e11bbcae7c1504a0/fused_norm_residual.py",
               "entrypoints": [
@@ -5022,6 +5024,7 @@
                 }
               ]
             },
+            "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/16edaf5510160b30/fused_norm_residual.py",
               "entrypoints": [
@@ -5036,16 +5039,15 @@
                   "end_line": 382
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "requesting model",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
-            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
               "entrypoints": [
@@ -5061,6 +5063,7 @@
                 }
               ]
             },
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
               "entrypoints": [
@@ -5075,7 +5078,9 @@
                   "end_line": 1138
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -5084,6 +5089,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v02_to_v03_tp8_ep8.md",
     "excluded_attributions": [
       "The new standalone TP4 finalize/all-reduce kernel is outside this TEP8 configuration; do not list it as this pair\u2019s executed fusion."
     ],
@@ -5435,9 +5441,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
             "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
-            "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
-            "path_relation": "different_paths",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/0e3246a8bbd8990f/muse_qk_norm.py",
               "entrypoints": [
@@ -5453,6 +5456,7 @@
                 }
               ]
             },
+            "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/df7233ecd09eea43/qk_norm_rope_cache.py",
               "entrypoints": [
@@ -5472,16 +5476,15 @@
                   "end_line": 290
                 }
               ]
-            }
+            },
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
-            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
               "entrypoints": [
@@ -5497,6 +5500,7 @@
                 }
               ]
             },
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
               "entrypoints": [
@@ -5511,7 +5515,9 @@
                   "end_line": 971
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "eligibility wrapper",
@@ -5519,8 +5525,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
             "before_sha256": null,
             "after_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/03180acecee59563/attention_kv_write.py",
               "entrypoints": [
@@ -5545,7 +5549,9 @@
                   "end_line": 200
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -5568,9 +5574,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
-            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
               "entrypoints": [
@@ -5586,6 +5589,7 @@
                 }
               ]
             },
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
               "entrypoints": [
@@ -5600,7 +5604,9 @@
                   "end_line": 971
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new routing dispatch",
@@ -5608,8 +5614,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
             "before_sha256": null,
             "after_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/5566d9752197d2b0/router_pooler.py",
               "entrypoints": [
@@ -5624,7 +5628,9 @@
                   "end_line": 103
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new epilogues",
@@ -5632,8 +5638,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
             "before_sha256": null,
             "after_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/b82eeb4cc8a9f4a5/router_pooler_topk.py",
               "entrypoints": [
@@ -5648,7 +5652,9 @@
                   "end_line": 329
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -5670,9 +5676,6 @@
             "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
             "after_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
             "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
-            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
-            "path_relation": "same_path",
-            "body_relation": "identical_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
               "entrypoints": [
@@ -5688,6 +5691,7 @@
                 }
               ]
             },
+            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
               "entrypoints": [
@@ -5702,7 +5706,9 @@
                   "end_line": 969
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
           },
           {
             "role": "new compact experts",
@@ -5710,8 +5716,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py",
             "before_sha256": null,
             "after_sha256": "6a2cd481da888c296c252e116cde2f26745e01a74858276cdc48e167d5031474",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/6a2cd481da888c29/mxfp4_compact_a4_moe.py",
               "entrypoints": [
@@ -5736,7 +5740,9 @@
                   "end_line": 265
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new dispatch",
@@ -5744,8 +5750,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py",
             "before_sha256": null,
             "after_sha256": "39b054665c41c85e6fc85a4fb9e1a706c240a6c90a9b6a5232eb9d229fe08c22",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/39b054665c41c85e/mxfp4_moe.py",
               "entrypoints": [
@@ -5760,7 +5764,9 @@
                   "end_line": 178
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -5769,6 +5775,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v01_to_v02_tp8_ep8.md",
     "excluded_attributions": [
       "The SGLang monokernel interface is present in 1020, but this pair does not pass --monokernel-backend amd and has no AMD plugin execution claim."
     ],
@@ -6031,9 +6038,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
             "before_sha256": "914e7957ee99f22eef5e1e11a1bf05a0cdc9ae90b6efe7a7ccbf810f5a8f03dc",
-            "after_sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/914e7957ee99f22e/runtime.py",
               "entrypoints": [
@@ -6049,6 +6053,7 @@
                 }
               ]
             },
+            "after_sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/707226c7c205a14f/runtime.py",
               "entrypoints": [
@@ -6063,7 +6068,9 @@
                   "end_line": 353
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new runner",
@@ -6071,8 +6078,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/runner.py",
             "before_sha256": null,
             "after_sha256": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/267c5b33db7be6ce/runner.py",
               "entrypoints": [
@@ -6092,7 +6097,9 @@
                   "end_line": 338
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new device body",
@@ -6100,8 +6107,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layer.py",
             "before_sha256": null,
             "after_sha256": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/507604a48233c776/layer.py",
               "entrypoints": [
@@ -6121,7 +6126,9 @@
                   "end_line": 270
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -6146,8 +6153,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py",
             "before_sha256": null,
             "after_sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/f1778a6cbe79a950/draft.py",
               "entrypoints": [
@@ -6172,7 +6177,9 @@
                   "end_line": 498
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "D-pre and D-post device bodies",
@@ -6180,8 +6187,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
             "before_sha256": null,
             "after_sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/d7f558567b18a26b/draft_attn_half.py",
               "entrypoints": [
@@ -6206,7 +6211,9 @@
                   "end_line": 561
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "D-attn device body",
@@ -6214,8 +6221,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
             "before_sha256": null,
             "after_sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/4a7d829bf604e76d/draft_attn.py",
               "entrypoints": [
@@ -6230,7 +6235,9 @@
                   "end_line": 761
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "D-MLP device body",
@@ -6238,8 +6245,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
             "before_sha256": null,
             "after_sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/9fe45862cef73b76/draft_mlp.py",
               "entrypoints": [
@@ -6254,7 +6259,9 @@
                   "end_line": 617
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -6279,9 +6286,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
             "before_sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
-            "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/94d0b45392248de3/fused_norm_gate.py",
               "entrypoints": [
@@ -6292,6 +6296,7 @@
                 }
               ]
             },
+            "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/ada56887a3648995/fused_norm_gate.py",
               "entrypoints": [
@@ -6306,7 +6311,9 @@
                   "end_line": 188
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new fused reducer",
@@ -6314,8 +6321,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
             "before_sha256": null,
             "after_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
               "entrypoints": [
@@ -6330,7 +6335,9 @@
                   "end_line": 125
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -6352,9 +6359,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
             "before_sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
-            "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/e11bbcae7c1504a0/fused_norm_residual.py",
               "entrypoints": [
@@ -6365,6 +6369,7 @@
                 }
               ]
             },
+            "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/16edaf5510160b30/fused_norm_residual.py",
               "entrypoints": [
@@ -6379,16 +6384,15 @@
                   "end_line": 382
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "requesting model",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
-            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
               "entrypoints": [
@@ -6404,6 +6408,7 @@
                 }
               ]
             },
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
               "entrypoints": [
@@ -6418,7 +6423,9 @@
                   "end_line": 1138
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -6427,6 +6434,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v02_to_v03_tp8_ep8.md",
     "excluded_attributions": [
       "The new standalone TP4 finalize/all-reduce kernel is outside this TEP8 configuration; do not list it as this pair\u2019s executed fusion."
     ],
@@ -6785,9 +6793,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
             "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
-            "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
-            "path_relation": "different_paths",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/0e3246a8bbd8990f/muse_qk_norm.py",
               "entrypoints": [
@@ -6803,6 +6808,7 @@
                 }
               ]
             },
+            "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/df7233ecd09eea43/qk_norm_rope_cache.py",
               "entrypoints": [
@@ -6822,16 +6828,15 @@
                   "end_line": 290
                 }
               ]
-            }
+            },
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
-            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
               "entrypoints": [
@@ -6847,6 +6852,7 @@
                 }
               ]
             },
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
               "entrypoints": [
@@ -6861,7 +6867,9 @@
                   "end_line": 971
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "eligibility wrapper",
@@ -6869,8 +6877,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
             "before_sha256": null,
             "after_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/03180acecee59563/attention_kv_write.py",
               "entrypoints": [
@@ -6895,7 +6901,9 @@
                   "end_line": 200
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -6918,9 +6926,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
-            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
               "entrypoints": [
@@ -6936,6 +6941,7 @@
                 }
               ]
             },
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
               "entrypoints": [
@@ -6950,7 +6956,9 @@
                   "end_line": 971
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new routing dispatch",
@@ -6958,8 +6966,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
             "before_sha256": null,
             "after_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/5566d9752197d2b0/router_pooler.py",
               "entrypoints": [
@@ -6974,7 +6980,9 @@
                   "end_line": 103
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new epilogues",
@@ -6982,8 +6990,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
             "before_sha256": null,
             "after_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/b82eeb4cc8a9f4a5/router_pooler_topk.py",
               "entrypoints": [
@@ -6998,7 +7004,9 @@
                   "end_line": 329
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -7020,9 +7028,6 @@
             "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
             "after_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
             "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
-            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
-            "path_relation": "same_path",
-            "body_relation": "identical_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
               "entrypoints": [
@@ -7038,6 +7043,7 @@
                 }
               ]
             },
+            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
               "entrypoints": [
@@ -7052,7 +7058,9 @@
                   "end_line": 969
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
           },
           {
             "role": "new compact experts",
@@ -7060,8 +7068,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py",
             "before_sha256": null,
             "after_sha256": "6a2cd481da888c296c252e116cde2f26745e01a74858276cdc48e167d5031474",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/6a2cd481da888c29/mxfp4_compact_a4_moe.py",
               "entrypoints": [
@@ -7086,7 +7092,9 @@
                   "end_line": 265
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new dispatch",
@@ -7094,8 +7102,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py",
             "before_sha256": null,
             "after_sha256": "39b054665c41c85e6fc85a4fb9e1a706c240a6c90a9b6a5232eb9d229fe08c22",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/39b054665c41c85e/mxfp4_moe.py",
               "entrypoints": [
@@ -7110,7 +7116,9 @@
                   "end_line": 178
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -7119,6 +7127,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v01_to_v02_tp8_ep8.md",
     "excluded_attributions": [
       "The SGLang monokernel interface is present in 1020, but this pair does not pass --monokernel-backend amd and has no AMD plugin execution claim."
     ],
@@ -7381,9 +7390,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/monokernels/runtime.py",
             "before_sha256": "914e7957ee99f22eef5e1e11a1bf05a0cdc9ae90b6efe7a7ccbf810f5a8f03dc",
-            "after_sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/914e7957ee99f22e/runtime.py",
               "entrypoints": [
@@ -7399,6 +7405,7 @@
                 }
               ]
             },
+            "after_sha256": "707226c7c205a14fb9af18fe9694f94fc815556b7a59d985e1334eca925dcf79",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/707226c7c205a14f/runtime.py",
               "entrypoints": [
@@ -7413,7 +7420,9 @@
                   "end_line": 353
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new runner",
@@ -7421,8 +7430,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/runner.py",
             "before_sha256": null,
             "after_sha256": "267c5b33db7be6ce439a33e417166d6d4b91a2c45e33457d7a84a15539f8ffeb",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/267c5b33db7be6ce/runner.py",
               "entrypoints": [
@@ -7442,7 +7449,9 @@
                   "end_line": 338
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new device body",
@@ -7450,8 +7459,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/layer.py",
             "before_sha256": null,
             "after_sha256": "507604a48233c776fad241df7b62ce5639bc862ecb53957f85d85675e82a2bed",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/507604a48233c776/layer.py",
               "entrypoints": [
@@ -7471,7 +7478,9 @@
                   "end_line": 270
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -7496,8 +7505,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/draft.py",
             "before_sha256": null,
             "after_sha256": "f1778a6cbe79a9501ba2a1728eccf85cfa1d256ffde9218179086d3bfc5c17ca",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/f1778a6cbe79a950/draft.py",
               "entrypoints": [
@@ -7522,7 +7529,9 @@
                   "end_line": 498
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "D-pre and D-post device bodies",
@@ -7530,8 +7539,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn_half.py",
             "before_sha256": null,
             "after_sha256": "d7f558567b18a26b295fec1fd360649e413742aacfe7d080365211f9035d5738",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/d7f558567b18a26b/draft_attn_half.py",
               "entrypoints": [
@@ -7556,7 +7563,9 @@
                   "end_line": 561
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "D-attn device body",
@@ -7564,8 +7573,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_attn.py",
             "before_sha256": null,
             "after_sha256": "4a7d829bf604e76d7d1647e9f45fdae42fbfbe4fb82fbf2ac813e003d15daa49",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/4a7d829bf604e76d/draft_attn.py",
               "entrypoints": [
@@ -7580,7 +7587,9 @@
                   "end_line": 761
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "D-MLP device body",
@@ -7588,8 +7597,6 @@
             "after_path": "/opt/sgl-amd-mono/sgl_amd_mono/muse_spark/gfx950/draft_mlp.py",
             "before_sha256": null,
             "after_sha256": "9fe45862cef73b76ff51b66339411982bdb39e9cb6a76cbc3d5065d74d3bcbc7",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/9fe45862cef73b76/draft_mlp.py",
               "entrypoints": [
@@ -7604,7 +7611,9 @@
                   "end_line": 617
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -7629,9 +7638,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py",
             "before_sha256": "94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266",
-            "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/94d0b45392248de3/fused_norm_gate.py",
               "entrypoints": [
@@ -7642,6 +7648,7 @@
                 }
               ]
             },
+            "after_sha256": "ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/ada56887a3648995/fused_norm_gate.py",
               "entrypoints": [
@@ -7656,7 +7663,9 @@
                   "end_line": 188
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new fused reducer",
@@ -7664,8 +7673,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py",
             "before_sha256": null,
             "after_sha256": "191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py",
               "entrypoints": [
@@ -7680,7 +7687,9 @@
                   "end_line": 125
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -7702,9 +7711,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py",
             "before_sha256": "e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd",
-            "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/e11bbcae7c1504a0/fused_norm_residual.py",
               "entrypoints": [
@@ -7715,6 +7721,7 @@
                 }
               ]
             },
+            "after_sha256": "16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/16edaf5510160b30/fused_norm_residual.py",
               "entrypoints": [
@@ -7729,16 +7736,15 @@
                   "end_line": 382
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "requesting model",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
-            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
               "entrypoints": [
@@ -7754,6 +7760,7 @@
                 }
               ]
             },
+            "after_sha256": "d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/d7e4953c71a74b44/model.py",
               "entrypoints": [
@@ -7768,7 +7775,9 @@
                   "end_line": 1138
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -7777,6 +7786,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v02_to_v03_tp8_ep8.md",
     "excluded_attributions": [
       "The new standalone TP4 finalize/all-reduce kernel is outside this TEP8 configuration; do not list it as this pair\u2019s executed fusion."
     ],
@@ -8145,9 +8155,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py",
             "before_sha256": "0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e",
-            "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
-            "path_relation": "different_paths",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/0e3246a8bbd8990f/muse_qk_norm.py",
               "entrypoints": [
@@ -8163,6 +8170,7 @@
                 }
               ]
             },
+            "after_sha256": "df7233ecd09eea43501bc03d36a247bd54cb9aef67b8865410449d877e761df3",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/df7233ecd09eea43/qk_norm_rope_cache.py",
               "entrypoints": [
@@ -8182,16 +8190,15 @@
                   "end_line": 290
                 }
               ]
-            }
+            },
+            "path_relation": "different_paths",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "dispatch",
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
-            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
               "entrypoints": [
@@ -8207,6 +8214,7 @@
                 }
               ]
             },
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
               "entrypoints": [
@@ -8221,7 +8229,9 @@
                   "end_line": 971
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "eligibility wrapper",
@@ -8229,8 +8239,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py",
             "before_sha256": null,
             "after_sha256": "03180acecee59563eff94bed7d45cdced88f8b62c55baa2b5b38c9694576936b",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/03180acecee59563/attention_kv_write.py",
               "entrypoints": [
@@ -8255,7 +8263,9 @@
                   "end_line": 200
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -8278,9 +8288,6 @@
             "before_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py",
             "before_sha256": "496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23",
-            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
-            "path_relation": "same_path",
-            "body_relation": "different_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/496fc8a155a50fd8/model.py",
               "entrypoints": [
@@ -8296,6 +8303,7 @@
                 }
               ]
             },
+            "after_sha256": "31520909318b5731f5f2dac1021c138e235b3f8a5655975e1765ba9e85e0c95f",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/31520909318b5731/model.py",
               "entrypoints": [
@@ -8310,7 +8318,9 @@
                   "end_line": 971
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new routing dispatch",
@@ -8318,8 +8328,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py",
             "before_sha256": null,
             "after_sha256": "5566d9752197d2b0b9145a24497aaf220e502e2409cc5f9e454888e0e44c91b2",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/5566d9752197d2b0/router_pooler.py",
               "entrypoints": [
@@ -8334,7 +8342,9 @@
                   "end_line": 103
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new epilogues",
@@ -8342,8 +8352,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py",
             "before_sha256": null,
             "after_sha256": "b82eeb4cc8a9f4a52c65bb1d330358e26f3fa35ded3ae013b26d5026cbd2f10e",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/b82eeb4cc8a9f4a5/router_pooler_topk.py",
               "entrypoints": [
@@ -8358,7 +8366,9 @@
                   "end_line": 329
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -8380,9 +8390,6 @@
             "before_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
             "after_path": "/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py",
             "before_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
-            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
-            "path_relation": "same_path",
-            "body_relation": "identical_file_bytes",
             "before_implementation": {
               "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
               "entrypoints": [
@@ -8398,6 +8405,7 @@
                 }
               ]
             },
+            "after_sha256": "8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py",
               "entrypoints": [
@@ -8412,7 +8420,9 @@
                   "end_line": 969
                 }
               ]
-            }
+            },
+            "path_relation": "same_path",
+            "body_relation": "identical_file_bytes"
           },
           {
             "role": "new compact experts",
@@ -8420,8 +8430,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py",
             "before_sha256": null,
             "after_sha256": "6a2cd481da888c296c252e116cde2f26745e01a74858276cdc48e167d5031474",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/6a2cd481da888c29/mxfp4_compact_a4_moe.py",
               "entrypoints": [
@@ -8446,7 +8454,9 @@
                   "end_line": 265
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           },
           {
             "role": "new dispatch",
@@ -8454,8 +8464,6 @@
             "after_path": "/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py",
             "before_sha256": null,
             "after_sha256": "39b054665c41c85e6fc85a4fb9e1a706c240a6c90a9b6a5232eb9d229fe08c22",
-            "path_relation": "added",
-            "body_relation": "different_file_bytes",
             "after_implementation": {
               "snapshot_path": "kernel_sources/blobs/39b054665c41c85e/mxfp4_moe.py",
               "entrypoints": [
@@ -8470,7 +8478,9 @@
                   "end_line": 178
                 }
               ]
-            }
+            },
+            "path_relation": "added",
+            "body_relation": "different_file_bytes"
           }
         ],
         "evidence": [
@@ -8479,6 +8489,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v01_to_v02_tp8_ep8.md",
     "excluded_attributions": [
       "The SGLang monokernel interface is present in 1020, but this pair does not pass --monokernel-backend amd and has no AMD plugin execution claim."
     ],

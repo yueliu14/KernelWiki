@@ -4,9 +4,10 @@ The operator collection focuses on the main LLM inference workloads: GEMM, MoE, 
 
 Every operator below owns a `corpus/` directory containing structured development cards, pinned
 source evidence, extraction scope and performance axes. The [corpus catalog](CORPUS.md)
-lists all 23 corpora and their shared-card references. These cards organize conditions, alternatives
-and implementation constraints; the operator pages provide broader explanations and historical
-experience. The table counts owned corpus decisions; shared references do not duplicate those records.
+lists all 23 corpora and their shared-card references. Read an operator's contract, then applicable
+decisions and the pinned implementation. Source observations and configuration inventories support
+those decisions; reading every source hit is unnecessary. The table counts owned corpus decisions;
+shared references do not duplicate those records.
 
 For execution chains spanning these operators, see [workload knowledge](../workload/README.md), including [QKV projection and preparation](../workload/qkv_projection_norm_rope_cache/README.md) and the [MoE expert pipeline](../workload/moe_expert_pipeline/README.md). Workload directories are named by semantic composition; their cases record model-specific inputs, outputs, dispatch and serving behavior.
 
@@ -14,7 +15,12 @@ Standalone normalization, activation, softmax, positional encoding, quantization
 
 AITER is the primary implementation source. Provider pages describe dispatch; backend pages cover Triton, Gluon, FlyDSL, HIP, CK, ASM or OPUS where an applicable source reference exists. A source reference is not a measured winner. Historical GEAK notes may cite excluded operators through pinned archived documents.
 
-All 23 workload families have pinned AITER implementation references. A single upstream kernel can serve several variants, such as grouped-query, chunked-prefill and sliding-window attention; those pages explain different contracts rather than count the shared source as separate kernels. Native pipeline notes distinguish registered public routes from source-only bodies.
+All 23 operator families have pinned AITER implementation references. A single upstream kernel can serve several variants, such as grouped-query, chunked-prefill and sliding-window attention; those pages explain different contracts rather than count the shared source as separate kernels. Native pipeline notes distinguish registered public routes from source-only bodies.
+
+Imported overviews live in each operator's linked `geak_reference.md`; their original SOTA labels,
+workload percentages and recipes are historical evidence. Other imported backend/numerics/fusion notes
+also retain their original provenance. Check the pinned source and scoped corpus conditions before
+transferring a claim. Default repository search omits `geak_reference.md`; open it directly for audit.
 
 ## GEMM and projection fusions
 

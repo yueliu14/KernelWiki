@@ -95,18 +95,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 
 - **compression-format**: Compression output packing and scales must match the next cache consumer. [attention-compression-cache-contract](decisions.md#attention-compression-cache-contract)
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for compressed attention; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/test_flydsl_compress_attn.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_compress_attn.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

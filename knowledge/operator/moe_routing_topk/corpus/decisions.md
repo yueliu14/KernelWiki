@@ -278,28 +278,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 |---|---|---|
 | — | — | No shared cards declared. |
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for moe routing topk; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/op_benchmarks/hip/bench_mxfp4_moe_sort_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/hip/bench_mxfp4_moe_sort_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/test_moe_sorting.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_moe_sorting.py) (`aiter_b3ad6c46`).
-- [op_tests/test_moe_sorting_mxfp4.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_moe_sorting_mxfp4.py) (`aiter_b3ad6c46`).
-- [op_tests/test_moe_topk_gating.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_moe_topk_gating.py) (`aiter_b3ad6c46`).
-- [op_tests/test_topk_softmax.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_topk_softmax.py) (`aiter_b3ad6c46`).
-- [op_tests/test_topk_softmax_shared_gate.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_topk_softmax_shared_gate.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/moe/moe_routing/__init__.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/moe/moe_routing/__init__.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/moe/moe_routing/test_moe_routing.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/moe/moe_routing/test_moe_routing.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/moe/moe_routing/test_moe_routing_herd.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/moe/moe_routing/test_moe_routing_herd.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/moe/moe_routing/test_topk_gating.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/moe/moe_routing/test_topk_gating.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/torch_compile/test_compile_moe_routing.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/torch_compile/test_compile_moe_routing.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

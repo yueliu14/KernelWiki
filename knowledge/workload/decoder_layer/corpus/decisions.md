@@ -6,6 +6,19 @@ Source inspection establishes implementation precedents. Effect and independent-
 
 [Semantic boundary](../README.md) · [Workload index](../../CORPUS.md)
 
+<a id="assessment-1"></a>
+## Shared assessment 1
+
+Applies only to the decisions linking here, whose assessment and effect records are identical.
+
+**Implementation confidence: high** — The pinned case entry and named implementation establish this scoped mechanism; this is not runtime or numerical validation; missing: target_model_engagement.
+
+**Effect confidence: unknown** — No comparable workload measurement is encoded for this decision; missing: paired_measurement, correctness_result, runtime_environment.
+
+**Attribution confidence: unknown** — Source inspection does not isolate the performance contribution of this mechanism; missing: controlled_ablation.
+
+**Effect: not_assessed** — This pass records an implemented contract. A comparable baseline/candidate performance result and an isolated effect for this decision have not been assessed.
+
 <a id="layer-preserve-cache-publication-boundary"></a>
 ## When must a fused layer keep a launch boundary for cache publication?
 
@@ -38,13 +51,7 @@ Source inspection establishes implementation precedents. Effect and independent-
 - [sgl_amd_mono_7a4a552d:dsv41_call](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/deepseek_v41/spec.py#L720-L779) — _launch calls K1, optional _select and K2 with shared cache and scratch state.
 - [sgl_amd_mono_7a4a552d:dsv41_body](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/deepseek_v41/gfx950/layer.py#L1004-L1304) — K2 composes attention back and FFN stages in one device kernel, with a 256-CTA launch through common geometry.
 
-**Implementation confidence: high** — The pinned case entry and named implementation establish this scoped mechanism; this is not runtime or numerical validation; missing: target_model_engagement.
-
-**Effect confidence: unknown** — No comparable workload measurement is encoded for this decision; missing: paired_measurement, correctness_result, runtime_environment.
-
-**Attribution confidence: unknown** — Source inspection does not isolate the performance contribution of this mechanism; missing: controlled_ablation.
-
-**Effect: not_assessed** — This pass records an implemented contract. A comparable baseline/candidate performance result and an isolated effect for this decision have not been assessed.
+**Assessment:** implementation: high; effect: unknown; attribution: unknown; outcome: not_assessed. [Reasons and missing evidence](#assessment-1).
 
 ### Validation for a new workload
 
@@ -87,13 +94,7 @@ Source inspection establishes implementation precedents. Effect and independent-
 - [sgl_amd_mono_7a4a552d:dsv41_select](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/deepseek_v41/spec.py#L782-L935) — Compressor, identity selection and conditional K2i/top-k integration between the two core launches.
 - [sgl_amd_mono_7a4a552d:dsv41_runner](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/deepseek_v41/gfx950/runner.py#L603-L856) — Live K1/K2 arguments, output buffers and compiled-launch calls.
 
-**Implementation confidence: high** — The pinned case entry and named implementation establish this scoped mechanism; this is not runtime or numerical validation; missing: target_model_engagement.
-
-**Effect confidence: unknown** — No comparable workload measurement is encoded for this decision; missing: paired_measurement, correctness_result, runtime_environment.
-
-**Attribution confidence: unknown** — Source inspection does not isolate the performance contribution of this mechanism; missing: controlled_ablation.
-
-**Effect: not_assessed** — This pass records an implemented contract. A comparable baseline/candidate performance result and an isolated effect for this decision have not been assessed.
+**Assessment:** implementation: high; effect: unknown; attribution: unknown; outcome: not_assessed. [Reasons and missing evidence](#assessment-1).
 
 ### Validation for a new workload
 
@@ -133,13 +134,7 @@ Source inspection establishes implementation precedents. Effect and independent-
 - [sgl_amd_mono_7a4a552d:dsv41_boundary](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/deepseek_v41/spec.py#L2-L40) — K1/K2 visibility boundary, deferred residuals, conditional indexer/compressor work and token-parallel final gather.
 - [sgl_amd_mono_7a4a552d:dsv41_forward](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/deepseek_v41/spec.py#L945-L1045) — Model forward, Engram and pending residual fold/settle decisions around covered layers.
 
-**Implementation confidence: high** — The pinned case entry and named implementation establish this scoped mechanism; this is not runtime or numerical validation; missing: target_model_engagement.
-
-**Effect confidence: unknown** — No comparable workload measurement is encoded for this decision; missing: paired_measurement, correctness_result, runtime_environment.
-
-**Attribution confidence: unknown** — Source inspection does not isolate the performance contribution of this mechanism; missing: controlled_ablation.
-
-**Effect: not_assessed** — This pass records an implemented contract. A comparable baseline/candidate performance result and an isolated effect for this decision have not been assessed.
+**Assessment:** implementation: high; effect: unknown; attribution: unknown; outcome: not_assessed. [Reasons and missing evidence](#assessment-1).
 
 ### Validation for a new workload
 

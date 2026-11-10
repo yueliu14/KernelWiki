@@ -104,6 +104,24 @@ def test_forms_do_not_encode_launch_counts_or_duplicate_cards(catalog):
         assert d["assessment"]["attribution"]["level"] == "unknown"
 
 
+def test_shared_assessments_keep_different_reasons_and_gaps_local(catalog):
+    catalog = deepcopy(catalog)
+    key = "stack-preserve-verify-state"
+    decision = catalog.decisions[key]
+    decision["assessment"]["implementation"]["reasons"].append("A case-specific source qualification.")
+    decision["assessment"]["implementation"]["missing_evidence"].append("additional_state_check")
+    path = ROOT / "knowledge/workload/decoder_stack/corpus/decisions.md"
+    text = workload.pages(catalog)[path]
+    local = text.split(f'<a id="{key}"></a>')[1].split('<a id="stack-bound-fusion-depth"></a>')[0]
+    assert "A case-specific source qualification" in local
+    assert "additional_state_check" in local
+    assert "**Effect confidence: unknown**" in local
+    assert "[Reasons and missing evidence](#assessment-1)" not in local
+    assert text.count("[Reasons and missing evidence](#assessment-1)") == 2
+    assert text.count("A case-specific source qualification") == 1
+    assert all(value in local for value in decision["validation_plan"])
+
+
 def test_source_audit_reads_fixed_git_objects_not_working_files(catalog, tmp_path):
     def git(*args):
         return subprocess.check_output(["git", "-C", str(tmp_path), *args], text=True).strip()

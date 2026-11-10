@@ -6,6 +6,19 @@ Source inspection establishes implementation precedents. Effect and independent-
 
 [Semantic boundary](../README.md) · [Workload index](../../CORPUS.md)
 
+<a id="assessment-1"></a>
+## Shared assessment 1
+
+Applies only to the decisions linking here, whose assessment and effect records are identical.
+
+**Implementation confidence: high** — The pinned case entry and named implementation establish this scoped mechanism; this is not runtime or numerical validation; missing: target_model_engagement.
+
+**Effect confidence: unknown** — No comparable workload measurement is encoded for this decision; missing: paired_measurement, correctness_result, runtime_environment.
+
+**Attribution confidence: unknown** — Source inspection does not isolate the performance contribution of this mechanism; missing: controlled_ablation.
+
+**Effect: not_assessed** — This pass records an implemented contract. A comparable baseline/candidate performance result and an isolated effect for this decision have not been assessed.
+
 <a id="stack-tagged-stage-mailboxes"></a>
 ## When can stages inside a persistent stack communicate through tagged mailboxes?
 
@@ -40,13 +53,7 @@ Source inspection establishes implementation precedents. Effect and independent-
 - [sgl_amd_mono_7a4a552d:qwen_state](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/README.md#L47-L163) — Per-request verify snapshots, KV/index-cache writes, MRoPE positions, stage structure and co-resident mailbox assumptions.
 - [sgl_amd_mono_7a4a552d:qwen_wait](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/gfx950/device.py#L16-L58) — Single-GPU guarded waits, timeout and fault-path distinction.
 
-**Implementation confidence: high** — The pinned case entry and named implementation establish this scoped mechanism; this is not runtime or numerical validation; missing: target_model_engagement.
-
-**Effect confidence: unknown** — No comparable workload measurement is encoded for this decision; missing: paired_measurement, correctness_result, runtime_environment.
-
-**Attribution confidence: unknown** — Source inspection does not isolate the performance contribution of this mechanism; missing: controlled_ablation.
-
-**Effect: not_assessed** — This pass records an implemented contract. A comparable baseline/candidate performance result and an isolated effect for this decision have not been assessed.
+**Assessment:** implementation: high; effect: unknown; attribution: unknown; outcome: not_assessed. [Reasons and missing evidence](#assessment-1).
 
 ### Validation for a new workload
 
@@ -90,13 +97,7 @@ Source inspection establishes implementation precedents. Effect and independent-
 - [sgl_amd_mono_7a4a552d:qwen_spec](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/spec.py#L286-L387) — Single-GPU model guards, target-verify forward fallback and runtime entry to the stack.
 - [sgl_amd_mono_7a4a552d:qwen_admission](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/spec.py#L430-L485) — TP1, four-token verify request widths and constraints on attention, ReplaySSM, expert layout and KV dtype.
 
-**Implementation confidence: high** — The pinned case entry and named implementation establish this scoped mechanism; this is not runtime or numerical validation; missing: target_model_engagement.
-
-**Effect confidence: unknown** — No comparable workload measurement is encoded for this decision; missing: paired_measurement, correctness_result, runtime_environment.
-
-**Attribution confidence: unknown** — Source inspection does not isolate the performance contribution of this mechanism; missing: controlled_ablation.
-
-**Effect: not_assessed** — This pass records an implemented contract. A comparable baseline/candidate performance result and an isolated effect for this decision have not been assessed.
+**Assessment:** implementation: high; effect: unknown; attribution: unknown; outcome: not_assessed. [Reasons and missing evidence](#assessment-1).
 
 ### Validation for a new workload
 
@@ -140,13 +141,7 @@ Source inspection establishes implementation precedents. Effect and independent-
 - [sgl_amd_mono_7a4a552d:qwen_launch](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/gfx950/runner.py#L555-L579) — Target verify launch loop and separate host-issued epoch tensor update after the stack.
 - [sgl_amd_mono_7a4a552d:qwen_stages](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/qwen38_flash_next/gfx950/kernel.py#L4450-L4625) — Static per-layer GDN/QSA, out-projection, mixer and expert stage sequence within each compiled launch.
 
-**Implementation confidence: high** — The pinned case entry and named implementation establish this scoped mechanism; this is not runtime or numerical validation; missing: target_model_engagement.
-
-**Effect confidence: unknown** — No comparable workload measurement is encoded for this decision; missing: paired_measurement, correctness_result, runtime_environment.
-
-**Attribution confidence: unknown** — Source inspection does not isolate the performance contribution of this mechanism; missing: controlled_ablation.
-
-**Effect: not_assessed** — This pass records an implemented contract. A comparable baseline/candidate performance result and an isolated effect for this decision have not been assessed.
+**Assessment:** implementation: high; effect: unknown; attribution: unknown; outcome: not_assessed. [Reasons and missing evidence](#assessment-1).
 
 ### Validation for a new workload
 

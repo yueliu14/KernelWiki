@@ -393,47 +393,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 
 - **state-lifetime**: State read/write indices and storage layout define the next token input. [attention-gated-delta-state-contract](decisions.md#attention-gated-delta-state-contract)
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for linear attention gated delta; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/op_benchmarks/triton/bench_chunk_kda.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_chunk_kda.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_flash_kda.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_flash_kda.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fused_gdn_decode_qkvz.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_gdn_decode_qkvz.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fused_gdn_prefill_qkvz.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_gdn_prefill_qkvz.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fused_kda_decode.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_kda_decode.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_gated_delta_rule_block.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_gated_delta_rule_block.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_gated_delta_rule_snapshot_dtype.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_gated_delta_rule_snapshot_dtype.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_kda.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_kda.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_gdr_mtp.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_gdr_mtp.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_linear_attention.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_linear_attention.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_linear_attention_prefill.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_linear_attention_prefill.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gated_delta_rule.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gated_delta_rule.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gdn_prepare.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gdn_prepare.py) (`aiter_b3ad6c46`).
-- [op_tests/test_gdr_decode_packed_bf16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_gdr_decode_packed_bf16.py) (`aiter_b3ad6c46`).
-- [op_tests/test_split_gdr_update.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_split_gdr_update.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/attention/test_chunk_kda.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_chunk_kda.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/attention/test_kda.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_kda.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gated_delta_net/__init__.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gated_delta_net/__init__.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gated_delta_net/test_fused_gdn_decode_qkvz.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gated_delta_net/test_fused_gdn_decode_qkvz.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gated_delta_net/test_fused_gdn_prefill_qkvz.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gated_delta_net/test_fused_gdn_prefill_qkvz.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gated_delta_net/test_fused_kda_decode.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gated_delta_net/test_fused_kda_decode.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gated_delta_net/test_fused_kda_decode_unified.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gated_delta_net/test_fused_kda_decode_unified.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gated_delta_net/test_fused_rearrange_sigmoid_gdr.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gated_delta_net/test_fused_rearrange_sigmoid_gdr.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gated_delta_net/test_gated_delta_rule_strided_qk.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gated_delta_net/test_gated_delta_rule_strided_qk.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/kimi_delta_attn/__init__.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/kimi_delta_attn/__init__.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/kimi_delta_attn/test_chunk_delta_attn_fwd.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/kimi_delta_attn/test_chunk_delta_attn_fwd.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/kimi_delta_attn/test_fast_launch.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/kimi_delta_attn/test_fast_launch.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/kimi_delta_attn/test_flash_kda.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/kimi_delta_attn/test_flash_kda.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/utils/gdr_mtp_refs.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/utils/gdr_mtp_refs.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/utils/kda_ref.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/utils/kda_ref.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

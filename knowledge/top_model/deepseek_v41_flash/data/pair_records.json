@@ -283,6 +283,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -598,6 +599,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -1259,6 +1261,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -1704,6 +1707,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -2215,6 +2219,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -2695,6 +2700,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -3706,6 +3712,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v09_to_v11_tp2_ep1.md",
     "excluded_attributions": [
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
@@ -4040,6 +4047,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -4355,6 +4363,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -5016,6 +5025,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -5461,6 +5471,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -5962,6 +5973,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -6442,6 +6454,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -7453,6 +7466,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v09_to_v11_tp2_ep1.md",
     "excluded_attributions": [
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
@@ -7787,6 +7801,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -8102,6 +8117,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -8763,6 +8779,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -9208,6 +9225,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -9709,6 +9727,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -10189,6 +10208,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -11200,6 +11220,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v09_to_v11_tp2_ep1.md",
     "excluded_attributions": [
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
@@ -11534,6 +11555,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -11849,6 +11871,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -12510,6 +12533,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -12955,6 +12979,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -13466,6 +13491,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -13946,6 +13972,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -14957,6 +14984,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v09_to_v11_tp2_ep1.md",
     "excluded_attributions": [
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
@@ -15291,6 +15319,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -15600,6 +15629,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -16261,6 +16291,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -16706,6 +16737,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -17217,6 +17249,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -17697,6 +17730,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -18703,6 +18737,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v09_to_v11_tp2_ep1.md",
     "excluded_attributions": [
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
@@ -19037,6 +19072,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -19352,6 +19388,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -20013,6 +20050,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -20458,6 +20496,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -20959,6 +20998,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -21439,6 +21479,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -22445,6 +22486,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v09_to_v11_tp2_ep1.md",
     "excluded_attributions": [
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
@@ -22779,6 +22821,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -23094,6 +23137,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -23755,6 +23799,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -24196,6 +24241,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -24707,6 +24753,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -25187,6 +25234,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -26182,6 +26230,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v09_to_v11_tp2_ep1.md",
     "excluded_attributions": [
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP2 pair."
@@ -26516,6 +26565,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -26831,6 +26881,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -27478,6 +27529,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v01_to_v02.md",
     "excluded_attributions": [
       "V01 is a current tag snapshot whose vLLM commit matches CI, not a historical-digest-verified container. V02 is commit source corroborated by CI.",
       "Server admission and CUDA graph capture limits also changed. The large E2E gain is not a measured causal effect of mHC or MoE alone."
@@ -27736,6 +27788,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v02_to_v03.md",
     "excluded_attributions": [
       "New common MXFP8/NVFP4 cache layouts and NVIDIA fused-attention paths also appear in this diff; their presence alone does not establish use on MI355X. ROCm decode still uses its fp8_ds_mla path.",
       "Engram placement and launch recipes change across this range; keep per-endpoint flags as confounders."
@@ -28061,6 +28114,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -28385,6 +28439,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [
       {
@@ -29055,6 +29110,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -29509,6 +29565,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -30029,6 +30086,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [
       {
@@ -30518,6 +30576,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -31216,6 +31275,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v09_to_v11_tp4_ep1.md",
     "excluded_attributions": [
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP4 pair.",
@@ -31885,6 +31945,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v01_to_v02.md",
     "excluded_attributions": [
       "V01 is a current tag snapshot whose vLLM commit matches CI, not a historical-digest-verified container. V02 is commit source corroborated by CI.",
       "Server admission and CUDA graph capture limits also changed. The large E2E gain is not a measured causal effect of mHC or MoE alone."
@@ -32144,6 +32205,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v02_to_v03.md",
     "excluded_attributions": [
       "New common MXFP8/NVFP4 cache layouts and NVIDIA fused-attention paths also appear in this diff; their presence alone does not establish use on MI355X. ROCm decode still uses its fp8_ds_mla path.",
       "Engram placement and launch recipes change across this range; keep per-endpoint flags as confounders."
@@ -32454,6 +32516,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -32769,6 +32832,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -33430,6 +33494,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -33875,6 +33940,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -34386,6 +34452,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -34866,6 +34933,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -35550,6 +35618,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v09_to_v11_tp4_ep1.md",
     "excluded_attributions": [
       "V10 contains only TP8 conc1; this measured TP2/TP4 delta spans a blank V10 column.",
       "New TP8 support is not a new fusion for this already supported TP4 pair.",
@@ -36219,6 +36288,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v01_to_v02.md",
     "excluded_attributions": [
       "V01 is a current tag snapshot whose vLLM commit matches CI, not a historical-digest-verified container. V02 is commit source corroborated by CI.",
       "Server admission and CUDA graph capture limits also changed. The large E2E gain is not a measured causal effect of mHC or MoE alone."
@@ -36478,6 +36548,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v02_to_v03.md",
     "excluded_attributions": [
       "New common MXFP8/NVFP4 cache layouts and NVIDIA fused-attention paths also appear in this diff; their presence alone does not establish use on MI355X. ROCm decode still uses its fp8_ds_mla path.",
       "Engram placement and launch recipes change across this range; keep per-endpoint flags as confounders."
@@ -36794,6 +36865,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -37109,6 +37181,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -37770,6 +37843,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -38215,6 +38289,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -38716,6 +38791,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -39196,6 +39272,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -39850,6 +39927,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v01_to_v02.md",
     "excluded_attributions": [
       "V01 is a current tag snapshot whose vLLM commit matches CI, not a historical-digest-verified container. V02 is commit source corroborated by CI.",
       "Server admission and CUDA graph capture limits also changed. The large E2E gain is not a measured causal effect of mHC or MoE alone."
@@ -40109,6 +40187,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v02_to_v03.md",
     "excluded_attributions": [
       "New common MXFP8/NVFP4 cache layouts and NVIDIA fused-attention paths also appear in this diff; their presence alone does not establish use on MI355X. ROCm decode still uses its fp8_ds_mla path.",
       "Engram placement and launch recipes change across this range; keep per-endpoint flags as confounders."
@@ -40425,6 +40504,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -40740,6 +40820,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -41401,6 +41482,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -41846,6 +41928,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -42357,6 +42440,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -42837,6 +42921,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -43491,6 +43576,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v01_to_v02.md",
     "excluded_attributions": [
       "V01 is a current tag snapshot whose vLLM commit matches CI, not a historical-digest-verified container. V02 is commit source corroborated by CI.",
       "Server admission and CUDA graph capture limits also changed. The large E2E gain is not a measured causal effect of mHC or MoE alone."
@@ -43750,6 +43836,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v02_to_v03.md",
     "excluded_attributions": [
       "New common MXFP8/NVFP4 cache layouts and NVIDIA fused-attention paths also appear in this diff; their presence alone does not establish use on MI355X. ROCm decode still uses its fp8_ds_mla path.",
       "Engram placement and launch recipes change across this range; keep per-endpoint flags as confounders."
@@ -44066,6 +44153,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -44381,6 +44469,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -45042,6 +45131,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -45487,6 +45577,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -45998,6 +46089,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -46478,6 +46570,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -47132,6 +47225,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v01_to_v02.md",
     "excluded_attributions": [
       "V01 is a current tag snapshot whose vLLM commit matches CI, not a historical-digest-verified container. V02 is commit source corroborated by CI.",
       "Server admission and CUDA graph capture limits also changed. The large E2E gain is not a measured causal effect of mHC or MoE alone."
@@ -47391,6 +47485,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v02_to_v03.md",
     "excluded_attributions": [
       "New common MXFP8/NVFP4 cache layouts and NVIDIA fused-attention paths also appear in this diff; their presence alone does not establish use on MI355X. ROCm decode still uses its fp8_ds_mla path.",
       "Engram placement and launch recipes change across this range; keep per-endpoint flags as confounders."
@@ -47707,6 +47802,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -48022,6 +48118,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -48683,6 +48780,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -49128,6 +49226,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -49639,6 +49738,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -50119,6 +50219,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -50439,6 +50540,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -50754,6 +50856,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -51415,6 +51518,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v05_to_v06.md",
     "excluded_attributions": [
       "Source review confirms the vLLM call sites and API contracts, not historical V06 AITER internals. Engram sharing/prefetch and recipe changes are additional contributors."
     ],
@@ -51860,6 +51964,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v06_to_v07.md",
     "excluded_attributions": [
       "No GPU trace establishes what fraction of a high-concurrency run falls within the 48-row guard. New quick-reduce INT4 setting can affect ordinary fallback collectives separately."
     ],
@@ -52371,6 +52476,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v07_to_v08.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -52851,6 +52957,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v08_to_v09.md",
     "excluded_attributions": [
       "NVIDIA sharded wqa/wkv code in the shared model is not credited to MI355X. New source support does not by itself establish benchmark-phase execution counts."
     ],
@@ -53171,6 +53278,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v03_to_v04.md",
     "excluded_attributions": [
       "CuTe DSL wo_b + reduce-scatter support in shared attention code is not evidence of this ROCm path using it."
     ],
@@ -53486,6 +53594,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v04_to_v05.md",
     "excluded_attributions": [],
     "matched_server_artifacts": [],
     "top_kernels": null,
@@ -54259,6 +54368,7 @@
         "evidence_level": "source_verified"
       }
     ],
+    "shared_change_report": "changes/v10_to_v11_tp8_ep1.md",
     "excluded_attributions": [
       "TP8 support already existed in V10, so it is not new fusion for this TP8 pair.",
       "MonoBuild.tuned is TP2/ratio2-only and cannot explain TP8 conc1 gains. MI325X/gfx942-only kernels are excluded."

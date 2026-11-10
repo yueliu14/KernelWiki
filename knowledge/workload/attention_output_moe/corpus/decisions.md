@@ -6,6 +6,19 @@ Source inspection establishes implementation precedents. Effect and independent-
 
 [Semantic boundary](../README.md) · [Workload index](../../CORPUS.md)
 
+<a id="assessment-1"></a>
+## Shared assessment 1
+
+Applies only to the decisions linking here, whose assessment and effect records are identical.
+
+**Implementation confidence: high** — The pinned case entry and named implementation establish this scoped mechanism; this is not runtime or numerical validation; missing: target_model_engagement.
+
+**Effect confidence: unknown** — No comparable workload measurement is encoded for this decision; missing: paired_measurement, correctness_result, runtime_environment.
+
+**Attribution confidence: unknown** — Source inspection does not isolate the performance contribution of this mechanism; missing: controlled_ablation.
+
+**Effect: not_assessed** — This pass records an implemented contract. A comparable baseline/candidate performance result and an isolated effect for this decision have not been assessed.
+
 <a id="post-attention-preserve-handoff"></a>
 ## What must a post-attention monokernel return to the next layer?
 
@@ -38,13 +51,7 @@ Source inspection establishes implementation precedents. Effect and independent-
 - [sgl_amd_mono_7a4a552d:m31_runner](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/minimax_m31/runner.py#L46-L171) — Shared epoch ownership, per-width scratch, compiled residency gate, negative-slot behavior and returned buffers.
 - [sgl_amd_mono_7a4a552d:m31_stages](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/minimax_m31/ffn.py#L2-L24) — o_proj, TP reduction/residual/norm, router, shared/routed experts, down projection and final reduction.
 
-**Implementation confidence: high** — The pinned case entry and named implementation establish this scoped mechanism; this is not runtime or numerical validation; missing: target_model_engagement.
-
-**Effect confidence: unknown** — No comparable workload measurement is encoded for this decision; missing: paired_measurement, correctness_result, runtime_environment.
-
-**Attribution confidence: unknown** — Source inspection does not isolate the performance contribution of this mechanism; missing: controlled_ablation.
-
-**Effect: not_assessed** — This pass records an implemented contract. A comparable baseline/candidate performance result and an isolated effect for this decision have not been assessed.
+**Assessment:** implementation: high; effect: unknown; attribution: unknown; outcome: not_assessed. [Reasons and missing evidence](#assessment-1).
 
 ### Validation for a new workload
 
@@ -89,13 +96,7 @@ Source inspection establishes implementation precedents. Effect and independent-
 - [sgl_amd_mono_7a4a552d:m31_build](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/minimax_m31/spec.py#L393-L485) — Post-load routed/shared weight views, runtime occupancy warmup, numerical envelope and spec capabilities.
 - [sgl_amd_mono_7a4a552d:common_geometry](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/common/plan.py#L21-L37) — 256 CTAs, 512 threads and stage task assignment used by these persistent kernels.
 
-**Implementation confidence: high** — The pinned case entry and named implementation establish this scoped mechanism; this is not runtime or numerical validation; missing: target_model_engagement.
-
-**Effect confidence: unknown** — No comparable workload measurement is encoded for this decision; missing: paired_measurement, correctness_result, runtime_environment.
-
-**Attribution confidence: unknown** — Source inspection does not isolate the performance contribution of this mechanism; missing: controlled_ablation.
-
-**Effect: not_assessed** — This pass records an implemented contract. A comparable baseline/candidate performance result and an isolated effect for this decision have not been assessed.
+**Assessment:** implementation: high; effect: unknown; attribution: unknown; outcome: not_assessed. [Reasons and missing evidence](#assessment-1).
 
 ### Validation for a new workload
 
@@ -137,13 +138,7 @@ Source inspection establishes implementation precedents. Effect and independent-
 - [sgl_amd_mono_7a4a552d:m31_epoch](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/minimax_m31/ffn.py#L1339-L1368) — Completion marks, epoch advance and clearing a reused 16-bit tag cycle after readers complete.
 - [sgl_amd_mono_7a4a552d:m31_body](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/sgl_amd_mono/minimax_m31/ffn.py#L1102-L1336) — Persistent stage calls and kernel launch rather than separate dispatches for each stage.
 
-**Implementation confidence: high** — The pinned case entry and named implementation establish this scoped mechanism; this is not runtime or numerical validation; missing: target_model_engagement.
-
-**Effect confidence: unknown** — No comparable workload measurement is encoded for this decision; missing: paired_measurement, correctness_result, runtime_environment.
-
-**Attribution confidence: unknown** — Source inspection does not isolate the performance contribution of this mechanism; missing: controlled_ablation.
-
-**Effect: not_assessed** — This pass records an implemented contract. A comparable baseline/candidate performance result and an isolated effect for this decision have not been assessed.
+**Assessment:** implementation: high; effect: unknown; attribution: unknown; outcome: not_assessed. [Reasons and missing evidence](#assessment-1).
 
 ### Validation for a new workload
 

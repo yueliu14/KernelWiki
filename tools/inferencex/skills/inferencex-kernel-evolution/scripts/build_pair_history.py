@@ -65,6 +65,77 @@ def source_ref(reference, old_files, new_files):
     return result
 
 
+def source_cell(source, side):
+    if not source.get(side + "_path"):
+        return "Absent / separate existing operations"
+    path = source.get(side + "_original_path", source[side + "_path"])
+    implementation = source.get(side + "_implementation")
+    if implementation:
+        url = "../" + implementation["snapshot_path"] if implementation.get("snapshot_path") else implementation["source_url"]
+    else:
+        url = source.get(side + "_source_url")
+    text = f"[{path}]({url})" if url else f"`{path}`"
+    text += f"<br>`{source[side+'_sha256']}`"
+    if implementation:
+        for entry in implementation["entrypoints"]:
+            text += f"<br>[{entry['name']}]({url}#L{entry['line']})"
+    return text
+
+
+def change_document(change, pairs):
+    rule = change["rule"]
+    text = f"# {change['label']}\n\n[Image changes](../kernel_evolution.md) · [Matrix](../configuration_history.md) · [Evidence rules](../../README.md#evidence)\n\n"
+    text += f"Before: `{change['before']['image_name']}`. After: `{change['after']['image_name']}`.\n\n"
+    text += f"Configuration selector: `{json.dumps(rule['config_selector'], sort_keys=True)}`. Source-verified changes; GPU-time rank and causal contributions are unavailable.\n\n"
+    matched = [p for p in pairs if p['shared_change_report'] == change['report']]
+    if matched:
+        text += "Applicable measured pairs: " + ", ".join(f"[{p['configuration_label']}]({ '../' + p['report']})" for p in matched) + ".\n"
+    else:
+        text += "This source transition has no matching measured pair; do not assign it an E2E delta.\n"
+    for key in ["required_cli", "required_env"]:
+        if rule.get(key):
+            text += f"\nRequired {key}: `{json.dumps(rule[key], sort_keys=True)}`.\n"
+    for index, kernel in enumerate(change["kernels"], 1):
+        text += f'\n<a id="kernel-{index}"></a>\n\n## {kernel["pipeline"]}\n\n'
+        for title, key in [("Before", "before"), ("After", "after"), ("Device language", "language"), ("Body change", "body_change"), ("Fusion", "fusion"), ("Applicability", "applicability")]:
+            text += f"**{title}:** {kernel[key]}\n\n"
+        text += "| Role | Before implementation / SHA256 | After implementation / SHA256 | Relation |\n| --- | --- | --- | --- |\n"
+        for source in kernel["sources"]:
+            text += f"| {source['role']} | {source_cell(source, 'before')} | {source_cell(source, 'after')} | {source['path_relation']}; {source['body_relation']} |\n"
+        text += "\nEvidence: " + ", ".join(f"[{ref}](../{ref})" for ref in kernel["evidence"]) + ".\n"
+    if rule["excluded_attributions"]:
+        text += "\n## Excluded attributions\n\n" + "\n".join("- " + note for note in rule["excluded_attributions"]) + "\n"
+    return text
+
+
+def prepare_changes(rules, images, inventories):
+    changes = {}
+    reports = set()
+    for rule in rules:
+        endpoints = []
+        for side in ["from", "to"]:
+            candidates = [(n, image) for n, image in enumerate(images, 1)
+                          if (image['image_name'] == rule[side + '_image_name'] if rule.get(side + '_image_name')
+                              else rule[side + '_digest'] in image['digests'])]
+            if len(candidates) != 1:
+                raise ValueError(f"Ambiguous image identity in reviewed rule: {side}")
+            endpoints.append(candidates[0])
+        (av, a), (bv, b) = endpoints
+        selector = rule['config_selector']
+        suffix = f"_tp{selector['decode_tp']}_ep{selector['decode_ep']}" if 'decode_tp' in selector and 'decode_ep' in selector else ''
+        report = f"changes/v{av:02d}_to_v{bv:02d}{suffix}.md"
+        if report in reports:
+            raise ValueError(f"Give distinct reviewed selectors distinct change records: {report}")
+        reports.add(report)
+        kernels = copy.deepcopy(rule['kernel_changes'])
+        for kernel in kernels:
+            kernel['evidence_level'] = 'source_verified'
+            kernel['sources'] = [source_ref(ref, inventories[a['image_name']], inventories[b['image_name']]) for ref in kernel['sources']]
+        changes[id(rule)] = {'rule': rule, 'before': a, 'after': b, 'kernels': kernels, 'report': report,
+                             'label': f"V{av:02d} → V{bv:02d}" + suffix.replace('_', ' ')}
+    return changes
+
+
 def pair_document(pair):
     a, b = pair["before"], pair["after"]
     text = f"# {pair['configuration_label']}: {a['date']} → {b['date']}\n\n"
@@ -77,35 +148,22 @@ def pair_document(pair):
         text += "\nThis is the next observed point for this configuration; intermediate images without a matching point: " + ", ".join(f"`{name}`" for name in pair["skipped_images"]) + ". The endpoint delta spans that gap.\n"
     text += "\n## Kernel changes for this pair\n\nThese are source-verified candidates and configuration eligibility checks. GPU-time ranking and realized benchmark-phase launch counts are unavailable. Missing CLI flags mean the option was not explicitly passed; defaults may differ between images.\n"
     if pair.get("source_provenance"):
-        text += "\n**Source provenance:** " + "; ".join(f"{side}: {info['source_kind']} ({info.get('source_revision') or info.get('digest') or 'see inventory'})" for side, info in pair["source_provenance"].items()) + ". Upstream-commit source is corroborated by CI version logs but is not a recovered historical container. A current tag snapshot alone does not establish historical file identity.\n"
+        text += "\n**Source provenance:** " + "; ".join(f"{side}: {info['source_kind']} ({info.get('source_revision') or info.get('digest') or 'see inventory'})" for side, info in pair["source_provenance"].items()) + ". See [source identity limits](../../README.md#evidence).\n"
         commits = [f"{side}: [{info['vllm_commit'][:12]}]({info['vllm_commit_url']})" for side, info in pair['source_provenance'].items() if info.get('vllm_commit')]
         if commits:
             text += '\n**vLLM commits:** ' + '; '.join(commits) + '. [Kernel implementation browser](../kernel_implementations.md) retains exact source paths and function links. AITER files are identified separately by container digest and file hash.\n'
-    for kernel in pair["kernel_changes"]:
-        text += f"\n### {kernel['pipeline']}\n\n"
-        for title, key in [("Before", "before"), ("After", "after"), ("Device language", "language"), ("Code/body change", "body_change"), ("Fusion", "fusion"), ("Applicability to this pair", "applicability")]:
-            text += f"**{title}:** {kernel[key]}\n\n"
-        text += "| Source role | Before path / file SHA256 | After path / file SHA256 | Relation |\n| --- | --- | --- | --- |\n"
-        for source in kernel["sources"]:
-            def cell(side):
-                if not source.get(side + "_path"):
-                    return "Absent / separate existing operations"
-                path = source.get(side + "_original_path", source[side + "_path"])
-                where = f"[{path}]({source[side+'_source_url']})" if source.get(side + "_source_url") else f"`{path}`"
-                text = f"{where}<br>`{source[side+'_sha256']}`"
-                implementation = source.get(side + '_implementation')
-                if implementation:
-                    url = '../' + implementation['snapshot_path'] if implementation.get('snapshot_path') else implementation['source_url']
-                    label = 'Complete implementation' if side + '_original_path' in source else 'Complete source'
-                    text += f'<br>[{label}]({url})'
-                    for entry in implementation['entrypoints']:
-                        text += f"<br>[{entry['name']}]({url}#L{entry['line']})"
-                return text
-            text += f"| {source['role']} | {cell('before')} | {cell('after')} | {source['path_relation']}; {source['body_relation']} |\n"
-        text += "\nEvidence: " + ", ".join(f"[{ref}](../{ref})" for ref in kernel["evidence"]) + ".\n"
+    text += "\n| Relevant kernel change | Applicability to this pair |\n| --- | --- |\n"
+    for index, kernel in enumerate(pair["kernel_changes"], 1):
+        link = f"../{pair['shared_change_report']}#kernel-{index}"
+        text += f"| [{kernel['pipeline']}]({link}) | {kernel['applicability']} |\n"
+    text += "\nThe linked change record owns the before/after bodies, fusion boundaries, exact paths, hashes and implementation links.\n"
     if pair["excluded_attributions"]:
         text += "\n### Changes not attributed to this configuration\n\n" + "\n".join("- " + note for note in pair["excluded_attributions"]) + "\n"
-    text += "\n## Exact CI configuration changes\n\n| Explicit launch flag | Before | After |\n| --- | --- | --- |\n"
+    text += "\n## Exact CI configuration changes\n\n"
+    if pair["launch_flag_changes"]:
+        text += "| Explicit launch flag | Before | After |\n| --- | --- | --- |\n"
+    else:
+        text += "No explicit launch-flag changes were recorded; defaults and image internals can still differ.\n"
     for delta in pair["launch_flag_changes"]:
         text += f"| `{delta['key']}` | `{delta['before'] if delta['before'] is not None else 'not explicitly passed'}` | `{delta['after'] if delta['after'] is not None else 'not explicitly passed'}` |\n"
     text += "\n| Endpoint | Client concurrency | Server admission | Monokernel CLI | Page size | Dataset |\n| --- | ---: | ---: | --- | ---: | --- |\n"
@@ -114,7 +172,7 @@ def pair_document(pair):
         admission = opts.get('max-running-requests', opts.get('max-num-seqs', 'not passed'))
         mono = opts.get('monokernel-backend', opts.get('monokernel', point['launch'].get('server_env', {}).get('VLLM_ROCM_MONO_DECODE', 'not passed')))
         page = opts.get('page-size', opts.get('block-size', 'not passed'))
-        text += f"| {side} | {pair['config']['conc']} | {admission} | {mono} | {page} | {', '.join(point['launch']['datasets'])} |\n"
+        text += f"| {side} | {pair['config']['conc']} | {admission} | {mono} | {page} | {', '.join(point['launch']['datasets']) or 'not recorded'} |\n"
     text += "\nBoth complete commands, environment changes, image digests and source hashes are in [pair_records.json](../data/pair_records.json). Endpoint CI logs are linked through [launch configurations](../evidence/ci_launch_configs.json) and [log extracts](../evidence/ci_log_extracts.json).\n"
     if pair.get("runtime_log_evidence"):
         report = pair["runtime_log_evidence"]["report"]
@@ -144,9 +202,8 @@ def pair_document(pair):
         if pair['id'] == 'tep8_conc1_off_2026-10-22_to_2026-10-30':
             text += "\nThe [bounded GPU validation attempt](../gpu_validation/README.md) obtained no allocation, so this pair still has no reproduced GPU trace.\n"
     elif pair["matched_server_artifacts"]:
-        text += "Exact endpoint server artifacts already inspected: " + ", ".join(f"{x['side']} `{x['artifact_id']}`" for x in pair["matched_server_artifacts"]) + ". See [server-log extracts](../evidence/server_log_extracts.json). Initialization and fast-path messages may include warmup.\n"
-        if pair.get("additional_server_log_evidence"):
-            text += "Additional exact endpoint archives: [recovered endpoint log evidence](../evidence/recovered_endpoint_logs.json).\n"
+        evidence = pair.get("additional_server_log_evidence", "evidence/server_log_extracts.json")
+        text += "Exact inspected endpoint artifacts: " + ", ".join(f"{x['side']} `{x['artifact_id']}`" for x in pair["matched_server_artifacts"]) + f". [Artifact records](../{evidence}); initialization may precede measurement.\n"
     else:
         text += "No nested server artifact for these exact endpoints has been inspected in this pilot; source guards and their own CI launch logs provide the current evidence.\n"
     text += "\nNo per-kernel causal speedup is assigned. Model/dataset revisions are not fully pinned at both endpoints, recipe fingerprints differ, and the launch changes above are potential contributors. GPU profiles would be new reproduced evidence.\n"
@@ -179,6 +236,7 @@ def main():
                     if file.get('source_url'):
                         target['source_url'] = file['source_url']
     rules = read(root / "evidence/kernel_pair_rules.json")
+    changes = prepare_changes(rules, images, inventories)
     server = read(root / "evidence/server_log_extracts.json")
     recovered_ids = set()
     recovered_logs = root / "evidence/recovered_endpoint_logs.json"
@@ -193,8 +251,8 @@ def main():
     verified = {f['point_id']: f for f in read(verified_path)} if verified_path.exists() else {}
     groups = defaultdict(list)
     for index, image in enumerate(images):
-        for id in image["representative_ids"]:
-            point = by_id[id]
+        for point_id in image["representative_ids"]:
+            point = by_id[point_id]
             groups[config_key(point)].append((index, point))
     pairs = []
     for group in groups.values():
@@ -228,10 +286,8 @@ def main():
                         raise ValueError(f"Applicability rule disagrees with {side} environment: {key}")
             parallel = f"tep{cfg['decode_tp']}" if cfg['decode_tp'] == cfg['decode_ep'] else f"tp{cfg['decode_tp']}_ep{cfg['decode_ep']}"
             slug = f"{parallel}_conc{cfg['conc']}_{cfg['offload_mode']}_{a['date']}_to_{b['date']}"
-            kernels = copy.deepcopy(rule["kernel_changes"])
-            for kernel in kernels:
-                kernel["evidence_level"] = "source_verified"
-                kernel["sources"] = [source_ref(ref, inventories[a["image_name"]], inventories[b["image_name"]]) for ref in kernel["sources"]]
+            change = changes[id(rule)]
+            kernels = copy.deepcopy(change["kernels"])
             matched_server = []
             for side, point in [("before", a), ("after", b)]:
                 for artifact in server:
@@ -246,7 +302,7 @@ def main():
                     "interactivity_change_pct": 100 * (b["p90_interactivity_tok_s_user"] / a["p90_interactivity_tok_s_user"] - 1),
                     "throughput_change_pct": 100 * (b["output_tok_s_chip"] / a["output_tok_s_chip"] - 1),
                     "launch_flag_changes": deltas(af, bf), "environment_changes": deltas(ac["server_env"], bc["server_env"]),
-                    "kernel_changes": kernels, "excluded_attributions": rule["excluded_attributions"],
+                    "kernel_changes": kernels, "shared_change_report": change["report"], "excluded_attributions": rule["excluded_attributions"],
                     "matched_server_artifacts": matched_server, "top_kernels": None, "gpu_profile_status": "unavailable",
                     "causal_attribution": "not_established", "report": "pairs/" + slug + ".md"}
             if all("source_kind" in snapshot_info[p["image_name"]] for p in [a, b]):
@@ -266,6 +322,13 @@ def main():
                         'families': [{'kind': f['kind'], 'family': f['family'], 'phases': {phase: {'observed_rows': info['observed_rows']} for phase, info in f['phases'].items()}} for f in fact['families']]}
             pairs.append(pair)
     pairs.sort(key=lambda p: (p["config"]["decode_tp"], p["config"]["offload_mode"], p["config"]["conc"], p["before"]["date"]))
+    (root / "changes").mkdir(exist_ok=True)
+    evolution = "# Reviewed image changes\n\n[Configuration matrix](configuration_history.md) · [Pair index](pair_changes.md) · [Implementation browser](kernel_implementations.md)\n\nEach shared record owns the kernel body, fusion and source details once. Pair pages retain their own performance, launch changes and applicability. Source changes do not establish GPU-time rankings or causal speedups.\n\n| Image edge / selector | Same-configuration pairs | Shared kernel/fusion record |\n| --- | ---: | --- |\n"
+    for change in changes.values():
+        (root / change['report']).write_text(change_document(change, pairs))
+        count = sum(p['shared_change_report'] == change['report'] for p in pairs)
+        evolution += f"| {change['label']} | {count} | [Bodies, fusion, guards and sources]({change['report']}) |\n"
+    (root / "kernel_evolution.md").write_text(evolution)
     (root / "pairs").mkdir(exist_ok=True)
     for pair in pairs:
         (root / pair["report"]).write_text(pair_document(pair))

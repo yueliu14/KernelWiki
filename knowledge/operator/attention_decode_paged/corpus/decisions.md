@@ -420,27 +420,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 | [attention-query-kv-tile-pipeline](../../attention_prefill_fmha/corpus/decisions.md#attention-query-kv-tile-pipeline) | attention_prefill_fmha | Which coupled decisions should be explored when changing attention tile sizes? |
 | [attention-split-kv-merge](../../mla_attention/corpus/decisions.md#attention-split-kv-merge) | mla_attention | When splitting KV work, what information must the merge preserve? |
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for attention decode paged; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/cpp/test_pa_decode_gluon_aot.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/cpp/test_pa_decode_gluon_aot.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_pa_decode.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_pa_decode.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_paged_attention_output_gate.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_paged_attention_output_gate.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_unified_attention.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_unified_attention.py) (`aiter_b3ad6c46`).
-- [op_tests/test_flydsl_pa_decode.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_flydsl_pa_decode.py) (`aiter_b3ad6c46`).
-- [op_tests/test_pa_decode_bf16_asm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_pa_decode_bf16_asm.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/attention/test_pa_decode.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_pa_decode.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/attention/test_paged_attention_output_gate.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_paged_attention_output_gate.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/attention/test_unified_attention.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/attention/test_unified_attention.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/test_pa_decode_gluon.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/test_pa_decode_gluon.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

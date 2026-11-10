@@ -1,0 +1,158 @@
+# V01 → V03 tp4 ep4
+
+[Image changes](../kernel_evolution.md) · [Matrix](../configuration_history.md) · [Evidence rules](../../README.md#evidence)
+
+Before: `lmsysorg/sglang-rocm:muse-spark-open`. After: `lmsysorg/sglang-rocm:muse-spark-open-1027`.
+
+Configuration selector: `{"decode_ep": 4, "decode_tp": 4}`. Source-verified changes; GPU-time rank and causal contributions are unavailable.
+
+Applicable measured pairs: [TEP4 conc16 / HiCache](../pairs/tep4_conc16_on_2026-10-16_to_2026-10-30.md).
+
+Required required_cli: `{"after": {"monokernel-backend": null}, "before": {"monokernel-backend": null}}`.
+
+<a id="kernel-1"></a>
+
+## QK normalization, RoPE and FP8 KV write
+
+**Before:** Existing _qk_norm_kernel combines Q/K RMSNorm and query scale; projection, RoPE and backend KV writing have separate boundaries.
+
+**After:** _muse_qk_rope_cache or _qkv_epilogue writes normalized/rotated Q/K and FP8 KV; model attention bypasses its ordinary cache write.
+
+**Device language:** Triton → Triton; the projection remains a separate split-K partial producer.
+
+**Body change:** New cache-store epilogue folds normalization, scale, rotation and FP8 conversion; explicit BF16 round trips preserve the former sequence semantics.
+
+**Fusion:** The QK route shares norm/RoPE/cache write in one launch. The QKV route is partial GEMM plus an epilogue launch; the whole projection is not one fused launch.
+
+**Applicability:** This TEP4 pair spans baseline → 1027. Unlike 1020’s TP8-only QK guard, 1027 permits local KV-head counts 2 or 4 and Q-head count 8 times KV heads; page size remains 16 in both endpoint CLIs. Shape/row guards remain conditional.
+
+| Role | Before implementation / SHA256 | After implementation / SHA256 | Relation |
+| --- | --- | --- | --- |
+| prior norm / new epilogue | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/muse_qk_norm.py](../kernel_sources/blobs/0e3246a8bbd8990f/muse_qk_norm.py)<br>`0e3246a8bbd8990f881aa38fa45e766249a1c6f109faf0b897fe8d86c2f24c6e`<br>[_qk_norm_kernel](../kernel_sources/blobs/0e3246a8bbd8990f/muse_qk_norm.py#L19)<br>[fused_qk_norm](../kernel_sources/blobs/0e3246a8bbd8990f/muse_qk_norm.py#L64) | [/sgl-workspace/sglang/python/sglang/kernels/ops/attention/qk_norm_rope_cache.py](../kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py)<br>`3fb15d9d004eeb88757b3ae2aa30497e4bc3e9ff7f01c47a9a2c3a1c9323eb8e`<br>[_muse_qk_rope_cache](../kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py#L57)<br>[_qkv_epilogue](../kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py#L122)<br>[qkv_proj_qk_norm_rope_cache](../kernel_sources/blobs/3fb15d9d004eeb88/qk_norm_rope_cache.py#L233) | different_paths; different_file_bytes |
+| dispatch | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py](../kernel_sources/blobs/496fc8a155a50fd8/model.py)<br>`496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23`<br>[MuseSpark1xAttention.forward](../kernel_sources/blobs/496fc8a155a50fd8/model.py#L434)<br>[MuseSpark1xMoE.forward](../kernel_sources/blobs/496fc8a155a50fd8/model.py#L798) | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py](../kernel_sources/blobs/d7e4953c71a74b44/model.py)<br>`d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242`<br>[MuseSpark1xAttention.forward](../kernel_sources/blobs/d7e4953c71a74b44/model.py#L638)<br>[MuseSpark1xMoE.forward](../kernel_sources/blobs/d7e4953c71a74b44/model.py#L1070) | same_path; different_file_bytes |
+| eligibility wrapper | Absent / separate existing operations | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/attention_kv_write.py](../kernel_sources/blobs/34933e2895490a37/attention_kv_write.py)<br>`34933e2895490a3719f918779df60c9575a7b05abccf3d51a03a396b31752adf`<br>[_attention_shape_ok](../kernel_sources/blobs/34933e2895490a37/attention_kv_write.py#L49)<br>[_kv_write_target](../kernel_sources/blobs/34933e2895490a37/attention_kv_write.py#L65)<br>[qkv_proj_norm_rope_kv_write](../kernel_sources/blobs/34933e2895490a37/attention_kv_write.py#L126)<br>[qk_norm_rope_kv_write](../kernel_sources/blobs/34933e2895490a37/attention_kv_write.py#L169) | added; different_file_bytes |
+
+Evidence: [evidence/source_diffs/01_to_02.diff](../evidence/source_diffs/01_to_02.diff), [evidence/source_excerpts.md#e1](../evidence/source_excerpts.md#e1), [evidence/source_diffs/02_to_03.diff](../evidence/source_diffs/02_to_03.diff).
+
+<a id="kernel-2"></a>
+
+## MoE router and pooler
+
+**Before:** Router GEMM, fused top-k routing, pooler GEMM and pre-expert norm remain separate stages.
+
+**After:** route_with_shared_pooler chooses a shared epilogue or a joint packed projection followed by _joint_epilogue.
+
+**Device language:** Triton / GEMM library calls → Triton / GEMM library calls.
+
+**Body change:** Packed pooler/router weights and shared reduction/top-k/norm epilogues avoid separate processing of completed router/pooler results.
+
+**Fusion:** Shared router/top-k/pre-expert norm epilogue; selected widths also share a router/pooler GEMM. Expert GEMMs remain separate.
+
+**Applicability:** TEP4 is admitted by the hidden/expert/weight-shape routing predicates; available row ranges and packed-weight conditions still govern shared/joint selection.
+
+| Role | Before implementation / SHA256 | After implementation / SHA256 | Relation |
+| --- | --- | --- | --- |
+| model routing | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py](../kernel_sources/blobs/496fc8a155a50fd8/model.py)<br>`496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23`<br>[MuseSpark1xAttention.forward](../kernel_sources/blobs/496fc8a155a50fd8/model.py#L434)<br>[MuseSpark1xMoE.forward](../kernel_sources/blobs/496fc8a155a50fd8/model.py#L798) | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py](../kernel_sources/blobs/d7e4953c71a74b44/model.py)<br>`d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242`<br>[MuseSpark1xAttention.forward](../kernel_sources/blobs/d7e4953c71a74b44/model.py#L638)<br>[MuseSpark1xMoE.forward](../kernel_sources/blobs/d7e4953c71a74b44/model.py#L1070) | same_path; different_file_bytes |
+| new routing dispatch | Absent / separate existing operations | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/router_pooler.py](../kernel_sources/blobs/c570dfbdc9d85dbb/router_pooler.py)<br>`c570dfbdc9d85dbb99aced47e0cbc73f938468969acf1a3cc007816b61444166`<br>[can_share_router_pooler](../kernel_sources/blobs/c570dfbdc9d85dbb/router_pooler.py#L40)<br>[route_with_shared_pooler](../kernel_sources/blobs/c570dfbdc9d85dbb/router_pooler.py#L83) | added; different_file_bytes |
+| new epilogues | Absent / separate existing operations | [/sgl-workspace/sglang/python/sglang/kernels/ops/moe/router_pooler_topk.py](../kernel_sources/blobs/6c876d2421932de4/router_pooler_topk.py)<br>`6c876d2421932de4d2abee1a27b32d04430ff354a8e0a7970407a83b99e7640e`<br>[_joint_epilogue](../kernel_sources/blobs/6c876d2421932de4/router_pooler_topk.py#L127)<br>[_joint_fp8_partial](../kernel_sources/blobs/6c876d2421932de4/router_pooler_topk.py#L426)<br>[joint_router_pooler_topk](../kernel_sources/blobs/6c876d2421932de4/router_pooler_topk.py#L356)<br>[joint_router_pooler_topk_fp8](../kernel_sources/blobs/6c876d2421932de4/router_pooler_topk.py#L494) | added; different_file_bytes |
+
+Evidence: [evidence/source_diffs/01_to_02.diff](../evidence/source_diffs/01_to_02.diff), [evidence/source_diffs/02_to_03.diff](../evidence/source_diffs/02_to_03.diff).
+
+<a id="kernel-3"></a>
+
+## MXFP4 expert route
+
+**Before:** Native-layout FlyDSL grouped experts and per-expert finalize; the MUSE_MOE_BACKEND=flydsl setting is present.
+
+**After:** Compact A4 target-verify experts in Triton, or AITER FlyDSL A4W4 prefill stages, followed by per-expert finalize.
+
+**Device language:** FlyDSL → shape-dependent Triton or FlyDSL; Python mxfp4_moe.py is dispatch glue.
+
+**Body change:** Add per-32 MXFP4 activations, compact verify work and preshuffled A4W4 weights; prefill stage 1 emits quantized intermediates/scales.
+
+**Fusion:** Activation and quantization staging change, while the required per-expert normalization and route-weighted reduction remain explicit. Do not call the entire MoE one kernel.
+
+**Applicability:** By 1027 compact A4 accepts 32 or 64 local experts, including TEP4/EP4 with 64 local experts. Verify rows must be divisible by 8 and within the cap. Other batches can use A4W4 or native fallback.
+
+| Role | Before implementation / SHA256 | After implementation / SHA256 | Relation |
+| --- | --- | --- | --- |
+| existing expert implementation | [/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py](../kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py)<br>`8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4`<br>[_launcher](../kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py#L40)<br>[launch_muse_moe_gemm](../kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py#L898) | [/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_gemm.py](../kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py)<br>`8bdebdca77615ff3c13ee79cdaf720f03921f13a9dd9f34f2b1684e1a6e65ed4`<br>[_launcher](../kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py#L40)<br>[launch_muse_moe_gemm](../kernel_sources/blobs/8bdebdca77615ff3/muse_moe_gemm.py#L898) | same_path; identical_file_bytes |
+| new compact experts | Absent / separate existing operations | [/sgl-workspace/sglang/python/sglang/kernels/ops/moe/mxfp4_compact_a4_moe.py](../kernel_sources/blobs/63551020e74ad73b/mxfp4_compact_a4_moe.py)<br>`63551020e74ad73bae018b34f2562e6f65235492e84913226fb1883f631470a8`<br>[_prepare_a4](../kernel_sources/blobs/63551020e74ad73b/mxfp4_compact_a4_moe.py#L30)<br>[_scatter_a4](../kernel_sources/blobs/63551020e74ad73b/mxfp4_compact_a4_moe.py#L45)<br>[_expert_a4](../kernel_sources/blobs/63551020e74ad73b/mxfp4_compact_a4_moe.py#L128)<br>[compact_a4_experts](../kernel_sources/blobs/63551020e74ad73b/mxfp4_compact_a4_moe.py#L224) | added; different_file_bytes |
+| new dispatch | Absent / separate existing operations | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/mxfp4_moe.py](../kernel_sources/blobs/4dd1c5eff0bd1f91/mxfp4_moe.py)<br>`4dd1c5eff0bd1f913b1bbe31e865141e94449bb24f3dc8ee8fd74e02d18139be`<br>[run_compact_a4](../kernel_sources/blobs/4dd1c5eff0bd1f91/mxfp4_moe.py#L69)<br>[_compact_a4_operands](../kernel_sources/blobs/4dd1c5eff0bd1f91/mxfp4_moe.py#L82)<br>[run_a4w4](../kernel_sources/blobs/4dd1c5eff0bd1f91/mxfp4_moe.py#L140) | added; different_file_bytes |
+
+Evidence: [evidence/source_diffs/01_to_02.diff](../evidence/source_diffs/01_to_02.diff), [evidence/source_diffs/02_to_03.diff](../evidence/source_diffs/02_to_03.diff).
+
+<a id="kernel-4"></a>
+
+## TP4 MoE finalize + all-reduce introduced
+
+**Before:** FlyDSL per-expert normalization/weighted finalize followed by a separate collective.
+
+**After:** A single muse_finalize_allreduce_tp4 HIP launch finalizes each row and exchanges/reduces peer partials.
+
+**Device language:** FlyDSL + separate collective → HIP/C++ fused finalize/collective.
+
+**Body change:** Use one 256-thread CTA per token row and peer inbox protocol; align normalization/reduction order and BF16 rounding with the prior path.
+
+**Fusion:** Compute + collective launch fusion; removes the separate finalize-to-collective launch boundary for supported rows.
+
+**Applicability:** New endpoint TEP4/EP4 and compact-A4 enabled; supported row count, top-8, hidden 4096 and local-expert predicates apply. The CLI does not enable the AMD layer monokernel.
+
+| Role | Before implementation / SHA256 | After implementation / SHA256 | Relation |
+| --- | --- | --- | --- |
+| prior finalize/new fused body | [/sgl-workspace/aiter/aiter/ops/flydsl/muse_moe_finalize.py](../kernel_sources/blobs/48af597a54827b3e/muse_moe_finalize.py)<br>`48af597a54827b3e7f9340dada68f74759bee80213df01fbe8f95c4e95fe6d2b`<br>[build_finalize](../kernel_sources/blobs/48af597a54827b3e/muse_moe_finalize.py#L83)<br>[build_splitk_silu](../kernel_sources/blobs/48af597a54827b3e/muse_moe_finalize.py#L14) | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.hip](../kernel_sources/blobs/8ab37d684c03d806/finalize_allreduce.hip)<br>`8ab37d684c03d8063428854fd416da182280863f6b9cf83611d7f4fc4ba03e77`<br>[muse_finalize_allreduce_tp4](../kernel_sources/blobs/8ab37d684c03d806/finalize_allreduce.hip#L108)<br>[muse_finalize_allreduce_fill](../kernel_sources/blobs/8ab37d684c03d806/finalize_allreduce.hip#L236) | different_paths; different_file_bytes |
+| new collective wrapper | Absent / separate existing operations | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/finalize_allreduce.py](../kernel_sources/blobs/1684029d6e761575/finalize_allreduce.py)<br>`1684029d6e76157557c3f044126e11e49a27f32ac1ed9b515ee92e1500f76b12`<br>[MuseFinalizeAllreduce](../kernel_sources/blobs/1684029d6e761575/finalize_allreduce.py#L139)<br>[run_compact_a4_allreduce](../kernel_sources/blobs/1684029d6e761575/finalize_allreduce.py#L260)<br>[ensure_finalize_allreduce](../kernel_sources/blobs/1684029d6e761575/finalize_allreduce.py#L249) | added; different_file_bytes |
+| model guard | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py](../kernel_sources/blobs/496fc8a155a50fd8/model.py)<br>`496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23`<br>[MuseSpark1xAttention.forward](../kernel_sources/blobs/496fc8a155a50fd8/model.py#L434)<br>[MuseSpark1xMoE.forward](../kernel_sources/blobs/496fc8a155a50fd8/model.py#L798) | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py](../kernel_sources/blobs/d7e4953c71a74b44/model.py)<br>`d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242`<br>[MuseSpark1xAttention.forward](../kernel_sources/blobs/d7e4953c71a74b44/model.py#L638)<br>[MuseSpark1xMoE.forward](../kernel_sources/blobs/d7e4953c71a74b44/model.py#L1070) | same_path; different_file_bytes |
+
+Evidence: [evidence/source_diffs/01_to_02.diff](../evidence/source_diffs/01_to_02.diff), [evidence/source_diffs/02_to_03.diff](../evidence/source_diffs/02_to_03.diff), [evidence/source_excerpts.md#e4](../evidence/source_excerpts.md#e4).
+
+<a id="kernel-5"></a>
+
+## Ordinary verify merge with output norm/gate
+
+**Before:** The attention partials are merged, then the existing output norm-gate kernel runs.
+
+**After:** VerifyReduceDeferral hands partials to forward_verify_partials → _reduce_norm_gate.
+
+**Device language:** Triton → Triton.
+
+**Body change:** The new body reads partials/maxima/denominators, performs split-KV reduction, rounds to BF16, and applies per-head RMSNorm and sigmoid gate before the output store.
+
+**Fusion:** One reduce+norm+gate launch replaces separate merge and norm-gate launches; removes the completed-attention intermediate between those launches.
+
+**Applicability:** Ordinary target-verify path, head_dim 64, output normalization enabled, and backend deferral active. On monokernel-covered MXFP4 layers the layer kernel supersedes this path; retain this candidate only for ordinary/fallback layers.
+
+| Role | Before implementation / SHA256 | After implementation / SHA256 | Relation |
+| --- | --- | --- | --- |
+| output consumer | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py](../kernel_sources/blobs/94d0b45392248de3/fused_norm_gate.py)<br>`94d0b45392248de3b71d846323a7961d0d9cc54755b5154035261a9349c8e266`<br>[_rms_norm_gate_fwd_kernel](../kernel_sources/blobs/94d0b45392248de3/fused_norm_gate.py#L43) | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_gate.py](../kernel_sources/blobs/ada56887a3648995/fused_norm_gate.py)<br>`ada56887a364899592ecc263d2e9da82a1c1a976e416557e057ac78ea386bfe9`<br>[_rms_norm_gate_fwd_kernel](../kernel_sources/blobs/ada56887a3648995/fused_norm_gate.py#L46)<br>[FusedRMSNormGate.forward_verify_partials](../kernel_sources/blobs/ada56887a3648995/fused_norm_gate.py#L178) | same_path; different_file_bytes |
+| new fused reducer | Absent / separate existing operations | [/sgl-workspace/sglang/python/sglang/kernels/ops/attention/verify_reduce_norm_gate.py](../kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py)<br>`191dc497d3084ba24455abffae2d8445db5cb8526208ae3a78d218498f0903e3`<br>[_reduce_norm_gate](../kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py#L32)<br>[verify_reduce_norm_gate](../kernel_sources/blobs/191dc497d3084ba2/verify_reduce_norm_gate.py#L90) | added; different_file_bytes |
+
+Evidence: [evidence/source_diffs/02_to_03.diff](../evidence/source_diffs/02_to_03.diff).
+
+<a id="kernel-6"></a>
+
+## Residual/norm boundary with FP8 output
+
+**Before:** The fused boundary yields a BF16 attention input and residual stream.
+
+**After:** forward_fp8 can additionally write the next projection input as FP8 plus per-row scales.
+
+**Device language:** Triton → Triton.
+
+**Body change:** The boundary kernel gains output/scaling buffers and a guarded FP8 output path; native fallback can still perform separate quantization.
+
+**Fusion:** For its fused Triton branch, quantization is part of the norm/boundary producer, saving a separate read/quantize launch.
+
+**Applicability:** Ordinary path when the model requests fp8_out/forward_fp8; do not transfer this benefit to the monokernel-covered layers without a trace.
+
+| Role | Before implementation / SHA256 | After implementation / SHA256 | Relation |
+| --- | --- | --- | --- |
+| boundary body | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py](../kernel_sources/blobs/e11bbcae7c1504a0/fused_norm_residual.py)<br>`e11bbcae7c1504a01dd346145d1e7af5f298580a4792c0fc117f50c18c908bfd`<br>[_fused_norm_residual_triton_kernel](../kernel_sources/blobs/e11bbcae7c1504a0/fused_norm_residual.py#L51) | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/fused_norm_residual.py](../kernel_sources/blobs/16edaf5510160b30/fused_norm_residual.py)<br>`16edaf5510160b306632ff31ad2346ae4c369f14a8c4ea61205b32c81b5109b5`<br>[_fused_norm_residual_triton_kernel](../kernel_sources/blobs/16edaf5510160b30/fused_norm_residual.py#L51)<br>[FusedPostNormResidualPreNorm.forward_fp8](../kernel_sources/blobs/16edaf5510160b30/fused_norm_residual.py#L372) | same_path; different_file_bytes |
+| requesting model | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py](../kernel_sources/blobs/496fc8a155a50fd8/model.py)<br>`496fc8a155a50fd8fa885b70c579a065a2079bc3fad1e66e7ba5c65ca0d87b23`<br>[MuseSpark1xAttention.forward](../kernel_sources/blobs/496fc8a155a50fd8/model.py#L434)<br>[MuseSpark1xMoE.forward](../kernel_sources/blobs/496fc8a155a50fd8/model.py#L798) | [/sgl-workspace/sglang/python/sglang/srt/rocm_muse_spark/model.py](../kernel_sources/blobs/d7e4953c71a74b44/model.py)<br>`d7e4953c71a74b44905d34e3bb364facaf2df812fd1a04fd00e21bcf618f3242`<br>[MuseSpark1xAttention.forward](../kernel_sources/blobs/d7e4953c71a74b44/model.py#L638)<br>[MuseSpark1xMoE.forward](../kernel_sources/blobs/d7e4953c71a74b44/model.py#L1070) | same_path; different_file_bytes |
+
+Evidence: [evidence/source_diffs/02_to_03.diff](../evidence/source_diffs/02_to_03.diff).
+
+## Excluded attributions
+
+- No intermediate TEP4 conc16 HiCache point exists for 1020; the measured change spans both source transitions.
+- The 1027 image has an AMD monokernel plugin, but this TEP4 endpoint does not enable it.

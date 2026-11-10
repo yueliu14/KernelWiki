@@ -317,12 +317,12 @@ Follow these references for the full conditions, alternatives and source evidenc
 | [flydsl-hgemm-tiling-validity](../../dense_gemm/corpus/decisions.md#flydsl-hgemm-tiling-validity) | dense_gemm | Which FlyDSL HGEMM configurations will fail to build at all, before any of them can be slow? |
 | [flydsl-host-launch-contract](../../dense_gemm/corpus/decisions.md#flydsl-host-launch-contract) | dense_gemm | What does the host side of a FlyDSL GEMM have to provide in AITER — compile cache, launch grid, per-stream state and kernel name? |
 | [flydsl-lds-pipeline-depth](../../dense_gemm/corpus/decisions.md#flydsl-lds-pipeline-depth) | dense_gemm | How many LDS stages should the K loop keep in flight, and what does each one cost? |
-| [flydsl-mfma-fragment-lane-layout](../../dense_gemm/corpus/decisions.md#flydsl-mfma-fragment-lane-layout) | dense_gemm | Which lane holds which row and column of a 16x16 MFMA fragment in AITER&#x27;s FlyDSL kernels, and what does that fix for loads, in-register scaling and stores? |
+| [flydsl-mfma-fragment-lane-layout](../../dense_gemm/corpus/decisions.md#flydsl-mfma-fragment-lane-layout) | dense_gemm | Which lane holds which row and column of a 16x16 MFMA fragment in AITER's FlyDSL kernels, and what does that fix for loads, in-register scaling and stores? |
 | [flydsl-preshuffle-b-layout-contract](../../dense_gemm/corpus/decisions.md#flydsl-preshuffle-b-layout-contract) | dense_gemm | What does enabling B preshuffle on a FlyDSL HGEMM actually require? |
-| [flydsl-test-parity-gate](../../dense_gemm/corpus/decisions.md#flydsl-test-parity-gate) | dense_gemm | Which parity does AITER&#x27;s own FlyDSL GEMM test demand, where does it relax it, and what does that say about validating an authored kernel? |
+| [flydsl-test-parity-gate](../../dense_gemm/corpus/decisions.md#flydsl-test-parity-gate) | dense_gemm | Which parity does AITER's own FlyDSL GEMM test demand, where does it relax it, and what does that say about validating an authored kernel? |
 | [flydsl-xor16-lds-layout-consistency](../../dense_gemm/corpus/decisions.md#flydsl-xor16-lds-layout-consistency) | dense_gemm | How should a FlyDSL GEMM apply an XOR16 LDS layout without making stores and loads disagree? |
-| [gemm-asm-tile-inventory-and-selection](../../dense_gemm/corpus/decisions.md#gemm-asm-tile-inventory-and-selection) | dense_gemm | Which tiles and split-K capabilities does AITER&#x27;s hand-written ASM ship per architecture, and how does its launcher choose among them for a shape? |
-| [gemm-shape-regime-routing](../../dense_gemm/corpus/decisions.md#gemm-shape-regime-routing) | dense_gemm | For each shape bucket, which backend did AITER&#x27;s own tuner ship, and what does that imply for a FlyDSL kernel? |
+| [gemm-asm-tile-inventory-and-selection](../../dense_gemm/corpus/decisions.md#gemm-asm-tile-inventory-and-selection) | dense_gemm | Which tiles and split-K capabilities does AITER's hand-written ASM ship per architecture, and how does its launcher choose among them for a shape? |
+| [gemm-shape-regime-routing](../../dense_gemm/corpus/decisions.md#gemm-shape-regime-routing) | dense_gemm | For each shape bucket, which backend did AITER's own tuner ship, and what does that imply for a FlyDSL kernel? |
 | [gemm-streamed-operand-cache-policy](../../dense_gemm/corpus/decisions.md#gemm-streamed-operand-cache-policy) | dense_gemm | Which operand loads and output stores should carry a streaming (non-temporal) cache policy, and which should keep the default? |
 | [gemm-workgroup-xcd-mapping](../../dense_gemm/corpus/decisions.md#gemm-workgroup-xcd-mapping) | dense_gemm | How should a FlyDSL GEMM map workgroup IDs onto output tiles and XCDs, and where does AITER already do it? |
 
@@ -333,20 +333,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 - **grid_fill_couples_tile_and_split**: The output tile count — ceil(M/tile_m)*ceil(N/tile_n) against the CU count — decides whether split-K is needed at all, and the rounds ceil(tiles*split/CUs) decide which split fills the machine; a split chosen for one tile is wrong for another, so re-decide it whenever the tile changes. [gemm-split-k-when-grid-underfills](decisions.md#gemm-split-k-when-grid-underfills), [flydsl-hgemm-config-space](../../dense_gemm/corpus/decisions.md#flydsl-hgemm-config-space), [gemm-blockscale-shipped-bucket-structure](../../scaled_quant_gemm/corpus/decisions.md#gemm-blockscale-shipped-bucket-structure), [gemm-asm-tile-inventory-and-selection](../../dense_gemm/corpus/decisions.md#gemm-asm-tile-inventory-and-selection)
 - **explicit_schedule_expires_with_geometry**: Changing tile, stages, access width or MFMA count invalidates literal instruction-group counts; retain the ordering hypothesis and rederive/remeasure the schedule. [flydsl-splitk-hot-loop-schedule-bundle](decisions.md#flydsl-splitk-hot-loop-schedule-bundle)
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for splitk streamk gemm; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/test_opus_a16w16_gemm.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_opus_a16w16_gemm.py) (`aiter_b3ad6c46`).
-- [op_tests/test_opus_a16w16_registry.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/test_opus_a16w16_registry.py) (`aiter_b3ad6c46`).
-- [op_tests/tuning_tests/test_asm_splitk_guard.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/tuning_tests/test_asm_splitk_guard.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

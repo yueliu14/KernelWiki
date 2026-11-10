@@ -278,16 +278,16 @@ Follow these references for the full conditions, alternatives and source evidenc
 | [flydsl-hgemm-tiling-validity](../../dense_gemm/corpus/decisions.md#flydsl-hgemm-tiling-validity) | dense_gemm | Which FlyDSL HGEMM configurations will fail to build at all, before any of them can be slow? |
 | [flydsl-host-launch-contract](../../dense_gemm/corpus/decisions.md#flydsl-host-launch-contract) | dense_gemm | What does the host side of a FlyDSL GEMM have to provide in AITER — compile cache, launch grid, per-stream state and kernel name? |
 | [flydsl-lds-pipeline-depth](../../dense_gemm/corpus/decisions.md#flydsl-lds-pipeline-depth) | dense_gemm | How many LDS stages should the K loop keep in flight, and what does each one cost? |
-| [flydsl-mfma-fragment-lane-layout](../../dense_gemm/corpus/decisions.md#flydsl-mfma-fragment-lane-layout) | dense_gemm | Which lane holds which row and column of a 16x16 MFMA fragment in AITER&#x27;s FlyDSL kernels, and what does that fix for loads, in-register scaling and stores? |
+| [flydsl-mfma-fragment-lane-layout](../../dense_gemm/corpus/decisions.md#flydsl-mfma-fragment-lane-layout) | dense_gemm | Which lane holds which row and column of a 16x16 MFMA fragment in AITER's FlyDSL kernels, and what does that fix for loads, in-register scaling and stores? |
 | [flydsl-preshuffle-b-layout-contract](../../dense_gemm/corpus/decisions.md#flydsl-preshuffle-b-layout-contract) | dense_gemm | What does enabling B preshuffle on a FlyDSL HGEMM actually require? |
 | [flydsl-splitk-hot-loop-schedule-bundle](../../splitk_streamk_gemm/corpus/decisions.md#flydsl-splitk-hot-loop-schedule-bundle) | splitk_streamk_gemm | What explicit instruction-order bundle can seed a hand-scheduled FlyDSL split-K GEMM hot loop? |
 | [flydsl-splitk-reduction-contract](../../splitk_streamk_gemm/corpus/decisions.md#flydsl-splitk-reduction-contract) | splitk_streamk_gemm | How does the FlyDSL split-K HGEMM combine partial results, and what does that impose on the launcher? |
-| [flydsl-test-parity-gate](../../dense_gemm/corpus/decisions.md#flydsl-test-parity-gate) | dense_gemm | Which parity does AITER&#x27;s own FlyDSL GEMM test demand, where does it relax it, and what does that say about validating an authored kernel? |
+| [flydsl-test-parity-gate](../../dense_gemm/corpus/decisions.md#flydsl-test-parity-gate) | dense_gemm | Which parity does AITER's own FlyDSL GEMM test demand, where does it relax it, and what does that say about validating an authored kernel? |
 | [flydsl-xor16-lds-layout-consistency](../../dense_gemm/corpus/decisions.md#flydsl-xor16-lds-layout-consistency) | dense_gemm | How should a FlyDSL GEMM apply an XOR16 LDS layout without making stores and loads disagree? |
 | [gemm-blockscale-k-loop-scale-application](../../scaled_quant_gemm/corpus/decisions.md#gemm-blockscale-k-loop-scale-application) | scaled_quant_gemm | How does a 128x128 block-scale GEMM apply its scales inside the K loop, and what does that fix about tile_k and the scale indexing? |
 | [gemm-blockscale-shipped-bucket-structure](../../scaled_quant_gemm/corpus/decisions.md#gemm-blockscale-shipped-bucket-structure) | scaled_quant_gemm | Which configuration does the Triton block-scale baseline run for each case, and what does AITER ship instead where it tuned small and large M separately? |
-| [gemm-default-backend-routing](../../dense_gemm/corpus/decisions.md#gemm-default-backend-routing) | dense_gemm | Which backend does AITER&#x27;s own dispatch pick when no tuned row exists, and how does that differ between gfx942 and gfx950? |
-| [gemm-shape-regime-routing](../../dense_gemm/corpus/decisions.md#gemm-shape-regime-routing) | dense_gemm | For each shape bucket, which backend did AITER&#x27;s own tuner ship, and what does that imply for a FlyDSL kernel? |
+| [gemm-default-backend-routing](../../dense_gemm/corpus/decisions.md#gemm-default-backend-routing) | dense_gemm | Which backend does AITER's own dispatch pick when no tuned row exists, and how does that differ between gfx942 and gfx950? |
+| [gemm-shape-regime-routing](../../dense_gemm/corpus/decisions.md#gemm-shape-regime-routing) | dense_gemm | For each shape bucket, which backend did AITER's own tuner ship, and what does that imply for a FlyDSL kernel? |
 | [gemm-split-k-when-grid-underfills](../../splitk_streamk_gemm/corpus/decisions.md#gemm-split-k-when-grid-underfills) | splitk_streamk_gemm | When does a GEMM case need split-K to fill the machine, and what does choosing it commit the rest of the kernel to? |
 | [gemm-streamed-operand-cache-policy](../../dense_gemm/corpus/decisions.md#gemm-streamed-operand-cache-policy) | dense_gemm | Which operand loads and output stores should carry a streaming (non-temporal) cache policy, and which should keep the default? |
 | [gemm-workgroup-xcd-mapping](../../dense_gemm/corpus/decisions.md#gemm-workgroup-xcd-mapping) | dense_gemm | How should a FlyDSL GEMM map workgroup IDs onto output tiles and XCDs, and where does AITER already do it? |
@@ -296,36 +296,6 @@ Follow these references for the full conditions, alternatives and source evidenc
 
 - **epilogue_staging_shares_lds**: An LDS CShuffle epilogue constrains tile_m/tile_n divisibility and adds a 2*tile_m*tile_n staging buffer to the same LDS budget as operand staging; validate them together. [flydsl-cshuffle-epilogue](decisions.md#flydsl-cshuffle-epilogue)
 
-## Coverage limits
+## Coverage and validation sources
 
-- Source observations and conditioned candidates for gemm epilogue fused; source presence is not a measured winner.
-- No new GPU measurements or binary disassembly are included.
-
-## Upstream correctness references
-
-These are test sources at pinned revisions, not results from executing the tests.
-
-- [op_tests/multigpu_tests/test_fused_ar_rms.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/multigpu_tests/test_fused_ar_rms.py) (`aiter_b3ad6c46`).
-- [op_tests/multigpu_tests/test_fused_ar_rms_per_group_quant.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/multigpu_tests/test_fused_ar_rms_per_group_quant.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_ff_a16w16_fused.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_ff_a16w16_fused.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fused_gemm_a8w8_blockscale_a16w16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_gemm_a8w8_blockscale_a16w16.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fused_gemm_a8w8_blockscale_mul_add.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_gemm_a8w8_blockscale_mul_add.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fused_gemm_afp4wfp4_a16w16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_gemm_afp4wfp4_a16w16.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fused_gemm_afp4wfp4_mul_add.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_gemm_afp4wfp4_mul_add.py) (`aiter_b3ad6c46`).
-- [op_tests/op_benchmarks/triton/bench_fused_gemm_commons.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/op_benchmarks/triton/bench_fused_gemm_commons.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/feed_forward/__init__.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/feed_forward/__init__.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/feed_forward/ff_test_utils.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/feed_forward/ff_test_utils.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/feed_forward/test_ff_a16w16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/feed_forward/test_ff_a16w16.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/feed_forward/test_ff_a16w16_fused.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/feed_forward/test_ff_a16w16_fused.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/fused/test_fused_gemm_a16w16_quant_x.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/fused/test_fused_gemm_a16w16_quant_x.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/fused/test_fused_gemm_a8w8_blockscale_a16w16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/fused/test_fused_gemm_a8w8_blockscale_a16w16.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/fused/test_fused_gemm_a8w8_blockscale_mul_add.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/fused/test_fused_gemm_a8w8_blockscale_mul_add.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/fused/test_fused_gemm_a8w8_blockscale_split_cat.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/fused/test_fused_gemm_a8w8_blockscale_split_cat.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/fused/test_fused_gemm_afp4wfp4_a16w16.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/fused/test_fused_gemm_afp4wfp4_a16w16.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/fused/test_fused_gemm_afp4wfp4_mul_add.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/fused/test_fused_gemm_afp4wfp4_mul_add.py) (`aiter_b3ad6c46`).
-- [op_tests/triton_tests/gemm/fused/test_fused_gemm_afp4wfp4_split_cat.py](https://github.com/ROCm/aiter/blob/b3ad6c461703110dc36286265c16e453ef0e2dd2/op_tests/triton_tests/gemm/fused/test_fused_gemm_afp4wfp4_split_cat.py) (`aiter_b3ad6c46`).
-
-## Sources
-
-- [Owned source observations](source_evidence.yaml)
-- [Owned cards and shared-card references](decisions.yaml)
+[Extraction limits](source_evidence.md#coverage-limits) · [Pinned test definitions (not test results)](source_evidence.md#upstream-correctness-references)

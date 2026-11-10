@@ -12,7 +12,7 @@ Define the same external boundary for baseline and candidate: prepared hidden st
 | Distributed-pipeline elapsed time | Completion including the specified communication and rank skew |
 | Serving throughput/latency | Workload effect after engagement, output correctness and comparable serving conditions are checked |
 
-For the [Muse Spark token-reuse example](cases/muse_spark_decode_dataflow.md), the 17 KiB versus 136 KiB input-representation comparison is arithmetic against a hypothetical expanded buffer. It supplies no measured speedup. Gate/up workgroups can read the reused input repeatedly; actual cache/traffic behavior requires measurement.
+The [Muse Spark storage example](cases/muse_spark_decode_dataflow.md#worked-storage-example) illustrates the first row: a hypothetical allocation comparison, with no measured traffic or speedup.
 
 ## A concrete evaluation protocol
 
@@ -22,6 +22,6 @@ For the [Muse Spark token-reuse example](cases/muse_spark_decode_dataflow.md), t
 4. For a workspace or scheduling change, retain the same semantic outputs and timing boundary. Inspect peak live storage and state lifetimes; account for extra events, launches or retained scratch. Verify graph replay and concurrent-call isolation when they are in scope.
 5. Inspect the caller and measure distributed completion before attributing any benefit to communication overlap. Recheck serving engagement, fallback coverage and end-to-end metrics before claiming a serving gain.
 
-Changes to representation, backend choice or overlap may preserve all five launches in the original source. Judge their measured complete-pipeline effect. Label an unimplemented experiment as proposed, a source observation as inspected, and historical measurements with their own evidence and environment.
+A change can preserve the launch count; judge its measured complete-pipeline effect. Use the [shared evidence vocabulary](../README.md#evidence-vocabulary) when reporting observations, proposals and measurements.
 
 Related: [general measurement guidance](../fusion_patterns.md#measure-the-chain-and-its-workload-contribution), [profiling](../../general/profile_bottleneck/README.md), [repository evidence contract](../../README.md#performance-evidence).

@@ -5,6 +5,25 @@ Workloads own composed computation and execution contracts; operators own consti
 reviewed Markdown document. A chain with reusable decisions owns `corpus/decisions.yaml` and its
 generated reading page; `knowledge/workload/CORPUS.md` indexes every registered case and decision.
 
+## Placement and naming
+
+Name a chain after its composed computation and external inputs/outputs. Reuse that owner when a new
+case has the same composition. Model, GPU, dtype, phase and backend belong in case metadata; split-K,
+launch counts and fusion schedules are implementation choices. For example, operator Q/K preparation
+owns the constituent kernel, while workload QKV preparation also includes projection and cache effects.
+Dated whole-model serving comparisons belong in `knowledge/top_model/`.
+
+Keep model-independent contracts and topic navigation in `<chain>/README.md`; add `dataflow.md`,
+`scheduling.md`, `dispatch.md` or `measurement.md` only when there is substantive shared content.
+Memory can stay with dataflow, communication with scheduling. Cases own source-specific details and
+may use a topic suffix such as `muse_spark_decode_dataflow.md`. Index each case in the chain README
+and catalog. The root workload README routes by semantics; generated `CORPUS.md` owns the case list.
+
+Use the [case template](../../knowledge/workload/_templates/workload_case.md) and optional
+[fusion supplement](../../knowledge/workload/_templates/fusion_case.md). Shared source context belongs
+under `_sources/`; repeated source descriptions and assessments should have one reading location.
+The renderer shares assessments only when every recorded reason, missing item and effect field agrees.
+
 ## Build and verify
 
 Python 3.10+ and the repository's PyYAML dependency are sufficient; no GPU stack is imported.
@@ -83,3 +102,12 @@ Public source indexes retain their existing schema 1 availability/verification c
 `kind: documentation` identifies upstream guides separately from executable source. Test references identify
 validation routes, not successful test runs. Raw profiles, private experiments and artifact locators
 remain in a private ledger. Update third-party attribution when adding another source provider.
+
+## Source-set schema 1
+
+Each `_sources/*.yaml` has `schema_version: 1`, `reviewed_on`, `evidence_kind`, `access` and `sources`.
+A source has `id`, `kind`, `availability`, `verification` and `supports`; public records additionally
+carry a `reference` URL pinned to a full Git commit. Use `public` / `source_linked` for those citations,
+and `private` / `curator_inspected` for existing private inspections. Neither establishes a measured
+winner. A private ID attributes inspection without making it publicly reproducible; keep private
+paths, hashes, raw reports and ID-to-artifact mappings in the private ledger.

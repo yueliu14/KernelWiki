@@ -16,4 +16,4 @@ Each row links to the exact configuration's dates, performance, CI commands and 
 | TEP8 conc8 / GPU | 2026-10-22 → 2026-10-30 | +62.91% | +2.86% | 0 | [Paths, bodies, fusion and CI](pairs/tep8_conc8_off_2026-10-22_to_2026-10-30.md) |
 | TEP8 conc16 / HiCache | 2026-10-16 → 2026-10-22 | +130.69% | +6.93% | 0 | [Paths, bodies, fusion and CI](pairs/tep8_conc16_on_2026-10-16_to_2026-10-22.md) |
 
-The older [adjacent-image CSV](data/point_comparisons.csv) remains a narrower view. [Structured pair records](data/pair_records.json) include all rows above. Kernel annotations are pinned to reviewed endpoint digests and configuration/CLI guards in [kernel_pair_rules.json](evidence/kernel_pair_rules.json); a new image requires a new source review.
+The older [adjacent-image CSV](data/point_comparisons.csv) remains a narrower view. [Structured pair records](data/pair_records.json) include all rows above. Kernel annotations are pinned to reviewed endpoint image/source identities and configuration/CLI guards in [kernel_pair_rules.json](evidence/kernel_pair_rules.json); a new image requires a new source review.
