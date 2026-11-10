@@ -4,6 +4,7 @@
 - [Workloads](workload/README.md): semantic subgraphs spanning multiple operators, with data contracts, scheduling, dispatch, memory/state, communication, fusion and whole-subgraph evidence.
 - [Workload fusion decisions](workload/CORPUS.md): model cases and reusable decisions for staged, persistent, megakernel and monokernel execution, with explicit source scope and effect confidence.
 - [General knowledge](general/README.md): profiling, optimization, backend programming, hardware and reusable recipes.
+- [DeepSeek-V4.1-Flash model history](top_model/deepseek_v41_flash/README.md): MI355X/vLLM image history, full configuration matrix, and 110 kernel/fusion pair records.
 - [Muse Spark model history](top_model/muse_spark/README.md): image-deduplicated MI355X/SGLang performance, CI provenance, and per-pair kernel/fusion evolution.
 - [Operator corpus](operator/CORPUS.md): structured development cards, pinned source evidence and configuration records.
 

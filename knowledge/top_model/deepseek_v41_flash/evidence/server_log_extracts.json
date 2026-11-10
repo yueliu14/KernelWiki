@@ -1,0 +1,1135 @@
+[
+  {
+    "version": 1,
+    "point_id": "441676",
+    "job_id": 103454471563,
+    "artifact_id": 10287797870,
+    "artifact_name": "server_logs_dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-a6b6d850b10bc1cf75ae",
+    "artifact_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/10287797870/zip",
+    "sha256": "168566bf5a74281b17f30560e7009ea580fc4c8ae309731bf5065913636468a5",
+    "entries": [
+      "results/benchmark.log",
+      "results/server.log"
+    ],
+    "extracts": [
+      {
+        "file": "results/server.log",
+        "line": 3,
+        "text": "INFO 09-11 23:38:40 [api_utils.py:347]  \u2584\u2584 \u2584\u2588 \u2588     \u2588     \u2588 \u2580\u2584\u2580 \u2588  version 0.28.1rc1.dev398+g79a7108d9"
+      },
+      {
+        "file": "results/server.log",
+        "line": 62,
+        "text": "(Worker pid=439645) INFO 09-11 23:40:05 [cuda_communicator.py:296] Using ['AITER_CUSTOM', 'PYNCCL'] all-reduce backends (in dispatch order) for group 'tp:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "results/server.log",
+        "line": 63,
+        "text": "(Worker pid=439645) INFO 09-11 23:40:06 [cuda_communicator.py:296] Using ['PYNCCL'] all-reduce backends (in dispatch order) for group 'ep:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "results/server.log",
+        "line": 67,
+        "text": "(Worker_TP0 pid=439645) INFO 09-11 23:40:07 [rocm.py:749] Using AITER Flash Attention backend for ViT model."
+      },
+      {
+        "file": "results/server.log",
+        "line": 68,
+        "text": "(Worker_TP0 pid=439645) INFO 09-11 23:40:07 [mm_encoder_attention.py:372] Using AttentionBackendEnum.ROCM_AITER_FA for MMEncoderAttention."
+      },
+      {
+        "file": "results/server.log",
+        "line": 72,
+        "text": "(Worker_TP0 pid=439645) INFO 09-11 23:40:07 [mxfp4.py:450] Using 'AITER_TRITON_MXFP4_BF16' Mxfp4 MoE backend."
+      },
+      {
+        "file": "results/server.log",
+        "line": 114,
+        "text": "(Worker_TP0 pid=439645) INFO 09-11 23:41:42 [mxfp4.py:1973] Using MoEPrepareAndFinalizeNoDPEPMonolithic"
+      },
+      {
+        "file": "results/server.log",
+        "line": 5187,
+        "text": "(Worker_TP0 pid=439645) INFO 09-11 23:42:45 [selector.py:194] Using ROCM_AITER_FA MLA prefill backend."
+      }
+    ],
+    "retrieved_at_utc": "2026-11-09T07:44:26.256223+00:00",
+    "matched_line_count_before_compaction": 1221,
+    "excerpt_selection": "Version, monokernel and backend initialization lines; duplicates normalized by PID/timestamp, first 100 retained. Full archives remain external.",
+    "exact_job_link_verified": true,
+    "job_artifact_link_evidence": [
+      {
+        "line": 13113,
+        "text": "2026-09-12T00:46:17.4501767Z Artifact download URL: https://github.com/SemiAnalysisAI/InferenceX/actions/runs/34657748450/artifacts/10287797870"
+      }
+    ]
+  },
+  {
+    "version": 2,
+    "point_id": "441916",
+    "job_id": 103622379771,
+    "artifact_id": 10305061016,
+    "artifact_name": "server_logs_dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-53d588214a6c3b796123",
+    "artifact_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/10305061016/zip",
+    "sha256": "b6ce82cb6075aa8ce55b2a335174d27fbf44418d0696d95b042625c2e07cce14",
+    "entries": [
+      "results/benchmark.log",
+      "results/server.log"
+    ],
+    "extracts": [
+      {
+        "file": "results/server.log",
+        "line": 3,
+        "text": "INFO 09-12 19:25:10 [api_utils.py:347]  \u2584\u2584 \u2584\u2588 \u2588     \u2588     \u2588 \u2580\u2584\u2580 \u2588  version 0.1.1.dev50+geed1f3d0c"
+      },
+      {
+        "file": "results/server.log",
+        "line": 88,
+        "text": "(Worker pid=1358682) INFO 09-12 19:26:19 [cuda_communicator.py:318] Using ['AITER_CUSTOM', 'PYNCCL'] all-reduce backends (in dispatch order) for group 'tp:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "results/server.log",
+        "line": 89,
+        "text": "(Worker pid=1358682) INFO 09-12 19:26:20 [cuda_communicator.py:318] Using ['PYNCCL'] all-reduce backends (in dispatch order) for group 'ep:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "results/server.log",
+        "line": 93,
+        "text": "(Worker_TP0 pid=1358682) INFO 09-12 19:26:21 [rocm.py:754] Using AITER Flash Attention backend for ViT model."
+      },
+      {
+        "file": "results/server.log",
+        "line": 94,
+        "text": "(Worker_TP0 pid=1358682) INFO 09-12 19:26:21 [mm_encoder_attention.py:372] Using AttentionBackendEnum.ROCM_AITER_FA for MMEncoderAttention."
+      },
+      {
+        "file": "results/server.log",
+        "line": 98,
+        "text": "(Worker_TP0 pid=1358682) INFO 09-12 19:26:21 [mxfp4.py:453] Using 'AITER_MXFP4_BF16' Mxfp4 MoE backend."
+      },
+      {
+        "file": "results/server.log",
+        "line": 2225,
+        "text": "(Worker_TP0 pid=1358682) INFO 09-12 19:32:39 [rocm_aiter_mla_sparse.py:55] Using AITER OPUS for large sparse MLA prefill on gfx950"
+      }
+    ],
+    "retrieved_at_utc": "2026-11-09T07:44:26.272864+00:00",
+    "matched_line_count_before_compaction": 3530,
+    "excerpt_selection": "Version, monokernel and backend initialization lines; duplicates normalized by PID/timestamp, first 100 retained. Full archives remain external.",
+    "exact_job_link_verified": true,
+    "job_artifact_link_evidence": [
+      {
+        "line": 4784,
+        "text": "2026-09-12T20:34:43.7700910Z Artifact download URL: https://github.com/SemiAnalysisAI/InferenceX/actions/runs/34710937012/artifacts/10305061016"
+      }
+    ]
+  },
+  {
+    "version": 3,
+    "point_id": "442953",
+    "job_id": 106807089184,
+    "artifact_id": 10695488447,
+    "artifact_name": "server_logs_dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-1acdc1220c1a7374f770",
+    "artifact_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/10695488447/zip",
+    "sha256": "80db1de7d04fc659eb2af6288c35deb87fd1a63a6aca763410380b9319a1de1d",
+    "entries": [
+      "results/benchmark.log",
+      "results/server.log"
+    ],
+    "extracts": [
+      {
+        "file": "results/server.log",
+        "line": 3,
+        "text": "INFO 09-22 12:00:02 [api_utils.py:347]  \u2584\u2584 \u2584\u2588 \u2588     \u2588     \u2588 \u2580\u2584\u2580 \u2588  version 0.3.1.dev190+g3df4ae153"
+      },
+      {
+        "file": "results/server.log",
+        "line": 144,
+        "text": "(Worker pid=1800753) INFO 09-22 12:01:08 [cuda_communicator.py:326] Using ['AITER_CUSTOM', 'PYNCCL'] all-reduce backends (in dispatch order) for group 'tp:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "results/server.log",
+        "line": 145,
+        "text": "(Worker pid=1800753) INFO 09-22 12:01:08 [cuda_communicator.py:326] Using ['PYNCCL'] all-reduce backends (in dispatch order) for group 'ep:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "results/server.log",
+        "line": 149,
+        "text": "(Worker_TP0 pid=1800753) INFO 09-22 12:01:10 [rocm.py:757] Using AITER Flash Attention backend for ViT model."
+      },
+      {
+        "file": "results/server.log",
+        "line": 150,
+        "text": "(Worker_TP0 pid=1800753) INFO 09-22 12:01:10 [mm_encoder_attention.py:372] Using AttentionBackendEnum.ROCM_AITER_FA for MMEncoderAttention."
+      },
+      {
+        "file": "results/server.log",
+        "line": 154,
+        "text": "(Worker_TP0 pid=1800753) INFO 09-22 12:01:10 [mxfp4.py:462] Using 'AITER_MXFP4_BF16' Mxfp4 MoE backend."
+      },
+      {
+        "file": "results/server.log",
+        "line": 2932,
+        "text": "(Worker_TP0 pid=1800753) INFO 09-22 12:07:06 [rocm_aiter_mla_sparse.py:57] Using AITER OPUS for large sparse MLA prefill on gfx950"
+      }
+    ],
+    "retrieved_at_utc": "2026-11-09T07:44:25.797499+00:00",
+    "matched_line_count_before_compaction": 4209,
+    "excerpt_selection": "Version, monokernel and backend initialization lines; duplicates normalized by PID/timestamp, first 100 retained. Full archives remain external.",
+    "exact_job_link_verified": true,
+    "job_artifact_link_evidence": [
+      {
+        "line": 5710,
+        "text": "2026-09-22T13:08:59.2512781Z Artifact download URL: https://github.com/SemiAnalysisAI/InferenceX/actions/runs/35696055681/artifacts/10695488447"
+      }
+    ]
+  },
+  {
+    "version": 4,
+    "point_id": "443092",
+    "job_id": 107511594382,
+    "artifact_id": 10794827583,
+    "artifact_name": "server_logs_dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-f99f56fd9e91c0a78f35",
+    "artifact_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/10794827583/zip",
+    "sha256": "457643327c678d0b8114ed4dc7e854766733ff569d217e86e2eea928d8fced44",
+    "entries": [
+      "results/benchmark.log",
+      "results/server.log"
+    ],
+    "extracts": [
+      {
+        "file": "results/server.log",
+        "line": 3,
+        "text": "INFO 09-24 05:55:24 [api_utils.py:347]  \u2584\u2584 \u2584\u2588 \u2588     \u2588     \u2588 \u2580\u2584\u2580 \u2588  version 0.30.1rc1.dev48+g7f1a5398e"
+      },
+      {
+        "file": "results/server.log",
+        "line": 140,
+        "text": "(Worker pid=3173093) INFO 09-24 05:56:28 [cuda_communicator.py:326] Using ['AITER_CUSTOM', 'PYNCCL'] all-reduce backends (in dispatch order) for group 'tp:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "results/server.log",
+        "line": 141,
+        "text": "(Worker pid=3173093) INFO 09-24 05:56:28 [cuda_communicator.py:326] Using ['PYNCCL'] all-reduce backends (in dispatch order) for group 'ep:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "results/server.log",
+        "line": 147,
+        "text": "(Worker_TP0 pid=3173093) INFO 09-24 05:56:30 [rocm.py:843] Using AITER Flash Attention backend for ViT model."
+      },
+      {
+        "file": "results/server.log",
+        "line": 148,
+        "text": "(Worker_TP0 pid=3173093) INFO 09-24 05:56:30 [mm_encoder_attention.py:372] Using AttentionBackendEnum.ROCM_AITER_FA for MMEncoderAttention."
+      },
+      {
+        "file": "results/server.log",
+        "line": 152,
+        "text": "(Worker_TP0 pid=3173093) INFO 09-24 05:56:30 [mxfp4.py:462] Using 'AITER_MXFP4_BF16' Mxfp4 MoE backend."
+      },
+      {
+        "file": "results/server.log",
+        "line": 2934,
+        "text": "(Worker_TP0 pid=3173093) INFO 09-24 06:03:54 [rocm_aiter_mla_sparse.py:57] Using AITER OPUS for large sparse MLA prefill on gfx950"
+      }
+    ],
+    "retrieved_at_utc": "2026-11-09T07:44:26.134319+00:00",
+    "matched_line_count_before_compaction": 4259,
+    "excerpt_selection": "Version, monokernel and backend initialization lines; duplicates normalized by PID/timestamp, first 100 retained. Full archives remain external.",
+    "exact_job_link_verified": true,
+    "job_artifact_link_evidence": [
+      {
+        "line": 5924,
+        "text": "2026-09-24T07:05:32.1822841Z Artifact download URL: https://github.com/SemiAnalysisAI/InferenceX/actions/runs/35961603828/artifacts/10794827583"
+      }
+    ]
+  },
+  {
+    "version": 5,
+    "point_id": "443186",
+    "job_id": 108126783553,
+    "artifact_id": 10853459571,
+    "artifact_name": "server_logs_dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-0249623dbb5b045f5a0a",
+    "artifact_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/10853459571/zip",
+    "sha256": "e502cc108951cf460be7f362fbe5612f5f1ac9618df5306f4a3111245b4479ad",
+    "entries": [
+      "results/benchmark.log",
+      "results/server.log"
+    ],
+    "extracts": [
+      {
+        "file": "results/server.log",
+        "line": 3,
+        "text": "INFO 09-25 07:27:52 [api_utils.py:347]  \u2584\u2584 \u2584\u2588 \u2588     \u2588     \u2588 \u2580\u2584\u2580 \u2588  version 0.30.1rc1.dev143+g29468dde8"
+      },
+      {
+        "file": "results/server.log",
+        "line": 140,
+        "text": "(Worker pid=3113136) INFO 09-25 07:28:56 [cuda_communicator.py:326] Using ['AITER_CUSTOM', 'PYNCCL'] all-reduce backends (in dispatch order) for group 'tp:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "results/server.log",
+        "line": 141,
+        "text": "(Worker pid=3113136) INFO 09-25 07:28:57 [cuda_communicator.py:326] Using ['PYNCCL'] all-reduce backends (in dispatch order) for group 'ep:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "results/server.log",
+        "line": 146,
+        "text": "(Worker_TP0 pid=3113136) INFO 09-25 07:28:59 [rocm.py:843] Using AITER Flash Attention backend for ViT model."
+      },
+      {
+        "file": "results/server.log",
+        "line": 147,
+        "text": "(Worker_TP0 pid=3113136) INFO 09-25 07:28:59 [mm_encoder_attention.py:372] Using AttentionBackendEnum.ROCM_AITER_FA for MMEncoderAttention."
+      },
+      {
+        "file": "results/server.log",
+        "line": 151,
+        "text": "(Worker_TP0 pid=3113136) INFO 09-25 07:28:59 [mxfp4.py:462] Using 'AITER_MXFP4_BF16' Mxfp4 MoE backend."
+      },
+      {
+        "file": "results/server.log",
+        "line": 2930,
+        "text": "(Worker_TP0 pid=3113136) INFO 09-25 07:36:10 [rocm_aiter_mla_sparse.py:57] Using AITER OPUS for large sparse MLA prefill on gfx950"
+      }
+    ],
+    "retrieved_at_utc": "2026-11-09T07:44:26.387973+00:00",
+    "matched_line_count_before_compaction": 4274,
+    "excerpt_selection": "Version, monokernel and backend initialization lines; duplicates normalized by PID/timestamp, first 100 retained. Full archives remain external.",
+    "exact_job_link_verified": true,
+    "job_artifact_link_evidence": [
+      {
+        "line": 5934,
+        "text": "2026-09-25T08:37:50.8873413Z Artifact download URL: https://github.com/SemiAnalysisAI/InferenceX/actions/runs/36101751233/artifacts/10853459571"
+      }
+    ]
+  },
+  {
+    "version": 6,
+    "point_id": "443863",
+    "job_id": 110486252222,
+    "artifact_id": 11185533719,
+    "artifact_name": "server_logs_dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-860e4098933fd8b18952",
+    "artifact_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/11185533719/zip",
+    "sha256": "27b900b21bcff45453a981ebf69980fd97e7220004542a3218e15afd1d57af60",
+    "entries": [
+      "srt-single-node-logs.tar.gz",
+      "srt-single-node-logs.tar.gz:.",
+      "srt-single-node-logs.tar.gz:./47167.json",
+      "srt-single-node-logs.tar.gz:./config.yaml",
+      "srt-single-node-logs.tar.gz:./config_tp4_c1.yaml",
+      "srt-single-node-logs.tar.gz:./logs",
+      "srt-single-node-logs.tar.gz:./logs/47167.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic",
+      "srt-single-node-logs.tar.gz:./logs/agentic/agentic_power_timezone_offset.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/agentic_power_window.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/logs",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/logs/aiperf.log",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export.jsonl",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf_timeslices.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf_timeslices.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_console.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/server_metrics_export.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/server_metrics_export.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/benchmark.log",
+      "srt-single-node-logs.tar.gz:./logs/agentic/benchmark_command.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/gpu_metrics.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/gpu_metrics_energy_end.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/gpu_metrics_energy_start.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/gpu_metrics_identity.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/metrics_plots.png",
+      "srt-single-node-logs.tar.gz:./logs/agentic/power_validation.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/workload_distribution_plots.png",
+      "srt-single-node-logs.tar.gz:./logs/agentic/workload_distribution_summary.txt",
+      "srt-single-node-logs.tar.gz:./logs/benchmark.out",
+      "srt-single-node-logs.tar.gz:./logs/config.yaml",
+      "srt-single-node-logs.tar.gz:./logs/config_tp4_c1.yaml",
+      "srt-single-node-logs.tar.gz:./logs/dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-860e4098933fd8b18952.json",
+      "srt-single-node-logs.tar.gz:./logs/fingerprint_agg_w0.json",
+      "srt-single-node-logs.tar.gz:./logs/host_setup_mia1-p01-g31.out",
+      "srt-single-node-logs.tar.gz:./logs/mia1-p01-g31_agg_w0.out",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard.html",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard.json",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle/benchmark_status.json",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle/config.yaml",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle/dashboard.yaml",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle/fingerprint_agg_w0.json",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle/log_signals.json",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle/profile_export.jsonl",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle/resource_snapshot.json",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle/run_lifecycle.json",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle/server_metrics_export.jsonl",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle/spans",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle/spans/benchmark.spans",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle/spans/host_setup_mia1-p01-g31.spans",
+      "srt-single-node-logs.tar.gz:./logs/perf_dashboard_bundle/spans/mia1-p01-g31_agg_w0.spans",
+      "srt-single-node-logs.tar.gz:./logs/resource_snapshot.json",
+      "srt-single-node-logs.tar.gz:./logs/sbatch_script.sh",
+      "srt-single-node-logs.tar.gz:./logs/server_ready.json",
+      "srt-single-node-logs.tar.gz:./logs/sweep_47167.log",
+      "srt-single-node-logs.tar.gz:./recipe.lock.yaml",
+      "srt-single-node-logs.tar.gz:./sbatch_script.sh",
+      "srt-single-node-submission.json",
+      "srt-slurm-sha.txt",
+      "results/benchmark.log",
+      "srt-setup.log"
+    ],
+    "extracts": [
+      {
+        "file": "./logs/mia1-p01-g31_agg_w0.out",
+        "line": 5,
+        "text": "(MainProcess pid=1036167) INFO 10-01 17:36:15 [api_utils.py:347]  \u2584\u2584 \u2584\u2588 \u2588     \u2588     \u2588 \u2580\u2584\u2580 \u2588  version 0.30.1rc1.dev493+gac9126e58"
+      },
+      {
+        "file": "./logs/mia1-p01-g31_agg_w0.out",
+        "line": 142,
+        "text": "(Worker pid=1038121) INFO 10-01 17:37:18 [cuda_communicator.py:326] Using ['AITER_CUSTOM', 'PYNCCL'] all-reduce backends (in dispatch order) for group 'tp:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "./logs/mia1-p01-g31_agg_w0.out",
+        "line": 143,
+        "text": "(Worker pid=1038121) INFO 10-01 17:37:19 [cuda_communicator.py:326] Using ['PYNCCL'] all-reduce backends (in dispatch order) for group 'ep:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "./logs/mia1-p01-g31_agg_w0.out",
+        "line": 149,
+        "text": "(Worker_TP0 pid=1038121) INFO 10-01 17:37:21 [rocm.py:843] Using AITER Flash Attention backend for ViT model."
+      },
+      {
+        "file": "./logs/mia1-p01-g31_agg_w0.out",
+        "line": 150,
+        "text": "(Worker_TP0 pid=1038121) INFO 10-01 17:37:21 [mm_encoder_attention.py:372] Using AttentionBackendEnum.ROCM_AITER_FA for MMEncoderAttention."
+      },
+      {
+        "file": "./logs/mia1-p01-g31_agg_w0.out",
+        "line": 155,
+        "text": "(Worker_TP0 pid=1038121) INFO 10-01 17:37:21 [mxfp4.py:462] Using 'AITER_MXFP4_BF16' Mxfp4 MoE backend."
+      }
+    ],
+    "retrieved_at_utc": "2026-11-09T07:44:27.903788+00:00",
+    "matched_line_count_before_compaction": 4387,
+    "excerpt_selection": "Version, monokernel and backend initialization lines; duplicates normalized by PID/timestamp, first 100 retained. Full archives remain external.",
+    "exact_job_link_verified": true,
+    "job_artifact_link_evidence": [
+      {
+        "line": 1903,
+        "text": "2026-10-01T18:50:09.1112292Z Artifact download URL: https://github.com/SemiAnalysisAI/InferenceX/actions/runs/36824408313/artifacts/11185533719"
+      }
+    ]
+  },
+  {
+    "version": 7,
+    "point_id": "444507",
+    "job_id": 114309765306,
+    "artifact_id": 11664426587,
+    "artifact_name": "server_logs_dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-7f8520f42cb613eb7011",
+    "artifact_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/11664426587/zip",
+    "sha256": "81ab5cb02937bb76661070b74173f580e3eca107e9fb3c4b54207bdef7c23561",
+    "entries": [
+      "results/benchmark.log",
+      "srt-single-node-logs.tar.gz",
+      "srt-single-node-logs.tar.gz:.",
+      "srt-single-node-logs.tar.gz:./48260.json",
+      "srt-single-node-logs.tar.gz:./config.yaml",
+      "srt-single-node-logs.tar.gz:./config_tp4_c1.yaml",
+      "srt-single-node-logs.tar.gz:./logs",
+      "srt-single-node-logs.tar.gz:./logs/48260.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/logs",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/logs/aiperf.log",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export.jsonl",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf_timeslices.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf_timeslices.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_console.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/server_metrics_export.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/server_metrics_export.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/benchmark.log",
+      "srt-single-node-logs.tar.gz:./logs/agentic/benchmark_command.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/workload_distribution_summary.txt",
+      "srt-single-node-logs.tar.gz:./logs/benchmark.out",
+      "srt-single-node-logs.tar.gz:./logs/config.yaml",
+      "srt-single-node-logs.tar.gz:./logs/config_tp4_c1.yaml",
+      "srt-single-node-logs.tar.gz:./logs/dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-7f8520f42cb613eb7011.json",
+      "srt-single-node-logs.tar.gz:./logs/fingerprint_agg_w0.json",
+      "srt-single-node-logs.tar.gz:./logs/host_setup_mia1-p01-g37.out",
+      "srt-single-node-logs.tar.gz:./logs/mia1-p01-g37_agg_w0.out",
+      "srt-single-node-logs.tar.gz:./logs/resource_snapshot.json",
+      "srt-single-node-logs.tar.gz:./logs/sbatch_script.sh",
+      "srt-single-node-logs.tar.gz:./logs/server_ready.json",
+      "srt-single-node-logs.tar.gz:./logs/sweep_48260.log",
+      "srt-single-node-logs.tar.gz:./recipe.lock.yaml",
+      "srt-single-node-logs.tar.gz:./sbatch_script.sh",
+      "srt-single-node-submission.json",
+      "srt-slurm-sha.txt",
+      "srt-setup.log"
+    ],
+    "extracts": [
+      {
+        "file": "./logs/mia1-p01-g37_agg_w0.out",
+        "line": 5,
+        "text": "(MainProcess pid=2788220) INFO 10-10 06:35:37 [api_utils.py:347]  \u2584\u2584 \u2584\u2588 \u2588     \u2588     \u2588 \u2580\u2584\u2580 \u2588  version 0.31.1rc1.dev253+g7d0b4e57a"
+      },
+      {
+        "file": "./logs/mia1-p01-g37_agg_w0.out",
+        "line": 140,
+        "text": "(Worker pid=2790454) INFO 10-10 06:36:40 [cuda_communicator.py:353] Using ['QUICK_REDUCE', 'AITER_CUSTOM', 'PYNCCL'] all-reduce backends (in dispatch order) for group 'tp:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "./logs/mia1-p01-g37_agg_w0.out",
+        "line": 141,
+        "text": "(Worker pid=2790454) INFO 10-10 06:36:40 [cuda_communicator.py:353] Using ['PYNCCL'] all-reduce backends (in dispatch order) for group 'ep:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "./logs/mia1-p01-g37_agg_w0.out",
+        "line": 145,
+        "text": "(Worker_TP0 pid=2790454) INFO 10-10 06:36:42 [rocm.py:886] Using AITER Flash Attention backend for ViT model."
+      },
+      {
+        "file": "./logs/mia1-p01-g37_agg_w0.out",
+        "line": 146,
+        "text": "(Worker_TP0 pid=2790454) INFO 10-10 06:36:42 [mm_encoder_attention.py:372] Using AttentionBackendEnum.ROCM_AITER_FA for MMEncoderAttention."
+      },
+      {
+        "file": "./logs/mia1-p01-g37_agg_w0.out",
+        "line": 151,
+        "text": "(Worker_TP0 pid=2790454) INFO 10-10 06:36:42 [mxfp4.py:540] Using 'AITER_MXFP4_BF16' Mxfp4 MoE backend."
+      },
+      {
+        "file": "./logs/mia1-p01-g37_agg_w0.out",
+        "line": 152,
+        "text": "(Worker_TP0 pid=2790454) INFO 10-10 06:36:43 [mono_decode.py:187] DSv4.1 mono decode: the FFN launch for layers with compress ratio 0"
+      },
+      {
+        "file": "./logs/mia1-p01-g37_agg_w0.out",
+        "line": 153,
+        "text": "(Worker_TP0 pid=2790454) INFO 10-10 06:36:43 [mono_decode.py:187] DSv4.1 mono decode: the FFN launch for layers with Engram"
+      },
+      {
+        "file": "./logs/mia1-p01-g37_agg_w0.out",
+        "line": 155,
+        "text": "(Worker_TP0 pid=2790454) INFO 10-10 06:36:43 [mono_decode.py:187] DSv4.1 mono decode: the FFN launch for layers with a compressor / indexer"
+      },
+      {
+        "file": "./logs/mia1-p01-g37_agg_w0.out",
+        "line": 156,
+        "text": "(Worker_TP0 pid=2790454) INFO 10-10 06:36:43 [mono_decode.py:191] DSv4.1 mono decode: the whole standard backbone layers"
+      },
+      {
+        "file": "./logs/mia1-p01-g37_agg_w0.out",
+        "line": 283,
+        "text": "(Worker_TP0 pid=2790454) INFO 10-10 06:39:05 [mono_decode.py:175] DSv4.1 mono decode off for some layers: draft layer"
+      },
+      {
+        "file": "./logs/mia1-p01-g37_agg_w0.out",
+        "line": 1207,
+        "text": "(Worker_TP0 pid=2790454) INFO 10-10 06:40:36 [mono_decode.py:372] DSv4.1 mono decode FFN launch active (decode steps of <= 48 rows)"
+      },
+      {
+        "file": "./logs/mia1-p01-g37_agg_w0.out",
+        "line": 1212,
+        "text": "(Worker_TP0 pid=2790454) INFO 10-10 06:40:40 [mono_decode.py:329] DSv4.1 mono decode layer active (decode steps of <= 48 rows)"
+      },
+      {
+        "file": "./logs/sweep_48260.log",
+        "line": 119,
+        "text": "2026-10-10 06:34:05 [INFO] Env: AITER_TRITON_LOG_LEVEL=ERROR DYN_VLLM_KV_EVENT_PORT=5200 HEAD_NODE_IP=10.24.112.125 OMP_NUM_THREADS=1 PYTHONUNBUFFERED=1 VLLM_ENGINE_READY_TIMEOUT_S=3600 VLLM_NIXL_SIDE_CHANNEL_HOST=10.24.112.125 VLLM_NIXL_SIDE_CHANNEL_PORT=5400 VLLM_PORT=20000 VLLM_ROCM_MONO_DECODE=1 VLLM_ROCM_QUICK_REDUCE_QUANTIZATION=INT4 VLLM_ROCM_USE_AITER=1 VLLM_ROCM_USE_AITER_MOE=1 VLLM_ROCM_USE_AITER_TRITON_SPARSE_MLA=True VLLM_USE_BREAKABLE_CUDAGRAPH=1 VLLM_USE_RUST_FRONTEND=1"
+      }
+    ],
+    "retrieved_at_utc": "2026-11-09T07:44:26.990372+00:00",
+    "matched_line_count_before_compaction": 4582,
+    "excerpt_selection": "Version, monokernel and backend initialization lines; duplicates normalized by PID/timestamp, first 100 retained. Full archives remain external.",
+    "exact_job_link_verified": true,
+    "job_artifact_link_evidence": [
+      {
+        "line": 1752,
+        "text": "2026-10-10T07:52:04.7878823Z Artifact download URL: https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38028752236/artifacts/11664426587"
+      }
+    ]
+  },
+  {
+    "version": 8,
+    "point_id": "444711",
+    "job_id": 115357512709,
+    "artifact_id": 11836295860,
+    "artifact_name": "server_logs_dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-6e6b678bfaca1e81bca9",
+    "artifact_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/11836295860/zip",
+    "sha256": "a4170daa9e50b3be383292a60f013210f847f2a0607dc7aeb8e69c1c08005960",
+    "entries": [
+      "srt-single-node-logs.tar.gz",
+      "srt-single-node-logs.tar.gz:.",
+      "srt-single-node-logs.tar.gz:./48714.json",
+      "srt-single-node-logs.tar.gz:./config.yaml",
+      "srt-single-node-logs.tar.gz:./config_tp4_c1.yaml",
+      "srt-single-node-logs.tar.gz:./logs",
+      "srt-single-node-logs.tar.gz:./logs/48714.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/logs",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/logs/aiperf.log",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export.jsonl",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf_timeslices.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf_timeslices.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_console.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/server_metrics_export.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/server_metrics_export.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/benchmark.log",
+      "srt-single-node-logs.tar.gz:./logs/agentic/benchmark_command.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/workload_distribution_summary.txt",
+      "srt-single-node-logs.tar.gz:./logs/benchmark.out",
+      "srt-single-node-logs.tar.gz:./logs/config.yaml",
+      "srt-single-node-logs.tar.gz:./logs/config_tp4_c1.yaml",
+      "srt-single-node-logs.tar.gz:./logs/dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-6e6b678bfaca1e81bca9.json",
+      "srt-single-node-logs.tar.gz:./logs/fingerprint_agg_w0.json",
+      "srt-single-node-logs.tar.gz:./logs/host_setup_mia1-p01-g14.out",
+      "srt-single-node-logs.tar.gz:./logs/mia1-p01-g14_agg_w0.out",
+      "srt-single-node-logs.tar.gz:./logs/resource_snapshot.json",
+      "srt-single-node-logs.tar.gz:./logs/sbatch_script.sh",
+      "srt-single-node-logs.tar.gz:./logs/server_ready.json",
+      "srt-single-node-logs.tar.gz:./logs/sweep_48714.log",
+      "srt-single-node-logs.tar.gz:./recipe.lock.yaml",
+      "srt-single-node-logs.tar.gz:./sbatch_script.sh",
+      "results/benchmark.log",
+      "srt-slurm-sha.txt",
+      "srt-single-node-submission.json",
+      "srt-setup.log"
+    ],
+    "extracts": [
+      {
+        "file": "./logs/mia1-p01-g14_agg_w0.out",
+        "line": 5,
+        "text": "(MainProcess pid=3968914) INFO 10-13 16:25:27 [api_utils.py:347]  \u2584\u2584 \u2584\u2588 \u2588     \u2588     \u2588 \u2580\u2584\u2580 \u2588  version 0.31.1rc1.dev376+g5555a2d8f"
+      },
+      {
+        "file": "./logs/mia1-p01-g14_agg_w0.out",
+        "line": 9,
+        "text": "(MainProcess pid=3968914) INFO 10-13 16:25:27 [api_utils.py:286] non-default args: {'model_tag': 'deepseek-ai/DeepSeek-V4.1-Flash', 'api_server_count': 1, 'enable_auto_tool_choice': True, 'tool_call_parser': 'deepseek_v41', 'host': '0.0.0.0', 'disable_uvicorn_access_log': True, 'model': 'deepseek-ai/DeepSeek-V4.1-Flash', 'tokenizer_mode': 'deepseek_v41', 'max_model_len': 1048576, 'served_model_name': ['deepseek-ai/DeepSeek-V4.1-Flash'], 'reasoning_parser': 'deepseek_v41', 'device_ids': [0, 1, 2, 3], 'tensor_parallel_size': 4, 'block_size': 128, 'gpu_memory_utilization': 0.9, 'language_model_only': True, 'max_num_batched_tokens': 16384, 'max_cudagraph_capture_size': 1024, 'monokernel': True, 'moe_backend': 'aiter', 'speculative_config': {'method': 'dspark', 'num_speculative_tokens': 5, 'draft_sample_method': 'probabilistic', 'rejection_sample_method': 'synthetic', 'enable_adaptive_verification': False, 'synthetic_acceptance_length': 3.51}, 'attention_config': AttentionConfig(backend=None, minimax_m3_msa_decode_backend='triton', backend_per_kind={}, flash_attn_version=None, flash_attn_max_num_splits_for_cuda_graph=32, tokenspeed_mla_min_split_kv=1, tq_max_kv_splits_for_cuda_graph=32, use_trtllm_attention=None, disable_flashinfer_q_quantization=False, mla_prefill_backend=None, use_prefill_query_quantization=False, indexer_kv_dtype='mxfp4', indexer_sparse_logits=True, hisparse_config=None, use_non_causal=False, sparse_mla_force_mqa=False, sparse_mla_prefill_workspace_factor=None, flex_attn_block_m=None, flex_attn_block_n=None, flex_attn_q_block_size=None, flex_attn_kv_block_size=None), 'engram_config': EngramConfig(cpu_offload=False, embedding_across_dp=False, dp_shared_memory=None, use_thp=False)}"
+      },
+      {
+        "file": "./logs/mia1-p01-g14_agg_w0.out",
+        "line": 140,
+        "text": "(Worker pid=3971572) INFO 10-13 16:26:33 [cuda_communicator.py:353] Using ['QUICK_REDUCE', 'AITER_CUSTOM', 'PYNCCL'] all-reduce backends (in dispatch order) for group 'tp:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "./logs/mia1-p01-g14_agg_w0.out",
+        "line": 141,
+        "text": "(Worker pid=3971572) INFO 10-13 16:26:33 [cuda_communicator.py:353] Using ['PYNCCL'] all-reduce backends (in dispatch order) for group 'ep:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "./logs/mia1-p01-g14_agg_w0.out",
+        "line": 145,
+        "text": "(Worker_TP0 pid=3971572) INFO 10-13 16:26:35 [rocm.py:886] Using AITER Flash Attention backend for ViT model."
+      },
+      {
+        "file": "./logs/mia1-p01-g14_agg_w0.out",
+        "line": 146,
+        "text": "(Worker_TP0 pid=3971572) INFO 10-13 16:26:35 [mm_encoder_attention.py:372] Using AttentionBackendEnum.ROCM_AITER_FA for MMEncoderAttention."
+      },
+      {
+        "file": "./logs/mia1-p01-g14_agg_w0.out",
+        "line": 151,
+        "text": "(Worker_TP0 pid=3971572) INFO 10-13 16:26:35 [mxfp4.py:540] Using 'AITER_MXFP4_BF16' Mxfp4 MoE backend."
+      },
+      {
+        "file": "./logs/mia1-p01-g14_agg_w0.out",
+        "line": 152,
+        "text": "(Worker_TP0 pid=3971572) INFO 10-13 16:26:35 [mono_decode.py:226] DSv4.1 mono decode: the whole standard backbone layers"
+      },
+      {
+        "file": "./logs/mia1-p01-g14_agg_w0.out",
+        "line": 272,
+        "text": "(Worker_TP0 pid=3971572) INFO 10-13 16:28:49 [mono_decode.py:205] DSv4.1 mono decode off for some layers: draft layer"
+      },
+      {
+        "file": "./logs/mia1-p01-g14_agg_w0.out",
+        "line": 1199,
+        "text": "(Worker_TP0 pid=3971572) INFO 10-13 16:30:21 [mono_decode.py:367] DSv4.1 mono decode layer active (decode steps of <= 48 rows)"
+      },
+      {
+        "file": "./logs/sweep_48714.log",
+        "line": 120,
+        "text": "2026-10-13 16:23:19 [INFO] Command: vllm serve deepseek-ai/DeepSeek-V4.1-Flash --host 0.0.0.0 --port 8000 --device-ids 0,1,2,3 --attention-config '{\"indexer_kv_dtype\":\"mxfp4\",\"indexer_sparse_logits\":true}' --block-size 128 --disable-uvicorn-access-log --enable-auto-tool-choice --engram-config '{\"cpu_offload\":false}' --gpu-memory-utilization 0.9 --language-model-only --max-cudagraph-capture-size 1024 --max-model-len 1048576 --max-num-batched-tokens 16384 --moe-backend aiter --monokernel --reasoning-parser deepseek_v41 --served-model-name deepseek-ai/DeepSeek-V4.1-Flash --speculative-config '{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"draft_sample_method\": \"probabilistic\", \"rejection_sample_method\": \"synthetic\", \"enable_adaptive_verification\": false, \"synthetic_acceptance_length\": 3.51}' --tensor-parallel-size 4 --tokenizer-mode deepseek_v41 --tool-call-parser deepseek_v41"
+      }
+    ],
+    "retrieved_at_utc": "2026-11-09T07:44:27.374545+00:00",
+    "matched_line_count_before_compaction": 4632,
+    "excerpt_selection": "Version, monokernel and backend initialization lines; duplicates normalized by PID/timestamp, first 100 retained. Full archives remain external.",
+    "exact_job_link_verified": true,
+    "job_artifact_link_evidence": [
+      {
+        "line": 1722,
+        "text": "2026-10-13T17:48:31.1990777Z Artifact download URL: https://github.com/SemiAnalysisAI/InferenceX/actions/runs/38377181342/artifacts/11836295860"
+      }
+    ]
+  },
+  {
+    "version": 8,
+    "point_id": "444711",
+    "job_id": 115357512709,
+    "artifact_id": 11824375132,
+    "artifact_name": "server_logs_dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-6e6b678bfaca1e81bca9",
+    "artifact_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/11824375132/zip",
+    "sha256": "793ab2dcada4e7baa8dcd19c14ef897194b676a8dc8af9aa7dea44973d8abb09",
+    "entries": [
+      "srt-single-node-submission.json",
+      "srt-setup.log",
+      "srt-slurm-sha.txt"
+    ],
+    "extracts": [],
+    "retrieved_at_utc": "2026-11-09T07:44:26.990683+00:00",
+    "matched_line_count_before_compaction": 0,
+    "excerpt_selection": "Version, monokernel and backend initialization lines; duplicates normalized by PID/timestamp, first 100 retained. Full archives remain external.",
+    "exact_job_link_verified": false,
+    "job_artifact_link_evidence": []
+  },
+  {
+    "version": 8,
+    "point_id": "444711",
+    "job_id": 115357512709,
+    "artifact_id": 11808390469,
+    "artifact_name": "server_logs_dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-4d5cacb7552cf0389e74",
+    "artifact_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/11808390469/zip",
+    "sha256": "78e31c706c3035623308bb6fdff74c3280efa913f24c7eb5b4fcaf379a9219e9",
+    "entries": [
+      "srt-single-node-logs.tar.gz",
+      "srt-single-node-logs.tar.gz:.",
+      "srt-single-node-logs.tar.gz:./48686.json",
+      "srt-single-node-logs.tar.gz:./config.yaml",
+      "srt-single-node-logs.tar.gz:./config_tp4_c1.yaml",
+      "srt-single-node-logs.tar.gz:./logs",
+      "srt-single-node-logs.tar.gz:./logs/48686.json",
+      "srt-single-node-logs.tar.gz:./logs/config.yaml",
+      "srt-single-node-logs.tar.gz:./logs/config_tp4_c1.yaml",
+      "srt-single-node-logs.tar.gz:./logs/host_setup_mia1-p01-g19.out",
+      "srt-single-node-logs.tar.gz:./logs/resource_snapshot.json",
+      "srt-single-node-logs.tar.gz:./logs/sbatch_script.sh",
+      "srt-single-node-logs.tar.gz:./logs/sweep_48686.log",
+      "srt-single-node-logs.tar.gz:./recipe.lock.yaml",
+      "srt-single-node-logs.tar.gz:./sbatch_script.sh",
+      "srt-setup.log",
+      "srt-single-node-submission.json",
+      "srt-slurm-sha.txt"
+    ],
+    "extracts": [],
+    "retrieved_at_utc": "2026-11-09T07:44:27.832731+00:00",
+    "matched_line_count_before_compaction": 1,
+    "excerpt_selection": "Version, monokernel and backend initialization lines; duplicates normalized by PID/timestamp, first 100 retained. Full archives remain external.",
+    "exact_job_link_verified": false,
+    "job_artifact_link_evidence": []
+  },
+  {
+    "version": 9,
+    "point_id": "445393",
+    "job_id": 118206654303,
+    "artifact_id": 12228583807,
+    "artifact_name": "server_logs_dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-28224ae9f01ef0553614",
+    "artifact_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/12228583807/zip",
+    "sha256": "372d7ef9e98cc1fd66b12fe3709619737c63a2ff8511a26f916b64921658d0bf",
+    "entries": [
+      "results/benchmark.log",
+      "srt-single-node-logs.tar.gz",
+      "srt-single-node-logs.tar.gz:.",
+      "srt-single-node-logs.tar.gz:./49876.json",
+      "srt-single-node-logs.tar.gz:./config.yaml",
+      "srt-single-node-logs.tar.gz:./logs",
+      "srt-single-node-logs.tar.gz:./logs/49876.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic",
+      "srt-single-node-logs.tar.gz:./logs/agentic/agentic_power_concurrency_1.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/agentic_power_timezone_offset.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/logs",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/logs/aiperf.log",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export.jsonl",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf_timeslices.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf_timeslices.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_console.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/server_metrics_export.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/server_metrics_export.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/benchmark.log",
+      "srt-single-node-logs.tar.gz:./logs/agentic/benchmark_command.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/workload_distribution_summary.txt",
+      "srt-single-node-logs.tar.gz:./logs/benchmark.out",
+      "srt-single-node-logs.tar.gz:./logs/clock_sync_mia1-p01-g09.out",
+      "srt-single-node-logs.tar.gz:./logs/config.yaml",
+      "srt-single-node-logs.tar.gz:./logs/dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-28224ae9f01ef0553614.json",
+      "srt-single-node-logs.tar.gz:./logs/fingerprint_agg_w0.json",
+      "srt-single-node-logs.tar.gz:./logs/host_setup_mia1-p01-g09.out",
+      "srt-single-node-logs.tar.gz:./logs/mia1-p01-g09_agg_w0.out",
+      "srt-single-node-logs.tar.gz:./logs/power",
+      "srt-single-node-logs.tar.gz:./logs/power/exporter-image.sha256",
+      "srt-single-node-logs.tar.gz:./logs/power/manifest.json",
+      "srt-single-node-logs.tar.gz:./logs/power/native-job-status.txt",
+      "srt-single-node-logs.tar.gz:./logs/power/power-producer-sha.txt",
+      "srt-single-node-logs.tar.gz:./logs/power/samples.csv",
+      "srt-single-node-logs.tar.gz:./logs/power/scrape-timings.jsonl",
+      "srt-single-node-logs.tar.gz:./logs/power/windows",
+      "srt-single-node-logs.tar.gz:./logs/power/windows/agentic_power_concurrency_1.json",
+      "srt-single-node-logs.tar.gz:./logs/resource_snapshot.json",
+      "srt-single-node-logs.tar.gz:./logs/sbatch_script.sh",
+      "srt-single-node-logs.tar.gz:./logs/server_ready.json",
+      "srt-single-node-logs.tar.gz:./logs/sweep_49876.log",
+      "srt-single-node-logs.tar.gz:./logs/telemetry_dcgm_exporter.out",
+      "srt-single-node-logs.tar.gz:./recipe.lock.yaml",
+      "srt-single-node-logs.tar.gz:./sbatch_script.sh",
+      "srt-slurm-sha.txt",
+      "srt-single-node-submission.json",
+      "srt-setup.log",
+      "srt-bind.log"
+    ],
+    "extracts": [
+      {
+        "file": "./logs/mia1-p01-g09_agg_w0.out",
+        "line": 5,
+        "text": "(MainProcess pid=4041325) INFO 10-19 22:00:52 [api_utils.py:418]  \u2584\u2584 \u2584\u2588 \u2588     \u2588     \u2588 \u2580\u2584\u2580 \u2588  version 0.32.1rc1.dev36+ge68efc685"
+      },
+      {
+        "file": "./logs/mia1-p01-g09_agg_w0.out",
+        "line": 9,
+        "text": "(MainProcess pid=4041325) INFO 10-19 22:00:52 [api_utils.py:357] non-default args: {'model_tag': 'deepseek-ai/DeepSeek-V4.1-Flash', 'api_server_count': 1, 'enable_auto_tool_choice': True, 'tool_call_parser': 'deepseek_v41', 'host': '0.0.0.0', 'disable_uvicorn_access_log': True, 'model': 'deepseek-ai/DeepSeek-V4.1-Flash', 'tokenizer_mode': 'deepseek_v41', 'max_model_len': 1048576, 'served_model_name': ['deepseek-ai/DeepSeek-V4.1-Flash'], 'reasoning_parser': 'deepseek_v41', 'device_ids': [0, 1, 2, 3], 'tensor_parallel_size': 4, 'block_size': 128, 'gpu_memory_utilization': 0.9, 'language_model_only': True, 'max_num_batched_tokens': 16384, 'max_cudagraph_capture_size': 1024, 'monokernel': True, 'moe_backend': 'aiter', 'speculative_config': {'method': 'dspark', 'num_speculative_tokens': 5, 'draft_sample_method': 'probabilistic', 'rejection_sample_method': 'synthetic', 'enable_adaptive_verification': False, 'synthetic_acceptance_length': 3.51}, 'attention_config': AttentionConfig(backend=None, minimax_m3_msa_decode_backend='triton', backend_per_kind={}, flash_attn_version=None, flash_attn_max_num_splits_for_cuda_graph=32, tokenspeed_mla_min_split_kv=1, tq_max_kv_splits_for_cuda_graph=32, use_trtllm_attention=None, disable_flashinfer_q_quantization=False, mla_prefill_backend=None, use_prefill_query_quantization=False, trtllm_ragged_backend='trtllm-gen', indexer_kv_dtype='mxfp4', indexer_sparse_logits=True, indexer_tp_shard_min_rows=65536, hisparse_config=None, use_non_causal=False, sparse_mla_force_mqa=False, sparse_mla_prefill_workspace_factor=None, flex_attn_block_m=None, flex_attn_block_n=None, flex_attn_q_block_size=None, flex_attn_kv_block_size=None), 'engram_config': EngramConfig(cpu_offload=False, embedding_across_dp=False, dp_shared_memory=None, use_thp=False)}"
+      },
+      {
+        "file": "./logs/mia1-p01-g09_agg_w0.out",
+        "line": 142,
+        "text": "(Worker pid=4047031) INFO 10-19 22:02:27 [cuda_communicator.py:353] Using ['QUICK_REDUCE', 'AITER_CUSTOM', 'PYNCCL'] all-reduce backends (in dispatch order) for group 'tp:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "./logs/mia1-p01-g09_agg_w0.out",
+        "line": 143,
+        "text": "(Worker pid=4047031) INFO 10-19 22:02:28 [cuda_communicator.py:353] Using ['PYNCCL'] all-reduce backends (in dispatch order) for group 'ep:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "./logs/mia1-p01-g09_agg_w0.out",
+        "line": 147,
+        "text": "(Worker_TP0 pid=4047031) INFO 10-19 22:02:33 [rocm.py:901] Using AITER Flash Attention backend for ViT model."
+      },
+      {
+        "file": "./logs/mia1-p01-g09_agg_w0.out",
+        "line": 148,
+        "text": "(Worker_TP0 pid=4047031) INFO 10-19 22:02:33 [mm_encoder_attention.py:372] Using AttentionBackendEnum.ROCM_AITER_FA for MMEncoderAttention."
+      },
+      {
+        "file": "./logs/mia1-p01-g09_agg_w0.out",
+        "line": 153,
+        "text": "(Worker_TP0 pid=4047031) INFO 10-19 22:02:33 [mxfp4.py:576] Using 'AITER_MXFP4_BF16' Mxfp4 MoE backend."
+      },
+      {
+        "file": "./logs/mia1-p01-g09_agg_w0.out",
+        "line": 154,
+        "text": "(Worker_TP0 pid=4047031) INFO 10-19 22:02:33 [mono_decode.py:292] DSv4.1 mono decode: the whole standard backbone layers"
+      },
+      {
+        "file": "./logs/mia1-p01-g09_agg_w0.out",
+        "line": 270,
+        "text": "(Worker_TP0 pid=4047031) INFO 10-19 22:05:37 [mono_decode.py:283] DSv4.1 mono decode: the DSpark draft layers"
+      },
+      {
+        "file": "./logs/mia1-p01-g09_agg_w0.out",
+        "line": 528,
+        "text": "(Worker_TP0 pid=4047031) INFO 10-19 22:06:45 [mono_decode.py:435] DSv4.1 mono decode layer active (decode steps of <= 48 rows)"
+      },
+      {
+        "file": "./logs/mia1-p01-g09_agg_w0.out",
+        "line": 978,
+        "text": "(Worker_TP0 pid=4047031) INFO 10-19 22:13:10 [mono_decode.py:435] DSv4.1 mono decode draft layer active (decode steps of <= 48 rows)"
+      },
+      {
+        "file": "./logs/sweep_49876.log",
+        "line": 123,
+        "text": "2026-10-19 21:58:02 [INFO] Command: vllm serve deepseek-ai/DeepSeek-V4.1-Flash --host 0.0.0.0 --port 8000 --device-ids 0,1,2,3 --attention-config '{\"indexer_kv_dtype\":\"mxfp4\",\"indexer_sparse_logits\":true}' --block-size 128 --disable-uvicorn-access-log --enable-auto-tool-choice --engram-config '{\"cpu_offload\":false}' --gpu-memory-utilization 0.9 --language-model-only --max-cudagraph-capture-size 1024 --max-model-len 1048576 --max-num-batched-tokens 16384 --moe-backend aiter --monokernel --reasoning-parser deepseek_v41 --served-model-name deepseek-ai/DeepSeek-V4.1-Flash --speculative-config '{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"draft_sample_method\": \"probabilistic\", \"rejection_sample_method\": \"synthetic\", \"enable_adaptive_verification\": false, \"synthetic_acceptance_length\": 3.51}' --tensor-parallel-size 4 --tokenizer-mode deepseek_v41 --tool-call-parser deepseek_v41"
+      }
+    ],
+    "retrieved_at_utc": "2026-11-09T07:44:28.006888+00:00",
+    "matched_line_count_before_compaction": 598,
+    "excerpt_selection": "Version, monokernel and backend initialization lines; duplicates normalized by PID/timestamp, first 100 retained. Full archives remain external.",
+    "exact_job_link_verified": true,
+    "job_artifact_link_evidence": [
+      {
+        "line": 1796,
+        "text": "2026-10-19T23:25:23.7013958Z Artifact download URL: https://github.com/SemiAnalysisAI/InferenceX/actions/runs/39295252770/artifacts/12228583807"
+      }
+    ]
+  },
+  {
+    "version": 10,
+    "point_id": "447088",
+    "job_id": 125113160330,
+    "artifact_id": 13122361038,
+    "artifact_name": "server_logs_dsv41flash_tp8_conc1_kvnone_spec-mtp_fp4_vllm_tp8-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-5340ebfbcf4da9a7418c",
+    "artifact_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13122361038/zip",
+    "sha256": "3eb379e0e2638c518cc8709031f08850e6dbf2a2f849828e3e18273ac336a2ec",
+    "entries": [
+      "results/benchmark.log",
+      "srt-single-node-submission.json",
+      "srt-slurm-sha.txt",
+      "srt-single-node-logs.tar.gz",
+      "srt-single-node-logs.tar.gz:.",
+      "srt-single-node-logs.tar.gz:./52139.json",
+      "srt-single-node-logs.tar.gz:./config.yaml",
+      "srt-single-node-logs.tar.gz:./logs",
+      "srt-single-node-logs.tar.gz:./logs/52139.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic",
+      "srt-single-node-logs.tar.gz:./logs/agentic/agentic_power_concurrency_1.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/agentic_power_timezone_offset.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/logs",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/logs/aiperf.log",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export.jsonl",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf_timeslices.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf_timeslices.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_console.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/server_metrics_export.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/server_metrics_export.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/benchmark.log",
+      "srt-single-node-logs.tar.gz:./logs/agentic/benchmark_command.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/workload_distribution_summary.txt",
+      "srt-single-node-logs.tar.gz:./logs/benchmark.out",
+      "srt-single-node-logs.tar.gz:./logs/clock_sync_mia1-p01-g11.out",
+      "srt-single-node-logs.tar.gz:./logs/config.yaml",
+      "srt-single-node-logs.tar.gz:./logs/dsv41flash_tp8_conc1_kvnone_spec-mtp_fp4_vllm_tp8-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-5340ebfbcf4da9a7418c.json",
+      "srt-single-node-logs.tar.gz:./logs/fingerprint_agg_w0.json",
+      "srt-single-node-logs.tar.gz:./logs/host_setup_mia1-p01-g11.out",
+      "srt-single-node-logs.tar.gz:./logs/mia1-p01-g11_agg_w0.out",
+      "srt-single-node-logs.tar.gz:./logs/power",
+      "srt-single-node-logs.tar.gz:./logs/power/exporter-image.sha256",
+      "srt-single-node-logs.tar.gz:./logs/power/manifest.json",
+      "srt-single-node-logs.tar.gz:./logs/power/native-job-status.txt",
+      "srt-single-node-logs.tar.gz:./logs/power/power-producer-sha.txt",
+      "srt-single-node-logs.tar.gz:./logs/power/samples.csv",
+      "srt-single-node-logs.tar.gz:./logs/power/scrape-timings.jsonl",
+      "srt-single-node-logs.tar.gz:./logs/power/windows",
+      "srt-single-node-logs.tar.gz:./logs/power/windows/agentic_power_concurrency_1.json",
+      "srt-single-node-logs.tar.gz:./logs/resource_snapshot.json",
+      "srt-single-node-logs.tar.gz:./logs/sbatch_script.sh",
+      "srt-single-node-logs.tar.gz:./logs/server_ready.json",
+      "srt-single-node-logs.tar.gz:./logs/sweep_52139.log",
+      "srt-single-node-logs.tar.gz:./logs/telemetry_dcgm_exporter.out",
+      "srt-single-node-logs.tar.gz:./recipe.lock.yaml",
+      "srt-single-node-logs.tar.gz:./sbatch_script.sh",
+      "srt-setup.log",
+      "srt-bind.log"
+    ],
+    "extracts": [
+      {
+        "file": "./logs/mia1-p01-g11_agg_w0.out",
+        "line": 5,
+        "text": "(MainProcess pid=3843074) INFO 11-02 05:36:33 [startup.py:38]  \u2584\u2584 \u2584\u2588 \u2588     \u2588     \u2588 \u2580\u2584\u2580 \u2588  version 0.33.0rc1.dev320+g335dd77b0"
+      },
+      {
+        "file": "./logs/mia1-p01-g11_agg_w0.out",
+        "line": 9,
+        "text": "(MainProcess pid=3843074) INFO 11-02 05:36:33 [startup.py:96] non-default args: {'model_tag': 'deepseek-ai/DeepSeek-V4.1-Flash', 'api_server_count': 1, 'enable_auto_tool_choice': True, 'tool_call_parser': 'deepseek_v41', 'host': '0.0.0.0', 'disable_uvicorn_access_log': True, 'model': 'deepseek-ai/DeepSeek-V4.1-Flash', 'tokenizer_mode': 'deepseek_v41', 'max_model_len': 1048576, 'served_model_name': ['deepseek-ai/DeepSeek-V4.1-Flash'], 'reasoning_parser': 'deepseek_v41', 'device_ids': [0, 1, 2, 3, 4, 5, 6, 7], 'tensor_parallel_size': 8, 'block_size': 128, 'gpu_memory_utilization': 0.9, 'language_model_only': True, 'max_num_batched_tokens': 32768, 'max_num_seqs': 1, 'max_cudagraph_capture_size': 8, 'monokernel': True, 'moe_backend': 'aiter', 'speculative_config': {'method': 'dspark', 'num_speculative_tokens': 5, 'draft_sample_method': 'probabilistic', 'rejection_sample_method': 'synthetic', 'enable_adaptive_verification': False, 'synthetic_acceptance_length': 3.51}, 'attention_config': AttentionConfig(backend=None, minimax_m3_msa_decode_backend='cutlass', backend_per_kind={}, flash_attn_version=None, flash_attn_max_num_splits_for_cuda_graph=32, tokenspeed_mla_min_split_kv=1, tq_max_kv_splits_for_cuda_graph=32, use_trtllm_attention=None, disable_flashinfer_q_quantization=False, mla_prefill_backend=None, use_prefill_query_quantization=False, trtllm_ragged_backend='trtllm-gen', indexer_kv_dtype='mxfp4', indexer_decode_cp=False, indexer_sparse_logits=True, indexer_tp_shard_min_rows=65536, minimax_m3_indexer_cp=False, hisparse_config=None, use_non_causal=False, sparse_mla_force_mqa=False, sparse_mla_prefill_workspace_factor=None, flex_attn_block_m=None, flex_attn_block_n=None, flex_attn_q_block_size=None, flex_attn_kv_block_size=None), 'engram_config': EngramConfig(cpu_offload=False, embedding_across_dp=False, dp_shared_memory=None, use_thp=False)}"
+      },
+      {
+        "file": "./logs/mia1-p01-g11_agg_w0.out",
+        "line": 236,
+        "text": "(Worker pid=3846495) INFO 11-02 05:37:44 [cuda_communicator.py:359] Using ['AITER_CUSTOM', 'PYNCCL'] all-reduce backends (in dispatch order) for group 'tp:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "./logs/mia1-p01-g11_agg_w0.out",
+        "line": 237,
+        "text": "(Worker pid=3846495) INFO 11-02 05:37:44 [cuda_communicator.py:359] Using ['PYNCCL'] all-reduce backends (in dispatch order) for group 'ep:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "./logs/mia1-p01-g11_agg_w0.out",
+        "line": 241,
+        "text": "(Worker_TP0 pid=3846495) INFO 11-02 05:37:49 [rocm.py:947] Using AITER Flash Attention backend for ViT model."
+      },
+      {
+        "file": "./logs/mia1-p01-g11_agg_w0.out",
+        "line": 242,
+        "text": "(Worker_TP0 pid=3846495) INFO 11-02 05:37:49 [mm_encoder_attention.py:372] Using AttentionBackendEnum.ROCM_AITER_FA for MMEncoderAttention."
+      },
+      {
+        "file": "./logs/mia1-p01-g11_agg_w0.out",
+        "line": 247,
+        "text": "(Worker_TP0 pid=3846495) INFO 11-02 05:37:49 [mxfp4.py:626] Using 'AITER_MXFP4_BF16' Mxfp4 MoE backend."
+      },
+      {
+        "file": "./logs/mia1-p01-g11_agg_w0.out",
+        "line": 252,
+        "text": "(Worker_TP0 pid=3846495) INFO 11-02 05:37:49 [mono_decode.py:486] DSv4.1 mono decode: the whole standard backbone layers"
+      },
+      {
+        "file": "./logs/mia1-p01-g11_agg_w0.out",
+        "line": 378,
+        "text": "(Worker_TP0 pid=3846495) INFO 11-02 05:40:53 [mono_decode.py:477] DSv4.1 mono decode: the DSpark draft layers"
+      },
+      {
+        "file": "./logs/mia1-p01-g11_agg_w0.out",
+        "line": 784,
+        "text": "(Worker_TP0 pid=3846495) INFO 11-02 05:41:41 [mono_decode.py:693] DSv4.1 mono decode layer active (decode steps of <= 48 rows)"
+      },
+      {
+        "file": "./logs/mia1-p01-g11_agg_w0.out",
+        "line": 1015,
+        "text": "(Worker_TP0 pid=3846495) INFO 11-02 05:44:09 [mono_decode.py:693] DSv4.1 mono decode draft layer active (decode steps of <= 48 rows)"
+      },
+      {
+        "file": "./logs/sweep_52139.log",
+        "line": 123,
+        "text": "2026-11-02 05:35:24 [INFO] Command: vllm serve deepseek-ai/DeepSeek-V4.1-Flash --host 0.0.0.0 --port 8000 --device-ids 0,1,2,3,4,5,6,7 --attention-config '{\"indexer_kv_dtype\":\"mxfp4\",\"indexer_sparse_logits\":true}' --block-size 128 --disable-uvicorn-access-log --enable-auto-tool-choice --engram-config '{\"cpu_offload\":false}' --gpu-memory-utilization 0.9 --language-model-only --max-cudagraph-capture-size 8 --max-model-len 1048576 --max-num-batched-tokens 32768 --max-num-seqs 1 --moe-backend aiter --monokernel --reasoning-parser deepseek_v41 --served-model-name deepseek-ai/DeepSeek-V4.1-Flash --speculative-config '{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"draft_sample_method\": \"probabilistic\", \"rejection_sample_method\": \"synthetic\", \"enable_adaptive_verification\": false, \"synthetic_acceptance_length\": 3.51}' --tensor-parallel-size 8 --tokenizer-mode deepseek_v41 --tool-call-parser deepseek_v41"
+      }
+    ],
+    "retrieved_at_utc": "2026-11-09T07:44:28.375522+00:00",
+    "matched_line_count_before_compaction": 1304,
+    "excerpt_selection": "Version, monokernel and backend initialization lines; duplicates normalized by PID/timestamp, first 100 retained. Full archives remain external.",
+    "exact_job_link_verified": true,
+    "job_artifact_link_evidence": [
+      {
+        "line": 1740,
+        "text": "2026-11-02T06:49:43.1455025Z Artifact download URL: https://github.com/SemiAnalysisAI/InferenceX/actions/runs/41394320841/artifacts/13122361038"
+      }
+    ]
+  },
+  {
+    "version": 11,
+    "point_id": "447804",
+    "job_id": 128292105363,
+    "artifact_id": 13561965484,
+    "artifact_name": "server_logs_dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-df7034e0d748be37b18e",
+    "artifact_url": "https://api.github.com/repos/SemiAnalysisAI/InferenceX/actions/artifacts/13561965484/zip",
+    "sha256": "a970ad60faf6b3f4022f017cb79de6667b6b2d4266cf95e5ce98b0e10ffdb52b",
+    "entries": [
+      "results/benchmark.log",
+      "srt-single-node-submission.json",
+      "srt-single-node-logs.tar.gz",
+      "srt-single-node-logs.tar.gz:.",
+      "srt-single-node-logs.tar.gz:./53178.json",
+      "srt-single-node-logs.tar.gz:./config.yaml",
+      "srt-single-node-logs.tar.gz:./logs",
+      "srt-single-node-logs.tar.gz:./logs/53178.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic",
+      "srt-single-node-logs.tar.gz:./logs/agentic/agentic_power_concurrency_1.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/agentic_power_timezone_offset.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/logs",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/logs/aiperf.log",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export.jsonl",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf_timeslices.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_aiperf_timeslices.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/profile_export_console.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/server_metrics_export.csv",
+      "srt-single-node-logs.tar.gz:./logs/agentic/aiperf_artifacts/server_metrics_export.json",
+      "srt-single-node-logs.tar.gz:./logs/agentic/benchmark.log",
+      "srt-single-node-logs.tar.gz:./logs/agentic/benchmark_command.txt",
+      "srt-single-node-logs.tar.gz:./logs/agentic/workload_distribution_summary.txt",
+      "srt-single-node-logs.tar.gz:./logs/benchmark.out",
+      "srt-single-node-logs.tar.gz:./logs/clock_sync_mia1-p01-g16.out",
+      "srt-single-node-logs.tar.gz:./logs/config.yaml",
+      "srt-single-node-logs.tar.gz:./logs/dsv41flash_tp4_conc1_kvnone_spec-mtp_fp4_vllm_tp4-pp1-dcp1-pcp1-ep1-dpafalse_disagg-false_spec-mtp_-df7034e0d748be37b18e.json",
+      "srt-single-node-logs.tar.gz:./logs/fingerprint_agg_w0.json",
+      "srt-single-node-logs.tar.gz:./logs/host_setup_mia1-p01-g16.out",
+      "srt-single-node-logs.tar.gz:./logs/host_teardown_mia1-p01-g16.out",
+      "srt-single-node-logs.tar.gz:./logs/mia1-p01-g16_agg_w0.out",
+      "srt-single-node-logs.tar.gz:./logs/power",
+      "srt-single-node-logs.tar.gz:./logs/power/cpu",
+      "srt-single-node-logs.tar.gz:./logs/power/cpu/cpu_manifest.json",
+      "srt-single-node-logs.tar.gz:./logs/power/cpu/samples.csv",
+      "srt-single-node-logs.tar.gz:./logs/power/exporter-image.sha256",
+      "srt-single-node-logs.tar.gz:./logs/power/manifest.json",
+      "srt-single-node-logs.tar.gz:./logs/power/native-job-status.txt",
+      "srt-single-node-logs.tar.gz:./logs/power/power-producer-sha.txt",
+      "srt-single-node-logs.tar.gz:./logs/power/samples.csv",
+      "srt-single-node-logs.tar.gz:./logs/power/scrape-timings.jsonl",
+      "srt-single-node-logs.tar.gz:./logs/power/windows",
+      "srt-single-node-logs.tar.gz:./logs/power/windows/agentic_power_concurrency_1.json",
+      "srt-single-node-logs.tar.gz:./logs/resource_snapshot.json",
+      "srt-single-node-logs.tar.gz:./logs/sbatch_script.sh",
+      "srt-single-node-logs.tar.gz:./logs/server_ready.json",
+      "srt-single-node-logs.tar.gz:./logs/sweep_53178.log",
+      "srt-single-node-logs.tar.gz:./logs/telemetry_cpu_power_exporter.mia1-p01-g16.out",
+      "srt-single-node-logs.tar.gz:./logs/telemetry_dcgm_exporter.out",
+      "srt-single-node-logs.tar.gz:./recipe.lock.yaml",
+      "srt-single-node-logs.tar.gz:./sbatch_script.sh",
+      "srt-slurm-sha.txt",
+      "srt-setup.log",
+      "srt-bind.log"
+    ],
+    "extracts": [
+      {
+        "file": "./logs/mia1-p01-g16_agg_w0.out",
+        "line": 5,
+        "text": "(MainProcess pid=1555657) INFO 11-07 03:53:47 [startup.py:38]  \u2584\u2584 \u2584\u2588 \u2588     \u2588     \u2588 \u2580\u2584\u2580 \u2588  version 0.33.0rc1.dev910+g4fab5a074"
+      },
+      {
+        "file": "./logs/mia1-p01-g16_agg_w0.out",
+        "line": 9,
+        "text": "(MainProcess pid=1555657) INFO 11-07 03:53:47 [startup.py:96] non-default args: {'model_tag': 'deepseek-ai/DeepSeek-V4.1-Flash', 'api_server_count': 1, 'enable_auto_tool_choice': True, 'tool_call_parser': 'deepseek_v41', 'host': '0.0.0.0', 'disable_uvicorn_access_log': True, 'model': 'deepseek-ai/DeepSeek-V4.1-Flash', 'tokenizer_mode': 'deepseek_v41', 'max_model_len': 1048576, 'served_model_name': ['deepseek-ai/DeepSeek-V4.1-Flash'], 'reasoning_parser': 'deepseek_v41', 'device_ids': [0, 1, 2, 3], 'tensor_parallel_size': 4, 'block_size': 128, 'gpu_memory_utilization': 0.9, 'language_model_only': True, 'max_num_batched_tokens': 32768, 'max_num_seqs': 1, 'max_cudagraph_capture_size': 8, 'monokernel': True, 'moe_backend': 'aiter', 'speculative_config': {'method': 'dspark', 'num_speculative_tokens': 5, 'draft_sample_method': 'probabilistic', 'rejection_sample_method': 'synthetic', 'enable_adaptive_verification': False, 'synthetic_acceptance_length': 3.51}, 'attention_config': AttentionConfig(backend=None, minimax_m3_msa_decode_backend='cutlass', backend_per_kind={}, flash_attn_version=None, flash_attn_max_num_splits_for_cuda_graph=32, tokenspeed_mla_min_split_kv=1, tq_max_kv_splits_for_cuda_graph=32, use_trtllm_attention=None, disable_flashinfer_q_quantization=False, mla_prefill_backend=None, use_prefill_query_quantization=False, trtllm_ragged_backend='trtllm-gen', indexer_kv_dtype='mxfp4', indexer_decode_cp=False, indexer_sparse_logits=True, indexer_logits_dtype='auto', indexer_tp_shard_min_rows=None, sparse_mla_shard_q=True, sparse_mla_shard_q_min_tokens=1024, minimax_m3_indexer_cp=False, hisparse_config=None, use_non_causal=False, sparse_mla_force_mqa=False, sparse_mla_prefill_workspace_factor=None, flex_attn_block_m=None, flex_attn_block_n=None, flex_attn_q_block_size=None, flex_attn_kv_block_size=None), 'engram_config': EngramConfig(cpu_offload=False, disk_offload=False, embedding_across_dp=False, dp_shared_memory=None, use_thp=False)}"
+      },
+      {
+        "file": "./logs/mia1-p01-g16_agg_w0.out",
+        "line": 136,
+        "text": "(Worker pid=1566566) INFO 11-07 03:54:54 [cuda_communicator.py:375] Using ['AITER_CUSTOM', 'PYNCCL'] all-reduce backends (in dispatch order) for group 'tp:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "./logs/mia1-p01-g16_agg_w0.out",
+        "line": 137,
+        "text": "(Worker pid=1566566) INFO 11-07 03:54:54 [cuda_communicator.py:375] Using ['PYNCCL'] all-reduce backends (in dispatch order) for group 'ep:0' out of potential backends: ['FLASHINFER_PCIE_IPC', 'FLASHINFER', 'NCCL_SYMM_MEM', 'QUICK_REDUCE', 'AITER_CUSTOM', 'CUSTOM', 'SYMM_MEM', 'PYNCCL']."
+      },
+      {
+        "file": "./logs/mia1-p01-g16_agg_w0.out",
+        "line": 141,
+        "text": "(Worker_TP0 pid=1566566) INFO 11-07 03:54:58 [rocm.py:969] Using AITER Flash Attention backend for ViT model."
+      },
+      {
+        "file": "./logs/mia1-p01-g16_agg_w0.out",
+        "line": 142,
+        "text": "(Worker_TP0 pid=1566566) INFO 11-07 03:54:58 [mm_encoder_attention.py:372] Using AttentionBackendEnum.ROCM_AITER_FA for MMEncoderAttention."
+      },
+      {
+        "file": "./logs/mia1-p01-g16_agg_w0.out",
+        "line": 147,
+        "text": "(Worker_TP0 pid=1566566) INFO 11-07 03:54:59 [mxfp4.py:634] Using 'AITER_MXFP4_BF16' Mxfp4 MoE backend."
+      },
+      {
+        "file": "./logs/mia1-p01-g16_agg_w0.out",
+        "line": 149,
+        "text": "(Worker_TP0 pid=1566566) INFO 11-07 03:54:59 [mono_decode.py:486] DSv4.1 mono decode: the whole standard backbone layers"
+      },
+      {
+        "file": "./logs/mia1-p01-g16_agg_w0.out",
+        "line": 269,
+        "text": "(Worker_TP0 pid=1566566) INFO 11-07 03:56:23 [mono_decode.py:477] DSv4.1 mono decode: the DSpark draft layers"
+      },
+      {
+        "file": "./logs/mia1-p01-g16_agg_w0.out",
+        "line": 472,
+        "text": "(Worker_TP0 pid=1566566) INFO 11-07 03:57:16 [mono_decode.py:693] DSv4.1 mono decode draft layer active (decode steps of <= 48 rows)"
+      },
+      {
+        "file": "./logs/mia1-p01-g16_agg_w0.out",
+        "line": 488,
+        "text": "(Worker_TP0 pid=1566566) INFO 11-07 03:57:28 [mono_decode.py:693] DSv4.1 mono decode layer active (decode steps of <= 48 rows)"
+      },
+      {
+        "file": "./logs/sweep_53178.log",
+        "line": 123,
+        "text": "2026-11-07 03:51:50 [INFO] Command: vllm serve deepseek-ai/DeepSeek-V4.1-Flash --host 0.0.0.0 --port 8000 --device-ids 0,1,2,3 --attention-config '{\"indexer_kv_dtype\":\"mxfp4\",\"indexer_sparse_logits\":true}' --block-size 128 --disable-uvicorn-access-log --enable-auto-tool-choice --engram-config '{\"cpu_offload\":false}' --gpu-memory-utilization 0.9 --language-model-only --max-cudagraph-capture-size 8 --max-model-len 1048576 --max-num-batched-tokens 32768 --max-num-seqs 1 --moe-backend aiter --monokernel --reasoning-parser deepseek_v41 --served-model-name deepseek-ai/DeepSeek-V4.1-Flash --speculative-config '{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"draft_sample_method\": \"probabilistic\", \"rejection_sample_method\": \"synthetic\", \"enable_adaptive_verification\": false, \"synthetic_acceptance_length\": 3.51}' --tensor-parallel-size 4 --tokenizer-mode deepseek_v41 --tool-call-parser deepseek_v41"
+      }
+    ],
+    "retrieved_at_utc": "2026-11-09T07:44:28.949124+00:00",
+    "matched_line_count_before_compaction": 399,
+    "excerpt_selection": "Version, monokernel and backend initialization lines; duplicates normalized by PID/timestamp, first 100 retained. Full archives remain external.",
+    "exact_job_link_verified": true,
+    "job_artifact_link_evidence": [
+      {
+        "line": 3707,
+        "text": "2026-11-07T05:05:28.2234937Z Artifact download URL: https://github.com/SemiAnalysisAI/InferenceX/actions/runs/42335637576/artifacts/13561965484"
+      }
+    ]
+  }
+]

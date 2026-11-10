@@ -1,0 +1,51 @@
+{
+  "validated_at_utc": "2026-11-09T08:02:35.236720+00:00",
+  "performance": {
+    "raw_selected_points": 154,
+    "unique_ci_jobs": 154,
+    "image_names": 11,
+    "configuration_rows": 17,
+    "representatives": 127,
+    "pairs": 110,
+    "gap_pairs": 9,
+    "adjacent_only_pairs": 101,
+    "cached_points_images_transitions_identical": true
+  },
+  "source": {
+    "snapshots": 11,
+    "container_exports": 4,
+    "unavailable_tags_with_ci_corroborated_upstream": 7,
+    "historical_api_digest_verified_containers": 3,
+    "exact_server_artifact_endpoint_links": 11,
+    "unmatched_server_attempt_candidates": 2
+  },
+  "checks": {
+    "corpus_build": "passed; 72 pages, 23 operators",
+    "workload_build": "passed; 8 cases, 9 decisions, 5 pages",
+    "pytest": "230 passed",
+    "inferencex_regressions": "8 passed; rerun after environment-guard validation change",
+    "skill_validator": "passed",
+    "markdown_local_links": "passed; 119 Markdown files",
+    "muse_regression": "54 points; 27 rows; 11 pair identities and deltas unchanged; auto framework sglang",
+    "deepseek_framework": "auto selects vllm",
+    "endpoint_log_replay": "127 parsed commands identical; only whitespace differs"
+  },
+  "gpu_profiling": "not performed; original compatible traces unavailable",
+  "causal_kernel_speedup": "not established",
+  "log_comparison_validation": {
+    "validated_at_utc": "2026-11-09T08:44:51.487412+00:00",
+    "endpoint_artifacts": 31,
+    "exact_upload_links": 31,
+    "phase_windows": 31,
+    "recovered_pairs": 16,
+    "existing_pairs_enriched": 10,
+    "supplemental_v01_to_v09_pairs": 6,
+    "pytest": "238 passed; includes 16 InferenceX checks",
+    "corpus_and_workload_build": "passed",
+    "runtime_and_pair_replay": "identical",
+    "muse_structured_pair_regression": "identical",
+    "markdown_links": "134 files checked; no broken local links",
+    "skill_validator": "passed",
+    "new_gpu_jobs": 0
+  }
+}

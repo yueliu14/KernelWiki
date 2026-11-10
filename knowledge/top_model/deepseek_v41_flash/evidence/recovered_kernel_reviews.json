@@ -1,0 +1,370 @@
+[
+  {
+    "from_version": 1,
+    "to_version": 9,
+    "pipelines": [
+      {
+        "id": "mono",
+        "title": "Whole-layer mono decode",
+        "before": "V01 model runs ordinary attention, mHC, experts and collectives; no mono module.",
+        "after": "V09 has persistent FlyDSL K1/K2 for target and DSpark draft layers.",
+        "body_change": "New mono layer/runner/attention/MoE bodies use peer-memory synchronization and in-kernel TP sums. Exact target and draft active messages occur in each V09 endpoint before E2E measurement.",
+        "fusion": "K1 combines the attention seam (slice/gate/norm/MXFP8) and attention front. K2 combines attention back/wo_b peer push, TP sum + FFN seam, MoE and its reduction. Compressor/indexer run between K1 and K2 where required; Engram injection stays outside. This is two principal persistent launches, not one whole-model kernel.",
+        "guards": "This supplemental V01\u2192V09 comparison is TP4/EP1. Decode-only, \u226448 token rows, suitable cache/routing/graph/residency. Initialization/active logs do not establish measurement-phase coverage.",
+        "paths": [
+          "vllm/models/deepseek_v41/amd/model.py",
+          "vllm/models/deepseek_v41/amd/mono_decode.py",
+          "vllm/models/deepseek_v41/amd/mono/layer.py",
+          "vllm/models/deepseek_v41/amd/mono/stages/seam.py",
+          "vllm/models/deepseek_v41/amd/mono/stages/moe.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "FlyDSL persistent kernels; Python dispatch"
+      },
+      {
+        "id": "mhc",
+        "title": "Ordinary mHC seam: reference to fused Triton producer",
+        "before": "V01 AMD model directly calls mhc_pre_delayed_torch/mhc_post_torch and separate normalization.",
+        "after": "V09 ordinary path calls the AITER delayed post/pre/RMSNorm implementation.",
+        "body_change": "Recovered AITER bodies resolve the earlier API-only uncertainty: a split-K main kernel forms post-mix, gate-projection partials and carried-pre collapse; a reduce kernel forms gates/Sinkhorn and applies normalization.",
+        "fusion": "Two principal Triton launches (_main_kernel + _reduce_kernel), not one. Main/reduce share partials and layer-input buffers. Entry identity-pre preparation can add operations; mono-covered layers bypass this ordinary seam.",
+        "guards": "gfx950, hc_mult=4, supported contiguous BF16 residual/FP32 gates and norm weights; first entry broadcast and ordinary fallback exceptions retained.",
+        "paths": [
+          "vllm/models/deepseek_v41/amd/model.py",
+          "vllm/model_executor/layers/mhc.py",
+          "vllm/_aiter_ops.py",
+          "aiter/ops/triton/fusions/mhc_fused_post_pre_delayed_rmsnorm.py",
+          "aiter/ops/triton/_triton_kernels/fusions/mhc_fused_post_pre_delayed_rmsnorm.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "PyTorch/reference operations \u2192 two Triton device stages"
+      },
+      {
+        "id": "indexer",
+        "title": "MXFP4 indexer producer fusion",
+        "before": "V01 uses its earlier indexer route; logs expose _gluon_fp8_mqa_logits_kernel and generic routing/reduction candidates.",
+        "after": "V09 requests mxfp4 indexer cache and uses k_norm_rope_mxfp4_cache, q_rope_mxfp4_quant and MXFP4 score kernels.",
+        "body_change": "Recovered Triton producers combine K normalization/rotation/packing/cache storage and Q rotation/packing plus weights; scoring remains a separate Gluon kernel.",
+        "fusion": "Fused K and Q producer operations, followed by separate sparse scoring/top-k. Not a single indexer-plus-attention launch. Log name differences identify compilations, not a complete removed/added execution set.",
+        "guards": "Applies to index-source layers using this cache/config. Such work also remains external between mono launches.",
+        "paths": [
+          "vllm/models/deepseek_v41/amd/rocm.py",
+          "aiter/ops/triton/fusions/k_norm_rope_mxfp4_cache.py",
+          "aiter/ops/triton/_triton_kernels/fusions/k_norm_rope_mxfp4_cache.py",
+          "aiter/ops/triton/rope/q_rope_mxfp4_quant.py",
+          "aiter/ops/triton/_triton_kernels/rope/q_rope_mxfp4_quant.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton Q/K producers and Gluon sparse-score device kernel"
+      },
+      {
+        "id": "attention",
+        "title": "Ordinary sparse attention output epilogue",
+        "before": "V01 performs sparse decode reduction, standalone inverse RoPE and BF16 wo_a contraction.",
+        "after": "V09 ordinary gfx950 AITER attention supports inverse-RoPE/MXFP8 output epilogue; wo_a consumes the quantized output through a separate grouped BMM.",
+        "body_change": "vLLM passes positions/cos-sin/out_mxfp8 through sparse_mla_fwd -> pa_decode_sparse -> gfx950 Gluon bodies for fp8_ds_mla packed caches. The device epilogue rotates and quantizes completed attention output.",
+        "fusion": "Reduction/inverse-RoPE/MXFP8 output share the selected output epilogue. Split attention still has main and reduce boundaries, and wo_a remains separate. No transfer of this ordinary-path fusion to already mono-covered work.",
+        "guards": "Ordinary or fallback attention, gfx950 and supported fp8_ds_mla cache. Runtime JIT diagnostics and source dispatch are evidence; no per-kernel duration is available.",
+        "paths": [
+          "vllm/models/deepseek_v41/amd/rocm.py",
+          "aiter/ops/triton/attention/sparse_mla.py",
+          "aiter/ops/triton/attention/pa_decode_sparse.py",
+          "aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton baseline \u2192 AITER Gluon sparse main/reduce with a separate Triton wo_a BMM"
+      }
+    ]
+  },
+  {
+    "from_version": 9,
+    "to_version": 11,
+    "pipelines": [
+      {
+        "id": "tiny_quant",
+        "title": "Tiny-M activation quantization fused into block32 GEMM",
+        "before": "V09 has separate MXFP8 activation quantization and packed/tiled GEMM.",
+        "after": "V11 _block32_packed_quant_kernel loads raw BF16/FP16 activations, calculates per-32 E8M0 scales/e4m3 data in registers and feeds tl.dot_scaled.",
+        "body_change": "Adds quant_in_kernel dispatch and retuned fused-quant tiles while preserving stock K-accumulation structure. Exact HIT logs expose M/N/K, tile and k_pack. Source and logs establish the guarded producer/consumer fusion.",
+        "fusion": "Removes the standalone activation-quant launch and x_q/x_scale global-memory round trip. A separate split-K reducer can still be needed; the whole linear is not always one launch.",
+        "guards": "Raw contiguous BF16/FP16, packed config, 0<M\u22648. Client concurrency does not equal M. Most recorded HITs occur before measurement; every pair reports its own phase and shapes.",
+        "paths": [
+          "vllm/model_executor/kernels/linear/mxfp8/rocm_block32_gemm.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton, including tl.dot_scaled"
+      },
+      {
+        "id": "markov",
+        "title": "DSpark Markov sampling on gfx950",
+        "before": "V09 uses ordinary sampling; V10 contains a fused helper whose architecture guard admits gfx942 only.",
+        "after": "V11 guard admits gfx950; exact endpoint logs report five steps, vocabulary 129280, rank 256, 505 blocks.",
+        "body_change": "The per-step kernel loads the previous token via prior block maxima, computes Markov bias plus base logits and block Gumbel-max. Final kernel resolves the last token. The info message is emitted after eligibility checks and before launches.",
+        "fusion": "Sampling core uses five per-step kernels plus one final resolver. Base-logit computation, input gathers and scratch initialization are outside this count. There is no single launch covering all five sequential steps.",
+        "guards": "gfx950 --monokernel, at most five request rows, supported sampler/dtypes. All observed first Markov messages precede E2E measurement; they do not prove sustained coverage at higher concurrency.",
+        "paths": [
+          "vllm/models/deepseek_v41/amd/ops/fused_markov.py",
+          "vllm/models/deepseek_v41/amd/ops/__init__.py",
+          "vllm/models/deepseek_v41/amd/dspark.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton sampling core; separate base-logit GEMM"
+      },
+      {
+        "id": "swa_meta",
+        "title": "SWA metadata helper admitted on gfx950",
+        "before": "V09 has no helper; V10 helper is gfx942-gated.",
+        "after": "V11 architecture predicate admits gfx950.",
+        "body_change": "The existing Triton _decode_swa_meta_kernel writes validity, dense window data and ragged indices/indptr directly into graph buffers.",
+        "fusion": "One metadata-core launch replaces the prior validity/window/count/cumsum/compaction/copy sequence described in source. First-use allocation, token-to-request preparation and tile-scheduler work remain outside that core count.",
+        "guards": "--monokernel, pure decode, \u226432 decode token rows, supported causal or DSpark non-causal metadata. No specific HIT message was found; source eligibility only, not measured launch elimination.",
+        "paths": [
+          "vllm/models/deepseek_v41/amd/ops/swa_decode_meta.py",
+          "vllm/models/deepseek_v41/amd/ops/__init__.py",
+          "vllm/models/deepseek_v41/amd/rocm.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton device body; Python architecture/shape guards"
+      },
+      {
+        "id": "tp2_mono",
+        "title": "TP2 ratio-2 internal mono tuning",
+        "before": "V09 uses generic persistent K1/K2 scheduling.",
+        "after": "V11 MonoBuild.tuned selects target-only gfx950 TP2 ratio-2 specializations.",
+        "body_change": "Seam reduction/slice work is combined; normalization publication and gates are rescheduled. MoE down stages pipeline loads/MFMA and cooperative shared-expert work. Same two external persistent-launch boundaries.",
+        "fusion": "Internal fusion/scheduling improvements inside K1/K2, not another layer-level launch collapse.",
+        "guards": "TP2 target ratio2 only; excludes TP4, TP8 and draft routing. Generic active logs do not identify which layers instantiated the tuned build.",
+        "paths": [
+          "vllm/models/deepseek_v41/amd/mono/layer.py",
+          "vllm/models/deepseek_v41/amd/mono/stages/seam.py",
+          "vllm/models/deepseek_v41/amd/mono/stages/moe.py",
+          "vllm/models/deepseek_v41/amd/mono/attention/plan.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": [
+          2
+        ],
+        "language": "FlyDSL"
+      },
+      {
+        "id": "mhc_same",
+        "title": "Ordinary delayed mHC device bodies unchanged",
+        "before": "V09/V10 AITER delayed post/pre/RMSNorm wrapper and two Triton device bodies.",
+        "after": "V11 retains byte-identical wrapper, device file and gfx950 delayed-seam tuning configuration.",
+        "body_change": "Although AITER package versions change, the specific delayed mHC seam files are unchanged. JIT logs may differ because warmup coverage changes; that does not imply a different kernel body.",
+        "fusion": "Existing main+reduce fusion is retained. V11 separate mHC overlap path can replace the producer/consumer scheduling on FULL graphs; the unchanged AITER seam itself is not new fusion.",
+        "guards": "Ordinary/fallback mHC path only; mono bypasses it. The added gfx942-only ASM seam in aiter/ops/mhc.py is not attributed to MI355X.",
+        "paths": [
+          "aiter/ops/triton/fusions/mhc_fused_post_pre_delayed_rmsnorm.py",
+          "aiter/ops/triton/_triton_kernels/fusions/mhc_fused_post_pre_delayed_rmsnorm.py",
+          "aiter/ops/triton/configs/gfx950/triton/mhc/mhc_fused_post_pre_delayed_rmsnorm/DEFAULT.json"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton, unchanged device bodies"
+      },
+      {
+        "id": "overlap_engram",
+        "title": "mHC overlap and Engram gate sharding",
+        "before": "Earlier ordinary model mHC gate work uses caller stream and common Engram implementation.",
+        "after": "V11 adds an ordinary-path Triton post/collapse/norm producer with auxiliary-stream gate work; Engram gate work is TP-sharded.",
+        "body_change": "mHC FULL graph capture creates stream dependencies, and Engram produces partial statistics/value slices, exchanges them, then finishes gating.",
+        "fusion": "mHC post/collapse/norm producer is fused; moving gate work to another stream is overlap, not single-kernel fusion. Engram retains partial-kernel, collective, final-kernel boundaries.",
+        "guards": "gfx950 ordinary/fallback path; mHC \u2264128 tokens, hc_mult4, no ubatching and FULL capture (not eager/piecewise). No direct overlap/Engram HIT log was found.",
+        "paths": [
+          "vllm/models/deepseek_v41/amd/mhc.py",
+          "vllm/models/deepseek_v41/amd/engram.py",
+          "vllm/models/deepseek_v41/amd/model.py",
+          "vllm/model_executor/kernels/mhc/triton.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton producers/Engram stages, AITER gate API, separate collective/stream operations"
+      },
+      {
+        "id": "indexer_same",
+        "title": "MXFP4 Q/K producer and score bodies retained",
+        "before": "V09/V10 MXFP4 K-store, Q-RoPE quant and score implementations.",
+        "after": "V11 retains these inspected producer and score files byte-for-byte.",
+        "body_change": "Logs continue to expose _pa_mqa_logits_mxfp4_kernel and _q_rope_mxfp4_quant_kernel, though logging coverage differs. The score source is Gluon even when the generic JIT logger says Triton.",
+        "fusion": "Existing norm/RoPE/quant/cache boundaries remain. No new producer fusion is assigned to a package-version bump.",
+        "guards": "Index-source work; still outside persistent mono launches. JIT warnings are observations of compilation, not every invocation.",
+        "paths": [
+          "aiter/ops/triton/fusions/k_norm_rope_mxfp4_cache.py",
+          "aiter/ops/triton/_triton_kernels/fusions/k_norm_rope_mxfp4_cache.py",
+          "aiter/ops/triton/rope/q_rope_mxfp4_quant.py",
+          "aiter/ops/triton/_triton_kernels/rope/q_rope_mxfp4_quant.py",
+          "aiter/ops/triton/_gluon_kernels/gfx950/attention/pa_mqa_logits_mxfp4.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton Q/K producers; Gluon score kernel"
+      },
+      {
+        "id": "sparse_body",
+        "title": "Ordinary sparse MLA body/dispatch changes",
+        "before": "Earlier gfx950 sparse main/reduce bodies.",
+        "after": "Later shared Gluon body adds 64-bit row bases, explicit FMA inverse rotation, zero-denominator protection and BF16 gather-layout adjustment.",
+        "body_change": "The fp8_ds_mla route passes through pa_decode_sparse to this shared Gluon body. The new fp8_scalar fast path in sparse_mla.py has separate format guards and is not credited to the packed DSv4 cache.",
+        "fusion": "Existing inverse-RoPE/MXFP8 epilogue remains fused; these changes are body/layout/numerical robustness and dispatch changes, not proof of a new cross-operator fusion. BF16_GATHER tuning applies only when that gather format is selected.",
+        "guards": "Ordinary/fallback sparse attention. Exact _sparse_mla/_sparse_mla_reduce JIT messages identify compiled candidates, not the full serving trace.",
+        "paths": [
+          "aiter/ops/triton/attention/sparse_mla.py",
+          "aiter/ops/triton/attention/pa_decode_sparse.py",
+          "aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Gluon device bodies; Python launch/format dispatch"
+      }
+    ]
+  },
+  {
+    "from_version": 10,
+    "to_version": 11,
+    "pipelines": [
+      {
+        "id": "tiny_quant",
+        "title": "Tiny-M activation quantization fused into block32 GEMM",
+        "before": "V10 already contains the fused tiny-M block32 quant+GEMM path.",
+        "after": "V11 retains the entire rocm_block32_gemm.py file byte-for-byte.",
+        "body_change": "Both TP8 c1 endpoints have 41 HIT log lines with the same set of M/N/K/tile signatures; all are before measurement. These diagnostic line counts are not launch counts.",
+        "fusion": "Existing quant+GEMM fusion is retained; it cannot be claimed as newly introduced fusion for V10\u2192V11.",
+        "guards": "Same tiny-M/packed/contiguous activation guards; no source-level change in this file. Logging once per shape prevents using the HIT count as call frequency.",
+        "paths": [
+          "vllm/model_executor/kernels/linear/mxfp8/rocm_block32_gemm.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton, including tl.dot_scaled"
+      },
+      {
+        "id": "markov",
+        "title": "DSpark Markov sampling on gfx950",
+        "before": "V09 uses ordinary sampling; V10 contains a fused helper whose architecture guard admits gfx942 only.",
+        "after": "V11 guard admits gfx950; exact endpoint logs report five steps, vocabulary 129280, rank 256, 505 blocks.",
+        "body_change": "The per-step kernel loads the previous token via prior block maxima, computes Markov bias plus base logits and block Gumbel-max. Final kernel resolves the last token. The info message is emitted after eligibility checks and before launches.",
+        "fusion": "Sampling core uses five per-step kernels plus one final resolver. Base-logit computation, input gathers and scratch initialization are outside this count. There is no single launch covering all five sequential steps.",
+        "guards": "gfx950 --monokernel, at most five request rows, supported sampler/dtypes. All observed first Markov messages precede E2E measurement; they do not prove sustained coverage at higher concurrency.",
+        "paths": [
+          "vllm/models/deepseek_v41/amd/ops/fused_markov.py",
+          "vllm/models/deepseek_v41/amd/ops/__init__.py",
+          "vllm/models/deepseek_v41/amd/dspark.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton sampling core; separate base-logit GEMM"
+      },
+      {
+        "id": "swa_meta",
+        "title": "SWA metadata helper admitted on gfx950",
+        "before": "V09 has no helper; V10 helper is gfx942-gated.",
+        "after": "V11 architecture predicate admits gfx950.",
+        "body_change": "The existing Triton _decode_swa_meta_kernel writes validity, dense window data and ragged indices/indptr directly into graph buffers.",
+        "fusion": "One metadata-core launch replaces the prior validity/window/count/cumsum/compaction/copy sequence described in source. First-use allocation, token-to-request preparation and tile-scheduler work remain outside that core count.",
+        "guards": "--monokernel, pure decode, \u226432 decode token rows, supported causal or DSpark non-causal metadata. No specific HIT message was found; source eligibility only, not measured launch elimination.",
+        "paths": [
+          "vllm/models/deepseek_v41/amd/ops/swa_decode_meta.py",
+          "vllm/models/deepseek_v41/amd/ops/__init__.py",
+          "vllm/models/deepseek_v41/amd/rocm.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton device body; Python architecture/shape guards"
+      },
+      {
+        "id": "mhc_same",
+        "title": "Ordinary delayed mHC device bodies unchanged",
+        "before": "V09/V10 AITER delayed post/pre/RMSNorm wrapper and two Triton device bodies.",
+        "after": "V11 retains byte-identical wrapper, device file and gfx950 delayed-seam tuning configuration.",
+        "body_change": "Although AITER package versions change, the specific delayed mHC seam files are unchanged. JIT logs may differ because warmup coverage changes; that does not imply a different kernel body.",
+        "fusion": "Existing main+reduce fusion is retained. V11 separate mHC overlap path can replace the producer/consumer scheduling on FULL graphs; the unchanged AITER seam itself is not new fusion.",
+        "guards": "Ordinary/fallback mHC path only; mono bypasses it. The added gfx942-only ASM seam in aiter/ops/mhc.py is not attributed to MI355X.",
+        "paths": [
+          "aiter/ops/triton/fusions/mhc_fused_post_pre_delayed_rmsnorm.py",
+          "aiter/ops/triton/_triton_kernels/fusions/mhc_fused_post_pre_delayed_rmsnorm.py",
+          "aiter/ops/triton/configs/gfx950/triton/mhc/mhc_fused_post_pre_delayed_rmsnorm/DEFAULT.json"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton, unchanged device bodies"
+      },
+      {
+        "id": "overlap_engram",
+        "title": "mHC overlap and Engram gate sharding",
+        "before": "Earlier ordinary model mHC gate work uses caller stream and common Engram implementation.",
+        "after": "V11 adds an ordinary-path Triton post/collapse/norm producer with auxiliary-stream gate work; Engram gate work is TP-sharded.",
+        "body_change": "mHC FULL graph capture creates stream dependencies, and Engram produces partial statistics/value slices, exchanges them, then finishes gating.",
+        "fusion": "mHC post/collapse/norm producer is fused; moving gate work to another stream is overlap, not single-kernel fusion. Engram retains partial-kernel, collective, final-kernel boundaries.",
+        "guards": "gfx950 ordinary/fallback path; mHC \u2264128 tokens, hc_mult4, no ubatching and FULL capture (not eager/piecewise). No direct overlap/Engram HIT log was found.",
+        "paths": [
+          "vllm/models/deepseek_v41/amd/mhc.py",
+          "vllm/models/deepseek_v41/amd/engram.py",
+          "vllm/models/deepseek_v41/amd/model.py",
+          "vllm/model_executor/kernels/mhc/triton.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton producers/Engram stages, AITER gate API, separate collective/stream operations"
+      },
+      {
+        "id": "indexer_same",
+        "title": "MXFP4 Q/K producer and score bodies retained",
+        "before": "V09/V10 MXFP4 K-store, Q-RoPE quant and score implementations.",
+        "after": "V11 retains these inspected producer and score files byte-for-byte.",
+        "body_change": "Logs continue to expose _pa_mqa_logits_mxfp4_kernel and _q_rope_mxfp4_quant_kernel, though logging coverage differs. The score source is Gluon even when the generic JIT logger says Triton.",
+        "fusion": "Existing norm/RoPE/quant/cache boundaries remain. No new producer fusion is assigned to a package-version bump.",
+        "guards": "Index-source work; still outside persistent mono launches. JIT warnings are observations of compilation, not every invocation.",
+        "paths": [
+          "aiter/ops/triton/fusions/k_norm_rope_mxfp4_cache.py",
+          "aiter/ops/triton/_triton_kernels/fusions/k_norm_rope_mxfp4_cache.py",
+          "aiter/ops/triton/rope/q_rope_mxfp4_quant.py",
+          "aiter/ops/triton/_triton_kernels/rope/q_rope_mxfp4_quant.py",
+          "aiter/ops/triton/_gluon_kernels/gfx950/attention/pa_mqa_logits_mxfp4.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Triton Q/K producers; Gluon score kernel"
+      },
+      {
+        "id": "sparse_body",
+        "title": "Ordinary sparse MLA body/dispatch changes",
+        "before": "Earlier gfx950 sparse main/reduce bodies.",
+        "after": "Later shared Gluon body adds 64-bit row bases, explicit FMA inverse rotation, zero-denominator protection.",
+        "body_change": "The fp8_ds_mla route passes through pa_decode_sparse to this shared Gluon body. The new fp8_scalar fast path in sparse_mla.py has separate format guards and is not credited to the packed DSv4 cache.",
+        "fusion": "Existing inverse-RoPE/MXFP8 epilogue remains fused; these changes are body/layout/numerical robustness and dispatch changes, not proof of a new cross-operator fusion. The BF16 gather-layout adjustment already existed in V10 and is not new in this pair.",
+        "guards": "Ordinary/fallback sparse attention. Exact _sparse_mla/_sparse_mla_reduce JIT messages identify compiled candidates, not the full serving trace.",
+        "paths": [
+          "aiter/ops/triton/attention/sparse_mla.py",
+          "aiter/ops/triton/attention/pa_decode_sparse.py",
+          "aiter/ops/triton/_gluon_kernels/gfx950/attention/sparse_mla.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "Gluon device bodies; Python launch/format dispatch"
+      },
+      {
+        "id": "topk",
+        "title": "FlyDSL radix top-k body and observed symbol",
+        "before": "V10 one-block radix selector.",
+        "after": "V11 adds a full_rows factory option and updates FlyDSL vector construction APIs.",
+        "body_change": "full_rows uses fixed width instead of row_ends and adds a _full symbol suffix. The TP8 V11 measured-phase log names radix_topk_one_block_decode_short_k512_b256_w64_v0_s0, with no _full suffix, so that new specialization is not credited to this observation.",
+        "fusion": "No new cross-operator fusion established. A later JIT warning is not proof that the earlier endpoint never ran a corresponding cached top-k kernel.",
+        "guards": "TP8 c1 measured-phase JIT at 06:59:58 in the V11 endpoint; consult its exact phase window. Distinguish wrapper symbol and generated device symbol.",
+        "paths": [
+          "aiter/ops/flydsl/kernels/topk/radix_topk_one_block.py"
+        ],
+        "evidence_kind": "source_verified",
+        "tp_selector": null,
+        "language": "FlyDSL"
+      }
+    ]
+  }
+]

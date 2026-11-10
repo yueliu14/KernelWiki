@@ -1,0 +1,2 @@
+# Preserve original container file bytes; snapshots remain browsable on GitHub.
+blobs/** -whitespace linguist-vendored=true
