@@ -25,6 +25,10 @@ jobs:
         with:
           python-version: '3.11'
       - run: python3 -m pip install -r requirements-dev.txt
+      - name: install search tool for discovery checks
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ripgrep
 
       # The rendered pages are generated artifacts. A hand-edit to one of them, or an edit to
       # the evidence without a re-render, makes the page a claim nothing backs.

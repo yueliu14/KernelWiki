@@ -125,7 +125,8 @@ upstream changes and maintain the corpus. Keep run histories and raw artifacts i
 
 ## Development checks
 
-Maintenance tools require Python 3.10+ and Git. Install their dependencies in a virtual environment:
+Maintenance tools require Python 3.10+ and Git; discovery tests also require `ripgrep` (`rg`).
+CI installs it explicitly. Install the Python dependencies in a virtual environment:
 
 ```bash
 python3 -m venv .venv
