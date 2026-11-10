@@ -54,7 +54,7 @@ def source_ref(reference, old_files, new_files):
             raise ValueError(f"Reviewed source path missing from inventory: {path}")
         result[side + "_sha256"] = inventory[path]["sha256"] if path else None
         if path:
-            for key in ["original_path", "repository_path", "source_kind", "source_url"]:
+            for key in ["original_path", "repository_path", "source_kind", "source_url", "implementation"]:
                 if key in inventory[path]:
                     result[side + "_" + key] = inventory[path][key]
     a, b = result.get("before_path"), result.get("after_path")
@@ -78,6 +78,9 @@ def pair_document(pair):
     text += "\n## Kernel changes for this pair\n\nThese are source-verified candidates and configuration eligibility checks. GPU-time ranking and realized benchmark-phase launch counts are unavailable. Missing CLI flags mean the option was not explicitly passed; defaults may differ between images.\n"
     if pair.get("source_provenance"):
         text += "\n**Source provenance:** " + "; ".join(f"{side}: {info['source_kind']} ({info.get('source_revision') or info.get('digest') or 'see inventory'})" for side, info in pair["source_provenance"].items()) + ". Upstream-commit source is corroborated by CI version logs but is not a recovered historical container. A current tag snapshot alone does not establish historical file identity.\n"
+        commits = [f"{side}: [{info['vllm_commit'][:12]}]({info['vllm_commit_url']})" for side, info in pair['source_provenance'].items() if info.get('vllm_commit')]
+        if commits:
+            text += '\n**vLLM commits:** ' + '; '.join(commits) + '. [Kernel implementation browser](../kernel_implementations.md) retains exact source paths and function links. AITER files are identified separately by container digest and file hash.\n'
     for kernel in pair["kernel_changes"]:
         text += f"\n### {kernel['pipeline']}\n\n"
         for title, key in [("Before", "before"), ("After", "after"), ("Device language", "language"), ("Code/body change", "body_change"), ("Fusion", "fusion"), ("Applicability to this pair", "applicability")]:
@@ -89,7 +92,14 @@ def pair_document(pair):
                     return "Absent / separate existing operations"
                 path = source.get(side + "_original_path", source[side + "_path"])
                 where = f"[{path}]({source[side+'_source_url']})" if source.get(side + "_source_url") else f"`{path}`"
-                return f"{where}<br>`{source[side+'_sha256']}`"
+                text = f"{where}<br>`{source[side+'_sha256']}`"
+                implementation = source.get(side + '_implementation')
+                if implementation:
+                    url = '../' + implementation['snapshot_path'] if implementation.get('snapshot_path') else implementation['source_url']
+                    text += f'<br>[Complete implementation]({url})'
+                    for entry in implementation['entrypoints']:
+                        text += f"<br>[{entry['name']}]({url}#L{entry['line']})"
+                return text
             text += f"| {source['role']} | {cell('before')} | {cell('after')} | {source['path_relation']}; {source['body_relation']} |\n"
         text += "\nEvidence: " + ", ".join(f"[{ref}](../{ref})" for ref in kernel["evidence"]) + ".\n"
     if pair["excluded_attributions"]:
@@ -131,6 +141,18 @@ def main():
     inventory_rows = read(root / "evidence/image_source_inventory.json")
     inventories = {row["image_name"]: {f["path"]: f for f in row["relevant_files"]} for row in inventory_rows}
     snapshot_info = {row["image_name"]: {k: row[k] for k in ["source_kind", "source_revision", "digest", "historical_api_digests"] if k in row} for row in inventory_rows}
+    source_index_path = root / 'kernel_sources/manifest.json'
+    if source_index_path.exists():
+        for snapshot in read(source_index_path)['snapshots']:
+            name = snapshot['image_name']
+            snapshot_info[name].update({k: snapshot[k] for k in ['vllm_commit', 'vllm_commit_url']})
+            for file in snapshot['files']:
+                if file['path'] in inventories[name]:
+                    target = inventories[name][file['path']]
+                    assert target['sha256'] == file['sha256']
+                    target['implementation'] = {k: file[k] for k in ['snapshot_path', 'source_url', 'entrypoints', 'url_kind'] if k in file}
+                    if file.get('source_url'):
+                        target['source_url'] = file['source_url']
     rules = read(root / "evidence/kernel_pair_rules.json")
     server = read(root / "evidence/server_log_extracts.json")
     recovered_ids = set()

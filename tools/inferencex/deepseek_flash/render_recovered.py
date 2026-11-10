@@ -10,7 +10,15 @@ def read(p):return json.loads(p.read_text())
 
 
 def source_cell(f):
-    return f"`{f['original_path']}`<br>`{f['sha256']}`" if f else 'Absent from captured source selection'
+    if not f:
+        return 'Absent from captured source selection'
+    text = f"`{f['original_path']}`<br>`{f['sha256']}`"
+    implementation = f.get('implementation')
+    if implementation:
+        url = '../' + implementation['snapshot_path']
+        text += f'<br>[Complete implementation]({url})'
+        text += ''.join(f"<br>[{e['name']}]({url}#L{e['line']})" for e in implementation['entrypoints'])
+    return text
 
 
 def main():
@@ -21,6 +29,13 @@ def main():
     facts={f['point_id']:f for f in read(root/'evidence/recovered_runtime_facts.json')}
     inventory={x['version']:x for x in read(root/'evidence/recovered_source_inventory.json')}
     files={v:{f['path']:f for f in x['files']} for v,x in inventory.items()}
+    source_index_path = root / 'kernel_sources/manifest.json'
+    source_index = {s['version']: s for s in read(source_index_path)['snapshots']} if source_index_path.exists() else {}
+    for version, snapshot in source_index.items():
+        for f in snapshot['files']:
+            if version in files and f['path'] in files[version]:
+                assert files[version][f['path']]['sha256'] == f['sha256']
+                files[version][f['path']]['implementation'] = f
     reviews={(r['from_version'],r['to_version']):r for r in read(root/'evidence/recovered_kernel_reviews.json')}
     (root/'recovered_pairs').mkdir(exist_ok=True)
     index='''# Recovered-container point-to-point kernel comparisons
@@ -53,6 +68,8 @@ Cells use `(p90 interactivity tok/s/user, output tok/s/chip)`. Version IDs refer
         title=f"TP{cfg['decode_tp']}/EP{cfg['decode_ep']} conc{cfg['conc']}"
         index+=f"| {title} | V{av:02d}→V{bv:02d}; {b['date']}→{c['date']} | ({b['p90_interactivity_tok_s_user']:.3f}, {b['output_tok_s_chip']:.3f}) | ({c['p90_interactivity_tok_s_user']:.3f}, {c['output_tok_s_chip']:.3f}) | {pair['interactivity_change_pct']:+.2f}% | {pair['throughput_change_pct']:+.2f}% | [Detailed comparison]({pair['report']}) |\n"
         text=f"# {title}: V{av:02d} → V{bv:02d}\n\n[Recovered-image comparisons](../recovered_image_history.md) · [Full matrix](../configuration_history.md)\n\n"
+        if source_index:
+            text += '**vLLM commits:** ' + ' → '.join(f"[{source_index[v]['vllm_commit'][:12]}]({source_index[v]['vllm_commit_url']})" for v in [av,bv]) + '. [Kernel implementation browser](../kernel_implementations.md). Container file identity is retained separately from the reported framework commit.\n\n'
         if pair['original_pair_report']:text+=f"[Original pair and exact launch changes](../{pair['original_pair_report']}).\n\n"
         else:text+='Supplemental comparison across V02–V08; intermediate measured points remain in the original matrix. This is not an adjacent-image kernel attribution.\n\n'
         text+='| Endpoint | Docker image | Point / exact CI | (p90 interactivity, output/chip) | Server artifact |\n| --- | --- | --- | ---: | --- |\n'
@@ -84,16 +101,26 @@ Cells use `(p90 interactivity tok/s/user, output tok/s/chip)`. Version IDs refer
                 excluded.append(review['title']+': excluded by TP guard.');continue
             text+=f"\n### {review['title']}\n\n"
             for label,key in [('Before','before'),('After','after'),('Device language','language'),('Code/body','body_change'),('Fusion boundaries','fusion'),('Applicability / log limit','guards')]:text+=f"**{label}:** {review[key]}\n\n"
-            text+='| Source path | Before SHA256 | After SHA256 | File relation |\n| --- | --- | --- | --- |\n'
+            text+='| Comparison path | Before installation / implementation | After installation / implementation | File relation |\n| --- | --- | --- | --- |\n'
             for path in review['paths']:
                 x,y=files[av].get(path),files[bv].get(path)
                 relation='identical bytes' if x and y and x['sha256']==y['sha256'] else 'changed bytes' if x and y else 'added/absent in snapshot'
-                text+=f"| `{path}` | `{x['sha256'] if x else 'absent'}` | `{y['sha256'] if y else 'absent'}` | {relation} |\n"
+                text+=f"| `{path}` | {source_cell(x)} | {source_cell(y)} | {relation} |\n"
         if excluded:text+='\nExcluded from this configuration:\n\n'+''.join('- '+x+'\n' for x in excluded)
         text+=f"\nPinned source evidence: [inventory](../evidence/recovered_source_inventory.json), [reviewed rules](../evidence/recovered_kernel_reviews.json), [V{av:02d}→V{bv:02d} source diff](../evidence/recovered_source_diffs/v{av:02d}_to_v{bv:02d}.diff). Installation paths are preserved in the inventory; canonical comparison paths above normalize the earlier deepseek_v4_1 directory name.\n"
         text+='\n## Named JIT kernels: observed sets and body comparisons\n\nThis table lists every symbol mentioned by the selected endpoints\' JIT diagnostics. Missing messages do not imply missing execution: the monitor activates after server warmup and uses warning_once. A changed file can contain an unchanged symbol; AST comparisons below separate those cases. A name match is a source candidate, not proof of a unique binary implementation.\n\n| Symbol | Before logged phases | After logged phases | Candidate source / symbol-body relation |\n| --- | --- | --- | --- |\n'
         for comparison in pair['jit_kernel_comparisons']:
-            refs='; '.join(f"`{r['path']}`: {r['symbol_body_relation']}" for r in comparison['source_comparisons']) or 'No mapped source'
+            refs=[]
+            for candidate in comparison['source_comparisons']:
+                ref=f"`{candidate['path']}`: {candidate['symbol_body_relation']}"
+                for side,version in [('before',av),('after',bv)]:
+                    f=files[version].get(candidate['path'],{}).get('implementation')
+                    if f:
+                        symbol=next((s for s in f['symbols'] if s['name'].rsplit('.',1)[-1]==comparison['symbol']),None)
+                        line=symbol['line'] if symbol else 1
+                        ref+=f" [{side} source](../{f['snapshot_path']}#L{line})"
+                refs.append(ref)
+            refs='; '.join(refs) or 'No mapped source'
             text+=f"| `{comparison['symbol']}` | {', '.join(comparison['before_log_phases']) or 'not logged'} | {', '.join(comparison['after_log_phases']) or 'not logged'} | {refs} |\n"
         text+='\nThe [structured pair record](../data/recovered_pair_records.json) retains complete generated kernel names (including FlyDSL variant parameters), candidate source paths, file hashes, symbol code/AST hashes and line ranges. Triton JIT log labeling can include Gluon implementations; source decorators distinguish them.\n\nNo GPU trace, kernel time ranking, per-step launch count, or causal kernel speedup is claimed. Admission, graph capture, batching, quick-reduce quantization and synthetic DSpark acceptance are retained in the original CI evidence and can affect E2E deltas.\n'
         (root/pair['report']).write_text(text)

@@ -35,3 +35,14 @@ python3 tools/inferencex/skills/inferencex-kernel-evolution/scripts/build_pair_h
 `analyze_recovered_logs.py` joins server active/HIT/JIT messages to AIPerf phase boundaries, using CI timestamps for the legacy baseline. Its 16-pair view is consecutive within the recovered-image subset: six V01→V09 comparisons supplement the original chronology, and ten existing pairs receive detailed links. Review `evidence/recovered_kernel_reviews.json` separately before rendering; source changes alone do not establish new runtime fusion.
 
 AIPerf's `Profiling` phase and `profile_export` files are E2E request evidence, not GPU traces. The default JIT monitor activates after server warmup and logs once per signature. HIT/active messages can occur during graph preparation. No message is not proof of no execution; diagnostic counts are not kernel invocation counts.
+
+## Clickable commits and implementations
+
+Run `link_kernel_sources.py --cache ... --knowledge knowledge/top_model/deepseek_v41_flash`
+before the two renderers to generate the commit/source browser and function-line links.
+It verifies selected bytes against source inventories, publishes content-addressed files
+for recovered containers, and links missing-image versions to their original upstream
+repository path at the CI-corroborated commit. The common pair renderer then includes
+both endpoint commit links and implementations; the recovered renderer adds device-body
+and named-JIT source links. vLLM revision, AITER package identity and container digest
+remain separate. No missing historical AITER implementation is inferred.

@@ -5,6 +5,7 @@ Collected **2026-11-09 UTC** from the [InferenceX dashboard](https://inferencex.
 The primary [configuration × image matrix](configuration_history.md) covers **2026-09-12 → 2026-11-09**, **11 Docker image names**, **154 observations**, **17 configuration rows**, and **127 image/configuration representatives**. All observations have unique CI job matches. Every one of the **110 consecutive-observed-image pairs** has its own kernel record; **9** span a missing V10 column. The narrower adjacent-image-only CSV contains 101 pairs.
 
 - [Recovered-container kernel/log comparisons](recovered_image_history.md): 16 pairs across V01/V09/V10/V11, with exact HIT/JIT messages, measurement-versus-warmup alignment, AITER device-body comparison and fusion boundaries.
+- [Commits and kernel implementations](kernel_implementations.md): all 11 vLLM revisions, exact source paths and function-line links; recovered container bytes and historical upstream-only sources are distinguished.
 - [Full configuration matrix](configuration_history.md): all observed TP2/TP4/TP8 + concurrency points, with blanks and per-pair links.
 - [Pair index](pair_changes.md): both dates, performance changes, source paths/hashes, implementation languages, bodies, fusion and exact launch changes.
 - [All 154 observations](performance_points.md): repeats are preserved; deduplication chooses one representative per image/configuration.

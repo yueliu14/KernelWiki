@@ -22,6 +22,15 @@ and adds scoped decisions; source inspection does not confer upstream validation
 
 ## AITER
 
+Selected byte-exact vLLM and AITER source files under
+`knowledge/top_model/deepseek_v41_flash/kernel_sources/blobs/` were exported from the
+public `vllm/vllm-openai-rocm` images identified in the adjacent manifest. Their original
+copyright and SPDX headers are preserved. vLLM files retain vLLM contributor attribution
+under Apache License 2.0 ([license text](LICENSE.md)); AITER files retain their applicable
+per-file notices and the MIT notice below. These are selected reading snapshots, not a
+full working copy or evidence of upstream validation. The manifest distinguishes actual
+container bytes from upstream-only links for unavailable historical images.
+
 The structured corpus contains attributed source excerpts: the retained GEMM snapshot is
 `a6bb499375849eec45d68c5ccaebc8865fd422c0`, and the operator expansion uses
 `b3ad6c461703110dc36286265c16e453ef0e2dd2`. The corpus catalog records repositories and full
