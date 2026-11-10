@@ -1,0 +1,44 @@
+{
+  "hardware": "mi355x",
+  "requested_framework": "vllm",
+  "selected_framework": "vllm",
+  "selection_reason": "explicit framework selection",
+  "available_frameworks": [
+    {
+      "framework": "atom",
+      "history_rows": 65,
+      "unique_points": 65,
+      "first_date": "2026-09-25",
+      "last_date": "2026-11-03",
+      "current_points": 11,
+      "current_latest_date": "2026-11-03"
+    },
+    {
+      "framework": "sglang",
+      "history_rows": 56,
+      "unique_points": 56,
+      "first_date": "2026-09-24",
+      "last_date": "2026-10-22",
+      "current_points": 13,
+      "current_latest_date": "2026-10-22"
+    },
+    {
+      "framework": "tilert",
+      "history_rows": 1,
+      "unique_points": 1,
+      "first_date": "2026-11-07",
+      "last_date": "2026-11-07",
+      "current_points": 1,
+      "current_latest_date": "2026-11-07"
+    },
+    {
+      "framework": "vllm",
+      "history_rows": 154,
+      "unique_points": 154,
+      "first_date": "2026-09-12",
+      "last_date": "2026-11-09",
+      "current_points": 10,
+      "current_latest_date": "2026-11-09"
+    }
+  ]
+}

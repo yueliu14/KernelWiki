@@ -1,0 +1,10 @@
+{
+  "pairing_policy": "next observed image per full configuration key",
+  "configuration_rows": 17,
+  "representative_points": 127,
+  "pair_records": 110,
+  "gap_pairs": 9,
+  "endpoint_jobs": 127,
+  "source_rules": "evidence/kernel_pair_rules.json",
+  "gpu_kernel_time_ranking": "unavailable"
+}

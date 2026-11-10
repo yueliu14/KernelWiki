@@ -1,0 +1,460 @@
+[
+  {
+    "image_name": "vllm/vllm-openai-rocm:deepseekv41-flash-0909",
+    "first_date": "2026-09-12",
+    "last_date": "2026-09-12",
+    "digests": [
+      null
+    ],
+    "run_ids": [
+      "34657748450"
+    ],
+    "point_count": 6,
+    "representative_ids": [
+      "441672",
+      "441673",
+      "441674",
+      "441675",
+      "441676",
+      "441677"
+    ],
+    "repetitions": []
+  },
+  {
+    "image_name": "vllm/vllm-openai-rocm:nightly-eed1f3d0c6043bd494424a22443ee198dd56f657",
+    "first_date": "2026-09-13",
+    "last_date": "2026-09-13",
+    "digests": [
+      null
+    ],
+    "run_ids": [
+      "34710937012"
+    ],
+    "point_count": 6,
+    "representative_ids": [
+      "441915",
+      "441916",
+      "441917",
+      "441918",
+      "441919",
+      "441920"
+    ],
+    "repetitions": []
+  },
+  {
+    "image_name": "vllm/vllm-openai-rocm:nightly-rocm100-3df4ae153eb385e27b52f26c81f8edb9e20b9984",
+    "first_date": "2026-09-22",
+    "last_date": "2026-09-22",
+    "digests": [
+      null
+    ],
+    "run_ids": [
+      "35696055681"
+    ],
+    "point_count": 16,
+    "representative_ids": [
+      "442953",
+      "442954",
+      "442955",
+      "442956",
+      "442957",
+      "442958",
+      "442959",
+      "442960",
+      "442961",
+      "442962",
+      "442963",
+      "442964",
+      "442965",
+      "442966",
+      "442967",
+      "442968"
+    ],
+    "repetitions": []
+  },
+  {
+    "image_name": "vllm/vllm-openai-rocm:nightly-rocm100-7f1a5398e9610d96c473931a26c0e12bbe0d0423",
+    "first_date": "2026-09-24",
+    "last_date": "2026-09-24",
+    "digests": [
+      null
+    ],
+    "run_ids": [
+      "35961603828"
+    ],
+    "point_count": 16,
+    "representative_ids": [
+      "443084",
+      "443085",
+      "443086",
+      "443087",
+      "443088",
+      "443089",
+      "443090",
+      "443091",
+      "443092",
+      "443093",
+      "443094",
+      "443095",
+      "443096",
+      "443097",
+      "443098",
+      "443099"
+    ],
+    "repetitions": []
+  },
+  {
+    "image_name": "vllm/vllm-openai-rocm:nightly-rocm100-29468dde8b515031dc6d4d9d06bf0a2fa0442098",
+    "first_date": "2026-09-25",
+    "last_date": "2026-09-25",
+    "digests": [
+      null
+    ],
+    "run_ids": [
+      "36101751233"
+    ],
+    "point_count": 16,
+    "representative_ids": [
+      "443179",
+      "443180",
+      "443181",
+      "443182",
+      "443183",
+      "443184",
+      "443185",
+      "443186",
+      "443187",
+      "443188",
+      "443189",
+      "443190",
+      "443191",
+      "443192",
+      "443193",
+      "443194"
+    ],
+    "repetitions": []
+  },
+  {
+    "image_name": "vllm/vllm-openai-rocm:nightly-rocm100-ac9126e58aa7bbab1856ba6593ba4d5003fea516",
+    "first_date": "2026-10-02",
+    "last_date": "2026-10-02",
+    "digests": [
+      null
+    ],
+    "run_ids": [
+      "36824408313"
+    ],
+    "point_count": 14,
+    "representative_ids": [
+      "443863",
+      "443864",
+      "443865",
+      "443866",
+      "443867",
+      "443868",
+      "443869",
+      "443870",
+      "443871",
+      "443872",
+      "443873",
+      "443874",
+      "443875",
+      "443876"
+    ],
+    "repetitions": []
+  },
+  {
+    "image_name": "vllm/vllm-openai-rocm:nightly-rocm100-7d0b4e57aac4c4323225b0eee9ae960ce75ffffe",
+    "first_date": "2026-10-12",
+    "last_date": "2026-10-12",
+    "digests": [
+      null
+    ],
+    "run_ids": [
+      "38028752236"
+    ],
+    "point_count": 14,
+    "representative_ids": [
+      "444503",
+      "444504",
+      "444505",
+      "444506",
+      "444507",
+      "444508",
+      "444509",
+      "444510",
+      "444511",
+      "444512",
+      "444513",
+      "444514",
+      "444515",
+      "444516"
+    ],
+    "repetitions": []
+  },
+  {
+    "image_name": "vllm/vllm-openai-rocm:nightly-rocm100-5555a2d8f7116b2b4877f66516f4128176cf722a",
+    "first_date": "2026-10-13",
+    "last_date": "2026-10-13",
+    "digests": [
+      null
+    ],
+    "run_ids": [
+      "38377181342"
+    ],
+    "point_count": 14,
+    "representative_ids": [
+      "444710",
+      "444711",
+      "444712",
+      "444713",
+      "444714",
+      "444715",
+      "444716",
+      "444717",
+      "444718",
+      "444719",
+      "444720",
+      "444721",
+      "444722",
+      "444723"
+    ],
+    "repetitions": []
+  },
+  {
+    "image_name": "vllm/vllm-openai-rocm:nightly-e68efc685ab1e6f1eda004ced7157e3ca411da2f",
+    "first_date": "2026-10-20",
+    "last_date": "2026-11-03",
+    "digests": [
+      "sha256:520e098f54ec96837228aaddea0a833cbf6374dbdffd480c1d65f26ffab7701b"
+    ],
+    "run_ids": [
+      "39295252770",
+      "39844994441",
+      "40161856449",
+      "41394320841"
+    ],
+    "point_count": 41,
+    "representative_ids": [
+      "445385",
+      "445386",
+      "445387",
+      "445388",
+      "445389",
+      "445390",
+      "445391",
+      "445392",
+      "445393",
+      "445394",
+      "445395",
+      "445396",
+      "445397",
+      "445398"
+    ],
+    "repetitions": [
+      {
+        "representative_id": "445385",
+        "ids": [
+          "445385",
+          "446286",
+          "446693",
+          "447079"
+        ],
+        "x_min_max": [
+          198.01980198019803,
+          277.77777777777777
+        ],
+        "y_min_max": [
+          360.84577,
+          365.45014
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445386",
+        "ids": [
+          "445386",
+          "446287",
+          "446694",
+          "447080"
+        ],
+        "x_min_max": [
+          460.8294930875576,
+          490.19607843137254
+        ],
+        "y_min_max": [
+          85.66052,
+          87.12995
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445387",
+        "ids": [
+          "445387",
+          "446288",
+          "446695",
+          "447081"
+        ],
+        "x_min_max": [
+          423.728813559322,
+          485.43689320388347
+        ],
+        "y_min_max": [
+          100.80527,
+          102.37104
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445388",
+        "ids": [
+          "445388",
+          "446289",
+          "446696",
+          "447082"
+        ],
+        "x_min_max": [
+          120.19230769230771,
+          178.57142857142858
+        ],
+        "y_min_max": [
+          630.78849,
+          660.26131
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445389",
+        "ids": [
+          "445389",
+          "446290",
+          "446697",
+          "447083"
+        ],
+        "x_min_max": [
+          390.62499999999994,
+          483.0917874396136
+        ],
+        "y_min_max": [
+          122.92412,
+          127.93083
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445390",
+        "ids": [
+          "445390",
+          "446291",
+          "446698",
+          "447084"
+        ],
+        "x_min_max": [
+          56.56108597285068,
+          66.84491978609626
+        ],
+        "y_min_max": [
+          1269.88805,
+          1350.72828
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445391",
+        "ids": [
+          "445391",
+          "446292",
+          "446699",
+          "447085"
+        ],
+        "x_min_max": [
+          288.1844380403458,
+          404.8582995951417
+        ],
+        "y_min_max": [
+          223.81104,
+          225.07696
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445393",
+        "ids": [
+          "445393",
+          "446293",
+          "446700",
+          "447086"
+        ],
+        "x_min_max": [
+          584.7953216374269,
+          588.2352941176471
+        ],
+        "y_min_max": [
+          45.12448,
+          45.71031
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      },
+      {
+        "representative_id": "445394",
+        "ids": [
+          "445394",
+          "446294",
+          "446701",
+          "447087"
+        ],
+        "x_min_max": [
+          526.3157894736842,
+          578.0346820809249
+        ],
+        "y_min_max": [
+          51.41384,
+          53.76776
+        ],
+        "interpretation": "observed spread; recipe changes may contribute, not a noise estimate"
+      }
+    ]
+  },
+  {
+    "image_name": "vllm/vllm-openai-rocm:nightly-335dd77b09161c5d63139b4e7ae51bb9928305b1",
+    "first_date": "2026-11-03",
+    "last_date": "2026-11-03",
+    "digests": [
+      "sha256:3c634cc2c51eda7eb840a236b1f09a5ecf6a4b0cb92c4b8486e2158770507291"
+    ],
+    "run_ids": [
+      "41394320841"
+    ],
+    "point_count": 1,
+    "representative_ids": [
+      "447088"
+    ],
+    "repetitions": []
+  },
+  {
+    "image_name": "vllm/vllm-openai-rocm:nightly-4fab5a07475822c6eaa971dceb2e2220d0446808",
+    "first_date": "2026-11-09",
+    "last_date": "2026-11-09",
+    "digests": [
+      "sha256:6f126f27a3b58959da3c16076248fc99eb31e26d0a3ae9f8563bda7317d6a7e6"
+    ],
+    "run_ids": [
+      "42335637576"
+    ],
+    "point_count": 10,
+    "representative_ids": [
+      "447797",
+      "447798",
+      "447799",
+      "447800",
+      "447801",
+      "447802",
+      "447803",
+      "447804",
+      "447805",
+      "447806"
+    ],
+    "repetitions": []
+  }
+]

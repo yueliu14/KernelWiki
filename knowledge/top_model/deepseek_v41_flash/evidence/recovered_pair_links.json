@@ -1,0 +1,102 @@
+[
+  {
+    "pair_id": "tp2_ep1_conc1_off_2026-10-20_to_2026-11-09",
+    "report": "recovered_pairs/tp2_ep1_conc1_v09_to_v11.md",
+    "before_point_id": "445386",
+    "after_point_id": "447798",
+    "before_artifact_id": 12222765118,
+    "after_artifact_id": 13563028606,
+    "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+    "gpu_profile_status": "unavailable"
+  },
+  {
+    "pair_id": "tp2_ep1_conc2_off_2026-10-20_to_2026-11-09",
+    "report": "recovered_pairs/tp2_ep1_conc2_v09_to_v11.md",
+    "before_point_id": "445387",
+    "after_point_id": "447799",
+    "before_artifact_id": 12222711774,
+    "after_artifact_id": 13564127198,
+    "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+    "gpu_profile_status": "unavailable"
+  },
+  {
+    "pair_id": "tp2_ep1_conc4_off_2026-10-20_to_2026-11-09",
+    "report": "recovered_pairs/tp2_ep1_conc4_v09_to_v11.md",
+    "before_point_id": "445389",
+    "after_point_id": "447801",
+    "before_artifact_id": 12222959431,
+    "after_artifact_id": 13563853565,
+    "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+    "gpu_profile_status": "unavailable"
+  },
+  {
+    "pair_id": "tp2_ep1_conc8_off_2026-10-20_to_2026-11-09",
+    "report": "recovered_pairs/tp2_ep1_conc8_v09_to_v11.md",
+    "before_point_id": "445391",
+    "after_point_id": "447803",
+    "before_artifact_id": 12229059529,
+    "after_artifact_id": 13563787714,
+    "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+    "gpu_profile_status": "unavailable"
+  },
+  {
+    "pair_id": "tp2_ep1_conc16_off_2026-10-20_to_2026-11-09",
+    "report": "recovered_pairs/tp2_ep1_conc16_v09_to_v11.md",
+    "before_point_id": "445385",
+    "after_point_id": "447797",
+    "before_artifact_id": 12224605382,
+    "after_artifact_id": 13564725051,
+    "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+    "gpu_profile_status": "unavailable"
+  },
+  {
+    "pair_id": "tp2_ep1_conc32_off_2026-10-20_to_2026-11-09",
+    "report": "recovered_pairs/tp2_ep1_conc32_v09_to_v11.md",
+    "before_point_id": "445388",
+    "after_point_id": "447800",
+    "before_artifact_id": 12236676394,
+    "after_artifact_id": 13564049818,
+    "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+    "gpu_profile_status": "unavailable"
+  },
+  {
+    "pair_id": "tp2_ep1_conc64_off_2026-10-20_to_2026-11-09",
+    "report": "recovered_pairs/tp2_ep1_conc64_v09_to_v11.md",
+    "before_point_id": "445390",
+    "after_point_id": "447802",
+    "before_artifact_id": 12229184365,
+    "after_artifact_id": 13565030597,
+    "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+    "gpu_profile_status": "unavailable"
+  },
+  {
+    "pair_id": "tp4_ep1_conc1_off_2026-10-20_to_2026-11-09",
+    "report": "recovered_pairs/tp4_ep1_conc1_v09_to_v11.md",
+    "before_point_id": "445393",
+    "after_point_id": "447804",
+    "before_artifact_id": 12228583807,
+    "after_artifact_id": 13561965484,
+    "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+    "gpu_profile_status": "unavailable"
+  },
+  {
+    "pair_id": "tp4_ep1_conc2_off_2026-10-20_to_2026-11-09",
+    "report": "recovered_pairs/tp4_ep1_conc2_v09_to_v11.md",
+    "before_point_id": "445394",
+    "after_point_id": "447805",
+    "before_artifact_id": 12232283661,
+    "after_artifact_id": 13563797350,
+    "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+    "gpu_profile_status": "unavailable"
+  },
+  {
+    "pair_id": "tp8_ep1_conc1_off_2026-11-03_to_2026-11-09",
+    "report": "recovered_pairs/tp8_ep1_conc1_v10_to_v11.md",
+    "before_point_id": "447088",
+    "after_point_id": "447806",
+    "before_artifact_id": 13122361038,
+    "after_artifact_id": 13566143184,
+    "evidence_status": "phase_aligned_log_observations_and_recovered_container_source",
+    "gpu_profile_status": "unavailable"
+  }
+]

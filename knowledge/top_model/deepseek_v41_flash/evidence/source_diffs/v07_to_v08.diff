@@ -1,0 +1,1450 @@
+--- V07:vllm/models/deepseek_v41/amd/model.py
++++ V08:vllm/models/deepseek_v41/amd/model.py
+@@ -62,6 +62,7 @@
+ from vllm.models.deepseek_v41.amd.mono_decode import MonoDecodeLayer
+ from vllm.models.deepseek_v41.amd.rocm import DeepseekV41ROCMAiterMLAAttention
+ from vllm.models.deepseek_v41.attention import DeepseekV4Attention
++from vllm.models.deepseek_v41.decoder_replay_layers import DecoderReplayLayers
+ from vllm.sequence import IntermediateTensors
+ from vllm.utils.math_utils import cdiv
+ from vllm.v1.attention.backends.registry import AttentionBackendEnum
+@@ -282,7 +283,17 @@
+         engram_mask: torch.Tensor | None = None,
+     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+         if self.mono is not None:
+-            out = self.mono(self, x, positions, residual, post_mix, res_mix, pre_mix)
++            out = self.mono(
++                self,
++                x,
++                positions,
++                residual,
++                post_mix,
++                res_mix,
++                pre_mix,
++                engram_hashes,
++                engram_mask,
++            )
+             if out is not None:
+                 return out
+         # Layer 0's attention seam projects the 2-D embedding with the folded
+@@ -411,6 +422,42 @@
+         x = self.ffn(x, input_ids)
+         return x, residual, post_mix, res_mix, ffn_pre
+ 
++    def write_kv(
++        self,
++        x: torch.Tensor,
++        positions: torch.Tensor,
++        input_ids: torch.Tensor | None,
++        pre_mix: torch.Tensor,
++        post_mix: torch.Tensor,
++        res_mix: torch.Tensor,
++        residual: torch.Tensor,
++    ) -> None:
++        """Write the KV ``forward`` would for the replay layers' inputs, skipping
++        the rest of the layer; the replay batch then reruns its rows."""
++        # The replay batch rules out Engram and sequence parallel here.
++        assert self.engram is None and not self.use_sequence_parallel
++        fuse_attn_norm = self.fuse_seam_norm
++        residual, post_mix, res_mix, x, _attn_pre = self.mhc_pre_delayed(
++            residual,
++            self.hc_attn_fn,
++            self.hc_attn_scale,
++            self.hc_attn_base,
++            self.rms_norm_eps,
++            self.hc_eps,
++            self.hc_eps,
++            self.hc_post_alpha,
++            self.hc_sinkhorn_iters,
++            pre_mix=pre_mix,
++            sublayer_out=x,
++            post_layer_mix=post_mix,
++            comb_res_mix=res_mix,
++            norm_weight=self.attn_norm.weight if fuse_attn_norm else None,
++            norm_eps=self.attn_norm.variance_epsilon,
++        )
++        if not fuse_attn_norm:
++            x = self.attn_norm(x)
++        self.attn.forward_kv(positions, x)
++
+ 
+ class DeepseekV4Model(nn.Module, EagleModelMixin):
+     def __init__(self, *, vllm_config: VllmConfig, prefix: str = ""):
+@@ -487,6 +534,45 @@
+             ),
+             prefix=f"{prefix}.layers",
+         )
++
++        # Config flag is the switch: ROCm forces swa_cache_layer.bounded_replay off.
++        self.decoder_replay_layers: DecoderReplayLayers | None = None
++        self.decoder_replay_start = self.end_layer
++        cut = max(config.kv_source_layer_ids)
++        if (
++            vllm_config.cache_config.swa_bounded_replay
++            and vllm_config.use_v2_model_runner
++            and cut < self.end_layer - 1
++            and self._decoder_replay_supported(vllm_config, cut)
++        ):
++            assert self.layers[cut].attn.compress_ratio <= 1
++            # The last KV source writes every row's KV, then replays.
++            self.decoder_replay_start = cut
++            # The attention metadata keys the replay layers read.
++            metadata_prefixes: set[str] = set()
++            for layer in islice(self.layers, cut, self.end_layer):
++                attn = typing.cast(DeepseekV4DecoderLayer, layer).attn
++                metadata_prefixes.add(attn.swa_cache_layer.prefix)
++                if attn.compressed_cache_prefix is not None:
++                    metadata_prefixes.add(attn.compressed_cache_prefix)
++                if attn.indexer is not None:
++                    metadata_prefixes.add(attn.indexer.k_cache.prefix)
++            self.decoder_replay_layers = DecoderReplayLayers(
++                config.sliding_window,
++                self._run_replay_layers,
++                self.layers[cut].write_kv,
++                metadata_prefixes,
++                self.layers[cut].attn.swa_cache_layer.prefix,
++            )
++            logger.info_once(
++                "Decoder SWA bounded replay: in eager prefill steps, layer %d "
++                "writes its KV for every token, and the rest of it and layers "
++                "%d-%d run on each request's last %d tokens only.",
++                cut,
++                cut + 1,
++                self.end_layer - 1,
++                config.sliding_window,
++            )
+ 
+         # The n-gram hash needs a slot-keyed rolling store of compressed ids
+         # (chunked prefill / decode lookback); key it off the first local
+@@ -647,13 +733,107 @@
+         if not get_pp_group().is_first_rank:
+             assert intermediate_tensors is not None
+             pre_mix = intermediate_tensors["pre_mix"]
++        (
++            hidden_states,
++            residual,
++            post_mix,
++            res_mix,
++            pre_mix,
++            aux_hidden_states,
++            final_aux_recon,
++            ran_layers,
++        ) = self._run_layers(
++            range(self.start_layer, self.decoder_replay_start),
++            hidden_states,
++            positions,
++            input_ids,
++            pre_mix,
++            post_mix,
++            res_mix,
++            residual,
++            engram_hashes,
++            engram_mask,
++            full_num_tokens,
++        )
++        # Replay collapses inside its own batch. The early loop still sets
++        # ran_layers, so that flag alone must not post again on the full batch.
++        collapsed = False
++        if self.decoder_replay_layers is not None:
++            hidden_states, pre_mix, *late_aux = self.decoder_replay_layers(
++                hidden_states,
++                positions,
++                input_ids,
++                pre_mix,
++                post_mix,
++                res_mix,
++                residual,
++            )
++            aux_hidden_states.extend(late_aux)
++            final_aux_recon = None
++            collapsed = True
++        if ran_layers and not collapsed:
++            if (
++                self.end_layer in self.aux_hidden_state_layers
++                and final_aux_recon is not None
++            ):
++                hidden_states = final_aux_recon
++            else:
++                hidden_states = self.mhc_post(
++                    hidden_states, residual, post_mix, res_mix
++                )
++
++        if not get_pp_group().is_last_rank:
++            return IntermediateTensors(
++                {"hidden_states": hidden_states, "pre_mix": pre_mix}
++            )
++
++        if self.use_sequence_parallel:
++            hidden_states = sp_all_gather(hidden_states)[:full_num_tokens]
++            pre_mix = sp_all_gather(pre_mix)[:full_num_tokens]
++
++        if self._mtp_hidden_buffer is not None:
++            num_tokens = hidden_states.shape[0]
++            self._mtp_hidden_buffer[:num_tokens].copy_(hidden_states.flatten(1))
++
++        # Collapse the hc copies with the pre-mix from the last layer's FFN
++        # mixes — the mix the reference applies via
++        # ``last_layer.hc_pre(h, pre_mix)`` (v4.1 has no learned hc_head).
++        assert pre_mix is not None
++        hidden_states = torch.ops.vllm.hc_collapse_triton(hidden_states, pre_mix)
++        hidden_states = self.norm(hidden_states)
++        if len(aux_hidden_states) > 0:
++            return hidden_states, aux_hidden_states
++        return hidden_states
++
++    def _run_layers(
++        self,
++        layer_ids: range,
++        hidden_states: torch.Tensor,
++        positions: torch.Tensor,
++        input_ids: torch.Tensor | None,
++        pre_mix: torch.Tensor | None,
++        post_mix: torch.Tensor | None,
++        res_mix: torch.Tensor | None,
++        residual: torch.Tensor | None,
++        engram_hashes: torch.Tensor | None,
++        engram_mask: torch.Tensor | None,
++        full_num_tokens: int,
++    ) -> tuple[
++        torch.Tensor,
++        torch.Tensor | None,
++        torch.Tensor | None,
++        torch.Tensor | None,
++        torch.Tensor | None,
++        list[torch.Tensor],
++        torch.Tensor | None,
++        bool,
++    ]:
+         aux_hidden_states: list[torch.Tensor] = []
+-        final_aux_recon: torch.Tensor | None = None  # avoid duplicate mhc_post call
+-        for idx, layer in enumerate(
+-            islice(self.layers, self.start_layer, self.end_layer),
+-            start=self.start_layer,
+-        ):
+-            hidden_states, residual, post_mix, res_mix, pre_mix = layer(
++        final_aux_recon: torch.Tensor | None = None
++        ran_layers = False
++        for idx in layer_ids:
++            ran_layers = True
++            hidden_states, residual, post_mix, res_mix, pre_mix = self.layers[idx](
+                 hidden_states,
+                 positions,
+                 input_ids,
+@@ -664,45 +844,122 @@
+                 engram_hashes,
+                 engram_mask,
+             )
+-            if idx + 1 in self.aux_hidden_state_layers:
+-                # Reconstruct the aux hidden state for draft models
++            # The aux id of the first replay layer is the post of the last
++            # full-batch layer. Capture it on the trimmed rows instead.
++            if idx + 1 in self.aux_hidden_state_layers and not (
++                self.decoder_replay_layers is not None
++                and idx + 1 == self.decoder_replay_start
++            ):
+                 aux_recon = self.mhc_post(hidden_states, residual, post_mix, res_mix)
+                 aux_hidden_state = aux_recon.mean(dim=1)
+                 if self.use_sequence_parallel:
+                     aux_hidden_state = sp_all_gather(aux_hidden_state)[:full_num_tokens]
+                 aux_hidden_states.append(aux_hidden_state)
+                 final_aux_recon = aux_recon
+-        if layer is not None:
+-            # Reuse if the last layer was captured as an aux hidden state
+-            if self.end_layer in self.aux_hidden_state_layers:
+-                hidden_states = final_aux_recon
+-            else:
+-                hidden_states = self.mhc_post(
+-                    hidden_states, residual, post_mix, res_mix
+-                )
+-
+-        if not get_pp_group().is_last_rank:
+-            return IntermediateTensors(
+-                {"hidden_states": hidden_states, "pre_mix": pre_mix}
+-            )
+-
+-        if self.use_sequence_parallel:
+-            hidden_states = sp_all_gather(hidden_states)[:full_num_tokens]
+-            pre_mix = sp_all_gather(pre_mix)[:full_num_tokens]
+-
+-        if self._mtp_hidden_buffer is not None:
+-            num_tokens = hidden_states.shape[0]
+-            self._mtp_hidden_buffer[:num_tokens].copy_(hidden_states.flatten(1))
+-
+-        # Collapse the hc copies with the pre-mix from the last layer's FFN
+-        # mixes — the mix the reference applies via
+-        # ``last_layer.hc_pre(h, pre_mix)`` (v4.1 has no learned hc_head).
+-        assert pre_mix is not None
+-        hidden_states = torch.ops.vllm.hc_collapse_triton(hidden_states, pre_mix)
+-        hidden_states = self.norm(hidden_states)
+-        if len(aux_hidden_states) > 0:
+-            return hidden_states, aux_hidden_states
+-        return hidden_states
++        return (
++            hidden_states,
++            residual,
++            post_mix,
++            res_mix,
++            pre_mix,
++            aux_hidden_states,
++            final_aux_recon,
++            ran_layers,
++        )
++
++    def _run_replay_layers(
++        self,
++        hidden_states: torch.Tensor,
++        positions: torch.Tensor,
++        input_ids: torch.Tensor | None,
++        pre_mix: torch.Tensor,
++        post_mix: torch.Tensor,
++        res_mix: torch.Tensor,
++        residual: torch.Tensor,
++    ) -> tuple[torch.Tensor, ...]:
++        """Layers past the last KV source, on the rows they are given.
++
++        The final ``mhc_post`` runs here, on this batch. The return is
++        ``(hidden_states, pre_mix, *aux)``.
++        """
++        # Post of the layer before the cut. These rows are already trimmed,
++        # and sequence parallel is unsupported while replay is on.
++        cut_aux: list[torch.Tensor] = []
++        if self.decoder_replay_start in self.aux_hidden_state_layers:
++            cut_aux.append(
++                self.mhc_post(hidden_states, residual, post_mix, res_mix).mean(dim=1)
++            )
++        (
++            hidden_states,
++            residual,
++            post_mix,
++            res_mix,
++            pre_mix,
++            aux,
++            final_aux_recon,
++            ran_layers,
++        ) = self._run_layers(
++            range(self.decoder_replay_start, self.end_layer),
++            hidden_states,
++            positions,
++            input_ids,
++            pre_mix,
++            post_mix,
++            res_mix,
++            residual,
++            None,
++            None,
++            positions.shape[0],
++        )
++        assert residual is not None and post_mix is not None
++        assert res_mix is not None and pre_mix is not None
++        if (
++            self.end_layer in self.aux_hidden_state_layers
++            and final_aux_recon is not None
++        ):
++            hidden_states = final_aux_recon
++        elif ran_layers:
++            hidden_states = self.mhc_post(hidden_states, residual, post_mix, res_mix)
++        return (hidden_states, pre_mix, *cut_aux, *aux)
++
++    def _decoder_replay_supported(self, vllm_config: VllmConfig, cut: int) -> bool:
++        """Whether this rank may replay from layer ``cut`` on; warns when not."""
++        parallel_config = vllm_config.parallel_config
++        spec_config = vllm_config.speculative_config
++        draft_config = spec_config.draft_model_config if spec_config else None
++        draft_hf_config = getattr(draft_config, "hf_config", None)
++        draft_window = getattr(draft_hf_config, "sliding_window", None)
++        draft_layer_types = getattr(draft_hf_config, "layer_types", None) or ()
++        window = self.config.sliding_window
++        if self.start_layer > cut or self.end_layer < self.config.num_hidden_layers:
++            reason = (
++                "the pipeline stage holding the last KV source layer must also "
++                "hold every layer after it"
++            )
++        elif (
++            self.use_sequence_parallel
++            or parallel_config.prefill_context_parallel_size > 1
++            or parallel_config.use_ubatching
++        ):
++            reason = (
++                "the replay-layer batch shrinks per rank, which sequence and "
++                "prefill-context parallelism and microbatching cannot follow"
++            )
++        elif any(i >= cut for i in getattr(self.config, "engram_layer_ids", ())):
++            reason = "an Engram layer sits at or after the last KV source layer"
++        elif draft_config is not None and (
++            draft_window is None
++            or draft_window > window
++            or any(t != "sliding_attention" for t in draft_layer_types)
++        ):
++            reason = (
++                f"the drafter (sliding window {draft_window}) reads hidden states "
++                f"outside the target's {window}-token window"
++            )
++        else:
++            return True
++        logger.warning_once("Decoder SWA bounded replay is off: %s.", reason)
++        return False
+ 
+     def load_weights(self, weights: Iterable[tuple[str, torch.Tensor]]) -> set[str]:
+         stacked_params_mapping = [
+@@ -1118,6 +1375,10 @@
+         engram_hash = self.model.engram_hash
+         return engram_hash.lookback_depth if engram_hash is not None else 0
+ 
++    @property
++    def decoder_replay_layers(self) -> DecoderReplayLayers | None:
++        return self.model.decoder_replay_layers
++
+     def forward(
+         self,
+         input_ids: torch.Tensor,
+--- V07:vllm/models/deepseek_v41/amd/mono/attention/back.py
++++ V08:vllm/models/deepseek_v41/amd/mono/attention/back.py
+@@ -151,7 +151,9 @@
+     table: slot | 1 << 31 for a compressed row, a window slot otherwise, -1 for
+     none (it reads a zero record: its scores are masked, its values zeros)."""
+     a, ratio = c["args"], c["ratio"]
+-    val = ld_i32(a["kt"], t * KEYS + fx.min(fx.max(k, 0), KEYS - 1))
++    # a table this launch wrote (``krdy``) is read past the CU's cache
++    cm = CM_DEV if const_expr("krdy" in c) else 0
++    val = ld_i32(a["kt"], t * KEYS + fx.min(fx.max(k, 0), KEYS - 1), cm)
+     ok = val != fx.Int32(-1)
+     slot = ok.select(val & fx.Int32(0x7FFFFFFF), fx.Int32(0))
+     if const_expr(ratio > 0):
+@@ -209,9 +211,11 @@
+     g = lane // 16
+     r16 = lane % 16
+     k0 = ch * ck
++    if const_expr("krdy" in c):
++        await_flags(c, c["krdy"], 1, lambda u: t)
+     # the key count, this lane's key and q: independent loads, out together
+-    # (K1's key table holds -1 past a token's keys)
+-    kv_len = ld_i32(a["klen"], t)
++    # (the key table holds -1 past a token's keys)
++    kv_len = ld_i32(a["klen"], t, CM_DEV if const_expr("krdy" in c) else 0)
+     key = k0 + kt * 16 + r16
+     data, sc, okv = key_rec(c, t, key)
+     qrow = d.heads * HEAD_DIM // 8
+--- V07:vllm/models/deepseek_v41/amd/mono/attention/front.py
++++ V08:vllm/models/deepseek_v41/amd/mono/attention/front.py
+@@ -188,6 +188,8 @@
+     ntopk."""
+     tid = c["tid"]
+     a, ratio = c["args"], c["ratio"]
++    # device scope where this launch reads the table (K2's)
++    cm = CM_DEV if const_expr(c.get("dev", False)) else 0
+     slot = ld_i32(a["slot"], 2 * t)
+     live = slot >= 0
+     nswa = live.select(ld_i32(a["swa_lens"], t), fx.Int32(0))
+@@ -212,10 +214,10 @@
+             c_val = (local >= 0).select(c_slot, fx.Int32(-1))
+             val = (k < ntopk).select(c_val, val)
+         if k < KEYS:
+-            bo.buffer_store(val, rsrc(a["kt"]), t * KEYS + k)
++            bo.buffer_store(val, rsrc(a["kt"]), t * KEYS + k, cache_modifier=cm)
+     if tid == 0:
+-        bo.buffer_store(kv_len, rsrc(a["klen"]), t)
+-        bo.buffer_store(ntopk, rsrc(a["klen"]), c["S"] + t)
++        bo.buffer_store(kv_len, rsrc(a["klen"]), t, cache_modifier=cm)
++        bo.buffer_store(ntopk, rsrc(a["klen"]), c["S"] + t, cache_modifier=cm)
+ 
+ 
+ # ---------------------------------------------------------------- wqkv_a
+@@ -357,6 +359,20 @@
+         amax = fx.max(amax, abs(y))
+     code = mx_code(butterfly(amax, (1, 2), fx.max))
+     mul = mx_mul(code)
++    if const_expr(c.get("index", False)):  # noqa: SIM102
++        # the bf16 qr, vLLM's indexer's input
++        if mine & (tt * 8 < Q_RANK):
++            words = [
++                fx.Vector.from_elements([ys[2 * i], ys[2 * i + 1]], fx.Float32)
++                .to(fx.BFloat16)
++                .bitcast(fx.Int32)[0]
++                for i in range(4)
++            ]
++            bo.buffer_store(
++                fx.Vector.from_elements(words, fx.Int32),
++                rsrc(a["qr_out"]),
++                t * (Q_RANK // 2) + 4 * tt,
++            )
+     if mine & (tt * 8 < Q_RANK):
+         w0 = fp8_pack4(*[clamp_fp8(ys[i] * mul) for i in range(4)])
+         w1 = fp8_pack4(*[clamp_fp8(ys[4 + i] * mul) for i in range(4)])
+@@ -597,8 +613,10 @@
+                 u = free + n_free * tid
+                 if u < xq_units:
+                     c["mb"].put(c["xrdy"], u, fx.Int32(1))
+-    for t in range(is_free.select(free, fx.Int32(s)), s, n_free):
+-        stage_kt(c, t)
++    if const_expr(not c.get("index", False)):
++        # an index source's top-k comes after this launch: K2 builds its table
++        for t in range(is_free.select(free, fx.Int32(s)), s, n_free):
++            stage_kt(c, t)
+     stamp(c, 1)
+     poss = [wqb_pos(c, t0, n) for t0, n in tiles]
+ 
+--- V07:vllm/models/deepseek_v41/amd/mono/layer.py
++++ V08:vllm/models/deepseek_v41/amd/mono/layer.py
+@@ -58,6 +58,12 @@
+     tp: int
+     ratio: int  # the layer's compress ratio (its attention's key sources)
+     timeline: bool = False
++    # K1's seam folds the previous layer's output into the residual; off for a
++    # residual that arrives settled (the first layer, after an Engram)
++    fold: bool = True
++    # the layer selects its own top-k (an index source): K1 hands its normed
++    # input and qr out for vLLM's indexer, K2 builds the key table
++    index: bool = False
+ 
+ 
+ def _moe_key(key: MonoBuild) -> MoeBuild:
+@@ -100,6 +106,7 @@
+     lo = min(o for o, _ in mr.values())
+     place({n: (o - lo, n_) for n, (o, n_) in mr.items()})
+     place({"normed": (0, s * HIDDEN * 2), "xrdy_moe": (s * HIDDEN * 2 + 256, s * 8)})
++    place({"krdy": (0, s * 8)})
+     return out
+ 
+ 
+@@ -175,7 +182,15 @@
+         seam: SeamLds
+         front: FrontLds  # type: ignore[valid-type]
+ 
+-    name = kernel_symbol("dsv41_mono_k1", s=s, tp=tp, r=key.ratio, tl=key.timeline)
++    name = kernel_symbol(
++        "dsv41_mono_k1",
++        s=s,
++        tp=tp,
++        r=key.ratio,
++        tl=key.timeline,
++        f=key.fold,
++        i=key.index,
++    )
+     keyed = key_tuple(key, SOURCES)
+ 
+     @flyc.kernel(name=name, known_block_size=[THREADS, 1, 1])
+@@ -215,6 +230,8 @@
+         t2r: Int64,
+         kt: Int64,
+         klen: Int64,
++        normed_out: Int64,
++        qr_out: Int64,
+         scratch: Int64,
+         epoch: Int64,
+         tl: Int64,
+@@ -250,9 +267,11 @@
+             "t2r": t2r,
+             "kt": kt,
+             "klen": klen,
++            "qr_out": qr_out,
+         }
+         flayout = {n: layout[n] for n in front_scratch(s, Dims(tp))}
+         c = mb_front.front_context(fkey, lds.front.peek(), fargs, scratch, tag, flayout)
++        c["index"] = key.index
+         amb = Mailbox(tag)
+         tid = fx.thread_idx.x
+         ca = {
+@@ -284,6 +303,7 @@
+                 "pre_out": pre_out,
+             },
+             "d": StageDims(tp),
++            "fold": key.fold,
+         }
+         for region in ("lin", "pmix"):
+             ca[region] = sreg(scratch, layout[region][0], region)
+@@ -295,9 +315,14 @@
+                 seam.stage_slice(ca, task)
+             gpu.barrier()
+ 
++        def store(*v):
++            store_x8(c, *v)
++            if const_expr(key.index):
++                store_normed(normed_out, *v)
++
+         def seam_rest():
+             for t in range(first_task(bid, NORM0), s, BLOCKS):
+-                seam.stage_norm(ca, t, lambda *v: store_x8(c, *v))
++                seam.stage_norm(ca, t, store)
+                 publish_x8(c, t)
+             for t in range(first_task(bid, GATE0), s, BLOCKS):
+                 seam.stage_gate(ca, t)
+@@ -344,6 +369,8 @@
+         t2r: Int64,
+         kt: Int64,
+         klen: Int64,
++        normed_out: Int64,
++        qr_out: Int64,
+         scratch: Int64,
+         epoch: Int64,
+         tl: Int64,
+@@ -386,6 +413,8 @@
+             t2r,
+             kt,
+             klen,
++            normed_out,
++            qr_out,
+             scratch,
+             epoch,
+             tl,
+@@ -544,7 +573,9 @@
+         seam: SeamLds  # type: ignore[valid-type]
+         moe: MoeLds  # type: ignore[valid-type]
+ 
+-    name = kernel_symbol("dsv41_mono_k2", s=s, tp=tp, r=key.ratio, tl=key.timeline)
++    name = kernel_symbol(
++        "dsv41_mono_k2", s=s, tp=tp, r=key.ratio, tl=key.timeline, i=key.index
++    )
+     keyed = key_tuple(key, SOURCES)
+ 
+     @flyc.kernel(name=name, known_block_size=[THREADS, 1, 1])
+@@ -558,6 +589,13 @@
+         comp_block: Int32,
+         kt: Int64,
+         klen: Int64,
++        slot: Int64,
++        swa_idx: Int64,
++        swa_lens: Int64,
++        t2r: Int64,
++        topk: Int64,
++        comp_bt: Int64,
++        bt_stride: Int32,
+         pos: Int64,
+         sink: Int64,
+         qk_scale: Int32,
+@@ -642,6 +680,32 @@
+         if const_expr(key.timeline):
+             c["tl"], c["tl_points"] = tl, mb_back.BACK_POINTS
+         mb_back.epoch_begin(c, epoch, ep)
++        if const_expr(key.index):
++            # the key table, from the top-k vLLM's indexer selected after K1,
++            # on the last CTAs: each split task waits on its token's
++            ckt = {
++                "S": s,
++                "tid": c["tid"],
++                "dev": True,
++                "ratio": key.ratio,
++                "args": {
++                    "slot": slot,
++                    "swa_idx": swa_idx,
++                    "swa_lens": swa_lens,
++                    "pos": pos,
++                    "t2r": t2r,
++                    "topk": topk,
++                    "comp_block": comp_block,
++                    "comp_bt": comp_bt,
++                    "bt_stride": bt_stride,
++                    "kt": kt,
++                    "klen": klen,
++                },
++            }
++            c["krdy"] = sreg(scratch, layout["krdy"][0], "krdy")
++            for t in range(first_task(bid, BLOCKS - s), s, BLOCKS):
++                mb_front.stage_kt(ckt, t)
++                mb_back.publish(c, c["krdy"], t)
+         mb_back.run_back(c, bkey, bid)
+         gpu.barrier()
+ 
+@@ -685,6 +749,13 @@
+         comp_block: Int32,
+         kt: Int64,
+         klen: Int64,
++        slot: Int64,
++        swa_idx: Int64,
++        swa_lens: Int64,
++        t2r: Int64,
++        topk: Int64,
++        comp_bt: Int64,
++        bt_stride: Int32,
+         pos: Int64,
+         sink: Int64,
+         qk_scale: Int32,
+@@ -736,6 +807,13 @@
+             comp_block,
+             kt,
+             klen,
++            slot,
++            swa_idx,
++            swa_lens,
++            t2r,
++            topk,
++            comp_bt,
++            bt_stride,
+             pos,
+             sink,
+             qk_scale,
+--- V07:vllm/models/deepseek_v41/amd/mono/runner.py
++++ V08:vllm/models/deepseek_v41/amd/mono/runner.py
+@@ -16,12 +16,13 @@
+ from __future__ import annotations
+ 
+ import os
++from collections.abc import Callable
+ from dataclasses import dataclass
+ from pathlib import Path
+ 
+ import torch
+ 
+-from .attention.plan import HEAD_DIM, HIDDEN, KEYS, Dims
++from .attention.plan import HEAD_DIM, HIDDEN, KEYS, Q_RANK, Dims
+ from .common.plan import BLOCKS
+ from .layer import (
+     EPOCH_WORDS,
+@@ -170,6 +171,12 @@
+         self.klen = torch.zeros(2 * MAX_TOKENS, dtype=torch.int32, device=dev)
+         self._dummy = torch.zeros(4, dtype=torch.int32, device=dev)
+         self._zero_rec = torch.zeros(1024, dtype=torch.uint8, device=dev)
++        # the first layer's incoming pre-mix: stream 0 of the broadcast embedding
++        self._first_pre = torch.zeros(MAX_TOKENS, HC, dtype=torch.float32, device=dev)
++        self._first_pre[:, 0] = 1.0
++        # an index source's K1 outputs, vLLM's indexer's inputs
++        self.normed = torch.zeros(MAX_TOKENS, HIDDEN, dtype=torch.bfloat16, device=dev)
++        self.qr = torch.zeros(MAX_TOKENS, Q_RANK, dtype=torch.bfloat16, device=dev)
+         # the attention seam's outputs, K1 -> K2
+         self.res_mid = torch.zeros(
+             MAX_TOKENS, HC, HIDDEN, dtype=torch.bfloat16, device=dev
+@@ -203,14 +210,17 @@
+             self._scratch[tokens] = buf
+         return buf
+ 
++    def first_pre_mix(self, tokens: int) -> torch.Tensor:
++        return self._first_pre[:tokens]
++
+     @staticmethod
+     def supports(tokens: int) -> bool:
+         return 1 <= tokens <= MAX_TOKENS
+ 
+-    def kernels(self, tokens: int, ratio: int):
+-        key = (tokens, ratio)
++    def kernels(self, tokens: int, ratio: int, fold: bool = True, index: bool = False):
++        key = (tokens, ratio, fold, index)
+         if key not in self._kernels:
+-            b = MonoBuild(tokens, self.tp, ratio)
++            b = MonoBuild(tokens, self.tp, ratio, fold=fold, index=index)
+             self._kernels[key] = (build_mono_k1(b), build_mono_k2(b))
+         return self._kernels[key]
+ 
+@@ -249,15 +259,21 @@
+         comp_cache: torch.Tensor | None = None,
+         comp_block_table: torch.Tensor | None = None,
+         outs: tuple | None = None,
++        fold: bool = True,
++        select: Callable[[torch.Tensor, torch.Tensor], None] | None = None,
+     ):
+         """-> (out, residual, post_mix, res_mix, pre_mix): the layer's outputs
+-        (``outs``: buffers to write them into)."""
++        (``outs``: buffers to write them into). ``select(normed, qr)``: an index
++        source's top-k selection into ``topk_indices``, run between the
++        kernels on K1's normed input and qr."""
+         M = x.shape[0]
+         assert self.supports(M), M
+         a = w.attn
+         assert a is not None
+         ratio = a.ratio
+-        k1, k2 = self.kernels(M, ratio)
++        index = select is not None
++        assert not index or ratio
++        k1, k2 = self.kernels(M, ratio, fold, index)
+         st = torch.cuda.current_stream()
+         if outs is None:
+             outs = self._outs(M, residual)
+@@ -324,11 +340,15 @@
+             token_to_req.data_ptr(),
+             self.kt.data_ptr(),
+             self.klen.data_ptr(),
++            self.normed.data_ptr(),
++            self.qr.data_ptr(),
+             self.scratch(M).data_ptr(),
+             self.epoch.data_ptr(),
+             0,
+             stream=st,
+         )
++        if select is not None:
++            select(self.normed[:M], self.qr[:M])
+         k2(
+             self.q.data_ptr(),
+             swa_cache.data_ptr(),
+@@ -339,6 +359,13 @@
+             comp_block,
+             self.kt.data_ptr(),
+             self.klen.data_ptr(),
++            slot_mapping.data_ptr(),
++            swa_indices.data_ptr(),
++            swa_lens.data_ptr(),
++            token_to_req.data_ptr(),
++            topk.data_ptr(),
++            bt.data_ptr(),
++            bt_stride,
+             positions.data_ptr(),
+             a.attn_sink.data_ptr(),
+             self._qk_scale,
+--- V07:vllm/models/deepseek_v41/amd/mono/stages/seam.py
++++ V08:vllm/models/deepseek_v41/amd/mono/stages/seam.py
+@@ -141,6 +141,8 @@
+     """Element e's loads of ``stage_slice`` (e clamped into the step's)."""
+     a = c["args"]
+     t, o, col = slice_at(c0, e)
++    if const_expr(not c.get("fold", True)):
++        return (ld_bf(a["res_in"], (t * HC + o) * HIDDEN + col),)
+     r = [ld_bf(a["res_in"], (t * HC + h) * HIDDEN + col) for h in range(HC)]
+     cm = [ld_f32(a["comb_in"], (t * HC + h) * HC + o) for h in range(HC)]
+     return r, cm, ld_f32(a["post_in"], t * HC + o)
+@@ -150,15 +152,19 @@
+     """Element e of ``stage_slice``'s R_new from ``slice_loads``' values."""
+     a = c["args"]
+     t, o, col = slice_at(c0, e)
+-    r, cm, post = got
+-    # aiter's mhc_fused_post_pre_delayed_rmsnorm: ((post x + c0 r0)
+-    # + c1 r1) + c2 r2, each product rounded, then fma(c3, r3, ..)
+-    v = post * pend_value(c, t, col, e % COLS) + (r[0] * cm[0])
+-    for h in range_constexpr(1, HC - 1):
+-        v = v + cm[h] * r[h]
+-    # bf16 R_new is what the collapse, the sums of squares and the
+-    # mix projection all read
+-    v = bf16_round(fma(cm[HC - 1], r[HC - 1], v))
++    if const_expr(not c.get("fold", True)):
++        # a settled residual (no owed post): stream o as it arrives
++        v = got[0]
++    else:
++        r, cm, post = got
++        # aiter's mhc_fused_post_pre_delayed_rmsnorm: ((post x + c0 r0)
++        # + c1 r1) + c2 r2, each product rounded, then fma(c3, r3, ..)
++        v = post * pend_value(c, t, col, e % COLS) + (r[0] * cm[0])
++        for h in range_constexpr(1, HC - 1):
++            v = v + cm[h] * r[h]
++        # bf16 R_new is what the collapse, the sums of squares and the
++        # mix projection all read
++        v = bf16_round(fma(cm[HC - 1], r[HC - 1], v))
+     bo.buffer_store(v.to(fx.BFloat16), rsrc(a["res_out"]), (t * HC + o) * HIDDEN + col)
+     fx.ptr_store(v, c["rl"] + (t * KT + o * COLS + e % COLS))
+ 
+--- V07:vllm/models/deepseek_v41/amd/mono_decode.py
++++ V08:vllm/models/deepseek_v41/amd/mono_decode.py
+@@ -1,15 +1,16 @@
+ # SPDX-License-Identifier: Apache-2.0
+ # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+-"""DeepSeek-V4.1 mono decode layer on ROCm CDNA4 (``VLLM_ROCM_MONO_DECODE=1``).
++"""DeepSeek-V4.1 mono decode layer on ROCm CDNA4 (``--monokernel``).
+ 
+ A decode step's backbone layer -- the attention seam, the attention, its TP
+ all-reduce, the FFN seam, the MoE and its all-reduce -- runs as two persistent
+ FlyDSL launches (``mono``, this directory) on the layer's loaded
+-weights, the TP reductions inside the kernels. A layer runs whole when it has
+-the standard seam and no compressor or indexer of its own (compress ratio 1 or
+-2) over ``fp8_ds_mla`` records. Any other backbone layer (the first, the Engram
+-layers, the compressor / indexer layers) keeps vLLM's attention seam and
+-attention and runs the rest as one launch, the FFN launch, from wo_b's
++weights, the TP reductions inside the kernels. Every backbone layer of the
++checkpoint runs whole (compress ratio 0, 1 or 2 over ``fp8_ds_mla`` records):
++the first layer and the Engram layers hand K1 a settled residual, and an index
++source runs vLLM's compressor and indexer between the two launches. A layer
++outside that (an MXFP8 KV cache, another indexer) keeps vLLM's attention seam
++and attention and runs the rest as one launch, the FFN launch, from wo_b's
+ unreduced output. A step takes the kernels when it is decode only, at most
+ ``MAX_ROWS`` rows (eager or a FULL CUDA graph: the model is not torch.compiled);
+ a whole layer also needs causal SWA windows. Anything else runs the layer as
+@@ -20,7 +21,7 @@
+ other's pushes): the conditions read only metadata every rank holds alike.
+ """
+ 
+-from typing import TYPE_CHECKING, cast
++from typing import TYPE_CHECKING, Any, cast
+ 
+ import torch
+ 
+@@ -62,7 +63,7 @@
+             # its peer memory is allocated and exchanged eagerly; vLLM warms
+             # every graph up eagerly before capturing it
+             raise RuntimeError(
+-                "VLLM_ROCM_MONO_DECODE was first reached inside a CUDA graph "
++                "--monokernel was first reached inside a CUDA graph "
+                 "capture, before an eager decode step."
+             )
+         from vllm.models.deepseek_v41.amd.mono.runner import MAX_TOKENS, DSV41MonoLayer
+@@ -113,6 +114,35 @@
+     return None
+ 
+ 
++def _select(
++    layer: "DeepseekV4DecoderLayer",
++    positions: torch.Tensor,
++    normed: torch.Tensor,
++    qr: torch.Tensor,
++) -> None:
++    """An index source's compressor and top-k selection, from K1's normed input
++    and bf16 qr: ``_forward_csa2_full`` / ``_forward_csa2_reindex`` and the
++    indexer op, serial."""
++    attn = layer.attn
++    comp, indexer = attn.compressor, attn.indexer
++    assert indexer is not None
++    if comp is not None:
++        kv_score = torch.mm(
++            normed, comp.fused_wkv_wgate.weight.T, out_dtype=torch.float32
++        )
++        latent = comp(kv_score, positions)
++        comp.insert_cache(latent, positions, attn.rotary_emb)
++        indexer._produce_k(latent, positions, attn.indexer_rotary_emb)
++    weights, _ = indexer.weights_proj(normed)
++    q, q_scale, weights = indexer.forward_q(
++        qr, None, weights, positions, attn.indexer_rotary_emb
++    )
++    assert weights is not None
++    indexer.indexer_op(
++        normed, (q, q_scale) if q_scale is not None else q, None, weights
++    )
++
++
+ class MonoDecodeLayer:
+     """One decoder layer's mono path (``create``: None when the layer is not
+     eligible): the whole layer (``__call__``) or, with ``ffn_only``, the FFN
+@@ -127,7 +157,7 @@
+     def create(
+         layer: "DeepseekV4DecoderLayer", vllm_config
+     ) -> "MonoDecodeLayer | None":
+-        if not envs.VLLM_ROCM_MONO_DECODE:
++        if not vllm_config.kernel_config.monokernel:
+             return None
+         from vllm.platforms.rocm import get_cdna_version
+ 
+@@ -150,7 +180,7 @@
+                 if cus < BLOCKS:
+                     why = f"needs {BLOCKS} compute units, the GPU has {cus}"
+         if why is not None:
+-            raise ValueError(f"VLLM_ROCM_MONO_DECODE {why}.")
++            raise ValueError(f"--monokernel {why}.")
+         # the layer: the kernels serve the backbone's seams and MoE
+         config = vllm_config.model_config.hf_config
+         attn, ffn = layer.attn, layer.ffn
+@@ -174,12 +204,17 @@
+         if why is not None:
+             logger.info_once("DSv4.1 mono decode off for some layers: %s", why)
+             return None
+-        # the whole layer: the kernels' attention takes the standard layers only
+-        if layer.engram is not None:
+-            why = "Engram"
+-        elif attn.compressor is not None or attn.indexer is not None:
+-            why = "a compressor / indexer"
+-        elif attn.compress_ratio not in (1, 2):
++        # the whole layer: the kernels' attention takes the standard layers; an
++        # index source's compressor and indexer run between its two launches
++        from vllm.models.deepseek_v41.amd.rocm import DeepseekV41RocmMxfp4Indexer
++
++        if attn.compressor is not None and attn.indexer is None:
++            why = "a compressor without an indexer"
++        elif attn.indexer is not None and not isinstance(
++            attn.indexer, DeepseekV41RocmMxfp4Indexer
++        ):
++            why = f"a {type(attn.indexer).__name__}"
++        elif attn.compress_ratio not in (0, 1, 2):
+             why = f"compress ratio {attn.compress_ratio}"
+         elif attn.kv_mxfp8 or attn.kv_cache_dtype != "fp8_ds_mla":
+             why = f"a {attn.kv_cache_dtype} KV cache"
+@@ -297,20 +332,23 @@
+         post_mix: torch.Tensor | None,
+         res_mix: torch.Tensor | None,
+         pre_mix: torch.Tensor | None,
++        engram_hashes: torch.Tensor | None = None,
++        engram_mask: torch.Tensor | None = None,
+     ) -> tuple[torch.Tensor, ...] | None:
+         """The layer's outputs (x, residual, post_mix, res_mix, pre_mix) by the
+         mono kernels, or None when this step takes the original path (always for
+         an ``ffn_only`` layer)."""
+         if self.ffn_only:
+             return None
+-        if residual is None or x.dim() != 2:
+-            return self._skip("first layer")
++        first = residual is None
++        if first and x.dim() != 2:
++            return self._skip("first layer of a pipeline stage")
+         why, swa, comp = self._decode_step(layer, x.shape[0])
+         attn = layer.attn
+-        tensors = (x, residual, post_mix, res_mix, pre_mix)
++        tensors = (x,) if first else (x, residual, post_mix, res_mix, pre_mix)
+         if why is None:
+             # the kernels' attention: causal SWA windows, the compressed cache
+-            if comp is None:
++            if comp is None and attn.compress_ratio:
+                 why = "layer metadata missing"
+             elif swa.decode_swa_width != SWA_WIDTH:
+                 why = f"SWA width {swa.decode_swa_width}"
+@@ -324,12 +362,37 @@
+                 why = "non-contiguous layer inputs"
+         if why is not None:
+             return self._skip(why)
+-        assert swa is not None and comp is not None
++        assert swa is not None
+         runner = _mono_runner(x.device)
+         logger.info_once(
+             "DSv4.1 mono decode layer active (decode steps of <= %d rows)", MAX_ROWS
+         )
+-        out = runner.forward(
++        # K1's seam folds the owed post into the residual, except where the
++        # residual arrives settled: the embedding, or after the Engram write
++        fold = True
++        if first:
++            residual = x.unsqueeze(1).expand(-1, layer.hc_mult, -1).contiguous()
++            pre_mix = runner.first_pre_mix(x.shape[0])
++            post_mix = res_mix = pre_mix  # unread without the fold
++            fold = False
++        elif layer.engram is not None and engram_hashes is not None:
++            residual = layer.mhc_post(x, residual, post_mix, res_mix)
++            hashes = engram_hashes[:, layer.engram.layer_hash_index]
++            residual = layer.engram(residual, hashes, engram_mask)
++            fold = False
++        kw: dict[str, Any] = {}
++        if attn.indexer is not None:
++            kw["select"] = lambda normed, qr: _select(layer, positions, normed, qr)
++        if attn.compress_ratio:
++            assert comp is not None
++            kw.update(
++                topk_indices=attn.topk_indices_buffer,
++                comp_cache=_record_view(
++                    attn._compressed_kv_cache(), comp.block_size // attn.compress_ratio
++                ),
++                comp_block_table=comp.block_table,
++            )
++        return runner.forward(
+             self.weights(layer),
+             x,
+             residual,
+@@ -342,13 +405,9 @@
+             swa.decode_swa_indices,
+             swa.decode_swa_lens,
+             swa.token_to_req_indices,
+-            topk_indices=attn.topk_indices_buffer,
+-            comp_cache=_record_view(
+-                attn._compressed_kv_cache(), comp.block_size // attn.compress_ratio
+-            ),
+-            comp_block_table=comp.block_table,
+-        )
+-        return out
++            fold=fold,
++            **kw,
++        )
+ 
+     def ffn(
+         self,
+--- V07:vllm/models/deepseek_v41/amd/vl_model.py
++++ V08:vllm/models/deepseek_v41/amd/vl_model.py
+@@ -51,6 +51,7 @@
+     DeepseekV4VLProcessingInfo,
+ )
+ from ..common.vl_cudagraph import DeepseekV4VLEncoderCudaGraphMixin
++from ..decoder_replay_layers import DecoderReplayLayers
+ from .model import (
+     DeepseekV41LLMForCausalLM,
+     _linear_scale_param_name,
+@@ -299,6 +300,10 @@
+     def token_lookback_depth(self) -> int:
+         return self.language_model.token_lookback_depth
+ 
++    @property
++    def decoder_replay_layers(self) -> DecoderReplayLayers | None:
++        return self.language_model.decoder_replay_layers
++
+     def forward(
+         self,
+         input_ids: torch.Tensor,
+--- V07:vllm/models/deepseek_v41/attention.py
++++ V08:vllm/models/deepseek_v41/attention.py
+@@ -547,11 +547,11 @@
+             swa_bounded_replay = False
+         if swa_bounded_replay and current_platform.is_rocm():
+             logger.warning_once(
+-                "SWA bounded replay is off on ROCm (the sparse SWA metadata "
+-                "builders forward replay_start, but the window clamp it relies "
+-                "on lives in the FlashInfer and FlashMLA prefill kernels, so "
+-                "the padded slots fault); the sliding-window cache takes part "
+-                "in prefix caching instead."
++                "Prefix-cache SWA replay is off on ROCm (the sparse SWA "
++                "metadata builders forward replay_start, but the window clamp "
++                "it relies on lives in the FlashInfer and FlashMLA prefill "
++                "kernels, so the padded slots fault); the sliding-window cache "
++                "takes part in prefix caching instead."
+             )
+             swa_bounded_replay = False
+         self.swa_cache_layer = DeepseekV4SWACache(
+--- V07:vllm/v1/attention/backends/mla/rocm_aiter_mla_sparse.py
++++ V08:vllm/v1/attention/backends/mla/rocm_aiter_mla_sparse.py
+@@ -12,11 +12,10 @@
+ from vllm.config import VllmConfig, get_current_vllm_config
+ from vllm.config.cache import CacheDType
+ from vllm.logger import init_logger
+-from vllm.model_executor.layers.attention.mla_attention import (
+-    get_mla_dims,
+-)
+ from vllm.model_executor.layers.attention.sparse_mla_attention import (
+-    SharedTopkIndicesBuffer,
++    SparseMLACommonImpl,
++    SparseMLACommonMetadata,
++    SparseMLACommonMetadataBuilder,
+ )
+ from vllm.platforms import current_platform
+ from vllm.triton_utils import tl, triton
+@@ -26,10 +25,7 @@
+     AttentionBackend,
+     AttentionCGSupport,
+     AttentionLayer,
+-    AttentionMetadata,
+-    AttentionMetadataBuilder,
+     CommonAttentionMetadata,
+-    MLAAttentionImpl,
+     MultipleOf,
+ )
+ from vllm.v1.attention.backends.mla.rocm_aiter_mla import (
+@@ -39,7 +35,6 @@
+     align_blocks_to_rows,
+     flat_kv_row_view,
+ )
+-from vllm.v1.attention.backends.utils import split_decodes_and_prefills
+ from vllm.v1.attention.ops.rocm_aiter_mla_sparse import (
+     rocm_sparse_attn_decode_bf16,
+     rocm_sparse_attn_prefill,
+@@ -73,6 +68,18 @@
+         not kv_cache_dtype.startswith("fp8")
+         and head_size == kv_lora_rank
+         and (num_prefills > 0 or num_decodes > 0)
++    )
++
++
++def _is_long_bf16_prefill(
++    kv_dtype: torch.dtype,
++    metadata: "ROCMAiterMLASparseMetadata",
++) -> bool:
++    return (
++        kv_dtype == torch.bfloat16
++        and metadata.num_decodes == 0
++        and metadata.num_prefills > 0
++        and metadata.prefill_max_seq_len > metadata.topk_tokens
+     )
+ 
+ 
+@@ -239,6 +246,10 @@
+     assert req_id.dtype == torch.int32
+     assert block_table.dtype == torch.int32
+     assert token_indices.dtype == torch.int32
++    assert req_id.shape[0] == token_indices.shape[0], (
++        f"req_id ({req_id.shape[0]}) and token_indices ({token_indices.shape[0]}) "
++        "must cover the same tokens"
++    )
+     assert token_indices.shape[1] == NUM_TOPK_TOKENS
+     assert NUM_TOPK_TOKENS % BLOCK_N == 0, (
+         f"NUM_TOPK_TOKENS ({NUM_TOPK_TOKENS}) must be divisible byBLOCK_N ({BLOCK_N})"
+@@ -390,35 +401,13 @@
+         return on_mi3xx()
+ 
+ 
+-@dataclass
+-class ROCMAiterMLASparseMetadata(AttentionMetadata):
+-    num_reqs: int
+-    max_query_len: int
+-    max_seq_len: int
+-
+-    num_actual_tokens: int  # Number of tokens excluding padding.
+-    query_start_loc: torch.Tensor
+-    slot_mapping: torch.Tensor
+-
+-    block_table: torch.Tensor
+-    req_id_per_token: torch.Tensor
+-
+-    qo_indptr: torch.Tensor
+-    paged_kv_last_page_len: torch.Tensor
+-    paged_kv_indices: torch.Tensor
+-    paged_kv_indptr: torch.Tensor
+-    attn_out_dtype: torch.dtype
+-
+-    block_size: int = 1
+-    topk_tokens: int = 2048
+-
+-    # Fields read by the shared MLA forward. This impl has no dense-MHA prefill
+-    # path (supports_dense_mha_prefill=False), so it always runs the MQA path;
+-    num_decodes: int = 0
+-    num_prefills: int = 0
+-    num_decode_tokens: int = 0
+-    prefill_max_seq_len: int = 0
+-    prefill: object = None
++@dataclass(kw_only=True)
++class ROCMAiterMLASparseMetadata(SparseMLACommonMetadata):
++    qo_indptr: torch.Tensor | None = None
++    paged_kv_last_page_len: torch.Tensor | None = None
++    paged_kv_indices: torch.Tensor | None = None
++    paged_kv_indptr: torch.Tensor | None = None
++    attn_out_dtype: torch.dtype | None = None
+ 
+     # Persistent MLA metadata (only populated when persistent mode is enabled,
+     # i.e. when the aiter sparse decode kernel supports work-stealing splits).
+@@ -432,9 +421,10 @@
+ 
+ @dataclass
+ class ROCMAiterMLASparseMetadataBuilder(
+-    AttentionMetadataBuilder[ROCMAiterMLASparseMetadata]
++    SparseMLACommonMetadataBuilder[ROCMAiterMLASparseMetadata]
+ ):
+     _cudagraph_support: ClassVar[AttentionCGSupport] = AttentionCGSupport.UNIFORM_BATCH
++    metadata_cls = ROCMAiterMLASparseMetadata
+ 
+     def __init__(
+         self,
+@@ -443,20 +433,15 @@
+         vllm_config: VllmConfig,
+         device: torch.device,
+     ):
+-        self.kv_cache_spec = kv_cache_spec
+-        self.model_config = vllm_config.model_config
++        super().__init__(kv_cache_spec, layer_names, vllm_config, device)
+         self.model_dtype = vllm_config.model_config.dtype
+         self.kv_cache_dtype = vllm_config.cache_config.cache_dtype
+         parallel_config = vllm_config.parallel_config
+-        self.device = device
+         max_num_batched_tokens = vllm_config.scheduler_config.max_num_batched_tokens
+ 
+-        self.vllm_config = vllm_config
+         self._init_reorder_batch_threshold(1, supports_spec_as_decode=True)
+ 
+         self.num_heads = self.model_config.get_num_attention_heads(parallel_config)
+-        self.mla_dims = get_mla_dims(self.model_config)
+-        self.topk_tokens = vllm_config.model_config.hf_text_config.index_topk
+         attention_context = vllm_config.compilation_config.static_forward_context
+         # Sink decode must use AITER's nonpersistent path. In particular,
+         # gfx942 has no persistent+LSE kernel, and its metadata heuristic
+@@ -521,9 +506,12 @@
+         kv_cache_dtype_str = getattr(vllm_config.cache_config, "cache_dtype", "auto")
+         if kv_cache_dtype_str in ("fp8", "fp8_e4m3", "fp8_e5m2"):
+             kv_cache_dtype_str = "fp8"
++            q_dtype = dtypes.fp8
+         else:
+             kv_cache_dtype_str = "bf16"
+         kv_dtype = dtypes.d_dtypes.get(kv_cache_dtype_str, dtypes.bf16)
++        self._mla_q_dtype = q_dtype
++        self._mla_kv_dtype = kv_dtype
+ 
+         (
+             (work_meta_data_size, work_meta_data_type),
+@@ -587,13 +575,19 @@
+         common_attn_metadata: CommonAttentionMetadata,
+         fast_build: bool = False,
+     ) -> ROCMAiterMLASparseMetadata:
+-        num_tokens = common_attn_metadata.num_actual_tokens
+-        (num_decodes, num_prefills, num_decode_tokens, _) = split_decodes_and_prefills(
+-            common_attn_metadata,
+-            decode_threshold=self.reorder_batch_threshold or 1,
+-        )
++        metadata = super().build(
++            common_prefix_len, common_attn_metadata, fast_build=fast_build
++        )
++        use_dense_prefill = (
++            metadata.prefill is not None and metadata.prefill.use_dense_mha
++        )
++        num_reqs = metadata.num_decodes if use_dense_prefill else metadata.num_reqs
++        num_tokens = int(common_attn_metadata.query_start_loc_cpu[num_reqs].item())
++        num_decodes = metadata.num_decodes
++        num_prefills = metadata.num_prefills
++        num_decode_tokens = metadata.num_decode_tokens
+         starts = np.asarray(common_attn_metadata.query_start_loc_cpu, dtype=np.int32)
+-        seg_lengths = np.diff(starts)
++        seg_lengths = np.diff(starts[: num_reqs + 1])
+         req_id_per_token = np.repeat(
+             np.arange(seg_lengths.shape[0], dtype=np.int32), seg_lengths
+         )
+@@ -616,15 +610,13 @@
+         self.req_id_per_token_buffer[:new_req_extent].copy_(
+             np_to_pinned_tensor(req_id_per_token), non_blocking=True
+         )
+-        query_lens = (
+-            common_attn_metadata.query_start_loc[1:]
+-            - common_attn_metadata.query_start_loc[:-1]
+-        )
+-        seq_lens = common_attn_metadata.seq_lens
++        query_start_loc = common_attn_metadata.query_start_loc[: num_reqs + 1]
++        query_lens = query_start_loc[1:] - query_start_loc[:-1]
++        seq_lens = common_attn_metadata.seq_lens[:num_reqs]
+         sparse_seqlen = generate_sparse_seqlen_triton(
+             query_lens,
+             seq_lens,
+-            common_attn_metadata.query_start_loc,
++            query_start_loc,
+             self.topk_tokens,
+             num_tokens,
+             common_attn_metadata.max_query_len,
+@@ -663,8 +655,13 @@
+         reduce_indptr = None
+         reduce_final_map = None
+         reduce_partial_map = None
+-        if self._use_persistent_metadata and not use_triton_sparse:
+-            num_reqs = common_attn_metadata.num_reqs
++        is_long_pure_bf16_prefill = _is_long_bf16_prefill(self._mla_kv_dtype, metadata)
++        if (
++            self._use_persistent_metadata
++            and not use_triton_sparse
++            and not is_long_pure_bf16_prefill
++            and num_tokens > 0
++        ):
+             with gpu_sync_allowed():
+                 seq_lens_cpu = common_attn_metadata.seq_lens[:num_reqs].cpu().numpy()
+             clamped_seq_lens = np.minimum(
+@@ -708,6 +705,8 @@
+                     uni_seqlen_qo=1,
+                     fast_mode=True,
+                     max_split_per_batch=max_split_per_batch,
++                    dtype_q=self._mla_q_dtype,
++                    dtype_kv=self._mla_kv_dtype,
+                 )
+                 torch.cuda.current_stream(self.device).synchronize()
+                 self._prev_metadata_key = metadata_key
+@@ -718,32 +717,18 @@
+             reduce_final_map = self._mla_reduce_final_map
+             reduce_partial_map = self._mla_reduce_partial_map
+ 
+-        metadata = ROCMAiterMLASparseMetadata(
+-            num_reqs=common_attn_metadata.num_reqs,
+-            max_query_len=common_attn_metadata.max_query_len,
+-            max_seq_len=common_attn_metadata.max_seq_len,
+-            num_actual_tokens=common_attn_metadata.num_actual_tokens,
+-            query_start_loc=common_attn_metadata.query_start_loc,
+-            slot_mapping=common_attn_metadata.slot_mapping,
+-            block_table=common_attn_metadata.block_table_tensor,
+-            req_id_per_token=req_id_per_token,
+-            block_size=self.kv_cache_spec.block_size,
+-            attn_out_dtype=self.model_dtype,
+-            topk_tokens=self.topk_tokens,
+-            num_decodes=num_decodes,
+-            num_prefills=num_prefills,
+-            num_decode_tokens=num_decode_tokens,
+-            qo_indptr=qo_indptr,
+-            paged_kv_last_page_len=paged_kv_last_page_len,
+-            paged_kv_indices=paged_kv_indices,
+-            paged_kv_indptr=paged_kv_indptr,
+-            work_meta_data=work_meta_data,
+-            work_indptr=work_indptr,
+-            work_info_set=work_info_set,
+-            reduce_indptr=reduce_indptr,
+-            reduce_final_map=reduce_final_map,
+-            reduce_partial_map=reduce_partial_map,
+-        )
++        metadata.attn_out_dtype = self.model_dtype
++        metadata.req_id_per_token = req_id_per_token
++        metadata.qo_indptr = qo_indptr
++        metadata.paged_kv_last_page_len = paged_kv_last_page_len
++        metadata.paged_kv_indices = paged_kv_indices
++        metadata.paged_kv_indptr = paged_kv_indptr
++        metadata.work_meta_data = work_meta_data
++        metadata.work_indptr = work_indptr
++        metadata.work_info_set = work_info_set
++        metadata.reduce_indptr = reduce_indptr
++        metadata.reduce_final_map = reduce_final_map
++        metadata.reduce_partial_map = reduce_partial_map
+         return metadata
+ 
+ 
+@@ -776,11 +761,7 @@
+     return (result, lse)
+ 
+ 
+-class ROCMAiterMLASparseImpl(
+-    MLAAttentionImpl[ROCMAiterMLASparseMetadata], SharedTopkIndicesBuffer
+-):
+-    is_sparse = True
+-    supports_dense_mha_prefill = False
++class ROCMAiterMLASparseImpl(SparseMLACommonImpl[ROCMAiterMLASparseMetadata]):
+     supports_dcp = False
+     use_aiter_sparse_mla = False
+ 
+@@ -803,10 +784,6 @@
+     ) -> None:
+         AiterMLAHelper.check_num_heads_validity(num_heads)
+ 
+-        self.num_heads = num_heads
+-        self.head_size = head_size
+-        self.scale = float(scale)
+-        self.num_kv_heads = num_kv_heads
+         sinks = mla_args.pop("sinks", None)
+         if sinks is not None:
+             if sinks.dtype != torch.float32:
+@@ -821,10 +798,24 @@
+             if not sinks.is_contiguous():
+                 raise ValueError("ROCm AITER MLA sinks must be contiguous")
+         self.sinks: torch.Tensor | None = sinks
+-        self.kv_cache_dtype = kv_cache_dtype
+-        self.kv_lora_rank: int = mla_args["kv_lora_rank"]
++        super().__init__(
++            num_heads,
++            head_size,
++            scale,
++            num_kv_heads,
++            alibi_slopes,
++            sliding_window,
++            kv_cache_dtype,
++            logits_soft_cap,
++            attn_type,
++            kv_sharing_target_layer_name,
++            indexer=indexer,
++            topk_indices_buffer=topk_indices_buffer,
++            **mla_args,
++        )
+         self.softmax_scale = scale
+-        self.init_topk_indices_buffer(indexer, topk_indices_buffer)
++        self.supports_dense_mha_prefill = sinks is None  # type: ignore[misc]
++        self.masked_mha_available = False
+ 
+         vllm_config = get_current_vllm_config()
+         max_tokens = vllm_config.scheduler_config.max_num_batched_tokens
+@@ -894,14 +885,26 @@
+             )
+         )
+ 
+-        if triton_sink_fallback or _use_rocm_sparse_triton(
+-            kv_cache_dtype=self.kv_cache_dtype,
+-            head_size=q.shape[-1],
+-            kv_lora_rank=self.kv_lora_rank,
+-            num_prefills=attn_metadata.num_prefills,
+-            num_decodes=attn_metadata.num_decodes,
+-            num_decode_tokens=attn_metadata.num_decode_tokens,
+-            max_query_len=attn_metadata.max_query_len,
++        # Long BF16 prefills omit persistent metadata. gfx942's
++        # nonpersistent ASM path is unsupported or unsafe for these shapes.
++        # Sink attention has its own Triton/LSE dispatch below.
++        triton_prefill_fallback = (
++            not need_lse
++            and on_gfx942()
++            and _is_long_bf16_prefill(kv_c_and_k_pe_cache.dtype, attn_metadata)
++        )
++        if (
++            triton_sink_fallback
++            or triton_prefill_fallback
++            or _use_rocm_sparse_triton(
++                kv_cache_dtype=self.kv_cache_dtype,
++                head_size=q.shape[-1],
++                kv_lora_rank=self.kv_lora_rank,
++                num_prefills=attn_metadata.num_prefills,
++                num_decodes=attn_metadata.num_decodes,
++                num_decode_tokens=attn_metadata.num_decode_tokens,
++                max_query_len=attn_metadata.max_query_len,
++            )
+         ):
+             output = torch.empty(
+                 [num_tokens, q.shape[1], self.kv_lora_rank],
+@@ -1078,6 +1081,7 @@
+             # Empty ragged rows have only sink mass and no value contribution.
+             # AITER can return NaN output/LSE for those rows; do not multiply it
+             # by a zero normalization factor and propagate the NaN.
++            assert attn_metadata.paged_kv_indptr is not None
+             has_keys = (
+                 attn_metadata.paged_kv_indptr[1:] > attn_metadata.paged_kv_indptr[:-1]
+             ).unsqueeze(-1)
+@@ -1156,7 +1160,7 @@
+                 else:
+                     ops.concat_mla_q(ql_nope, q_pe, q)
+ 
+-        num_actual_toks = attn_metadata.num_actual_tokens
++        num_actual_toks = q.shape[0]
+ 
+         # Get topk indices
+         assert self.topk_indices_buffer is not None
+@@ -1168,7 +1172,7 @@
+             kv_c_and_k_pe_cache, attn_metadata.block_size
+         )
+         triton_convert_req_index_to_global_index(
+-            attn_metadata.req_id_per_token,
++            attn_metadata.req_id_per_token[:num_actual_toks],
+             attn_metadata.block_table,
+             topk_indices,
+             attn_metadata.paged_kv_indptr,

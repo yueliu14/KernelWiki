@@ -1,0 +1,561 @@
+--- V03:vllm/model_executor/kernels/mhc/tilelang_kernels.py
++++ V04:vllm/model_executor/kernels/mhc/tilelang_kernels.py
+@@ -22,6 +22,23 @@
+ from vllm.utils.math_utils import cdiv
+ 
+ ENABLE_PDL = current_platform.is_arch_support_pdl() and current_platform.is_cuda()
++
++# TileLang's HIP AllReduce shuffle phase ignores a nonzero reduction-group
++# offset, so the 64-thread RMSNorm reduction must be wave64-aligned and use
++# threads 0..63.
++_MIX_ON_TRAILING_THREADS = current_platform.is_rocm()
++
++
++def _is_mix_thread():
++    if _MIX_ON_TRAILING_THREADS:
++        return T.get_thread_binding() >= 64
++    return T.get_thread_binding() < 32
++
++
++def _is_collapse_thread():
++    if _MIX_ON_TRAILING_THREADS:
++        return T.get_thread_binding() < 64
++    return T.get_thread_binding() >= 32
+ 
+ 
+ @cache
+@@ -353,7 +370,7 @@
+                 mixes[j] *= rms[0]
+             T.copy(mixes, mixes_shared)
+ 
+-        if split_mode != "input" and T.get_thread_binding() < 32:
++        if split_mode != "input" and _is_mix_thread():
+             cm = T.alloc_fragment((hc_mult, hc_mult), T.float32)
+             for j in T.Parallel(hc_mult):
+                 if save_pre_mix:
+@@ -399,7 +416,7 @@
+ 
+             for j, k in T.Parallel(hc_mult, hc_mult):
+                 comb_mix[i, j * hc_mult + k] = cm[j, k]
+-        elif split_mode != "stats" and T.get_thread_binding() >= 32:
++        elif split_mode != "stats" and _is_collapse_thread():
+             pre_mix_shared = T.alloc_shared(hc_mult, T.float32)
+             for j in T.Parallel(hc_mult):
+                 if use_pre_mix_in:
+@@ -546,7 +563,7 @@
+         mixes_shared = T.alloc_shared(hc_mult3, T.float32)
+         T.copy(mixes, mixes_shared)
+ 
+-        if T.get_thread_binding() < 32:
++        if _is_mix_thread():
+             cm = T.alloc_fragment((hc_mult, hc_mult), T.float32)
+             for j in T.Parallel(hc_mult):
+                 post_mix[i, j] = (
+--- V03:vllm/models/deepseek_v41/amd/rocm.py
++++ V04:vllm/models/deepseek_v41/amd/rocm.py
+@@ -37,6 +37,7 @@
+ from vllm.v1.attention.ops.rocm_aiter_mla_sparse import (
+     build_ragged_indices_from_dense,
+     rocm_inv_rope_einsum,
++    rocm_inverse_rope_rows_,
+     rocm_sparse_attn_decode,
+     rocm_sparse_attn_prefill,
+ )
+@@ -673,6 +674,7 @@
+             self.n_local_groups,
+             self.o_lora_rank,
+             self.wo_a,
++            inverse_rope=False,
+         )
+         zf = z.flatten(1)
+         if self._wo_b_scale is not None and zf.dim() == 2:
+@@ -747,15 +749,28 @@
+                 attn_metadata=rocm_metadata,
+                 swa_metadata=swa_metadata,
+             )
++        rotated = 0
+         if num_decodes > 0:
+-            self._forward_decode(
++            rotated = self._forward_decode(
+                 q=q[:num_decode_tokens],
++                positions=positions[:num_decode_tokens],
+                 kv_cache=self_kv_cache,
+                 swa_metadata=swa_metadata,
+                 attn_metadata=rocm_metadata,
+                 swa_only=swa_only,
+                 output=output[:num_decode_tokens],
+             )
++        # Only the decode reduce rotates its own rows, and only the leading
++        # `rotated` of them; prefill rows and any decode path that did not
++        # fuse still owe the standalone pass. Settle that here rather than in
++        # _o_proj: the split is batch-dependent and _o_proj runs compiled,
++        # where such a value freezes at its trace-time value.
++        rocm_inverse_rope_rows_(
++            output[rotated:, : self.n_local_heads, :],
++            positions[rotated:],
++            self.rotary_emb.cos_sin_cache,
++            self.rope_head_dim,
++        )
+ 
+     def _decode_topk_ragged(
+         self,
+@@ -796,12 +811,14 @@
+     def _forward_decode(
+         self,
+         q: torch.Tensor,
++        positions: torch.Tensor,
+         kv_cache: torch.Tensor | None,
+         swa_metadata: DeepseekV4ROCMAiterSparseSWAMetadata,
+         attn_metadata: DeepseekV4FlashMLAMetadata | None,
+         swa_only: bool,
+         output: torch.Tensor,
+-    ) -> None:
++    ) -> int:
++        """Returns how many leading rows the decode epilogue inverse-RoPE'd."""
+         num_decodes = swa_metadata.num_decodes
+         num_decode_tokens = swa_metadata.num_decode_tokens
+ 
+@@ -820,7 +837,7 @@
+                 num_decode_tokens=num_decode_tokens,
+             )
+ 
+-        rocm_sparse_attn_decode(
++        return rocm_sparse_attn_decode(
+             q=q,
+             kv_cache=kv_cache,
+             swa_k_cache=self.swa_cache_layer.kv_cache,
+@@ -839,6 +856,8 @@
+             nope_head_dim=self.nope_head_dim,
+             rope_head_dim=self.rope_head_dim,
+             output=output,
++            inv_rope_positions=positions,
++            inv_rope_cos_sin_cache=self.rotary_emb.cos_sin_cache,
+             extra_cache_nan_free=_trust_dsv4_extra_cache_nan_free(
+                 self.kv_cache_dtype,
+                 self._has_kv_transfer,
+--- V03:vllm/models/deepseek_v41/attention.py
++++ V04:vllm/models/deepseek_v41/attention.py
+@@ -26,6 +26,7 @@
+ from vllm.model_executor.layers.sparse_attn_indexer import SparseAttnIndexer
+ from vllm.model_executor.layers.sparse_mqa_indexer import SparseMQAIndexer
+ from vllm.models.common.ops import fused_q_kv_rmsnorm
++from vllm.models.common.ops.sequence_parallel import sp_reduce_scatter
+ from vllm.models.deepseek_v41.common.ops import (
+     MXFP4_BLOCK_SIZE,
+     fused_indexer_q_rope_quant,
+@@ -33,6 +34,7 @@
+ )
+ 
+ if TYPE_CHECKING:
++    from vllm.model_executor.kernels.linear.cute_dsl.gemm_rs_ar import GemmRsAr
+     from vllm.v1.attention.backends.mla.sparse_swa import (
+         DeepseekSparseSWAMetadata,
+     )
+@@ -389,6 +391,9 @@
+             return_bias=False,
+             prefix=f"{prefix}.wo_b",
+         )
++        # Set by ``bind_gemm_rs`` when the decoder layer runs sequence
++        # parallel and the fused GEMM + reduce-scatter kernel accepts wo_b.
++        self.gemm_rs: GemmRsAr | None = None
+ 
+         # Initialize rotary embedding before the indexer/compressor consume it.
+         self.rotary_emb = build_deepseek_v4_rope(
+@@ -531,6 +536,15 @@
+                 "instead."
+             )
+             swa_bounded_replay = False
++        if swa_bounded_replay and current_platform.is_rocm():
++            logger.warning_once(
++                "SWA bounded replay is off on ROCm (the sparse SWA metadata "
++                "builders forward replay_start, but the window clamp it relies "
++                "on lives in the FlashInfer and FlashMLA prefill kernels, so "
++                "the padded slots fault); the sliding-window cache takes part "
++                "in prefix caching instead."
++            )
++            swa_bounded_replay = False
+         self.swa_cache_layer = DeepseekV4SWACache(
+             head_dim=self.head_dim,
+             window_size=self.window_size,
+@@ -662,6 +676,41 @@
+             attn_out,
+         )
+         return self._o_proj(attn_out, positions)
++
++    def bind_gemm_rs(self) -> None:
++        """Fuse ``wo_b`` with the sequence-parallel TP reduce-scatter.
++
++        The decoder layer calls this after the model initialized the
++        process-wide GEMM-RS workspace and before weights load: the
++        eligibility check inspects the projection's linear kernel and weight
++        shape, which online quantization may later re-layout.
++        """
++        from vllm.model_executor.kernels.linear.cute_dsl.gemm_rs_ar import (
++            get_gemm_rs_ar,
++        )
++
++        # The layer owns the reduction under sequence parallel.
++        assert not self.wo_b.reduce_results
++        gemm_rs = get_gemm_rs_ar()
++        if gemm_rs.can_run(self.wo_b):
++            self.gemm_rs = gemm_rs
++        else:
++            gemm_rs.warn_incompatible_projection()
++
++    def _wo_b_proj(self, z: torch.Tensor) -> torch.Tensor:
++        """Apply ``wo_b``; with GEMM-RS bound, also reduce-scatter the result.
++
++        Every ``_o_proj`` implementation projects through this so the decoder
++        layer sees one contract: when ``gemm_rs`` is bound the output is
++        already the local sequence-parallel shard, otherwise it is the
++        unreduced TP partial.
++        """
++        if self.gemm_rs is None:
++            return self.wo_b(z)
++        if self.gemm_rs.should_run(z):
++            return self.gemm_rs.apply(z, self.wo_b)
++        # Small batches stay on the unfused path, which is faster there.
++        return sp_reduce_scatter(self.wo_b(z))
+ 
+     def _alloc_attn_out(
+         self, num_tokens: int, hidden_states: torch.Tensor
+--- V03:vllm/models/deepseek_v41/compressor.py
++++ V04:vllm/models/deepseek_v41/compressor.py
+@@ -37,7 +37,7 @@
+         return "CompressorBackend"
+ 
+     @staticmethod
+-    def get_supported_kernel_block_sizes() -> list[int | MultipleOf]:
++    def get_supported_kernel_block_sizes(kv_cache_spec=None) -> list[int | MultipleOf]:
+         return [MultipleOf(1)]
+ 
+     @classmethod
+--- V03:vllm/models/deepseek_v41/sparse_mla.py
++++ V04:vllm/models/deepseek_v41/sparse_mla.py
+@@ -86,7 +86,7 @@
+     ]
+ 
+     @staticmethod
+-    def get_supported_kernel_block_sizes() -> list[int | MultipleOf]:
++    def get_supported_kernel_block_sizes(kv_cache_spec=None) -> list[int | MultipleOf]:
+         return [64 if current_platform.is_device_capability_family(90) else 128]
+ 
+     @staticmethod
+@@ -255,7 +255,7 @@
+         return "FLASHMLA_MEGA_ATTN_DSV41"
+ 
+     @staticmethod
+-    def get_supported_kernel_block_sizes() -> list[int | MultipleOf]:
++    def get_supported_kernel_block_sizes(kv_cache_spec=None) -> list[int | MultipleOf]:
+         return [128]
+ 
+     @classmethod
+--- V03:vllm/v1/attention/backends/mla/rocm_aiter_mla_sparse.py
++++ V04:vllm/v1/attention/backends/mla/rocm_aiter_mla_sparse.py
+@@ -276,48 +276,6 @@
+     return out
+ 
+ 
+-@triton.jit
+-def fetch_id_to_ragged_kernel(
+-    in_tensor_ptr,  # [num_seq, topk]
+-    cumsum_ptr,  # [num_seq + 1]
+-    out_tensor_ptr,  # [max_num_seq * topk]
+-    in_tensor_ptr_stride,
+-    TOPK: tl.constexpr,
+-    TOKEN_NUM: tl.constexpr,
+-    BLOCK_SIZE: tl.constexpr,
+-):
+-    seq_id = tl.program_id(0)
+-    block_id = tl.program_id(1)
+-    offset = tl.arange(0, BLOCK_SIZE)
+-    token_start = tl.load(cumsum_ptr + seq_id)
+-    token_end = tl.load(cumsum_ptr + seq_id + 1)
+-    token_num = token_end - token_start
+-    row_offset = block_id * BLOCK_SIZE
+-    if row_offset >= token_num:
+-        return
+-    in_tensor_offset = seq_id * in_tensor_ptr_stride + row_offset + offset
+-    in_tensor_mask = (row_offset + offset) < TOPK
+-    in_tensor_val = tl.load(in_tensor_ptr + in_tensor_offset, mask=in_tensor_mask)
+-    out_tensor_offset = token_start + row_offset + offset
+-    out_tensor_mask = (out_tensor_offset < token_end) & in_tensor_mask
+-    tl.store(out_tensor_ptr + out_tensor_offset, in_tensor_val, mask=out_tensor_mask)
+-
+-
+-def fetch_id_to_ragged_triton(
+-    in_tensor: torch.Tensor, cumsum: torch.Tensor, out_tensor: torch.Tensor, topk
+-):
+-    num_tokens = in_tensor.size(0)
+-    block_size = 64
+-    num_block_per_row = triton.cdiv(topk, block_size)
+-    grid = (
+-        num_tokens,
+-        num_block_per_row,
+-    )
+-    fetch_id_to_ragged_kernel[grid](
+-        in_tensor, cumsum, out_tensor, in_tensor.stride(0), topk, num_tokens, block_size
+-    )
+-
+-
+ class ROCMAiterMLASparseBackend(AttentionBackend):
+     supported_dtypes: ClassVar[list[torch.dtype]] = [torch.float16, torch.bfloat16]
+     supported_kv_cache_dtypes: ClassVar[list[CacheDType]] = [
+@@ -329,7 +287,7 @@
+     ]
+ 
+     @staticmethod
+-    def get_supported_kernel_block_sizes() -> list[int | MultipleOf]:
++    def get_supported_kernel_block_sizes(kv_cache_spec=None) -> list[int | MultipleOf]:
+         return [1, MultipleOf(16)]
+ 
+     @staticmethod
+--- V03:vllm/v1/attention/ops/rocm_aiter_mla_sparse.py
++++ V04:vllm/v1/attention/ops/rocm_aiter_mla_sparse.py
+@@ -1572,8 +1572,13 @@
+     positions: torch.Tensor,
+     cos_sin_cache: torch.Tensor,
+     rope_head_dim: int,
++    out: torch.Tensor | None = None,
+ ) -> torch.Tensor:
+-    """bf16 inverse GPT-J RoPE via a single fused Triton kernel."""
++    """bf16 inverse GPT-J RoPE via a single fused Triton kernel.
++
++    ``out`` may alias ``o``: the rotation is a per-row bijection whose kernel
++    reads both lanes of a pair before storing either.
++    """
+     assert o.dim() == 3 and o.stride(-1) == 1, (
+         "_fused_inverse_rope_gptj expects a [T, H, D] input with a contiguous last dim"
+     )
+@@ -1585,9 +1590,14 @@
+         f"[P, {rope_head_dim}] = cos | sin, got {tuple(cos_sin_cache.shape)}"
+     )
+     num_tokens, num_heads, head_dim = o.shape
+-    out = torch.empty(
+-        (num_tokens, num_heads, head_dim), dtype=torch.bfloat16, device=o.device
+-    )
++    if out is None:
++        out = torch.empty(
++            (num_tokens, num_heads, head_dim), dtype=torch.bfloat16, device=o.device
++        )
++    else:
++        assert out.dtype == torch.bfloat16, (
++            f"inverse RoPE writes bf16, got an output buffer of {out.dtype}"
++        )
+     if num_tokens == 0:
+         return out
+     _inverse_rope_gptj_kernel[(num_tokens, num_heads)](
+@@ -1608,6 +1618,25 @@
+     return out
+ 
+ 
++def rocm_inverse_rope_rows_(
++    o: torch.Tensor,
++    positions: torch.Tensor,
++    cos_sin_cache: torch.Tensor,
++    rope_head_dim: int,
++) -> None:
++    """Inverse-RoPE attention output rows in place.
++
++    For rows no attention kernel rotated in its epilogue. Call it from the
++    eager attention segment: which rows still owe a rotation depends on the
++    prefill/decode split, and the o_proj that used to do this runs inside the
++    compiled region, where a batch-dependent Python value would be frozen at
++    trace time.
++    """
++    if o.shape[0] == 0:
++        return
++    _fused_inverse_rope_gptj(o, positions, cos_sin_cache, rope_head_dim, out=o)
++
++
+ def _get_cached_wo_a_bf16(
+     wo_a: torch.nn.Module,
+     n_local_groups: int,
+@@ -1664,16 +1693,27 @@
+     n_local_groups: int,
+     o_lora_rank: int,
+     wo_a: torch.nn.Module,
++    inverse_rope: bool = True,
+ ) -> torch.Tensor:
+     """Inverse-RoPE + WO_A bmm path used on ROCm.
+ 
+     Fuses the inverse GPT-J RoPE into one Triton kernel and caches the bf16
+-    wo_a weight so the per-step dequant disappears.
++    wo_a weight so the per-step dequant disappears. Callers whose attention
++    already rotated every row pass ``inverse_rope=False``; that is a property
++    of the attention backend, not of the batch, so it stays constant across
++    steps and is safe to read from compiled code.
+     """
+-    o_ref = _fused_inverse_rope_gptj(
+-        o, positions, rotary_emb.cos_sin_cache, rope_head_dim
+-    )
+-    o_ref = o_ref.view(o.shape[0], n_local_groups, -1)
++    if inverse_rope:
++        o_ref = _fused_inverse_rope_gptj(
++            o, positions, rotary_emb.cos_sin_cache, rope_head_dim
++        )
++    else:
++        assert o.dtype == torch.bfloat16, (
++            "a pre-rotated attention output feeds the wo_a bmm directly, so it "
++            f"must already be bf16, got {o.dtype}"
++        )
++        o_ref = o
++    o_ref = o_ref.reshape(o.shape[0], n_local_groups, -1)
+ 
+     wo_a_weight = _get_cached_wo_a_bf16(
+         wo_a, n_local_groups, o_lora_rank, o_ref.shape[-1]
+@@ -2889,6 +2929,8 @@
+     part_acc_ptr,
+     attn_sink_ptr,
+     out_ptr,
++    pos_ptr,
++    cos_sin_ptr,
+     out_stride0,
+     out_stride1,
+     pm_stride0,
+@@ -2896,6 +2938,7 @@
+     pa_stride0,
+     pa_stride_s,
+     pa_stride_h,
++    cs_stride,
+     num_heads,
+     HAS_ATTN_SINK: tl.constexpr,
+     ADAPTIVE_SPLITS: tl.constexpr,
+@@ -2903,6 +2946,9 @@
+     BLOCK_H: tl.constexpr,
+     NUM_SPLITS: tl.constexpr,
+     SPLITS_PAD: tl.constexpr,
++    FUSE_INV_ROPE: tl.constexpr,
++    NOPE: tl.constexpr,
++    HALF: tl.constexpr,
+ ):
+     query_idx = tl.program_id(0)
+     pid_h = tl.program_id(1)
+@@ -2991,6 +3037,26 @@
+         acc += w_s[:, None] * acc_s
+ 
+     out = tl.where(l_final[:, None] > 0.0, acc / denom[:, None], 0.0)
++
++    if FUSE_INV_ROPE:
++        # Inverse GPT-J RoPE on the trailing rope lanes, straight out of the
++        # combine registers: out_even = a*cos + b*sin, out_odd = b*cos - a*sin.
++        # NoPE lanes take cos=1/sin=0 so one expression covers the whole row
++        # and the o_proj rotation pass disappears for these tokens.
++        pos = tl.load(pos_ptr + query_idx).to(tl.int64)
++        pair_idx = tl.arange(0, COMB_DIM // 2) - (NOPE // 2)
++        is_rope = pair_idx >= 0
++        k = tl.where(is_rope, pair_idx, 0)
++        cos = tl.where(is_rope, tl.load(cos_sin_ptr + pos * cs_stride + k), 1.0)
++        sin = tl.where(is_rope, tl.load(cos_sin_ptr + pos * cs_stride + HALF + k), 0.0)
++        even, odd = tl.split(tl.reshape(out, (BLOCK_H, COMB_DIM // 2, 2)))
++        out = tl.reshape(
++            tl.join(
++                even * cos[None, :] + odd * sin[None, :],
++                odd * cos[None, :] - even * sin[None, :],
++            ),
++            (BLOCK_H, COMB_DIM),
++        )
+ 
+     out_row_ptr = (
+         out_ptr + query_idx * out_stride0 + head_offsets[:, None] * out_stride1
+@@ -3312,6 +3378,8 @@
+     out: torch.Tensor | None = None,
+     extra_cache_nan_free: bool = False,
+     adaptive_splits: bool = False,
++    inv_rope_positions: torch.Tensor | None = None,
++    inv_rope_cos_sin_cache: torch.Tensor | None = None,
+ ) -> torch.Tensor:
+     assert q.ndim == 3, f"expected q=[b,h,d], got {q.shape}"
+     assert main_cache.ndim == 3, (
+@@ -3554,12 +3622,27 @@
+             num_warps=4,
+         )
+ 
++    fuse_inv_rope = inv_rope_positions is not None
++    if fuse_inv_rope:
++        assert inv_rope_cos_sin_cache is not None
++        assert inv_rope_cos_sin_cache.shape[-1] == rope_head_dim, (
++            "fused inverse RoPE expects cos_sin_cache laid out as "
++            f"[P, {rope_head_dim}] = cos | sin, got "
++            f"{tuple(inv_rope_cos_sin_cache.shape)}"
++        )
++        assert nope_head_dim % 2 == 0 and rope_head_dim % 2 == 0, (
++            "fused inverse RoPE pairs adjacent lanes, so both head dims must "
++            f"be even, got nope={nope_head_dim} rope={rope_head_dim}"
++        )
++
+     _sparse_attn_decode_reduce_kernel[(num_queries, num_heads)](
+         part_m,
+         part_l,
+         part_acc,
+         attn_sink,
+         out,
++        inv_rope_positions,
++        inv_rope_cos_sin_cache,
+         out.stride(0),
+         out.stride(1),
+         part_m.stride(0),
+@@ -3567,6 +3650,7 @@
+         part_acc.stride(0),
+         part_acc.stride(1),
+         part_acc.stride(2),
++        inv_rope_cos_sin_cache.stride(0) if inv_rope_cos_sin_cache is not None else 0,
+         num_heads,
+         HAS_ATTN_SINK=has_attn_sink,
+         ADAPTIVE_SPLITS=adaptive_splits,
+@@ -3574,6 +3658,9 @@
+         BLOCK_H=1,
+         NUM_SPLITS=num_splits,
+         SPLITS_PAD=triton.next_power_of_2(num_splits),
++        FUSE_INV_ROPE=fuse_inv_rope,
++        NOPE=nope_head_dim,
++        HALF=rope_head_dim // 2,
+         num_warps=4,
+     )
+     return out
+@@ -3598,6 +3685,8 @@
+     out: torch.Tensor | None = None,
+     extra_cache_nan_free: bool = False,
+     adaptive_splits: bool = False,
++    inv_rope_positions: torch.Tensor | None = None,
++    inv_rope_cos_sin_cache: torch.Tensor | None = None,
+ ) -> torch.Tensor:
+     if main_ragged_indices is None or main_ragged_indptr is None:
+         main_ragged_indices, main_ragged_indptr = build_ragged_indices_from_dense(
+@@ -3636,6 +3725,8 @@
+         out=out,
+         extra_cache_nan_free=extra_cache_nan_free,
+         adaptive_splits=adaptive_splits,
++        inv_rope_positions=inv_rope_positions,
++        inv_rope_cos_sin_cache=inv_rope_cos_sin_cache,
+     )
+ 
+ 
+@@ -3737,7 +3828,16 @@
+     output: torch.Tensor,
+     extra_cache_nan_free: bool = False,
+     adaptive_splits: bool = False,
+-) -> None:
++    inv_rope_positions: torch.Tensor | None = None,
++    inv_rope_cos_sin_cache: torch.Tensor | None = None,
++) -> int:
++    """Run sparse MLA decode into ``output``.
++
++    Passing ``inv_rope_positions`` folds the inverse RoPE into the reduce
++    epilogue. Returns how many leading rows of ``output`` came back rotated,
++    so a caller mixing in a decode path that does not fuse still knows what it
++    owes the standalone pass. Read it from the eager attention segment only.
++    """
+     assert swa_k_cache.dtype == torch.uint8, (
+         "ROCm Triton sparse decode expects uint8 fp8_ds_mla SWA cache, "
+         f"got {swa_k_cache.dtype}"
+@@ -3786,6 +3886,9 @@
+         out=direct_out,
+         extra_cache_nan_free=extra_cache_nan_free,
+         adaptive_splits=adaptive_splits,
++        inv_rope_positions=inv_rope_positions,
++        inv_rope_cos_sin_cache=inv_rope_cos_sin_cache,
+     )
+     if direct_out is None:
+         output.copy_(attn_out.to(output.dtype))
++    return output.shape[0] if inv_rope_positions is not None else 0
