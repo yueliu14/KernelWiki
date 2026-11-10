@@ -4,8 +4,7 @@
 - [Workloads](workload/README.md): semantic subgraphs spanning multiple operators, with data contracts, scheduling, dispatch, memory/state, communication, fusion and whole-subgraph evidence.
 - [Workload fusion decisions](workload/CORPUS.md): model cases and reusable decisions for staged, persistent, megakernel and monokernel execution, with explicit source scope and effect confidence.
 - [General knowledge](general/README.md): profiling, optimization, backend programming, hardware and reusable recipes.
-- [DeepSeek-V4.1-Flash model history](top_model/deepseek_v41_flash/README.md): MI355X/vLLM image history, full configuration matrix, and 110 kernel/fusion pair records.
-- [Muse Spark model history](top_model/muse_spark/README.md): image-deduplicated MI355X/SGLang performance, CI provenance, and per-pair kernel/fusion evolution.
+- [Dated model histories](top_model/README.md): select a model/stack, then a configuration pair; shared image changes and runtime evidence have distinct owners.
 - [Operator corpus](operator/CORPUS.md): structured development cards, pinned source evidence and configuration records.
 
 ## Reading a backend page
@@ -25,6 +24,8 @@ excerpts live in `_sources/aiter/pull_requests/`; these are shared provenance re
 not another operator collection or a table of measured winners.
 
 ## Contributing knowledge
+
+Model deployment history belongs under `top_model/<model>/`. Keep the configuration matrix as the performance entry, shared image-change explanations in one place, and pair pages focused on endpoints, launch changes and applicability. Transfer reusable operator or workload conclusions to their existing owners by reference; do not copy a dated model gain into a generic recommendation. Supporting payloads are opened on demand through the model's evidence guide.
 
 Keep new operator entries within GEMM, MoE, attention or attention indexers and their variants/fusions. Document small supporting operations with the main workload: packing and quantization with GEMM, routing and dispatch with MoE, cache writes and positional encoding with attention, and causal state mixing with gated-delta attention. Do not add separate collections for generic small operators, vision convolutions or training-only kernels.
 

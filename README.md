@@ -7,11 +7,23 @@ An **operator- and workload-level GPU kernel knowledge base for LLM inference**,
 | Content | Start here | Purpose |
 | --- | --- | --- |
 | Written knowledge | [Operators](knowledge/operator/README.md) · [Workloads](knowledge/workload/README.md) · [General](knowledge/general/README.md) | Implementations, multi-operator execution contracts and optimization, source entry points, applicability and evidence |
+| Dated model history | [Model index](knowledge/top_model/README.md) | Configuration-matched CI evolution, shared kernel changes and exact implementation links |
 | Structured corpus | [Operator catalog](knowledge/operator/catalog.yaml) · [Corpus guide](knowledge/operator/CORPUS.md) · [General decisions](knowledge/general/corpus/decisions.md) | Source observations, conditioned decisions, experience summaries and upstream configuration seeds |
 | Corpus maintenance | [Tools](tools/corpus/README.md) · [AITER refresh skill](tools/corpus/skills/aiter-corpus-refresh/SKILL.md) | Extract pinned source evidence, update decisions, validate references and generate reading pages |
 
 ```text
 knowledge/
+  top_model/
+    README.md                  # reading order and evidence semantics
+    <model>/
+      README.md
+      configuration_history.md
+      pairs/                   # endpoints, applicability, links
+      changes/                 # shared kernel/body/fusion explanations
+      kernel_implementations.md
+      data/                    # reproducible machine-readable exports
+      evidence/                # dated provenance and runtime records
+      kernel_sources/          # selected exact source snapshots
   operator/
     README.md
     catalog.yaml
@@ -97,6 +109,9 @@ AITER is the main source of implementation knowledge. This is a curated workload
 ## Reading and searching
 
 Browse the operator, workload and general indexes, or search the Markdown and YAML files directly.
+For model history, use the [model index](knowledge/top_model/README.md) and follow the requested
+configuration's pair. Default `rg` discovery omits large model audit/source payloads via `.rgignore`;
+use a linked file or `rg --no-ignore` in the selected directory when inspecting evidence.
 Agents can use the catalog to locate an operator's corpus, read its decisions and follow the cited
 evidence to pinned upstream source. For example, from the repository root:
 

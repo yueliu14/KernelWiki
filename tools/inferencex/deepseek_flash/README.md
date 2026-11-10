@@ -46,3 +46,9 @@ repository path at the CI-corroborated commit. The common pair renderer then inc
 both endpoint commit links and implementations; the recovered renderer adds device-body
 and named-JIT source links. vLLM revision, AITER package identity and container digest
 remain separate. No missing historical AITER implementation is inferred.
+
+The common pair renderer also writes shared `changes/` records and the `kernel_evolution.md`
+index. `render_recovered.py` writes `recovered_changes/` once per reviewed source edge;
+runtime pair pages retain their own observations and guards. `render_summary.py` owns only
+the model README and all-observation table. Keep these ownership boundaries when updating
+the generators so a later run does not recreate duplicate explanations.

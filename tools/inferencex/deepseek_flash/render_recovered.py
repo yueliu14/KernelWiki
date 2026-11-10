@@ -21,6 +21,24 @@ def source_cell(f):
     return text
 
 
+def shared_review_document(edge, files):
+    av, bv = edge['from_version'], edge['to_version']
+    text = f"# Recovered source change V{av:02d} → V{bv:02d}\n\n[Runtime pair index](../recovered_image_history.md) · [Full matrix](../configuration_history.md)\n\n"
+    text += "Shared source/body/fusion findings for recovered containers. V01 is a current tag snapshot without a historical digest; V09–V11 are historical-digest matched. Pair pages own phase-aligned log observations. No GPU-time ranking or causal contribution is established.\n"
+    for review in edge['pipelines']:
+        text += f'\n<a id="{review["id"]}"></a>\n\n## {review["title"]}\n\n'
+        text += f"TP selector: `{review['tp_selector']}` (`None` means all configurations reviewed on this edge).\n\n"
+        for label, key in [('Before', 'before'), ('After', 'after'), ('Device language', 'language'), ('Body change', 'body_change'), ('Fusion', 'fusion'), ('Applicability / log limit', 'guards')]:
+            text += f"**{label}:** {review[key]}\n\n"
+        text += "| Comparison path | Before implementation | After implementation | File relation |\n| --- | --- | --- | --- |\n"
+        for path in review['paths']:
+            x, y = files[av].get(path), files[bv].get(path)
+            relation = 'identical bytes' if x and y and x['sha256'] == y['sha256'] else 'changed bytes' if x and y else 'added/absent in captured selection'
+            text += f"| `{path}` | {source_cell(x)} | {source_cell(y)} | {relation} |\n"
+    text += f"\n[Source inventories](../evidence/recovered_source_inventory.json) · [Reviewed rules](../evidence/recovered_kernel_reviews.json) · [Pinned diff](../evidence/recovered_source_diffs/v{av:02d}_to_v{bv:02d}.diff).\n"
+    return text
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--knowledge',type=Path,required=True)
@@ -37,6 +55,9 @@ def main():
                 assert files[version][f['path']]['sha256'] == f['sha256']
                 files[version][f['path']]['implementation'] = f
     reviews={(r['from_version'],r['to_version']):r for r in read(root/'evidence/recovered_kernel_reviews.json')}
+    (root / 'recovered_changes').mkdir(exist_ok=True)
+    for (av, bv), edge in reviews.items():
+        (root / 'recovered_changes' / f'v{av:02d}_to_v{bv:02d}.md').write_text(shared_review_document(edge, files))
     (root/'recovered_pairs').mkdir(exist_ok=True)
     index='''# Recovered-container point-to-point kernel comparisons
 
@@ -94,18 +115,13 @@ Cells use `(p90 interactivity tok/s/user, output tok/s/chip)`. Version IDs refer
             chosen.extend(e for e in fact['events'] if e['kind']=='jit_compile' and e['phase']=='e2e_measurement')
             for e in chosen:
                 text+=f"- **{side}, {e['phase']}**, `{e['file']}:{e['line']}`: `{e['text']}`\n"
-        text+='\n## Reviewed kernel bodies and fusion boundaries\n\nThese findings use recovered container file bytes. V01\'s tag was not historically digest-pinned; V09–V11 were. Source facts establish possible launch boundaries; only the log observations above establish which diagnostic path was reached.\n'
+        text += "\n## Applicable source changes\n\n| Shared kernel/body/fusion record | Applicability / log limit |\n| --- | --- |\n"
         excluded=[]
         for review in reviews[av,bv]['pipelines']:
             if review['tp_selector'] and cfg['decode_tp'] not in review['tp_selector']:
                 excluded.append(review['title']+': excluded by TP guard.');continue
-            text+=f"\n### {review['title']}\n\n"
-            for label,key in [('Before','before'),('After','after'),('Device language','language'),('Code/body','body_change'),('Fusion boundaries','fusion'),('Applicability / log limit','guards')]:text+=f"**{label}:** {review[key]}\n\n"
-            text+='| Comparison path | Before installation / implementation | After installation / implementation | File relation |\n| --- | --- | --- | --- |\n'
-            for path in review['paths']:
-                x,y=files[av].get(path),files[bv].get(path)
-                relation='identical bytes' if x and y and x['sha256']==y['sha256'] else 'changed bytes' if x and y else 'added/absent in snapshot'
-                text+=f"| `{path}` | {source_cell(x)} | {source_cell(y)} | {relation} |\n"
+            link = f"../recovered_changes/v{av:02d}_to_v{bv:02d}.md#{review['id']}"
+            text += f"| [{review['title']}]({link}) | {review['guards']} |\n"
         if excluded:text+='\nExcluded from this configuration:\n\n'+''.join('- '+x+'\n' for x in excluded)
         text+=f"\nPinned source evidence: [inventory](../evidence/recovered_source_inventory.json), [reviewed rules](../evidence/recovered_kernel_reviews.json), [V{av:02d}→V{bv:02d} source diff](../evidence/recovered_source_diffs/v{av:02d}_to_v{bv:02d}.diff). Installation paths are preserved in the inventory; canonical comparison paths above normalize the earlier deepseek_v4_1 directory name.\n"
         text+='\n## Named JIT kernels: observed sets and body comparisons\n\nThis table lists every symbol mentioned by the selected endpoints\' JIT diagnostics. Missing messages do not imply missing execution: the monitor activates after server warmup and uses warning_once. A changed file can contain an unchanged symbol; AST comparisons below separate those cases. A name match is a source candidate, not proof of a unique binary implementation.\n\n| Symbol | Before logged phases | After logged phases | Candidate source / symbol-body relation |\n| --- | --- | --- | --- |\n'

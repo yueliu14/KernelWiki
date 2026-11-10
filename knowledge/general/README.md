@@ -34,6 +34,7 @@ procedures apply across models, shapes and implementations.
 | An operator's implementation contract and source observations | `operator/<op>/backend/` and `corpus/` | MLA cache ABI, MoE routing weights, supported GEMM layouts |
 | An outcome for a particular operator, dtype, shape and environment | `operator/<op>/corpus/decisions.yaml` | A gfx950 FP8 blockscale tuning result |
 | Whole-model reports and examples teaching a transferable method | `general/case_studies/` and `general/corpus/` | End-to-end Amdahl accounting, measurement controls |
+| Dated model/stack performance and implementation evolution | `top_model/<model>/` | Image-deduplicated CI history and configuration-specific kernel-change pairs |
 
 Start with the [operator collection](../operator/README.md) for implementation-specific knowledge.
 General guides link to that knowledge instead of maintaining another operator overview or repeating
