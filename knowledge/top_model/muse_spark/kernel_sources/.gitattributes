@@ -1,0 +1,2 @@
+# Preserve upstream file bytes and keep imported source snapshots out of the default PR diff.
+blobs/** -whitespace linguist-vendored=true

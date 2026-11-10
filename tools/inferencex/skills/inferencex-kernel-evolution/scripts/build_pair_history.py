@@ -77,7 +77,16 @@ def pair_document(pair):
         text += "| Source role | Before path / file SHA256 | After path / file SHA256 | Relation |\n| --- | --- | --- | --- |\n"
         for source in kernel["sources"]:
             def cell(side):
-                return f"`{source[side+'_path']}`<br>`{source[side+'_sha256']}`" if source.get(side + "_path") else "Absent / separate existing operations"
+                if not source.get(side + '_path'):
+                    return 'Absent / separate existing operations'
+                text = f"`{source[side+'_path']}`<br>`{source[side+'_sha256']}`"
+                implementation = source.get(side + '_implementation')
+                if implementation:
+                    path = '../' + implementation['snapshot_path']
+                    text += f'<br>[Complete source]({path})'
+                    for entry in implementation['entrypoints']:
+                        text += f"<br>[{entry['name']}]({path}#L{entry['line']})"
+                return text
             text += f"| {source['role']} | {cell('before')} | {cell('after')} | {source['path_relation']}; {source['body_relation']} |\n"
         text += "\nEvidence: " + ", ".join(f"[{ref}](../{ref})" for ref in kernel["evidence"]) + ".\n"
     if pair["excluded_attributions"]:
@@ -91,7 +100,30 @@ def pair_document(pair):
         text += f"| {side} | {pair['config']['conc']} | {opts.get('max-running-requests','not passed')} | {opts.get('monokernel-backend','not passed')} | {opts.get('page-size','not passed')} | {', '.join(point['launch']['datasets'])} |\n"
     text += "\nBoth complete commands, environment changes, image digests and source hashes are in [pair_records.json](../data/pair_records.json). Endpoint CI logs are linked through [launch configurations](../evidence/ci_launch_configs.json) and [log extracts](../evidence/ci_log_extracts.json).\n"
     text += "\n## Runtime and attribution status\n\n"
-    if pair["matched_server_artifacts"]:
+    if pair.get("verified_runtime"):
+        text += "Both exact endpoint server artifacts were retrieved by the upload IDs in their own CI job logs. "
+        text += "[Runtime recheck](../runtime_verification.md) · [Phase-aligned evidence](../evidence/verified_runtime_facts.json) · [Source/body audit](../evidence/verified_source_audit.json).\n\n"
+        text += "| Endpoint / artifact | Dispatch diagnostic family | Setup/graph warmup rows | Benchmark warmup rows | Measurement rows |\n| --- | --- | --- | --- | --- |\n"
+        boundary_notes = []
+        for side in ['before', 'after']:
+            fact = pair['verified_runtime'][side]
+            dispatch = [f for f in fact['families'] if f['kind'] == 'dispatch']
+            for family in dispatch:
+                def rows(phase):
+                    value = family['phases'].get(phase)
+                    return ', '.join(map(str, value['observed_rows'])) if value else 'no diagnostic'
+                text += f"| {side} / `{fact['artifact_id']}` | {family['family']} | {rows('server_setup_or_graph_warmup')} | {rows('benchmark_warmup')} | {rows('e2e_measurement')} |\n"
+            if not dispatch:
+                text += f"| {side} / `{fact['artifact_id']}` | No selected dispatch diagnostics | — | — | — |\n"
+            boundary = [f['family'] for f in dispatch if 'phase_boundary_uncertain' in f['phases']]
+            if boundary:
+                boundary_notes.append(f"{side}: {', '.join(boundary)} also has events within one second of the measurement start; these remain boundary-uncertain.")
+        if boundary_notes:
+            text += '\n' + '\n\n'.join(boundary_notes) + '\n'
+        text += "\nRows describe the first logged shape occurrences, not sustained coverage. Once-only diagnostics suppress later uses. Initialization, dispatch and GPU timing are separate evidence levels; no log count is used as a launch count.\n"
+        if pair['id'] == 'tep8_conc1_off_2026-10-22_to_2026-10-30':
+            text += "\nThe [bounded GPU validation attempt](../gpu_validation/README.md) obtained no allocation, so this pair still has no reproduced GPU trace.\n"
+    elif pair["matched_server_artifacts"]:
         text += "Exact endpoint server artifacts already inspected: " + ", ".join(f"{x['side']} `{x['artifact_id']}`" for x in pair["matched_server_artifacts"]) + ". See [server-log extracts](../evidence/server_log_extracts.json). Initialization and fast-path messages may include warmup.\n"
     else:
         text += "No nested server artifact for these exact endpoints has been inspected in this pilot; source guards and their own CI launch logs provide the current evidence.\n"
@@ -111,6 +143,10 @@ def main():
     inventories = {row["digest"]: {f["path"]: f for f in row["relevant_files"]} for row in read(root / "evidence/image_source_inventory.json")}
     rules = read(root / "evidence/kernel_pair_rules.json")
     server = read(root / "evidence/server_log_extracts.json")
+    verified_path = root / 'evidence/verified_runtime_facts.json'
+    verified = {f['point_id']: f for f in read(verified_path)} if verified_path.exists() else {}
+    source_index_path = root / 'kernel_sources/manifest.json'
+    source_index = {s['image_digest']: {f['container_path']: f for f in s['files']} for s in read(source_index_path)['snapshots']} if source_index_path.exists() else {}
     groups = defaultdict(list)
     for index, image in enumerate(images):
         for id in image["representative_ids"]:
@@ -143,6 +179,13 @@ def main():
             for kernel in kernels:
                 kernel["evidence_level"] = "source_verified"
                 kernel["sources"] = [source_ref(ref, inventories[a["image_digest"]], inventories[b["image_digest"]]) for ref in kernel["sources"]]
+                for source in kernel['sources']:
+                    for side, point in [('before', a), ('after', b)]:
+                        path = source.get(side + '_path')
+                        if source_index and path:
+                            implementation = source_index[point['image_digest']][path]
+                            assert implementation['sha256'] == source[side + '_sha256']
+                            source[side + '_implementation'] = {k: implementation[k] for k in ['snapshot_path', 'entrypoints']}
             matched_server = []
             for side, point in [("before", a), ("after", b)]:
                 for artifact in server:
@@ -158,6 +201,15 @@ def main():
                     "kernel_changes": kernels, "excluded_attributions": rule["excluded_attributions"],
                     "matched_server_artifacts": matched_server, "top_kernels": None, "gpu_profile_status": "unavailable",
                     "causal_attribution": "not_established", "report": "pairs/" + slug + ".md"}
+            if a['id'] in verified and b['id'] in verified:
+                pair['verified_runtime'] = {}
+                pair['matched_server_artifacts'] = []
+                for side, point in [('before', a), ('after', b)]:
+                    fact = verified[point['id']]
+                    pair['matched_server_artifacts'].append({'side': side, 'artifact_id': fact['artifact_id'], 'exact_job_link_verified': True})
+                    pair['verified_runtime'][side] = {'artifact_id': fact['artifact_id'], 'point_id': point['id'],
+                        'evidence': 'evidence/verified_runtime_facts.json',
+                        'families': [{'kind': f['kind'], 'family': f['family'], 'phases': {phase: {'observed_rows': info['observed_rows']} for phase, info in f['phases'].items()}} for f in fact['families']]}
             pairs.append(pair)
     pairs.sort(key=lambda p: (p["config"]["decode_tp"], p["config"]["offload_mode"], p["config"]["conc"], p["before"]["date"]))
     (root / "pairs").mkdir(exist_ok=True)
