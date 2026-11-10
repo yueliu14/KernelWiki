@@ -12,13 +12,31 @@ KernelWiki reorganized documents, adjusted links and distilled reusable conclusi
 The public workload cases and derived fusion decisions reference
 [sgl-project/sgl-amd-mono](https://github.com/sgl-project/sgl-amd-mono) at commit
 `7a4a552db119d1c3689165a182f151388a636272`. The source index links the reviewed files and
-selected line ranges; the repository does not vendor the upstream kernels or code objects.
+selected line ranges; those workload references do not vendor upstream kernels or code objects.
 Copyright 2026 SGLang contributors, Apache License 2.0; see the pinned upstream
 [LICENSE](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/LICENSE)
 and [NOTICE](https://github.com/sgl-project/sgl-amd-mono/blob/7a4a552db119d1c3689165a182f151388a636272/NOTICE).
 The reviewed files also retain vLLM contributor notices and, for adapted common/DeepSeek
 components, ROCm/ATOM's AMD attribution under MIT. KernelWiki summarizes their contracts
 and adds scoped decisions; source inspection does not confer upstream validation or measured gains.
+
+## InferenceX container source snapshots
+
+`knowledge/top_model/muse_spark/kernel_sources/blobs/` contains selected, unmodified source
+files exported from the public `lmsysorg/sglang-rocm` images identified in the adjacent
+manifest. These reading snapshots cover the cited SGLang, AITER and SGLang-AMD-Mono
+kernel implementations and dispatch paths. They are deduplicated by file content;
+container paths, image digests and SHA256 values are retained in the manifest. They are
+not a full working copy, and their inclusion does not establish upstream validation.
+
+Existing per-file copyright and SPDX notices are preserved byte for byte. SGLang and
+SGLang-AMD-Mono code is covered by Apache License 2.0, included in [LICENSE.md](LICENSE.md),
+with SGLang and vLLM contributor notices where present. The AITER MIT notice below also
+applies to its included files, subject to their per-file notices. These are container
+snapshots and must not be assumed identical to a named upstream commit.
+The public SGLang-AMD-Mono [NOTICE](knowledge/top_model/muse_spark/kernel_sources/notices/sgl-amd-mono-NOTICE.txt)
+is also retained from the public reference commit cited above; it is attribution material,
+not a claim that the container code matches that revision.
 
 ## AITER
 

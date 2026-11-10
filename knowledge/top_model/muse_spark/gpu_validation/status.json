@@ -1,0 +1,33 @@
+{
+  "status": "unavailable",
+  "gpu_execution_occurred": false,
+  "new_gpu_traces": 0,
+  "pair_id": "tep8_conc1_off_2026-10-22_to_2026-10-30",
+  "checked_at_utc": "2026-11-09T09:41:40Z",
+  "scheduler_request": {
+    "nodes": 1,
+    "tasks": 1,
+    "cpus_per_task": 1,
+    "gpus": 8,
+    "time_limit": "01:30:00"
+  },
+  "jobs": [
+    {
+      "id": 276043,
+      "state": "CANCELLED",
+      "node": null,
+      "note": "Initial deadline was only five minutes after submission, too short to represent a 90-minute completion deadline; excluded as a capacity test."
+    },
+    {
+      "id": 276044,
+      "state": "CANCELLED",
+      "node": null,
+      "last_reported_reason": "Priority",
+      "note": "No allocation; scheduler cancellation mechanism not independently established."
+    }
+  ],
+  "agentx_submission_error": "AssocMaxSubmitJobLimit",
+  "external_directory": "/shared_nfs/yueliu14/inferencex_muse_spark_research/gpu_validation/20261109_c1",
+  "planned_workload": "Deterministic synthetic c1 shape probe; one warmup, three unprofiled 256-output-token requests, one separately profiled request per image. Not a replay of historical AgentX.",
+  "cache_status": "Shared main model has 65 readable shards and draft has one readable shard. Historical HF cache symlinks target node-local /mnt/hf_cache and could not be verified on a GPU host; snapshot identities must be rechecked after allocation."
+}

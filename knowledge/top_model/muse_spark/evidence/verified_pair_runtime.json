@@ -1,0 +1,1900 @@
+[
+  {
+    "id": "tep4_conc16_on_2026-10-16_to_2026-10-30",
+    "endpoint_points": [
+      "445167",
+      "446938"
+    ],
+    "families": [
+      {
+        "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=2, head_dim=128",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                21
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/preproject epilogue",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                1
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fused finalize + TP4 all-reduce enabled (rank *)",
+        "before": null,
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler (FP8 pooler) active",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 496,
+              "observed_rows": [
+                24,
+                32
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler active",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1488,
+              "observed_rows": [
+                8,
+                16,
+                40,
+                48,
+                56,
+                64
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "tep4_conc28_on_2026-10-30_to_2026-11-08",
+    "endpoint_points": [
+      "446940",
+      "447695"
+    ],
+    "families": [
+      {
+        "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=2, head_dim=128",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                448
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                21
+              ]
+            }
+          }
+        },
+        "after": null
+      },
+      {
+        "family": "Muse fast path: shared router/preproject epilogue",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                1
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                1
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fused finalize + TP4 all-reduce enabled (rank *)",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler (FP8 pooler) active",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 496,
+              "observed_rows": [
+                24,
+                32
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 5704,
+              "observed_rows": [
+                24,
+                32,
+                40,
+                48,
+                56,
+                64,
+                80,
+                96,
+                112,
+                128,
+                144,
+                160,
+                176,
+                192,
+                208,
+                224,
+                240,
+                256,
+                320,
+                352,
+                384,
+                416,
+                448
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler active",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1488,
+              "observed_rows": [
+                8,
+                16,
+                40,
+                48,
+                56,
+                64
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "benchmark_warmup": {
+              "diagnostic_lines": 248,
+              "observed_rows": [
+                48
+              ]
+            },
+            "e2e_measurement": {
+              "diagnostic_lines": 1240,
+              "observed_rows": [
+                76,
+                77,
+                78,
+                82,
+                85
+              ]
+            },
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 744,
+              "observed_rows": [
+                8,
+                16,
+                46
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "tep4_conc36_on_2026-10-30_to_2026-11-08",
+    "endpoint_points": [
+      "446941",
+      "447696"
+    ],
+    "families": [
+      {
+        "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=2, head_dim=128",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                512
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                21
+              ]
+            }
+          }
+        },
+        "after": null
+      },
+      {
+        "family": "Muse fast path: shared router/preproject epilogue",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                1
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                1
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fused finalize + TP4 all-reduce enabled (rank *)",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler (FP8 pooler) active",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 496,
+              "observed_rows": [
+                24,
+                32
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 6200,
+              "observed_rows": [
+                24,
+                32,
+                40,
+                48,
+                56,
+                64,
+                80,
+                96,
+                112,
+                128,
+                144,
+                160,
+                176,
+                192,
+                208,
+                224,
+                240,
+                256,
+                320,
+                352,
+                384,
+                416,
+                448,
+                480,
+                512
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler active",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1488,
+              "observed_rows": [
+                8,
+                16,
+                40,
+                48,
+                56,
+                64
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "benchmark_warmup": {
+              "diagnostic_lines": 248,
+              "observed_rows": [
+                46
+              ]
+            },
+            "e2e_measurement": {
+              "diagnostic_lines": 992,
+              "observed_rows": [
+                36,
+                77,
+                80,
+                83
+              ]
+            },
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 496,
+              "observed_rows": [
+                8,
+                16
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "tep4_conc40_on_2026-10-30_to_2026-11-08",
+    "endpoint_points": [
+      "446942",
+      "447697"
+    ],
+    "families": [
+      {
+        "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=2, head_dim=128",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                512
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                21
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "e2e_measurement": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                28
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/preproject epilogue",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                1
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": [
+                1
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fused finalize + TP4 all-reduce enabled (rank *)",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 4,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler (FP8 pooler) active",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 496,
+              "observed_rows": [
+                24,
+                32
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 6200,
+              "observed_rows": [
+                24,
+                32,
+                40,
+                48,
+                56,
+                64,
+                80,
+                96,
+                112,
+                128,
+                144,
+                160,
+                176,
+                192,
+                208,
+                224,
+                240,
+                256,
+                320,
+                352,
+                384,
+                416,
+                448,
+                480,
+                512
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler active",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1488,
+              "observed_rows": [
+                8,
+                16,
+                40,
+                48,
+                56,
+                64
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "e2e_measurement": {
+              "diagnostic_lines": 2976,
+              "observed_rows": [
+                39,
+                63,
+                74,
+                80,
+                81,
+                90,
+                91,
+                101,
+                102,
+                113,
+                114,
+                121
+              ]
+            },
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 744,
+              "observed_rows": [
+                8,
+                16,
+                46
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "tep8_conc1_off_2026-10-16_to_2026-10-22",
+    "endpoint_points": [
+      "445154",
+      "446033"
+    ],
+    "families": [
+      {
+        "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/preproject epilogue",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                1
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler active",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1488,
+              "observed_rows": [
+                8,
+                16,
+                24
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "tep8_conc1_off_2026-10-22_to_2026-10-30",
+    "endpoint_points": [
+      "446033",
+      "446944"
+    ],
+    "families": [
+      {
+        "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        },
+        "after": null
+      },
+      {
+        "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                8
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        },
+        "after": null
+      },
+      {
+        "family": "Muse fast path: shared router/preproject epilogue",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                1
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                7
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler active",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1488,
+              "observed_rows": [
+                8,
+                16,
+                24
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "benchmark_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                16
+              ]
+            },
+            "phase_boundary_uncertain": {
+              "diagnostic_lines": 488,
+              "observed_rows": [
+                16
+              ]
+            },
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 16,
+              "observed_rows": [
+                8
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "monokernel muse_spark_dflash2_draft_hip on gfx950: widths [8] built (timing/size omitted)",
+        "before": null,
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "monokernel muse_spark_hip on gfx950: widths [8] built (timing/size omitted)",
+        "before": null,
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "monokernel: muse_spark DFlash2 draft attached at stage 2 (D-pre, D-attn, D-post and D-MLP launches a layer)",
+        "before": null,
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "monokernel: muse_spark DFlash2 draft: the context projection TP-sharded (1024 rows a rank)",
+        "before": null,
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": []
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "tep8_conc4_off_2026-10-16_to_2026-10-22",
+    "endpoint_points": [
+      "445155",
+      "446037"
+    ],
+    "families": [
+      {
+        "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/preproject epilogue",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                1
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler active",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1488,
+              "observed_rows": [
+                8,
+                16,
+                24
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "tep8_conc4_off_2026-10-22_to_2026-10-30",
+    "endpoint_points": [
+      "446037",
+      "446945"
+    ],
+    "families": [
+      {
+        "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        },
+        "after": null
+      },
+      {
+        "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                16
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "benchmark_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                18
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/preproject epilogue",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                1
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                14
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler active",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1488,
+              "observed_rows": [
+                8,
+                16,
+                24
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "e2e_measurement": {
+              "diagnostic_lines": 480,
+              "observed_rows": [
+                8
+              ]
+            },
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 32,
+              "observed_rows": [
+                8,
+                16
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "monokernel muse_spark_dflash2_draft_hip on gfx950: widths [8, 16] built (timing/size omitted)",
+        "before": null,
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "monokernel muse_spark_hip on gfx950: widths [8, 16] built (timing/size omitted)",
+        "before": null,
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "monokernel: muse_spark DFlash2 draft attached at stage 2 (D-pre, D-attn, D-post and D-MLP launches a layer)",
+        "before": null,
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "monokernel: muse_spark DFlash2 draft: the context projection TP-sharded (1024 rows a rank)",
+        "before": null,
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": []
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "tep8_conc8_off_2026-10-16_to_2026-10-22",
+    "endpoint_points": [
+      "445156",
+      "446039"
+    ],
+    "families": [
+      {
+        "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/preproject epilogue",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                14
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler active",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1488,
+              "observed_rows": [
+                8,
+                16,
+                24
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "tep8_conc8_off_2026-10-22_to_2026-10-30",
+    "endpoint_points": [
+      "446039",
+      "446946"
+    ],
+    "families": [
+      {
+        "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        },
+        "after": null
+      },
+      {
+        "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                16
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "benchmark_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                17
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/preproject epilogue",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                14
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                14
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler active",
+        "before": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1488,
+              "observed_rows": [
+                8,
+                16,
+                24
+              ]
+            }
+          }
+        },
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 32,
+              "observed_rows": [
+                8,
+                16
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "monokernel muse_spark_dflash2_draft_hip on gfx950: widths [8, 16] built (timing/size omitted)",
+        "before": null,
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "monokernel muse_spark_hip on gfx950: widths [8, 16] built (timing/size omitted)",
+        "before": null,
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "monokernel: muse_spark DFlash2 draft attached at stage 2 (D-pre, D-attn, D-post and D-MLP launches a layer)",
+        "before": null,
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "monokernel: muse_spark DFlash2 draft: the context projection TP-sharded (1024 rows a rank)",
+        "before": null,
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": []
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "tep8_conc16_on_2026-10-16_to_2026-10-22",
+    "endpoint_points": [
+      "445172",
+      "446032"
+    ],
+    "families": [
+      {
+        "family": "DFLASH fused KV materialization enabled. n_layers=5, num_kv_heads=1, head_dim=128",
+        "before": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        },
+        "after": {
+          "kind": "initialization",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1,
+              "observed_rows": []
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QK norm/RoPE/FP8 cache",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: QKV projection/QK norm/RoPE/FP8 cache",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                32
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/norm with hipBLASLt pooler",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                64
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse fast path: shared router/preproject epilogue",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 8,
+              "observed_rows": [
+                1
+              ]
+            }
+          }
+        }
+      },
+      {
+        "family": "Muse joint router/pooler active",
+        "before": null,
+        "after": {
+          "kind": "dispatch",
+          "phases": {
+            "server_setup_or_graph_warmup": {
+              "diagnostic_lines": 1488,
+              "observed_rows": [
+                8,
+                16,
+                24
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+]

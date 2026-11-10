@@ -96,7 +96,8 @@ def pair_document(pair):
                 implementation = source.get(side + '_implementation')
                 if implementation:
                     url = '../' + implementation['snapshot_path'] if implementation.get('snapshot_path') else implementation['source_url']
-                    text += f'<br>[Complete implementation]({url})'
+                    label = 'Complete implementation' if side + '_original_path' in source else 'Complete source'
+                    text += f'<br>[{label}]({url})'
                     for entry in implementation['entrypoints']:
                         text += f"<br>[{entry['name']}]({url}#L{entry['line']})"
                 return text
@@ -119,7 +120,30 @@ def pair_document(pair):
         report = pair["runtime_log_evidence"]["report"]
         text += f"\n## Recovered-container kernel and log comparison\n\n[Detailed endpoint log/source comparison](../{report}) adds exact active/HIT/JIT messages, measured-phase versus warmup alignment, symbol-body hashes, unchanged AITER paths and expanded fusion review. [Recovered endpoint artifacts](../evidence/recovered_endpoint_logs.json) preserve the exact file hashes and upload links. Diagnostic occurrence counts are not GPU kernel invocation counts.\n"
     text += "\n## Runtime and attribution status\n\n"
-    if pair["matched_server_artifacts"]:
+    if pair.get("verified_runtime"):
+        text += "Both exact endpoint server artifacts were retrieved by the upload IDs in their own CI job logs. "
+        text += "[Runtime recheck](../runtime_verification.md) · [Phase-aligned evidence](../evidence/verified_runtime_facts.json) · [Source/body audit](../evidence/verified_source_audit.json).\n\n"
+        text += "| Endpoint / artifact | Dispatch diagnostic family | Setup/graph warmup rows | Benchmark warmup rows | Measurement rows |\n| --- | --- | --- | --- | --- |\n"
+        boundary_notes = []
+        for side in ['before', 'after']:
+            fact = pair['verified_runtime'][side]
+            dispatch = [f for f in fact['families'] if f['kind'] == 'dispatch']
+            for family in dispatch:
+                def rows(phase):
+                    value = family['phases'].get(phase)
+                    return ', '.join(map(str, value['observed_rows'])) if value else 'no diagnostic'
+                text += f"| {side} / `{fact['artifact_id']}` | {family['family']} | {rows('server_setup_or_graph_warmup')} | {rows('benchmark_warmup')} | {rows('e2e_measurement')} |\n"
+            if not dispatch:
+                text += f"| {side} / `{fact['artifact_id']}` | No selected dispatch diagnostics | — | — | — |\n"
+            boundary = [f['family'] for f in dispatch if 'phase_boundary_uncertain' in f['phases']]
+            if boundary:
+                boundary_notes.append(f"{side}: {', '.join(boundary)} also has events within one second of the measurement start; these remain boundary-uncertain.")
+        if boundary_notes:
+            text += '\n' + '\n\n'.join(boundary_notes) + '\n'
+        text += "\nRows describe the first logged shape occurrences, not sustained coverage. Once-only diagnostics suppress later uses. Initialization, dispatch and GPU timing are separate evidence levels; no log count is used as a launch count.\n"
+        if pair['id'] == 'tep8_conc1_off_2026-10-22_to_2026-10-30':
+            text += "\nThe [bounded GPU validation attempt](../gpu_validation/README.md) obtained no allocation, so this pair still has no reproduced GPU trace.\n"
+    elif pair["matched_server_artifacts"]:
         text += "Exact endpoint server artifacts already inspected: " + ", ".join(f"{x['side']} `{x['artifact_id']}`" for x in pair["matched_server_artifacts"]) + ". See [server-log extracts](../evidence/server_log_extracts.json). Initialization and fast-path messages may include warmup.\n"
         if pair.get("additional_server_log_evidence"):
             text += "Additional exact endpoint archives: [recovered endpoint log evidence](../evidence/recovered_endpoint_logs.json).\n"
@@ -145,10 +169,11 @@ def main():
     if source_index_path.exists():
         for snapshot in read(source_index_path)['snapshots']:
             name = snapshot['image_name']
-            snapshot_info[name].update({k: snapshot[k] for k in ['vllm_commit', 'vllm_commit_url']})
+            snapshot_info[name].update({k: snapshot[k] for k in ['vllm_commit', 'vllm_commit_url'] if k in snapshot})
             for file in snapshot['files']:
-                if file['path'] in inventories[name]:
-                    target = inventories[name][file['path']]
+                path = file.get('path', file.get('container_path'))
+                if path in inventories[name]:
+                    target = inventories[name][path]
                     assert target['sha256'] == file['sha256']
                     target['implementation'] = {k: file[k] for k in ['snapshot_path', 'source_url', 'entrypoints', 'url_kind'] if k in file}
                     if file.get('source_url'):
@@ -164,6 +189,8 @@ def main():
         server = list({(row["artifact_id"], row.get("job_id")): row for row in server}.values())
     recovered_links = root / "evidence/recovered_pair_links.json"
     log_links = {r["pair_id"]: r for r in read(recovered_links)} if recovered_links.exists() else {}
+    verified_path = root / 'evidence/verified_runtime_facts.json'
+    verified = {f['point_id']: f for f in read(verified_path)} if verified_path.exists() else {}
     groups = defaultdict(list)
     for index, image in enumerate(images):
         for id in image["representative_ids"]:
@@ -228,6 +255,15 @@ def main():
                 pair["additional_server_log_evidence"] = "evidence/recovered_endpoint_logs.json"
             if slug in log_links:
                 pair["runtime_log_evidence"] = log_links[slug]
+            if a['id'] in verified and b['id'] in verified:
+                pair['verified_runtime'] = {}
+                pair['matched_server_artifacts'] = []
+                for side, point in [('before', a), ('after', b)]:
+                    fact = verified[point['id']]
+                    pair['matched_server_artifacts'].append({'side': side, 'artifact_id': fact['artifact_id'], 'exact_job_link_verified': True})
+                    pair['verified_runtime'][side] = {'artifact_id': fact['artifact_id'], 'point_id': point['id'],
+                        'evidence': 'evidence/verified_runtime_facts.json',
+                        'families': [{'kind': f['kind'], 'family': f['family'], 'phases': {phase: {'observed_rows': info['observed_rows']} for phase, info in f['phases'].items()}} for f in fact['families']]}
             pairs.append(pair)
     pairs.sort(key=lambda p: (p["config"]["decode_tp"], p["config"]["offload_mode"], p["config"]["conc"], p["before"]["date"]))
     (root / "pairs").mkdir(exist_ok=True)
