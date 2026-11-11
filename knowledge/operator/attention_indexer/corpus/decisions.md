@@ -49,12 +49,14 @@ A required trait must be established for the actual design before the card appli
 #### Use when
 
 - The workload uses weighted, rectified MQA logits over a per-query KV window.
+- Reviewed PR evidence covers FP8 Q/KV on gfx942 and gfx950 with H=32 or H=64; other dtypes and head counts were not reported.
 
 #### Try
 
 - Preserve logits[m,n] = sum_h ReLU(dot(Q[m,h,:], K[n,:]) * kv_scale[n]) * weights[m,h].
 - Keep rectification before the head reduction and preserve the signed head weights and KV scale placement.
 - Validate selected indices after top-k as well as score error; small score changes near the cutoff may change the sparse attention input.
+- When comparing latency, use the same clean_logits setting in candidate and reference: in one gfx942 FP8 FlyDSL case (Sq=Skv=4096, H=64, mfma_r2_w4) fused clean_logits initialization was reported at 191.4 us versus 210.4 us with separate output initialization.
 
 #### Rationale
 
@@ -105,6 +107,8 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 #### Limits
 
 - This is not ordinary softmax attention and not the MiniMax page-max scoring contract.
+- Preserving these semantics does not decide speed: in the same later author comparison on MI355 (gfx950, ROCm 7.2.2, both sides clean_logits=False), an FP8 FlyDSL implementation was reported slower than a newer Gluon kernel for a square DSv4 case (batch=1, Sq=Skv=4096, H=64) but faster for a GLM 5.2 case (batch=2, Sq=Skv=8192, H=32); both are single-case author reports.
+- The PR reports give a pass against the existing Triton kernel (rel=1.3e-02 for FP8 fn/fn on gfx950 at batch=1, Sq=128, Skv=32768, H=64, D=128; a pass on gfx942) and do not report top-k index agreement.
 
 <a id="indexer-fp8-architecture-format"></a>
 ### Which FP8 format conversions does the contiguous FlyDSL MQA logits path require?
