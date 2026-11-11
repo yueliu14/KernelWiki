@@ -451,6 +451,7 @@ Raw run artifacts are not published here. Historical reports have not been repro
 - The grouped kernel's tile decode after the remap is MoE-specific; the remap ports, the decode has to be rewritten for a dense grid.
 - Logical XCD grouping is a measured mapping choice, not a guarantee of physical scheduling affinity.
 - Source mappings establish implementation precedents; reported remapping outcomes are separately scoped in the experience summaries below.
+- A Triton fp8 e4m3 split-K decode GEMM on gfx950 (M=24–112, N=4608, K=8192, per-row and per-channel fp32 scales) followed this card outside its FlyDSL match. It applied the XCD pid remap only when the grid was a multiple of 8, together with a bm128 warp retune. Its verified score (1.0585) trailed the best sibling in its round that did not follow the card (1.0674). The engineer's unverified bench showed L2 hit rising from 39.3% to 45.6% at M=112, while time with the remap alone stayed neutral within ±0.5%.
 
 <a id="flydsl-hgemm-config-space"></a>
 ### Which tile, warp and split-K values will the FlyDSL HGEMM family actually accept, and how does a shape narrow them?

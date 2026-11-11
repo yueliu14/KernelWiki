@@ -54,7 +54,12 @@ cards:
   - 'Count rounds, not workgroups: AITER''s ASM launchers score each (tile, split) by ceil(tiles*split / CUs)
     and keep the fewest rounds, preferring fewer idle CUs in the last round (gemm-asm-tile-inventory-and-selection).
     One workgroup past a CU multiple costs a whole extra round, so step the split down or the tile up rather
-    than overshoot.'
+    than overshoot. Cross-backend example (a Triton kernel, outside this card''s FlyDSL match): in a bf16 split-K
+    GEMM at M 17-32, N=4608 on 256 CUs, masking each 64-wide N tile to 48 live columns raised the grid from
+    576 programs (2.25 per CU) to 768 (exactly 3 per CU). Both grids take 3 rounds, so the step avoided no
+    overshoot. It filled the partly idle last round with smaller per-program work, and it was associated with
+    a gain over its parent. In the engineer''s bench, narrower BN, more warps and an in-CTA K split were slower
+    on that kernel.'
   - 'Choose the combine together with the split, because split-K is not a knob on its own: the FlyDSL HGEMM
     initialises the output from split 0 and atomically adds the others (flydsl-splitk-reduction-contract),
     Triton writes fp32 partials and runs a separate reduce kernel, ASM multiplies the launch grid by the split.
