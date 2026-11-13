@@ -555,6 +555,7 @@ dependencies:
   - flydsl-hgemm-config-space
   - gemm-blockscale-shipped-bucket-structure
   - gemm-asm-tile-inventory-and-selection
+  - masked-live-columns-for-whole-wave-grid
 - id: explicit_schedule_expires_with_geometry
   axes:
   - pipeline_schedule

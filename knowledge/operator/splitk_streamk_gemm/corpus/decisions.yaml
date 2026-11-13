@@ -220,6 +220,62 @@ cards:
       protocol: GEAK task benchmark, measured independently of the engineer for each step against its parent;
         1 recorded step; not re-run for KernelWiki
       correctness: the GEAK task's correctness check passed for every counted step
+  - outcome: beneficial
+    conditions:
+    - Triton split-K GEMM writing fp32 partials, bf16, on gfx950 (256 CUs); this backend is outside the card's
+      FlyDSL match.
+    - Decode regime; the change applied only to the M 17-32 path (BM=32), and the M<=16 path compiled as before.
+    - 'N=4608 with N divisible by 48 and the K split fixed at 8: the split itself was not changed.'
+    - A 64-wide N tile with columns 48-63 masked on the W load and the partial store raised the grid from 576
+      programs (2.25 per CU) to 768 (exactly 3 per CU); both grids take 3 rounds.
+    - In the engineers' unverified benches, narrower dense BN, more warps per CTA, an in-CTA K split and other
+      live widths (e.g. 36) were slower than 48 live of 64.
+    summary: With the K split held at 8 in a Triton bf16 split-K GEMM on gfx950 (M 17-32), these steps did
+      not deepen the split. They evened out per-CU load by masking each 64-wide N tile to 48 live columns,
+      giving exactly 3 programs per CU, and this was associated with gains over their parents. One engineer
+      reported that the remaining gap was not a too-few-waves problem, because finer partitions add X re-reads;
+      that attribution is the engineer's and was not independently measured.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: sglang-rocm image 7184d3ae, Triton 3.7.0, PyTorch 2.9.1 ROCm 7.2
+      dtype: bf16
+      shape_layout: decode M=8 to 32; split-K partial sums
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark over 16 cases, measured independently of the engineer for each step against
+        its parent; 2 recorded steps; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
+  - outcome: beneficial
+    conditions:
+    - Triton fp8 e4m3 decode GEMM with per-row and per-channel fp32 scales, N=4608, K=8192, on gfx950, with
+      a split-K partial kernel followed by a separate scaled-sum kernel.
+    - Only the 128-row M bucket changed, which the engineer reports covers M=72-112; the engineer's sweep found
+      the M<=64 bucket configs already optimal within noise, so they kept the parent's values.
+    - 'The tile was re-balanced against split-K at an unchanged CTA count: BN 64->128 and BK 256->128 with
+      split-K 2->4, keeping 8 warps and 3 stages.'
+    - The kernel body was unchanged; only the launch configuration row differed from the parent.
+    summary: 'Filling more of the machine was not what helped here: keeping the same CTA count while trading
+      a narrower N tile for a wider one plus a deeper K split beat its parent. In the engineer''s unverified
+      sweeps, adding CTAs (split-K 8/16, BN 16/32, or an M-split grid) never beat the parent, and split-K 1
+      was slower; the engineer attributes the gain to BN=128 halving activation re-reads from L2.'
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: sglang-rocm image 7184d3ae, Triton 3.7.0, PyTorch 2.9.1 ROCm 7.2
+      dtype: fp8 e4m3 activations and weights, per-row and per-channel fp32 scales
+      shape_layout: decode M=24 to 112; N=4608, K=8192
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark over 24 cases, measured independently of the engineer for each step against
+        its parent; 1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
 - id: flydsl-splitk-hot-loop-schedule-bundle
   type: performance_candidate
   axes:
@@ -520,6 +576,97 @@ cards:
           - epilogue
           - runtime_contract
           backend: flydsl
+- id: masked-live-columns-for-whole-wave-grid
+  type: performance_candidate
+  axes:
+  - work_partition
+  - workgroup_tile
+  - execution_geometry
+  - tunable_surface
+  match:
+    operator_families:
+    - splitk_streamk_gemm
+    - skinny_gemv_decode
+    target_languages:
+    - triton
+    gfx:
+    - gfx950
+  question: When a power-of-two N tile leaves a fractional number of programs per CU, can a wider masked tile
+    with fewer live columns fill the machine evenly?
+  evidence_level: reported_experience
+  status: candidate_only
+  upstream_review:
+    status: unreviewed
+  conditions:
+  - The grid with the natural power-of-two tile gives a fractional per-CU program count; the engineer computed
+    2.25 for N=4608, SK=8 at BM=32.
+  - Each program streams its own weight slice, as in decode-M or split-K partial GEMMs, so the slowest CUs
+    set the tail.
+  - The tile width is limited to powers of two (for example Triton tl.arange), so the exact live width cannot
+    be the arange width.
+  - N is divisible by the chosen live width; otherwise fall back to the dense tile.
+  actions:
+  - Keep the arange at the power-of-two width BN, but index columns as pn*LN + arange(BN) with LN < BN live
+    columns, and step the grid by LN.
+  - Mask the dead columns (c >= LN) on the weight load (other=0) and on the output or partial store.
+  - Choose LN so that (N/LN) * split * M-tiles is an exact multiple of the CU count, for example 48 of 64 giving
+    768 programs at N=4608, SK=8.
+  - Gate the masked tile in the launcher on the tile and on N % LN == 0, with a constexpr default that leaves
+    other paths compiling to the same code.
+  - Re-sweep num_warps for the masked tile; the engineer found 2 warps a further ~0.4 us faster at M=24 and
+    neutral at M=32.
+  - Time it against a same-session control run of the unchanged kernel, because unchanged cases drifted by
+    up to ~1 us between runs.
+  alternatives:
+  - 'Narrower live widths that give more programs per CU (32 or 36 of 64): 3-5 us slower in the engineer''s
+    bench.'
+  - 'Narrower dense tiles (BN=16/32) at BM=32 with 1 to 8 warps: slower in the engineer''s bench.'
+  - 'Splitting M into two BM=16 halves: 30-34 us, much slower in the engineer''s bench.'
+  - 'Three separate 16-wide dots per program instead of one masked 64-wide tile: slightly slower.'
+  - 'Retuning BK, num_stages or matrix_instr_nonkdim=32 instead: equal or slower in the engineer''s bench.'
+  why:
+  - With 2.25 programs per CU, some CUs run 3 programs and the rest 2, so the extra programs set the tail;
+    an exact per-CU count balances the load.
+  - The engineer attributes the loss from finer tiles to each extra program re-reading the whole X K-slice
+    (BM x K/SK), so a wide tile amortises that read.
+  - In the engineer's account, the MFMA and LDS work per wave does not shrink with a narrower tile, so masking
+    a few columns costs less than adding programs.
+  source_evidence: []
+  measurement_evidence: []
+  limitations:
+  - 'Comes from one recorded step: a Triton bf16 split-K partial GEMM on gfx950 at M=17 to 32, with the fill
+    derived at N=4608, SK=8.'
+  - The best LN depends on N, split-K, M-tiles and the CU count; re-derive it whenever the tile or split changes.
+  - Dead columns still occupy MFMA lanes (a quarter of the tile at 48 of 64), so the gain relies on the kernel
+    being fill- or bandwidth-limited rather than compute-limited.
+  - The per-case timings and the explanations for the losing variants are the engineer's unverified single-session
+    bench, taken on a GPU with intermittent foreign work.
+  experience:
+  - outcome: beneficial
+    conditions:
+    - Triton bf16 split-K partial-sum GEMM on gfx950, decode M=17 to 32 (the BM=32 tile path).
+    - The N tile keeps a 64-wide arange but has 48 live columns, used only when N is divisible by 48; the engineer
+      derived the fill at N=4608, SK=8.
+    - The masked tile runs with 2 warps instead of 1; the M up to 16 paths compile unchanged (LN defaults to
+      None).
+    summary: Stepping the grid by 48 live columns of a masked 64-wide N tile, so the split-K launch puts exactly
+      3 programs on every CU instead of 2.25, improved the bf16 decode split-K GEMM over its parent on gfx950.
+      The engineer's unverified bench put M=24/32 at the M=8 level and found narrower live widths, narrower
+      dense tiles and M-splits slower.
+    provenance:
+      kind: private_summary
+      references: []
+      artifacts: not_published
+      verification: internally_validated
+    context:
+      gfx: gfx950
+      software: sglang-rocm image 7184d3ae, Triton 3.7.0, PyTorch 2.9.1 ROCm 7.2
+      dtype: bf16
+      shape_layout: decode M=8 to 32; split-K partial sums
+      baseline: the parent source of the same recorded GEAK optimization step
+      protocol: GEAK task benchmark over 16 cases, measured independently of the engineer for each step against
+        its parent; 1 recorded step; not re-run for KernelWiki
+      correctness: the GEAK task's correctness check passed for every counted step
 shared_cards:
 - flydsl-async-copy-by-family
 - flydsl-gfx942-path-gates
@@ -536,3 +683,10 @@ shared_cards:
 - gemm-shape-regime-routing
 - gemm-streamed-operand-cache-policy
 - gemm-workgroup-xcd-mapping
+- fp32-operand-bf16-hi-mid-split-mfma-separate-accumulators
+- gemm-host-plan-cache
+- gemm-compiler-schedule-and-register-budget
+- triton-dot-accumulator-form
+- flydsl-hgemm-decode-slice-k-warps-fp32-partials
+- gemm-k-fold-into-mfma-n-for-tiny-m-decode
+- small-tile-waves-per-workgroup-duplicate-mfma-audit

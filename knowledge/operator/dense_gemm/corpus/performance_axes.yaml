@@ -554,6 +554,7 @@ dependencies:
     correctness and latency under the same dtype, compiler and tolerance before assigning a benefit.
   decision_refs:
   - triton-dot-accumulator-form
+  - fp32-operand-bf16-hi-mid-split-mfma-separate-accumulators
 - id: lds_layout_is_bidirectional
   axes:
   - operand_layout
@@ -654,6 +655,7 @@ dependencies:
     it must be re-measured with it; keep the unmapped kernel as the control.
   decision_refs:
   - gemm-workgroup-xcd-mapping
+  - gemm-decode-k-order-rotation-for-shared-activation
 - id: shipped_selection_routes_by_bucket
   axes:
   - implementation_variant

@@ -295,3 +295,4 @@ shared_cards:
 - gemm-split-k-when-grid-underfills
 - gemm-streamed-operand-cache-policy
 - gemm-workgroup-xcd-mapping
+- splitk-decode-gemm-single-weight-pass-and-xcd-remap

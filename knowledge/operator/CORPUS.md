@@ -16,11 +16,11 @@ knowledge/operator/<operator>/corpus/
 
 The [operator catalog](catalog.yaml) and this generated navigation page live alongside the operator directories. The shared production and validation tools live under [tools/corpus](../../tools/corpus/README.md).
 
-**23 operators · 120 canonical cards · 4481 snapshot-qualified source observations · 359 shipped groups.** Shared references are not counted as additional knowledge records.
+**23 operators · 124 canonical cards · 4481 snapshot-qualified source observations · 359 shipped groups.** Shared references are not counted as additional knowledge records.
 
 ## Upstream PR review coverage
 
-22 canonical PR reports. reviewed: 49, unreviewed: 11, unresolved: 37, blocked: 23.
+22 canonical PR reports. reviewed: 49, unreviewed: 15, unresolved: 37, blocked: 23.
 
 Counts describe review coverage, not successful optimizations. Reports with missing measurements remain explicit; shared references do not duplicate results.
 
@@ -52,11 +52,11 @@ Counts describe review coverage, not successful optimizations. Reports with miss
 | operator | owned cards | shared cards | owned observations | reading |
 |---|---:|---:|---:|---|
 | [batched_gemm](batched_gemm/README.md) | 2 | 7 | 178 | [Decisions](batched_gemm/corpus/decisions.md) · [Evidence](batched_gemm/corpus/source_evidence.md) |
-| [dense_gemm](dense_gemm/README.md) | 22 | 14 | 303 | [Decisions](dense_gemm/corpus/decisions.md) · [Evidence](dense_gemm/corpus/source_evidence.md) |
-| [gemm_epilogue_fused](gemm_epilogue_fused/README.md) | 4 | 26 | 304 | [Decisions](gemm_epilogue_fused/corpus/decisions.md) · [Evidence](gemm_epilogue_fused/corpus/source_evidence.md) |
+| [dense_gemm](dense_gemm/README.md) | 24 | 14 | 303 | [Decisions](dense_gemm/corpus/decisions.md) · [Evidence](dense_gemm/corpus/source_evidence.md) |
+| [gemm_epilogue_fused](gemm_epilogue_fused/README.md) | 4 | 27 | 304 | [Decisions](gemm_epilogue_fused/corpus/decisions.md) · [Evidence](gemm_epilogue_fused/corpus/source_evidence.md) |
 | [scaled_quant_gemm](scaled_quant_gemm/README.md) | 12 | 15 | 577 | [Decisions](scaled_quant_gemm/corpus/decisions.md) · [Evidence](scaled_quant_gemm/corpus/source_evidence.md) |
-| [skinny_gemv_decode](skinny_gemv_decode/README.md) | 2 | 18 | 143 | [Decisions](skinny_gemv_decode/corpus/decisions.md) · [Evidence](skinny_gemv_decode/corpus/source_evidence.md) |
-| [splitk_streamk_gemm](splitk_streamk_gemm/README.md) | 3 | 15 | 76 | [Decisions](splitk_streamk_gemm/corpus/decisions.md) · [Evidence](splitk_streamk_gemm/corpus/source_evidence.md) |
+| [skinny_gemv_decode](skinny_gemv_decode/README.md) | 2 | 29 | 143 | [Decisions](skinny_gemv_decode/corpus/decisions.md) · [Evidence](skinny_gemv_decode/corpus/source_evidence.md) |
+| [splitk_streamk_gemm](splitk_streamk_gemm/README.md) | 4 | 22 | 76 | [Decisions](splitk_streamk_gemm/corpus/decisions.md) · [Evidence](splitk_streamk_gemm/corpus/source_evidence.md) |
 
 ## Attention, KV caches and preparation fusions
 
@@ -70,7 +70,7 @@ Counts describe review coverage, not successful optimizations. Reports with miss
 | [gqa_mqa_attention](gqa_mqa_attention/README.md) | 3 | 1 | 63 | [Decisions](gqa_mqa_attention/corpus/decisions.md) · [Evidence](gqa_mqa_attention/corpus/source_evidence.md) |
 | [linear_attention_gated_delta](linear_attention_gated_delta/README.md) | 6 | 0 | 275 | [Decisions](linear_attention_gated_delta/corpus/decisions.md) · [Evidence](linear_attention_gated_delta/corpus/source_evidence.md) |
 | [mla_attention](mla_attention/README.md) | 2 | 1 | 180 | [Decisions](mla_attention/corpus/decisions.md) · [Evidence](mla_attention/corpus/source_evidence.md) |
-| [qk_norm_rope_cache](qk_norm_rope_cache/README.md) | 2 | 0 | 175 | [Decisions](qk_norm_rope_cache/corpus/decisions.md) · [Evidence](qk_norm_rope_cache/corpus/source_evidence.md) |
+| [qk_norm_rope_cache](qk_norm_rope_cache/README.md) | 3 | 0 | 175 | [Decisions](qk_norm_rope_cache/corpus/decisions.md) · [Evidence](qk_norm_rope_cache/corpus/source_evidence.md) |
 | [sliding_window_attention](sliding_window_attention/README.md) | 3 | 0 | 24 | [Decisions](sliding_window_attention/corpus/decisions.md) · [Evidence](sliding_window_attention/corpus/source_evidence.md) |
 | [sparse_attention_nsa](sparse_attention_nsa/README.md) | 5 | 0 | 82 | [Decisions](sparse_attention_nsa/corpus/decisions.md) · [Evidence](sparse_attention_nsa/corpus/source_evidence.md) |
 

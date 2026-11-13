@@ -931,6 +931,7 @@ cards:
   match:
     operator_families:
     - scaled_quant_gemm
+    - skinny_gemv_decode
     target_languages:
     - triton
     - gluon
@@ -994,6 +995,7 @@ cards:
   match:
     operator_families:
     - scaled_quant_gemm
+    - skinny_gemv_decode
     target_languages:
     - triton
     - gluon
@@ -1057,6 +1059,7 @@ cards:
   match:
     operator_families:
     - scaled_quant_gemm
+    - skinny_gemv_decode
     target_languages:
     - triton
     - gluon
@@ -1123,6 +1126,7 @@ cards:
   match:
     operator_families:
     - scaled_quant_gemm
+    - skinny_gemv_decode
     target_languages:
     - triton
     - gluon
