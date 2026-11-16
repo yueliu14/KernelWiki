@@ -133,7 +133,7 @@ PR association and effect confidence are **unknown** for this reviewed scope; th
 
 #### Applicability
 
-- `operator_families`: <code>qk_norm_rope_cache</code>, <code>gemm_epilogue_fused</code>
+- `operator_families`: <code>qk_norm_rope_cache</code>
 - `target_languages`: <code>triton</code>
 - `gfx`: <code>gfx950</code>
 

@@ -1320,7 +1320,7 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Applicability
 
-- `operator_families`: <code>dense_gemm</code>, <code>skinny_gemv_decode</code>, <code>splitk_streamk_gemm</code>
+- `operator_families`: <code>dense_gemm</code>
 - `target_languages`: <code>triton</code>, <code>gluon</code>, <code>flydsl</code>, <code>hip</code>, <code>ck</code>, <code>asm</code>, <code>tilelang</code>
 
 #### Use when
@@ -1375,7 +1375,7 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Applicability
 
-- `operator_families`: <code>dense_gemm</code>, <code>skinny_gemv_decode</code>, <code>splitk_streamk_gemm</code>
+- `operator_families`: <code>dense_gemm</code>
 - `target_languages`: <code>triton</code>, <code>gluon</code>, <code>flydsl</code>, <code>hip</code>, <code>ck</code>, <code>asm</code>, <code>tilelang</code>
 
 #### Use when
@@ -1430,7 +1430,7 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Applicability
 
-- `operator_families`: <code>dense_gemm</code>, <code>attention_prefill_fmha</code>, <code>skinny_gemv_decode</code>, <code>splitk_streamk_gemm</code>
+- `operator_families`: <code>dense_gemm</code>, <code>attention_prefill_fmha</code>
 - `target_languages`: <code>triton</code>
 
 #### Use when
@@ -1484,7 +1484,7 @@ Reviewed the named PR, its committed changes and available discussion; this does
 
 #### Applicability
 
-- `operator_families`: <code>dense_gemm</code>, <code>skinny_gemv_decode</code>, <code>splitk_streamk_gemm</code>
+- `operator_families`: <code>dense_gemm</code>
 - `target_languages`: <code>flydsl</code>
 - `gfx`: <code>gfx950</code>
 
@@ -1551,7 +1551,7 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Applicability
 
-- `operator_families`: <code>dense_gemm</code>, <code>skinny_gemv_decode</code>, <code>splitk_streamk_gemm</code>
+- `operator_families`: <code>dense_gemm</code>
 - `target_languages`: <code>triton</code>
 - `gfx`: <code>gfx950</code>
 
@@ -1617,7 +1617,7 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Applicability
 
-- `operator_families`: <code>dense_gemm</code>, <code>skinny_gemv_decode</code>, <code>splitk_streamk_gemm</code>
+- `operator_families`: <code>dense_gemm</code>
 - `target_languages`: <code>triton</code>
 - `gfx`: <code>gfx950</code>
 
@@ -1689,7 +1689,7 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Applicability
 
-- `operator_families`: <code>dense_gemm</code>, <code>splitk_streamk_gemm</code>
+- `operator_families`: <code>dense_gemm</code>
 - `target_languages`: <code>triton</code>
 - `gfx`: <code>gfx950</code>
 

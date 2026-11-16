@@ -665,7 +665,7 @@ Reviewed the linked PR changes, body and discussion for the specified implementa
 
 #### Applicability
 
-- `operator_families`: <code>scaled_quant_gemm</code>, <code>skinny_gemv_decode</code>
+- `operator_families`: <code>scaled_quant_gemm</code>
 - `target_languages`: <code>triton</code>, <code>gluon</code>, <code>flydsl</code>, <code>hip</code>, <code>ck</code>, <code>asm</code>, <code>tilelang</code>
 
 #### Use when
@@ -720,7 +720,7 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Applicability
 
-- `operator_families`: <code>scaled_quant_gemm</code>, <code>skinny_gemv_decode</code>
+- `operator_families`: <code>scaled_quant_gemm</code>
 - `target_languages`: <code>triton</code>, <code>gluon</code>, <code>flydsl</code>, <code>hip</code>, <code>ck</code>, <code>asm</code>, <code>tilelang</code>
 
 #### Use when
@@ -775,7 +775,7 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Applicability
 
-- `operator_families`: <code>scaled_quant_gemm</code>, <code>skinny_gemv_decode</code>
+- `operator_families`: <code>scaled_quant_gemm</code>
 - `target_languages`: <code>triton</code>, <code>gluon</code>, <code>flydsl</code>, <code>hip</code>, <code>ck</code>, <code>asm</code>, <code>tilelang</code>
 
 #### Use when
@@ -830,7 +830,7 @@ Raw run artifacts are not published here. Historical reports have not been repro
 
 #### Applicability
 
-- `operator_families`: <code>scaled_quant_gemm</code>, <code>skinny_gemv_decode</code>
+- `operator_families`: <code>scaled_quant_gemm</code>
 - `target_languages`: <code>triton</code>, <code>gluon</code>, <code>flydsl</code>, <code>hip</code>, <code>ck</code>, <code>asm</code>, <code>tilelang</code>
 
 #### Use when

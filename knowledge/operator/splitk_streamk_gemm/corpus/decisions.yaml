@@ -586,7 +586,6 @@ cards:
   match:
     operator_families:
     - splitk_streamk_gemm
-    - skinny_gemv_decode
     target_languages:
     - triton
     gfx:
@@ -683,10 +682,3 @@ shared_cards:
 - gemm-shape-regime-routing
 - gemm-streamed-operand-cache-policy
 - gemm-workgroup-xcd-mapping
-- fp32-operand-bf16-hi-mid-split-mfma-separate-accumulators
-- gemm-host-plan-cache
-- gemm-compiler-schedule-and-register-budget
-- triton-dot-accumulator-form
-- flydsl-hgemm-decode-slice-k-warps-fp32-partials
-- gemm-k-fold-into-mfma-n-for-tiny-m-decode
-- small-tile-waves-per-workgroup-duplicate-mfma-audit

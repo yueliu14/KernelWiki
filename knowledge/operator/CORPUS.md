@@ -53,10 +53,10 @@ Counts describe review coverage, not successful optimizations. Reports with miss
 |---|---:|---:|---:|---|
 | [batched_gemm](batched_gemm/README.md) | 2 | 7 | 178 | [Decisions](batched_gemm/corpus/decisions.md) · [Evidence](batched_gemm/corpus/source_evidence.md) |
 | [dense_gemm](dense_gemm/README.md) | 24 | 14 | 303 | [Decisions](dense_gemm/corpus/decisions.md) · [Evidence](dense_gemm/corpus/source_evidence.md) |
-| [gemm_epilogue_fused](gemm_epilogue_fused/README.md) | 4 | 27 | 304 | [Decisions](gemm_epilogue_fused/corpus/decisions.md) · [Evidence](gemm_epilogue_fused/corpus/source_evidence.md) |
+| [gemm_epilogue_fused](gemm_epilogue_fused/README.md) | 4 | 26 | 304 | [Decisions](gemm_epilogue_fused/corpus/decisions.md) · [Evidence](gemm_epilogue_fused/corpus/source_evidence.md) |
 | [scaled_quant_gemm](scaled_quant_gemm/README.md) | 12 | 15 | 577 | [Decisions](scaled_quant_gemm/corpus/decisions.md) · [Evidence](scaled_quant_gemm/corpus/source_evidence.md) |
-| [skinny_gemv_decode](skinny_gemv_decode/README.md) | 2 | 29 | 143 | [Decisions](skinny_gemv_decode/corpus/decisions.md) · [Evidence](skinny_gemv_decode/corpus/source_evidence.md) |
-| [splitk_streamk_gemm](splitk_streamk_gemm/README.md) | 4 | 22 | 76 | [Decisions](splitk_streamk_gemm/corpus/decisions.md) · [Evidence](splitk_streamk_gemm/corpus/source_evidence.md) |
+| [skinny_gemv_decode](skinny_gemv_decode/README.md) | 2 | 18 | 143 | [Decisions](skinny_gemv_decode/corpus/decisions.md) · [Evidence](skinny_gemv_decode/corpus/source_evidence.md) |
+| [splitk_streamk_gemm](splitk_streamk_gemm/README.md) | 4 | 15 | 76 | [Decisions](splitk_streamk_gemm/corpus/decisions.md) · [Evidence](splitk_streamk_gemm/corpus/source_evidence.md) |
 
 ## Attention, KV caches and preparation fusions
 

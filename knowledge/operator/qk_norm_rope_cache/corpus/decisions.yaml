@@ -104,7 +104,6 @@ cards:
   match:
     operator_families:
     - qk_norm_rope_cache
-    - gemm_epilogue_fused
     target_languages:
     - triton
     gfx:

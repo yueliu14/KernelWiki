@@ -1959,8 +1959,6 @@ cards:
   match:
     operator_families:
     - dense_gemm
-    - skinny_gemv_decode
-    - splitk_streamk_gemm
     target_languages:
     - triton
     - gluon
@@ -2023,8 +2021,6 @@ cards:
   match:
     operator_families:
     - dense_gemm
-    - skinny_gemv_decode
-    - splitk_streamk_gemm
     target_languages:
     - triton
     - gluon
@@ -2089,8 +2085,6 @@ cards:
     operator_families:
     - dense_gemm
     - attention_prefill_fmha
-    - skinny_gemv_decode
-    - splitk_streamk_gemm
     target_languages:
     - triton
   question: Should the dot product receive the existing accumulator directly?
@@ -2165,8 +2159,6 @@ cards:
   match:
     operator_families:
     - dense_gemm
-    - skinny_gemv_decode
-    - splitk_streamk_gemm
     target_languages:
     - flydsl
     gfx:
@@ -2258,8 +2250,6 @@ cards:
   match:
     operator_families:
     - dense_gemm
-    - skinny_gemv_decode
-    - splitk_streamk_gemm
     target_languages:
     - triton
     gfx:
@@ -2348,8 +2338,6 @@ cards:
   match:
     operator_families:
     - dense_gemm
-    - skinny_gemv_decode
-    - splitk_streamk_gemm
     target_languages:
     - triton
     gfx:
@@ -2467,7 +2455,6 @@ cards:
   match:
     operator_families:
     - dense_gemm
-    - splitk_streamk_gemm
     target_languages:
     - triton
     gfx:
