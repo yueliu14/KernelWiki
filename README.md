@@ -8,6 +8,7 @@ An **operator- and workload-level GPU kernel knowledge base for LLM inference**,
 | --- | --- | --- |
 | Written knowledge | [Operators](knowledge/operator/README.md) · [Workloads](knowledge/workload/README.md) · [General](knowledge/general/README.md) | Implementations, multi-operator execution contracts and optimization, source entry points, applicability and evidence |
 | Structured corpus | [Operator catalog](knowledge/operator/catalog.yaml) · [Corpus guide](knowledge/operator/CORPUS.md) · [General decisions](knowledge/general/corpus/decisions.md) | Source observations, conditioned decisions, experience summaries and upstream configuration seeds |
+| Evidence statistics | [Coverage](knowledge/statistics/README.md) · [Reported effects](knowledge/statistics/reported_effects.md) | Generated card/result counts, evidence gaps and individual speedup metrics grouped by measurement scope |
 | Corpus maintenance | [Tools](tools/corpus/README.md) · [AITER refresh skill](tools/corpus/skills/aiter-corpus-refresh/SKILL.md) | Extract pinned source evidence, update decisions, validate references and generate reading pages |
 
 ```text
@@ -77,8 +78,8 @@ For source-grounded implementation decisions, start with the [GEMM](knowledge/op
 [attention](knowledge/operator/attention_prefill_fmha/corpus/decisions.md), [MoE](knowledge/operator/grouped_gemm_moe/corpus/decisions.md) or
 [indexer](knowledge/operator/attention_indexer/corpus/decisions.md) corpus. All **23 operators** own a local
 `corpus/` with source evidence, development cards, extraction scope and performance axes.
-The collection contains **107 canonical cards (including 8 general-method cards), 4,481 source observations and 359 upstream
-configuration/selection groups**. Cross-operator knowledge uses shared references to a single owner;
+The [generated statistics](knowledge/statistics/README.md) count canonical cards, source observations,
+upstream configuration groups and reported effects. Cross-operator knowledge uses shared references to a single owner;
 the catalog under `knowledge/operator/` provides navigation and snapshot metadata. See the [maintenance guide](tools/corpus/README.md).
 
 The corpus preserves the AITER `a6bb49937584` GEMM evidence and adds source from `b3ad6c461703`

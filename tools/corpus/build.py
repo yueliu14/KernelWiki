@@ -11,6 +11,7 @@ from pathlib import Path
 
 from validate import Catalog, qualified, source_refs
 import _render_upstream as pr_renderer
+import stats
 
 
 def link(label, target, page, anchor=""):
@@ -259,6 +260,7 @@ def render_index(catalog):
            f"**{len(catalog.operators)} operators · {len(catalog.cards)} canonical cards · "
            f"{len(catalog.sources)} snapshot-qualified source observations · {len(catalog.seeds)} shipped groups.** "
            "Shared references are not counted as additional knowledge records.", ""]
+    out += [link("Evidence coverage and scoped reported effects", catalog.root / "knowledge/statistics/README.md", page), ""]
     counts = Counter(c["upstream_review"]["status"] for c in catalog.cards.values())
     out += ["## Upstream PR review coverage", "",
             f"{len(catalog.upstream)} canonical PR reports. " + ", ".join(f"{key}: {counts[key]}" for key in ("reviewed", "unreviewed", "unresolved", "blocked")) + ".", "",
@@ -311,6 +313,7 @@ def pages(catalog, operators=None, include_index=True):
         result[path] = text
         path, text = render_index(catalog)
         result[path] = text
+        result.update(stats.pages(catalog))
     for record in catalog.upstream.values():
         path, text = pr_renderer.render_record(catalog.root, record)
         result[path] = text
@@ -331,6 +334,7 @@ def main():
     stale = []
     for path, text in rendered.items():
         if args.emit:
+            path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(text, encoding="utf-8")
         elif not path.exists() or path.read_text(encoding="utf-8") != text:
             stale.append(str(path.relative_to(catalog.root)))

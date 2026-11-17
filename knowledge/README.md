@@ -7,6 +7,7 @@
 - [DeepSeek-V4.1-Flash model history](top_model/deepseek_v41_flash/README.md): MI355X/vLLM image history, full configuration matrix, and 110 kernel/fusion pair records.
 - [Muse Spark model history](top_model/muse_spark/README.md): image-deduplicated MI355X/SGLang performance, CI provenance, and per-pair kernel/fusion evolution.
 - [Operator corpus](operator/CORPUS.md): structured development cards, pinned source evidence and configuration records.
+- [Evidence statistics](statistics/README.md): generated coverage, result distributions and scoped upstream-reported effects.
 
 ## Reading a backend page
 
