@@ -15,6 +15,8 @@ with `python3 -m pip install -r requirements-dev.txt` in a virtual environment; 
 ```bash
 python3 tools/corpus/build.py --emit
 python3 tools/corpus/build.py --check
+python3 tools/corpus/stats.py --emit
+python3 tools/corpus/stats.py --check
 python3 tools/corpus/validate.py
 python3 tools/corpus/validate.py --verify-source /path/to/aiter
 python3 tools/corpus/validate.py --verify-upstream /path/to/aiter
@@ -35,6 +37,11 @@ For commit-to-PR provenance, reported effects and confidence, follow the
 reviewed PR reports are stored once under `knowledge/_sources/aiter/pull_requests/` and
 referenced through `experience`. The initial examples are a partial backfill, and all
 other directions remain explicitly unreviewed. PR reports never imply local reproduction.
+
+The build also generates [evidence statistics](../../knowledge/statistics/README.md), including
+coverage counts and scoped reported effects. `stats.py` generates/checks just those artifacts;
+`build.py --check` includes them in the existing CI gate. See the [statistics contract](statistics.md)
+for population, counting units and interpretation.
 
 The build validates the whole reference graph and renders all operators by default. `--operator`
 or `--family` limits the selected pages or source audit. Source extraction reads the exact git

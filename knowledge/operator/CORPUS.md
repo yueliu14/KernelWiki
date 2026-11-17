@@ -18,6 +18,8 @@ The [operator catalog](catalog.yaml) and this generated navigation page live alo
 
 **23 operators · 109 canonical cards · 4481 snapshot-qualified source observations · 359 shipped groups.** Shared references are not counted as additional knowledge records.
 
+[Evidence coverage and scoped reported effects](../statistics/README.md)
+
 ## Upstream PR review coverage
 
 22 canonical PR reports. reviewed: 49, unreviewed: 0, unresolved: 37, blocked: 23.
