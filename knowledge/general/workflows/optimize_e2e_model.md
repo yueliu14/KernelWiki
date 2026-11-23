@@ -49,6 +49,22 @@ artifact (per-kernel `pct_gpu_time` + captured shapes + prefill-vs-decode regime
 [`../profiling/`](../profile_bottleneck/README.md). A same-named kernel in prefill vs decode = different
 shape regimes → may need regime-specific variants.
 
+#### Profiling an AgentX replay
+
+At the target client concurrency, trace slow requests and record active batch sizes and context lengths. Use the observed delay to choose one experiment.
+
+| Observation in the scored replay | First experiment |
+| --- | --- |
+| Later turns recompute prefixes | Measure evictions and recomputed tokens per KV pool. Vary the sliding-window share if that pool fills first. If host write-back dominates, time a page-size change end to end (pp. 46–49). |
+| Replicas lose throughput or MoE ranks wait for a peer | Compare prefix reuse and KV capacity per replica at fixed GPU count. For expert imbalance, inspect routed tokens per rank before changing expert placement (pp. 49–51). |
+| Longer drafts slow decode | Measure accepted tokens and verify time per step. Check graph and attention-kernel coverage at the observed verify widths and context lengths (pp. 39–40, 51–53). |
+| Decode steps are fast but some requests stream slowly | Attribute the slow requests' elapsed time to prefill and decode. At Inkling C32 the slowest tenth spent 60% of their decode time behind other requests' prefills. Profile those prompt steps (p. 57). |
+| Collectives sit between short kernels | Time the full chain with real tensor layouts, copies and synchronization. At Inkling C1 on MI350X, a hot microbenchmark predicted about 0.8 ms saved per step. The paired serving run saved 1.73 ms (pp. 61–62). |
+
+Run baseline and candidate at matching concurrency in the same job window. Check accuracy on the exercised path when numerics change. Compare throughput at equal P90 interactivity using the same token metric, and report time to first token separately (pp. 62–64).
+
+Source: *Lessons learned: building a competitive AgentX Pareto curve on AMD* (2026-11-19). Figures above are reported by the authors.
+
 ### 3. Strategize (System Architect)
 Route the Top-N by **Amdahl mass** into tracks:
 - **config track** (Tier-0, cheap, run first) — flags/env/backend swaps that reshape the
