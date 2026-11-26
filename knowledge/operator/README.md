@@ -1,24 +1,21 @@
-# GEMM, MoE, attention and indexer knowledge
+# GEMM, MoE, attention and indexer kernels
 
-The operator collection focuses on the main LLM inference workloads: GEMM, MoE, attention and attention indexers, including their variants and fusions. Start with a workload family, then follow its backend implementations and run-derived lessons.
+Agents: [AGENTS.md](../../AGENTS.md) maps a kernel to its operator directory.
 
-Every operator below owns a `corpus/` directory containing structured development cards, pinned
-source evidence, extraction scope and performance axes. The [corpus catalog](CORPUS.md)
-lists all 23 corpora and their shared-card references. These cards organize conditions, alternatives
-and implementation constraints; the operator pages provide broader explanations and historical
-experience. The table counts owned corpus decisions; shared references do not duplicate those records.
+Each operator directory has `README.md` (overview, regimes), `cards.md` (decision cards rendered from
+`corpus/decisions.yaml`; open the ones matching your kernel language), `tuning.md`, `numerics.md`, `fusion.md`, and
+`backend/` pages per language: `<lang>.md` holds dated GEAK notes, `<lang>_aiter.md` walks the pinned AITER source.
+The last column counts the cards an operator owns; shared cards are listed at the end of each `cards.md`.
 
-For execution chains spanning these operators, see [workload knowledge](../workload/README.md), including [QKV projection and preparation](../workload/qkv_projection_norm_rope_cache/README.md) and the [MoE expert pipeline](../workload/moe_expert_pipeline/README.md). Workload directories are named by semantic composition; their cases record model-specific inputs, outputs, dispatch and serving behavior.
+Standalone normalization, activation, softmax, positional encoding, quantization and copy kernels have no operator
+of their own: their contracts live with the kernel that consumes them (see the fusion operators below), and the
+methods in `general/optimization/` apply directly.
 
-Standalone normalization, activation, softmax, positional encoding, quantization, sampling, copy/transpose, scans and generic collectives are outside this operator index. Their relevant contracts belong with the main kernel that consumes them. MoE routing/dispatch and Q/K preparation fusions remain because they define the corresponding workload.
-
-AITER is the primary implementation source. Provider pages describe dispatch; backend pages cover Triton, Gluon, FlyDSL, HIP, CK, ASM or OPUS where an applicable source reference exists. A source reference is not a measured winner. Historical GEAK notes may cite excluded operators through pinned archived documents.
-
-All 23 workload families have pinned AITER implementation references. A single upstream kernel can serve several variants, such as grouped-query, chunked-prefill and sliding-window attention; those pages explain different contracts rather than count the shared source as separate kernels. Native pipeline notes distinguish registered public routes from source-only bodies.
+AITER is the primary implementation source. A source reference is not a measured winner.
 
 ## GEMM and projection fusions
 
-| Operator | Inference focus | AITER references | Corpus decisions |
+| Operator | Inference focus | AITER references | Cards |
 | --- | --- | --- | ---: |
 | [dense_gemm](dense_gemm/README.md) | Dense attention and FFN projections; prefill versus decode tiling. | aiter, asm, ck, flydsl, gluon, hip, opus, triton | 19 |
 | [scaled_quant_gemm](scaled_quant_gemm/README.md) | FP8, INT8, FP4 and microscaled projections, including packing and scale contracts. | aiter, asm, ck, flydsl, gluon, hip, opus, triton | 12 |
@@ -29,7 +26,7 @@ All 23 workload families have pinned AITER implementation references. A single u
 
 ## MoE and expert parallelism
 
-| Operator | Inference focus | AITER references | Corpus decisions |
+| Operator | Inference focus | AITER references | Cards |
 | --- | --- | --- | ---: |
 | [grouped_gemm_moe](grouped_gemm_moe/README.md) | Expert grouped GEMMs, token imbalance and low-bit expert weights. | aiter, asm, ck, flydsl, gluon, hip, opus, triton | 8 |
 | [fused_moe_grouped_gemm](fused_moe_grouped_gemm/README.md) | Fused expert execution and compute/communication overlap. | aiter, flydsl | 1 |
@@ -39,7 +36,7 @@ All 23 workload families have pinned AITER implementation references. A single u
 
 ## Attention and its fusions
 
-| Operator | Inference focus | AITER references | Corpus decisions |
+| Operator | Inference focus | AITER references | Cards |
 | --- | --- | --- | ---: |
 | [attention_prefill_fmha](attention_prefill_fmha/README.md) | Forward FMHA for prompt processing, including variable-length causal attention. | aiter, asm, flydsl, gluon, hip, triton | 3 |
 | [attention_decode_paged](attention_decode_paged/README.md) | Decode attention over paged KV caches, split/reduce and mixed precision. | asm, flydsl, gluon, hip, triton | 7 |
@@ -55,6 +52,6 @@ All 23 workload families have pinned AITER implementation references. A single u
 
 ## Attention indexer
 
-| Operator | Inference focus | AITER references | Corpus decisions |
+| Operator | Inference focus | AITER references | Cards |
 | --- | --- | --- | ---: |
 | [attention_indexer](attention_indexer/README.md) | MQA logits, index scores, block selection and top-k for sparse attention. | aiter, flydsl, gluon, hip, opus, triton | 9 |

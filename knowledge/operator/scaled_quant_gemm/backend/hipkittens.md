@@ -87,7 +87,7 @@ hipcc --offload-arch=gfx950 ...   # pinned HK commit, FP8 GEMM micro-bench
 - HazyResearch blog: https://hazyresearch.stanford.edu/blog/2025-11-09-hk ; code https://github.com/HazyResearch/HipKittens
 - FP8 GEMM Optimization on AMD CDNA4 (8-wave ping-pong, 3204 @ 8192, ROCm 7.1, MI355X): https://rocm.blogs.amd.com/software-tools-optimization/cdna4-gemm-kernels/README.html
 - Deep Dive Into 4-Wave Interleave FP8 GEMM: https://rocm.blogs.amd.com/software-tools-optimization/4wave-fp8gemm/README.html
-- AMD SOTA landscape §1 GEMM (HK FP8 8-wave 3222 / 4-wave 3327; hipBLASLt 3130): [landscape/amd_sota_2026](../../../general/landscape/amd_sota_2026.md)
+- AMD SOTA landscape §1 GEMM (HK FP8 8-wave 3222 / 4-wave 3327; hipBLASLt 3130): landscape/amd_sota_2026
 
 ## Migration provenance
 

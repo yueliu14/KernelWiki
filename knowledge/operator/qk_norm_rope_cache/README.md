@@ -1,6 +1,6 @@
 # qk_norm_rope_cache
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 Fused Q/K normalization, positional encoding, quantization and cache writes.
@@ -21,7 +21,7 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 ## Operator contract
 

@@ -30,7 +30,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: Sparse paged-decode attention over a unified or split KV pool with per-token paged indices. TODO: add details once API has settled
 
-Symbols: [`_check_out`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_decode_sparse.py#L67), [`pa_decode_sparse`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_decode_sparse.py#L78), [`_as_int32_contiguous_1d`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_decode_sparse.py#L459), [`_decode_num_splits_occ`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_decode_sparse.py#L465), [`_last_round_fills`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_decode_sparse.py#L484), [`_rounds_suit_32`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_decode_sparse.py#L490), [`_dsv4_block_m`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_decode_sparse.py#L500), [`_staged_block_m`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_decode_sparse.py#L516), [`_launch_splits`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_decode_sparse.py#L529), [`_pa_decode_sparse_gfx950_gluon`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_decode_sparse.py#L536).
+Symbols: `_check_out`, `pa_decode_sparse`, `_as_int32_contiguous_1d`, `_decode_num_splits_occ`, `_last_round_fills`, `_rounds_suit_32`, `_dsv4_block_m`, `_staged_block_m`, `_launch_splits`, `_pa_decode_sparse_gfx950_gluon`.
 
 Parameters referenced in this file: `BLOCK_D`, `BLOCK_H`, `BLOCK_K`, `BLOCK_M`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -40,7 +40,7 @@ Parameters referenced in this file: `BLOCK_D`, `BLOCK_H`, `BLOCK_K`, `BLOCK_M`, 
 
 Source documentation: Sparse paged-prefill attention over two KV sources (prefix + extend) with per-head sink bias — gfx1250 (gluon) only. Exposes pa_prefill_sparse — grid (T, cdiv(H, BLOCK_H)), one token and BLOCK_H heads per CTA. Same grid as the decode kernel. No split-K: prefill fills the GPU via the token dimension. Gfx950(mla_gluon) and others(Triton _sparse_attn_prefill_kernel, they take a 1-D (kv_indices, kv_indptr) pair over one pool.
 
-Symbols: [`_pinned_prefill_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_prefill_sparse.py#L49), [`pa_prefill_sparse`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_prefill_sparse.py#L66), [`_prep_single_source`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_prefill_sparse.py#L330), [`_as_index_contiguous_1d`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_prefill_sparse.py#L366), [`_as_int32_contiguous_1d`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_prefill_sparse.py#L374).
+Symbols: `_pinned_prefill_config`, `pa_prefill_sparse`, `_prep_single_source`, `_as_index_contiguous_1d`, `_as_int32_contiguous_1d`.
 
 Parameters referenced in this file: `BLOCK_D`, `BLOCK_H`, `BLOCK_K`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -50,7 +50,7 @@ Parameters referenced in this file: `BLOCK_D`, `BLOCK_H`, `BLOCK_K`, `num_stages
 
 Source documentation: QSA operators for index scoring, selection and sparse paged GQA.
 
-Symbols: [`_prev_pow2`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/qsa.py#L18), [`_table_width_bucket`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/qsa.py#L24), [`_kv_splits_heuristic`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/qsa.py#L29), [`_kernel_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/qsa.py#L48), [`_check_vector`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/qsa.py#L74), [`qsa_paged_mqa_logits`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/qsa.py#L83), [`qsa_expand_block_indices`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/qsa.py#L215), [`qsa_sparse_paged_gqa`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/qsa.py#L276).
+Symbols: `_prev_pow2`, `_table_width_bucket`, `_kv_splits_heuristic`, `_kernel_config`, `_check_vector`, `qsa_paged_mqa_logits`, `qsa_expand_block_indices`, `qsa_sparse_paged_gqa`.
 
 Parameters referenced in this file: `BLOCK_D`, `BLOCK_M`, `BLOCK_N`, `BLOCK_Q`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -60,7 +60,7 @@ Parameters referenced in this file: `BLOCK_D`, `BLOCK_M`, `BLOCK_N`, `BLOCK_Q`, 
 
 Source documentation: Sparse (top-k gathered) MLA attention. Everything after softmax_scale is keyword-only: kv_indptr and kv_indices are both flat int32, so a positional mix-up would type-check and return garbage. Supported KV cache formats. The format is inferred from kv_buffer's shape, dtype and kv_scale; each row gives what the caller has to pass. R is the QK width, kv_lora_rank + qk_rope_head_dim.
 
-Symbols: [`_check_out`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L29), [`_cache_pointers`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L43), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L88), [`_check_packed_arch`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L99), [`_check_fp8_arch`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L114), [`_check_lds_budget`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L147), [`_mla_num_splits`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L173), [`_async_launch_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L189), [`_resolve_dot_precision`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L229), [`_dsv32_row`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L255), [`_classify_flat`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L259), [`_classify_cache`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L286), [`_check_geometry`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L337), [`_check_index_stream`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L376), [`_forward_paged`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L396), [`sparse_mla_fwd`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla.py#L457).
+Symbols: `_check_out`, `_cache_pointers`, `_get_config`, `_check_packed_arch`, `_check_fp8_arch`, `_check_lds_budget`, `_mla_num_splits`, `_async_launch_config`, `_resolve_dot_precision`, `_dsv32_row`, `_classify_flat`, `_classify_cache`, `_check_geometry`, `_check_index_stream`, `_forward_paged`, `sparse_mla_fwd`.
 
 Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `num_warps`, `waves_per_eu`.
 
@@ -68,7 +68,7 @@ Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `num_warps`, `waves_pe
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla_dsv4_train.py) · **Recent**
 
-Symbols: [`_build_inverted_topk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla_dsv4_train.py#L27), [`sparse_mla_fwd`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla_dsv4_train.py#L65), [`SparseMLADSV4Function`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla_dsv4_train.py#L251), [`sparse_mla_dsv4_train`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/sparse_mla_dsv4_train.py#L279).
+Symbols: `_build_inverted_topk`, `sparse_mla_fwd`, `SparseMLADSV4Function`, `sparse_mla_dsv4_train`.
 
 Parameters referenced in this file: `BLOCK_D`, `BLOCK_G`, `BLOCK_H`, `BLOCK_K`, `num_stages`, `num_warps`.
 
@@ -78,7 +78,7 @@ Parameters referenced in this file: `BLOCK_D`, `BLOCK_G`, `BLOCK_H`, `BLOCK_K`, 
 
 Source documentation: Sparse paged-decode attention kernels (split-K + per-token paged indices). Two-kernel decomposition of a flash-decode whose K range for each token is a gathered subset of a unified KV pool: _pa_decode_sparse : split-K main kernel. Grid (T, ceil(H/BLOCK_H), KV_SPLITS). Each program owns one token, one head-block, and one slice of the token's sparse K range; writes pre-sink (m, l, acc) partials.
 
-Symbols: [`_pa_decode_sparse`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/pa_decode_sparse.py#L52), [`_pa_decode_sparse_reduce`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/pa_decode_sparse.py#L283).
+Symbols: `_pa_decode_sparse`, `_pa_decode_sparse_reduce`.
 
 Parameters referenced in this file: `BLOCK_D`, `BLOCK_H`, `BLOCK_K`, `num_stages`, `num_warps`.
 
@@ -88,7 +88,7 @@ Parameters referenced in this file: `BLOCK_D`, `BLOCK_H`, `BLOCK_K`, `num_stages
 
 Source documentation: QSA triton kernels for index scoring and sparse paged GQA.
 
-Symbols: [`_qsa_paged_mqa_logits_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/qsa.py#L42), [`_qsa_paged_mqa_logits_mfma_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/qsa.py#L165), [`_expand_selected_groups`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/qsa.py#L259), [`_qsa_sparse_paged_gqa_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/qsa.py#L308).
+Symbols: `_qsa_paged_mqa_logits_kernel`, `_qsa_paged_mqa_logits_mfma_kernel`, `_expand_selected_groups`, `_qsa_sparse_paged_gqa_kernel`.
 
 Parameters referenced in this file: `BLOCK_D`, `BLOCK_M`, `BLOCK_N`.
 
@@ -96,7 +96,7 @@ Parameters referenced in this file: `BLOCK_D`, `BLOCK_M`, `BLOCK_N`.
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/sparse_attention_dsv4.py) · **Recent**
 
-Symbols: [`_get_lds_limit`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/sparse_attention_dsv4.py#L13), [`_pack_dense_prefix_to_ragged_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/sparse_attention_dsv4.py#L36), [`_compute_topk_lens_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/sparse_attention_dsv4.py#L68), [`_pack_global_topk_ragged_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/sparse_attention_dsv4.py#L94), [`_compute_combined_lens_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/sparse_attention_dsv4.py#L136), [`_combine_topk_swa_indices_ragged_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/sparse_attention_dsv4.py#L164), [`_exp`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/sparse_attention_dsv4.py#L231), [`_prefill_prune_configs`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/sparse_attention_dsv4.py#L237), [`_get_prefill_autotune_configs`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/sparse_attention_dsv4.py#L251), [`_sparse_attn_prefill_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/sparse_attention_dsv4.py#L294).
+Symbols: `_get_lds_limit`, `_pack_dense_prefix_to_ragged_kernel`, `_compute_topk_lens_kernel`, `_pack_global_topk_ragged_kernel`, `_compute_combined_lens_kernel`, `_combine_topk_swa_indices_ragged_kernel`, `_exp`, `_prefill_prune_configs`, `_get_prefill_autotune_configs`, `_sparse_attn_prefill_kernel`.
 
 Parameters referenced in this file: `BLOCK_D`, `BLOCK_H`, `BLOCK_K`, `BLOCK_SIZE`, `matrix_instr_nonkdim`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -104,7 +104,7 @@ Parameters referenced in this file: `BLOCK_D`, `BLOCK_H`, `BLOCK_K`, `BLOCK_SIZE
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/sparse_mla_dsv4_train.py) · **Recent**
 
-Symbols: [`_sparse_mla_fwd_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/sparse_mla_dsv4_train.py#L29).
+Symbols: `_sparse_mla_fwd_kernel`.
 
 Parameters referenced in this file: `BLOCK_D`, `BLOCK_G`, `BLOCK_H`, `BLOCK_K`, `num_stages`, `num_warps`.
 
@@ -112,7 +112,7 @@ Parameters referenced in this file: `BLOCK_D`, `BLOCK_G`, `BLOCK_H`, `BLOCK_K`, 
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py) · **Recent**
 
-Symbols: [`cdiv_fn`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py#L8), [`apply_softcap`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py#L13), [`find_seq_idx`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py#L21), [`_kernel_unified_attention_sparse_mla_2d`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/unified_attention_sparse_mla.py#L60).
+Symbols: `cdiv_fn`, `apply_softcap`, `find_seq_idx`, `_kernel_unified_attention_sparse_mla_2d`.
 
 Parameters referenced in this file: `BLOCK_M`, `BLOCK_Q`, `BLOCK_SIZE`.
 
@@ -122,7 +122,7 @@ Parameters referenced in this file: `BLOCK_M`, `BLOCK_Q`, `BLOCK_SIZE`.
 
 Source documentation: This function computes the sparse attention. Note: topk_indices index the KV cache, not block_table.
 
-Symbols: [`unified_attention_sparse_mla`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/unified_attention_sparse_mla.py#L6).
+Symbols: `unified_attention_sparse_mla`.
 
 Parameters referenced in this file: `BLOCK_M`, `BLOCK_SIZE`, `num_stages`, `num_warps`.
 

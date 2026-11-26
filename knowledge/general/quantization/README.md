@@ -15,7 +15,7 @@ sources:
 # quantization/ — the strategy layer
 
 > **What this section is.** The *conceptual / strategy* layer of quantization for AMD MI GPUs:
-> which format, which granularity, which calibration method, which gate, which serving flags. It sits
+> which format, which granularity, which scaling, which accuracy gate. It sits
 > **above** the bit-exact deep numerics already written per-operator:
 > - [operators/quant_dequant_fp8](https://github.com/yueliu14/KernelWiki/blob/45cd3f5b51d16322db8dc301fa783148d323d27b/knowledge/operator/quant_dequant_fp8/README.md) — FP8 cast/dequant numerics (FNUZ vs OCP, 224 cap, amax/scale).
 > - [operators/quant_fp4_mxfp](https://github.com/yueliu14/KernelWiki/blob/45cd3f5b51d16322db8dc301fa783148d323d27b/knowledge/operator/quant_fp4_mxfp/README.md) — MXFP4/6 block-floating-point numerics (E8M0, group 32, shuffle).
@@ -35,14 +35,11 @@ sources:
    32-element block scale, power-of-2 amax, scale shuffle, FP6 runs at the FP4 rate.
 4. **Choose granularity & static-vs-dynamic** → [`scaling_strategies.md`](scaling_strategies.md).
    per-tensor / per-token / per-channel / per-block, and the 224.0 ROCm dynamic cap.
-5. **Produce the checkpoint** → [`calibration_and_quark.md`](calibration_and_quark.md). AMD Quark +
-   GPTQ/AWQ/SmoothQuant/QuaRot; what vLLM/SGLang consume.
-6. **Gate the result** → [`accuracy_evaluation.md`](accuracy_evaluation.md). `err_ratio<0.05` isolated,
+5. **Gate the result** → [`accuracy_evaluation.md`](accuracy_evaluation.md). `err_ratio<0.05` isolated,
    task accuracy (MMLU/GSM8K/perplexity) e2e — **never byte parity**.
-7. **Know what the HW can actually do** → [`hardware_support_matrix.md`](hardware_support_matrix.md).
+6. **Know what the HW can actually do** → [`hardware_support_matrix.md`](hardware_support_matrix.md).
    CDNA1–4 × {fp16,bf16,fp8,fp6,fp4,int8} MFMA support + rate.
-8. **KV cache is its own axis** → [`kv_cache_quantization.md`](kv_cache_quantization.md).
-9. **Deploy** → [`deployment_recipes.md`](deployment_recipes.md). sglang/vLLM AMD serve flags.
+7. **KV cache is its own axis** → [`kv_cache_quantization.md`](kv_cache_quantization.md).
 
 ## Files
 | file | one-liner |
@@ -51,11 +48,9 @@ sources:
 | [`fnuz_vs_ocp.md`](fnuz_vs_ocp.md) | CDNA3 FNUZ vs CDNA4 OCP, the 2× trap, conversion |
 | [`block_scaling_mxfp.md`](block_scaling_mxfp.md) | E8M0 block scale, shuffle, block-scaled MFMA |
 | [`scaling_strategies.md`](scaling_strategies.md) | granularity × dynamic/static, 224.0 cap |
-| [`calibration_and_quark.md`](calibration_and_quark.md) | Quark, GPTQ/AWQ/SmoothQuant, checkpoints |
 | [`accuracy_evaluation.md`](accuracy_evaluation.md) | err_ratio gate, task accuracy, SR |
 | [`hardware_support_matrix.md`](hardware_support_matrix.md) | CDNA1–4 MFMA dtype support + rate |
 | [`kv_cache_quantization.md`](kv_cache_quantization.md) | fp8/int8 KV, per-head scale, paged layout |
-| [`deployment_recipes.md`](deployment_recipes.md) | serve an fp8 model on sglang/vLLM AMD |
 
 ## Hardware anchors
 [hardware/cdna3_mi300](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/hardware/cdna3_mi300) · [hardware/cdna4_mi350](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/hardware/cdna4_mi350) · [hardware/shared/dtype_numerics](../hardware/shared/dtype_numerics.md)

@@ -28,7 +28,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: Computes the 8 bit matmul Y = X x WT using the block-scale quantization approach. Key parameters: - X: Matrix X with shape (M, K). - W: Matrix W with shape (N, K). - W_scale: Scale tensor for W with shape (**scale_n, *scale_k). Returns: - Y: The output matrix with shape (M, N). *scale_k = (K + scale_block_size_k - 1) // scale_block_size_k **scale_n = (N + scale_block_size_n - 1) // scale_block_size_n
 
-Symbols: [`gemm_a16w8_blockscale`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16w8_blockscale.py#L21), [`gemm_a16w8_blockscale_preshuffle`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16w8_blockscale.py#L156).
+Symbols: `gemm_a16w8_blockscale`, `gemm_a16w8_blockscale_preshuffle`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -38,7 +38,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 Source documentation: Computes matrix multiplication Y = X @ W^T with BF16 activations and FP4 weights. Key parameters: x (torch.Tensor): BF16/FP16 input matrix X with shape (M, K). Quantized to MXFP4 on-the-fly during GEMM. w (torch.Tensor): FP4 E2M1 weight matrix W with shape (N, K//2). w_scales (torch.Tensor): E8M0 per-group scale for w with shape (N, K//32). One scale per 32 elements in K dimension.
 
-Symbols: [`gemm_a16wfp4_fake_tensor`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16wfp4.py#L26), [`gemm_a16wfp4_`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16wfp4.py#L43), [`gemm_a16wfp4`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16wfp4.py#L184), [`gemm_a16wfp4_preshuffle_fake_tensor`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16wfp4.py#L197), [`gemm_a16wfp4_preshuffle_`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16wfp4.py#L228), [`gemm_a16wfp4_preshuffle`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16wfp4.py#L371).
+Symbols: `gemm_a16wfp4_fake_tensor`, `gemm_a16wfp4_`, `gemm_a16wfp4`, `gemm_a16wfp4_preshuffle_fake_tensor`, `gemm_a16wfp4_preshuffle_`, `gemm_a16wfp4_preshuffle`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -48,7 +48,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 Source documentation: Computes 8 bit matrix multiplication Y = (X @ W^T) * (x_scale * w_scale) with optional bias. INT8 inputs are scaled back to higher precision using per-tensor scale factors. Args: x (torch.Tensor): Input matrix with shape (M, K). w (torch.Tensor): Weight matrix with shape (N, K), internally transposed. x_scale (torch.Tensor): Scale factor for x with shape (M, 1) or (M,). w_scale (torch.Tensor): Scale factor for w with shape (1, N) or (N,).
 
-Symbols: [`gemm_a8w8`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a8w8.py#L28), [`gemm_a8w8_preshuffle`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a8w8.py#L215).
+Symbols: `gemm_a8w8`, `gemm_a8w8_preshuffle`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `num_warps`.
 
@@ -58,7 +58,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 Source documentation: Computes 8 bit matrix multiplication Y = X @ W^T using block-wise quantization scales. Each block along K and N dimensions has independent scale factors for fine-grained quantization. Args: x (torch.Tensor): INT8 input matrix with shape (M, K). w (torch.Tensor): INT8 weight matrix with shape (N, K), internally transposed. x_scale (torch.Tensor): Block-wise scale for x with shape (M, scale_k). scale_k = ceil(K / scale_block_size_k).
 
-Symbols: [`gemm_a8w8_blockscale`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a8w8_blockscale.py#L37), [`gemm_a8w8_blockscale_preshuffle`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a8w8_blockscale.py#L240).
+Symbols: `gemm_a8w8_blockscale`, `gemm_a8w8_blockscale_preshuffle`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `num_stages`, `num_warps`.
 
@@ -68,7 +68,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 Source documentation: Compatibility entry point for E4M3 GEMM with 1x32 or 32x32 E8M0 scales. Execution and tuning use the shared AFP8WFP8 implementation. The original contiguous-input contract and argument names remain supported.
 
-Symbols: [`gemm_a8w8_blockscale_group32`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a8w8_blockscale_group32.py#L10).
+Symbols: `gemm_a8w8_blockscale_group32`.
 
 Parameters referenced in this file: `split_k`.
 
@@ -78,7 +78,7 @@ Parameters referenced in this file: `split_k`.
 
 Source documentation: Computes 8 bit matrix multiplication Y = X @ W^T using per-token quantization scales. Each token (row) in x and each output column in w has independent scale factors. Args: x (torch.Tensor): INT8 input matrix with shape (M, K). w (torch.Tensor): INT8 weight matrix with shape (N, K), internally transposed. x_scale (torch.Tensor): Per-token scale for x with shape (M, 1) or (M,). w_scale (torch.Tensor): Per-output-channel scale for w with shape (N, 1) or (N,).
 
-Symbols: [`gemm_a8w8_per_token_scale`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a8w8_per_token_scale.py#L16).
+Symbols: `gemm_a8w8_per_token_scale`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -88,7 +88,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 Source documentation: Computes matrix multiplication Y = X @ W^T with FP8 activations and FP4 weights. Args: x (torch.Tensor): FP8 E4M3 input matrix with shape (M, K). w (torch.Tensor): Packed FP4 weight matrix with shape (N, K//2), internally transposed. Each uint8 contains 2 FP4 values. y (torch.Tensor): Pre-allocated output tensor with shape (M, N). x_scales (torch.Tensor): FP32 per-row scale for x with shape (M, 1). w_scales (torch.Tensor): E8M0 per-group scale for w with shape (N, K//32).
 
-Symbols: [`set_use_gemm_splitk_bf16`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a8wfp4.py#L22), [`gemm_a8wfp4`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a8wfp4.py#L27).
+Symbols: `set_use_gemm_splitk_bf16`, `gemm_a8wfp4`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -98,7 +98,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 Source documentation: Computes matrix multiplication Y = X @ W^T with FP4 activations and FP4 weights. Args: x (torch.Tensor): FP4 E2M1 input matrix with shape (M, K//2). w (torch.Tensor): FP4 E2M1 weight matrix with shape (N, K//2), internally transposed. x_scales (torch.Tensor): E8M0 per-group scale for x with shape (M, K//32). One scale per 32 elements in K dimension. w_scales (torch.Tensor): E8M0 per-group scale for w with shape (N, K//32). One scale per 32 elements in K dimension.
 
-Symbols: [`set_use_gemm_splitk_bf16`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp4wfp4.py#L37), [`get_splitk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp4wfp4.py#L42), [`gemm_afp4wfp4_fake_tensor`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp4wfp4.py#L82), [`gemm_afp4wfp4_`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp4wfp4.py#L119), [`gemm_afp4wfp4`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp4wfp4.py#L313), [`gemm_afp4wfp4_preshuffled_scales`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp4wfp4.py#L350), [`gemm_afp4wfp4_preshuffle`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp4wfp4.py#L489), [`gemm_afp4wfp4_preshuffled_weight_scales`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp4wfp4.py#L743).
+Symbols: `set_use_gemm_splitk_bf16`, `get_splitk`, `gemm_afp4wfp4_fake_tensor`, `gemm_afp4wfp4_`, `gemm_afp4wfp4`, `gemm_afp4wfp4_preshuffled_scales`, `gemm_afp4wfp4_preshuffle`, `gemm_afp4wfp4_preshuffled_weight_scales`.
 
 Parameters referenced in this file: `BLOCK_K_BYTES`, `BLOCK_SIZE_K`, `BLOCK_SIZE_K_STEP`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `num_warps`.
 
@@ -106,7 +106,7 @@ Parameters referenced in this file: `BLOCK_K_BYTES`, `BLOCK_SIZE_K`, `BLOCK_SIZE
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp4wfp4_pre_quant_atomic.py) · **Recent**
 
-Symbols: [`gemm_afp4wfp4_pre_quant`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp4wfp4_pre_quant_atomic.py#L14).
+Symbols: `gemm_afp4wfp4_pre_quant`.
 
 ### `aiter/ops/triton/gemm/basic/gemm_afp8wfp8.py`
 
@@ -114,7 +114,7 @@ Symbols: [`gemm_afp4wfp4_pre_quant`](https://github.com/ROCm/aiter/blob/e9995854
 
 Source documentation: Compute X @ W.T with E4M3 operands and compact E8M0 scales. Activation scales cover 1x32 or 1x128 elements. w_scale_group_size specifies (N, K) elements per weight scale: (1, 32), (32, 32), or (128, 128). Scale tensors have shapes (M, K / activation group) and (ceil(N / weight N group), K / weight K group). Byte views are accepted. Config files select ordinary or packed K-panel execution, N_FIRST traversal, NUM_KSPLIT, and FUSED_SPLITK.
 
-Symbols: [`_split_counters`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp8wfp8.py#L29), [`_split_k_partition`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp8wfp8.py#L44), [`_fused_workspace`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp8wfp8.py#L51), [`_is_gluon_available`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp8wfp8.py#L68), [`_resolve_x_scale_strides`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp8wfp8.py#L76), [`gemm_afp8wfp8`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp8wfp8.py#L114), [`gemm_afp8wfp8_preshuffle`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_afp8wfp8.py#L344).
+Symbols: `_split_counters`, `_split_k_partition`, `_fused_workspace`, `_is_gluon_available`, `_resolve_x_scale_strides`, `gemm_afp8wfp8`, `gemm_afp8wfp8_preshuffle`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `matrix_instr_nonkdim`, `num_buffers`, `num_stages`, `num_warps`, `split_k`, `waves_per_eu`.
 
@@ -122,7 +122,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w8_blockscale.py) · **Recent**
 
-Symbols: [`_gemm_a16w8_blockscale_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w8_blockscale.py#L44), [`_gemm_a16w8_blockscale_preshuffle_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w8_blockscale.py#L249), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w8_blockscale.py#L437).
+Symbols: `_gemm_a16w8_blockscale_kernel`, `_gemm_a16w8_blockscale_preshuffle_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `matrix_instr_nonkdim`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -130,7 +130,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16wfp4.py) · **Recent**
 
-Symbols: [`_gemm_a16wfp4_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16wfp4.py#L39), [`_gemm_a16wfp4_preshuffle_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16wfp4.py#L215), [`get_splitk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16wfp4.py#L383), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16wfp4.py#L420).
+Symbols: `_gemm_a16wfp4_kernel`, `_gemm_a16wfp4_preshuffle_kernel`, `get_splitk`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_K_STEP`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `matrix_instr_nonkdim`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -138,7 +138,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_K_STEP`, `BLOCK_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8w8.py) · **Recent**
 
-Symbols: [`_gemm_a8w8_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8w8.py#L45), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8w8.py#L196).
+Symbols: `_gemm_a8w8_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -146,7 +146,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8w8_blockscale.py) · **Recent**
 
-Symbols: [`_gemm_a8w8_blockscale_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8w8_blockscale.py#L37), [`_gemm_a8w8_blockscale_preshuffle_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8w8_blockscale.py#L233), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8w8_blockscale.py#L432).
+Symbols: `_gemm_a8w8_blockscale_kernel`, `_gemm_a8w8_blockscale_preshuffle_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_K`, `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `num_stages`.
 
@@ -154,7 +154,7 @@ Parameters referenced in this file: `BLOCK_K`, `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8w8_per_token_scale.py) · **Recent**
 
-Symbols: [`_gemm_a8w8_per_token_scale_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8w8_per_token_scale.py#L38), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8w8_per_token_scale.py#L186).
+Symbols: `_gemm_a8w8_per_token_scale_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -162,7 +162,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8wfp4.py) · **Recent**
 
-Symbols: [`_gemm_a8wfp4_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8wfp4.py#L41), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8wfp4.py#L207), [`_get_splitk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a8wfp4.py#L228).
+Symbols: `_gemm_a8wfp4_kernel`, `_get_config`, `_get_splitk`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_K_STEP`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -170,7 +170,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_K_STEP`, `BLOCK_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_afp4wfp4.py) · **Recent**
 
-Symbols: [`_gemm_afp4wfp4_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_afp4wfp4.py#L39), [`_gemm_afp4wfp4_kernel_preshuffle_scales`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_afp4wfp4.py#L233), [`_gemm_afp4wfp4_preshuffle_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_afp4wfp4.py#L509), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_afp4wfp4.py#L721).
+Symbols: `_gemm_afp4wfp4_kernel`, `_gemm_afp4wfp4_kernel_preshuffle_scales`, `_gemm_afp4wfp4_preshuffle_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `matrix_instr_nonkdim`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -178,7 +178,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_afp8wfp8.py) · **Recent**
 
-Symbols: [`_gemm_afp8wfp8_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_afp8wfp8.py#L44), [`_tile_on_xcd`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_afp8wfp8.py#L314), [`_sum_splits_on_xcd`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_afp8wfp8.py#L326), [`_gemm_afp8wfp8_packed_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_afp8wfp8.py#L353), [`_gemm_afp8wfp8_preshuffle_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_afp8wfp8.py#L516), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_afp8wfp8.py#L724).
+Symbols: `_gemm_afp8wfp8_kernel`, `_tile_on_xcd`, `_sum_splits_on_xcd`, `_gemm_afp8wfp8_packed_kernel`, `_gemm_afp8wfp8_preshuffle_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `matrix_instr_nonkdim`, `num_stages`, `num_warps`, `waves_per_eu`.
 

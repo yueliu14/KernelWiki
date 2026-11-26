@@ -1,6 +1,6 @@
 # moe_routing_topk
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 Expert selection, routing weights, token sorting and alignment for MoE GEMMs.
@@ -21,38 +21,19 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 **PR evidence correction (2026-11-04):** [PR #1909](https://github.com/ROCm/aiter/pull/1909)
 is a closed, unmerged proposal for plain `topk_sigmoid`. Its reported average 1.66x
 does not measure `biased_grouped_topk` and does not establish a shipped gfx9 dispatch.
 The imported material below conflates these implementations; do not transfer that
-performance or support claim to grouped routing. See the [reviewed report](corpus/decisions.md#moe-sigmoid-dpp-selection)
+performance or support claim to grouped routing. See the reviewed report
 for its comparison conditions, inconsistent extrema and confidence.
 
 ## GEAK reference material
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.
 
-<details>
-<summary>Original GEAK metadata</summary>
-
-```yaml
-title: moe_routing_topk — overview
-kind: operator_overview
-operator: moe_routing_topk
-gens: [gfx942, gfx950]
-dtypes: [bf16, fp16, fp32]
-regimes: [prefill, decode]
-updated: 2026-06-08
-sources:
-  - ROCm/aiter@a6bb499375849eec45d68c5ccaebc8865fd422c0:aiter/ops/topk.py
-  - ROCm/aiter@a6bb499375849eec45d68c5ccaebc8865fd422c0:csrc/kernels/topk_softmax_kernels_group.cu
-  - https://github.com/vllm-project/vllm/pull/17955
-  - https://huggingface.co/blog/yiakwy-xpu-team/efficient-moe-align-sort-design-for-sglang
-```
-
-</details>
 
 # moe_routing_topk  (router gating → top-k expert select → expert histogram/sort)
 

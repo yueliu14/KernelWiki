@@ -103,7 +103,7 @@ accompanied by an engagement proof that the change is actually live
 
 ## Sources
 - Warmup / median-of-repeats / measure-don't-assume-clock discipline and MI300X clock variance: perf_knowledge [`../hardware/cdna3_mi300/clocks_power.md`](../hardware/cdna3_mi300/clocks_power.md) (ROCm MI300 arch docs) + ROCm workload-optimization guide.
-- REPEATS=7 / 0.5% noise band / same-session 2-launch A/B / +2.23% e2e: perf_knowledge e2e run 2026-06-08 (see [`../backends/aiter/tuned_gemm.md`](../libraries/aiter/tuned_gemm.md), [`../backends/aiter/overview.md`](../libraries/aiter/overview.md)).
+- REPEATS=7 / 0.5% noise band / same-session 2-launch A/B / +2.23% e2e: perf_knowledge e2e run 2026-06-08 (see `../backends/aiter/tuned_gemm.md`, `../backends/aiter/overview.md`).
 - Clock control via amd-smi/rocm-smi: AMD SMI docs.
 
 ## Migration provenance

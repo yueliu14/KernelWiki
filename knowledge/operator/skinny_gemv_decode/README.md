@@ -1,6 +1,6 @@
 # skinny_gemv_decode
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 Small-M decode projections and GEMV-like regimes.
@@ -17,29 +17,12 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.
 
-<details>
-<summary>Original GEAK metadata</summary>
-
-```yaml
-title: skinny_gemv_decode — overview
-kind: operator_overview
-operator: skinny_gemv_decode
-gens: [gfx942, gfx950]
-dtypes: [bf16, fp16, fp8_e4m3_fnuz]
-regimes: [decode]
-updated: 2026-06-05
-sources:
-  - https://github.com/ROCm/aiter
-  - https://rocm.docs.amd.com/en/latest/how-to/rocm-for-ai/inference-optimization/vllm-optimization.html
-```
-
-</details>
 
 # skinny_gemv_decode
 

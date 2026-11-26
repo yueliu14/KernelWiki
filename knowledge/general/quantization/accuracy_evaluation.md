@@ -61,7 +61,7 @@ Any FP8/FP6/FP4/INT path changes bits *by design*; demanding parity would reject
   same harness (lm-eval-harness / Quark's `--tasks`). Quark's accuracy/perf blog uses exactly this
   vLLM+SGLang MI300X methodology.
 - **Throughput**: median of ≥3 warm repeats, tagged `value @ hw, ROCm ver, lib@commit, date`
-  ([index/conventions.md](../reference/geak_index/conventions.md)).
+  (index/conventions.md).
 
 ## MMA-Sim / bit-accurate references
 For isolating *where* error comes from (cast vs accumulate vs rounding mode), a bit-accurate matrix-core

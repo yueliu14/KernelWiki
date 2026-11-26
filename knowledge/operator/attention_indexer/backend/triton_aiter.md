@@ -28,7 +28,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: This function computes the logits to be used by a topk function for sparse attention. Q: [seq_len, NUM_HEADS, HEAD_SIZE], dtype float8 KV: [seq_len_kv, HEAD_SIZE], dtype float8 kv_scales: [seq_len_kv], dtype float32 weights: [seq_len, NUM_HEADS], dtype float32 cu_starts: [seq_len], dtype int32, start indices cu_ends: [seq_len], dtype int32, end indices clean_logits: bool. If True, positions outside [cu_starts[i], cu_ends[i]) in row i are explicitly written as -inf.
 
-Symbols: [`_async_copy_accepts_distributed_layout`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/fp8_mqa_logits.py#L35), [`_permute_accepts_constexpr_tuple`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/fp8_mqa_logits.py#L45), [`_gfx950_kv_splits`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/fp8_mqa_logits.py#L70), [`_gfx942_tile_fits_lds`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/fp8_mqa_logits.py#L85), [`fp8_mqa_logits`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/fp8_mqa_logits.py#L97).
+Symbols: `_async_copy_accepts_distributed_layout`, `_permute_accepts_constexpr_tuple`, `_gfx950_kv_splits`, `_gfx942_tile_fits_lds`, `fp8_mqa_logits`.
 
 Parameters referenced in this file: `BLOCK_KV`, `BLOCK_M`, `matrix_instr_nonkdim`, `num_buffers`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -38,7 +38,7 @@ Parameters referenced in this file: `BLOCK_KV`, `BLOCK_M`, `matrix_instr_nonkdim
 
 Source documentation: Build the FP8 decode persistent grid entirely on the GPU. The returned int32 [NumCTAs, 4] table contains packed query row, first chunk, chunk count and context length. Pass it as PersistentSchedule to :func:deepgemm_fp8_paged_mqa_logits. Rebuild it when context lengths, next_n, ChunkK or max_model_len change. Both construction and execution can be captured in a CUDA graph; out allows storage reuse.
 
-Symbols: [`_context_lens_and_stride`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits.py#L85), [`deepgemm_fp8_paged_mqa_logits_ragged_k`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits.py#L133), [`deepgemm_fp8_paged_mqa_logits_stage1_ragged_k`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits.py#L185), [`deepgemm_fp8_paged_mqa_logits_stage1`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits.py#L237), [`_compile_deepgemm_fp8_paged_mqa_logits`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits.py#L318), [`deepgemm_fp8_paged_mqa_logits_schedule`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits.py#L502), [`deepgemm_fp8_paged_mqa_logits_persistent_schedule`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits.py#L544), [`deepgemm_fp8_paged_mqa_logits`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits.py#L634).
+Symbols: `_context_lens_and_stride`, `deepgemm_fp8_paged_mqa_logits_ragged_k`, `deepgemm_fp8_paged_mqa_logits_stage1_ragged_k`, `deepgemm_fp8_paged_mqa_logits_stage1`, `_compile_deepgemm_fp8_paged_mqa_logits`, `deepgemm_fp8_paged_mqa_logits_schedule`, `deepgemm_fp8_paged_mqa_logits_persistent_schedule`, `deepgemm_fp8_paged_mqa_logits`.
 
 Parameters referenced in this file: `BLOCK_B`, `BLOCK_S`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -48,7 +48,7 @@ Parameters referenced in this file: `BLOCK_B`, `BLOCK_S`, `num_stages`, `num_war
 
 Source documentation: Everything needed to write a preshuffled cache and to read it back.
 
-Symbols: [`mfma_nonk_dim`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L50), [`kv_tile`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L56), [`cache_format`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L61), [`_split_cache`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L83), [`_spec_block_m`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L107), [`plan_block_m`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L120), [`_kv_splits`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L137), [`_select_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L165), [`select_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L237), [`cache_strides`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L253), [`build_candidate_gather`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L266), [`build_schedule`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L323), [`_check_schedule`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L426), [`paged_mxfp4_mqa_logits`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/pa_mqa_logits_mxfp4.py#L447).
+Symbols: `mfma_nonk_dim`, `kv_tile`, `cache_format`, `_split_cache`, `_spec_block_m`, `plan_block_m`, `_kv_splits`, `_select_config`, `select_config`, `cache_strides`, `build_candidate_gather`, `build_schedule`, `_check_schedule`, `paged_mxfp4_mqa_logits`.
 
 Parameters referenced in this file: `BLOCK_KV`, `BLOCK_M`, `BLOCK_S`, `BLOCK_T`, `num_buffers`, `num_warps`, `waves_per_eu`.
 
@@ -58,7 +58,7 @@ Parameters referenced in this file: `BLOCK_KV`, `BLOCK_M`, `BLOCK_S`, `BLOCK_T`,
 
 Source documentation: Triton kernel to build the block-sparse LUT (kv_block_indices) from a 4D block attention mask without using nonzero or argsort.
 
-Symbols: [`_block_attn_mask_to_lut_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/block_lut.py#L24), [`block_attn_mask_to_lut_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/block_lut.py#L84).
+Symbols: `_block_attn_mask_to_lut_kernel`, `block_attn_mask_to_lut_kernel`.
 
 Parameters referenced in this file: `BLOCK_KB`.
 
@@ -66,7 +66,7 @@ Parameters referenced in this file: `BLOCK_KB`.
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/fp8_mqa_logits.py) · **Recent**
 
-Symbols: [`_fp8_mqa_logits_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/fp8_mqa_logits.py#L17).
+Symbols: `_fp8_mqa_logits_kernel`.
 
 Parameters referenced in this file: `BLOCK_KV`, `BLOCK_Q`.
 
@@ -74,7 +74,7 @@ Parameters referenced in this file: `BLOCK_KV`, `BLOCK_Q`.
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/pa_mqa_logits.py) · **Recent**
 
-Symbols: [`_sum_combine`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/pa_mqa_logits.py#L11), [`_deepgemm_fp8_paged_mqa_logits_stage1_ragged_k`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/pa_mqa_logits.py#L27), [`_deepgemm_fp8_paged_mqa_logits_ragged_k`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/pa_mqa_logits.py#L134), [`_deepgemm_fp8_paged_mqa_logits_stage1`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/pa_mqa_logits.py#L242), [`_deepgemm_fp8_paged_mqa_logits_persistent_schedule`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/pa_mqa_logits.py#L366), [`_deepgemm_fp8_paged_mqa_logits_varctx_schedule`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/pa_mqa_logits.py#L454), [`_deepgemm_fp8_paged_mqa_logits`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/pa_mqa_logits.py#L517), [`_gluon_deepgemm_fp8_paged_mqa_logits`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/pa_mqa_logits.py#L629), [`_gluon_deepgemm_fp8_paged_mqa_logits_preshuffle`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/pa_mqa_logits.py#L661), [`_gluon_deepgemm_fp8_paged_mqa_logits_preshuffle_varctx`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/pa_mqa_logits.py#L693).
+Symbols: `_sum_combine`, `_deepgemm_fp8_paged_mqa_logits_stage1_ragged_k`, `_deepgemm_fp8_paged_mqa_logits_ragged_k`, `_deepgemm_fp8_paged_mqa_logits_stage1`, `_deepgemm_fp8_paged_mqa_logits_persistent_schedule`, `_deepgemm_fp8_paged_mqa_logits_varctx_schedule`, `_deepgemm_fp8_paged_mqa_logits`, `_gluon_deepgemm_fp8_paged_mqa_logits`, `_gluon_deepgemm_fp8_paged_mqa_logits_preshuffle`, `_gluon_deepgemm_fp8_paged_mqa_logits_preshuffle_varctx`.
 
 Parameters referenced in this file: `BLOCK_B`, `BLOCK_S`.
 

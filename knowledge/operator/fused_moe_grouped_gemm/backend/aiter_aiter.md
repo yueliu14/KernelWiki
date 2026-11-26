@@ -28,7 +28,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: Lightweight runtime for communication-compute fused MoE Stage2.
 
-Symbols: [`CommFusedMoeRuntime`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/comm_fused_moe_runtime.py#L17).
+Symbols: `CommFusedMoeRuntime`.
 
 ## Configuration references
 

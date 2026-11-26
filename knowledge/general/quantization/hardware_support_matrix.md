@@ -35,7 +35,7 @@ sources:
 Notes: CDNA1 lacks native BF16 (FP16/INT8 are its matrix dtypes); FP8 first appears on CDNA3 in the
 **FNUZ** dialect; FP4/FP6 and the **block-scaled MFMA** are introduced on CDNA4. INT4 has no dedicated
 MFMA path on any gen — INT4 weights are dequantized to fp16/fp8 for the GEMM
-([formats_overview.md](formats_overview.md), [calibration_and_quark.md](calibration_and_quark.md)).
+([formats_overview.md](formats_overview.md), calibration_and_quark.md).
 
 ## Relative MFMA rate (matrix core, vs FP16=1×)
 | dtype | CDNA3 (gfx942) | CDNA4 (gfx950) |
@@ -59,7 +59,7 @@ power limits). This is why FP6 is "free accuracy" over FP4 ([block_scaling_mxfp.
 | FP32 matrix | 157 TFLOP/s | 1× |
 Marketing figures of FP8 10 PF / FP6+FP4 20 PF / FP16 5 PF include **2:4 structured sparsity** (2×).
 **TF32 is removed on CDNA4.** Full table + memory roofline: [hardware/cdna4_mi350](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/hardware/cdna4_mi350) (peak_tables).
-All theoretical peak — MI300X sustains ~45%; quote *achieved* ([index/conventions.md](../reference/geak_index/conventions.md)).
+All theoretical peak — MI300X sustains ~45%; quote *achieved* (index/conventions.md).
 
 ## Strategy implications
 - **CDNA1/2**: no FP8 HW → INT8 w8a8 or stay bf16/fp16 for compute wins; quant is footprint-only.

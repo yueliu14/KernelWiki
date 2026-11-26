@@ -1,6 +1,6 @@
 # attention_indexer
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 MQA logits, index scores, block selection and top-k for sparse attention.
@@ -28,7 +28,7 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 ## Operator contract
 

@@ -28,7 +28,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: Split-K partial reduction epilogue for the gfx1250 a8w8 preshuffle GEMM.
 
-Symbols: [`compile_gemm_a8w8_splitk_reduce`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/gemm_a8w8_splitk_reduce_gfx1250.py#L24).
+Symbols: `compile_gemm_a8w8_splitk_reduce`.
 
 Parameters referenced in this file: `split_k`.
 
@@ -38,7 +38,7 @@ Parameters referenced in this file: `split_k`.
 
 Source documentation: One-stage split-K epilogue: last arriving split reduces the fp32 partials.
 
-Symbols: [`pairwise_sum`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/splitk_epilogue.py#L30), [`reduce_thread_split`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/splitk_epilogue.py#L46), [`splitk_reduce_epilogue`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/splitk_epilogue.py#L65), [`_semaphore_addr`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/splitk_epilogue.py#L162).
+Symbols: `pairwise_sum`, `reduce_thread_split`, `splitk_reduce_epilogue`, `_semaphore_addr`.
 
 Parameters referenced in this file: `split_k`, `tile_m`, `tile_n`.
 
@@ -48,7 +48,7 @@ Parameters referenced in this file: `split_k`, `tile_m`, `tile_n`.
 
 Source documentation: Fused split-K reduction shared by the K-split workgroups in one cluster.
 
-Symbols: [`emit_fused_splitk_epilogue`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/splitk_fused_epilogue_gfx1250.py#L22).
+Symbols: `emit_fused_splitk_epilogue`.
 
 Parameters referenced in this file: `num_warps`, `split_k`, `tile_m`, `tile_n`.
 

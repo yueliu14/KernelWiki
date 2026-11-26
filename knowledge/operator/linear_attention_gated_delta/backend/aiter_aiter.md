@@ -28,7 +28,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: HIP hidden-state forward with h layout [V, K] (K=128, V=128), always returning (h, v_new, final_state). w, u: [B, H, T, K/V] head-major contiguous. h snapshots: [B, NT, H, V, K]; v_new output: [B, H, T_flat, V]. g is a 3-D tensor, token-major [B, T, H] or head-major [B, H, T]. state_dtype controls initial/final persistent state. snapshot_dtype independently controls temporary chunk snapshots and defaults to k.dtype.
 
-Symbols: [`_device_idx`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/chunk_gated_delta_rule_fwd_h.py#L27), [`_get_shared_memory_per_cu`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/chunk_gated_delta_rule_fwd_h.py#L33), [`_compute_bv`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/chunk_gated_delta_rule_fwd_h.py#L51), [`_select_bv`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/chunk_gated_delta_rule_fwd_h.py#L71), [`_get_varlen_host_metadata`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/chunk_gated_delta_rule_fwd_h.py#L83), [`chunk_gated_delta_rule_fwd_h_hip`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/chunk_gated_delta_rule_fwd_h.py#L95), [`_StateArgs`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/chunk_gated_delta_rule_fwd_h.py#L118), [`_prepare_state_args`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/chunk_gated_delta_rule_fwd_h.py#L123), [`_resolve_snapshot_dtype`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/chunk_gated_delta_rule_fwd_h.py#L158), [`_normalize_g_tensor`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/chunk_gated_delta_rule_fwd_h.py#L167), [`chunk_gated_delta_rule_fwd_h_hip_fn`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/chunk_gated_delta_rule_fwd_h.py#L200).
+Symbols: `_device_idx`, `_get_shared_memory_per_cu`, `_compute_bv`, `_select_bv`, `_get_varlen_host_metadata`, `chunk_gated_delta_rule_fwd_h_hip`, `_StateArgs`, `_prepare_state_args`, `_resolve_snapshot_dtype`, `_normalize_g_tensor`, `chunk_gated_delta_rule_fwd_h_hip_fn`.
 
 ### `aiter/ops/fused_split_gdr_update.py`
 
@@ -36,7 +36,7 @@ Symbols: [`_device_idx`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190
 
 Source documentation: HIP fused split GDR decode update (ksplit4_db backend). Args: mixed_qkv: [B, 2*key_dim+value_dim, T], bfloat16. A_log: [HV], float32. a: [B*T, HV], bfloat16. dt_bias: [HV], bfloat16. b_gate: [B*T, HV], bfloat16. initial_state_source: [N, HV, K/4, V, 4], float32 swizzled state, updated in-place. initial_state_indices: [B], int32 indices into initial_state_source.
 
-Symbols: [`_fused_split_gdr_update`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/fused_split_gdr_update.py#L16), [`fused_split_gdr_update`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/fused_split_gdr_update.py#L37).
+Symbols: `_fused_split_gdr_update`, `fused_split_gdr_update`.
 
 ### `aiter/ops/gdr_decode_packed_bf16.py`
 
@@ -44,7 +44,7 @@ Symbols: [`_fused_split_gdr_update`](https://github.com/ROCm/aiter/blob/e9995854
 
 Source documentation: Decode one token from packed QKV and update BF16 V-major state in place. Every non-negative entry in indices must be smaller than the state-pool size and unique within the batch. Negative sentinel entries may repeat. Duplicate valid indices cause unsynchronized concurrent state updates and therefore have undefined behavior.
 
-Symbols: [`_gdr_decode_packed_bf16`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/gdr_decode_packed_bf16.py#L25), [`gdr_decode_packed_bf16`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/gdr_decode_packed_bf16.py#L38).
+Symbols: `_gdr_decode_packed_bf16`, `gdr_decode_packed_bf16`.
 
 ## Configuration references
 

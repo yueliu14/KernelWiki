@@ -49,7 +49,7 @@ via the vLLM op. Pick one.
 ## Cross-links
 [fused_moe_grouped_gemm](../fused_moe_grouped_gemm/README.md) · [moe_routing_topk](../moe_routing_topk/README.md) · [moe_dispatch_combine](../moe_dispatch_combine/README.md) · [scaled_quant_gemm](../scaled_quant_gemm/README.md) ·
 [`backends/aiter/fmoe.md`](../grouped_gemm_moe/backend/aiter.md) ·
-[`backends/mori_rccl/mori_ep.md`](../../general/libraries/mori_rccl/mori_ep.md).
+`backends/mori_rccl/mori_ep.md`.
 
 ## Sources
 - atomic-add fusion glue, token-range, EP: `ROCm/aiter@a6bb49937:aiter/fused_moe_dp_shared_expert.py`.

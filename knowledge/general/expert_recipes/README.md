@@ -112,7 +112,7 @@ bash   _contribute/make_pr.sh <slug>                                            
 ## Canonical copy
 
 KernelWiki maintains this imported copy with Git. The local Git revision identifies the maintained
-files. [`tuning_skillset.manifest.sha256`](../workflows/geak/tuning_skillset.manifest.sha256) is an
+files. `tuning_skillset.manifest.sha256` is an
 archived upstream manifest: it is provenance, not a checksum contract for this modified copy.
 It intentionally includes historical files that are no longer maintained here. Do not overwrite
 local changes to satisfy that historical manifest or run GEAK-specific sync commands in KernelWiki.

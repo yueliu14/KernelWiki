@@ -33,7 +33,7 @@ layer ([`GEAK/kernel_workflow/`](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72
 
 ## Step 0 — Decide it's worth optimizing (Amdahl)
 If this kernel is being optimized for an e2e win, first check `pct_gpu_time` from the
-profile ([`optimize_e2e_model.md`](optimize_e2e_model.md)). Small mass (<0.5% each) →
+profile (`optimize_e2e_model.md`). Small mass (<0.5% each) →
 don't gate alone; **stack** it with siblings. A head op (GEMM/attention, often the bulk
 of GPU time — GEMM was ~78% on Qwen3.5-27B) always justifies the full ladder.
 
@@ -44,7 +44,7 @@ Create the task dir the kernel layer consumes: `unittest.py` (correctness + timi
 - **Capture shapes live**, do not synthesize. For a GEMM the lookup key includes the
   **`bias` flag** and exact `M/N/K/dtype` — sglang issues most dense GEMMs with
   `bias=False` (bias applied separately). A synthesized `bias=True` set mismatches every
-  live call → **0 engagement** (see [`gemm_tuning_workflow.md`](gemm_tuning_workflow.md)).
+  live call → **0 engagement** (see `gemm_tuning_workflow.md`).
 - The oracle is **IMMUTABLE** (anti-cheating). Re-hash `reference_io.pt` vs
   `meta.json.reference_io_sha256` before trusting any later result.
 
@@ -77,16 +77,16 @@ tolerance) AND is faster.
 ## Step 3 — Tier B: tune the promising backend(s) (no source)
 - **GEMM** → the aiter per-shape DB is the lever (gradlib races
   hipBLASLt/asm/triton/skinny/flydsl per shape, so one tune covers per-backend GEMM
-  tuning). Full recipe: [`gemm_tuning_workflow.md`](gemm_tuning_workflow.md).
+  tuning). Full recipe: `gemm_tuning_workflow.md`.
   ⚠ **Do NOT use PyTorch TunableOp / `HIPBLASLT_TUNING_FILE`** on sglang/aiter — they hook
   the torch dispatch the aiter live path bypasses (zero engagement).
 - **attention** → the Tier-B lever is the `--attention-backend` swap
-  ([`attention_backend_selection.md`](attention_backend_selection.md)).
+  (`attention_backend_selection.md`).
 - **FlyDSL env path** — FlyDSL is one of the backends the aiter DB tune races
   (`libtype=flydsl`); when `is_flydsl_available()` is true a normal aiter tune selects it
   for shapes where it wins with **zero extra code**. Confirm with
   `AITER_LOG_TUNED_CONFIG=1` (look for `libtype is flydsl`). See
-  [`../backends/aiter/flydsl_path.md`](../libraries/aiter/flydsl_path.md).
+  `../backends/aiter/flydsl_path.md`.
 
 ## Step 4 — Tier C: author or rewrite code (editable languages only)
 Only if the winner is editable and there's headroom. Hand the op to the **kernel
@@ -95,7 +95,7 @@ immutable unittest. Two modes:
 - **rewrite** (`mode=optimize`) — an editable impl already exists → optimize it.
 - **author** (`mode=author`, `target_language=<lang>`) — no editable impl → write a fresh
   baseline, then optimize. Full author loop:
-  [`authoring_a_kernel_with_geak.md`](authoring_a_kernel_with_geak.md).
+  `authoring_a_kernel_with_geak.md`.
 
 Language priority for authoring:
 - **Triton** is always a viable author target (fastest to iterate).
@@ -111,7 +111,7 @@ Language priority for authoring:
 fp8 GEMM / fp8 KV → **accuracy gate, not byte parity** (mark
 `parity_note=needs_accuracy_gate`). On gfx950 prefer block-scaled MXFP8/MXFP6/MXFP4 (FP6
 runs at FP4 rate). See [`../quantization/`](../quantization/README.md) and
-[`gemm_tuning_workflow.md`](gemm_tuning_workflow.md).
+`gemm_tuning_workflow.md`.
 
 ## Step 6 — Verify (the isolated gate)
 A candidate is accepted into the bank only if **both** hold on the immutable oracle:
@@ -123,7 +123,7 @@ A candidate is accepted into the bank only if **both** hold on the immutable ora
 ## Step 7 — Bank the win
 Record the winner as one of `{env, flag, patch, authored}` with its apply recipe, the
 isolated speedup, the shapes it covers, and the parity note. This becomes the input to
-e2e integration ([`integrating_a_new_kernel.md`](integrating_a_new_kernel.md)) and a
+e2e integration (`integrating_a_new_kernel.md`) and a
 [`../case_studies/by_kernel/`](https://github.com/AMD-AGI/GEAK/blob/02bfbb0b72746941be3ab3ad48fb21a284ae2fde/perf_knowledge/case_studies/by_kernel) entry. **An isolated win is not
 an e2e win** until it engages on the live path and clears the Amdahl gate.
 
@@ -135,12 +135,12 @@ an e2e win** until it engages on the live path and clears the Amdahl gate.
 - **Claiming an e2e win from an isolated speedup** — Amdahl can erase it.
 
 ## Cross-links
-- e2e wrapper: [`optimize_e2e_model.md`](optimize_e2e_model.md)
-- GEMM tune: [`gemm_tuning_workflow.md`](gemm_tuning_workflow.md)
+- e2e wrapper: `optimize_e2e_model.md`
+- GEMM tune: `gemm_tuning_workflow.md`
 - Backend choice: [`choosing_a_backend.md`](choosing_a_backend.md)
-- Author loop: [`authoring_a_kernel_with_geak.md`](authoring_a_kernel_with_geak.md)
-- Wire-in: [`integrating_a_new_kernel.md`](integrating_a_new_kernel.md)
-- Routing priors: [`../index/decision_trees.md`](../reference/geak_index/decision_trees.md)
+- Author loop: `authoring_a_kernel_with_geak.md`
+- Wire-in: `integrating_a_new_kernel.md`
+- Routing priors: `../index/decision_trees.md`
 
 ## Sources
 - The ladder (Tier A–D), `best_known_ms` bar, immutable-oracle discipline, FlyDSL dual path: `GEAK/e2e_workflow/roles/op_benchmarker.md`.

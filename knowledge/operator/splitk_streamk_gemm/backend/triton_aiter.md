@@ -26,7 +26,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/common/splitk_reduce.py)
 
-Symbols: [`_gemm_splitk_reduce_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/common/splitk_reduce.py#L22), [`_batched_gemm_splitk_reduce_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/common/splitk_reduce.py#L108).
+Symbols: `_gemm_splitk_reduce_kernel`, `_batched_gemm_splitk_reduce_kernel`.
 
 Parameters referenced in this file: `BLOCK_SIZE_M`, `BLOCK_SIZE_N`.
 

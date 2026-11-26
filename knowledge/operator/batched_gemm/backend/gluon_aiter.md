@@ -26,7 +26,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/batched/batched_gemm_a16w8.py) · **Recent**
 
-Symbols: [`_tile_coords`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/batched/batched_gemm_a16w8.py#L16), [`_issue_load`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/batched/batched_gemm_a16w8.py#L25), [`_batched_gemm_a16w8_gfx1250_persistent_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/batched/batched_gemm_a16w8.py#L79).
+Symbols: `_tile_coords`, `_issue_load`, `_batched_gemm_a16w8_gfx1250_persistent_kernel`.
 
 Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `num_warps`, `waves_per_eu`.
 
@@ -34,7 +34,7 @@ Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `num_warps`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/batched/batched_gemm_bf16.py) · **Recent**
 
-Symbols: [`_batched_gemm_bf16_bandwidth_bound_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/batched/batched_gemm_bf16.py#L32), [`_batched_gemm_bf16_compute_bound_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/batched/batched_gemm_bf16.py#L411).
+Symbols: `_batched_gemm_bf16_bandwidth_bound_kernel`, `_batched_gemm_bf16_compute_bound_kernel`.
 
 Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `NUM_KSPLIT`, `num_warps`, `waves_per_eu`.
 

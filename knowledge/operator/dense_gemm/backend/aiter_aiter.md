@@ -28,7 +28,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: DeepGEMM front-end (CK backend). Hosts the CK-backed deepgemm_ck binding plus a thin deepgemm() wrapper. Opus entries have been extracted under aiter.ops.opus.*; see aiter.ops.opus.gemm_a16w16_opus for BF16 matmul and aiter.ops.opus.opus_gemm_a16w16_tune for id-based kernel selection. opus_gemm_a16w16_tune is kept here as a deprecation shim for one release to ease migration from the old aggregate entry.
 
-Symbols: [`deepgemm_ck`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/deepgemm.py#L25), [`deepgemm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/deepgemm.py#L35), [`opus_gemm_a16w16_tune`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/deepgemm.py#L46).
+Symbols: `deepgemm_ck`, `deepgemm`, `opus_gemm_a16w16_tune`.
 
 Parameters referenced in this file: `splitK`.
 
@@ -38,7 +38,7 @@ Parameters referenced in this file: `splitK`.
 
 Source documentation: Return a per-(device, stream) zero-initialized semaphore workspace. SplitK a16w16 ASM kernels use an atomic-counter protocol where the last workgroup performs the reduction phase. Concurrent launches on different streams must not share the same atomic counter, or the counts get mixed and the reduction phase never fires (deadlock).
 
-Symbols: [`_gemm_a16w16_asm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/gemm_op_a16w16.py#L18), [`_get_semaphore_workspace_keyed`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/gemm_op_a16w16.py#L38), [`get_semaphore_workspace`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/gemm_op_a16w16.py#L43), [`gemm_a16w16_asm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/gemm_op_a16w16.py#L63).
+Symbols: `_gemm_a16w16_asm`, `_get_semaphore_workspace_keyed`, `get_semaphore_workspace`, `gemm_a16w16_asm`.
 
 Parameters referenced in this file: `splitK`.
 
@@ -48,7 +48,7 @@ Parameters referenced in this file: `splitK`.
 
 Source documentation: (row, M it was tuned at): the row for M itself, else for M padded at the two getPaddedM granularities, the walk the CK / asm lookups make. key maps an M to the table key; row is None when no level hits.
 
-Symbols: [`get_padded_m`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/gemm_op_common.py#L10), [`find_padded_m_row`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/gemm_op_common.py#L13), [`mxscale_w_scale_block`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/gemm_op_common.py#L32), [`with_mxscale_w_scale_block`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/gemm_op_common.py#L44).
+Symbols: `get_padded_m`, `find_padded_m_row`, `mxscale_w_scale_block`, `with_mxscale_w_scale_block`.
 
 ### `aiter/tuned_gemm.py`
 
@@ -56,7 +56,7 @@ Symbols: [`get_padded_m`](https://github.com/ROCm/aiter/blob/e9995854abbd935f019
 
 Source documentation: * Copyright (C) Advanced Micro Devices, Inc. All rights reserved. * Copyright (C) 2024-2026, The vLLM team. * * Licensed under the Apache License, Version 2.0 (the "License"); * you may not use this file except in compliance with the License.
 
-Symbols: [`_get_flydsl_gemm_kernels`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L39), [`get_GEMM_A16W16_config_`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L65), [`is_skinny_default_shape`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L87), [`get_GEMM_A16W16_tuned_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L111), [`get_GEMM_A16W16_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L224), [`save_shapes`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L299), [`gen_gemm_a16w16_fake_tensor`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L332), [`gemm_a16w16`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L350), [`skinny_gemm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L417), [`hipb_gemm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L454), [`torch_gemm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L477), [`asm_gemm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L527), [`flydsl_gemm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L547), [`opus_gemm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L597), [`triton_gemm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L646), [`TunedGemm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/tuned_gemm.py#L678).
+Symbols: `_get_flydsl_gemm_kernels`, `get_GEMM_A16W16_config_`, `is_skinny_default_shape`, `get_GEMM_A16W16_tuned_config`, `get_GEMM_A16W16_config`, `save_shapes`, `gen_gemm_a16w16_fake_tensor`, `gemm_a16w16`, `skinny_gemm`, `hipb_gemm`, `torch_gemm`, `asm_gemm`, `flydsl_gemm`, `opus_gemm`, `triton_gemm`, `TunedGemm`.
 
 Parameters referenced in this file: `splitK`, `split_k`.
 

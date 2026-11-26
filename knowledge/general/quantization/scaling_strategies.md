@@ -45,7 +45,7 @@ are static ⇒ **per-channel static** (computed once at quantization time). The 
   server startup — costs ~2–5 min startup but skips pre-quantization.
 - **Static**: scales fixed from a **calibration** pass and baked into the checkpoint. Cheapest at
   runtime; needs a representative dataset; risks drift if serving distribution ≠ calib distribution.
-  Required for the most aggressive paths and for KV per-head scales ([calibration_and_quark.md](calibration_and_quark.md),
+  Required for the most aggressive paths and for KV per-head scales (calibration_and_quark.md,
   [kv_cache_quantization.md](kv_cache_quantization.md)).
 - **Rule of thumb**: weights → static per-channel; activations → dynamic per-token (or static per-token
   via calibration when latency-critical).
@@ -56,7 +56,7 @@ easy. **SmoothQuant** (arXiv 2211.10438) migrates the difficulty by a per-channe
 `X̂ = X·diag(s)^-1`, `Ŵ = diag(s)·W`, with `s_j = max|X_j|^α / max|W_j|^(1−α)` (smoothing strength α,
 typically ~0.5). This **flattens activation outliers into the weights**, enabling W8A8 / per-token FP8
 without the outlier blowup. AMD Quark ships SmoothQuant + **AutoSmoothQuant** (per-layer α by MSE)
-([calibration_and_quark.md](calibration_and_quark.md)).
+(calibration_and_quark.md).
 
 ## The 224.0 ROCm dynamic cap (a real, sourced gotcha)
 vLLM dynamic FP8 quant on ROCm clamps amax to **224.0**, not the FNUZ max 240:

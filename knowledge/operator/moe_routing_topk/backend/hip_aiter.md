@@ -26,19 +26,19 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/moe_sorting_opus.h) · **Recent**
 
-Symbols: [`__launch_bounds__`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/moe_sorting_opus.h#L130), [`wave_cumsum`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/moe_sorting_opus.h#L579), [`wave_reduce`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/moe_sorting_opus.h#L682).
+Symbols: `__launch_bounds__`, `wave_cumsum`, `wave_reduce`.
 
 ### `csrc/kernels/moe_align_block_size_kernels.cu`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/moe_align_block_size_kernels.cu) · **Recent**
 
-Symbols: [`index`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/moe_align_block_size_kernels.cu#L27), [`moe_align_block_size_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/moe_align_block_size_kernels.cu#L35).
+Symbols: `index`, `moe_align_block_size_kernel`.
 
 ### `csrc/kernels/moe_fused_gate.cu`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/moe_fused_gate.cu) · **Recent**
 
-Symbols: [`cmp_gt`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/moe_fused_gate.cu#L48), [`cmp_eq`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/moe_fused_gate.cu#L64), [`moe_fused_gate_impl`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/moe_fused_gate.cu#L90), [`moe_fused_gate_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/moe_fused_gate.cu#L428), [`moe_fused_gate_kernel_dynamic`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/moe_fused_gate.cu#L496).
+Symbols: `cmp_gt`, `cmp_eq`, `moe_fused_gate_impl`, `moe_fused_gate_kernel`, `moe_fused_gate_kernel_dynamic`.
 
 ### `csrc/kernels/topk_gating/topk_sigmoid.cu`
 
@@ -68,13 +68,13 @@ Native implementation or support code; inspect its callers and bindings to ident
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels.cu) · **Recent**
 
-Symbols: [`moeSoftmax`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels.cu#L66), [`moeTopK`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels.cu#L129), [`topkGatingSoftmax`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels.cu#L238), [`applySharedExpertSigmoid`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels.cu#L640), [`moe_sum_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels.cu#L751), [`topkGatingSoftmaxFusedGate`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels.cu#L785).
+Symbols: `moeSoftmax`, `moeTopK`, `topkGatingSoftmax`, `applySharedExpertSigmoid`, `moe_sum_kernel`, `topkGatingSoftmaxFusedGate`.
 
 ### `csrc/kernels/topk_softmax_kernels_group.cu`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu) · **Recent**
 
-Symbols: [`wave_reduce`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu#L77), [`cumsum_topk_with_pivot`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu#L129), [`wave_reduce_max2`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu#L147), [`wave_reduce_argmax2`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu#L187), [`warpReduceMax`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu#L229), [`legacy_topk_lane_rank`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu#L315), [`legacy_topk_tie_rank`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu#L323), [`topk_candidate_better`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu#L333), [`emit_legacy_ordered_topk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu#L341), [`blockReduceMax`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu#L411), [`grouped_topk_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu#L444), [`topk_reg_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu#L744), [`grouped_topk_opt_sort_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/topk_softmax_kernels_group.cu#L1034).
+Symbols: `wave_reduce`, `cumsum_topk_with_pivot`, `wave_reduce_max2`, `wave_reduce_argmax2`, `warpReduceMax`, `legacy_topk_lane_rank`, `legacy_topk_tie_rank`, `topk_candidate_better`, `emit_legacy_ordered_topk`, `blockReduceMax`, `grouped_topk_kernel`, `topk_reg_kernel`, `grouped_topk_opt_sort_kernel`.
 
 ### `csrc/include/moe_sorting.h`
 

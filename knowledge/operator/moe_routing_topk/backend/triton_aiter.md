@@ -30,7 +30,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: Sort (token, slot) pairs by their expert id via a single Triton kernel. Replaces the multi-kernel torch chain (per-row sort, gather, two stable argsorts, advanced indexing, fp32 histc) with a single counting-sort kernel launch. Intended for use in the triton_kernels.matmul_ogs MoE pipeline, where the launch overhead of the original chain is a measurable fraction of decode TPOT. Args: topk_weights: [n_tokens, n_expts_act] per-token routing weights. Must be contiguous.
 
-Symbols: [`fused_routing_from_topk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/fusions/fused_routing_from_topk.py#L28).
+Symbols: `fused_routing_from_topk`.
 
 Parameters referenced in this file: `BLOCK_E`, `BLOCK_NK`, `num_warps`.
 
@@ -40,7 +40,7 @@ Parameters referenced in this file: `BLOCK_E`, `BLOCK_NK`, `num_warps`.
 
 Source documentation: Represents a boolean matrix in a packed format where each element occupies a single bit of memory. _scratchpad is either None or an all-zero array of size >= shape[-1]; we pass it along with the actual bitmatrix to avoid having to launch a separate memset kernel when we call Bitmatrix::sum().
 
-Symbols: [`Bitmatrix`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/bitmatrix.py#L13), [`clear_sums`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/bitmatrix.py#L42), [`sum_bitmatrix_rows`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/bitmatrix.py#L50).
+Symbols: `Bitmatrix`, `clear_sums`, `sum_bitmatrix_rows`.
 
 Parameters referenced in this file: `BLOCK_M`, `BLOCK_MM`, `num_warps`.
 
@@ -50,7 +50,7 @@ Parameters referenced in this file: `BLOCK_M`, `BLOCK_MM`, `num_warps`.
 
 Source documentation: Fusion-2 driver: (k+1) candidates + popularity -> kept-k (Vout/Iout) + post-drop histogram + cross-block prefix offsets. hist/part are PRE-ZEROED.
 
-Symbols: [`keepk_sort0`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/minunique.py#L15), [`_minunique_common`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/minunique.py#L63), [`routing_minunique`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/minunique.py#L144), [`routing_minunique_fused`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/minunique.py#L188).
+Symbols: `keepk_sort0`, `_minunique_common`, `routing_minunique`, `routing_minunique_fused`.
 
 Parameters referenced in this file: `BLOCK_A`, `num_warps`.
 
@@ -60,7 +60,7 @@ Parameters referenced in this file: `BLOCK_A`, `num_warps`.
 
 Source documentation: Routing entry point. score_mode selects the path: * score_mode is None (default) -> the plain flat top-k routing process: flat top-k with softmax. sm_first controls whether softmax is applied to the logits before the top-k (True) or inside the top-k (False). The fused-V4-only arguments (bias, use_grouped_topk ...) are ignored on this path. * score_mode is not None -> the fused V4 (DeepSeek) routing process: fused score transform + (optionally grouped) top-k.
 
-Symbols: [`ExptData`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/routing.py#L31), [`RoutingData`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/routing.py#L63), [`sort_tokens`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/routing.py#L92), [`sort_tokens_fused`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/routing.py#L161), [`log2_power_of_two`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/routing.py#L238), [`_compute_expt_data_internal`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/routing.py#L243), [`routing`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/routing.py#L278), [`routing_from_hash`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/routing.py#L444), [`EpScatterGeometry`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/routing.py#L513), [`_ep_sort_scratch`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/routing.py#L546), [`ep_sort_routing`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/routing.py#L558), [`compute_expt_data_torch`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/routing.py#L698), [`routing_torch`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/routing.py#L726).
+Symbols: `ExptData`, `RoutingData`, `sort_tokens`, `sort_tokens_fused`, `log2_power_of_two`, `_compute_expt_data_internal`, `routing`, `routing_from_hash`, `EpScatterGeometry`, `_ep_sort_scratch`, `ep_sort_routing`, `compute_expt_data_torch`, `routing_torch`.
 
 Parameters referenced in this file: `BLOCK_A`, `num_warps`.
 
@@ -70,7 +70,7 @@ Parameters referenced in this file: `BLOCK_A`, `num_warps`.
 
 Source documentation: Triton grouped top-k expert selection. See module docstring. Returns (y_vals, y_indx, bitmatrix) matching the contract of aiter.ops.triton.moe.moe_routing.topk.topk: - y_vals: (n_rows, k) in x.dtype. - y_indx: (n_rows, k) int16. - bitmatrix: real :class:Bitmatrix; same uint32 (n_cols_words, n_rows_pad32).T storage / scratchpad layout the _topk kernel emits, so sort_tokens and sort_tokens_fused consume it unchanged.
 
-Symbols: [`grouped_topk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/topk.py#L12), [`topk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/topk.py#L167), [`hash_routing`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/topk.py#L300).
+Symbols: `grouped_topk`, `topk`, `hash_routing`.
 
 Parameters referenced in this file: `BLOCK_M`, `BLOCK_MM`, `BLOCK_N`, `BLOCK_S`, `BLOCK_SP`, `num_warps`.
 
@@ -80,7 +80,7 @@ Parameters referenced in this file: `BLOCK_M`, `BLOCK_MM`, `BLOCK_N`, `BLOCK_S`,
 
 Source documentation: Caller-owned MoE gating launchers without bitmatrix routing metadata.
 
-Symbols: [`exact_sigmoid_biased_topk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/moe/moe_routing/topk_gating.py#L14).
+Symbols: `exact_sigmoid_biased_topk`.
 
 Parameters referenced in this file: `BLOCK_N`, `num_warps`.
 
@@ -88,7 +88,7 @@ Parameters referenced in this file: `BLOCK_N`, `num_warps`.
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/fusions/fused_routing_from_topk.py) · **Recent**
 
-Symbols: [`_fused_routing_from_topk_hist_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/fusions/fused_routing_from_topk.py#L43), [`_fused_routing_from_topk_offset_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/fusions/fused_routing_from_topk.py#L93), [`_fused_routing_from_topk_place_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/fusions/fused_routing_from_topk.py#L117).
+Symbols: `_fused_routing_from_topk_hist_kernel`, `_fused_routing_from_topk_offset_kernel`, `_fused_routing_from_topk_place_kernel`.
 
 Parameters referenced in this file: `BLOCK_E`, `BLOCK_NK`.
 
@@ -98,7 +98,7 @@ Parameters referenced in this file: `BLOCK_E`, `BLOCK_NK`.
 
 Source documentation: Vertical popcount Input x : uint32[..., N] Output y : uint32[..., 32] semantics : y[..., i] = sum_j((x[..., j] >> i) & 1) credits: @apgoucher
 
-Symbols: [`vpopc`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/bitmatrix.py#L8), [`_sum_bitmatrix_memset`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/bitmatrix.py#L57), [`_sum_bitmatrix_rows`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/bitmatrix.py#L73), [`_sum_bitmatrix_rows_fused`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/bitmatrix.py#L126).
+Symbols: `vpopc`, `_sum_bitmatrix_memset`, `_sum_bitmatrix_rows`, `_sum_bitmatrix_rows_fused`.
 
 Parameters referenced in this file: `BLOCK_M`, `BLOCK_MM`, `BLOCK_N`.
 
@@ -106,7 +106,7 @@ Parameters referenced in this file: `BLOCK_M`, `BLOCK_MM`, `BLOCK_N`.
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/bitmatrix_sonicmoe.py) · **Recent**
 
-Symbols: [`_sonicmoe_bitmatrix_metadata_compute_stage1`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/bitmatrix_sonicmoe.py#L19), [`_sonicmoe_bitmatrix_metadata_compute_stage2`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/bitmatrix_sonicmoe.py#L56).
+Symbols: `_sonicmoe_bitmatrix_metadata_compute_stage1`, `_sonicmoe_bitmatrix_metadata_compute_stage2`.
 
 Parameters referenced in this file: `BLOCK_M`, `BLOCK_N`, `BLOCK_SIZE`.
 
@@ -114,19 +114,19 @@ Parameters referenced in this file: `BLOCK_M`, `BLOCK_N`, `BLOCK_SIZE`.
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/expt_data.py) · **Recent**
 
-Symbols: [`_cdiv_pow2`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/expt_data.py#L6), [`_expt_data_compute_stage1`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/expt_data.py#L11), [`_expt_data_compute_stage2`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/expt_data.py#L67), [`_expt_data_compute_stage2_fused`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/expt_data.py#L87).
+Symbols: `_cdiv_pow2`, `_expt_data_compute_stage1`, `_expt_data_compute_stage2`, `_expt_data_compute_stage2_fused`.
 
 ### `aiter/ops/triton/_triton_kernels/moe/moe_routing/minunique.py`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/minunique.py) · **Recent**
 
-Symbols: [`_keepk_sort0`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/minunique.py#L20).
+Symbols: `_keepk_sort0`.
 
 ### `aiter/ops/triton/_triton_kernels/moe/moe_routing/routing.py`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/routing.py) · **Recent**
 
-Symbols: [`_routing_compute_indx`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/routing.py#L17), [`_routing_compute_indx_fused`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/routing.py#L99), [`_combined_routing`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/routing.py#L191), [`_combined_routing_fused`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/routing.py#L282), [`_ep_gate_prep_scan_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/routing.py#L375), [`_ep_scatter_atomic_expt_data_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/routing.py#L507).
+Symbols: `_routing_compute_indx`, `_routing_compute_indx_fused`, `_combined_routing`, `_combined_routing_fused`, `_ep_gate_prep_scan_kernel`, `_ep_scatter_atomic_expt_data_kernel`.
 
 Parameters referenced in this file: `BLOCK_A`, `BLOCK_M`, `num_warps`.
 
@@ -134,7 +134,7 @@ Parameters referenced in this file: `BLOCK_A`, `BLOCK_M`, `num_warps`.
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/routing_sonicmoe.py) · **Recent**
 
-Symbols: [`_sonicmoe_compute_col_partial_sum_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/routing_sonicmoe.py#L26), [`_sonicmoe_general_compute_col_partial_sum_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/routing_sonicmoe.py#L72), [`_sonicmoe_general_metadata_compute_stage2`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/routing_sonicmoe.py#L104), [`_sonicmoe_token_offset_searchsorted_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/routing_sonicmoe.py#L150).
+Symbols: `_sonicmoe_compute_col_partial_sum_kernel`, `_sonicmoe_general_compute_col_partial_sum_kernel`, `_sonicmoe_general_metadata_compute_stage2`, `_sonicmoe_token_offset_searchsorted_kernel`.
 
 Parameters referenced in this file: `BLOCK_SIZE`.
 
@@ -142,7 +142,7 @@ Parameters referenced in this file: `BLOCK_SIZE`.
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/topk.py) · **Recent**
 
-Symbols: [`get_topmask_and_fullmask`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/topk.py#L8), [`fpval_to_key`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/topk.py#L20), [`key_to_fpval`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/topk.py#L26), [`_apply_score_mode`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/topk.py#L32), [`streaming_topk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/topk.py#L55), [`_topk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/topk.py#L186), [`_hash_routing`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/topk.py#L344), [`_grouped_topk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/topk.py#L516).
+Symbols: `get_topmask_and_fullmask`, `fpval_to_key`, `key_to_fpval`, `_apply_score_mode`, `streaming_topk`, `_topk`, `_hash_routing`, `_grouped_topk`.
 
 Parameters referenced in this file: `BLOCK_M`, `BLOCK_N`, `BLOCK_S`, `BLOCK_SP`.
 
@@ -152,7 +152,7 @@ Parameters referenced in this file: `BLOCK_M`, `BLOCK_N`, `BLOCK_S`, `BLOCK_SP`.
 
 Source documentation: Caller-owned MoE gating kernels without bitmatrix routing metadata.
 
-Symbols: [`_exact_sigmoid_biased_topk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/topk_gating.py#L11).
+Symbols: `_exact_sigmoid_biased_topk`.
 
 Parameters referenced in this file: `BLOCK_N`.
 
@@ -162,7 +162,7 @@ Parameters referenced in this file: `BLOCK_N`.
 
 Source documentation: Add packed [16-bit key \| 16-bit count] values by equal-key runs.
 
-Symbols: [`keyed_add`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/moe/moe_routing/utils.py#L13).
+Symbols: `keyed_add`.
 
 ## Tests and benchmarks
 

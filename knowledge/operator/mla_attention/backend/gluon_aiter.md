@@ -28,7 +28,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: Unified Gluon MLA entry (gfx950 / CDNA4) — decode and DeepSeek V4 sparse prefill. mla_gluon supports the full decode (stage-1 + stage-2 reduce, or the stage-1-only fast path when NUM_KV_SPLITS==1) and writes the final attention into the caller's o. MTP (Multi-Token Prediction): pass 4-D q_nope/q_pe/o shaped [batch, qlen, nhead, dim]. qlen is a runtime value (one compiled kernel serves any qlen). Each query position q_pos attends KV [0, seq_len-qlen+q_pos] (causal tail).
 
-Symbols: [`_mla_gluon`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gluon/mla_gluon.py#L60), [`_mla_softmax_reducev_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gluon/mla_gluon.py#L722), [`mla_gluon`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gluon/mla_gluon.py#L820).
+Symbols: `_mla_gluon`, `_mla_softmax_reducev_kernel`, `mla_gluon`.
 
 Parameters referenced in this file: `BLOCK_H`, `BLOCK_N`, `BLOCK_S`, `num_warps`.
 
@@ -38,7 +38,7 @@ Parameters referenced in this file: `BLOCK_H`, `BLOCK_N`, `BLOCK_S`, `num_warps`
 
 Source documentation: Configuration for unified attention layouts and derived constants.
 
-Symbols: [`MLAConfig`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/attention/mla.py#L21), [`MLAProgram`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/attention/mla.py#L507), [`fast_exp`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/attention/mla.py#L1541), [`cdiv_fn`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/attention/mla.py#L1547), [`apply_softcap`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/attention/mla.py#L1552), [`_find_seq_idx`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/attention/mla.py#L1560), [`_mla_decode_lds_pipeline`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/attention/mla.py#L1583), [`_mla_decode_fwd_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/attention/mla.py#L1752), [`_mla_prefill_fwd_kernel_non_pipelined`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/attention/mla.py#L2355), [`_mla_decode_fwd_kernel_non_pipelined`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/attention/mla.py#L2770), [`_mla_decode_fwd_reduce_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/attention/mla.py#L3204).
+Symbols: `MLAConfig`, `MLAProgram`, `fast_exp`, `cdiv_fn`, `apply_softcap`, `_find_seq_idx`, `_mla_decode_lds_pipeline`, `_mla_decode_fwd_kernel`, `_mla_prefill_fwd_kernel_non_pipelined`, `_mla_decode_fwd_kernel_non_pipelined`, `_mla_decode_fwd_reduce_kernel`.
 
 Parameters referenced in this file: `BLOCK_M`, `BLOCK_Q`, `BLOCK_SCALES_SIZE`, `BLOCK_SIZE`, `num_stages`, `num_warps`, `waves_per_eu`.
 

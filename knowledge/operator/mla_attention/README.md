@@ -1,6 +1,6 @@
 # mla_attention
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 Multi-head latent attention, compressed KV and decode/prefill variants.
@@ -28,32 +28,12 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.
 
-<details>
-<summary>Original GEAK metadata</summary>
-
-```yaml
-title: mla_attention — overview
-kind: operator_overview
-operator: mla_attention
-gens: [gfx942, gfx950]
-dtypes: [bf16, fp16, fp8_e4m3_fnuz, fp8_e4m3]
-regimes: [prefill, decode, training]
-updated: 2026-08-12
-sources:
-  - ROCm/aiter@a6bb499375849eec45d68c5ccaebc8865fd422c0:aiter/mla.py
-  - https://rocm.blogs.amd.com/software-tools-optimization/aiter-mla/README.html
-  - https://vllm.ai/blog/2026-02-27-rocm-attention-backend
-  - https://arxiv.org/abs/2405.04434
-  - Attention-Kernels/geak_trans_py2flydsl/fmha_backward/FMHA_BWD_FlyDSL_Skills.md
-```
-
-</details>
 
 # mla_attention  (DeepSeek Multi-head Latent Attention)
 

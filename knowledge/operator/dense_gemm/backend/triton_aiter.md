@@ -30,7 +30,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: Computes 16 bit matrix multiplication Y = X @ W^T Uses the gluon backend automatically on supported architectures (gfx1250) and the triton backend everywhere else. Pass backend to force a choice. Args: x (torch.Tensor): Input matrix with shape (M, K). w (torch.Tensor): Weight matrix with shape (N, K), internally transposed. bias (Optional[torch.Tensor]): Bias vector with shape (N,). dtype (Optional[torch.dtype]): Output datatype (BF16 or FP16).
 
-Symbols: [`_is_gluon_available`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16w16.py#L35), [`gemm_a16w16_fake_tensor`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16w16.py#L43), [`gemm_a16w16_`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16w16.py#L70), [`gemm_a16w16`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16w16.py#L570).
+Symbols: `_is_gluon_available`, `gemm_a16w16_fake_tensor`, `gemm_a16w16_`, `gemm_a16w16`.
 
 Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -40,7 +40,7 @@ Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `BLOCK_SIZE
 
 Source documentation: Computes 16 bit matrix multiplication Y = X @ W^T using atomic operations for split-K reduction. Args: x (torch.Tensor): BF16/FP16 input matrix matrix with shape (M, K). w (torch.Tensor): BF16/FP16 weight matrix with shape (N, K), internally transposed. dtype (Optional[torch.dtype]): Output datatype (BF16 or FP16). Note: BF16 atomic aggregation may have slight precision loss. y (Optional[torch.Tensor]): Pre-allocated output tensor with shape (M, N).
 
-Symbols: [`gemm_a16w16_atomic_fake_tensor`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16w16_atomic.py#L19), [`gemm_a16w16_atomic_`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16w16_atomic.py#L35), [`gemm_a16w16_atomic`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16w16_atomic.py#L117).
+Symbols: `gemm_a16w16_atomic_fake_tensor`, `gemm_a16w16_atomic_`, `gemm_a16w16_atomic`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -50,7 +50,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 Source documentation: Computes 16 bit gated matrix multiplication Y = X @ W^T with gating mechanism (e.g., SwiGLU). Uses first half of W output as gate for second half, producing (M, N//2) output. Args: x (torch.Tensor): Input matrix with shape (M, K). w (torch.Tensor): Weight matrix with shape (N, K), internally transposed. N must be even. dtype (Optional[torch.dtype]): Output datatype (BF16 or FP16). y (Optional[torch.Tensor]): Pre-allocated output tensor with shape (M, N//2).
 
-Symbols: [`gemm_a16w16_gated`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/basic/gemm_a16w16_gated.py#L17).
+Symbols: `gemm_a16w16_gated`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`.
 
@@ -58,7 +58,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py) · **Recent**
 
-Symbols: [`_gemm_a16_w16_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py#L46), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16.py#L184).
+Symbols: `_gemm_a16_w16_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -66,7 +66,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py) · **Recent**
 
-Symbols: [`_gemm_a16_w16_atomic_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py#L41), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_atomic.py#L150).
+Symbols: `_gemm_a16_w16_atomic_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -74,7 +74,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py) · **Recent**
 
-Symbols: [`_gemm_a16_w16_gated_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py#L38), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_gated.py#L155).
+Symbols: `_gemm_a16_w16_gated_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_M`, `BLOCK_N`, `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `num_stages`.
 
@@ -84,7 +84,7 @@ Parameters referenced in this file: `BLOCK_M`, `BLOCK_N`, `BLOCK_SIZE_K`, `BLOCK
 
 Source documentation: Kernel for computing the matmul C = A x B. A has shape (M, K), B has shape (K, N) and C has shape (M, N)
 
-Symbols: [`gemm_a16w16_persistent_kernel_`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/basic/gemm_a16w16_persistent.py#L45).
+Symbols: `gemm_a16w16_persistent_kernel_`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `num_stages`, `waves_per_eu`.
 

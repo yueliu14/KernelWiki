@@ -28,7 +28,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: elem_bits sizes A's pad interval; elem_bits_b sizes B's (defaults to elem_bits).
 
-Symbols: [`_pad_interval`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/basic/gemm_a16w16.py#L36), [`create_shared_layouts`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/basic/gemm_a16w16.py#L41), [`create_wmma_layouts`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/basic/gemm_a16w16.py#L73), [`_gemm_a16w16_bandwidth_bound_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/basic/gemm_a16w16.py#L91), [`_gemm_a16w16_compute_bound_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/basic/gemm_a16w16.py#L412).
+Symbols: `_pad_interval`, `create_shared_layouts`, `create_wmma_layouts`, `_gemm_a16w16_bandwidth_bound_kernel`, `_gemm_a16w16_compute_bound_kernel`.
 
 Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `num_warps`.
 
@@ -38,7 +38,7 @@ Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `num_warps`
 
 Source documentation: Gluon persistent Triton GEMM.
 
-Symbols: [`gemm_a16w16_persistent_kernel_`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/basic/gemm_a16w16_persistent.py#L44), [`gemm_a16w16_persistent_compute_bound_kernel_`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/gemm/basic/gemm_a16w16_persistent.py#L345).
+Symbols: `gemm_a16w16_persistent_kernel_`, `gemm_a16w16_persistent_compute_bound_kernel_`.
 
 Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `NUM_KSPLIT`, `num_stages`, `num_warps`, `waves_per_eu`.
 

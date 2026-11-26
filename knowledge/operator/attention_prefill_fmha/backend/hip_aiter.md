@@ -34,31 +34,31 @@ Native implementation or support code; inspect its callers and bindings to ident
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus.h) · **Recent**
 
-Symbols: [`gqa_d128_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus.h#L26), [`gqa_d128_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus.h#L30).
+Symbols: `gqa_d128_kernel`, `gqa_d128_kernel`.
 
 ### `csrc/include/fmha_fwd_hd128_bf16_opus_defs.h`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_defs.h) · **Recent**
 
-Symbols: [`ceil_div`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_defs.h#L141).
+Symbols: `ceil_div`.
 
 ### `csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp) · **Recent**
 
-Symbols: [`sched_barrier_pairs`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L19), [`sched_barrier_exp_pairs`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L26), [`sched_barrier_exp_valu_pairs`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L35), [`sched_barrier_valu_exp_pairs`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L45), [`sched_mfma_tail`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L54), [`make_layout_q`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L61), [`make_layout_o`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L82), [`make_layout_o_x4`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L108), [`make_layout_gk_gv`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L130), [`make_layout_sk_sv`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L156), [`make_layout_rk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L175), [`make_layout_rv`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L204), [`make_layout_gq`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L244), [`make_layout_sq`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L270), [`make_layout_rq`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L291), [`attn_row_max`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L321), [`attn_sub_row`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L333), [`attn_scale_sub_row`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L345), [`attn_exp2_slice`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L354), [`load_range`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L367), [`attn_sum`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L378), [`scale_output_tile`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L390), [`pin_output_tile`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L399), [`attn_mask_vec2_imm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L411), [`attn_mask_causal_tile`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L429), [`attn_mask_border_tile`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L481), [`__attribute__`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L528), [`kv_frag_t`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L613), [`s_frag_t`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L618), [`__launch_bounds__`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd128_bf16_opus_kernel.hpp#L968).
+Symbols: `sched_barrier_pairs`, `sched_barrier_exp_pairs`, `sched_barrier_exp_valu_pairs`, `sched_barrier_valu_exp_pairs`, `sched_mfma_tail`, `make_layout_q`, `make_layout_o`, `make_layout_o_x4`, `make_layout_gk_gv`, `make_layout_sk_sv`, `make_layout_rk`, `make_layout_rv`, `make_layout_gq`, `make_layout_sq`, `make_layout_rq`, `attn_row_max`, `attn_sub_row`, `attn_scale_sub_row`, `attn_exp2_slice`, `load_range`, `attn_sum`, `scale_output_tile`, `pin_output_tile`, `attn_mask_vec2_imm`, `attn_mask_causal_tile`, `attn_mask_border_tile`, `__attribute__`, `kv_frag_t`, `s_frag_t`, `__launch_bounds__`.
 
 ### `csrc/include/fmha_fwd_hd192_v128_bf16_opus_defs.h`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_defs.h) · **Recent**
 
-Symbols: [`ceil_div`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_defs.h#L192).
+Symbols: `ceil_div`.
 
 ### `csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp) · **Recent**
 
-Symbols: [`sched_mfma_valu`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L42), [`sched_mfma_exp`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L49), [`sched_mfma_exp_valu`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L57), [`sched_mfma_tail`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L65), [`attn_row_max`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L71), [`attn_scale_sub_row`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L82), [`attn_scale_sub_row_slice`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L93), [`attn_exp2_slice`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L104), [`attn_sum`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L112), [`scale_output_tile`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L123), [`pin_output_tile`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L132), [`async_load_range`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L148), [`make_layout_o_x4`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L165), [`make_layout_g`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L187), [`make_layout_sq`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L213), [`make_layout_s`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L234), [`make_layout_rq`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L252), [`make_layout_rk_su`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L284), [`make_layout_rv_su`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L315), [`attn_mask_vec2_imm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L353), [`attn_mask_causal_tile`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L368), [`attn_mask_border_tile`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L414), [`__attribute__`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L460), [`s_frag_t`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L656), [`__launch_bounds__`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus_kernel.hpp#L1110).
+Symbols: `sched_mfma_valu`, `sched_mfma_exp`, `sched_mfma_exp_valu`, `sched_mfma_tail`, `attn_row_max`, `attn_scale_sub_row`, `attn_scale_sub_row_slice`, `attn_exp2_slice`, `attn_sum`, `scale_output_tile`, `pin_output_tile`, `async_load_range`, `make_layout_o_x4`, `make_layout_g`, `make_layout_sq`, `make_layout_s`, `make_layout_rq`, `make_layout_rk_su`, `make_layout_rv_su`, `attn_mask_vec2_imm`, `attn_mask_causal_tile`, `attn_mask_border_tile`, `__attribute__`, `s_frag_t`, `__launch_bounds__`.
 
 ### `csrc/include/mha_v4_quant.h`
 
@@ -94,7 +94,7 @@ Native implementation or support code; inspect its callers and bindings to ident
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_v4_quant.cu) · **Recent**
 
-Symbols: [`swap_thread_data`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_v4_quant.cu#L33), [`subtract_k_mean`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_v4_quant.cu#L58), [`hadamard_rotate_activation_hd128_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_v4_quant.cu#L76), [`hadamard_rotate_activation_mxfp8_quant_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_v4_quant.cu#L165), [`hadamard_rotate_activation_mxfp6_quant_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_v4_quant.cu#L259), [`hadamard_rotate_activation_mxfp4_quant_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_v4_quant.cu#L470), [`fp6_p_v_token`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_v4_quant.cu#L580), [`mxfp4_v_token`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_v4_quant.cu#L593), [`__launch_bounds__`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_v4_quant.cu#L600), [`__launch_bounds__`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_v4_quant.cu#L707).
+Symbols: `swap_thread_data`, `subtract_k_mean`, `hadamard_rotate_activation_hd128_kernel`, `hadamard_rotate_activation_mxfp8_quant_kernel`, `hadamard_rotate_activation_mxfp6_quant_kernel`, `hadamard_rotate_activation_mxfp4_quant_kernel`, `fp6_p_v_token`, `mxfp4_v_token`, `__launch_bounds__`, `__launch_bounds__`.
 
 ### `csrc/include/attention_ck.h`
 
@@ -112,13 +112,13 @@ Native implementation or support code; inspect its callers and bindings to ident
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus.h)
 
-Symbols: [`gqa_d192_v128_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus.h#L20), [`gqa_d192_v128_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/fmha_fwd_hd192_v128_bf16_opus.h#L24).
+Symbols: `gqa_d192_v128_kernel`, `gqa_d192_v128_kernel`.
 
 ### `csrc/include/mha_common.h`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/mha_common.h)
 
-Symbols: [`ParsePhiloxCudaState`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/include/mha_common.h#L20).
+Symbols: `ParsePhiloxCudaState`.
 
 ### `csrc/include/mha_fwd.h`
 
@@ -160,61 +160,61 @@ Native implementation or support code; inspect its callers and bindings to ident
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_common.cu)
 
-Symbols: [`ParsePhiloxCudaState`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_common.cu#L7).
+Symbols: `ParsePhiloxCudaState`.
 
 ### `csrc/kernels/mha_native/fmha_fwd_d64_bf16_combine.cu`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fmha_fwd_d64_bf16_combine.cu)
 
-Symbols: [`__launch_bounds__`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fmha_fwd_d64_bf16_combine.cu#L6).
+Symbols: `__launch_bounds__`.
 
 ### `csrc/kernels/mha_native/fmha_fwd_d64_bf16_msk0_split.cu`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fmha_fwd_d64_bf16_msk0_split.cu)
 
-Symbols: [`__launch_bounds__`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fmha_fwd_d64_bf16_msk0_split.cu#L6).
+Symbols: `__launch_bounds__`.
 
 ### `csrc/kernels/mha_native/fmha_fwd_d64_bf16_msk1_split.cu`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fmha_fwd_d64_bf16_msk1_split.cu)
 
-Symbols: [`__launch_bounds__`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fmha_fwd_d64_bf16_msk1_split.cu#L6).
+Symbols: `__launch_bounds__`.
 
 ### `csrc/kernels/mha_native/fused/op_combine.hpp`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_combine.hpp)
 
-Symbols: [`combine_split`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_combine.hpp#L66).
+Symbols: `combine_split`.
 
 ### `csrc/kernels/mha_native/fused/op_epilog.hpp`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_epilog.hpp)
 
-Symbols: [`epilog_store`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_epilog.hpp#L50), [`epilog_store_split`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_epilog.hpp#L206).
+Symbols: `epilog_store`, `epilog_store_split`.
 
 ### `csrc/kernels/mha_native/fused/op_gemm.hpp`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp)
 
-Symbols: [`pack_short4`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L52), [`swz`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L64), [`lds_elem_offset`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L77), [`v_lds_elem_offset`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L88), [`f32_to_bf16_trunc`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L96), [`bf16_to_f32`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L102), [`clear_acc`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L109), [`slice_q`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L123), [`gemm0_subtile`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L146), [`pack_p_subtile`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L211), [`slice_p`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L232), [`gemm1_subtile`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L245), [`gemm0`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L309), [`gemm1_bpermute`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_gemm.hpp#L338).
+Symbols: `pack_short4`, `swz`, `lds_elem_offset`, `v_lds_elem_offset`, `f32_to_bf16_trunc`, `bf16_to_f32`, `clear_acc`, `slice_q`, `gemm0_subtile`, `pack_p_subtile`, `slice_p`, `gemm1_subtile`, `gemm0`, `gemm1_bpermute`.
 
 ### `csrc/kernels/mha_native/fused/op_lds.hpp`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp)
 
-Symbols: [`s_waitcnt_vmcnt`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L67), [`s_waitcnt_vmcnt_0`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L78), [`s_waitcnt_lgkmcnt_0`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L82), [`s_waitcnt_lgkmcnt_1`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L86), [`async_load_fence`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L93), [`s_barrier`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L103), [`block_sync_lds`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L110), [`bpermute_f32`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L124), [`buf_base_elems`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L143), [`buf_base_bytes`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L147), [`async_copy_k_subtile`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L188), [`load_v_from_dram`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L259), [`store_v_to_lds`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L314), [`k_lds_offset`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L366), [`copy_k_to_lds_2x_guarded`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_lds.hpp#L370).
+Symbols: `s_waitcnt_vmcnt`, `s_waitcnt_vmcnt_0`, `s_waitcnt_lgkmcnt_0`, `s_waitcnt_lgkmcnt_1`, `async_load_fence`, `s_barrier`, `block_sync_lds`, `bpermute_f32`, `buf_base_elems`, `buf_base_bytes`, `async_copy_k_subtile`, `load_v_from_dram`, `store_v_to_lds`, `k_lds_offset`, `copy_k_to_lds_2x_guarded`.
 
 ### `csrc/kernels/mha_native/fused/op_softmax.hpp`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_softmax.hpp)
 
-Symbols: [`softmax_mask`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_softmax.hpp#L74), [`softmax_row_max`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_softmax.hpp#L148), [`softmax_exp2`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_softmax.hpp#L186), [`softmax_row_sum`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_softmax.hpp#L208), [`rescale_o_acc`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_softmax.hpp#L238), [`rescale_o_acc`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_softmax.hpp#L250), [`softmax_row_max`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_softmax.hpp#L272), [`softmax_exp`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_softmax.hpp#L291), [`softmax_row_sum`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_softmax.hpp#L306), [`rescale_o_acc`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/op_softmax.hpp#L325).
+Symbols: `softmax_mask`, `softmax_row_max`, `softmax_exp2`, `softmax_row_sum`, `rescale_o_acc`, `rescale_o_acc`, `softmax_row_max`, `softmax_exp`, `softmax_row_sum`, `rescale_o_acc`.
 
 ### `csrc/kernels/mha_native/fused/pipeline.hpp`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/pipeline.hpp)
 
-Symbols: [`make_buffer_resource`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/pipeline.hpp#L77), [`clamp_num_records`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/pipeline.hpp#L87), [`fmha_fwd_d64_device`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/csrc/kernels/mha_native/fused/pipeline.hpp#L124).
+Symbols: `make_buffer_resource`, `clamp_num_records`, `fmha_fwd_d64_device`.
 
 ### `csrc/kernels/mha_native/mha_native_launch.h`
 

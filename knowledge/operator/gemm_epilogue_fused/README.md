@@ -1,6 +1,6 @@
 # gemm_epilogue_fused
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 GEMM with activation, residual, normalization/quantization and communication boundaries.
@@ -18,30 +18,12 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.
 
-<details>
-<summary>Original GEAK metadata</summary>
-
-```yaml
-title: gemm_epilogue_fused — overview
-kind: operator_overview
-operator: gemm_epilogue_fused
-gens: [gfx908, gfx90a, gfx942, gfx950]
-dtypes: [bf16, fp16, fp8_e4m3_fnuz, mxfp4]
-regimes: [prefill, decode]
-updated: 2026-06-08
-sources:
-  - https://rocm.docs.amd.com/en/latest/how-to/rocm-for-ai/inference-optimization/optimizing-with-composable-kernel.html
-  - https://rocm.docs.amd.com/en/latest/how-to/rocm-for-ai/inference-optimization/workload.html
-  - ROCm/aiter@HEAD:aiter/tuned_gemm.py
-```
-
-</details>
 
 # gemm_epilogue_fused  (`D = act(α·A·Bᵀ + bias + β·residual)`, optionally → quant)
 

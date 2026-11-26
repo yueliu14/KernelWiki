@@ -78,7 +78,7 @@ NVIDIA Blackwell, where FP6 is rated at the FP8 rate. Consequence for strategy:
 - Default to **MXFP6** (or mixed MXFP4/MXFP6) over plain MXFP4 unless MXFP4 already passes the gate —
   you pay nothing in throughput.
 - AMD's "near-lossless MXFP4" recipe layers **rotations (QuaRot/Hadamard) + SmoothQuant** before the
-  cast ([calibration_and_quark.md](calibration_and_quark.md), [operators/quant_fp4_mxfp](https://github.com/yueliu14/KernelWiki/blob/45cd3f5b51d16322db8dc301fa783148d323d27b/knowledge/operator/quant_fp4_mxfp/README.md)).
+  cast (calibration_and_quark.md, [operators/quant_fp4_mxfp](https://github.com/yueliu14/KernelWiki/blob/45cd3f5b51d16322db8dc301fa783148d323d27b/knowledge/operator/quant_fp4_mxfp/README.md)).
 
 ## CDNA3 vs CDNA4
 | | CDNA3 (gfx942) | CDNA4 (gfx950) |

@@ -25,7 +25,7 @@ sources:
 > P2P link) intra-node and RDMA inter-node, with five kernel types for different topology/latency regimes.
 > Its **quantized all-to-all** (FP4 dispatch + FP8 combine) gives a **2.56× round-trip bandwidth reduction**
 > (28672 → 11200 B/token), and MI355X+MoRI SGLang beats B200 SGLang by **1.25× tok/s/GPU** at iso-latency.
-> DeepEP-on-ROCm / UCCL-EP are the portable alternatives ([`backends/mori_rccl/deepep.md`](../../../general/libraries/mori_rccl/deepep.md)).
+> DeepEP-on-ROCm / UCCL-EP are the portable alternatives (`backends/mori_rccl/deepep.md`).
 
 ## SOTA implementation(s)
 | impl | source | gens/dtypes | measured perf | when best |
@@ -103,8 +103,8 @@ Inter-node: switch to `InterNodeV1` (throughput) or `InterNodeV1LL`/`AsyncLL` (l
 
 ## Alternatives / cross-links
 [moe_dispatch_combine](../README.md) · [hip.md](hip.md) · [aiter.md](aiter.md) (the EP seam) · [triton.md](triton.md) ·
-[fused_moe_grouped_gemm](../../fused_moe_grouped_gemm/README.md) · [`backends/mori_rccl/mori_ep.md`](../../../general/libraries/mori_rccl/mori_ep.md) ·
-[`backends/mori_rccl/deepep.md`](../../../general/libraries/mori_rccl/deepep.md) (portable) · [overview.md](../README.md) ·
+[fused_moe_grouped_gemm](../../fused_moe_grouped_gemm/README.md) · `backends/mori_rccl/mori_ep.md` ·
+`backends/mori_rccl/deepep.md` (portable) · [overview.md](../README.md) ·
 [numerics.md](../numerics.md).
 
 ## Sources

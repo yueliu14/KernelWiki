@@ -28,7 +28,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: Fused route sort + compact MXFP4 activation quantization. gfx950 only, model_dim=4096, block_m=32, M in [1, 128]. (num_experts, topk) must be one of (512, 10) or (513, 11) -- the expert histogram is a kernel template parameter.
 
-Symbols: [`moe_sorting_opus_get_workspace_size`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/moe_sorting_opus.py#L12), [`moe_sorting_opus_fwd`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/moe_sorting_opus.py#L22), [`mxfp4_moe_sort_quant_fwd`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/moe_sorting_opus.py#L43).
+Symbols: `moe_sorting_opus_get_workspace_size`, `moe_sorting_opus_fwd`, `mxfp4_moe_sort_quant_fwd`.
 
 ## Tests and benchmarks
 

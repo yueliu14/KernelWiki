@@ -30,7 +30,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: SP4 head exchange into contiguous token-major rows.
 
-Symbols: [`sp_head_exchange`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/sp_head_exchange.py#L11).
+Symbols: `sp_head_exchange`.
 
 ## Tests and benchmarks
 

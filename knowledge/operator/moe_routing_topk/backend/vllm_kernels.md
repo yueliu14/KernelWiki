@@ -59,7 +59,7 @@ greedy parity `AITER=1` vs `=0`.
 
 ## Alternatives / cross-links
 [aiter.md](aiter.md) · [triton.md](triton.md) · [hip.md](hip.md) ·
-[`backends/vllm_kernels/aiter_integration.md`](../../../general/libraries/vllm_kernels/aiter_integration.md) ·
+`backends/vllm_kernels/aiter_integration.md` ·
 [overview.md](../README.md).
 
 ## Sources

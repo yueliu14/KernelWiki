@@ -55,7 +55,7 @@ Element max values per the OCP MX spec / HIP FP8 reference; FP6/FP4 maxima are t
 - **INT4** — 4-bit weight-only. GPTQ/AWQ store INT4 weights + group scales; the GEMM usually
   **dequantizes INT4→fp16/fp8 on the fly** rather than running an INT4 matrix core path. Quark's
   two-level **INT4-weight / FP8-compute** scheme gives ~4× compression with FP8-class accuracy
-  ([calibration_and_quark.md](calibration_and_quark.md)).
+  (calibration_and_quark.md).
 
 ## OCP Microscaling (MX) — the unifying framing
 The **OCP MX spec v1.0** defines a *block floating-point* family: a vector of low-bit **element**

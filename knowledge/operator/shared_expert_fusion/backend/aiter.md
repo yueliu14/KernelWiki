@@ -55,7 +55,7 @@ fusion on/off; greedy parity.
 
 ## Alternatives / cross-links
 [hip.md](hip.md) · [triton.md](triton.md) · [`backends/aiter/fmoe.md`](../../grouped_gemm_moe/backend/aiter.md) ·
-[`backends/mori_rccl/mori_ep.md`](../../../general/libraries/mori_rccl/mori_ep.md) · [overview.md](../README.md).
+`backends/mori_rccl/mori_ep.md` · [overview.md](../README.md).
 
 ## Sources
 - on-box: `ROCm/aiter@a6bb49937:aiter/fused_moe_dp_shared_expert.py`.

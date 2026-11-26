@@ -1,6 +1,6 @@
 # attention_decode_paged
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 Decode attention over paged KV caches, split/reduce and mixed precision.
@@ -25,31 +25,12 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.
 
-<details>
-<summary>Original GEAK metadata</summary>
-
-```yaml
-title: attention_decode_paged — overview
-kind: operator_overview
-operator: attention_decode_paged
-gens: [gfx90a, gfx942, gfx950]
-dtypes: [bf16, fp16, fp8_e4m3_fnuz, fp8_e4m3]
-regimes: [decode]
-updated: 2026-06-08
-sources:
-  - ROCm/aiter@a6bb499375849eec45d68c5ccaebc8865fd422c0:aiter/paged_attn.py
-  - https://github.com/vllm-project/vllm/tree/main/csrc/rocm
-  - https://vllm.ai/blog/2026-02-27-rocm-attention-backend
-  - https://arxiv.org/abs/2205.14135
-```
-
-</details>
 
 # attention_decode_paged  (paged-KV decode attention / flash-decoding)
 

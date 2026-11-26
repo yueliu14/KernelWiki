@@ -52,7 +52,7 @@ These live in the **tile-programming-gluon** pack, not this one: they wrap
 ```python
 import gluon_swp                       # tile-programming-gluon: scripts/gluon_swp.py
 with gluon_swp.pipelined(2, buffer_ops=True):
-    out = my_gluon_kernel[grid](...)   # compile INSIDE the block; Triton caches
+    out = my_gluon_kernelgrid   # compile INSIDE the block; Triton caches
 ```
 
 `gluon_swp.py` wraps `HIPBackend.gluon_to_ttgir` in-process and runs the passes as a second

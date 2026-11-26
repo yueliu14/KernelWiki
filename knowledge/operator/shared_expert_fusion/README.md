@@ -1,6 +1,6 @@
 # shared_expert_fusion
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 Shared-expert computation and its overlap or fusion with routed experts.
@@ -17,30 +17,12 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.
 
-<details>
-<summary>Original GEAK metadata</summary>
-
-```yaml
-title: shared_expert_fusion — overview
-kind: operator_overview
-operator: shared_expert_fusion
-gens: [gfx942, gfx950]
-dtypes: [bf16, fp8_e4m3_fnuz, fp8_e4m3]
-regimes: [prefill, decode]
-updated: 2026-06-08
-sources:
-  - ROCm/aiter@a6bb499375849eec45d68c5ccaebc8865fd422c0:aiter/fused_moe_dp_shared_expert.py
-  - https://rocm.blogs.amd.com/software-tools-optimization/wide-ep-deepseek/README.html
-  - https://rocm.blogs.amd.com/software-tools-optimization/aiter-ai-tensor-engine/README.html
-```
-
-</details>
 
 # shared_expert_fusion  (shared-expert + routed-expert overlap/fusion)
 

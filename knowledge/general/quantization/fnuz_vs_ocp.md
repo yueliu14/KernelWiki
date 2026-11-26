@@ -72,7 +72,7 @@ acceptable per AMD's framework experiments, and it dovetails with the **224.0 RO
 - An **OCP FP8 checkpoint** (the de-facto standard, shared with NVIDIA H100) reads **incorrectly on
   MI300X** without dialect-aware conversion. AMD's Hugging Face **Quark OCP-FP8 collection** is the safe
   source; loaders must apply the correct dialect for the target arch
-  ([calibration_and_quark.md](calibration_and_quark.md), [deployment_recipes.md](deployment_recipes.md)).
+  (calibration_and_quark.md, deployment_recipes.md).
 - The trap is **specific to CDNA3**. On MI350/MI355 (OCP) the off-by-2× problem does not exist — OCP
   checkpoints load natively.
 - gfx942 vs gfx950 is the line: treat any cross-gen FP8 move as a **re-cast**, gated on `err_ratio<0.05`

@@ -29,7 +29,7 @@ operator cards; for raw hardware numbers see [hardware/cdna3_mi300/arch.md](../h
 4. **Get the memory subsystem right** — [optimization/vectorization_and_coalescing.md](vectorization_and_coalescing.md),
    [optimization/memory_pipelining.md](memory_pipelining.md), [optimization/xcd_l2_locality.md](xcd_l2_locality.md).
 5. **Search the residual** — [optimization/autotuning_methodology.md](autotuning_methodology.md) (choose the tuner for the dispatch path actually observed; see
-   [GEMM tuning](../workflows/gemm_tuning_workflow.md) for a reusable capture/tune/deploy procedure).
+   GEMM tuning for a reusable capture/tune/deploy procedure).
 6. **Keep it correct** — [optimization/numerical_stability.md](numerical_stability.md).
 
 ## Files in this section

@@ -30,7 +30,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: Swizzle the program id based on integer XCD_SWIZZLE.
 
-Symbols: [`matmul_launch_metadata`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a16w4.py#L13), [`xcd_swizzle`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a16w4.py#L70), [`unswizzle_mx_scale_gfx1250`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a16w4.py#L83), [`_moe_gemm_a16w4`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a16w4.py#L107).
+Symbols: `matmul_launch_metadata`, `xcd_swizzle`, `unswizzle_mx_scale_gfx1250`, `_moe_gemm_a16w4`.
 
 Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `num_warps`.
 
@@ -38,7 +38,7 @@ Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `num_warps`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a4w4.py) · **Recent**
 
-Symbols: [`matmul_launch_metadata`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a4w4.py#L45), [`get_moe_a4w4_layouts_prefill`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a4w4.py#L102), [`get_moe_a4w4_layouts_decode`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a4w4.py#L345), [`unswizzle_scales_gfx1250`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a4w4.py#L516), [`unshuffle_weights_gfx1250`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a4w4.py#L536), [`_moe_gemm_a4w4_prefill`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a4w4.py#L556), [`_moe_gemm_a4w4_decode`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a4w4.py#L1407).
+Symbols: `matmul_launch_metadata`, `get_moe_a4w4_layouts_prefill`, `get_moe_a4w4_layouts_decode`, `unswizzle_scales_gfx1250`, `unshuffle_weights_gfx1250`, `_moe_gemm_a4w4_prefill`, `_moe_gemm_a4w4_decode`.
 
 Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `num_warps`.
 
@@ -46,7 +46,7 @@ Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `num_warps`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a8w4.py) · **Recent**
 
-Symbols: [`matmul_launch_metadata`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a8w4.py#L48), [`unswizzle_mx_scale_gfx1250`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a8w4.py#L108), [`unshuffle_weight_gfx1250`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a8w4.py#L128), [`_moe_gemm_a8w4_decode_persistent`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a8w4.py#L140), [`_moe_gemm_a8w4_decode`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a8w4.py#L902), [`_gather_idx_dtype`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a8w4.py#L1746), [`get_moe_a8w4_layouts`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a8w4.py#L1757), [`_build_moe_a8w4_layouts`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a8w4.py#L1799), [`_moe_gemm_a8w4_prefill`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/moe_op_gemm_a8w4.py#L1976).
+Symbols: `matmul_launch_metadata`, `unswizzle_mx_scale_gfx1250`, `unshuffle_weight_gfx1250`, `_moe_gemm_a8w4_decode_persistent`, `_moe_gemm_a8w4_decode`, `_gather_idx_dtype`, `get_moe_a8w4_layouts`, `_build_moe_a8w4_layouts`, `_moe_gemm_a8w4_prefill`.
 
 Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `BLOCK_N_PERSISTENT`, `num_warps`.
 
@@ -56,13 +56,13 @@ Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `BLOCK_N_PE
 
 Source documentation: Gluon grouped row-reduce for the gfx1250 MoE scatter-combine (replaces the Triton _reduce_grouped). One workgroup per group sums the K*B rows indx[g, :] (TDM-loaded, summed in-register, no cross-wave communication) into out[g, :N], with optional external residual fold-in.
 
-Symbols: [`reduce_grouped_gluon`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/reduce.py#L16), [`reduce_grouped_gluon_num_warps`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/moe/reduce.py#L76).
+Symbols: `reduce_grouped_gluon`, `reduce_grouped_gluon_num_warps`.
 
 ### `aiter/ops/triton/_gluon_kernels/gfx942/moe/moe_op_gemm_int8_smoothquant.py`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx942/moe/moe_op_gemm_int8_smoothquant.py) · **Recent**
 
-Symbols: [`_gluon_moe_gemm_int8_smoothquant`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx942/moe/moe_op_gemm_int8_smoothquant.py#L29).
+Symbols: `_gluon_moe_gemm_int8_smoothquant`.
 
 Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `num_warps`.
 
@@ -70,7 +70,7 @@ Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `num_warps`
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx950/moe/moe_op_gemm_a16w4.py) · **Recent**
 
-Symbols: [`matmul_launch_metadata`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx950/moe/moe_op_gemm_a16w4.py#L13), [`unswizzle_mx_scale_cdna4`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx950/moe/moe_op_gemm_a16w4.py#L69), [`_moe_gemm_a16w4_swizzle`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx950/moe/moe_op_gemm_a16w4.py#L83), [`_moe_gemm_a16w4_swizzle_pipelined`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx950/moe/moe_op_gemm_a16w4.py#L433).
+Symbols: `matmul_launch_metadata`, `unswizzle_mx_scale_cdna4`, `_moe_gemm_a16w4_swizzle`, `_moe_gemm_a16w4_swizzle_pipelined`.
 
 Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `matrix_instr_nonkdim`, `num_warps`.
 

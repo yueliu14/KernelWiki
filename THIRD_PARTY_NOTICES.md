@@ -20,34 +20,7 @@ The reviewed files also retain vLLM contributor notices and, for adapted common/
 components, ROCm/ATOM's AMD attribution under MIT. KernelWiki summarizes their contracts
 and adds scoped decisions; source inspection does not confer upstream validation or measured gains.
 
-## InferenceX container source snapshots
-
-`knowledge/top_model/muse_spark/kernel_sources/blobs/` contains selected, unmodified source
-files exported from the public `lmsysorg/sglang-rocm` images identified in the adjacent
-manifest. These reading snapshots cover the cited SGLang, AITER and SGLang-AMD-Mono
-kernel implementations and dispatch paths. They are deduplicated by file content;
-container paths, image digests and SHA256 values are retained in the manifest. They are
-not a full working copy, and their inclusion does not establish upstream validation.
-
-Existing per-file copyright and SPDX notices are preserved byte for byte. SGLang and
-SGLang-AMD-Mono code is covered by Apache License 2.0, included in [LICENSE.md](LICENSE.md),
-with SGLang and vLLM contributor notices where present. The AITER MIT notice below also
-applies to its included files, subject to their per-file notices. These are container
-snapshots and must not be assumed identical to a named upstream commit.
-The public SGLang-AMD-Mono [NOTICE](knowledge/top_model/muse_spark/kernel_sources/notices/sgl-amd-mono-NOTICE.txt)
-is also retained from the public reference commit cited above; it is attribution material,
-not a claim that the container code matches that revision.
-
 ## AITER
-
-Selected byte-exact vLLM and AITER source files under
-`knowledge/top_model/deepseek_v41_flash/kernel_sources/blobs/` were exported from the
-public `vllm/vllm-openai-rocm` images identified in the adjacent manifest. Their original
-copyright and SPDX headers are preserved. vLLM files retain vLLM contributor attribution
-under Apache License 2.0 ([license text](LICENSE.md)); AITER files retain their applicable
-per-file notices and the MIT notice below. These are selected reading snapshots, not a
-full working copy or evidence of upstream validation. The manifest distinguishes actual
-container bytes from upstream-only links for unavailable historical images.
 
 The structured corpus contains attributed source excerpts: the retained GEMM snapshot is
 `a6bb499375849eec45d68c5ccaebc8865fd422c0`, and the operator expansion uses
@@ -55,15 +28,6 @@ The structured corpus contains attributed source excerpts: the retained GEMM sna
 commits; operator-local evidence records identify their snapshot, and generated pages link to exact
 source ranges. The extraction, curation and rendering
 changes do not confer any upstream benchmark or validation status on these excerpts.
-
-Reviewed PR provenance under `knowledge/_sources/aiter/pull_requests/` includes short
-before/after code excerpts at the full change and parent commits recorded in each YAML.
-The AITER MIT notice applies subject to each file's retained notices. The Triton prefill
-attention source additionally carries `Copyright (C) 2023-2026 SGLang Team` and the
-Apache License 2.0 notice, whose text is included in [LICENSE.md](LICENSE.md); both
-attributions are retained here. Attributed PR descriptions and comments are quoted with their source URLs,
-capture/update times and excerpt fingerprints. Reported performance remains attributed
-to its upstream author and is not presented as reproduced KernelWiki validation.
 
 Source references and selected documentation excerpts use ROCm/aiter, commit `e9995854abbd935f0190b19abebe9938b6b90cca`. Additional native-pipeline and workload-variant reviews reference commit `b3ad6c461703110dc36286265c16e453ef0e2dd2`. Each page or added section identifies its source revision. KernelWiki does not distribute AITER code objects or a full working copy of AITER.
 

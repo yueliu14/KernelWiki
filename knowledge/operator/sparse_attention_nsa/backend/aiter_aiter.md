@@ -30,7 +30,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: Sparse prefill attention with split fp8 NoPE and bf16 RoPE inputs (asm). Signature-compatible with :func:aiter.ops.pa_sparse_prefill_opus.pa_sparse_prefill_fp8_opus. Args: q_nope: [T, H, 512] fp8 query without positional encoding. q_rope: [T, H, 64] bf16 query RoPE encoding part. unified_kv_nope: [total_pages, 512] fp8 prefix KV NoPE source. unified_kv_rope: [total_pages, 64] bf16 prefix KV RoPE source.
 
-Symbols: [`mla_sparse_prefill_fp8_asm_fwd`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/mla_sparse_prefill.py#L19), [`_mla_sparse_prefill_fp8_asm_fake`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/mla_sparse_prefill.py#L36), [`mla_sparse_prefill_fp8_asm`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/mla_sparse_prefill.py#L58).
+Symbols: `mla_sparse_prefill_fp8_asm_fwd`, `_mla_sparse_prefill_fp8_asm_fake`, `mla_sparse_prefill_fp8_asm`.
 
 ### `aiter/ops/msa_attention.py`
 
@@ -38,7 +38,7 @@ Symbols: [`mla_sparse_prefill_fp8_asm_fwd`](https://github.com/ROCm/aiter/blob/e
 
 Source documentation: Sparse block selection for index-head attention.
 
-Symbols: [`pa_sparse_block_score_decode`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/msa_attention.py#L22), [`pa_sparse_block_score_prefill`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/msa_attention.py#L57), [`pa_sparse_block_topk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/msa_attention.py#L90), [`pa_sparse_block_topk_cp`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/msa_attention.py#L133).
+Symbols: `pa_sparse_block_score_decode`, `pa_sparse_block_score_prefill`, `pa_sparse_block_topk`, `pa_sparse_block_topk_cp`.
 
 ### `aiter/ops/qsa.py`
 
@@ -46,7 +46,7 @@ Symbols: [`pa_sparse_block_score_decode`](https://github.com/ROCm/aiter/blob/e99
 
 Source documentation: QSA top-level dispatch: selects the best backend (triton, FlyDSL, etc.) for each QSA operator based on the input shape and available backends. Consumers should import from here rather than from the backend-specific modules directly.
 
-Symbols: [`qsa_paged_mqa_logits`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/qsa.py#L37), [`qsa_select_paged_tokens`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/qsa.py#L102).
+Symbols: `qsa_paged_mqa_logits`, `qsa_select_paged_tokens`.
 
 ### `aiter/ops/vsa_sparse_attention.py`
 
@@ -54,7 +54,7 @@ Symbols: [`qsa_paged_mqa_logits`](https://github.com/ROCm/aiter/blob/e9995854abb
 
 Source documentation: Run VSA block-sparse attention on contiguous BHSD tensors. block_lut stores one absolute K-block index followed by delta-encoded indices for each 128-token Q block. block_counts gives the number of active entries in each LUT row. The final LUT slot is reserved as a lookahead sentinel by the current CK pipeline.
 
-Symbols: [`_validate_vsa_inputs`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/vsa_sparse_attention.py#L11), [`_vsa_sparse_attention_fake`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/vsa_sparse_attention.py#L81), [`_vsa_sparse_attention_fwd`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/vsa_sparse_attention.py#L97), [`vsa_sparse_attention`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/vsa_sparse_attention.py#L108).
+Symbols: `_validate_vsa_inputs`, `_vsa_sparse_attention_fake`, `_vsa_sparse_attention_fwd`, `vsa_sparse_attention`.
 
 ## Tests and benchmarks
 

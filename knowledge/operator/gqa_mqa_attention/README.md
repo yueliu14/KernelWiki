@@ -1,6 +1,6 @@
 # gqa_mqa_attention
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 Grouped-query and multi-query head sharing.
@@ -17,31 +17,12 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.
 
-<details>
-<summary>Original GEAK metadata</summary>
-
-```yaml
-title: gqa_mqa_attention — overview
-kind: operator_overview
-operator: gqa_mqa_attention
-gens: [gfx90a, gfx942, gfx950]
-dtypes: [bf16, fp16, fp8_e4m3_fnuz, fp8_e4m3]
-regimes: [prefill, decode]
-updated: 2026-06-08
-sources:
-  - ROCm/aiter@a6bb499375849eec45d68c5ccaebc8865fd422c0:aiter/paged_attn.py
-  - https://github.com/Dao-AILab/flash-attention
-  - https://arxiv.org/abs/2305.13245
-  - https://vllm.ai/blog/2026-02-27-rocm-attention-backend
-```
-
-</details>
 
 # gqa_mqa_attention  (grouped-query / multi-query attention)
 

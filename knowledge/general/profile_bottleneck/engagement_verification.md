@@ -38,8 +38,8 @@ grep -c 'is tuned on cu_num' server.log   # must be > 0
 Each hit logs `... is tuned on cu_num = N in <file>, libtype is <ck|flydsl|...>`. The perf_knowledge e2e run
 recorded **246 `is tuned on cu_num` hits** alongside the **+2.23% e2e** win @ MI300X gfx942,
 sglang 0.5.11/aiter, 2026-06-08 — engagement and speedup measured *together*
-([`../backends/aiter/tuned_gemm.md`](../libraries/aiter/tuned_gemm.md),
-[`../backends/aiter/overview.md`](../libraries/aiter/overview.md)).
+(`../backends/aiter/tuned_gemm.md`,
+`../backends/aiter/overview.md`).
 
 **Zero engagement traps (real):**
 - **Bias mismatch**: tuning synthesized `bias=true` shapes while live calls are `bias=false` → 100%
@@ -51,8 +51,8 @@ sglang 0.5.11/aiter, 2026-06-08 — engagement and speedup measured *together*
 PyTorch **TunableOp** (and `HIPBLASLT_TUNING_FILE`) hook the **PyTorch GEMM dispatch**. But in
 sglang/vllm with aiter, the live GEMM is dispatched **by aiter and bypasses PyTorch dispatch entirely**
 → TunableOp's tuned solutions are never consulted → **0 engagement**, no matter how good the CSV
-([`../backends/rocblas_tunableop/tunableop.md`](../libraries/rocblas_tunableop/tunableop.md),
-[`../backends/rocblas_tunableop/when_wins.md`](../libraries/rocblas_tunableop/when_wins.md)).
+(`../backends/rocblas_tunableop/tunableop.md`,
+`../backends/rocblas_tunableop/when_wins.md`).
 - Smoking gun: `PYTORCH_TUNABLEOP_VERBOSE=1` shows the CSV loaded, yet the tuned `Gemm_*` rows are never
   hit for your live shapes → the aiter-bypass. TunableOp only engages on paths that go through PyTorch.
 - Corollary: the **only** lever that engages the live sglang/vllm GEMM is **aiter's per-shape DB**.

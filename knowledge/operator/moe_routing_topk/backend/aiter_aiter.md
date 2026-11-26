@@ -26,7 +26,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/moe_sorting.py) · **Recent**
 
-Symbols: [`moe_sorting_fwd`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/moe_sorting.py#L12).
+Symbols: `moe_sorting_fwd`.
 
 ## Tests and benchmarks
 

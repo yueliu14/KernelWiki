@@ -26,7 +26,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/mla.py) · **Recent**
 
-Symbols: [`select_2d_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/mla.py#L46), [`select_3d_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/mla.py#L65), [`mla_prefill_fwd`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/mla.py#L129), [`_fits_int32_offsets`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/mla.py#L264), [`mla_decode_fwd`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/mla.py#L275).
+Symbols: `select_2d_config`, `select_3d_config`, `mla_prefill_fwd`, `_fits_int32_offsets`, `mla_decode_fwd`.
 
 Parameters referenced in this file: `BLOCK_M`, `BLOCK_Q`, `BLOCK_SCALES_SIZE`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -36,7 +36,7 @@ Parameters referenced in this file: `BLOCK_M`, `BLOCK_Q`, `BLOCK_SCALES_SIZE`, `
 
 Source documentation: Memory-efficient attention for decoding. It supports page size = 1.
 
-Symbols: [`_decode_grouped_att_m_fwd_rope`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/mla_decode_rope.py#L42), [`_decode_softmax_reducev_fwd`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/mla_decode_rope.py#L114), [`decode_attention_fwd_grouped_rope`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/attention/mla_decode_rope.py#L146).
+Symbols: `_decode_grouped_att_m_fwd_rope`, `_decode_softmax_reducev_fwd`, `decode_attention_fwd_grouped_rope`.
 
 Parameters referenced in this file: `BLOCK_C`, `BLOCK_DV`, `BLOCK_H`, `BLOCK_R`.
 
@@ -46,7 +46,7 @@ Parameters referenced in this file: `BLOCK_C`, `BLOCK_DV`, `BLOCK_H`, `BLOCK_R`.
 
 Source documentation: One-launch FP8 q/k/v prep for MLA prefill attention.
 
-Symbols: [`_check_out`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/fusions/fused_mla_prefill_qkv_fp8.py#L23), [`fused_mla_prefill_qkv_fp8`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/fusions/fused_mla_prefill_qkv_fp8.py#L30).
+Symbols: `_check_out`, `fused_mla_prefill_qkv_fp8`.
 
 Parameters referenced in this file: `BLOCK_T`.
 
@@ -54,7 +54,7 @@ Parameters referenced in this file: `BLOCK_T`.
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gather_kv_b_proj.py) · **Recent**
 
-Symbols: [`gather_kv_b_proj`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gather_kv_b_proj.py#L15).
+Symbols: `gather_kv_b_proj`.
 
 Parameters referenced in this file: `num_stages`.
 
@@ -62,7 +62,7 @@ Parameters referenced in this file: `num_stages`.
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/mla.py) · **Recent**
 
-Symbols: [`fast_exp`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/mla.py#L14), [`cdiv_fn`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/mla.py#L20), [`apply_softcap`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/mla.py#L25), [`_find_seq_idx`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/mla.py#L33), [`_mla_prefill_fwd_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/mla.py#L74), [`_mla_decode_fwd_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/mla.py#L336), [`_mla_decode_fwd_reduce_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/mla.py#L669).
+Symbols: `fast_exp`, `cdiv_fn`, `apply_softcap`, `_find_seq_idx`, `_mla_prefill_fwd_kernel`, `_mla_decode_fwd_kernel`, `_mla_decode_fwd_reduce_kernel`.
 
 Parameters referenced in this file: `BLOCK_M`, `BLOCK_Q`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -72,7 +72,7 @@ Parameters referenced in this file: `BLOCK_M`, `BLOCK_Q`, `num_stages`, `num_war
 
 Source documentation: Memory-efficient attention for decoding. It supports page size = 1.
 
-Symbols: [`_fwd_grouped_kernel_stage1_rope`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py#L58), [`_fwd_kernel_stage2`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py#L341), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/attention/mla_decode_rope.py#L404).
+Symbols: `_fwd_grouped_kernel_stage1_rope`, `_fwd_kernel_stage2`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_C`, `BLOCK_DV`, `BLOCK_H`, `BLOCK_N`, `BLOCK_R`, `BLOCK_ROTARY`.
 
@@ -80,7 +80,7 @@ Parameters referenced in this file: `BLOCK_C`, `BLOCK_DV`, `BLOCK_H`, `BLOCK_N`,
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/fusions/fused_mla_prefill_qkv_fp8.py) · **Recent**
 
-Symbols: [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/fusions/fused_mla_prefill_qkv_fp8.py#L25), [`_fused_mla_prefill_qkv_fp8_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/fusions/fused_mla_prefill_qkv_fp8.py#L31).
+Symbols: `_get_config`, `_fused_mla_prefill_qkv_fp8_kernel`.
 
 Parameters referenced in this file: `BLOCK_T`, `num_warps`.
 
@@ -88,7 +88,7 @@ Parameters referenced in this file: `BLOCK_T`, `num_warps`.
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gather_kv_b_proj.py) · **Recent**
 
-Symbols: [`_next_pow2`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gather_kv_b_proj.py#L8), [`_load_unshuffle_segment`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gather_kv_b_proj.py#L14), [`_triton_gather_kv_b_proj_fp4_impl`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gather_kv_b_proj.py#L68), [`_triton_gather_kv_b_proj_impl`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gather_kv_b_proj.py#L381), [`_triton_gather_kv_b_proj_flat`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gather_kv_b_proj.py#L776), [`_triton_gather_kv_b_proj`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gather_kv_b_proj.py#L1074).
+Symbols: `_next_pow2`, `_load_unshuffle_segment`, `_triton_gather_kv_b_proj_fp4_impl`, `_triton_gather_kv_b_proj_impl`, `_triton_gather_kv_b_proj_flat`, `_triton_gather_kv_b_proj`.
 
 ## Configuration references
 

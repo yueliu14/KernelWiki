@@ -1,6 +1,6 @@
 # sliding_window_attention
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 Window-limited attention and local/global layer combinations.
@@ -17,30 +17,12 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.
 
-<details>
-<summary>Original GEAK metadata</summary>
-
-```yaml
-title: sliding_window_attention — overview
-kind: operator_overview
-operator: sliding_window_attention
-gens: [gfx90a, gfx942, gfx950]
-dtypes: [bf16, fp16, fp8_e4m3_fnuz]
-regimes: [prefill, decode]
-updated: 2026-06-08
-sources:
-  - https://github.com/Dao-AILab/flash-attention
-  - https://blog.vllm.ai/2026/02/27/rocm-attention-backend.html
-  - https://rocm.docs.amd.com/en/latest/how-to/rocm-for-ai/inference-optimization/workload.html
-```
-
-</details>
 
 # sliding_window_attention  (SWA / local attention)
 

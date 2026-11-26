@@ -63,7 +63,7 @@ caching) — **not** an Instinct issue, but a portability caveat.
 - vLLM: `vllm serve <model> --kv-cache-dtype fp8` (dynamic), or load a Quark `*-FP8-KV` checkpoint:
   `LLM(model=..., kv_cache_dtype='fp8', quantization='quark')`. AMD ships pre-quantized
   `amd/...-FP8-KV` models. Quark export adds KV via `--kv_cache_dtype fp8`
-  ([calibration_and_quark.md](calibration_and_quark.md), [deployment_recipes.md](deployment_recipes.md)).
+  (calibration_and_quark.md, deployment_recipes.md).
 - **Perf note (AMD)**: *skipping* KV quant is often faster (no dequant in the hot attention loop);
   quantize KV when you need the **memory/context** headroom, then check the accuracy gate
   ([accuracy_evaluation.md](accuracy_evaluation.md)).

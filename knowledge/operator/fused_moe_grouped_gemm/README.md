@@ -1,6 +1,6 @@
 # fused_moe_grouped_gemm
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 Fused expert execution and compute/communication overlap.
@@ -18,30 +18,12 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.
 
-<details>
-<summary>Original GEAK metadata</summary>
-
-```yaml
-title: fused_moe_grouped_gemm — overview
-kind: operator_overview
-operator: fused_moe_grouped_gemm
-gens: [gfx942, gfx950]
-dtypes: [bf16, fp8_e4m3_fnuz, fp8_e4m3, int8, fp4_e2m1, mxfp4]
-regimes: [prefill, decode]
-updated: 2026-06-08
-sources:
-  - ROCm/aiter@a6bb499375849eec45d68c5ccaebc8865fd422c0:aiter/fused_moe.py
-  - ROCm/aiter@a6bb499375849eec45d68c5ccaebc8865fd422c0:aiter/configs/tuned_fmoe.csv
-  - https://rocm.blogs.amd.com/software-tools-optimization/aiter-ai-tensor-engine/README.html
-```
-
-</details>
 
 # fused_moe_grouped_gemm  (the fused MoE up/gate/down grouped-GEMM mega-kernel)
 

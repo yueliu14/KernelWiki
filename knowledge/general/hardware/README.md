@@ -2,12 +2,12 @@
 
 Cross-operator reference material. Source revisions and evidence remain attached to individual documents.
 
-- [CDNA1 / MI100 (gfx908) — architecture overview](cdna1_mi100/arch.md)
-- [CDNA1 / MI100 (gfx908) — Matrix Core / MFMA (first gen)](cdna1_mi100/matrix_core.md)
-- [CDNA2 / MI250X / MI210 (gfx90a) — architecture overview](cdna2_mi200/arch.md)
-- [CDNA2 / MI250X / MI210 (gfx90a) — Matrix Core / MFMA](cdna2_mi200/matrix_core.md)
-- [CDNA2 / MI250X / MI210 (gfx90a) — memory hierarchy](cdna2_mi200/memory.md)
-- [CDNA2 / MI250X / MI210 (gfx90a) — occupancy math](cdna2_mi200/occupancy.md)
+- CDNA1 / MI100 (gfx908) — architecture overview
+- CDNA1 / MI100 (gfx908) — Matrix Core / MFMA (first gen)
+- CDNA2 / MI250X / MI210 (gfx90a) — architecture overview
+- CDNA2 / MI250X / MI210 (gfx90a) — Matrix Core / MFMA
+- CDNA2 / MI250X / MI210 (gfx90a) — memory hierarchy
+- CDNA2 / MI250X / MI210 (gfx90a) — occupancy math
 - [CDNA3 / MI300X (gfx942) — architecture overview](cdna3_mi300/arch.md)
 - [CDNA3 / MI300X (gfx942) — clocks, power & thermals](cdna3_mi300/clocks_power.md)
 - [CDNA3 / MI300X (gfx942) — ISA notes for kernel authors](cdna3_mi300/isa_notes.md)
@@ -24,11 +24,11 @@ Cross-operator reference material. Source revisions and evidence remain attached
 - [CDNA4 / MI350 (gfx950) — memory hierarchy & LDS](cdna4_mi350/memory.md)
 - [CDNA4 / MI350X / MI355X (gfx950) — peak throughput tables](cdna4_mi350/peak_tables.md)
 - [AMD Instinct (MI-series) Hardware Reference — DETECT THE BOX FIRST](geak_amd_instinct.md)
-- [AMD RDNA4 gfx1201 ISA / R9700 Product Reference — DETECT THE BOX FIRST](geak_amd_rdna4.md)
-- [AMD Ryzen AI / Radeon Client Hardware Reference (RDNA) — DETECT THE BOX FIRST](geak_amd_ryzen.md)
-- [RDNA4 / gfx1201 — architecture overview](rdna4_gfx1201/arch.md)
-- [RDNA4 / gfx1201 — occupancy](rdna4_gfx1201/occupancy.md)
-- [RDNA4 / gfx1201 — pitfalls](rdna4_gfx1201/pitfalls.md)
+- AMD RDNA4 gfx1201 ISA / R9700 Product Reference — DETECT THE BOX FIRST
+- AMD Ryzen AI / Radeon Client Hardware Reference (RDNA) — DETECT THE BOX FIRST
+- RDNA4 / gfx1201 — architecture overview
+- RDNA4 / gfx1201 — occupancy
+- RDNA4 / gfx1201 — pitfalls
 - [Datatype numerics across CDNA](shared/dtype_numerics.md)
 - [HBM, Infinity Fabric & Infinity Cache](shared/hbm_infinity_fabric.md)
 - [L2 / XCD locality, tile swizzle & coalescing](shared/l2_xcd_swizzle.md)

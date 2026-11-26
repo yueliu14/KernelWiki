@@ -26,7 +26,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/fusions/fused_qk_norm_rope_group_quant.py) · **Recent**
 
-Symbols: [`get_fused_qk_norm_rope_group_quant_layouts`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/fusions/fused_qk_norm_rope_group_quant.py#L26), [`norm_quant_rope`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/fusions/fused_qk_norm_rope_group_quant.py#L58), [`store_rows`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/fusions/fused_qk_norm_rope_group_quant.py#L86), [`fused_qk_norm_rope_group_quant_gfx1250`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_gluon_kernels/gfx1250/fusions/fused_qk_norm_rope_group_quant.py#L135).
+Symbols: `get_fused_qk_norm_rope_group_quant_layouts`, `norm_quant_rope`, `store_rows`, `fused_qk_norm_rope_group_quant_gfx1250`.
 
 Parameters referenced in this file: `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `num_warps`.
 

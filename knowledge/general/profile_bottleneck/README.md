@@ -38,8 +38,8 @@ with locked clocks and a known engagement proof, is not evidence.** See engageme
 
 ## Cross-refs
 - Tuning that these tools verify: [`../operators/dense_gemm/tuning.md`](../../operator/dense_gemm/tuning.md),
-  [`../backends/aiter/tuned_gemm.md`](../libraries/aiter/tuned_gemm.md),
-  [`../backends/rocblas_tunableop/tunableop.md`](../libraries/rocblas_tunableop/tunableop.md).
+  `../backends/aiter/tuned_gemm.md`,
+  `../backends/rocblas_tunableop/tunableop.md`.
 - Hardware peaks/clocks these tools sit on top of:
   [`../hardware/cdna3_mi300/peak_tables.md`](../hardware/cdna3_mi300/peak_tables.md),
   [`../hardware/cdna4_mi350/peak_tables.md`](../hardware/cdna4_mi350/peak_tables.md),

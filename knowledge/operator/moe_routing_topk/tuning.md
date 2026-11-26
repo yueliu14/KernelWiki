@@ -18,7 +18,7 @@ sources:
 is a closed, unmerged proposal for plain `topk_sigmoid`. Its reported average 1.66x
 does not measure `biased_grouped_topk` and does not establish a shipped gfx9 dispatch.
 The imported material below conflates these implementations; do not transfer that
-performance or support claim to grouped routing. See the [reviewed report](corpus/decisions.md#moe-sigmoid-dpp-selection)
+performance or support claim to grouped routing. See the reviewed report
 for its comparison conditions, inconsistent extrema and confidence.
 
 ## What you actually tune

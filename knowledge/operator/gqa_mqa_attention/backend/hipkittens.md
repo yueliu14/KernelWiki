@@ -88,7 +88,7 @@ AMDGCN dump: confirm pinned tiles feed AGPRs to MFMA (no spurious v_accvgpr_read
 ## Sources
 - HipKittens — arXiv 2511.08083 (Hazy Research, Nov 2025): https://arxiv.org/abs/2511.08083 ; HTML (Table 1) https://arxiv.org/html/2511.08083v1
 - HazyResearch blog: https://hazyresearch.stanford.edu/blog/2025-11-09-hk ; code https://github.com/HazyResearch/HipKittens
-- AMD SOTA landscape §2 attention (GQA bwd 1.8×/2.3×; AITER GQA bwd 30%; MHA bwd seq8192 AITER 1169 > HK 1091): [landscape/amd_sota_2026](../../../general/landscape/amd_sota_2026.md)
+- AMD SOTA landscape §2 attention (GQA bwd 1.8×/2.3×; AITER GQA bwd 30%; MHA bwd seq8192 AITER 1169 > HK 1091): landscape/amd_sota_2026
 
 ## Migration provenance
 

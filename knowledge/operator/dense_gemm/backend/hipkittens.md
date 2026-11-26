@@ -87,7 +87,7 @@ wave-specialization fails on CDNA).
 - HipKittens: Fast and Furious AMD Kernels — arXiv 2511.08083 (Hazy Research, Nov 2025): https://arxiv.org/abs/2511.08083 ; HTML (Tables 2, 4) https://arxiv.org/html/2511.08083v1
 - HazyResearch blog "AMD GPUs go brrr": https://hazyresearch.stanford.edu/blog/2025-11-09-hk
 - Code: https://github.com/HazyResearch/HipKittens
-- AMD SOTA landscape §1 GEMM (HK 1610 BF16; TK-B200 1538 / CUTLASS-B200 1570; XCD +3–19%): [landscape/amd_sota_2026](../../../general/landscape/amd_sota_2026.md)
+- AMD SOTA landscape §1 GEMM (HK 1610 BF16; TK-B200 1538 / CUTLASS-B200 1570; XCD +3–19%): landscape/amd_sota_2026
 
 ## Migration provenance
 

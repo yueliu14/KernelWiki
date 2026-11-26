@@ -1,6 +1,6 @@
 # dense_gemm
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 Dense attention and FFN projections; prefill versus decode tiling.
@@ -29,7 +29,7 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 ### Historical case studies
 
@@ -39,24 +39,6 @@ Each page pins its source revision. Source references describe implementations a
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.
 
-<details>
-<summary>Original GEAK metadata</summary>
-
-```yaml
-title: dense_gemm — overview
-kind: operator_overview
-operator: dense_gemm
-gens: [gfx908, gfx90a, gfx942, gfx950]
-dtypes: [bf16, fp16, fp8_e4m3_fnuz, fp8_e4m3, mxfp4]
-regimes: [prefill, decode]
-updated: 2026-06-08
-sources:
-  - https://rocm.docs.amd.com/en/latest/how-to/rocm-for-ai/inference-optimization/workload.html
-  - https://rocm.blogs.amd.com/software-tools-optimization/matrix-cores-cdna/README.html
-  - ROCm/aiter@HEAD:aiter/tuned_gemm.py
-```
-
-</details>
 
 # dense_gemm  (`C = A · Bᵀ [+ bias] [+ act]`)
 

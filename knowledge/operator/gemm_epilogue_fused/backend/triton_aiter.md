@@ -28,7 +28,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: Full feed-forward block with gating (e.g swiglu). x: torch.Tensor (M, K) w_up: torch.Tensor (N, K) w_down: torch.Tensor (N, K) intermediate: torch.Tensor (M, N) y: torch.Tensor (M, K) activation: One of ("silu", "relu", "gelu", "gelu_tanh", "silu_exp2", None)
 
-Symbols: [`ff_a16w16_nogate`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/feed_forward/ff_a16w16.py#L10), [`ff_a16w16_gated`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/feed_forward/ff_a16w16.py#L60).
+Symbols: `ff_a16w16_nogate`, `ff_a16w16_gated`.
 
 ### `aiter/ops/triton/gemm/feed_forward/ff_a16w16_fused_gated.py`
 
@@ -36,7 +36,7 @@ Symbols: [`ff_a16w16_nogate`](https://github.com/ROCm/aiter/blob/e9995854abbd935
 
 Source documentation: Computes a full feed-forward operation with a gated activation (e.g FF with SwiGLU) Uses the first half of the output (along the N dim) as a gate for the second half. Key parameters: - X: Matrix X with shape (M, K). - w_up: Up-projection W with shape (N, K). - w_down: Down-projection W with shape (N//2, K). - dtype: Optional parameter to specify bf16 or fp16 datatype. Default is bf16 - Y: Output Matrix Y with shape (M, K).
 
-Symbols: [`ff_a16w16_fused_gated`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/feed_forward/ff_a16w16_fused_gated.py#L19).
+Symbols: `ff_a16w16_fused_gated`.
 
 Parameters referenced in this file: `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -46,7 +46,7 @@ Parameters referenced in this file: `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`
 
 Source documentation: Computes a full feed-forward operation with activation (e.g FF with Relu) Key parameters: - X: Matrix X with shape (M, K). - w_up: Up-projection W with shape (N, K). - w_down: Down-projection W with shape (N, K). - dtype: Optional parameter to specify bf16 or fp16 datatype. Default is bf16 - Y: Output Matrix Y with shape (M, K). If this is none, then it's created by this API and returned as output. - activation: Optional activation function to apply.
 
-Symbols: [`ff_a16w16_fused_ungated`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/feed_forward/ff_a16w16_fused_ungated.py#L19).
+Symbols: `ff_a16w16_fused_ungated`.
 
 Parameters referenced in this file: `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -56,7 +56,7 @@ Parameters referenced in this file: `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`
 
 Source documentation: Computes 16-bit matmul Y = X @ W^T and also emits an MXFP8-quantized X. This fuses the GEMM with the activation per-1x32 MXFP8 quantization that immediately follows the router-gate GEMM in MoE flows (e.g. DSv4), avoiding a separate kernel/DRAM pass to cast X from BF16 to FP8 + e8m0 scales.
 
-Symbols: [`fused_gemm_a16w16_quant_x`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_a16w16_quant_x.py#L22).
+Symbols: `fused_gemm_a16w16_quant_x`.
 
 Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -66,7 +66,7 @@ Parameters referenced in this file: `BLOCK_K`, `BLOCK_M`, `BLOCK_N`, `BLOCK_SIZE
 
 Source documentation: Computes the 8 bit matmul Y = X x WT + B using the block-scale quantization approach for x_fp8 and w_fp8. Computes the 16 bit matmul Y = X x WT + B for x_bf16 and w_bf16 This fusion is primarily aiming for fusing the gate up-projections and MOE gating: gate up-projections: (M, K) x (2N, K) = (M, 2N) MOE gating: (M, K) x (N, K) + (N, ) = (M, N) Key parameters: - x_fp8: Matrix X with shape (M, K). - w_fp8: Matrix W with shape (N_fp8, K).
 
-Symbols: [`fused_gemm_a8w8_blockscale_a16w16`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py#L17).
+Symbols: `fused_gemm_a8w8_blockscale_a16w16`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -76,7 +76,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 Source documentation: Computes matrix multiplication Y = X @ W^T with FP8 activations and FP8 weights. if fuse_type == 0: the final output = a * Y + b elif fuse_type == 1 the final output = a * b + Y Args: x (torch.Tensor): FP8 input matrix with shape (M, K). w (torch.Tensor): FP8 weight matrix with shape (N, K), internally transposed. x_scale (torch.Tensor): Block-wise scale for x with shape (M, scale_k). scale_k = ceil(K / scale_block_size_k).
 
-Symbols: [`set_use_gemm_splitk_bf16`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py#L20), [`get_splitk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py#L25), [`fused_gemm_a8w8_blockscale_mul_add`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py#L62).
+Symbols: `set_use_gemm_splitk_bf16`, `get_splitk`, `fused_gemm_a8w8_blockscale_mul_add`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_K_STEP`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `split_k`.
 
@@ -86,7 +86,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_K_STEP`, `BLOCK_
 
 Source documentation: Computes the 8 bit matmul C = X @ W^T using the block-scale quantization approach. Then split the product C into C1 and C2 with sizes S1 and S2 at the last dimension respectively. Finally concatenate Y to C1 at the last dimension. Equivalent to the following sequence: c = (x @ w).view(-1, y.shape(1), S1 + S2) c1, c2 = c.split([S1, S2], dim=-1) c1 = c1.cat(y, dim=-1) return c1, c2 Key parameters: - x: Matrix X with shape (M, K). - w: Matrix W with shape (N, K).
 
-Symbols: [`fused_gemm_a8w8_blockscale_split_cat`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py#L18), [`fused_gemm_a8w8_blockscale_preshuffle_split_cat`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py#L211).
+Symbols: `fused_gemm_a8w8_blockscale_split_cat`, `fused_gemm_a8w8_blockscale_preshuffle_split_cat`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `BLOCK_SIZE_S3`, `NUM_KSPLIT`, `split_k`.
 
@@ -96,7 +96,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 Source documentation: Computes the 8 bit matmul Y = X x WT + B using the block-scale quantization approach for x_fp4 and w_fp4. Computes the 16 bit matmul Y = X x WT + B for x_bf16 and w_bf16 This fusion is primarily aiming for fusing the gate up-projections and MOE gating: gate up-projections: (M, K) x (2N, K) = (M, 2N) MOE gating: (M, K) x (N, K) + (N, ) = (M, N) Key parameters: - x_fp4: Matrix X with shape (M, K). - w_fp4: Matrix W with shape (N_fp4, K).
 
-Symbols: [`fused_gemm_afp4wfp4_a16w16`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_afp4wfp4_a16w16.py#L24).
+Symbols: `fused_gemm_afp4wfp4_a16w16`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -106,7 +106,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 Source documentation: Computes matrix multiplication Y = X @ W^T with FP4 activations and FP4 weights. if fuse_type == 0: the final output = a * Y + b elif fuse_type == 1 the final output = a * b + Y Args: x (torch.Tensor): FP4 E2M1 input matrix with shape (M, K). w (torch.Tensor): FP4 E2M1 weight matrix with shape (N, K), internally transposed. x_scales (torch.Tensor): E8M0 per-group scale for x with shape (M, K//32). One scale per 32 elements in K dimension.
 
-Symbols: [`set_use_gemm_splitk_bf16`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_afp4wfp4_mul_add.py#L25), [`get_splitk`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_afp4wfp4_mul_add.py#L30), [`fused_gemm_afp4wfp4_mul_add`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_afp4wfp4_mul_add.py#L67), [`fused_gemm_afp4wfp4_preshuffle_add_mul`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_afp4wfp4_mul_add.py#L252).
+Symbols: `set_use_gemm_splitk_bf16`, `get_splitk`, `fused_gemm_afp4wfp4_mul_add`, `fused_gemm_afp4wfp4_preshuffle_add_mul`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_K_STEP`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -116,7 +116,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_K_STEP`, `BLOCK_
 
 Source documentation: Computes the 4 bit matmul C = X @ W^T using the block-scale quantization approach. Then split the product C into C1 and C2 with sizes S1 and S2 at the last dimension respectively. Finally concatenate Y to C1 at the last dimension. Equivalent to the following sequence: c = (x @ w).view(-1, y.shape(1), S1 + S2) c1, c2 = c.split([S1, S2], dim=-1) c1 = c1.cat(y, dim=-1) return c1, c2 Key parameters: - x: Matrix X with shape (M, K // 2). - w: Matrix W with shape (N, K // 2).
 
-Symbols: [`fused_gemm_afp4wfp4_split_cat`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_afp4wfp4_split_cat.py#L19), [`fused_gemm_afp4wfp4_preshuffle_split_cat`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/gemm/fused/fused_gemm_afp4wfp4_split_cat.py#L204).
+Symbols: `fused_gemm_afp4wfp4_split_cat`, `fused_gemm_afp4wfp4_preshuffle_split_cat`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `BLOCK_SIZE_S3`, `NUM_KSPLIT`, `split_k`.
 
@@ -124,7 +124,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py) · **Recent**
 
-Symbols: [`_ff_a16w16_fused_gated`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py#L37), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_gated.py#L213).
+Symbols: `_ff_a16w16_fused_gated`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_M`, `BLOCK_N`, `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`.
 
@@ -132,7 +132,7 @@ Parameters referenced in this file: `BLOCK_M`, `BLOCK_N`, `BLOCK_SIZE_K`, `BLOCK
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_ungated.py) · **Recent**
 
-Symbols: [`_ff_a16w16_fused_ungated`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_ungated.py#L37), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/feed_forward/ff_a16w16_fused_ungated.py#L179).
+Symbols: `_ff_a16w16_fused_ungated`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`.
 
@@ -140,7 +140,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a16w16_quant_x.py) · **Recent**
 
-Symbols: [`_fused_gemm_a16w16_quant_x_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a16w16_quant_x.py#L51), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a16w16_quant_x.py#L253).
+Symbols: `_fused_gemm_a16w16_quant_x_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -148,7 +148,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py) · **Recent**
 
-Symbols: [`_fused_gemm_a8w8_blockscale_a16w16_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py#L42), [`_fused_gemm_a8w8_blockscale_a16w16_reduce_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py#L290), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_a16w16.py#L408).
+Symbols: `_fused_gemm_a8w8_blockscale_a16w16_kernel`, `_fused_gemm_a8w8_blockscale_a16w16_reduce_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`.
 
@@ -156,7 +156,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py) · **Recent**
 
-Symbols: [`_fused_gemm_a8w8_blockscale_mul_add_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py#L37), [`_fused_gemm_a8w8_blockscale_mul_add_reduce_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py#L256), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_mul_add.py#L340).
+Symbols: `_fused_gemm_a8w8_blockscale_mul_add_kernel`, `_fused_gemm_a8w8_blockscale_mul_add_reduce_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `matrix_instr_nonkdim`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -164,7 +164,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py) · **Recent**
 
-Symbols: [`_fused_gemm_a8w8_blockscale_split_cat`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py#L38), [`_fused_gemm_a8w8_blockscale_preshuffle_split_cat`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py#L288), [`_fused_gemm_a8w8_blockscale_split_cat_reduce`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py#L546), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_a8w8_blockscale_split_cat.py#L666).
+Symbols: `_fused_gemm_a8w8_blockscale_split_cat`, `_fused_gemm_a8w8_blockscale_preshuffle_split_cat`, `_fused_gemm_a8w8_blockscale_split_cat_reduce`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `BLOCK_SIZE_S3`, `NUM_KSPLIT`.
 
@@ -172,7 +172,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py) · **Recent**
 
-Symbols: [`_fused_gemm_afp4wfp4_a16w16_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py#L43), [`_fused_gemm_afp4wfp4_preshuffle_a16w16_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py#L343), [`_fused_gemm_afp4wfp4_a16w16_reduce_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py#L701), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_a16w16.py#L819).
+Symbols: `_fused_gemm_afp4wfp4_a16w16_kernel`, `_fused_gemm_afp4wfp4_preshuffle_a16w16_kernel`, `_fused_gemm_afp4wfp4_a16w16_reduce_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `matrix_instr_nonkdim`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -180,7 +180,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py) · **Recent**
 
-Symbols: [`_fused_gemm_afp4wfp4_mul_add_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py#L40), [`_fused_gemm_afp4wfp4_preshuffle_mul_add_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py#L261), [`_fused_gemm_afp4wfp4_mul_add_reduce_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py#L530), [`_get_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_mul_add.py#L611).
+Symbols: `_fused_gemm_afp4wfp4_mul_add_kernel`, `_fused_gemm_afp4wfp4_preshuffle_mul_add_kernel`, `_fused_gemm_afp4wfp4_mul_add_reduce_kernel`, `_get_config`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `NUM_KSPLIT`, `matrix_instr_nonkdim`, `num_stages`, `num_warps`, `waves_per_eu`.
 
@@ -188,7 +188,7 @@ Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_
 
 [Source](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py) · **Recent**
 
-Symbols: [`_fused_gemm_afp4wfp4_split_cat`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py#L36), [`_fused_gemm_afp4wfp4_preshuffle_split_cat`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py#L296), [`_fused_gemm_afp4wfp4_split_cat_reduce`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/triton/_triton_kernels/gemm/fused/fused_gemm_afp4wfp4_split_cat.py#L597).
+Symbols: `_fused_gemm_afp4wfp4_split_cat`, `_fused_gemm_afp4wfp4_preshuffle_split_cat`, `_fused_gemm_afp4wfp4_split_cat_reduce`.
 
 Parameters referenced in this file: `BLOCK_SIZE_K`, `BLOCK_SIZE_M`, `BLOCK_SIZE_N`, `BLOCK_SIZE_S3`, `NUM_KSPLIT`.
 

@@ -62,7 +62,7 @@ This is the [`../../operators/rmsnorm/`](https://github.com/yueliu14/KernelWiki/
 - **It's a task-accuracy decision, not byte parity** — gate on a small eval (gsm8k), not on
   bit-exactness. fp8 dynamic quant changes the numbers.
 - This is the same fp8-accuracy caution that **rejected `--quantization fp8` on Qwen3.5-27B** —
-  see [`../by_model/llama_fp8_serving.md`](../../../general/case_studies/by_model/llama_fp8_serving.md).
+  see `../by_model/llama_fp8_serving.md`.
 
 ## Final result (numbers, vendor-reported)
 | metric | value | source / label |
@@ -88,7 +88,7 @@ and the QK-norm+RoPE+quant variant (`fused_qk_rmsnorm_group_quant`,
 - Operator: [`../../operators/fused_norm_quant/overview.md`](https://github.com/yueliu14/KernelWiki/blob/45cd3f5b51d16322db8dc301fa783148d323d27b/knowledge/operator/fused_norm_quant/README.md) · numerics: [`../../operators/fused_norm_quant/numerics.md`](https://github.com/yueliu14/KernelWiki/blob/45cd3f5b51d16322db8dc301fa783148d323d27b/knowledge/operator/fused_norm_quant/numerics.md) · aiter card: [`../../operators/fused_norm_quant/backends/aiter.md`](https://github.com/yueliu14/KernelWiki/blob/45cd3f5b51d16322db8dc301fa783148d323d27b/knowledge/operator/fused_norm_quant/backend/aiter.md)
 - Seam: [`../../operators/rmsnorm/`](https://github.com/yueliu14/KernelWiki/blob/45cd3f5b51d16322db8dc301fa783148d323d27b/knowledge/operator/rmsnorm/README.md) · [`../../operators/quant_dequant_fp8/`](https://github.com/yueliu14/KernelWiki/blob/45cd3f5b51d16322db8dc301fa783148d323d27b/knowledge/operator/quant_dequant_fp8/README.md) · [`../../operators/fused_add_rmsnorm/`](https://github.com/yueliu14/KernelWiki/blob/45cd3f5b51d16322db8dc301fa783148d323d27b/knowledge/operator/fused_add_rmsnorm/README.md)
 - Fusion strategy: [`../../optimization/kernel_fusion_strategy.md`](../../../general/optimization/kernel_fusion_strategy.md)
-- fp8 serving recipe: [`../by_model/llama_fp8_serving.md`](../../../general/case_studies/by_model/llama_fp8_serving.md) · quant: [`../../quantization/`](../../../general/quantization/README.md)
+- fp8 serving recipe: `../by_model/llama_fp8_serving.md` · quant: [`../../quantization/`](../../../general/quantization/README.md)
 - The GEMM that consumes the output: [`gemm_aiter_db_tuning.md`](../../dense_gemm/case_studies/gemm_aiter_db_tuning.md) · [`../../operators/scaled_quant_gemm/`](../README.md)
 
 ## Sources

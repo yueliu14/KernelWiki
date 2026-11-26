@@ -16,7 +16,7 @@ only the Python pass list omits them. Two ways to reach them, and the first edit
 ```python
 import gluon_swp                        # scripts/gluon_swp.py -- wraps gluon_to_ttgir
 with gluon_swp.pipelined(2, buffer_ops=True):
-    out = my_kernel[grid](...)          # compile INSIDE the block; Triton caches
+    out = my_kernelgrid          # compile INSIDE the block; Triton caches
 ```
 
 `gluon_swp.py` runs the passes as a second pass manager over the module the stock

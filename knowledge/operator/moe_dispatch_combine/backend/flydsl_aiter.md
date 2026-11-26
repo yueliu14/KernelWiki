@@ -28,7 +28,7 @@ The source links below are pinned to AITER `e9995854abbd`. **Recent** means the 
 
 Source documentation: FlyDSL intranode dispatch/combine kernels for EP MoE.
 
-Symbols: [`_wave_uniform_i64`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_kernel.py#L52), [`_pack_f32x4_to_fp8`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_kernel.py#L59), [`make_dispatch_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_kernel.py#L70), [`make_combine_kernel`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_kernel.py#L420), [`make_dispatch_jit`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_kernel.py#L1176), [`make_combine_jit`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_kernel.py#L1311).
+Symbols: `_wave_uniform_i64`, `_pack_f32x4_to_fp8`, `make_dispatch_kernel`, `make_combine_kernel`, `make_dispatch_jit`, `make_combine_jit`.
 
 ### `aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py`
 
@@ -36,7 +36,7 @@ Symbols: [`_wave_uniform_i64`](https://github.com/ROCm/aiter/blob/e9995854abbd93
 
 Source documentation: Resolved tuned CSV path (kernel_type / ep_size kept for API compat).
 
-Symbols: [`_device_cu_count`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L60), [`_check_block_num_resident`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L65), [`_resolve_launch_geometry`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L78), [`dtype_to_tuning_name`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L126), [`_detect_gpu_model`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L133), [`resolve_tuning_config_path`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L143), [`build_geometry_tuning_table_for_config`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L154), [`_dtype_elem_size`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L204), [`_is_fp4_dtype`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L209), [`_token_bytes_for`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L213), [`_token_view_dim_for`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L221), [`FlyDSLDispatchCombineConfig`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L227), [`build_p2p_table`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L360), [`FlyDSLDispatchGroupMajorOp`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L368), [`FlyDSLDispatchCombineIntraNodeOp`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/flydsl_dispatch_combine_intranode_op.py#L564).
+Symbols: `_device_cu_count`, `_check_block_num_resident`, `_resolve_launch_geometry`, `dtype_to_tuning_name`, `_detect_gpu_model`, `resolve_tuning_config_path`, `build_geometry_tuning_table_for_config`, `_dtype_elem_size`, `_is_fp4_dtype`, `_token_bytes_for`, `_token_view_dim_for`, `FlyDSLDispatchCombineConfig`, `build_p2p_table`, `FlyDSLDispatchGroupMajorOp`, `FlyDSLDispatchCombineIntraNodeOp`.
 
 ### `aiter/ops/flydsl/kernels/moe_g2l_lut.py`
 
@@ -44,7 +44,7 @@ Symbols: [`_device_cu_count`](https://github.com/ROCm/aiter/blob/e9995854abbd935
 
 Source documentation: EP global->local expert LUT build (FlyDSL), single-block parallel scan. Collapses the host ne + cumsum + sub + where chain (6 elementwise/scan launches) into one kernel: read the (E_global,) 0/1 expert_mask, scan first within each wave and then across wave totals, and write g2l_lut[i] = mask[i] ? prefix_incl[i]-1 : E (sentinel E = dropped route).
 
-Symbols: [`build_moe_g2l_lut_module`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_g2l_lut.py#L38).
+Symbols: `build_moe_g2l_lut_module`.
 
 ### `aiter/ops/flydsl/kernels/moe_gather_reduce.py`
 
@@ -52,7 +52,7 @@ Symbols: [`build_moe_g2l_lut_module`](https://github.com/ROCm/aiter/blob/e999585
 
 Source documentation: One-pass MoE gather-reduce (weighted) epilogue kernel (FlyDSL). Background ---------- After the per-expert stage2 GEMM, MoE output lives in a grouped layout grouped_out (E, max_m, model_dim): expert e holds its routed tokens in rows [0, counts[e]).
 
-Symbols: [`_GatherRouteLds`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_gather_reduce.py#L69), [`_lds_li32`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_gather_reduce.py#L74), [`_lds_si32`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_gather_reduce.py#L78), [`_unpack_pair_to_f32`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_gather_reduce.py#L82), [`_pack_pair_from_f32`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_gather_reduce.py#L93), [`build_moe_gather_reduce_module`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_gather_reduce.py#L100).
+Symbols: `_GatherRouteLds`, `_lds_li32`, `_lds_si32`, `_unpack_pair_to_f32`, `_pack_pair_from_f32`, `build_moe_gather_reduce_module`.
 
 Parameters referenced in this file: `BLOCK_THREADS`, `split_k`.
 
@@ -62,7 +62,7 @@ Parameters referenced in this file: `BLOCK_THREADS`, `split_k`.
 
 Source documentation: Routing reductions with cached JIT launchers.
 
-Symbols: [`sorted_sum`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_gemm_2stage/gfx9_fp8/moe_reduce.py#L19), [`invert_sorted_ids`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_gemm_2stage/gfx9_fp8/moe_reduce.py#L101).
+Symbols: `sorted_sum`, `invert_sorted_ids`.
 
 ### `aiter/ops/flydsl/kernels/moe_reduce.py`
 
@@ -70,7 +70,7 @@ Symbols: [`sorted_sum`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b
 
 Source documentation: MoE topk-reduction kernel (FlyDSL, layout API). Y[t, d] = sum_k X[t, k, d], optionally gated by the EP validity mask (valid[t,k] = expert_mask[topk_ids[t,k]] != 0). Epilogue of stage2 mode="reduce", shared by every dtype's reduce path. Build a per-shape launcher with compile_moe_reduction (cached); the kernel's compile-time params are Constexpr so flyc specializes per shape/dtype.
 
-Symbols: [`_moe_reduction_body`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_reduce.py#L34), [`_pick_reduce_block`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_reduce.py#L194), [`compile_moe_reduction`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_reduce.py#L203).
+Symbols: `_moe_reduction_body`, `_pick_reduce_block`, `compile_moe_reduction`.
 
 ### `aiter/ops/flydsl/kernels/moe_scatter_copy_preshuffle_scale.py`
 
@@ -78,7 +78,7 @@ Symbols: [`_moe_reduction_body`](https://github.com/ROCm/aiter/blob/e9995854abbd
 
 Source documentation: Fused MoE route-gather + e8m0-scale preshuffle kernel (FlyDSL). Background ---------- The grouped a8w4 stage1 path needs the per-token MXFP8 e8m0 scale both *route-gathered* into the grouped per-expert layout and *preshuffled* into the WMMA layout the masked grouped GEMM consumes. Previously this was two passes: 1. scatter-copy a1_scale_token_u8[tok] -> a1_scale_raw[e, m] (row-major) 2.
 
-Symbols: [`_emit_preshuffle_dword`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_scatter_copy_preshuffle_scale.py#L74), [`build_moe_scatter_copy_preshuffle_scale_module`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_scatter_copy_preshuffle_scale.py#L95).
+Symbols: `_emit_preshuffle_dword`, `build_moe_scatter_copy_preshuffle_scale_module`.
 
 Parameters referenced in this file: `BLOCK_THREADS`, `tile_k`.
 
@@ -88,7 +88,7 @@ Parameters referenced in this file: `BLOCK_THREADS`, `tile_k`.
 
 Source documentation: One-pass MoE route-gather (scatter-copy) kernel (FlyDSL). Background ---------- Before the stage1 GEMM, each token's quantized payload (and per-token scale) must be copied from the flat per-token layout into the grouped per-expert layout the masked grouped kernel consumes:: for e in range(E): toks = tokens routed to expert e # n = counts[e] of them grouped[e, :n] = a_payload[toks] # copy each token's row This kernel does that copy in one pass.
 
-Symbols: [`build_moe_scatter_copy_token_module`](https://github.com/ROCm/aiter/blob/e9995854abbd935f0190b19abebe9938b6b90cca/aiter/ops/flydsl/kernels/moe_scatter_copy_token.py#L51).
+Symbols: `build_moe_scatter_copy_token_module`.
 
 Parameters referenced in this file: `BLOCK_THREADS`.
 

@@ -111,7 +111,7 @@ DeepSeek-V3: E=256, inter 2048, hidden 7168, fp8 per-1x128.
 
 ## Alternatives / cross-links
 [fused_moe_grouped_gemm](../README.md) · [aiter.md](aiter.md) (driver) · [hip.md](hip.md) (stage-1 asm) ·
-[triton.md](triton.md) (fallback) · [`backends/composable_kernel_lib/api.md`](../../../general/libraries/composable_kernel_lib/api.md) ·
+[triton.md](triton.md) (fallback) · `backends/composable_kernel_lib/api.md` ·
 [`languages/composable_kernel/ck_tile.md`](../../../general/backend/composable_kernel/ck_tile.md) ·
 [overview.md](../README.md) · [numerics.md](../numerics.md).
 

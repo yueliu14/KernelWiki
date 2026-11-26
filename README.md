@@ -1,125 +1,65 @@
-# KernelWiki
+# KernelWiki — kernel-level edition
 
-An **operator- and workload-level GPU kernel knowledge base for LLM inference**, focused on **GEMM, MoE, attention and attention indexers**, including their variants and fusions. It documents backend implementations, multi-operator dataflow, scheduling, dispatch, memory, communication and performance evidence to help developers and GEAK write, select and improve kernels and execution paths.
+A **kernel-level GPU kernel knowledge base for LLM inference on AMD Instinct**: how GEMM, MoE, attention and
+attention-indexer kernels and their fusions are implemented, tuned, measured and validated.
 
-## Content
+This branch (`agent/kernel-level-lean`) is derived from `main` for agents that optimize a single kernel. It keeps the
+kernel-level knowledge and drops everything above the kernel; see [What changed](#what-changed-from-main).
 
-| Content | Start here | Purpose |
-| --- | --- | --- |
-| Written knowledge | [Operators](knowledge/operator/README.md) · [Workloads](knowledge/workload/README.md) · [General](knowledge/general/README.md) | Implementations, multi-operator execution contracts and optimization, source entry points, applicability and evidence |
-| Structured corpus | [Operator catalog](knowledge/operator/catalog.yaml) · [Corpus guide](knowledge/operator/CORPUS.md) · [General decisions](knowledge/general/corpus/decisions.md) | Source observations, conditioned decisions, experience summaries and upstream configuration seeds |
-| Corpus maintenance | [Tools](tools/corpus/README.md) · [AITER refresh skill](tools/corpus/skills/aiter-corpus-refresh/SKILL.md) | Extract pinned source evidence, update decisions, validate references and generate reading pages |
+**Agents: start at [AGENTS.md](AGENTS.md).** It routes from "what my kernel computes", "which language" and "what
+limits it" to a handful of pages.
+
+## Layout
 
 ```text
+AGENTS.md                         # router: operator × language × bottleneck -> pages
 knowledge/
-  operator/
-    README.md
-    catalog.yaml
-    CORPUS.md                   # generated navigation
-    <operator>/
-      README.md
-      backend/<backend>_aiter.md
-      backend/<backend>_notes.md
-      corpus/
-        scope.yaml
-        source_evidence.yaml
-        decisions.yaml
-        performance_axes.yaml
-        source_evidence.md      # generated
-        decisions.md            # generated
-        tuned_configs.yaml      # where upstream seeds are available
-        seeds.md                # generated where applicable
-  workload/
-    README.md
-    fusion_patterns.md
-    _templates/workload_case.md
-    _templates/fusion_case.md
-    _sources/<source_set>.md
-    _sources/<source_set>.yaml
-    <semantic_chain>/
-      README.md
-      dataflow.md
-      scheduling.md
-      dispatch.md
-      measurement.md
-      cases/<case>.md
+  operator/<op>/                  # 23 operators: GEMM, MoE, attention, indexer and their fusions
+    README.md                     # overview, regimes, TL;DR
+    cards.md                      # decision cards (rendered from corpus/decisions.yaml)
+    tuning.md numerics.md fusion.md
+    backend/<lang>.md             # GEAK implementation notes (dated)
+    backend/<lang>_aiter.md       # pinned AITER source walkthroughs (reference)
+    corpus/*.yaml                 # machine-readable source of cards.md (edited on main)
   general/
-    corpus/
-      decisions.yaml
-      performance_axes.yaml
-      decisions.md             # generated
-    profile_bottleneck/
-    optimization/
-    backend/
-    hardware/
-    quantization/
-    ...
-tools/corpus/
-  extract.py
-  seeds.py
-  validate.py
-  build.py
-  skills/aiter-corpus-refresh/
-tests/corpus/
+    cards.md                      # cross-operator method cards
+    backend/<lang>/               # authoring guides: triton_amd, gluon, flydsl, hip_cpp, composable_kernel, asm_mfma, tilelang, ...
+    hardware/                     # cdna4_mi350 (gfx950), cdna3_mi300 (gfx942), shared CDNA facts
+    optimization/                 # methods by bottleneck
+    profile_bottleneck/           # profiling, timing protocol, engagement checks
+    quantization/                 # formats, scaling, kernel-level accuracy gates
+    expert_recipes/               # authoring skills and per-language tuning recipes
+    case_studies/by_kernel/
+    workflows/                    # optimize_single_kernel, choosing_a_backend, roofline skill
+tools/agent/                      # prune.sh, build_cards.py, slim.py, lint.py
 ```
 
-## Getting started
+## What changed from main
 
-- [Dense GEMM](knowledge/operator/dense_gemm/README.md) · [Quantized GEMM](knowledge/operator/scaled_quant_gemm/README.md) · [Grouped GEMM / MoE](knowledge/operator/grouped_gemm_moe/README.md)
-- [MLA](knowledge/operator/mla_attention/README.md) · [Paged decode attention](knowledge/operator/attention_decode_paged/README.md) · [Attention indexer](knowledge/operator/attention_indexer/README.md)
-- [GEMM fusions](knowledge/operator/gemm_epilogue_fused/README.md) · [Fused MoE](knowledge/operator/fused_moe_grouped_gemm/README.md) · [Q/K preparation fusions](knowledge/operator/qk_norm_rope_cache/README.md)
-- [Workload semantic chains](knowledge/workload/README.md) · [MoE dataflow example](knowledge/workload/moe_expert_pipeline/cases/muse_spark_decode_dataflow.md) · [Fusion patterns](knowledge/workload/fusion_patterns.md) · [QKV preparation chain](knowledge/workload/qkv_projection_norm_rope_cache/README.md)
-- [Bottleneck analysis](knowledge/general/profile_bottleneck/README.md) · [Optimization methods](knowledge/general/optimization/README.md) · [Writing knowledge and recording evidence](knowledge/README.md)
+| Change | Why |
+| --- | --- |
+| Removed `top_model/` (model CI histories, 25 MB of data and kernel snapshots), `workload/`, `_sources/`, `general/{landscape,reference,libraries}`, model case studies, serving/integration workflows and tuning recipes, model-level quantization deployment, pre-CDNA3 and client GPUs | Not kernel-level knowledge |
+| Generated `corpus/decisions.md`, `source_evidence.md`, `seeds.md`, `CORPUS.md` replaced by one compact `cards.md` per operator | Same cards without source-id lists, review boilerplate and HTML escapes; sorted so reported outcomes and constraints come first; each card states the languages it applies to |
+| Backend source walkthroughs keep symbol names but drop the per-symbol pinned URLs | Those link lists were ~40% of the pages' bytes; the file-level source link still pins the revision |
+| Imported GEAK metadata blocks removed from operator READMEs; links to removed material reduced to text | No dead ends |
+| Added `AGENTS.md` router | One entry page that routes by operator, language and bottleneck instead of a tree to explore |
+| Corpus maintenance tools and tests stay on `main` | They need the full tree (PR records, generated pages); edit `corpus/*.yaml` there |
 
-## Operator scope and evidence
-
-For source-grounded implementation decisions, start with the [GEMM](knowledge/operator/dense_gemm/corpus/decisions.md),
-[attention](knowledge/operator/attention_prefill_fmha/corpus/decisions.md), [MoE](knowledge/operator/grouped_gemm_moe/corpus/decisions.md) or
-[indexer](knowledge/operator/attention_indexer/corpus/decisions.md) corpus. All **23 operators** own a local
-`corpus/` with source evidence, development cards, extraction scope and performance axes.
-The collection contains **107 canonical cards (including 8 general-method cards), 4,481 source observations and 359 upstream
-configuration/selection groups**. Cross-operator knowledge uses shared references to a single owner;
-the catalog under `knowledge/operator/` provides navigation and snapshot metadata. See the [maintenance guide](tools/corpus/README.md).
-
-The corpus preserves the AITER `a6bb49937584` GEMM evidence and adds source from `b3ad6c461703`
-across GEMM, attention, MoE and indexers. References include a snapshot prefix and stable content ID;
-source links use the full commit. Each operator records its coverage limits and pinned upstream
-correctness-test sources. Cards distinguish source precedents from reported experience; historical
-reports have not been reproduced for this corpus. Complete run histories and raw artifacts remain private.
-
-- **23 operator directories**, grouped by GEMM, MoE, attention and indexer workloads, with **92 AITER backend/provider reference pages**, **13 implementation-note pages**; reusable conclusions and reported experience are maintained in corpus decisions.
-- Standalone small operators, spatial convolutions, training losses, recommendation attention and general solvers are excluded from the operator collection. Quantization, activation, cache layout, normalization and communication are documented where they affect a main kernel or fusion. MoE routing/dispatch and Q/K preparation fusions remain part of those workloads.
-- AITER references primarily use [`e9995854abbd`](https://github.com/ROCm/aiter/tree/e9995854abbd935f0190b19abebe9938b6b90cca), with a recent-source window of 2026-07-21 through 2026-10-21. Additional native-pipeline and workload-variant reviews, including [Split-K](knowledge/operator/splitk_streamk_gemm/backend/opus_aiter.md), [shared experts](knowledge/operator/shared_expert_fusion/backend/flydsl_aiter.md) and [FP4 GEMM](knowledge/operator/scaled_quant_gemm/backend/asm_notes.md), use [`b3ad6c461703`](https://github.com/ROCm/aiter/tree/b3ad6c461703110dc36286265c16e453ef0e2dd2). Explicit gradient-only implementations and tests are excluded from current operator reference pages.
-- Historical explanations and the summaries distilled into corpus come from GEAK [`02bfbb0b7274`](https://github.com/AMD-AGI/GEAK/tree/02bfbb0b72746941be3ab3ad48fb21a284ae2fde). General methods remain under `knowledge/general/`; citations to excluded operators can point to pinned archived documents.
-
-AITER is the main source of implementation knowledge. This is a curated workload collection, not a claim to cover every AITER kernel. Documents include pinned links to source, configuration and tests. Choosing the best implementation requires a specific GPU, dtype, shape/layout and comparable measurements. Source coverage adds no GPU benchmark results and does not certify historical SOTA labels as current winners.
-
-## Reading and searching
-
-Browse the operator, workload and general indexes, or search the Markdown and YAML files directly.
-Agents can use the catalog to locate an operator's corpus, read its decisions and follow the cited
-evidence to pinned upstream source. For example, from the repository root:
+Re-derive after `main` changes:
 
 ```bash
-rg -n -i 'split.?k' knowledge/operator/dense_gemm knowledge/operator/splitk_streamk_gemm
-rg -n 'source_evidence:' knowledge/operator/dense_gemm/corpus/decisions.yaml
+git merge main                       # or check out main's files
+bash tools/agent/prune.sh            # remove non-kernel-level material and generated corpus pages
+python3 tools/agent/build_cards.py   # cards.md from corpus/decisions.yaml
+python3 tools/agent/slim.py          # symbol-link slimming, README cleanup, dead-link removal
+python3 tools/agent/lint.py          # links resolve, cards fresh, router size, no HTML escapes
 ```
 
-Use the [AITER corpus refresh skill](tools/corpus/skills/aiter-corpus-refresh/SKILL.md) to review
-upstream changes and maintain the corpus. Keep run histories and raw artifacts in your private store.
+## Evidence
 
-## Development checks
+Nothing here is a measured winner for a particular kernel. Cards separate `reported` upstream outcomes (not
+reproduced here) from `source-only` observations of shipped code; pages pin their source revision and date. Keep
+independently measured results, upstream-reported results and source-only observations distinct when adding
+knowledge, and name hardware, software revision, shapes, dtypes and timing protocol with every measured result.
 
-Maintenance tools require Python 3.10+ and Git. Install their dependencies in a virtual environment:
-
-```bash
-python3 -m venv .venv
-. .venv/bin/activate
-python3 -m pip install -r requirements-dev.txt
-python3 -m pytest -q
-python3 tools/corpus/build.py --check
-```
-
-## Attribution and licenses
-
-Imported GEAK content retains its attribution and Apache-2.0 license. AITER excerpts retain upstream notices, including MIT and per-file Apache-2.0 notices. See [LICENSE](LICENSE.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
+See [LICENSE.md](LICENSE.md) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

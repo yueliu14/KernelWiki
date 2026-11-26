@@ -1,6 +1,6 @@
 # moe_dispatch_combine
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 Expert-parallel dispatch, gather, reduction and combine.
@@ -19,30 +19,12 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 ## GEAK reference material
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.
 
-<details>
-<summary>Original GEAK metadata</summary>
-
-```yaml
-title: moe_dispatch_combine — overview
-kind: operator_overview
-operator: moe_dispatch_combine
-gens: [gfx942, gfx950]
-dtypes: [bf16, fp8_e4m3_fnuz, fp8_e4m3, fp4_e2m1]
-regimes: [prefill, decode]
-updated: 2026-06-08
-sources:
-  - https://github.com/ROCm/mori/blob/main/docs/MORI-EP-GUIDE.md
-  - https://gau-nernst.github.io/amd-a2a/
-  - https://rocm.blogs.amd.com/software-tools-optimization/wide-ep-deepseek/README.html
-```
-
-</details>
 
 # moe_dispatch_combine  (token permute/scatter to experts + un-permute/combine)
 
@@ -87,7 +69,7 @@ quality here is worth ~300×.
 | hip | 🟢 sota (the kernels: P2P symmetric-memory dispatch/combine; vLLM/sglang permute) | [backends/hip.md](backend/hip.md) |
 | triton | 🟡 (local permute/scatter; GPU-initiated comms via Iris experimental) | [backends/triton.md](backend/triton.md) |
 
-(DeepEP / UCCL-EP are the **portable** EP backends — see [`backends/mori_rccl/deepep.md`](../../general/libraries/mori_rccl/deepep.md).)
+(DeepEP / UCCL-EP are the **portable** EP backends — see `backends/mori_rccl/deepep.md`.)
 
 ## Fusion neighbors
 - **prob-mult → combine** (routing weight multiplied during gather).

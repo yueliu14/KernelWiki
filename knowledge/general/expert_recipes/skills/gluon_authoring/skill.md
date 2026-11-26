@@ -628,7 +628,7 @@ python3 "$SKILL/scripts/gluon_swp.py" --selftest # offline; skips cleanly with n
 ```python
 import gluon_swp
 with gluon_swp.pipelined(2, buffer_ops=True):    # compile INSIDE the block -- Triton caches
-    out = my_anchor[grid](...)
+    out = my_anchorgrid
 ```
 
 It produces **byte-identical TTGIR to the on-disk splice on all four versions**, armed and unarmed, so

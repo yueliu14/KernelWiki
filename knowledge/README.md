@@ -1,44 +1,28 @@
 # Kernel knowledge
 
-- [Operators](operator/README.md): GEMM, MoE, attention and indexer implementations, variants, fusions and lessons for LLM inference.
-- [Workloads](workload/README.md): semantic subgraphs spanning multiple operators, with data contracts, scheduling, dispatch, memory/state, communication, fusion and whole-subgraph evidence.
-- [Workload fusion decisions](workload/CORPUS.md): model cases and reusable decisions for staged, persistent, megakernel and monokernel execution, with explicit source scope and effect confidence.
-- [General knowledge](general/README.md): profiling, optimization, backend programming, hardware and reusable recipes.
-- [DeepSeek-V4.1-Flash model history](top_model/deepseek_v41_flash/README.md): MI355X/vLLM image history, full configuration matrix, and 110 kernel/fusion pair records.
-- [Muse Spark model history](top_model/muse_spark/README.md): image-deduplicated MI355X/SGLang performance, CI provenance, and per-pair kernel/fusion evolution.
-- [Operator corpus](operator/CORPUS.md): structured development cards, pinned source evidence and configuration records.
+Agents: start at [AGENTS.md](../AGENTS.md).
+
+- [Operators](operator/README.md): GEMM, MoE, attention and indexer kernels, their variants and fusions. Each operator
+  has an overview, decision cards (`cards.md`), short tuning/numerics/fusion notes and per-language backend pages.
+- [General knowledge](general/README.md): kernel authoring by language, hardware, optimization methods, profiling and
+  measurement, quantization formats and reusable recipes.
 
 ## Reading a backend page
 
-`<backend>_aiter.md` describes the pinned AITER source snapshot with entry points, dispatch/shape contracts, configuration references and related tests. Some pages explain a workload variant of a shared implementation; others list source files and symbols. Symbol lists include support functions; they are not counts of independently launchable kernels. Native `.cuh` pipelines belong with their wrappers, instance traits and launch plans. ASM code objects are grouped by family, and may include compiled DSL output.
-
-`<backend>_notes.md` explains selected implementation decisions in detail. `<backend>.md` preserves older GEAK material, including dated measurements and upstream reports. Read the source date before applying a historical recommendation.
+`<backend>_aiter.md` describes the pinned AITER source snapshot: entry points, dispatch and shape contracts,
+configuration references and related tests. `<backend>_notes.md` explains selected implementation decisions in detail.
+`<backend>.md` preserves older GEAK material, including dated measurements and upstream reports; read the source date
+before applying a historical recommendation.
 
 ## Performance evidence
 
-Keep independently measured results, upstream-reported results and source-only observations distinct. A source change or a tuned configuration does not itself establish a speedup. Every new performance result should name hardware, software/source revisions, workload, layouts/dtypes, timing protocol, baseline, correctness check and evidence location. Rank implementations only for compatible cases.
-
-Corpus decisions expose their upstream PR review status and can cite scoped
-[PR effect reports](../tools/corpus/upstream-evidence.md), including explicit unknown
-fields and separate association, effect and attribution confidence. Reviewed public
-excerpts live in `_sources/aiter/pull_requests/`; these are shared provenance records,
-not another operator collection or a table of measured winners.
+Keep independently measured results, upstream-reported results and source-only observations distinct. A source
+change or a tuned configuration does not itself establish a speedup. Every new performance result should name
+hardware, software/source revisions, shapes, layouts/dtypes, timing protocol and correctness gate.
 
 ## Contributing knowledge
 
-Keep new operator entries within GEMM, MoE, attention or attention indexers and their variants/fusions. Document small supporting operations with the main workload: packing and quantization with GEMM, routing and dispatch with MoE, cache writes and positional encoding with attention, and causal state mixing with gated-delta attention. Do not add separate collections for generic small operators, vision convolutions or training-only kernels.
-
-Put operator-specific implementation knowledge under `operator/<op>/backend/`; put transferable run-derived lessons under that operator's `corpus/decisions.yaml`. Organize multi-operator execution subgraphs under `workload/<semantic_chain>/`, with a model-independent contract and links to the participating operators. Record dataflow, scheduling, dispatch, memory/state, communication, measurement and fusion topics there as needed. Store model/stack-specific cases under that chain's `cases/`, with model, phase and topics in case metadata; shared source context belongs in `workload/_sources/`. Use the [workload case template](workload/_templates/workload_case.md) and, for fusion cases, its [fusion supplement](workload/_templates/fusion_case.md). A joint benchmark or adjacent launches alone do not establish fusion, and an execution-contract case need not claim any fusion or speedup. Put methods that apply across operators under `general/`; workload topic pages connect those methods to concrete subgraphs. Add a local navigation link and cite the relevant source or measurement. AITER implementation links should include a commit.
-
-Put structured evidence and development cards under `operator/<op>/corpus/`; follow the
-[corpus maintenance guide](../tools/corpus/README.md). Cite reusable implementations through pinned
-upstream source links. Include the exact source revision or digest with measured
-results; historical patch references retain their original context. All repository documentation
-and comments use English.
-
-The AITER references prioritize inference-relevant files changed from 2026-07-21 through 2026-10-21. Backend pages can link shared source files or test suites containing both forward and backward code; the documented target is inference, with gradients and dropout disabled. Older GEAK evidence retains its original context. There is no scheduled update process or automatic best-kernel promotion.
-
-Reusable skills and tuning workflows remain in `general/` even when they focus on GEMM or attention.
-Place a specific operator's measured outcome or implementation constraint under that operator.
-Use the [content boundaries](general/README.md#content-boundaries) to distinguish a reusable procedure
-from a case-specific result; avoid duplicate overviews and copies of evidence.
+Keep entries at kernel level: implementation, tuning, numerics, measurement and validation of GEMM, MoE, attention
+and indexer kernels and their fusions. Operator-specific knowledge goes under `operator/<op>/` (cards are edited in
+`corpus/decisions.yaml` on `main`, then rendered here with `python3 tools/agent/build_cards.py`), transferable methods
+under `general/`. Model histories, serving and workload material belong on `main`. All documentation uses English.

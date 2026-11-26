@@ -1,6 +1,6 @@
 # linear_attention_gated_delta
 
-[Corpus decisions](corpus/decisions.md) · [Source evidence](corpus/source_evidence.md) · [Extraction scope](corpus/scope.yaml)
+[Decision cards](cards.md)
 
 
 Recurrent and chunked gated-delta attention, including its causal-conv front end.
@@ -25,7 +25,7 @@ Each page pins its source revision. Source references describe implementations a
 
 ## Development decisions
 
-[Corpus decisions](corpus/decisions.md) — source-grounded constraints and scoped experience summaries.
+[Decision cards](cards.md) — source-grounded constraints and scoped experience summaries.
 
 ### Historical case studies
 
@@ -35,26 +35,6 @@ Each page pins its source revision. Source references describe implementations a
 
 The material below is imported from GEAK. Its backend status and performance statements belong to the original source dates. Use the pinned AITER references where available to check current applicability.
 
-<details>
-<summary>Original GEAK metadata</summary>
-
-```yaml
-title: linear_attention_gated_delta — overview
-kind: operator_overview
-operator: linear_attention_gated_delta
-gens: [gfx942, gfx950]
-dtypes: [bf16, fp16]
-regimes: [prefill, decode]
-updated: 2026-06-08
-sources:
-  - https://github.com/fla-org/flash-linear-attention
-  - https://github.com/NVlabs/GatedDeltaNet
-  - https://arxiv.org/abs/2412.06464
-  - https://www.amd.com/en/developer/resources/technical-articles/2026/day-0-support-for-qwen-3-5-on-amd-instinct-gpus.html
-  - ROCm/aiter@a6bb499375849eec45d68c5ccaebc8865fd422c0
-```
-
-</details>
 
 # linear_attention_gated_delta  (Gated DeltaNet / chunked linear-attention scan)
 

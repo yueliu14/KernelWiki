@@ -19,7 +19,7 @@ Do not probe availability with `from triton import gluon`.
 Gluon keeps Triton's host launcher model:
 
 - `@gluon.jit`;
-- `kernel[grid](...)`;
+- `kernelgrid`;
 - `gl.program_id`;
 - `gl.constexpr`;
 - launch attributes such as `num_warps` and `num_ctas`.
